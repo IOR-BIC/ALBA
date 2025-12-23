@@ -94,8 +94,7 @@ albaPipeGraph::~albaPipeGraph()
   m_RenFront->RemoveActor2D(m_PlotActor);
   m_RenFront->RemoveActor2D(m_PlotTimeLineActor);
   m_RenFront->SetBackground(m_OldColour);
-  m_AlwaysVisibleRenderer->SetBackground(m_OldColour);
-
+  
   for(int i=0;i<m_VtkData.size();i++)
   {
     vtkDEL(m_VtkData[i]);
@@ -268,7 +267,6 @@ void albaPipeGraph::Create(albaSceneNode *n)
 
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);  
-  m_AlwaysVisibleRenderer->SetBackground(1,1,1);
 }
 
 //----------------------------------------------------------------------------

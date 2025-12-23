@@ -20,6 +20,10 @@
 #include "vtkALBASimpleRulerActor2DTest.h"
 
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 #include "vtkALBASmartPointer.h"
 #include "vtkActor.h"
 #include "vtkCamera.h"
@@ -29,25 +33,15 @@
 void vtkALBASimpleRulerActor2DTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
+  InitializeRenderWindow();
 	vtkCamera *camera = m_Renderer->GetActiveCamera();
 	camera->ParallelProjectionOn();
 	camera->Modified();
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
 }
 //----------------------------------------------------------------------------
 void vtkALBASimpleRulerActor2DTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 
 //------------------------------------------------------------------------------
@@ -57,9 +51,10 @@ void vtkALBASimpleRulerActor2DTest::RenderData(vtkActor2D *actor, char* testName
   renderWindowInteractor->SetRenderWindow(m_RenderWindow);
 
 	m_Renderer->AddActor2D(actor);
+	
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
-	COMPARE_IMAGES(testName);
+  COMPARE_IMAGES(testName);
 }
 //------------------------------------------------------------------------------
 void vtkALBASimpleRulerActor2DTest::TestDynamicAllocation()

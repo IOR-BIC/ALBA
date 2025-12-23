@@ -46,6 +46,9 @@
 #include "vtkActor2DCollection.h"
 #include "vtkActor2D.h"
 #include "vtkLookupTable.h"
+#include "vtkViewport.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 enum PIPE_POINT_CLOUD_ACTORS
   {
@@ -74,24 +77,11 @@ void albaPipePointCloudTest::TestFixture()
 //----------------------------------------------------------------------------
 void albaPipePointCloudTest::BeforeTest()
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipePointCloudTest::AfterTest()
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipePointCloudTest::TestPipeExecution()
@@ -220,7 +210,8 @@ void albaPipePointCloudTest::TestPipeExecution()
     pointCloudActor = (vtkActor *) SelectActorToControl(actorList, PIPE_POINT_CLOUD_ACTOR);
     CPPUNIT_ASSERT(pointCloudActor != NULL);
 
-    m_RenderWindow->Render();
+		m_Renderer->ResetCamera();
+		m_RenderWindow->Render();
 	  printf("\n Visualization: %s \n", strings[i]);
 
 		COMPARE_IMAGES("TestPipeExecution", i);
@@ -363,6 +354,7 @@ void albaPipePointCloudTest::TestScalarActorPos()
 		pointCloudActor = (vtkActor *)SelectActorToControl(actorList, PIPE_POINT_CLOUD_ACTOR);
 		CPPUNIT_ASSERT(pointCloudActor != NULL);
 
+		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
 		printf("\n ScalarPos: %s \n", strings[i]);
 

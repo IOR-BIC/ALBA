@@ -46,6 +46,8 @@
 
 #include <ctime>
 #include <time.h>
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 static int index = 0;
 
@@ -53,24 +55,12 @@ static int index = 0;
 void vtkALBACollisionDetectionFilterTest::BeforeTest()
 //-------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-	vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(600, 0);
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //-------------------------------------------------------------------------
 void vtkALBACollisionDetectionFilterTest::AfterTest()
 //-------------------------------------------------------------------------
 {
-	m_Renderer->RemoveAllViewProps();
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
-	vtkDEL(m_RenderWindowInteractor);
 }
 
 //-------------------------------------------------------------------------
@@ -159,6 +149,7 @@ void vtkALBACollisionDetectionFilterTest::Test()
   int steps = 50;
   for (int t = 0; t < steps; t++) 
   {
+		m_Renderer->ResetCamera();
     m_Renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
     m_RenderWindow->Render();
 		COMPARE_IMAGES("Test", index);
@@ -171,7 +162,6 @@ void vtkALBACollisionDetectionFilterTest::Visualize( vtkActor *actor )
 //-------------------------------------------------------------------------
 {
   m_Renderer->AddActor(actor);
-  m_RenderWindow->Render();
 }
 //-------------------------------------------------------------------------
 void vtkALBACollisionDetectionFilterTest::AddPolydataToVisualize(vtkPolyData *data, vtkProperty *property /* = NULL */)
@@ -234,6 +224,7 @@ void vtkALBACollisionDetectionFilterTest::TestChangingMatrix()
   int steps = 50;
   for (int t = 0; t < steps; t++) 
   {
+		m_Renderer->ResetCamera();
     m_Renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
     m_RenderWindow->Render();
 		COMPARE_IMAGES("TestChangingMatrix", index);
@@ -260,6 +251,7 @@ void vtkALBACollisionDetectionFilterTest::TestChangingMatrix()
 
     for (int t = 0; t < steps; t++) 
     {
+			m_Renderer->ResetCamera();
       m_Renderer->GetActiveCamera()->Azimuth(-(180.0/steps));
       m_RenderWindow->Render();
 			COMPARE_IMAGES("TestChangingMatrix", index);

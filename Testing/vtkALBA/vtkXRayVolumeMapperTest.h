@@ -70,8 +70,6 @@ protected:
 		ID_TEST_ENABLE_AUTOLOAD,
 	};
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);
 };

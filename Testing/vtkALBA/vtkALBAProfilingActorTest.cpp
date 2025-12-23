@@ -27,6 +27,11 @@
 #include "vtkPointData.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
+
 class vtkALBAProfilingActorDummy : public vtkALBAProfilingActor
 {
   public:
@@ -55,25 +60,12 @@ class vtkALBAProfilingActorDummy : public vtkALBAProfilingActor
 void vtkALBAProfilingActorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
-	vtkCamera *camera = m_Renderer->GetActiveCamera();
-	camera->ParallelProjectionOn();
-	camera->Modified();
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void vtkALBAProfilingActorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 
 //------------------------------------------------------------
@@ -90,8 +82,8 @@ void vtkALBAProfilingActorTest::TestRenderOverlay()
   vtkALBAProfilingActorDummy *profActor = vtkALBAProfilingActorDummy::New();
   
 	m_Renderer->AddActor(profActor);
-  m_RenderWindow->Render();
 
+	m_Renderer->ResetCamera();
   CPPUNIT_ASSERT(profActor->RenderOverlay((vtkViewport*)m_Renderer) == 1);
 	m_RenderWindow->Render();
   profActor->FPSUpdate(m_Renderer);
@@ -107,8 +99,8 @@ void vtkALBAProfilingActorTest::TestRenderOpaqueGeometry()
   vtkALBAProfilingActorDummy *profActor = vtkALBAProfilingActorDummy::New();
 
   m_Renderer->AddActor(profActor);
-	m_RenderWindow->Render();
 
+	m_Renderer->ResetCamera();
   CPPUNIT_ASSERT(profActor->RenderOpaqueGeometry((vtkViewport*)m_Renderer) == 0);
 	m_RenderWindow->Render();
   profActor->FPSUpdate(m_Renderer);
@@ -125,8 +117,9 @@ void vtkALBAProfilingActorTest::TestRenderTranslucentGeometry()
 
   m_Renderer->AddActor(profActor);
 
-  CPPUNIT_ASSERT(profActor->RenderTranslucentGeometry((vtkViewport*)m_Renderer) == 0); //This method only returns 0
 
+	m_Renderer->ResetCamera();
+  CPPUNIT_ASSERT(profActor->RenderTranslucentGeometry((vtkViewport*)m_Renderer) == 0); //This method only returns 0
   m_RenderWindow->Render();
 	COMPARE_IMAGES("TestRenderTranslucentGeometry");
 

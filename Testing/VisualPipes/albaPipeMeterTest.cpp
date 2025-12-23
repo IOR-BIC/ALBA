@@ -67,24 +67,12 @@ void albaPipeMeterTest::TestFixture()
 void albaPipeMeterTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(600, 600);
-	m_RenderWindow->SetPosition(0, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeMeterTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeMeterTest::TestPipeExecution()
@@ -140,18 +128,15 @@ void albaPipeMeterTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
-    break;
   }
 
   vtkActor *vectorActor;
   vectorActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(vectorActor != NULL);
 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-
   COMPARE_IMAGES("TestPipeExecution", 0);
 
   vtkDEL(actorList);

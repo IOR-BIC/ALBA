@@ -17,10 +17,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkALBARGtoSPImageFilterTest.h"
 #include "vtkALBARGtoSPImageFilter.h"
 
-#include "albaDefines.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridReader.h"
 #include "vtkDataArray.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 void vtkALBARGtoSPImageFilterTest::BeforeTest()

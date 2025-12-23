@@ -65,12 +65,6 @@ class albaGizmoBoundingBoxTest : public albaTest
 
     albaVMESurface *m_GizmoInputSurface;
     albaVMERoot *m_Root;
-
-    // TODO: REFACTOR THIS 
-    // move somewhere else... there should be a common class for testing facilities
-    void RenderData(vtkDataSet *data);
-
-    void CreateRenderStuff();
 };
 
 #endif

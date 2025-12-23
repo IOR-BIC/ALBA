@@ -46,6 +46,7 @@
 #include <fstream>
 #include "vtkActor.h"
 #include "vtkMapper.h"
+#include "vtkDataSet.h"
 
 enum PIPE_MESH_ACTORS
   {
@@ -62,24 +63,11 @@ void albaPipeMeshSliceTest::TestFixture()
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::BeforeTest()
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshSliceTest::AfterTest()
 {
-  vtkDEL(m_RenderWindowInteractor);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_Renderer);
 }
 
 enum ID_TEST
@@ -149,8 +137,6 @@ void albaPipeMeshSliceTest::TestPipeExecution()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 	
@@ -204,6 +190,7 @@ void albaPipeMeshSliceTest::TestPipeExecution()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
+    m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 
 		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());		
@@ -277,8 +264,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -331,6 +316,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
+    m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 
 		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
@@ -405,8 +391,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -459,6 +443,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
+    m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 
 		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
@@ -533,8 +518,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -586,6 +569,8 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
+
+    m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
 
 		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
@@ -666,8 +651,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -720,6 +703,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
 
+    m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 
     albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
@@ -797,8 +781,6 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -852,6 +834,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
     CPPUNIT_ASSERT(meshActor != NULL);
     CPPUNIT_ASSERT(meshActor->GetPickable() == false);
 
+    m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 
     albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());

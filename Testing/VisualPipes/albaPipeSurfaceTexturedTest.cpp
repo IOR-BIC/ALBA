@@ -40,6 +40,9 @@
 #include "vtkDoubleArray.h"
 
 // render window stuff
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCubeSource.h"
 #include "vtkCylinderSource.h"
@@ -74,33 +77,17 @@ void albaPipeSurfaceTexturedTest::TestFixture()
 void albaPipeSurfaceTexturedTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTexturedTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTexturedTest::TestPipeTextureExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
+	InitializeRenderWindow();
 	
   ////// Create VME (import vtkData) ////////////////////
 	vtkJPEGReader *ImporterImage;
@@ -151,8 +138,6 @@ void albaPipeSurfaceTexturedTest::TestPipeTextureExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 	
@@ -193,8 +178,9 @@ void albaPipeSurfaceTexturedTest::TestPipeTextureExecution()
     surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_SURFACE_ACTOR);
     CPPUNIT_ASSERT(surfaceActor != NULL);
 
+		m_Renderer->ResetCamera();
     m_RenderWindow->Render();
-	  printf("\n Visualizzazione: %s \n", strings[i]);
+	  printf("\n Visualization: %s \n", strings[i]);
 
 		COMPARE_IMAGES("TestPipeTextureExecution", i);
   }
@@ -213,17 +199,7 @@ void albaPipeSurfaceTexturedTest::TestPipeTextureExecution()
 void albaPipeSurfaceTexturedTest::TestPipeClassicExecution()
 //----------------------------------------------------------------------------
 {
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400,0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
+	InitializeRenderWindow();
 	
 	////// Create VME (import vtkData) ////////////////////
 	vtkDataSetReader *Importer;
@@ -264,8 +240,6 @@ void albaPipeSurfaceTexturedTest::TestPipeClassicExecution()
 	while(actor)
 	{   
 		m_Renderer->AddActor(actor);
-		m_RenderWindow->Render();
-
 		actor = actorList->GetNextProp();
 	}
 
@@ -290,9 +264,9 @@ void albaPipeSurfaceTexturedTest::TestPipeClassicExecution()
 		surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_SURFACE_ACTOR);
 		CPPUNIT_ASSERT(surfaceActor != NULL);
 
+		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
-		printf("\n Visualizzazione: %s \n", strings[i-SCALAR_TEST]);
-
+		printf("\n Visualization: %s \n", strings[i-SCALAR_TEST]);
 		COMPARE_IMAGES("TestPipeClassicExecution", i);
 
 		if(i == SCALAR_TEST)

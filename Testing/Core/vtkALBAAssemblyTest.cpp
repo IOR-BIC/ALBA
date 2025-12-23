@@ -38,6 +38,10 @@
 #include "vtkAssemblyNode.h"
 #include "vtkCubeSource.h"
 
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 #include <vtkOpenGLHelper.h>
 
 //force moudule init to avoid a crash on shallowcopy
@@ -200,13 +204,10 @@ void vtkALBAAssemblyTest::GetVolumesTest()
 void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 //----------------------------------------------------------------------------
 {
-  vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
-
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-
-
-  PrepareToRender(m_Renderer,m_RenderWindow);
+  InitializeRenderWindow();
+	vtkCamera *camera = m_Renderer->GetActiveCamera();
+	camera->ParallelProjectionOn();
+	camera->Modified();
 
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
 
@@ -259,6 +260,7 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 	m_Renderer->AddActor(assembly);
 	assembly->GetBounds();
 
+	m_Renderer->ResetCamera();
   CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)m_Renderer) == 1);
   m_RenderWindow->Render();
 
@@ -282,12 +284,10 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
 void vtkALBAAssemblyTest::RenderTranslucentPolygonalGeometryTest()
 //----------------------------------------------------------------------------
 {
-  vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
-
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-
-  PrepareToRender(m_Renderer,m_RenderWindow);
+	InitializeRenderWindow();
+	vtkCamera *camera = m_Renderer->GetActiveCamera();
+	camera->ParallelProjectionOn();
+	camera->Modified();
 
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
   
@@ -340,7 +340,8 @@ void vtkALBAAssemblyTest::RenderTranslucentPolygonalGeometryTest()
   m_Renderer->AddActor(assembly);
 	assembly->GetBounds();
 
-  CPPUNIT_ASSERT(assembly->RenderTranslucentPolygonalGeometry((vtkViewport*)m_Renderer) == 1);
+	m_Renderer->ResetCamera();
+	CPPUNIT_ASSERT(assembly->RenderTranslucentPolygonalGeometry((vtkViewport*)m_Renderer) == 1);
   m_RenderWindow->Render();
 
 	COMPARE_IMAGES("RenderTranslucentGeometry");
@@ -600,18 +601,4 @@ void vtkALBAAssemblyTest::ShallowCopyTest()
   vtkDEL(actor2);
   vtkDEL(assembly1);
   vtkDEL(assembly2);
-}
-//------------------------------------------------------------
-void vtkALBAAssemblyTest::PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *render_window)
-//------------------------------------------------------------
-{
-  renderer->SetBackground(0.0, 0.0, 0.0);
-
-  vtkCamera *camera = renderer->GetActiveCamera();
-  camera->ParallelProjectionOn();
-  camera->Modified();
-
-  render_window->AddRenderer(renderer);
-  render_window->SetSize(640, 480);
-  render_window->SetPosition(100,0);
 }

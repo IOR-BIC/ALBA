@@ -60,16 +60,12 @@
 
 void albaGizmoRotateCircleTest::BeforeTest()
 {
-  CreateRenderStuff();
+  InitializeRenderWindow();
 	CreateTestData();
 }
 
 void albaGizmoRotateCircleTest::AfterTest()
 {
-  m_Renderer->Delete();
-  m_RenderWindow->Delete();
-  m_RenderWindowInteractor->Delete();
-
   albaDEL(m_GizmoInputSurface);
   albaDEL(m_Root); 
 }
@@ -122,9 +118,6 @@ void albaGizmoRotateCircleTest::TestConstructor()
   gizmoRotateCircle->SetAxis(albaInteractorConstraint::Z);
   RenderGizmo(gizmoRotateCircle);
   
-  // remove this comment to enable render window interaction
-  // m_RenderWindowInteractor->Start();
-
   cppDEL(gizmoRotateCircle);
 
 }
@@ -235,40 +228,6 @@ void albaGizmoRotateCircleTest::TestSetGetAbsPose()
 void albaGizmoRotateCircleTest::TestFixture()
 {
 	
-}
-
-void albaGizmoRotateCircleTest::RenderData( vtkDataSet *data )
-{
-  vtkDataSetMapper *mapper = vtkDataSetMapper::New();
-  mapper->ScalarVisibilityOn();
-  mapper->SetInputData(data);
-
-  vtkActor *actor = vtkActor::New();
-  actor->SetMapper(mapper);
-
-  m_Renderer->AddActor(actor);
-  
-  m_RenderWindow->Render();
-  
-  mapper->Delete();
-  actor->Delete();
-
-} 
-  
-
-void albaGizmoRotateCircleTest::CreateRenderStuff()
-{
-  m_Renderer = vtkRenderer::New();
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New() ;
-  
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 
 void albaGizmoRotateCircleTest::RenderGizmo( albaGizmoRotateCircle * gizmoRotateCircle )

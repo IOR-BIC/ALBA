@@ -37,6 +37,7 @@
 #include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
 #include "albaSmartPointer.h"
+#include "vtkDataSet.h"
 
 void albaOpVOIDensityTest::Test()
 {

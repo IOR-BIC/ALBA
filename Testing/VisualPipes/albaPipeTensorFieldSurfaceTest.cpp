@@ -40,6 +40,9 @@
 
 #include <iostream>
 #include <fstream>
+#include "vtkImageData.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 
 
 //----------------------------------------------------------------------------
@@ -51,20 +54,11 @@ void albaPipeTensorFieldSurfaceTest::TestFixture()
 void albaPipeTensorFieldSurfaceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-	vtkNEW(m_RenderWindowInteractor);
-
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
 }
 //----------------------------------------------------------------------------
 void albaPipeTensorFieldSurfaceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
-	vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -75,16 +69,7 @@ void albaPipeTensorFieldSurfaceTest::TestCreate()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  ///////////////// render stuff /////////////////////////
-
-  vtkRenderer *frontRenderer;
-  vtkNEW(frontRenderer);
-  frontRenderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(frontRenderer);
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  //////////////////////////////////////////////////////////////////////////
+  InitializeRenderWindow();
 
   albaVMEVolumeGray *volume;
   albaNEW(volume);
@@ -120,20 +105,19 @@ void albaPipeTensorFieldSurfaceTest::TestCreate()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *rootscenenode = new albaSceneNode(NULL, NULL, storage->GetRoot(), NULL, NULL);
-  albaSceneNode *sceneNode = new albaSceneNode(NULL,rootscenenode,volume, frontRenderer);
+  albaSceneNode *sceneNode = new albaSceneNode(NULL,rootscenenode,volume, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   albaPipeTensorFieldSurface *pipe = new albaPipeTensorFieldSurface;
   pipe->Create(sceneNode);
 	
-  m_RenderWindow->Render();
-
-	COMPARE_IMAGES("TestCreate");
+  
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
+  COMPARE_IMAGES("TestCreate");
 
   delete sceneNode;
   delete(rootscenenode);
-
-  vtkDEL(frontRenderer);
 	
   volume->ReparentTo(NULL);
   albaDEL(volume);

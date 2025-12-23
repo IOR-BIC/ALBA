@@ -61,16 +61,12 @@
 
 void albaGizmoRotateFanTest::BeforeTest()
 {
-  CreateRenderStuff();
+  InitializeRenderWindow();
 	CreateTestData();
 }
 
 void albaGizmoRotateFanTest::AfterTest()
 {
-  m_Renderer->Delete();
-  m_RenderWindow->Delete();
-  m_RenderWindowInteractor->Delete();
-
   albaDEL(m_GizmoInputSurface);
   albaDEL(m_Root); 
 }
@@ -195,39 +191,6 @@ void albaGizmoRotateFanTest::TestShow()
 	CPPUNIT_ASSERT(logic->GetCall(1).testFunction == albaFakeLogicForTest::FKL_VME_SHOW);
 
   cppDEL(gizmoRotateFan);
-}
-
-void albaGizmoRotateFanTest::RenderData( vtkDataSet *data )
-{
-  vtkDataSetMapper *mapper = vtkDataSetMapper::New();
-  mapper->ScalarVisibilityOn();
-  mapper->SetInputData(data);
-
-  vtkActor *actor = vtkActor::New();
-  actor->SetMapper(mapper);
-
-  m_Renderer->AddActor(actor);
-  
-  m_RenderWindow->Render();
-  
-  mapper->Delete();
-  actor->Delete();
-} 
-  
-
-void albaGizmoRotateFanTest::CreateRenderStuff()
-{
-  m_Renderer = vtkRenderer::New();
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New() ;
-  
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 
 void albaGizmoRotateFanTest::RenderGizmo( albaGizmoRotateFan *gizmoRotateFan )

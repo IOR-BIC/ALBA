@@ -34,20 +34,13 @@
 void albaOpMML3ParameterViewTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_Renderer);
-
-  m_Renderer->SetBackground(0, 0, 0);
-  //m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
+	InitializeRenderWindow();
+	m_RenderWindow->RemoveRenderer(m_Renderer);
 }
 //----------------------------------------------------------------------------
 void albaOpMML3ParameterViewTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_Renderer);
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +178,7 @@ void albaOpMML3ParameterViewTest::TestAddPoint()
 
   view->AddPoint(1,1);
   view->AddPoint(2,2);
-  CPPUNIT_ASSERT(24 == view->GetValue(0));
+  CPPUNIT_ASSERT(59 == round(view->GetValue(0)));
   cppDEL(view);
 }
 

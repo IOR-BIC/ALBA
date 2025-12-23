@@ -41,30 +41,19 @@
 #include "vtkCellData.h"
 #include "vtkDataSetWriter.h"
 #include "vtkPolyData.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 //----------------------------------------------------------------------------
 void albaPipeLandmarkCloudTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeLandmarkCloudTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeLandmarkCloudTest::DynamicAllocationTest()
@@ -128,17 +117,15 @@ void albaPipeLandmarkCloudTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   m_Renderer->ResetCamera();
-
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("TestPipeExecution", 0);
 
   m_Renderer->RemoveAllViewProps();
-  m_RenderWindow->Render();
+
 	
   pipe->SetScalarVisibility(true);
   pipe->OnEvent(&albaEvent(this,albaPipeLandmarkCloud::ID_SCALAR_VISIBILITY));
@@ -151,13 +138,11 @@ void albaPipeLandmarkCloudTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   m_Renderer->ResetCamera();
-
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("TestPipeExecution", 1);
 
   m_Renderer->RemoveAllViewProps();
@@ -175,13 +160,11 @@ void albaPipeLandmarkCloudTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   m_Renderer->ResetCamera();
-
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("TestPipeExecution", 2);
 
   delete sceneNode;

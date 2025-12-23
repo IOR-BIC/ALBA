@@ -38,6 +38,9 @@
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #include <iostream>
 #include <fstream>
@@ -54,27 +57,15 @@ void albaPipeVolumeProjectedTest::TestFixture()
 void albaPipeVolumeProjectedTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
+	InitializeRenderWindow();
 	m_Renderer->GetActiveCamera()->SetPosition(5, 5, 5);
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeProjectedTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
+
 //----------------------------------------------------------------------------
 void albaPipeVolumeProjectedTest::TestPipeExecution()
 //----------------------------------------------------------------------------
@@ -117,8 +108,6 @@ void albaPipeVolumeProjectedTest::TestPipeExecution()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
 
@@ -128,7 +117,6 @@ void albaPipeVolumeProjectedTest::TestPipeExecution()
 
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
-
 		COMPARE_IMAGES("TestPipeExecution", testNum);
 
     m_Renderer->RemoveAllViewProps();
@@ -196,8 +184,6 @@ void albaPipeVolumeProjectedTest::TestProjectionRange()
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);
-			m_RenderWindow->Render();
-
 			actor = actorList->GetNextProp();
 		}
 
@@ -207,7 +193,6 @@ void albaPipeVolumeProjectedTest::TestProjectionRange()
 
 		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
-
 		COMPARE_IMAGES("TestProjectionRange", testNum);
 
 		m_Renderer->RemoveAllViewProps();

@@ -38,6 +38,7 @@
 #include "vtkStructuredPointsReader.h"
 
 #include <string.h>
+#include "vtkImageData.h"
 
 class OpCropDeformableROIDummy: public albaOpCropDeformableROI
 {

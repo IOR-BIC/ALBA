@@ -18,13 +18,10 @@
 #define __CPP_UNIT_albaGizmoScaleIsotropicTest_H__
 
 #include "albaTest.h"
-#include "albaGizmoScaleIsotropic.h"
-#include "albaVMESurface.h"
-#include "albaVMERoot.h"
 
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
+class albaGizmoScaleIsotropic;
+class albaVMESurface;
+class albaVMERoot;
 
 class albaGizmoScaleIsotropicTest : public albaTest
 {
@@ -64,11 +61,6 @@ class albaGizmoScaleIsotropicTest : public albaTest
     albaVMESurface *m_GizmoInputSurface;
     albaVMERoot *m_Root;
 
-    // TODO: REFACTOR THIS 
-    // move somewhere else... there should be a common class for testing facilities
-    void RenderData(vtkDataSet *data);
-
-    void CreateRenderStuff();     
 };
 
 #endif

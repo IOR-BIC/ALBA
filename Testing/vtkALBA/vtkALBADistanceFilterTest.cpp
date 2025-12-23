@@ -33,7 +33,10 @@
 #include "albaVMEVolumeGray.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkALBASmartPointer.h"
-#include "vtkDataSetReader.h"
+#include "vtkDataSet.h"
+#include "vtkFieldData.h"
+#include "vtkPointData.h"
+
 
 //-----------------------------------------------------------
 void vtkALBADistanceFilterTest::TestDynamicAllocation()

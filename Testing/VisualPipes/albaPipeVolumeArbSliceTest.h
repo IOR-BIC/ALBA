@@ -52,8 +52,6 @@ protected:
   void TestPipeExecution_SetColorLookupTable();
   void TestPipeExecution_TicksOnOff();
 	void TestPipeExecution_Arbitrary();
-
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

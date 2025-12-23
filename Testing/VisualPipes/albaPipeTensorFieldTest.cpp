@@ -109,18 +109,12 @@ void albaPipeTensorFieldTest::TestFixture()
 void albaPipeTensorFieldTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
 void albaPipeTensorFieldTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -131,19 +125,9 @@ void albaPipeTensorFieldTest::TestCreate()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
-  ///////////////// render stuff /////////////////////////
+  InitializeRenderWindow();
 
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  vtkCamera *cam = m_Renderer->GetActiveCamera();
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  //////////////////////////////////////////////////////////////////////////
+	vtkCamera *cam = m_Renderer->GetActiveCamera();
 
   albaVMEVolumeGray *volume;
   albaNEW(volume);
@@ -215,10 +199,12 @@ void albaPipeTensorFieldTest::TestCreate()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
+
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
+  COMPARE_IMAGES("TestCreate");
 
   delete sceneNode;
   delete(rootscenenode);

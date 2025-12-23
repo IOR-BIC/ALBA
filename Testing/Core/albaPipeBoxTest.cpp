@@ -31,10 +31,13 @@
 #include "albaVMESurface.h"
 
 #include "vtkALBAAssembly.h"
+#include "vtkDataSet.h"
 
 #include "vtkMapper.h"
 #include "vtkPolyDataReader.h"
 #include "vtkCamera.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 // render window stuff
 
@@ -60,34 +63,17 @@ void albaPipeBoxTest::TestFixture()
 void albaPipeBoxTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeBoxTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeBoxTest::TestPipe3DExecution()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
+  InitializeRenderWindow();
 
 
   ////// Create VME (import vtkData) ////////////////////
@@ -136,13 +122,12 @@ void albaPipeBoxTest::TestPipe3DExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   char *strings="3D";
 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
 
@@ -160,17 +145,7 @@ void albaPipeBoxTest::TestPipe3DSubtreeExecution()
 //----------------------------------------------------------------------------
 {
 
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
+  InitializeRenderWindow();
 
 
   ////// Create VME (import vtkData) ////////////////////
@@ -219,13 +194,12 @@ void albaPipeBoxTest::TestPipe3DSubtreeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   char *strings="3DSubtree";
 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
 
@@ -243,19 +217,7 @@ void albaPipeBoxTest::TestPipe3DSubtreeExecution()
 void albaPipeBoxTest::TestPipe4DExecution()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
+  InitializeRenderWindow();
 
   ////// Create VME (import vtkData) ////////////////////
   vtkPolyDataReader *importer;
@@ -297,13 +259,12 @@ void albaPipeBoxTest::TestPipe4DExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   char *strings="4D";
 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
 
@@ -320,19 +281,7 @@ void albaPipeBoxTest::TestPipe4DExecution()
 void albaPipeBoxTest::TestPipe4DSubtreeExecution()
 //----------------------------------------------------------------------------
 {
-
-  ///////////////// render stuff /////////////////////////
-
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(200,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-  ///////////// end render stuff /////////////////////////
-
+  InitializeRenderWindow();
 
   ////// Create VME (import vtkData) ////////////////////
   vtkPolyDataReader *importer;
@@ -394,13 +343,12 @@ void albaPipeBoxTest::TestPipe4DSubtreeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
   char *strings="4DSubtree";
 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
 

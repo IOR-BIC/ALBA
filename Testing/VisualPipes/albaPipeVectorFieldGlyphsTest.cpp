@@ -55,17 +55,11 @@
 void albaPipeVectorFieldGlyphsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-	vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeVectorFieldGlyphsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
-	vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -82,17 +76,7 @@ void albaPipeVectorFieldGlyphsTest::TestCreate()
 	storage->GetRoot()->SetName("root");
 	storage->GetRoot()->Initialize();
 
-	///////////////// render stuff /////////////////////////
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	///////////// end render stuff /////////////////////////
+	InitializeRenderWindow();
 
 	albaVMEVolumeGray *testVolume;
 	albaNEW(testVolume);
@@ -154,11 +138,10 @@ void albaPipeVectorFieldGlyphsTest::TestCreate()
 	while (actor)
 	{
 		m_Renderer->AddActor(actor);
-		m_RenderWindow->Render();
-
 		actor = actorList->GetNextProp();
 	}
 
+	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
 	COMPARE_IMAGES("image");
 

@@ -39,8 +39,6 @@ public:
 protected:
   void TestFixture();
   void TestPipeExecution();
-
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

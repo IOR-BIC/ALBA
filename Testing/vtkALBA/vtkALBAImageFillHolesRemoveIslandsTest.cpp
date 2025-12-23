@@ -39,6 +39,10 @@
 #include "vtkTimerLog.h"
 
 #include "albaString.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 
 //------------------------------------------------------------
 void vtkALBAImageFillHolesRemoveIslandsTest::TestFixture()
@@ -49,38 +53,23 @@ void vtkALBAImageFillHolesRemoveIslandsTest::TestFixture()
 void vtkALBAImageFillHolesRemoveIslandsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_Renderer);
-	vtkNEW(m_RenderWindow);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(100, 0);
-
-	m_Renderer->SetBackground(0.0, 0.0, 0.0);
-
-	m_TestName = "Test";
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void vtkALBAImageFillHolesRemoveIslandsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_Renderer);
-	vtkDEL(m_RenderWindow);
 }
 
 //------------------------------------------------------------
 void vtkALBAImageFillHolesRemoveIslandsTest::RenderData(vtkActor *actor)
 //------------------------------------------------------------
 {
-  vtkRenderWindowInteractor *renderWindowInteractor = vtkRenderWindowInteractor::New();
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
 	m_Renderer->AddActor(actor);
+
+  m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
-
 	COMPARE_IMAGES(m_TestName);
-
-  renderWindowInteractor->Delete();
 }
 
 //------------------------------------------------------------

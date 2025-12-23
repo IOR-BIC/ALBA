@@ -228,6 +228,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBARGtoSPImageFilterTest::suite());
 	runner.addTest(vtkALBADistanceFilterTest::suite());
 	runner.addTest(vtkALBACircleSourceTest::suite());
+	/* */ 
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.
