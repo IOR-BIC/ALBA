@@ -52,8 +52,6 @@ protected:
   void TestPipeExecution_UseVTKProperty();
   void TestPipeExecution_Thickness_PickActor();
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
   /**Compare Mapper scalarange with controlled values */
   void ProceduralControl(double controlRangeMapper[2] , vtkProp *propToControl);
 

@@ -48,6 +48,10 @@
 #include <vector>
 #include "albaVMEVolumeGray.h"
 #include "vtkStructuredPointsReader.h"
+#include "vtkViewport.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkImageData.h"
 
 enum PIPE_MESH_ACTORS
   {
@@ -77,24 +81,11 @@ void albaPipeMeshTest::TestFixture()
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::BeforeTest()
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeMeshTest::AfterTest()
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 
 //----------------------------------------------------------------------------
@@ -218,6 +209,7 @@ void albaPipeMeshTest::TestPipeExecution()
 		surfaceActor = (vtkActor *)SelectActorToControl(actorList, PIPE_MESH_ACTOR);
 		CPPUNIT_ASSERT(surfaceActor != NULL);
 
+		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
 		printf("\n Visualization: %s \n", strings[i]);
 
@@ -304,8 +296,6 @@ void albaPipeMeshTest::TestScalarVisualization()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 	
@@ -361,6 +351,8 @@ void albaPipeMeshTest::TestScalarVisualization()
     CPPUNIT_ASSERT(meshActor != NULL);
 
     ProceduralControl(controlValues, meshActor);
+
+		m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 		printf("\n visualization: %s \n", strings[arrayIndex]);
 
@@ -432,8 +424,6 @@ void albaPipeMeshTest::TestPipeDensityMap()
 	while (actor)
 	{
 		m_Renderer->AddActor(actor);
-		m_RenderWindow->Render();
-
 		actor = actorList->GetNextProp();
 	}
 
@@ -489,6 +479,7 @@ void albaPipeMeshTest::TestPipeDensityMap()
 		CPPUNIT_ASSERT(meshActor != NULL);
 
 		//ProceduralControl(controlValues, meshActor);
+		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
 		printf("\n visualization: %s \n", strings[arrayIndex]);
 

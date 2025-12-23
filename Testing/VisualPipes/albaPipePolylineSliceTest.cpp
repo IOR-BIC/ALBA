@@ -45,6 +45,9 @@
 #include "vtkCamera.h"
 
 #include <iostream>
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 enum TESTS_PIPE_SURFACE
 {
@@ -63,24 +66,11 @@ void albaPipePolylineSliceTest::TestFixture()
 //----------------------------------------------------------------------------
 void albaPipePolylineSliceTest::BeforeTest()
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineSliceTest::AfterTest()
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipePolylineSliceTest::TestPipeExecution()
@@ -143,11 +133,11 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 			while (actor)
 			{
 				m_Renderer->AddActor(actor);
-				m_RenderWindow->Render();
-
 				actor = actorList->GetNextProp();
 			}
 
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_TestRadius");
 
 			m_Renderer->RemoveAllProps();
@@ -162,11 +152,11 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 			while (actor)
 			{
 				m_Renderer->AddActor(actor);
-				m_RenderWindow->Render();
-
 				actor = actorList->GetNextProp();
 			}
 
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_TestThickness");
 
 			m_Renderer->RemoveAllProps();
@@ -186,11 +176,11 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 			while (actor)
 			{
 				m_Renderer->AddActor(actor);
-				m_RenderWindow->Render();
-
 				actor = actorList->GetNextProp();
 			}
 
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_TestSpheres");
 
 			m_Renderer->RemoveAllProps();
@@ -208,11 +198,11 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 			while (actor)
 			{
 				m_Renderer->AddActor(actor);
-				m_RenderWindow->Render();
-
 				actor = actorList->GetNextProp();
 			}
 
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_TestResolution");
 
 			m_Renderer->RemoveAllProps();
@@ -229,11 +219,11 @@ void albaPipePolylineSliceTest::TestPipeExecution()
 			while (actor)
 			{
 				m_Renderer->AddActor(actor);
-				m_RenderWindow->Render();
-
 				actor = actorList->GetNextProp();
 			}
 
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_TestFill");
 
 			m_Renderer->RemoveAllProps();

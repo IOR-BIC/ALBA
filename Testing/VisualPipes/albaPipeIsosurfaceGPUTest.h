@@ -44,7 +44,6 @@ protected:
   void TestPipeExecutionOpacity();
   void TestExtractIsosurface();
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

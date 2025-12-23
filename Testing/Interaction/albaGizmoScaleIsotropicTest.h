@@ -18,62 +18,49 @@
 #define __CPP_UNIT_albaGizmoScaleIsotropicTest_H__
 
 #include "albaTest.h"
-#include "albaGizmoScaleIsotropic.h"
-#include "albaVMESurface.h"
-#include "albaVMERoot.h"
 
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
+class albaGizmoScaleIsotropic;
+class albaVMESurface;
+class albaVMERoot;
 
 class albaGizmoScaleIsotropicTest : public albaTest
 {
-  
-  public:
-  
+
+public:
+
   // Executed before each test
   void BeforeTest();
 
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( albaGizmoScaleIsotropicTest );
-  CPPUNIT_TEST( TestFixture );
-  CPPUNIT_TEST( TestConstructor );
-  CPPUNIT_TEST( TestSetGetCubeLength );
-  CPPUNIT_TEST( TestSetListener);
-  CPPUNIT_TEST( TestSetInput );
-  CPPUNIT_TEST( TestSetGetAbsPose );
-  CPPUNIT_TEST( TestShow );
+  CPPUNIT_TEST_SUITE(albaGizmoScaleIsotropicTest);
+  CPPUNIT_TEST(TestFixture);
+  CPPUNIT_TEST(TestConstructor);
+  CPPUNIT_TEST(TestSetGetCubeLength);
+  CPPUNIT_TEST(TestSetListener);
+  CPPUNIT_TEST(TestSetInput);
+  CPPUNIT_TEST(TestSetGetAbsPose);
+  CPPUNIT_TEST(TestShow);
   CPPUNIT_TEST_SUITE_END();
 
-  protected:
-    
-    void CreateTestData();
+protected:
 
-    void TestFixture();
-    void TestConstructor();
-    void TestSetGetCubeLength();
-    void TestSetListener();
-    void TestSetInput();
-    void TestShow();
-    void TestSetGetAbsPose();
-  
-    void RenderGizmo( albaGizmoScaleIsotropic * gizmoScaleIsotropic );
+  void CreateTestData();
 
-    albaVMESurface *m_GizmoInputSurface;
-    albaVMERoot *m_Root;
+  void TestFixture();
+  void TestConstructor();
+  void TestSetGetCubeLength();
+  void TestSetListener();
+  void TestSetInput();
+  void TestShow();
+  void TestSetGetAbsPose();
 
-    // TODO: REFACTOR THIS 
-    // move somewhere else... there should be a common class for testing facilities
-    void RenderData(vtkDataSet *data);
+  void RenderGizmo(albaGizmoScaleIsotropic *gizmoScaleIsotropic);
 
-    void CreateRenderStuff(); 
-      
-    vtkRenderer *m_Renderer;
-    vtkRenderWindow *m_RenderWindow;
-    vtkRenderWindowInteractor *m_RenderWindowInteractor;    
-    
+  albaVMESurface *m_GizmoInputSurface;
+  albaVMERoot *m_Root;
+
 };
 
 #endif

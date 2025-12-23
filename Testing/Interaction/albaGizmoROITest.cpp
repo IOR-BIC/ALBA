@@ -58,16 +58,12 @@
 
 void albaGizmoROITest::BeforeTest()
 {
-  CreateRenderStuff();
+  InitializeRenderWindow();
 	CreateTestData();
 }
 
 void albaGizmoROITest::AfterTest()
 {
-  m_Renderer->Delete();
-  m_RenderWindow->Delete();
-  m_RenderWindowInteractor->Delete();
-
   albaDEL(m_GizmoInputSurface);
   albaDEL(m_Root); 
 }
@@ -108,8 +104,6 @@ void albaGizmoROITest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoROI);
-  // m_RenderWindowInteractor->Start();
-
   cppDEL(gizmoROI);
 
 }
@@ -148,40 +142,7 @@ void albaGizmoROITest::TestFixture()
 {
 	
 }
-
-void albaGizmoROITest::RenderData( vtkDataSet *data )
-{
-  vtkDataSetMapper *mapper = vtkDataSetMapper::New();
-  mapper->ScalarVisibilityOn();
-  mapper->SetInput(data);
-
-  vtkActor *actor = vtkActor::New();
-  actor->SetMapper(mapper);
-
-  m_Renderer->AddActor(actor);
   
-  m_RenderWindow->Render();
-  
-  mapper->Delete();
-  actor->Delete();
-
-} 
-  
-
-void albaGizmoROITest::CreateRenderStuff()
-{
-  m_Renderer = vtkRenderer::New();
-  m_RenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New() ;
-  
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(640, 480);
-  m_RenderWindow->SetPosition(400,0);
-
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-}
 
 void albaGizmoROITest::RenderGizmo( albaGizmoROI *gizmoROI )
 {

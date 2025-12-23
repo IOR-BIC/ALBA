@@ -20,16 +20,14 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestResult.h>
 
-
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkImageData.h"
-#include "vtkPointData.h"
 #include "albaString.h"
 
-class albaString;
 class vtkImageData;
 class vtkPointData;
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
+class vtkDataSet;
 
 // Helper class used to build a fake application needed by the wxConfig
 // to store settings into the registry with the same name of the application
@@ -74,12 +72,17 @@ protected:
 	void CompareImage(albaString suiteName, albaString imageName, int index = -1);
 
 	void CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, albaString imageName, int index=-1);
+
+	void InitializeRenderWindow();
+
+	void RenderData(vtkDataSet *data);
 	
 	albaString GetTestDataDir(albaString suiteName);
 
 	TestApp *m_App;
 	vtkRenderer *m_Renderer;
 	vtkRenderWindow *m_RenderWindow;
+	vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
 	albaString m_WorkingDir;
 };

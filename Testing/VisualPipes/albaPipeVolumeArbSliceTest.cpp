@@ -39,10 +39,14 @@
 #include "vtkLookupTable.h"
 
 // render window stuff
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
 #include <iostream>
 #include <fstream>
+#include "vtkImageData.h"
 
 enum PIPE_BOX_ACTORS
 {
@@ -61,25 +65,12 @@ void albaPipeVolumeArbSliceTest::TestFixture()
 void albaPipeVolumeArbSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(640, 480);
-	m_RenderWindow->SetPosition(200, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 
 enum ID_TEST
@@ -139,8 +130,6 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -184,9 +173,10 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution()
 
       char *strings="Slice";
 
-      m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
+			printf("\n Visualization: %s \n", strings);
 
+			m_Renderer->ResetCamera();
+      m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution", 3 * direction + i);
     }
 
@@ -255,8 +245,6 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_SetSliceOpacity()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -301,9 +289,10 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_SetSliceOpacity()
 
       char *strings="Slice";
 
-      m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
+			printf("\n Visualization: %s \n", strings);
 
+			m_Renderer->ResetCamera();
+      m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_SetSliceOpacity", ID_TEST_PIPEEXECUTION_SLICEOPACITY + 3 * direction + i);
     }
 
@@ -374,8 +363,6 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_SetLutRange()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -418,10 +405,10 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_SetLutRange()
 			m_Renderer->ResetCamera();
 
       char *strings="Slice";
+			printf("\n Visualization: %s \n", strings);
 
+			m_Renderer->ResetCamera();
       m_RenderWindow->Render();
-      printf("\n Visualization: %s \n", strings);
-
 			COMPARE_IMAGES("TestPipeExecution_SetLutRange", ID_TEST_PIPEEXECUTION_LUTRANGE + 3 * direction + i);
     }
 
@@ -487,8 +474,6 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_SetColorLookupTable()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -533,10 +518,11 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_SetColorLookupTable()
 
       char *strings="Slice";
 
-      m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
-
-			COMPARE_IMAGES("TestPipeExecution_SetColorLookupTable", ID_TEST_PIPEEXECUTION_COLORLOOKUPTABLE + 3 * direction + i);
+      
+			m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
+      COMPARE_IMAGES("TestPipeExecution_SetColorLookupTable", ID_TEST_PIPEEXECUTION_COLORLOOKUPTABLE + 3 * direction + i);
     }
 
     m_Renderer->RemoveAllProps();
@@ -603,8 +589,6 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_TicksOnOff()
     while(actor)
     {   
       m_Renderer->AddActor(actor);
-      m_RenderWindow->Render();
-
       actor = actorList->GetNextProp();
     }
     double x,y,z,vx,vy,vz;
@@ -631,9 +615,10 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_TicksOnOff()
 
       char *strings="Slice";
 
-      m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
 
+      m_Renderer->ResetCamera();
+			m_RenderWindow->Render();
 			COMPARE_IMAGES("TestPipeExecution_TicksOnOff", ID_TEST_PIPEEXECUTION_TICKS + showticks * 3 + i);
     }
 
@@ -695,8 +680,6 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_Arbitrary()
 	while (actor)
 	{
 		m_Renderer->AddActor(actor);
-		m_RenderWindow->Render();
-
 		actor = actorList->GetNextProp();
 	}
 	double x, y, z, vx, vy, vz;
@@ -716,9 +699,10 @@ void albaPipeVolumeArbSliceTest::TestPipeExecution_Arbitrary()
 
 	char *strings = "Slice";
 
-	m_RenderWindow->Render();
 	printf("\n Visualization: %s \n", strings);
 
+	m_Renderer->ResetCamera();
+	m_RenderWindow->Render();
 	COMPARE_IMAGES("TestPipeExecution_Arbitrary", ID_TEST_PIPEEXECUTION_TICKS + 1);
 
 	m_Renderer->RemoveAllProps();

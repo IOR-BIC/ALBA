@@ -35,7 +35,13 @@
 #include "mmaMaterial.h"
 
 #include "vtkPointData.h"
+#include "vtkDataSet.h"
 #include "vtkALBAAssembly.h"
+
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 
 //----------------------------------------------------------------------------
 void albaVisualPipeSlicerSliceTest::TestFixture()
@@ -46,23 +52,13 @@ void albaVisualPipeSlicerSliceTest::TestFixture()
 void albaVisualPipeSlicerSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(320, 240);
-	m_RenderWindow->SetPosition(400, 0);
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+	InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaVisualPipeSlicerSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
+
 }
 //----------------------------------------------------------------------------
 void albaVisualPipeSlicerSliceTest::TestPipeExecution()
@@ -128,7 +124,6 @@ void albaVisualPipeSlicerSliceTest::TestPipeExecution()
   while(actor)
   { 
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
     actor = actorList->GetNextProp();
   }
 
@@ -138,8 +133,7 @@ void albaVisualPipeSlicerSliceTest::TestPipeExecution()
 
   m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-
-	COMPARE_IMAGES("TestPipeExecution", 1);
+  COMPARE_IMAGES("TestPipeExecution", 1);
 
   vtkDEL(actorList);
 

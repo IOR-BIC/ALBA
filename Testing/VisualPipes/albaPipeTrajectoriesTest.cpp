@@ -38,9 +38,12 @@
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkPointData.h"
-#include "vtkPolyData.h"
 #include "vtkCamera.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
@@ -56,24 +59,12 @@ void albaPipeTrajectoriesTest::TestFixture()
 void albaPipeTrajectoriesTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(600, 600);
-	m_RenderWindow->SetPosition(0, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeTrajectoriesTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeTrajectoriesTest::TestPipeExecution()
@@ -128,8 +119,6 @@ void albaPipeTrajectoriesTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -137,8 +126,8 @@ void albaPipeTrajectoriesTest::TestPipeExecution()
   cloudActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(cloudActor != NULL);
 
+	m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-
 	COMPARE_IMAGES("TestPipeExecution", 0);
 
 	vtkDEL(actorList);

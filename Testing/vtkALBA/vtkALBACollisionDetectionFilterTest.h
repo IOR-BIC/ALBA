@@ -46,8 +46,6 @@ protected:
 
   void Visualize(vtkActor *actor);
   void AddPolydataToVisualize(vtkPolyData *data, vtkProperty *property = NULL);
-
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 };
 
 #endif

@@ -43,6 +43,9 @@
 #include "vtkRenderWindowInteractor.h"
 
 #include <iostream>
+#include "vtkPropCollection.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 //----------------------------------------------------------------------------
 void albaPipeScalarTest::TestFixture()
@@ -53,25 +56,12 @@ void albaPipeScalarTest::TestFixture()
 void albaPipeScalarTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  vtkNEW(m_Renderer);
-  vtkNEW(m_RenderWindow);
-  vtkNEW(m_RenderWindowInteractor);
-
-	m_Renderer->SetBackground(0.1, 0.1, 0.1);
-	m_Renderer->GetActiveCamera()->ParallelProjectionOn();
-	m_RenderWindow->AddRenderer(m_Renderer);
-	m_RenderWindow->SetSize(600, 600);
-	m_RenderWindow->SetPosition(400, 0);
-
-	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  InitializeRenderWindow();
 }
 //----------------------------------------------------------------------------
 void albaPipeScalarTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
-  vtkDEL(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
 void albaPipeScalarTest::TestPipeExecution()
@@ -109,8 +99,6 @@ void albaPipeScalarTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
   }
 
@@ -118,6 +106,7 @@ void albaPipeScalarTest::TestPipeExecution()
   surfaceActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
 	COMPARE_IMAGES("TestPipeExecution", 0);
 

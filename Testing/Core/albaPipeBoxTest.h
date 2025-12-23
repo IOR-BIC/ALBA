@@ -49,8 +49,6 @@ protected:
   void TestPipe3DSubtreeExecution();
   void TestPipe4DSubtreeExecution();
 
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
-
 };
 
 #endif

@@ -38,6 +38,8 @@
 #include "albaOpImporterVTK.h"
 #include "albaVMERoot.h"
 #include "albaVMEVolumeGray.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
 
 //-----------------------------------------------------------
 void albaOpVolumeMirrorTest::TestDynamicAllocation() 
