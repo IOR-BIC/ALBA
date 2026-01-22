@@ -535,6 +535,8 @@ void albaInteractor2DMeasure::iSetColor(int color, double r, double g, double b,
 void albaInteractor2DMeasure::ShowText(bool show)
 {
 	m_ShowText = show;
+	for (int i = 0; i < m_TextActorVector.size(); i++)
+		ShowText(i, show);
 
 	Update();
 }

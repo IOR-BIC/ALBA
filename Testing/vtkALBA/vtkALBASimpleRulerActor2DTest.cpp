@@ -47,9 +47,6 @@ void vtkALBASimpleRulerActor2DTest::AfterTest()
 //------------------------------------------------------------------------------
 void vtkALBASimpleRulerActor2DTest::RenderData(vtkActor2D *actor, char* testName)
 {
-  vtkALBASmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
 	m_Renderer->AddActor2D(actor);
 	
 	m_Renderer->ResetCamera();
