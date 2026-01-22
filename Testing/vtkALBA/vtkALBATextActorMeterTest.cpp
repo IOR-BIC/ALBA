@@ -50,10 +50,7 @@ void vtkALBATextActorMeterTest::AfterTest()
 //------------------------------------------------------------
 void vtkALBATextActorMeterTest::RenderData(vtkActor2D *actor, char* testName)
 {
-  vtkALBASmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
-	m_Renderer->AddActor2D(actor);
+ 	m_Renderer->AddActor2D(actor);
 	
 	m_Renderer->ResetCamera();
 	m_RenderWindow->Render();
