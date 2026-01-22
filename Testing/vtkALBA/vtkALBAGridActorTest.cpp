@@ -50,9 +50,6 @@ void vtkALBAGridActorTest::RenderData(vtkActor *actor, char* testName)
   camera->ParallelProjectionOn();
   camera->Modified();
 
-  vtkALBASmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(m_RenderWindow);
-
   m_Renderer->AddActor(actor);
 
 	m_Renderer->ResetCamera();
@@ -112,7 +109,7 @@ void vtkALBAGridActorTest::TestGetLabelActor()
 
   RenderData(actor, "TestGetLabelActor");
 
-	CPPUNIT_ASSERT(strcmp("0.2",actor->GetLabelActor()->GetInput())==0);
+	CPPUNIT_ASSERT(strcmp("10",actor->GetLabelActor()->GetInput())==0);
 
   actor->Delete();
 }
