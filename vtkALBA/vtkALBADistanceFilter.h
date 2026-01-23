@@ -130,9 +130,7 @@ class ALBA_EXPORT vtkALBADistanceFilter : public vtkDataSetAlgorithm  {
 		/** execute data*/
 		void RequestData(vtkInformation* request, vtkPointSet *output);
     //void ExecuteData(vtkDataObject *output);
-    /** compute and update extents */
-    int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
-
+    
     /**  Prepare special data fast traversing in the volume*/
     void PrepareVolume();
 

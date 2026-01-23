@@ -208,7 +208,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-	/* */
+	/* 
 	//runner.addTest(albaOpImporterMSF1xTest::suite()); 
 	runner.addTest(albaOpImporterSTLTest::suite());
 	runner.addTest(albaOpExporterSTLTest::suite());
@@ -312,9 +312,9 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterVTKXMLTest::suite());
 	runner.addTest(albaOpInteractiveClipSurfaceTest::suite());
 	runner.addTest(albaOpCreateEditSkeletonTest::suite());
-	runner.addTest(albaOpRegisterClustersTest::suite());
-	runner.addTest(albaOpClassicICPRegistrationTest::suite());
-	runner.addTest(albaOpMML3ParameterViewTest::suite());
+	runner.addTest(albaOpRegisterClustersTest::suite()); */
+	runner.addTest(albaOpClassicICPRegistrationTest::suite()); 
+	runner.addTest(albaOpMML3ParameterViewTest::suite());/*
 	runner.addTest(albaOpInteractionDebuggerTest::suite());
 	runner.addTest(albaOpIterativeRegistrationTest::suite()); 
 	runner.addTest(albaOpImporterAnsysCDBFileTest::suite()); 

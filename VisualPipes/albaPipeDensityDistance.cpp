@@ -33,11 +33,9 @@
 #include "albaDataVector.h"
 #include "albaVMEGenericAbstract.h"
 #include "albaVME.h"
-#include "albaVME.h"
 #include "albaGUIValidator.h"
 #include "vtkALBASmartPointer.h"
 
-#include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
@@ -54,13 +52,12 @@
 #include "vtkImageMapper.h"
 
 #include "vtkColorTransferFunction.h"
-#include "vtkActor.h"
-#include "vtkPolyData.h"
 #include "vtkScalarBarActor.h"
 #include "vtkActor2D.h"
 #include "vtkLookupTable.h"
 #include "vtkMassProperties.h"
 #include "vtkClipPolyData.h"
+#include "vtkTriangleFilter.h"
 
 #include <vector>
 
@@ -78,6 +75,7 @@ albaPipeDensityDistance::albaPipeDensityDistance()
   m_DistanceFilter  = NULL;
   m_Table           = NULL;
   m_Normals         = NULL;
+	m_TriangleFilter  = NULL;
   m_Volume          = NULL;
   m_ScalarBar       = NULL;
   
@@ -107,6 +105,7 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
   Superclass::Create(n);
 
   vtkNEW(m_Normals);
+	vtkNEW(m_TriangleFilter);
 	vtkNEW(m_DistanceFilter);
 	vtkNEW(m_Mapper);
 	vtkNEW(m_Actor);
@@ -122,7 +121,10 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 
   m_Vme->AddObserver(this);
 
-	m_Normals->SetInputData(data);
+	m_TriangleFilter->SetInputData(data);
+	m_TriangleFilter->Update();
+
+	m_Normals->SetInputConnection(m_TriangleFilter->GetOutputPort());
 	m_Normals->ComputePointNormalsOn();
 	m_Normals->SplittingOff();
 	m_Normals->Update();
@@ -136,79 +138,6 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 	  m_DistanceFilter->SetDistanceModeToScalar();
 	  m_DistanceFilter->SetInputMatrix(surface_output->GetAbsMatrix()->GetVTKMatrix());
 		m_DistanceFilter->Update();
-
-		/*double i;
-		m_Table->AddRGBPoint(-m_DistanceFilter->GetMaxDistance(), 1.f, 0.f, 0.0f);
-		double step=(double)(m_MaxDistance*2)/(m_NumSections-1);
-		double init=(double)(-m_MaxDistance+step);
-		for(i=init;i<m_MaxDistance;i+=step)
-		{
-			if(i<=0)
-				m_Table->AddRGBPoint(i, 1.f, (float)(1+(i/m_MaxDistance)), (float)(1+(i/m_MaxDistance)));
-			else
-				m_Table->AddRGBPoint(i, (float)(1-(i/m_MaxDistance)), (float)(1-(i/m_MaxDistance)), 1.f);
-		}
-		m_Table->AddRGBPoint(m_DistanceFilter->GetMaxDistance(), 0.1f, 0.1f, 1.f);
-		//m_Table->AddRGBPoint(-m_DistanceFilter->GetMaxDistance(), 1.f, 0.f, 0.0f);
-    //m_Table->AddRGBPoint(-0.5f *	m_DistanceFilter->GetMaxDistance(), 1.f, 0.1f, 1.f);
-	  //m_Table->AddRGBPoint(0.5f *	m_DistanceFilter->GetMaxDistance(), 0.9f, 0.9f, 1.f);
-	  //m_Table->AddRGBPoint(					m_DistanceFilter->GetMaxDistance(), 0.1f, 0.1f, 1.f);
-	  m_Table->Build();
-
-
-		//Calculate the areas
-		vtkALBASmartPointer<vtkMassProperties> mass_all;
-		mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		mass_all->Update();
-
-		double total_area = mass_all->GetSurfaceArea();
-
-		double area=0;
-		step=(double)(m_MaxDistance*2)/(m_NumSections);
-		albaString message;
-
-		vtkALBASmartPointer<vtkClipPolyData> clip;
-		clip->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		clip->SetValue(m_MaxDistance);
-		clip->GenerateClippedOutputOn();
-		clip->Update();
-
-		vtkALBASmartPointer<vtkMassProperties> mass;
-		mass->SetInput(clip->GetOutput());
-		mass->Update();
-		area = (mass->GetSurfaceArea() / total_area) * 100.0;
-
-		message= albaString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
-		albaLogMessage(message);
-	
-		vtkALBASmartPointer<vtkClipPolyData> clip_old;
-		clip_old=clip;
-		for (i=m_MaxDistance-step;i>=-m_MaxDistance;i-=step)
-		{
-			vtkALBASmartPointer<vtkClipPolyData> clip;
-			clip->SetInput(clip_old->GetClippedOutput());
-			clip->SetValue(i);
-			clip->GenerateClippedOutputOn();
-			clip->Update();
-
-			clip_old=clip;
-
-			vtkALBASmartPointer<vtkMassProperties> mass;
-			mass->SetInput(clip->GetOutput());
-			mass->Update();
-			area = (mass->GetSurfaceArea() / total_area) * 100.0;
-
-			message= albaString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
-			albaLogMessage(message);
-		}
-
-		vtkALBASmartPointer<vtkMassProperties> mass_final;
-		mass_final->SetInput(clip_old->GetClippedOutput());
-		mass_final->Update();
-		area = (mass_final->GetSurfaceArea() / total_area) * 100.0;
-
-		message= albaString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
-		albaLogMessage(message);*/
 
 		int i;
 		for (i=-4*m_MaxDistance;i<-m_MaxDistance;i++)
@@ -232,7 +161,7 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 		clipHigh->SetValue(m_MaxDistance);
 		clipHigh->GenerateClippedOutputOn();
 		clipHigh->Update();
-
+		
 		vtkALBASmartPointer<vtkClipPolyData> clipMidHight;
 		clipMidHight->SetInputConnection(clipHigh->GetClippedOutputPort());
 		clipMidHight->SetValue(0);
@@ -245,21 +174,21 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
 		clipMidLow->GenerateClippedOutputOn();
 		clipMidLow->Update();
 
-		vtkALBASmartPointer<vtkMassProperties> mass_high;
-		mass_high->SetInputConnection(clipHigh->GetOutputPort());
-		mass_high->Update();
+			vtkALBASmartPointer<vtkMassProperties> mass_high;
+			mass_high->SetInputConnection(clipHigh->GetOutputPort());
+			mass_high->Update();
 
 		/*vtkALBASmartPointer<vtkMassProperties> mass_mid1;
 		mass_mid1->SetInput(clipMidHight->GetOutput());
 		mass_mid1->Update();*/
 
-		vtkALBASmartPointer<vtkMassProperties> mass_mid;
-		mass_mid->SetInputConnection(clipMidLow->GetOutputPort());
-		mass_mid->Update();
-
-		vtkALBASmartPointer<vtkMassProperties> mass_low;
-		mass_low->SetInputConnection(clipMidLow->GetClippedOutputPort());
-		mass_low->Update();
+			vtkALBASmartPointer<vtkMassProperties> mass_mid;			
+			mass_mid->SetInputConnection(clipMidLow->GetOutputPort());
+			mass_mid->Update();
+		
+			vtkALBASmartPointer<vtkMassProperties> mass_low;
+			mass_low->SetInputConnection(clipMidLow->GetClippedOutputPort());
+			mass_low->Update();
 
 		//double area[4];
 		m_AreaDistance[0] = (mass_low->GetSurfaceArea() / total_area) * 100.0;
@@ -308,6 +237,7 @@ albaPipeDensityDistance::~albaPipeDensityDistance()
   m_Vme->RemoveObserver(this);
 
   vtkDEL(m_Normals);
+	vtkDEL(m_TriangleFilter);
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
   vtkDEL(m_DistanceFilter);

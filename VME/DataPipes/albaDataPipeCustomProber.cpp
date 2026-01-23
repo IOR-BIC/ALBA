@@ -60,8 +60,7 @@ albaDataPipeCustomProber::albaDataPipeCustomProber()
   vtkNEW(m_Normals);
   vtkNEW(m_Prober);
   m_Prober->SetInputConnection(m_Normals->GetOutputPort());
-	m_Prober->Update();
-  SetInput(m_Prober->GetOutput());
+  SetInputConnection(m_Prober->GetOutputPort());
 }
 
 //------------------------------------------------------------------------------

@@ -621,7 +621,8 @@ vtkPolyData *albaVMELandmarkCloud::NewPolyData(albaTimeStamp t)
     vtkPointData* pdata = polydata->GetPointData();
     vtkALBASmartPointer<vtkBitArray> data;
     pdata->SetScalars(data);
-    AppendPoint(polydata,0,0,0,GetNumberOfLandmarks());
+    if(GetNumberOfLandmarks() >0)
+      AppendPoint(polydata,0,0,0,GetNumberOfLandmarks());
   }
   return polydata;
 }
