@@ -44,9 +44,9 @@
 albaCxxTypeMacro(albaOpImporterPLY);
 
 //----------------------------------------------------------------------------
-albaOpImporterPLY::albaOpImporterPLY(const wxString &label) :
-albaOp(label)
+albaOpImporterPLY::albaOpImporterPLY(const wxString &label) : albaOpImporterFile(label)
 {
+	SetWildc("Polygon File Format (*.ply)|*.ply");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Files.clear();
@@ -76,12 +76,11 @@ void albaOpImporterPLY::OpRun()
 
   if (!m_TestMode && m_Files.size() == 0)
   {
-    albaString wildc = "Polygon File Format (*.ply)|*.ply";
     std::vector<wxString> files;
     albaString f;
 
     m_Files.clear();
-    albaGetOpenMultiFiles(fileDir.GetCStr(),wildc.GetCStr(), files);
+    albaGetOpenMultiFiles(fileDir.GetCStr(),m_Wildc, files);
     for(unsigned i = 0; i < files.size(); i++)
     {
       f = files[i];
@@ -94,7 +93,7 @@ void albaOpImporterPLY::OpRun()
 	if(m_Files.size() != 0) 
 	{
 		result = OP_RUN_OK;
-    ImportPLY();
+    ImportFile();
 	}
 
 	albaEventMacro(albaEvent(this,result));
@@ -126,7 +125,7 @@ void albaOpImporterPLY::OpUndo()
 }
 
 //----------------------------------------------------------------------------
-int albaOpImporterPLY::ImportPLY()
+int albaOpImporterPLY::ImportFile()
 {
   albaGUIBusyInfo wait("Loading file...",m_TestMode);  
 
@@ -166,10 +165,11 @@ int albaOpImporterPLY::ImportPLY()
 }
 
 //----------------------------------------------------------------------------
-void albaOpImporterPLY::SetFileName(const char *file_name)
+void albaOpImporterPLY::SetFileName(albaString filename)
 {
-  m_Files.resize(1);
-  m_Files[0] = file_name;
+	Superclass::SetFileName(filename);
+	m_Files.resize(1);
+	m_Files[0] = filename;
 }
 //----------------------------------------------------------------------------
 void albaOpImporterPLY::GetImportedPLY(std::vector<albaVMESurface*> &importedPLY)

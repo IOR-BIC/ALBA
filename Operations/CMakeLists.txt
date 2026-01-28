@@ -180,6 +180,7 @@ IF (ALBA_USE_VTK)
 	albaOpMeshScarlarsImporter.cpp albaOpMeshScarlarsImporter.h
 	albaOpMeasureAxisRotations.cpp albaOpMeasureAxisRotations.cpp
 	albaOpTransformAtoB.cpp	albaOpTransformAtoB.h
+	albaOpImporter.cpp albaOpImporter.h
   )
 ENDIF (ALBA_USE_VTK)
 

@@ -59,10 +59,9 @@ albaCxxTypeMacro(albaOpImporterVTKXML);
 static int m_ErrorCount = 0;
 
 //----------------------------------------------------------------------------
-albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) :
-albaOp(label)
-//----------------------------------------------------------------------------
+albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) : albaOpImporterFile(label)
 {
+	SetWildc("VTK XML ImageData (*.vti)|*.vti|VTK XML PolyData (*.vtp)|*.vtp|VTK XML StructuredGrid (*.vts)|*.vts|VTK XML RectilinearGrid (*.vtr)|*.vtr|VTK XML UnstructuredGrid (*.vtu)|*.vtu");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Input   = NULL;
@@ -71,7 +70,7 @@ albaOp(label)
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
   m_VmeGrayVol  = NULL;
-  m_VmeRGBVol  = NULL;
+  m_VmeRGBVol   = NULL;
   m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
@@ -80,14 +79,13 @@ albaOp(label)
   m_EventRouter->SetCallback(ErrorProcessEvents);
   m_EventRouter->SetClientData(this);
 
-  m_File    = "";
-  m_FileDir = "";
+  m_FileName = "";
+  m_FileDir  = "";
 
   ResetErrorCount();
 }
 //----------------------------------------------------------------------------
 albaOpImporterVTKXML::~albaOpImporterVTKXML()
-//----------------------------------------------------------------------------
 {
   albaDEL(m_VmePointSet);
   albaDEL(m_VmePolyLine);
@@ -101,36 +99,33 @@ albaOpImporterVTKXML::~albaOpImporterVTKXML()
 }
 //----------------------------------------------------------------------------
 bool albaOpImporterVTKXML::InternalAccept(albaVME* node)   
-//----------------------------------------------------------------------------
 {
   return true;
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterVTKXML::Copy()   
-//----------------------------------------------------------------------------
 {
   albaOpImporterVTKXML *cp = new albaOpImporterVTKXML(m_Label);
-  cp->m_File = m_File;
+  cp->m_FileName = m_FileName;
   return cp;
 }
 //----------------------------------------------------------------------------
 void albaOpImporterVTKXML::OpRun()   
-//----------------------------------------------------------------------------
 {
   albaString f;
-  if (m_File.IsEmpty())
+  if (m_FileName.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir, GetWildCard(), _("Choose VTK XML file"));
-    m_File = f;
+    f = albaGetOpenFile(m_FileDir, m_Wildc, _("Choose VTK XML file"));
+    m_FileName = f;
   }
 
   int result = OP_RUN_CANCEL;
-  if(!m_File.IsEmpty())
+  if(!m_FileName.IsEmpty())
   {
-    if (ImportVTKXML() == ALBA_OK)
+    if (ImportFile() == ALBA_OK)
     {
       wxString path, name, ext;
-      wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
+      wxFileName::SplitPath(m_FileName.GetCStr(),&path,&name,&ext);
       albaTagItem tag_Nature;
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
@@ -149,38 +144,17 @@ void albaOpImporterVTKXML::OpRun()
   albaEventMacro(albaEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void albaOpImporterVTKXML::SetFileName(albaString filename)
-//----------------------------------------------------------------------------
-{
-  m_File = filename;
-}
-//----------------------------------------------------------------------------
-albaString albaOpImporterVTKXML::GetWildCard()
-//----------------------------------------------------------------------------
-{
-	albaString wildc = "vtk xml ImageData (*.vti)|*.vti ";
-	wildc += "|vtk xml PolyData (*.vtp)|*.vtp";
-	wildc += "|vtk xml StructuredGrid (*.vts)|*.vts";
-	wildc += "|vtk xml RectilinearGrid (*.vtr)|*.vtr";
-	wildc += "|vtk xml UnstructuredGrid (*.vtu)|*.vtu";
-
-	return wildc;
-}
-//----------------------------------------------------------------------------
 void albaOpImporterVTKXML::ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata)
-//----------------------------------------------------------------------------
 {
   m_ErrorCount++;
 }
 //----------------------------------------------------------------------------
 void albaOpImporterVTKXML::ResetErrorCount()
-//----------------------------------------------------------------------------
 {
   m_ErrorCount = 0;
 }
 //----------------------------------------------------------------------------
-int albaOpImporterVTKXML::ImportVTKXML()
-//----------------------------------------------------------------------------
+int albaOpImporterVTKXML::ImportFile()
 {
   vtkDataSet *data = NULL;
 
@@ -193,13 +167,13 @@ int albaOpImporterVTKXML::ImportVTKXML()
   albaNEW(m_VmeGeneric);
 
 	wxString path, name, ext;
-	wxFileName::SplitPath(m_File.GetCStr(), &path, &name, &ext);
+	wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 
 	if (ext == "vti")
 	{
 		vtkALBASmartPointer<vtkXMLImageDataReader> imageReader;
 		imageReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
-		imageReader->SetFileName(m_File.GetCStr());
+		imageReader->SetFileName(m_FileName.GetCStr());
 		imageReader->Update();
 
 		if (m_ErrorCount == 0)
@@ -233,7 +207,7 @@ int albaOpImporterVTKXML::ImportVTKXML()
 	{
 		vtkALBASmartPointer<vtkXMLPolyDataReader> polydataReader;
 		polydataReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
-		polydataReader->SetFileName(m_File.GetCStr());
+		polydataReader->SetFileName(m_FileName.GetCStr());
 		polydataReader->Update();
 
 		if (m_ErrorCount == 0)
@@ -267,7 +241,7 @@ int albaOpImporterVTKXML::ImportVTKXML()
 	{
 		vtkALBASmartPointer<vtkXMLRectilinearGridReader> rgReader;
 		rgReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
-		rgReader->SetFileName(m_File.GetCStr());
+		rgReader->SetFileName(m_FileName.GetCStr());
 		rgReader->Update();
 
 		if (m_ErrorCount == 0)
@@ -297,7 +271,7 @@ int albaOpImporterVTKXML::ImportVTKXML()
 	{
 		vtkALBASmartPointer<vtkXMLUnstructuredGridReader> ugReader;
 		ugReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
-		ugReader->SetFileName(m_File.GetCStr());
+		ugReader->SetFileName(m_FileName.GetCStr());
 		ugReader->Update();
 
 		if (m_ErrorCount == 0)
@@ -323,7 +297,7 @@ int albaOpImporterVTKXML::ImportVTKXML()
 	{
 		vtkALBASmartPointer<vtkXMLStructuredGridReader> sgReader;
 		sgReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
-		sgReader->SetFileName(m_File.GetCStr());
+		sgReader->SetFileName(m_FileName.GetCStr());
 		sgReader->Update();
 
 		if (m_ErrorCount == 0)
@@ -341,3 +315,4 @@ int albaOpImporterVTKXML::ImportVTKXML()
 
   return ALBA_ERROR;
 }
+

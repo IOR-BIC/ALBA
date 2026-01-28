@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -38,13 +38,13 @@ class albaVMEGroup;
 	This modality in not supported by alba vrml importer, it can only import uncompressed wrl.
 
 */
-class ALBA_EXPORT albaOpImporterVRML: public albaOp
+class ALBA_EXPORT albaOpImporterVRML: public albaOpImporterFile
 {
 public:
            albaOpImporterVRML(const wxString &label = "VRMLImporter");
 	virtual ~albaOpImporterVRML();
 	
-  albaTypeMacro(albaOpImporterVRML, albaOp);
+  albaTypeMacro(albaOpImporterVRML, albaOpImporterFile);
 
   albaOp* Copy();
 
@@ -59,13 +59,16 @@ public:
 
   /** Import vrml data. */
   void ImportVRML();
+  /** Import the file, return ALBA_OK on success. */
+  virtual int ImportFile();
+
+
 
 protected:
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME* node) { return true; };
 
-	albaString m_File;
 	albaString m_FileDir;
   
 	albaVMEGroup *m_Group;

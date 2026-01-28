@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -42,13 +42,13 @@ class albaVMEImage;
 /** Import operation that try to read VTK data file and set it into the corresponding VME 
 that accept the VTK data format. If no VME can accept the format a message box will be shown 
 to the user and no data will be imported.*/
-class ALBA_EXPORT albaOpImporterMetaImage: public albaOp 
+class ALBA_EXPORT albaOpImporterMetaImage: public albaOpImporterFile 
 {
 public:
   albaOpImporterMetaImage(const wxString &label = "Importer Meta Image");
  ~albaOpImporterMetaImage(); 
   
-  albaTypeMacro(albaOpImporterMetaImage, albaOp);
+  albaTypeMacro(albaOpImporterMetaImage, albaOpImporterFile);
 
   albaOp* Copy();
 
@@ -58,15 +58,8 @@ public:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	virtual void OpStop(int result);
 
-	/** Import vtk data, return ALBA_OK on success. */
-  virtual int ImportMetaImage();
-
-  /** Set the vtk filename to be imported. 
-      This is used when the operation is executed not using user interface. */
-  void SetFileName(const char *name) {m_File = name;};
-
-	/** retrieve the file name*/
-	wxString GetFileName() { return m_File; };
+	/** Import ITK data, return ALBA_OK on success. */
+  virtual int ImportFile();
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
@@ -76,7 +69,6 @@ protected:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node) { return true; };
 
-  wxString m_File;
   wxString m_FileDir;
   
   albaVMEImage      *m_VmeImage;
