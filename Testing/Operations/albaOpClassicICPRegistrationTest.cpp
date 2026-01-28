@@ -95,7 +95,7 @@ void albaOpClassicICPRegistrationTest::TestOpDo()
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
 	importer->SetInput(root);
-  importer->ImportVTK();
+  importer->ImportFile();
   
   albaVMESurface *surface = albaVMESurface::SafeDownCast(importer->GetOutput());
   
@@ -108,7 +108,7 @@ void albaOpClassicICPRegistrationTest::TestOpDo()
   fileName2<<"/VTK_Surfaces/surface.vtk";
   importer2->SetFileName(fileName2);
 	importer2->SetInput(root);
-  importer2->ImportVTK();
+  importer2->ImportFile();
   
   albaVME *vme = importer2->GetOutput();
   

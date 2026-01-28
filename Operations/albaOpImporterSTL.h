@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "albaString.h"
 #include <vector>
 
@@ -42,18 +42,15 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,int);
 // albaOpImporterSTL :
 //----------------------------------------------------------------------------
 /** */
-class ALBA_EXPORT albaOpImporterSTL: public albaOp
+class ALBA_EXPORT albaOpImporterSTL: public albaOpImporterFile
 {
 public:
 	albaOpImporterSTL(const wxString &label = "STLImporter");
 	~albaOpImporterSTL(); 
 	
-  albaTypeMacro(albaOpImporterSTL, albaOp);
+  albaTypeMacro(albaOpImporterSTL, albaOpImporterFile);
 
   albaOp* Copy();
-
-	/** Set the filename for the .stl to import */
-  void SetFileName(const char *file_name);
 
   /** Builds operation's interface. */
 	void OpRun();
@@ -72,6 +69,8 @@ public:
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
+  /** Import the file, return ALBA_OK on success. */
+  virtual int ImportFile();
 
 protected:
 

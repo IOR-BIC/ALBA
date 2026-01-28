@@ -42,6 +42,7 @@ class albaOpRename;
 class albaOpReparentTo;
 class albaOpCreateGroup;
 class albaOpShowHistory;
+class albaOpImporterFile;
 class vtkMatrix4x4;
 class albaDeviceButtonsPadMouse;
 class albaGUISettings;
@@ -171,6 +172,8 @@ public:
 	/** Get Build Num*/
 	void SetBuildNum(albaString val) { m_BuildNum = val; }
 
+	int ImportFile(albaString filename);
+
 protected:
 	/** Execute the current operation. */
   virtual void OpDo(albaOp *op);
@@ -211,8 +214,9 @@ protected:
 
   albaUser           *m_User; ///<User credentials
 
-  std::vector<albaOp *> m_OpList; ///< List of pointer of plugged operations.
-  int                m_NumOp; ///< Number of plugged operations.
+	std::vector<albaOp *> m_OpList; ///< List of pointer of plugged operations.
+	std::vector<albaOpImporterFile *> m_OpImporterFileList; ///< List of pointer of plugged importer file operations.
+	int                m_NumOp; ///< Number of plugged operations.
   wxAcceleratorEntry m_OpAccelEntries[MAXOP]; ///< List of Accelerators for menu items.
   int                m_NumOfAccelerators;
 
@@ -234,5 +238,7 @@ protected:
 
   /** test friend */
   friend class albaOpManagerTest;
+private:
+	albaOpImporterFile *SelectOpFromList(std::vector<albaOpImporterFile *> opList);
 };
 #endif

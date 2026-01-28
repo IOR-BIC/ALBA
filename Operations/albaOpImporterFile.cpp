@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIDialogAskAndRemember
+ Module: albaOpImporter
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC
@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "albaDefines.h" 
+#include "albaDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -22,38 +22,46 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaGUIDialogAskAndRemember.h"
-#include "albaDecl.h"
+#include "albaOpImporterFile.h"
 
 //----------------------------------------------------------------------------
-// Constants:
+albaCxxTypeMacro(albaOpImporterFile);
+
+
 //----------------------------------------------------------------------------
-enum LOGIN_ID
+albaOpImporterFile::albaOpImporterFile(const wxString &label) :
+albaOp(label)
 {
-  ID_CHOICE = MINID,
-  ID_REMEMBER,
-};
-//----------------------------------------------------------------------------
-albaGUIDialogAskAndRemember::albaGUIDialogAskAndRemember(const wxString& title, wxString& message, wxString choices[], int choicesNum, int* choice, int* remember)
-: albaGUIDialog(title, albaOK)
-{
-
-  m_Gui = new albaGUI(this);
-  m_Gui->Label(message, true, true);
-  m_Gui->Divider();
-  m_Gui->Combo(ID_CHOICE,"", choice, choicesNum,choices); 
-  m_Gui->Label("");
-  if(remember != NULL)
-    m_Gui->Bool(ID_REMEMBER, "Remember choice", remember, 1);
-  Add(m_Gui,1);
-  if (remember != NULL)
-  {
-    wxStaticText *guiLabel = new wxStaticText(this, -1, " (You can change this options from Edit->Settings...)", wxPoint(-1, -1), wxSize(500, -1), wxST_NO_AUTORESIZE);
-    Add(guiLabel);
-  }
-
+	m_OpType = OPTYPE_IMPORTER;
+	m_Canundo = true;
+	m_FileName = "";
 }
+
 //----------------------------------------------------------------------------
-albaGUIDialogAskAndRemember::~albaGUIDialogAskAndRemember()
+albaOpImporterFile::~albaOpImporterFile()
 {
 }
+
+//----------------------------------------------------------------------------
+void albaOpImporterFile::SetFileName(albaString fileName)
+{
+	m_FileName = fileName;
+}
+
+//----------------------------------------------------------------------------
+int albaOpImporterFile::AcceptFile(albaString fileName)
+{
+		wxString file(fileName.GetCStr());
+		wxString ext = "." + file.AfterLast('.');
+					
+		wxString wildcards(m_Wildc.GetCStr());
+		
+		return wildcards.Contains(ext);
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterFile::SetWildc(albaString wildc)
+{
+	m_Wildc = wildc;
+}
+

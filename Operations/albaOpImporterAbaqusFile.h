@@ -19,7 +19,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "albaTextFileReaderHelper.h"
 #include <map>
 #include <set>
@@ -66,36 +66,28 @@ struct AbaqusPart
 //----------------------------------------------------------------------------
 // albaOpImporterAbaqusFile :
 //----------------------------------------------------------------------------
-class ALBA_EXPORT albaOpImporterAbaqusFile : public albaTextFileReaderHelper, public albaOp
+class ALBA_EXPORT albaOpImporterAbaqusFile : public albaTextFileReaderHelper, public albaOpImporterFile
 {
 public:
   albaOpImporterAbaqusFile(const wxString &label = "AbaqusImporter");
   ~albaOpImporterAbaqusFile(); 
 
-  albaTypeMacro(albaOpImporterAbaqusFile, albaOp);
+  albaTypeMacro(albaOpImporterAbaqusFile, albaOpImporterFile);
 
   virtual void OnEvent(albaEventBase *alba_event);
   
   albaOp* Copy();
 
-  /** Set the input Abaqus file */
-  void SetFileName(const char *abaqusFileNameFullPath) {m_AbaqusInputFileNameFullPath = abaqusFileNameFullPath;};
-
-  /** Get the input Abaqus file */
-  wxString GetFileName() {return m_AbaqusInputFileNameFullPath.ToAscii();};
-
   /** Builds operation's interface. */
   void OpRun();
 
-  /** Import the mesh*/
-  int Import();
-
+  /** Import the mesh, return ALBA_OK on success.*/
+  int ImportFile();
+  
 protected:
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
-
-  albaString GetWildcard();
 
   int ParseAbaqusFile(albaString fileName);
 
@@ -111,8 +103,6 @@ protected:
   int WriteElements();
 
   
-  wxString m_AbaqusInputFileNameFullPath;
-
   int m_ImporterType;
   albaVMEMesh *m_ImportedVmeMesh;
 

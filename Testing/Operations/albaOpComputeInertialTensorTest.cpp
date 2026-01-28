@@ -79,7 +79,7 @@ void albaOpComputeInertialTensorTest::TestAddAttributes()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
-  importer->ImportVTK();
+  importer->ImportFile();
   albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
   
   CPPUNIT_ASSERT(surface!=NULL);
@@ -108,7 +108,7 @@ void albaOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue(
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
-  importer->ImportVTK();
+  importer->ImportFile();
   albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
   
   CPPUNIT_ASSERT(surface!=NULL);
@@ -160,7 +160,7 @@ void albaOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefa
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
-  importer->ImportVTK();
+  importer->ImportFile();
   albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
   
   CPPUNIT_ASSERT(surface!=NULL);
@@ -258,7 +258,7 @@ void albaOpComputeInertialTensorTest::TestOpDoUndo()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
-  importer->ImportVTK();
+  importer->ImportFile();
   albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
   
   CPPUNIT_ASSERT(surface!=NULL);
@@ -298,7 +298,7 @@ void albaOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag()
 	albaString fileName=ALBA_DATA_ROOT;
 	fileName<<"/Surface/sphere.vtk";
 	importer->SetFileName(fileName);
-	importer->ImportVTK();
+	importer->ImportFile();
 	albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
 
 	surface->GetTagArray()->SetTag("DENSITY", "1.0");
@@ -357,7 +357,7 @@ void albaOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDENS
 	albaString fileName=ALBA_DATA_ROOT;
 	fileName<<"/Surface/sphere.vtk";
 	importer->SetFileName(fileName);
-	importer->ImportVTK();
+	importer->ImportFile();
 	albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
 
 	surface->GetTagArray()->SetTag("DENSITY", "1.0");

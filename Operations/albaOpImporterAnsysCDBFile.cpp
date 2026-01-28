@@ -47,8 +47,8 @@ albaCxxTypeMacro(albaOpImporterAnsysCDBFile);
 //----------------------------------------------------------------------------
 albaOpImporterAnsysCDBFile::albaOpImporterAnsysCDBFile(const wxString &label) :
 albaOpImporterAnsysCommon(label)
-{ 
-
+{
+	SetWildc("Cdb Files (*.cdb)|*.cdb|All Files (*.*)|*.*"); 
 }
 //----------------------------------------------------------------------------
 albaOpImporterAnsysCDBFile::~albaOpImporterAnsysCDBFile()
@@ -61,11 +61,6 @@ albaOp* albaOpImporterAnsysCDBFile::Copy()
 {
   albaOpImporterAnsysCDBFile *cp = new albaOpImporterAnsysCDBFile(m_Label);
   return cp;
-}
-//----------------------------------------------------------------------------
-albaString albaOpImporterAnsysCDBFile::GetWildcard()
-{
-  return "cdb files (*.cdb)|*.cdb|All Files (*.*)|*.*";
 }
 
 //----------------------------------------------------------------------------
@@ -126,4 +121,5 @@ int albaOpImporterAnsysCDBFile::ParseAnsysFile(albaString fileName)
 
   return ALBA_OK;
 }
+
 
