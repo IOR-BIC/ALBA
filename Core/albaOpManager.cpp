@@ -49,6 +49,8 @@
 #include "albaOpReparentTo.h"
 #include "albaOpCreateGroup.h"
 #include "albaOpShowHistory.h"
+#include "albaOpImporterFile.h"
+#include "albaGUIDialogAskAndRemember.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -190,6 +192,8 @@ void albaOpManager::OnEvent(albaEventBase *alba_event)
 void albaOpManager::OpAdd(albaOp *op, wxString menuPath, bool can_undo, albaGUISettings *setting)
 {
   m_OpList.push_back(op);
+  if(op->IsA("albaOpImporterFile"))
+		m_OpImporterFileList.push_back((albaOpImporterFile*)op);
   op->m_OpMenuPath = menuPath;
 	op->m_Id = m_NumOp + OP_USER;
   op->SetListener(this);
@@ -310,6 +314,40 @@ void albaOpManager::SetAccelerator(albaOp *op)
     m_OpAccelEntries[m_NumOfAccelerators++].Set(flag_num,  (int) key_code.ToAscii()[0], op->m_Id);
   }
 }
+
+//----------------------------------------------------------------------------
+albaOpImporterFile *albaOpManager::SelectOpFromList(std::vector<albaOpImporterFile *> opList)
+{
+	wxString title = "Different Importer can manage this file type";
+	wxString message = "There are more importer that can import this type of file\nPlease select the right one:";
+
+	// If no importers available, return NULL.
+	size_t n = opList.size();
+	if (n == 0)
+		return NULL;
+
+	// Allocate choices array and fill with importer names.
+	wxString *choices = new wxString[n];
+	for (size_t i = 0; i < n; ++i)
+			choices[i] = opList[i]->m_Label;
+
+	int choice = 0;
+	// Show dialog (choices is a C-style array of wxString)
+	albaGUIDialogAskAndRemember *askAndRemember = new albaGUIDialogAskAndRemember(title, message, choices, (int)n, &choice, NULL);
+	askAndRemember->ShowModal();
+
+	// Validate selection and pick the corresponding importer
+	albaOpImporterFile *selected = NULL;
+	if (choice >= 0 && choice < (int)n)
+		selected = opList[choice];
+
+	// Cleanup
+	delete askAndRemember;
+	delete[] choices;
+
+	return selected;
+}
+
 //----------------------------------------------------------------------------
 void albaOpManager::VmeSelected(albaVME* v)   
 {
@@ -419,6 +457,47 @@ void albaOpManager::EnableOp(bool CanEnable)
 	}
 	if (m_ToolBar) EnableToolbar(CanEnable);
 }
+
+//----------------------------------------------------------------------------
+int albaOpManager::ImportFile(albaString filename)
+{
+
+  std::vector<albaOpImporterFile *> opList;
+  albaOpImporterFile *op=NULL;
+
+  for(int i=0; i< m_OpImporterFileList.size(); i++)
+    if (m_OpImporterFileList[i]->Accept(m_Selected) && m_OpImporterFileList[i]->AcceptFile(filename))
+     opList.push_back(m_OpImporterFileList[i]);
+
+  if (opList.size() == 0)
+    op = NULL;
+  else if (opList.size() == 1)
+    op = opList[0];
+  else
+    op = SelectOpFromList(opList);
+
+  if (op != NULL)
+  {
+    albaOpImporterFile *importer = albaOpImporterFile::SafeDownCast(op->Copy());
+    importer->SetInput(m_Selected);
+    importer->SetListener(this);
+    importer->SetFileName(filename.GetCStr());
+    if (importer->ImportFile() == ALBA_OK)
+    {
+      importer->OpDo();
+      cppDEL(importer);
+      return ALBA_OK;
+    }
+    else
+    {
+			cppDEL(importer);
+			return ALBA_ERROR;
+    }
+  }
+
+  albaLogMessage("No suitable importers. Cannot Open file: %s", filename.GetCStr());
+}
+
 //----------------------------------------------------------------------------
 void albaOpManager::EnableContextualMenu(albaGUITreeContextualMenu *contextualMenu, albaVME *node, bool CanEnable)
 {

@@ -24,6 +24,9 @@
 
 #include "albaOpImporterFile.h"
 
+//----------------------------------------------------------------------------
+albaCxxTypeMacro(albaOpImporterFile);
+
 
 //----------------------------------------------------------------------------
 albaOpImporterFile::albaOpImporterFile(const wxString &label) :
@@ -49,19 +52,11 @@ void albaOpImporterFile::SetFileName(albaString fileName)
 int albaOpImporterFile::AcceptFile(albaString fileName)
 {
 		wxString file(fileName.GetCStr());
-		wxString ext = file.AfterLast('.');
+		wxString ext = "." + file.AfterLast('.');
 					
 		wxString wildcards(m_Wildc.GetCStr());
-		wxArrayString patterns = wxSplit(wildcards, ';');
-					
-		for (size_t i = 0; i < patterns.GetCount(); ++i)
-		{
-			wxString pattern = patterns[i].AfterLast('.');
-			if (pattern.CmpNoCase(ext) == 0)
-				return true;
-		}
-					
-		return false;  
+		
+		return wildcards.Contains(ext);
 }
 
 //----------------------------------------------------------------------------

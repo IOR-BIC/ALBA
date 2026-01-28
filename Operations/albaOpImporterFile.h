@@ -41,15 +41,16 @@ public:
 	albaOpImporterFile(const wxString &label = "Importer");
 	~albaOpImporterFile();
 
-	
+	albaTypeMacro(albaOpImporterFile, albaOp);
+
 	/** Set the file to be imported. */
 	virtual void SetFileName(albaString fileName);
 
 	/** Accept file for import validation. */
   int AcceptFile(albaString fileName);
 	
-	/** Import the file, return ALBA_OK on success. */
-	virtual int ImportFile()=0;
+	/** Import the file, return ALBA_OK on success. Redefine this method to enable Drag & Drop */
+	virtual int ImportFile() { return ALBA_ERROR; };
 
 	/** Retrieve the file name*/
 	albaString GetFileName() { return m_FileName; };

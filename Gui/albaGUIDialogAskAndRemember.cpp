@@ -43,11 +43,14 @@ albaGUIDialogAskAndRemember::albaGUIDialogAskAndRemember(const wxString& title, 
   m_Gui->Divider();
   m_Gui->Combo(ID_CHOICE,"", choice, choicesNum,choices); 
   m_Gui->Label("");
-  m_Gui->Bool(ID_REMEMBER, "Remember choice", remember, 1);
+  if(remember != NULL)
+    m_Gui->Bool(ID_REMEMBER, "Remember choice", remember, 1);
   Add(m_Gui,1);
-  wxStaticText* guiLabel = new wxStaticText(this, -1, " (You can change this options from Edit->Settings...)", wxPoint(-1, -1), wxSize(500, -1), wxST_NO_AUTORESIZE);
-  Add(guiLabel);
- 
+  if (remember != NULL)
+  {
+    wxStaticText *guiLabel = new wxStaticText(this, -1, " (You can change this options from Edit->Settings...)", wxPoint(-1, -1), wxSize(500, -1), wxST_NO_AUTORESIZE);
+    Add(guiLabel);
+  }
 
 }
 //----------------------------------------------------------------------------
