@@ -176,7 +176,7 @@ void  albaOpImporterVRML::OpRun()
   if(!m_FileName.IsEmpty()) 
   {
     result = OP_RUN_OK;
-    ImportVRML();
+    ImportFile();
   }
 
   albaEventMacro(albaEvent(this,result));
@@ -188,7 +188,7 @@ void  albaOpImporterVRML::SetFileName(const char *file_name)
   m_FileName = file_name;
 }
 //----------------------------------------------------------------------------
-void  albaOpImporterVRML::ImportVRML()
+int  albaOpImporterVRML::ImportFile()
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
@@ -258,12 +258,6 @@ void  albaOpImporterVRML::ImportVRML()
     }
   }
   m_Output = m_Group;
-}
 
-//----------------------------------------------------------------------------
-int albaOpImporterVRML::ImportFile()
-{
-  // Forward to existing importer method
-  return this->ImportFile();
+	return ALBA_OK;
 }
-

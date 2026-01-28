@@ -57,12 +57,8 @@ public:
   /** Set the filename for the .vrl to import */
   void SetFileName(const char *file_name);
 
-  /** Import vrml data. */
-  void ImportVRML();
-  /** Import the file, return ALBA_OK on success. */
-  virtual int ImportFile();
-
-
+  /** Import VRML data, return ALBA_OK on success. */
+  int ImportFile();
 
 protected:
 
