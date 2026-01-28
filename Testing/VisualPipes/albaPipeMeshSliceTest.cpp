@@ -94,7 +94,7 @@ void albaPipeMeshSliceTest::TestPipeExecution()
   Importer->TestModeOn();
   Importer->SetFileName(filename);
   Importer->SetInput(storage->GetRoot());
-  Importer->ImportVTK();
+  Importer->ImportFile();
   albaVMEMesh *mesh;
   mesh =albaVMEMesh::SafeDownCast(Importer->GetOutput());
 	mesh->GetMaterial();
@@ -219,7 +219,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
   Importer->TestModeOn();
   Importer->SetFileName(filename);
   Importer->SetInput(storage->GetRoot());
-  Importer->ImportVTK();
+  Importer->ImportFile();
   albaVMEMesh *mesh;
   mesh =albaVMEMesh::SafeDownCast(Importer->GetOutput());
   mesh->GetMaterial();
@@ -346,7 +346,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
   Importer->TestModeOn();
   Importer->SetFileName(filename);
   Importer->SetInput(storage->GetRoot());
-  Importer->ImportVTK();
+  Importer->ImportFile();
   albaVMEMesh *mesh;
   mesh =albaVMEMesh::SafeDownCast(Importer->GetOutput());
   mesh->GetMaterial();
@@ -473,7 +473,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
   Importer->TestModeOn();
   Importer->SetFileName(filename);
   Importer->SetInput(storage->GetRoot());
-  Importer->ImportVTK();
+  Importer->ImportFile();
   albaVMEMesh *mesh;
   mesh =albaVMEMesh::SafeDownCast(Importer->GetOutput());
   mesh->GetMaterial();
@@ -600,7 +600,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
   Importer->TestModeOn();
   Importer->SetFileName(filename);
   Importer->SetInput(storage->GetRoot());
-  Importer->ImportVTK();
+  Importer->ImportFile();
   albaVMEMesh *mesh;
   mesh =albaVMEMesh::SafeDownCast(Importer->GetOutput());
   mesh->GetMaterial();
@@ -732,7 +732,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
   Importer->TestModeOn();
   Importer->SetFileName(filename);
   Importer->SetInput(storage->GetRoot());
-  Importer->ImportVTK();
+  Importer->ImportFile();
   albaVMEMesh *mesh;
   mesh =albaVMEMesh::SafeDownCast(Importer->GetOutput());
   mesh->GetMaterial();

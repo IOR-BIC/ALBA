@@ -40,8 +40,6 @@
 #ifdef ALBA_USE_VTK
   #include "albaViewVTK.h"
   
-  #include "albaOpImporterVTK.h"
-  #include "albaOpImporterSTL.h"
   #include "albaInteractionManager.h"
   #include "albaInteractionFactory.h"
   #include "albaInteractor.h"
@@ -2943,7 +2941,7 @@ void albaLogicWithManagers::ImportExternalFile(albaString &filename)
 		vtkImporter->SetInput(m_VMEManager->GetRoot());
 		vtkImporter->SetListener(m_OpManager);
 		vtkImporter->SetFileName(filename.GetCStr());
-		vtkImporter->ImportVTK();
+		vtkImporter->ImportFile();
 		vtkImporter->OpDo();
 		cppDEL(vtkImporter);
 	}

@@ -73,7 +73,7 @@ void albaOpCreateEditSkeletonTest::TestOpRun()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/PolylineGraph/PolylineGraph.vtk";
   importer->SetFileName(fileName);
-  importer->ImportVTK();
+  importer->ImportFile();
   albaVMEPolyline *polyline=albaVMEPolyline::SafeDownCast(importer->GetOutput());
 	polyline->Update();
 	polyline->GetOutput()->Update();

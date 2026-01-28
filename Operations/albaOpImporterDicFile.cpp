@@ -62,7 +62,7 @@ albaOp* albaOpImporterDicFile::Copy()
 }
 
 //----------------------------------------------------------------------------
-int albaOpImporterDicFile::Import()
+int albaOpImporterDicFile::ImportFile()
 {
 	
 	if (ReadInit(m_FileName, GetTestMode(), true, "Please wait parsing DIC File...", m_Listener) == ALBA_ERROR)
@@ -161,6 +161,8 @@ int albaOpImporterDicFile::Import()
 	albaDEL(pointCloudVME);
 
 	ReadFinalize();
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------

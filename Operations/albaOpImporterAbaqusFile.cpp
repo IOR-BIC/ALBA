@@ -964,10 +964,3 @@ albaMatrix albaOpImporterAbaqusFile::RotationMatrixUnnormalizedDirVector(double 
 
   return matrix;
 }
-//----------------------------------------------------------------------------
-int albaOpImporterAbaqusFile::ImportFile()
-{
-  // Forward to existing importer method
-  return this->ImportFile();
-}
-
