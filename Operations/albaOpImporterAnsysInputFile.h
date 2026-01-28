@@ -33,13 +33,11 @@ public:
 	albaOpImporterAnsysInputFile(const wxString &label = "MeshImporter");
 	~albaOpImporterAnsysInputFile(); 
 	
-  albaTypeMacro(albaOpImporterAnsysInputFile, albaOp);
+  albaTypeMacro(albaOpImporterAnsysInputFile, albaOpImporterFile);
 
   albaOp* Copy();
 
 protected:
-
-  albaString GetWildcard();
 
   int ParseAnsysFile(albaString fileName);
 

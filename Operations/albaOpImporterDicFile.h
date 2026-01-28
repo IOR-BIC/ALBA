@@ -19,7 +19,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "albaTextFileReaderHelper.h"
 #include "albaDefines.h"
 
@@ -30,14 +30,14 @@ PURPOSE. See the above copyright notice for more information.
 /** 
 Reads scalars from a .DIC file
 */
-class ALBA_EXPORT albaOpImporterDicFile : public albaTextFileReaderHelper, public albaOp
+class ALBA_EXPORT albaOpImporterDicFile : public albaTextFileReaderHelper, public albaOpImporterFile
 {
 public:
 
 	albaOpImporterDicFile(const wxString &label = "Load DIC file");
 	~albaOpImporterDicFile(); 
 
-	albaTypeMacro(albaOpImporterDicFile, albaOp);
+	albaTypeMacro(albaOpImporterDicFile, albaOpImporterFile);
 
 	/** Builds operation's interface. */
 	void OpRun();
@@ -47,19 +47,14 @@ public:
 	/** Get the filename to import */
 	albaString GetFileName() const { return m_FileName; }
 
-	/** Get the filename to import */
-	void SetFileName(albaString val) { m_FileName = val; }
-
 protected:
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
-	/** imports informations */
-	int Import(void);
+	/** Imports informations, return ALBA_OK on success.  */
+	int ImportFile();
 	 
-	albaString m_FileName;
-
 	friend class albaOpImporterDICFileTest;
   
 };

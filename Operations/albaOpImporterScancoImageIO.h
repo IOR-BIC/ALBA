@@ -70,7 +70,7 @@ This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOS
 
 
 #include <fstream>
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "vtkSystemIncludes.h"
  
 //----------------------------------------------------------------------------
@@ -85,11 +85,11 @@ class albaProgressBarHelper;
 /**
 Perform ScancoIO ISQ and AIM importer.
 */
-class albaOpImporterScancoImageIO : public albaOp
+class albaOpImporterScancoImageIO : public albaOpImporterFile
 {
 public:
 	/** Run-time type information (and related methods). */
-	albaTypeMacro(albaOpImporterScancoImageIO, albaOp);
+	albaTypeMacro(albaOpImporterScancoImageIO, albaOpImporterFile);
 
 	albaOpImporterScancoImageIO(const wxString &label= "Importer SCANCO");
 	~albaOpImporterScancoImageIO();
@@ -193,13 +193,6 @@ public:
 		strncpy(this->m_ModificationDate, modificationDate, 32);
 	}
 
-	
-	/** Returns FileName */
-	albaString GetFileName() const { return m_FileName; }
-
-	/** Sets FileName */
-	void SetFileName(albaString fileName) { m_FileName = fileName; }
-
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node) { return true; };
 
@@ -299,7 +292,6 @@ protected:
 	int m_ScalarsType;
 	
 	albaTagArray *m_TagArray;
-	albaString m_FileName;
 	albaProgressBarHelper *m_PBHelper;
 };
 

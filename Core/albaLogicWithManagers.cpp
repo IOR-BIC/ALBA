@@ -40,8 +40,6 @@
 #ifdef ALBA_USE_VTK
   #include "albaViewVTK.h"
   
-  #include "albaOpImporterVTK.h"
-  #include "albaOpImporterSTL.h"
   #include "albaInteractionManager.h"
   #include "albaInteractionFactory.h"
   #include "albaInteractor.h"
@@ -2934,31 +2932,7 @@ void albaLogicWithManagers::UpdateMeasureUnit()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ImportExternalFile(albaString &filename)
 {
-	wxString path, name, ext;
-	wxFileName::SplitPath(filename.GetCStr(), &path, &name, &ext);
-	ext.MakeLower();
-	if (ext == "vtk")
-	{
-		albaOpImporterVTK *vtkImporter = new albaOpImporterVTK("importer");
-		vtkImporter->SetInput(m_VMEManager->GetRoot());
-		vtkImporter->SetListener(m_OpManager);
-		vtkImporter->SetFileName(filename.GetCStr());
-		vtkImporter->ImportVTK();
-		vtkImporter->OpDo();
-		cppDEL(vtkImporter);
-	}
-	else if (ext == "stl")
-	{
-		albaOpImporterSTL *stlImporter = new albaOpImporterSTL("importer");
-		stlImporter->SetInput(m_VMEManager->GetRoot());
-		stlImporter->SetListener(m_OpManager);
-		stlImporter->SetFileName(filename.GetCStr());
-		stlImporter->ImportSTL();
-		stlImporter->OpDo();
-		cppDEL(stlImporter);
-	}
-	else
-		wxMessageBox(_("Can not import this type of file!"), _("Warning"));
+	m_OpManager->ImportFile(filename);
 }
 
 //----------------------------------------------------------------------------

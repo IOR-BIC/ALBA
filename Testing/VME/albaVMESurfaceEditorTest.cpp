@@ -63,7 +63,7 @@ void albaVMESurfaceEditorTest::TestSetData()
   importer1->TestModeOn();
   importer1->SetFileName(filename);
   importer1->SetInput(storage->GetRoot());
-  importer1->ImportVTK();
+  importer1->ImportFile();
   albaSmartPointer<albaVMESurface> surface = albaVMESurface::SafeDownCast(importer1->GetOutput());
   surface->Update();
   surface->GetOutput()->GetVTKData()->Update();

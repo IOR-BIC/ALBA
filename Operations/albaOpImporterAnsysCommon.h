@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaTextFileReaderHelper.h"
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -63,7 +63,7 @@ struct AnsysMaterial
 /** 
 Importer for Ansys Input files
 */
-class ALBA_EXPORT albaOpImporterAnsysCommon : public albaTextFileReaderHelper, public albaOp
+class ALBA_EXPORT albaOpImporterAnsysCommon : public albaTextFileReaderHelper, public albaOpImporterFile
 {
 public:
 
@@ -71,25 +71,17 @@ public:
 	~albaOpImporterAnsysCommon(); 
 
 	virtual void OnEvent(albaEventBase *alba_event);
-
-	/** Set the input Ansys file */
-	void SetFileName(const char *ansysInputFileNameFullPath) {m_AnsysInputFileNameFullPath = ansysInputFileNameFullPath;};
 	
-  /** Get the input Ansys file */
-  wxString GetFileName() {return m_AnsysInputFileNameFullPath.ToAscii();};
-
   /** Builds operation's interface. */
   void OpRun();
 
 	/** Import the mesh*/
-	int Import();
+	int ImportFile();
 
 protected:
  
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
-
-  virtual albaString GetWildcard() = 0;
 
 	virtual int ParseAnsysFile(albaString fileName) = 0;
 
@@ -103,8 +95,6 @@ protected:
 
   void AddElement(int Id, int nNodes, int type, int matId, int *nodes);
   bool IsInRange(int elemId, int partId);
-
-	wxString m_AnsysInputFileNameFullPath;
 
 	int m_ImporterType;
 

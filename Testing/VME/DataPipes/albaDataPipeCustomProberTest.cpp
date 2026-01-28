@@ -76,7 +76,7 @@ void albaDataPipeCustomProberTest::TestExecute()
   importer->TestModeOn();
   importer->SetFileName(filename);
   importer->SetInput(storage->GetRoot());
-  importer->ImportVTK();
+  importer->ImportFile();
   albaSmartPointer<albaVMEVolumeGray> volume = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
   volume->Update();
   double rangeVol[2];
@@ -90,7 +90,7 @@ void albaDataPipeCustomProberTest::TestExecute()
   importer1->TestModeOn();
   importer1->SetFileName(filename);
   importer1->SetInput(storage->GetRoot());
-  importer1->ImportVTK();
+  importer1->ImportFile();
   albaSmartPointer<albaVMESurface> surface = albaVMESurface::SafeDownCast(importer1->GetOutput());
   surface->Update();
   
