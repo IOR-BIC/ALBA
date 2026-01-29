@@ -52,7 +52,7 @@ void albaOpImporterSTLTest::Test()
   importer1->SetInput(storage->GetRoot());
 	albaString filename = ALBA_DATA_ROOT;
   filename<<"/STL/Cubo.stl";
-	importer1->SetFileName(filename.GetCStr());
+	importer1->SetFileName(filename);
 	importer1->OpRun();
   std::vector<albaVMESurface*> importedSTL;
   importer1->GetImportedSTL(importedSTL);

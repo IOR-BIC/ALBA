@@ -71,7 +71,7 @@ void albaOpExporterBMPTest::TestExportBMP()
   albaString filename = ALBA_DATA_ROOT;
   filename << "/Test_ExporterBMP/VolTestBMP.vtk";
   importerVTK->SetFileName(filename.GetCStr());
-  importerVTK->ImportVTK();
+  importerVTK->ImportFile();
 
 	albaVMEVolumeGray *vmeVolumeGrayImported = albaVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
 	vmeVolumeGrayImported->Update();

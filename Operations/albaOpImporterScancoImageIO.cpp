@@ -75,6 +75,7 @@ albaOpImporterScancoImageIO::albaOpImporterScancoImageIO(const wxString &label)
 //----------------------------------------------------------------------------
 albaOpImporterScancoImageIO::~albaOpImporterScancoImageIO()
 {
+	SetWildc("Scanco ISQ (*.isq)|*.isq|Scanco AIM (*.aim)|*.aim");
   delete[] this->m_RawHeader;
 }
 
@@ -225,11 +226,10 @@ albaOp* albaOpImporterScancoImageIO::Copy()
 //----------------------------------------------------------------------------
 void albaOpImporterScancoImageIO::OpRun()
 {
-	wxString wildc = "Scanco ISQ (*.isq)|*.isq|Scanco AIM (*.aim)|*.aim";
 	albaString f;
 	if (m_FileName.IsEmpty())
 	{
-		f = albaGetOpenFile(albaGetLastUserFolder(), wildc, _("Choose SCANCO file"));
+		f = albaGetOpenFile(albaGetLastUserFolder(), m_Wildc, _("Choose SCANCO file"));
 		m_FileName = f;
 	}
 

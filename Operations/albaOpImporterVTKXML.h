@@ -21,7 +21,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -40,7 +40,7 @@ class vtkCallbackCommand;
 /**
 class name: albaOpImporterVTKXMLXML
 Operation to importer VTK XML format (.vtp extension)*/
-class ALBA_EXPORT albaOpImporterVTKXML: public albaOp 
+class ALBA_EXPORT albaOpImporterVTKXML: public albaOpImporterFile 
 {
 public:
   /** constructor */
@@ -49,7 +49,7 @@ public:
   ~albaOpImporterVTKXML(); 
 
   /** RTTI macro*/
-  albaTypeMacro(albaOpImporterVTKXML, albaOp);
+  albaTypeMacro(albaOpImporterVTKXML, albaOpImporterFile);
 
   /** clone the current object */
   /*virtual*/ albaOp* Copy();
@@ -58,16 +58,7 @@ public:
   /*virtual*/ void OpRun();
 
   /** Import VTK XML data. */
-  virtual int ImportVTKXML();
-
-  /** retrieve the file name*/
-  albaString GetFileName(){return m_File;};
-
-	/** retrieve the wildCard*/
-	virtual albaString GetWildCard();
-
-  /** Set the file name*/
-  void SetFileName(albaString filename);
+  virtual int ImportFile();
 
 protected:
 
@@ -80,7 +71,6 @@ protected:
   /** Set m_ErrorCount to 0.*/
   static void ResetErrorCount();
 
-  albaString m_File;
   albaString m_FileDir;
 
   albaVMEPointSet *m_VmePointSet;

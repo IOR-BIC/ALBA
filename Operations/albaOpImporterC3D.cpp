@@ -61,11 +61,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterC3D);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaOpImporterC3D::_InternalC3DData::_InternalC3DData()
-//----------------------------------------------------------------------------
 {
 	//vmes
 	m_VmeGroup = NULL;
@@ -124,10 +122,9 @@ albaOpImporterC3D::_InternalC3DData::_InternalC3DData()
 }
 
 //----------------------------------------------------------------------------
-albaOpImporterC3D::albaOpImporterC3D(const wxString &label) :
-	albaOp(label)
-	//----------------------------------------------------------------------------
+albaOpImporterC3D::albaOpImporterC3D(const wxString &label) : albaOpImporterFile(label)
 {
+	SetWildc("C3d Files (*.c3d)|*.c3d");
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
 
@@ -143,14 +140,12 @@ albaOpImporterC3D::albaOpImporterC3D(const wxString &label) :
 
 //----------------------------------------------------------------------------
 albaOpImporterC3D::~albaOpImporterC3D()
-//----------------------------------------------------------------------------
 {
 	Clear();
 }
 
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::Clear()
-//----------------------------------------------------------------------------
 {
 	for (unsigned i = 0; i < m_intData.size(); i++)
 	{
@@ -176,13 +171,11 @@ void albaOpImporterC3D::Clear()
 }
 //----------------------------------------------------------------------------
 bool albaOpImporterC3D::InternalAccept(albaVME *node)
-//----------------------------------------------------------------------------
 {
 	return true;
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterC3D::Copy()
-//----------------------------------------------------------------------------
 {
 	albaOpImporterC3D *cp = new albaOpImporterC3D(m_Label);
 	cp->m_Canundo = m_Canundo;
@@ -193,14 +186,12 @@ albaOp* albaOpImporterC3D::Copy()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::OpRun()
-//----------------------------------------------------------------------------
 {
 	CreateGui();
 	ShowGui();
 }
 //----------------------------------------------------------------------------
 int albaOpImporterC3D::OpenC3D(const albaString &fullFileName)
-//----------------------------------------------------------------------------
 {
 	albaLogMessage("C3D_Open");
 
@@ -222,7 +213,6 @@ int albaOpImporterC3D::OpenC3D(const albaString &fullFileName)
 }
 //----------------------------------------------------------------------------
 bool albaOpImporterC3D::LoadDictionary()
-//----------------------------------------------------------------------------
 {
 	vcl_string landmarkName, segmentName;
 	vcl_ifstream dictionaryInputStream(m_DictionaryFileName, std::ios::in);
@@ -244,13 +234,11 @@ bool albaOpImporterC3D::LoadDictionary()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::DestroyDictionary()
-//----------------------------------------------------------------------------
 {
 	m_dictionaryStruct.clear();
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::Initialize(const albaString &fullFileName, albaOpImporterC3D::_InternalC3DData &intData)
-//----------------------------------------------------------------------------
 {
 	//initialize class members with read data 
 	//Trajectories
@@ -283,7 +271,6 @@ void albaOpImporterC3D::Initialize(const albaString &fullFileName, albaOpImporte
 }
 //----------------------------------------------------------------------------
 albaVMEGroup *albaOpImporterC3D::ImportSingleFile(const albaString &fullFileName, albaOpImporterC3D::_InternalC3DData &intData)
-//----------------------------------------------------------------------------
 {
 	if (OpenC3D(fullFileName) == NOERROR)
 	{
@@ -336,10 +323,9 @@ albaVMEGroup *albaOpImporterC3D::ImportSingleFile(const albaString &fullFileName
 }
 
 //----------------------------------------------------------------------------
-bool albaOpImporterC3D::Import()
-//----------------------------------------------------------------------------
+int albaOpImporterC3D::ImportFile()
 {
-	bool result = false;
+	int result = ALBA_ERROR;
 	Clear();
 	for (unsigned fileIndex = 0; fileIndex < m_C3DInputFileNameFullPaths.size(); fileIndex++)
 	{
@@ -347,16 +333,25 @@ bool albaOpImporterC3D::Import()
 		albaVMEGroup *imported = ImportSingleFile(m_C3DInputFileNameFullPaths[fileIndex], intData);
 		if (imported != NULL)
 		{
-			result = true;
+			result = ALBA_OK;
 			//m_VmeGroups.push_back(imported);
 			m_intData.push_back(intData);
 		}
 	}
 	return result;
 }
+
+//----------------------------------------------------------------------------
+void albaOpImporterC3D::SetFileName(albaString filename)
+{
+	Superclass::SetFileName(filename);
+	Clear(); 
+	m_C3DInputFileNameFullPaths.resize(1); 
+	m_C3DInputFileNameFullPaths[0] = filename;
+}
+
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::ImportTrajectories(albaOpImporterC3D::_InternalC3DData &intData)
-//----------------------------------------------------------------------------
 {
 	intData.m_Clouds.clear();
 
@@ -567,7 +562,6 @@ void albaOpImporterC3D::ImportTrajectories(albaOpImporterC3D::_InternalC3DData &
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::ImportAnalog(albaOpImporterC3D::_InternalC3DData &intData)
-//----------------------------------------------------------------------------
 {
 	albaProgressBarHelper progessHelper(m_Listener);
 	progessHelper.SetTextMode(m_TestMode);
@@ -623,7 +617,6 @@ void albaOpImporterC3D::ImportAnalog(albaOpImporterC3D::_InternalC3DData &intDat
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intData)
-//----------------------------------------------------------------------------
 {
 	albaProgressBarHelper progessHelper(m_Listener);
 	progessHelper.SetTextMode(m_TestMode);
@@ -825,7 +818,6 @@ void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intD
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::ImportEvent(albaOpImporterC3D::_InternalC3DData &intData)
-//----------------------------------------------------------------------------
 {
 	//For every event
 	for (int currentEvent = 0; currentEvent<intData.m_NumEvents; currentEvent++)
@@ -838,7 +830,6 @@ void albaOpImporterC3D::ImportEvent(albaOpImporterC3D::_InternalC3DData &intData
 }
 //----------------------------------------------------------------------------
 // Operation constants
-//----------------------------------------------------------------------------
 enum C3D_IMPORTER_ID
 {
 	ID_FIRST = MINID,
@@ -853,15 +844,13 @@ enum C3D_IMPORTER_ID
 };
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::CreateGui()
-//----------------------------------------------------------------------------
 {
-	albaString wildcard = "c3d files (*.c3d)|*.c3d";
 	std::vector<wxString> files;
 	albaString f;
 
 	m_C3DInputFileNameFullPaths.clear();
 	{
-		albaGetOpenMultiFiles(m_FileDir, wildcard, files);
+		albaGetOpenMultiFiles(m_FileDir, m_Wildc, files);
 		for (unsigned i = 0; i < files.size(); i++)
 		{
 			f = files[i];
@@ -887,7 +876,6 @@ void albaOpImporterC3D::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::DictionaryUpdate()
-//----------------------------------------------------------------------------
 {
 	bool emptyName = (m_DictionaryFileName == "");
 	DestroyDictionary();
@@ -907,7 +895,6 @@ void albaOpImporterC3D::DictionaryUpdate()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -915,7 +902,7 @@ void albaOpImporterC3D::OnEvent(albaEventBase *alba_event)
 		{
 			case wxOK:
 			{
-				if (Import())
+				if (ImportFile()==ALBA_OK)
 				{
 					this->OpStop(OP_RUN_OK);
 				}
@@ -958,7 +945,6 @@ void albaOpImporterC3D::OnEvent(albaEventBase *alba_event)
 
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::OpDo()
-//----------------------------------------------------------------------------
 {
 	albaGUIBusyInfo wait("Please wait, create all VMEs in tree",m_TestMode);
 
@@ -970,7 +956,6 @@ void albaOpImporterC3D::OpDo()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterC3D::OpUndo()
-//----------------------------------------------------------------------------
 {
 	for (unsigned i = 0; i < m_intData.size(); i++)
 	{

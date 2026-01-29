@@ -62,10 +62,9 @@ albaCxxTypeMacro(albaOpImporterImage);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpImporterImage::albaOpImporterImage(const wxString &label) :
-albaOp(label)
-//----------------------------------------------------------------------------
+albaOpImporterImage::albaOpImporterImage(const wxString& label) : albaOpImporterFile(label)
 {
+	SetWildc("Images (*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff)| *.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff|Bitmap (*.bmp)|*.bmp|JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG (*.png)|*.png|TIFF (*.tif;*.tiff)|*.tif;*.tiff");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Files.clear();
@@ -102,7 +101,6 @@ enum IMAGE_IMPORTER_ID
 void albaOpImporterImage::OpRun()   
 //----------------------------------------------------------------------------
 {
-	albaString wildc = "Images (*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff)| *.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff|Bitmap (*.bmp)|*.bmp|JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG (*.png)|*.png|TIFF (*.tif;*.tiff)|*.tif;*.tiff";
 	
   if (!m_TestMode)
   {
@@ -111,7 +109,7 @@ void albaOpImporterImage::OpRun()
 
 		std::vector<wxString> files;
 			
-		albaGetOpenMultiFiles((const char *)albaGetLastUserFolder().ToAscii(), wildc.GetCStr(), files);
+		albaGetOpenMultiFiles((const char *)albaGetLastUserFolder().ToAscii(), m_Wildc, files);
 
 		for (int i = 0; i < files.size(); i++)
 			m_Files.push_back(files[i].ToAscii());
@@ -403,8 +401,29 @@ void albaOpImporterImage::AddFileName(const char *file_name)
 }
 
 //----------------------------------------------------------------------------
+void albaOpImporterImage::SetFileName(albaString filename)
+{
+	Superclass::SetFileName(filename);
+	m_Files.resize(1);
+	m_Files[0] = filename;
+}
+
+//----------------------------------------------------------------------------
 char ** albaOpImporterImage::GetIcon()
 {
 #include "pic/MENU_IMPORT_IMAGE.xpm"
 	return MENU_IMPORT_IMAGE_xpm;
 }
+
+//----------------------------------------------------------------------------
+int albaOpImporterImage::ImportFile()
+{
+  // Forward to existing importer method
+  Import();
+
+	if(m_Output)
+		return ALBA_OK;
+	else
+		return ALBA_ERROR;
+}
+

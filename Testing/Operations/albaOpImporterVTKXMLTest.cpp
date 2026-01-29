@@ -89,7 +89,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKPolylineGraph()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/VTKXML/PolylineGraph.vtp";
   importer->SetFileName(fileName);
-  importer->ImportVTKXML();
+  importer->ImportFile();
   albaVMEPolylineGraph *polylineGraph=albaVMEPolylineGraph::SafeDownCast(importer->GetOutput());
   
   CPPUNIT_ASSERT(polylineGraph!=NULL);
@@ -114,7 +114,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKVolumeSP()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/VTKXML/volumeSP.vti";
   importer->SetFileName(fileName);
-  importer->ImportVTKXML();
+  importer->ImportFile();
   albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(volume!=NULL);
@@ -138,7 +138,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKVolumeRG()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/VTKXML/volumeRG.vtr";
   importer->SetFileName(fileName);
-  importer->ImportVTKXML();
+  importer->ImportFile();
   albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(volume!=NULL);
@@ -162,7 +162,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKSurface()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/VTKXML/sphere.vtp";
   importer->SetFileName(fileName);
-  importer->ImportVTKXML();
+  importer->ImportFile();
   albaVMESurface *surface=albaVMESurface::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(surface!=NULL);
@@ -186,7 +186,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKMesh()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/VTKXML/mesh.vtu";
   importer->SetFileName(fileName);
-  importer->ImportVTKXML();
+  importer->ImportFile();
   albaVMEMesh *surface=albaVMEMesh::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(surface!=NULL);
@@ -210,7 +210,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKPointSet()
   albaString fileName=ALBA_DATA_ROOT;
   fileName<<"/VTKXML/pointset.vtp";
   importer->SetFileName(fileName);
-  importer->ImportVTKXML();
+  importer->ImportFile();
   albaVMEPointSet *pointset=albaVMEPointSet::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(pointset!=NULL);

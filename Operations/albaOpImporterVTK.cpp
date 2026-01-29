@@ -55,16 +55,14 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterVTK);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpImporterVTK::albaOpImporterVTK(const wxString &label) :
-albaOp(label)
-//----------------------------------------------------------------------------
+albaOpImporterVTK::albaOpImporterVTK(const wxString &label) :albaOpImporterFile(label)
 {
+	SetWildc("VTK Data (*.vtk)|*.vtk");
   m_OpType  = OPTYPE_IMPORTER;
 	m_Canundo = true;
-	m_File    = "";
+	m_FileName    = "";
 
   //m_VmePointSet = NULL;
   m_VmeLandmarkCloud = NULL;
@@ -80,7 +78,6 @@ albaOp(label)
 }
 //----------------------------------------------------------------------------
 albaOpImporterVTK::~albaOpImporterVTK()
-//----------------------------------------------------------------------------
 {
   //albaDEL(m_VmePointSet);
   albaDEL(m_VmeLandmarkCloud);
@@ -94,28 +91,25 @@ albaOpImporterVTK::~albaOpImporterVTK()
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterVTK::Copy()   
-//----------------------------------------------------------------------------
 {
   albaOpImporterVTK *cp = new albaOpImporterVTK(m_Label);
-  cp->m_File			= m_File;
+  cp->m_FileName			= m_FileName;
   return cp;
 }
 //----------------------------------------------------------------------------
 void albaOpImporterVTK::OpRun()   
-//----------------------------------------------------------------------------
 {
-	albaString wildc = "vtk Data (*.vtk)|*.vtk";
   albaString f;
-  if (m_File.IsEmpty())
+  if (m_FileName.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir, wildc, _("Choose VTK file"));
-    m_File = f;
+    f = albaGetOpenFile(m_FileDir, m_Wildc, _("Choose VTK file"));
+    m_FileName = f;
   }
 
   int result = OP_RUN_CANCEL;
-  if(!m_File.IsEmpty())
+  if(!m_FileName.IsEmpty())
 	{
-    if (ImportVTK() == ALBA_OK)
+    if (ImportFile() == ALBA_OK)
     {
       result = OP_RUN_OK;
     }
@@ -129,14 +123,13 @@ void albaOpImporterVTK::OpRun()
 	OpStop(result);
 }
 //----------------------------------------------------------------------------
-int albaOpImporterVTK::ImportVTK()
-//----------------------------------------------------------------------------
+int albaOpImporterVTK::ImportFile()
 {
 	bool success = false;
 	albaGUIBusyInfo wait(_("Loading file..."),m_TestMode);
 
 	vtkALBASmartPointer<vtkDataSetReader> reader;
-	reader->SetFileName(m_File);
+	reader->SetFileName(m_FileName);
 
 	vtkDataReader *preader = NULL;
 	// workaround to avoid double reading
@@ -161,13 +154,13 @@ int albaOpImporterVTK::ImportVTK()
 		return ALBA_ERROR;
 	}
 	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, preader));
-	preader->SetFileName(m_File);
+	preader->SetFileName(m_FileName);
 	preader->Update();
 
   if (preader->GetNumberOfOutputPorts()>0)
 	{
 		wxString path, name, ext;
-		wxFileName::SplitPath(m_File, &path, &name, &ext);
+		wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 
     vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputDataObject(0));
 		if (data)
@@ -254,6 +247,7 @@ char ** albaOpImporterVTK::GetIcon()
 	return MENU_IMPORT_VTK_xpm;
 }
 
+//----------------------------------------------------------------------------
 void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug)
 {
 
@@ -299,3 +293,4 @@ void albaOpImporterVTK::CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid* ug
 		pointData->AddArray(idArray);
 	}
 }
+

@@ -45,10 +45,9 @@ albaCxxTypeMacro(albaOpImporterSTL);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpImporterSTL::albaOpImporterSTL(const wxString &label) :
-albaOp(label)
-//----------------------------------------------------------------------------
+albaOpImporterSTL::albaOpImporterSTL(const wxString &label) :albaOpImporterFile(label)
 {
+	SetWildc("Stereo Litography (*.stl)|*.stl");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Files.clear();
@@ -56,20 +55,17 @@ albaOp(label)
 }
 //----------------------------------------------------------------------------
 albaOpImporterSTL::~albaOpImporterSTL()
-//----------------------------------------------------------------------------
 {
   for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
     albaDEL(m_ImportedSTLs[i]);
 }
 //----------------------------------------------------------------------------
 bool albaOpImporterSTL::InternalAccept(albaVME*node)
-//----------------------------------------------------------------------------
 {
   return true;
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterSTL::Copy()   
-//----------------------------------------------------------------------------
 {
   albaOpImporterSTL *cp = new albaOpImporterSTL(m_Label);
   cp->m_Files = m_Files;
@@ -77,18 +73,16 @@ albaOp* albaOpImporterSTL::Copy()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::OpRun()   
-//----------------------------------------------------------------------------
 {
 	albaString	fileDir = albaGetLastUserFolder();
 
   if (!m_TestMode && m_Files.size() == 0)
   {
-    albaString wildc = "Stereo Litography (*.stl)|*.stl";
     std::vector<wxString> files;
     albaString f;
 
     m_Files.clear();
-    albaGetOpenMultiFiles(fileDir.GetCStr(),wildc.GetCStr(), files);
+    albaGetOpenMultiFiles(fileDir.GetCStr(),m_Wildc, files);
     for(unsigned i = 0; i < files.size(); i++)
     {
       f = files[i];
@@ -101,12 +95,6 @@ void albaOpImporterSTL::OpRun()
 	if(m_Files.size() != 0) 
 	{
 		result = OP_RUN_OK;
-    m_Swaps.resize(m_Files.size());
-    for(unsigned i = 0; i < m_Swaps.size(); i++)
-    {
-      m_Swaps[i] = 0;
-      CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
-    }
     ImportSTL();
 	}
 
@@ -114,7 +102,6 @@ void albaOpImporterSTL::OpRun()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::CheckSwap(const char *file_name, int &swapFlag)
-//----------------------------------------------------------------------------
 {
   //check if the file is binary
   if(IsFileBinary(file_name))
@@ -160,7 +147,6 @@ void albaOpImporterSTL::CheckSwap(const char *file_name, int &swapFlag)
 }
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::OpDo()
-//----------------------------------------------------------------------------
 {
   for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
   {
@@ -174,7 +160,6 @@ void albaOpImporterSTL::OpDo()
 
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::OpUndo()
-//----------------------------------------------------------------------------
 {
   for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
   {
@@ -188,10 +173,16 @@ void albaOpImporterSTL::OpUndo()
 
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::ImportSTL()
-//----------------------------------------------------------------------------
 {
   albaGUIBusyInfo wait("Loading file...",m_TestMode);  
   
+	m_Swaps.resize(m_Files.size());
+	for (unsigned i = 0; i < m_Swaps.size(); i++)
+	{
+		m_Swaps[i] = 0;
+		CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
+	}
+
   unsigned int i;
   for(i = 0; i < m_ImportedSTLs.size(); i++)
     albaDEL(m_ImportedSTLs[i]);
@@ -283,7 +274,6 @@ void albaOpImporterSTL::ImportSTL()
 }
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::Swap_Four(unsigned int *value)
-//----------------------------------------------------------------------------
 { 
 	unsigned int r; 
 	r =  *value;
@@ -293,7 +283,6 @@ void albaOpImporterSTL::Swap_Four(unsigned int *value)
 //----------------------------------------------------------------------------
 bool albaOpImporterSTL::IsFileBinary(const char *name_file)
 //  it is similar to the protected member vtkSTLReader::GetSTLFileType(FILE *fp)
-//----------------------------------------------------------------------------
 {
   unsigned char header[80];
   int i;
@@ -325,22 +314,9 @@ bool albaOpImporterSTL::IsFileBinary(const char *name_file)
   fclose(pFile);
   return binary;
 }
-//----------------------------------------------------------------------------
-void albaOpImporterSTL::SetFileName(const char *file_name)
-//----------------------------------------------------------------------------
-{
-  m_Files.resize(1);
-  m_Files[0] = file_name;
-  m_Swaps.resize(m_Files.size());
-  for(unsigned i = 0; i < m_Swaps.size(); i++)
-  {
-    m_Swaps[i] = 0;
-    CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
-  }
-}
+
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::GetImportedSTL(std::vector<albaVMESurface*> &importedSTL)
-//----------------------------------------------------------------------------
 {
   importedSTL.clear();
   importedSTL.resize(m_ImportedSTLs.size());
@@ -356,3 +332,27 @@ char ** albaOpImporterSTL::GetIcon()
 #include "pic/MENU_IMPORT_STL.xpm"
 	return MENU_IMPORT_STL_xpm;
 }
+//----------------------------------------------------------------------------
+int albaOpImporterSTL::ImportFile(){
+
+  // Forward to existing importer method
+  ImportSTL();
+
+  if(m_ImportedSTLs.size() > 0)
+  {
+    return ALBA_OK;
+  }
+  else
+  {
+    return ALBA_ERROR;
+	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterSTL::SetFileName(albaString fileName)
+{
+  m_FileName = fileName;
+	m_Files.clear();
+	m_Files.push_back(m_FileName);
+}
+

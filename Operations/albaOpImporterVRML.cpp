@@ -133,13 +133,14 @@ albaCxxTypeMacro(albaOpImporterVRML);
 	}
 */
 //----------------------------------------------------------------------------
- albaOpImporterVRML:: albaOpImporterVRML(const wxString &label) : albaOp(label)
-//----------------------------------------------------------------------------
+ albaOpImporterVRML:: albaOpImporterVRML(const wxString &label) :albaOpImporterFile(label)
 {
 	m_OpType	= OPTYPE_IMPORTER;
-	m_File		= "";
+	m_FileName		= "";
 	m_Canundo	= true;
 	m_Group		= NULL;
+
+	SetWildc("VRML Data(*.wrl) | *.wrl");
 
  	m_FileDir = albaGetLastUserFolder();
 }
@@ -154,7 +155,7 @@ albaOp * albaOpImporterVRML::Copy()
 //----------------------------------------------------------------------------
 {
   albaOpImporterVRML *cp = new  albaOpImporterVRML(m_Label);
-	cp->m_File		= m_File;
+	cp->m_FileName		= m_FileName;
   cp->m_FileDir = m_FileDir;
   return cp; 
 }
@@ -162,21 +163,20 @@ albaOp * albaOpImporterVRML::Copy()
 void  albaOpImporterVRML::OpRun()   
 //----------------------------------------------------------------------------
 {
-	albaString vrml_wildc	= "VRML Data (*.wrl)|*.wrl";
-  albaString f;
+	albaString f;
 
-  if (m_File.IsEmpty())
+  if (m_FileName.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir.GetCStr(),vrml_wildc.GetCStr()); 	
-    m_File = f;
+    f = albaGetOpenFile(m_FileDir.GetCStr(),m_Wildc); 	
+    m_FileName = f;
   }
 
   int result = OP_RUN_CANCEL;
 
-  if(!m_File.IsEmpty()) 
+  if(!m_FileName.IsEmpty()) 
   {
     result = OP_RUN_OK;
-    ImportVRML();
+    ImportFile();
   }
 
   albaEventMacro(albaEvent(this,result));
@@ -185,14 +185,14 @@ void  albaOpImporterVRML::OpRun()
 void  albaOpImporterVRML::SetFileName(const char *file_name)
 //----------------------------------------------------------------------------
 {
-  m_File = file_name;
+  m_FileName = file_name;
 }
 //----------------------------------------------------------------------------
-void  albaOpImporterVRML::ImportVRML()
+int  albaOpImporterVRML::ImportFile()
 //----------------------------------------------------------------------------
 {
   wxString path, name, ext;
-  wxFileName::SplitPath(m_File.GetCStr(),&path,&name,&ext);
+  wxFileName::SplitPath(m_FileName.GetCStr(),&path,&name,&ext);
 
   albaNEW(m_Group);
   m_Group->SetName(name.ToAscii());
@@ -201,7 +201,7 @@ void  albaOpImporterVRML::ImportVRML()
 
   vtkALBASmartPointer<vtkVRMLImporter> importer;
   importer->SetRenderWindow(rw.GetPointer());
-  importer->SetFileName(m_File.GetCStr());
+  importer->SetFileName(m_FileName.GetCStr());
   importer->Update();
 
   albaMatrix matrix;
@@ -258,4 +258,6 @@ void  albaOpImporterVRML::ImportVRML()
     }
   }
   m_Output = m_Group;
+
+	return ALBA_OK;
 }
