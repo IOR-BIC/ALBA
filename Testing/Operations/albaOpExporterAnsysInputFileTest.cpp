@@ -61,7 +61,7 @@ void albaOpExporterAnsysInputFileTest::Check_INPFile(albaString fileName)
   importer->TestModeOn();
   importer->SetFileName((filePath << fileName).GetCStr());
 	importer->SetInput(root);
-  importer->Import();
+  importer->ImportFile();
 
   albaVMEMesh *importedData = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
 
@@ -86,7 +86,7 @@ void albaOpExporterAnsysInputFileTest::Check_INPFile(albaString fileName)
 
   // Import
   importer->SetFileName(filePath.GetCStr());
-  importer->Import();
+  importer->ImportFile();
 
   albaVMEMesh *importedData2 = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
 
@@ -111,7 +111,7 @@ void albaOpExporterAnsysInputFileTest::CompareINPFilesData(albaString fileName)
   importer->TestModeOn();
   importer->SetFileName((filePath << fileName).GetCStr());
 	importer->SetInput(root);
-  importer->Import();
+  importer->ImportFile();
 
   albaVMEMesh *importedData = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
 
@@ -136,7 +136,7 @@ void albaOpExporterAnsysInputFileTest::CompareINPFilesData(albaString fileName)
 
   // Import
   importer->SetFileName(filePath.GetCStr());
-  importer->Import();
+  importer->ImportFile();
 
   albaVMEMesh *importedData2 = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
 
