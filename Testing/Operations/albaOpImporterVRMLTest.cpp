@@ -50,7 +50,7 @@ void albaOpImporterVRMLTest::Test()
 	albaString filename=ALBA_DATA_ROOT;
 	filename<<"/VRML/DatoTestVRMLImporter.wrl";
 	importer->SetFileName(filename);
-	importer->ImportVRML();
+	importer->ImportFile();
 
 	//Check the output of the importer
 	CPPUNIT_ASSERT(importer->GetOutput() != NULL);

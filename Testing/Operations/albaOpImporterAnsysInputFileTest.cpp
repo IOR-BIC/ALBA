@@ -103,7 +103,7 @@ void albaOpImporterAnsysInputFileTest::ImportInputFile(albaString fileName, int 
   filePath<<"/albaOpImporterAnsysInputFileTest/" << fileName;
   importer->SetFileName(filePath.GetCStr());
 	importer->SetInput(root);
-  importer->Import();
+  importer->ImportFile();
 
   // Imported Mesh
   albaVMEMesh *importedMesh = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());
