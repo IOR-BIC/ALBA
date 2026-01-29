@@ -92,7 +92,7 @@ void albaOpImporterAnsysCDBFileTest::ImportCDBFile(albaString fileName, int numP
   filePath<<"/albaOpImporterAnsysCDBFileTest/" << fileName;
   importer->SetFileName(filePath.GetCStr());
 	importer->SetInput(root);
-  importer->Import();
+  importer->ImportFile();
 
   // Imported Mesh
   albaVMEMesh *importedMesh = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());

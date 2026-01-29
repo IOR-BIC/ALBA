@@ -333,10 +333,7 @@ char ** albaOpImporterSTL::GetIcon()
 	return MENU_IMPORT_STL_xpm;
 }
 //----------------------------------------------------------------------------
-int albaOpImporterSTL::ImportFile()
-{
-	m_Files.clear();
-	m_Files.push_back(m_FileName);
+int albaOpImporterSTL::ImportFile(){
 
   // Forward to existing importer method
   ImportSTL();
@@ -349,5 +346,13 @@ int albaOpImporterSTL::ImportFile()
   {
     return ALBA_ERROR;
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpImporterSTL::SetFileName(albaString fileName)
+{
+  m_FileName = fileName;
+	m_Files.clear();
+	m_Files.push_back(m_FileName);
 }
 

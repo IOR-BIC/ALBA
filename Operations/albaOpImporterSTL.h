@@ -69,8 +69,14 @@ public:
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
+
   /** Import the file, return ALBA_OK on success. */
   virtual int ImportFile();
+
+	/** Set the file to be imported. */
+  virtual void SetFileName(albaString fileName);
+
+
 
 protected:
 

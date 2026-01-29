@@ -53,7 +53,7 @@ void albaOpImporterDICFileTest::Test()
   filename<<"/PointCloud/PointCloud.dat";
 	importer->SetFileName(filename.GetCStr());
 	importer->SetInput(root);
-	importer->Import();
+	importer->ImportFile();
 	albaVMEPointCloud *node=(albaVMEPointCloud *)importer->GetOutput();
 
   CPPUNIT_ASSERT(node->GetNumberOfPoints() == 30);
