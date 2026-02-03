@@ -100,23 +100,6 @@ vtkMTimeType vtkALBADistanceFilter::GetMTime()
   return time;
 }
 
-//----------------------------------------------------------------------------
-int	vtkALBADistanceFilter::RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
-{
-	this->vtkDataSetAlgorithm::RequestUpdateExtent(request, inputVector,	outputVector);
-
-  vtkDataObject *source = this->GetSource();
-  if (source)
-  {
-    vtkInformation* outInfo = this->GetOutputInformation(0);
-    int wholeExtent[6];
-    outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]); 
-  }
-
-	return 1;
-  }
-
 
 //----------------------------------------------------------------------------
 void vtkALBADistanceFilter::RequestData(vtkInformation* request, vtkPointSet *output)

@@ -96,7 +96,6 @@ void vtkALBADataPipeTest::TestGetMTime()
 	long time1, time2;
 	time1 = dp->GetMTime();
 	dp->Modified();
-	dp->Update();
 	time2 = dp->GetMTime();
 
 	CPPUNIT_ASSERT(time2 > time1);
@@ -107,7 +106,6 @@ void vtkALBADataPipeTest::TestGetMTime()
 	dp->SetDataPipe(mdp);
 	time1 = dp->GetMTime();
 	dp->Modified();
-	dp->Update();
 	time2 = dp->GetMTime();
 
 	CPPUNIT_ASSERT(time2 > time1);
