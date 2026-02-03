@@ -107,6 +107,7 @@ void albaOpExporterBMPTest::TestExportBMP()
   albaString filenameOriginal = ALBA_DATA_ROOT;
   filenameOriginal << "/Test_ExporterBMP/Bn_2295_bc_0012.bmp"; ///
   importerBMPOriginal->TestModeOn();
+	importerBMPOriginal->SetYFlip(true);
   importerBMPOriginal->SetInput(storage->GetRoot());
 	importerBMPOriginal->AddFileName(filenameOriginal);
   importerBMPOriginal->Import();

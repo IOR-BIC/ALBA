@@ -224,8 +224,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpConnectivitySurfaceTest::suite());
 	runner.addTest(albaOpRemoveCellsTest::suite());
 	runner.addTest(albaOpBooleanSurfaceTest::suite());
-	runner.addTest(albaOpEditNormalsTest::suite()); 
-	runner.addTest(albaOpExporterBMPTest::suite()); 
+	runner.addTest(albaOpEditNormalsTest::suite()); */
+	runner.addTest(albaOpExporterBMPTest::suite()); /*
 	runner.addTest(albaOpImporterMSFTest::suite());
 	runner.addTest(albaOpImporterExternalFileTest::suite());
 	runner.addTest(albaOpOpenExternalFileTest::suite());

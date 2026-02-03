@@ -73,8 +73,18 @@ public:
   /** Import the file, return ALBA_OK on success. */
   virtual int ImportFile();
 
-
-
+  /** Get if X-Flip is enabled */
+  int GetXFlip() { return m_XFlip; }
+  /** Enable/Disable X-Flip */
+  void SetXFlip(int val) { m_XFlip = val; }
+	/** Get if Y-Flip is enabled */
+	int GetYFlip() const { return m_YFlip; }
+	/** Enable/Disable Y-Flip */
+	void SetYFlip(int val) { m_YFlip = val; }
+	/** Get if Z-Flip is enabled */
+	int GetZFlip() const { return m_ZFlip; }
+	/** Enable/Disable Z-Flip */
+	void SetZFlip(int val) { m_ZFlip = val; }
 protected:
 
 	/** Return true for the acceptable vme type. */
