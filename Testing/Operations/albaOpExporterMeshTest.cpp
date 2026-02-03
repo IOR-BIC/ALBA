@@ -77,7 +77,7 @@ void albaOpExporterMeshTest::TestExporterMesh()
   DummyVme *dummyVme = new DummyVme();
   importerVTK->SetInput(dummyVme);
   importerVTK->SetFileName(vtkFileName.GetCStr());
-  importerVTK->ImportVTK();
+  importerVTK->ImportFile();
 
   // Check that the vme has been correctly generated
   CPPUNIT_ASSERT(dummyVme->GetChild(0) && dummyVme->GetChild(0)->IsA("albaVMEMesh"));
@@ -223,7 +223,7 @@ void albaOpExporterMeshTest::TestBackCalculation()
 	DummyVme *dummyVme = new DummyVme();
 	importerVTK->SetInput(dummyVme);
 	importerVTK->SetFileName(vtkFileName.GetCStr());
-	importerVTK->ImportVTK();
+	importerVTK->ImportFile();
 
 	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();
@@ -294,7 +294,7 @@ void albaOpExporterMeshTest::TestBackCalculationSetValues()
 	DummyVme *dummyVme = new DummyVme();
 	importerVTK->SetInput(dummyVme);
 	importerVTK->SetFileName(vtkFileName.GetCStr());
-	importerVTK->ImportVTK();
+	importerVTK->ImportFile();
 
 	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();
@@ -374,7 +374,7 @@ void albaOpExporterMeshTest::TestBackCalculationTripleInterval()
 	DummyVme *dummyVme = new DummyVme();
 	importerVTK->SetInput(dummyVme);
 	importerVTK->SetFileName(vtkFileName.GetCStr());
-	importerVTK->ImportVTK();
+	importerVTK->ImportFile();
 
 	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();

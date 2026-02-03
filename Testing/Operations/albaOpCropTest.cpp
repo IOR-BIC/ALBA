@@ -55,7 +55,7 @@ void albaOpCropTest::TestCropRG()
 	Importer->TestModeOn();
 	Importer->SetFileName(filename);
 	Importer->SetInput(storage->GetRoot());
-	Importer->ImportVTK();
+	Importer->ImportFile();
 	albaVMEVolumeGray *Input=albaVMEVolumeGray::SafeDownCast(Importer->GetOutput());
 	Input->Update();
 
@@ -134,7 +134,7 @@ void albaOpCropTest::TestCropSP()
 	Importer->TestModeOn();
 	Importer->SetFileName(filename);
 	Importer->SetInput(storage->GetRoot());
-	Importer->ImportVTK();
+	Importer->ImportFile();
 	albaVMEVolumeGray *Input=albaVMEVolumeGray::SafeDownCast(Importer->GetOutput());
 	Input->Update();
 

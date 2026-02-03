@@ -57,9 +57,9 @@ albaCxxTypeMacro(albaOpImporterAbaqusFile);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpImporterAbaqusFile::albaOpImporterAbaqusFile(const wxString &label) :
-albaOp(label)
+albaOpImporterAbaqusFile::albaOpImporterAbaqusFile(const wxString &label) : albaOpImporterFile(label)
 {
+	SetWildc("Inp Files (*.inp)|*.inp|All Files (*.*)|*.*");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_ImporterType = 0;
@@ -70,7 +70,6 @@ albaOp(label)
 
   m_DataDir = userPath + "\\Data";
   m_CacheDir = m_DataDir + "\\AbaqusReaderCache";
-  m_AbaqusInputFileNameFullPath		= "";
 }
 //----------------------------------------------------------------------------
 albaOpImporterAbaqusFile::~albaOpImporterAbaqusFile()
@@ -106,26 +105,20 @@ albaOp* albaOpImporterAbaqusFile::Copy()
   albaOpImporterAbaqusFile *cp = new albaOpImporterAbaqusFile(m_Label);
   return cp;
 }
-//----------------------------------------------------------------------------
-albaString albaOpImporterAbaqusFile::GetWildcard()
-{
-  return "inp files (*.inp)|*.inp|All Files (*.*)|*.*";
-}
+
 
 //----------------------------------------------------------------------------
 void albaOpImporterAbaqusFile::OpRun()   
-{  
-  albaString wildcard = GetWildcard();
-
+{
   int result = OP_RUN_CANCEL;
-  m_AbaqusInputFileNameFullPath = "";
+  m_FileName = "";
 
   wxString f;
-  f = albaGetOpenFile("", wildcard).ToAscii(); 
+  f = albaGetOpenFile("", m_Wildc).ToAscii();
   if(!f.IsEmpty() && wxFileExists(f))
   {
-    m_AbaqusInputFileNameFullPath = f;
-    Import();
+    m_FileName = f;
+    ImportFile();
     result = OP_RUN_OK;
   }
   albaEventMacro(albaEvent(this,result));  
@@ -139,7 +132,7 @@ void albaOpImporterAbaqusFile::OnEvent(albaEventBase *alba_event)
     {
     case wxOK:
       {
-        this->Import();
+        this->ImportFile();
         this->OpStop(OP_RUN_OK);
       }
       break;
@@ -156,7 +149,7 @@ void albaOpImporterAbaqusFile::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-int albaOpImporterAbaqusFile::Import()
+int albaOpImporterAbaqusFile::ImportFile()
 {
   int returnValue=ALBA_OK;
 
@@ -183,7 +176,7 @@ int albaOpImporterAbaqusFile::Import()
   }
 
   // Parsing Abaqus File
-  if(ParseAbaqusFile(m_AbaqusInputFileNameFullPath) == ALBA_ERROR)
+  if(ParseAbaqusFile(m_FileName) == ALBA_ERROR)
   {
     return ALBA_ERROR;
   }
@@ -213,7 +206,7 @@ int albaOpImporterAbaqusFile::Import()
     else if (returnValue == ALBA_OK)
     {
       wxString name, path, ext;
-      wxFileName::SplitPath(m_AbaqusInputFileNameFullPath, &path, &name, &ext);
+      wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 
       albaNEW(m_ImportedVmeMesh);
 

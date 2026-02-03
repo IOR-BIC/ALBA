@@ -50,7 +50,7 @@ albaCxxTypeMacro(albaOpImporterAnsysInputFile);
 albaOpImporterAnsysInputFile::albaOpImporterAnsysInputFile(const wxString &label) :
 albaOpImporterAnsysCommon(label)
 {
-
+	SetWildc("Inp Files (*.inp)|*.inp|All Files (*.*)|*.*");
 }
 //----------------------------------------------------------------------------
 albaOpImporterAnsysInputFile::~albaOpImporterAnsysInputFile()
@@ -63,11 +63,6 @@ albaOp* albaOpImporterAnsysInputFile::Copy()
 {
   albaOpImporterAnsysInputFile *cp = new albaOpImporterAnsysInputFile(m_Label);
   return cp;
-}
-//----------------------------------------------------------------------------
-albaString albaOpImporterAnsysInputFile::GetWildcard()
-{
-  return "inp files (*.inp)|*.inp|All Files (*.*)|*.*";
 }
 
 //----------------------------------------------------------------------------
@@ -211,3 +206,5 @@ int albaOpImporterAnsysInputFile::UpdateElements()
 
   return ALBA_OK;
 }
+
+

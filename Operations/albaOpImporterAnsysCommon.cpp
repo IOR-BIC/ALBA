@@ -46,7 +46,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 albaOpImporterAnsysCommon::albaOpImporterAnsysCommon(const wxString &label) :
-albaOp(label)
+albaOpImporterFile(label)
 { 
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
@@ -60,7 +60,7 @@ albaOp(label)
 
 	m_DataDir = userPath + "\\Data";
   m_CacheDir = m_DataDir + "\\AnsysReaderCache";
-  m_AnsysInputFileNameFullPath		= "";
+  m_FileName		= "";
  }
 
 //----------------------------------------------------------------------------
@@ -90,17 +90,15 @@ bool albaOpImporterAnsysCommon::InternalAccept(albaVME *node)
 //----------------------------------------------------------------------------
 void albaOpImporterAnsysCommon::OpRun()   
 {  
-  albaString wildcard = GetWildcard();
-
   int result = OP_RUN_CANCEL;
-  m_AnsysInputFileNameFullPath = "";
+  m_FileName = "";
 
   wxString f;
-  f = albaGetOpenFile("", wildcard).ToAscii(); 
+  f = albaGetOpenFile("", m_Wildc).ToAscii(); 
   if(!f.IsEmpty() && wxFileExists(f))
   {
-    m_AnsysInputFileNameFullPath = f;
-    Import();
+    m_FileName = f;
+    ImportFile();
     result = OP_RUN_OK;
   }
   albaEventMacro(albaEvent(this,result));  
@@ -115,7 +113,7 @@ void albaOpImporterAnsysCommon::OnEvent(albaEventBase *alba_event)
     {
     case wxOK:
       {
-        this->Import();
+        this->ImportFile();
         this->OpStop(OP_RUN_OK);
       }
       break;
@@ -131,7 +129,7 @@ void albaOpImporterAnsysCommon::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-int albaOpImporterAnsysCommon::Import()
+int albaOpImporterAnsysCommon::ImportFile()
 {
   m_NodesFileName = m_CacheDir + "\\nodes.lis" ;
   m_MaterialsFileName = m_CacheDir + "\\materials.lis" ;
@@ -153,7 +151,7 @@ int albaOpImporterAnsysCommon::Import()
 	}
   
   // Parsing Ansys File
-  if(ParseAnsysFile(m_AnsysInputFileNameFullPath) == ALBA_ERROR)
+  if(ParseAnsysFile(m_FileName) == ALBA_ERROR)
   {
     return ALBA_ERROR;
   }
@@ -161,7 +159,7 @@ int albaOpImporterAnsysCommon::Import()
   albaGUIBusyInfo("Please wait importing VME Mesh AnsysText...",m_TestMode);
   
   wxString name, path, ext;
-  wxFileName::SplitPath(m_AnsysInputFileNameFullPath, &path, &name, &ext);
+  wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 
   int returnValue = ALBA_OK;  
   
@@ -388,7 +386,7 @@ int albaOpImporterAnsysCommon::ReadCMBLOCK()
 	if (compType == "ELEM,")
 	{
 		wxString fname, fpath, fext;
-		wxFileName::SplitPath(m_AnsysInputFileNameFullPath, &fpath, &fname, &fext);
+		wxFileName::SplitPath(m_FileName.GetCStr(), &fpath, &fname, &fext);
 
 		// Create Component
 		AnsysComponent comp;

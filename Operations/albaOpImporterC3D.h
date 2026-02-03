@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "btkAcquisitionFileReader.h"
 #include "btkForcePlatformsExtractor.h"
 #include "btkGroundReactionWrenchFilter.h"
@@ -47,13 +47,13 @@ class albaVMEGroup;
 This operation is a wrapper of C3D Reader SDK of Aurion. Need C3D_Reader.lib, C3D_Reader.dll,
 LicenseAurion.dll. The license can be obtained by Aurion following messagebox created by dll.
 */
-class ALBA_EXPORT albaOpImporterC3D : public albaOp
+class ALBA_EXPORT albaOpImporterC3D : public albaOpImporterFile
 {
 public:
 	albaOpImporterC3D(const wxString &label = "C3D Importer");
 	~albaOpImporterC3D();
 
-	albaTypeMacro(albaOpImporterC3D, albaOp);
+	albaTypeMacro(albaOpImporterC3D, albaOpImporterFile);
 
 	virtual void OnEvent(albaEventBase *alba_event);
 
@@ -69,12 +69,13 @@ public:
 	void OpUndo();
 
 	/** Import the c3d*/
-	bool Import();
+	int ImportFile();
 
 	//methods useful for test
 
 	/* Set/Get Full pathname of c3d File*/
-	void SetC3DFileName(const char *filec3d) { Clear(); m_C3DInputFileNameFullPaths.resize(1); m_C3DInputFileNameFullPaths[0] = filec3d; }
+	void SetFileName(albaString filename);
+
 	const char * GetC3DFileName() { if (m_C3DInputFileNameFullPaths.empty()) return NULL; return m_C3DInputFileNameFullPaths[0]; }
 
 	/* Set/Get Full pathname of dictionary File*/
@@ -114,6 +115,7 @@ public:
 	/* Set/Get Event import flag*/
 	void SetImportEvent(int flag) { m_ImportEventFlag = flag; }
 	int  GetImportEvent() { return m_ImportEventFlag; }
+
 
 protected:
 
