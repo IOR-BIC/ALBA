@@ -114,7 +114,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-	/* 
+	/*  */
 #ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
 	runner.addTest(albaPipeVolumeMIPTest::suite());
 	runner.addTest(albaPipeVolumeDRRTest::suite());
@@ -133,30 +133,30 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeIsosurfaceTest::suite());
 	runner.addTest(albaPipePointSetTest::suite());
 	runner.addTest(albaPipeFactoryVMETest::suite());
-	runner.addTest(albaPipePolylineTest::suite()); */
+	runner.addTest(albaPipePolylineTest::suite()); 
 	runner.addTest(albaPipeLandmarkCloudTest::suite()); 
-	runner.addTest(albaPipeVectorTest::suite()); /*/
+	runner.addTest(albaPipeVectorTest::suite()); 
 	runner.addTest(albaPipeMeterTest::suite());
 	runner.addTest(albaPipeVolumeProjectedTest::suite());
-	runner.addTest(albaPipeScalarMatrixTest::suite()); */ 
-	runner.addTest(albaPipePolylineGraphEditorTest::suite()); /*
+	runner.addTest(albaPipeScalarMatrixTest::suite()); 
+	runner.addTest(albaPipePolylineGraphEditorTest::suite()); 
 	runner.addTest(albaPipeMeshSliceTest::suite());
 	runner.addTest(albaPipeSurfaceSliceTest::suite());
 	runner.addTest(albaPipeVolumeOrthoSliceTest::suite());
- 	runner.addTest(albaPipeVolumeArbSliceTest::suite()); */
-	runner.addTest(albaPipeTrajectoriesTest::suite()); /*
+ 	runner.addTest(albaPipeVolumeArbSliceTest::suite()); 
+	runner.addTest(albaPipeTrajectoriesTest::suite());
 	runner.addTest(albaPipeSliceTest::suite()); 
 	runner.addTest(albaPipePolylineSliceTest::suite()); 
-	runner.addTest(albaPipeWrappedMeterTest::suite()); */
-	runner.addTest(albaPipeDensityDistanceTest::suite()); /*
+	runner.addTest(albaPipeWrappedMeterTest::suite()); 
+	runner.addTest(albaPipeDensityDistanceTest::suite());
 	runner.addTest(albaPipeGraphTest::suite());
 	runner.addTest(albaPipeCompoundTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());
 	runner.addTest(albaPipeCompoundVolumeFixedScalarsTest::suite());
 	runner.addTest(albaVisualPipePolylineGraphTest::suite());
-	runner.addTest(albaPipeSurfaceEditorTest::suite()); */
-	runner.addTest(albaPipeTensorFieldSurfaceTest::suite()); /*
+	runner.addTest(albaPipeSurfaceEditorTest::suite()); 
+	runner.addTest(albaPipeTensorFieldSurfaceTest::suite()); 
 	runner.addTest(albaPipeVectorFieldSurfaceTest::suite());
 	runner.addTest(albaPipeVectorFieldGlyphsTest::suite());
 	runner.addTest(albaPipeVectorFieldMapWithArrowsTest::suite());
