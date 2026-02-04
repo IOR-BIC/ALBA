@@ -279,7 +279,7 @@ void albaOpImporterImage::Import()
 			}
 
 			vtkALBASmartPointer<vtkImageFlip> yFlipFilter;
-			if (m_YFlip)
+			if (!m_YFlip) //invert Y flip logic for image coordinate system
 			{
 				yFlipFilter->SetInput(finalImage);
 				yFlipFilter->SetFilteredAxis(1); // Y
