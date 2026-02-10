@@ -304,12 +304,13 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 			m_Slicer[i]->SetSclicingMode(i);
 			m_Slicer[i]->SetPlaneOrigin(m_Origin);
 			m_Slicer[i]->SetInputData(vtk_data);
-
+	
 
 			vtkNEW(m_Texture[i]);
 			m_Texture[i]->RepeatOff();
 			m_Texture[i]->SetInterpolate(m_Interpolate);
 			m_Texture[i]->SetQualityTo32Bit();
+			m_Texture[i]->SetColorModeToMapScalars();
 			m_Texture[i]->SetInputConnection(m_Slicer[i]->GetOutputPort());
 			m_Texture[i]->SetLookupTable(m_ColorLUT);
 
@@ -346,7 +347,7 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 
 			vtkNEW(m_SliceMapper[i]);
 			m_SliceMapper[i]->SetInputConnection(m_SlicePlane[i]->GetOutputPort());
-			m_SliceMapper[i]->ScalarVisibilityOff();
+			m_SliceMapper[i]->ScalarVisibilityOn();
 
 			vtkNEW(m_SliceActor[i]);
 			m_SliceActor[i]->SetMapper(m_SliceMapper[i]);
