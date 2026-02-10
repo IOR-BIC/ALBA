@@ -2689,19 +2689,13 @@ void albaLogicWithManagers::TreeContextualMenu(albaEvent &e)
 
 // Splash Screen
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ShowSplashScreen()
-{
-	wxBitmap splashImage = albaPictureFactory::GetPictureFactory()->GetBmp("SPLASH_SCREEN");
-	ShowSplashScreen(splashImage);
-}
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message, int x, int y, wxColour color)
+void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message, int pos, wxColour color)
 {
 	m_SplashScreen = new albaGUISplashScreen(splashImage, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 2000, NULL);
 
-	if (message.IsEmpty()) message = m_AppBuildNum;
+	if (message.IsEmpty()) message = GetTopWin()->GetTitle()  + " is not a medical device.";
 
-	m_SplashScreen->SetText(message, x, y, color);
+	m_SplashScreen->SetText(message,(albaGUISplashScreen::SPLASH_SCREEN_POSITION)pos, color);
 	wxMilliSleep(1500);
 
 	albaYield();
