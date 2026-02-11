@@ -452,6 +452,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetAppBuildNum(m_AppBuildNum.GetCStr());
 	m_AboutDialog->SetAlbaBuildNum(m_AlbaBuildNum.GetCStr());
 	m_AboutDialog->SetWebSite("https://github.com/IOR-BIC/ALBA");
+	m_AboutDialog->SetCitationPaper(m_CitationPaper.GetCStr());
 
 	wxString imagePath = albaGetConfigDirectory().ToAscii();
 	imagePath += "\\" + m_AboutImage;
@@ -2731,7 +2732,7 @@ void albaLogicWithManagers::ShowWebSite(wxString url)
 	}
 
 	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + "\"" + url + "/\"";
+	command = command + "\"" + url + "\"";
 	wxExecute(command);
 }
 

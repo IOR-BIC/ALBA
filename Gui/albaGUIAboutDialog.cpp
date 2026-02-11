@@ -44,6 +44,7 @@
 #include "albaGUIValidator.h"
 #include "albaLogicWithManagers.h"
 #include "wx/datetime.h"
+#include "wx/clipbrd.h"
 
 //----------------------------------------------------------------------------
 // constant :
@@ -52,6 +53,8 @@ enum albaGUIAboutDialog_IDS
 {
 	ID_SHOW_WEBSITE = MINID,
   ID_SHOW_LICENSE,
+  ID_SHOW_CITATION,
+  ID_COPY_CITATION,
 };
 
 //----------------------------------------------------------------------------
@@ -65,6 +68,7 @@ albaGUIAboutDialog::albaGUIAboutDialog(wxString dialog_title)
 	m_WebSiteURL = "";
 	m_LicenseURL = "";
 	m_ExtraMessage = "";
+	m_CitationPaper = "";
 
 	m_AboutDialog = NULL;
 	m_PreviewImage = NULL;
@@ -101,6 +105,20 @@ void albaGUIAboutDialog::OnEvent(albaEventBase *alba_event)
 				albaLogicWithManagers::ShowWebSite(m_LicenseURL);
 			}
 			break;
+      case ID_SHOW_CITATION:
+      {
+        albaLogicWithManagers::ShowWebSite(m_CitationPaper);
+      }
+      break;
+      case ID_COPY_CITATION:
+      {
+        if (wxTheClipboard->Open())
+        {
+          wxTheClipboard->SetData(new wxTextDataObject(m_CitationPaper));
+          wxTheClipboard->Close();
+        }
+      }
+      break;
       default:
         e->Log();
       break; 
@@ -138,6 +156,7 @@ void albaGUIAboutDialog::SetExtraMessage(wxString message)
 {
 	m_ExtraMessage = "\n" + message;
 }
+
 
 //----------------------------------------------------------------------------
 void albaGUIAboutDialog::CreateDialog()
@@ -221,6 +240,35 @@ void albaGUIAboutDialog::CreateDialog()
 			mainSizer->Add(licenseTextSizer, 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, borderSize);
 		}
 
+		// Creating citation section
+		if (m_CitationPaper != "")
+		{
+
+			wxString citationMessage = "If you use this software in scientific research,\n citing the related paper would be greatly appreciated.";
+
+			wxBoxSizer *citationTextSizer = new wxBoxSizer(wxVERTICAL);
+
+			citationTextSizer->Add(AddText(m_AboutDialog, citationMessage, panelWidth - (borderSize * 2), wxALIGN_LEFT), 0, wxALL | wxALIGN_LEFT, 0);
+
+			wxBoxSizer *citationButtonSizer = new wxBoxSizer(wxHORIZONTAL);
+				
+			albaGUIButton *citationLinkButton = new albaGUIButton(m_AboutDialog, ID_SHOW_CITATION, "Show Paper", wxPoint(-1, -1), wxSize(90, 25));
+			citationLinkButton->SetBackgroundStyle(wxBG_STYLE_COLOUR);
+			citationLinkButton->SetForegroundColour(wxColour(0, 0, 255));
+			citationButtonSizer->Add(citationLinkButton, 0, wxEXPAND | wxLEFT, 5);
+			citationLinkButton->SetListener(this);
+
+			albaGUIButton *citationCopyButton = new albaGUIButton(m_AboutDialog, ID_COPY_CITATION, "Copy DOI", wxPoint(-1, -1), wxSize(80, 25));
+			citationCopyButton->SetBackgroundStyle(wxBG_STYLE_COLOUR);
+			citationCopyButton->SetForegroundColour(wxColour(0, 0, 255));
+			citationButtonSizer->Add(citationCopyButton, 0, wxEXPAND | wxLEFT, 5);
+			citationCopyButton->SetListener(this);
+
+			citationTextSizer->Add(citationButtonSizer, 0, wxEXPAND | wxTOP, 5);
+
+			mainSizer->Add(citationTextSizer, 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, borderSize);
+		}
+
 		// Creating buttons
 		wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -242,7 +290,8 @@ void albaGUIAboutDialog::CreateDialog()
 		buttonSizer->Add(okButton, 0, wxALIGN_BOTTOM, 0);
 		mainSizer->Add(buttonSizer, 0, wxALL, 5);
 
-		m_AboutDialog->Add(mainSizer, 0, wxALL);
+		m_AboutDialog->Add(mainSizer, 0, wxALL);	
+		m_AboutDialog->FitInside();
 		m_AboutDialog->Fit();
 
 		// Show dialog
