@@ -182,3 +182,13 @@ const char* albaFakeLogicForTest::GetAlbaBuildNum()
 void albaFakeLogicForTest::SetAlbaBuildNum(char *buildNum)
 {
 }
+
+const char *albaFakeLogicForTest::GetCitationPaper()
+{
+	return "";
+}
+
+void albaFakeLogicForTest::SetCitationPaper(char *link)
+{
+
+}
