@@ -264,7 +264,10 @@ public:
 	virtual const char* GetAlbaBuildNum();
 	/** Get Alba Build Number*/
 	virtual void SetAlbaBuildNum(char* buildNum);
-
+	/** Get the link to the citation Paper */
+	const char *GetCitationPaper() { return m_CitationPaper.GetCStr(); }
+	/** Set the link to the citation Paper */
+	void SetCitationPaper(char *link) { m_CitationPaper = link; }
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -468,6 +471,7 @@ protected:
 
 	albaString m_AlbaBuildNum;
 	albaString m_AppBuildNum;
+	albaString m_CitationPaper;
 	albaString m_Extension;
 
 	albaUser *m_User; ///< Applications' user

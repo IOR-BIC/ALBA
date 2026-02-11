@@ -18,6 +18,7 @@
 #define _albaAbsLogicManager_H
 
 #include "albaConfigure.h"
+#include "albaString.h"
 
 class albaVME;
 class albaVMEImage;
@@ -89,5 +90,10 @@ public:
 	virtual const char* GetAlbaBuildNum() = 0;
 	/** Get Alba Build Number*/
 	virtual void SetAlbaBuildNum(char *buildNum) = 0;
+
+	/** Get the link to the citation Paper */
+	virtual const char *GetCitationPaper() = 0;
+	/** Set the link to the citation Paper */
+	virtual void SetCitationPaper(char *link) = 0;
 };
 #endif

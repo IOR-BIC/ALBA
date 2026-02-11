@@ -62,7 +62,12 @@ public:
 
 	/** Show the Settings Dialog. */
 	bool ShowModal();
-	
+
+	/** Get the link to the citation Paper */
+	wxString GetCitationPaper() const { return m_CitationPaper; }
+	/** Set the link to the citation Paper */
+	void SetCitationPaper(wxString val) { m_CitationPaper = val; }
+
 protected:
 	wxStaticText* AddText(albaGUIDialog * dialog, wxString &text, int Width, int align);
 
@@ -79,5 +84,6 @@ protected:
 	wxString			m_WebSiteURL;
 	wxString			m_LicenseURL;
 	wxString			m_ExtraMessage;
+	wxString			m_CitationPaper;
 };
 #endif // _albaGUIAboutDialog_H_
