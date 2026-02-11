@@ -153,6 +153,7 @@ else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/AddToPathPage.nsh ${PROJECT_BINARY_DIR}/Installer/AddToPathPage.nsh @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/PaperCitationPage.nsh ${PROJECT_BINARY_DIR}/Installer/PaperCitationPage.nsh @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnvVarUpdate.nsh ${PROJECT_BINARY_DIR}/Installer/EnvVarUpdate.nsh @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnumUsersReg.nsh ${PROJECT_BINARY_DIR}/Installer/EnumUsersReg.nsh @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_BINARY_DIR}/Installer/InstallerCommon.nsh @ONLY)
