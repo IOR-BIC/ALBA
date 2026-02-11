@@ -7,6 +7,7 @@
 !include nsProcess.nsh
 !include EnumUsersReg.nsh
 !include AddToPathPage.nsh
+!include PaperCitationPage.nsh
 !include x64.nsh
 
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXE_NAME}"
@@ -144,6 +145,9 @@ FunctionEnd
 	; Installer pages ;;;;;;;;;;;;;;
 	!insertmacro MUI_PAGE_WELCOME
 	!insertmacro MUI_PAGE_LICENSE "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Licence.rtf"
+	!ifdef PAPER_LINK
+		!insertmacro PaperCitationPage
+	!endif
 	!insertmacro MUI_PAGE_DIRECTORY
 	!ifdef INSERT_ADD_PATH_PAGE
 		!insertmacro AddToPathPage
