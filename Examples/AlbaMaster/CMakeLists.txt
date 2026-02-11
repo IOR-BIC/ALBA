@@ -69,7 +69,7 @@ IF (WIN32)
   
   CONFIGURE_FILE(${APP_INSTALLER_DIR}/AlbaMasterInstallerScript.nsi.in  ${EXECUTABLE_OUTPUT_PATH}/Release/AlbaMasterInstallerScript.nsi @ONLY)
 
-  CONFIGURE_FILE(${ALBA_BINARY_DIR}/Installer/PaperCitationPage.nsh ${EXECUTABLE_OUTPUT_PATH}/Installer/PaperCitationPage.nsh @ONLY)
+  CONFIGURE_FILE(${ALBA_BINARY_DIR}/INSTALLER/PaperCitationPage.nsh ${EXECUTABLE_OUTPUT_PATH}/Release/PaperCitationPage.nsh @ONLY)
   CONFIGURE_FILE(${ALBA_BINARY_DIR}/INSTALLER/AddToPathPage.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/AddToPathPage.nsh @ONLY)
   CONFIGURE_FILE(${ALBA_BINARY_DIR}/INSTALLER/EnumUsersReg.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/EnumUsersReg.nsh @ONLY)
   CONFIGURE_FILE(${ALBA_BINARY_DIR}/INSTALLER/InstallerCommon.nsh  ${EXECUTABLE_OUTPUT_PATH}/Release/InstallerCommon.nsh @ONLY)
