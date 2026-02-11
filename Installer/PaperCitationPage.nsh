@@ -1,4 +1,4 @@
-!macro MUI_PAGE_PAPERCITATION
+!macro PaperCitationPage
 
 Page Custom PaperCitationPageCreate PaperCitationPageLeave
 
