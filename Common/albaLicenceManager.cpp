@@ -70,6 +70,12 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		RegKey.QueryValue("LocalKey", localKey);
 		//If the CryptKey is changed the Decription of the string will fail and a new Local Key should be created
 		ValidKey = !DecryptStr(localKey.ToAscii()).empty();
+		if (!ValidKey)
+		{
+			//Delete the invalid local key and registered value if there is an attempt to change the crypt key or to rewrite the registry values
+			RegKey.DeleteValue("LocalKey");
+			RegKey.DeleteValue("Registered");
+		}
 	}
 
 	if (!ValidKey)
