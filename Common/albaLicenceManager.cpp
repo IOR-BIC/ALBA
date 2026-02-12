@@ -63,7 +63,22 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 {
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxRegKey RegKey(regKeyStr);
-	if (!RegKey.Exists())
+	bool ValidKey = false;
+	if(RegKey.Exists())
+	{
+		wxString localKey;
+		RegKey.QueryValue("LocalKey", localKey);
+		//If the CryptKey is changed the Decription of the string will fail and a new Local Key should be created
+		ValidKey = !DecryptStr(localKey.ToAscii()).empty();
+		if (!ValidKey)
+		{
+			//Delete the invalid local key and registered value if there is an attempt to change the crypt key or to rewrite the registry values
+			RegKey.DeleteValue("LocalKey");
+			RegKey.DeleteValue("Registered");
+		}
+	}
+
+	if (!ValidKey)
 	{
 		char tmp[255];
 
@@ -80,8 +95,6 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		
 		if(created)
 			RegKey.SetValue("LocalKey", cryptedCode.ToAscii());
-		wxLog::EnableLogging(true);
-		
 		
 		return TRIAL_MODE;
 	}
