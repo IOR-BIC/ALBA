@@ -190,5 +190,5 @@ const char *albaFakeLogicForTest::GetCitationPaper()
 
 void albaFakeLogicForTest::SetCitationPaper(char *link)
 {
-
+	return;
 }
