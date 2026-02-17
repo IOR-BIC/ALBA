@@ -16,6 +16,7 @@
 !define PRODUCT_NAME "AlbaMaster"
 !define PRODUCT_PUBLISHER "BIC Software"
 !define PRODUCT_WEB_SITE "https://github.com/IOR-BIC"
+!define PAPER_LINK "https://doi.org/10.1016/j.softx.2025.102188"
 
 !define PRODUCT_VERSION "@APP_VERSION@"
 !define PRODUCT_EXE_NAME "${PRODUCT_NAME}.exe"

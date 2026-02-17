@@ -113,6 +113,7 @@ in sub classes also create the manager
 class ALBA_EXPORT albaLogicWithManagers : public albaObserver, public albaAbsLogicManager
 {
 public:
+
 	albaLogicWithManagers(albaGUIMDIFrame *mdiFrame = NULL);
 	virtual     ~albaLogicWithManagers();
 
@@ -203,14 +204,10 @@ public:
 	/** Sets the flag to know if Log bar should be built.*/
 	void PlugLogbar(bool plug) { m_PlugLogPanel = plug; };
 
-	/**
- Show the splash screen for the application. To define your own splash screen image simply
- overwrite the SPLASH_SCREEN image into the picture factory by plugging your .xpm image. \sa albaPictureFactory*/
-	virtual void ShowSplashScreen();
-
+	
 	/**
 	Used to give a splash screen image directly from the bitmap without converting it in xpm.*/
-	virtual void ShowSplashScreen(wxBitmap &splashImage, wxString message ="", int x = 0, int y = 0, wxColour color = *wxBLACK);
+	virtual void ShowSplashScreen(wxBitmap &splashImage, wxString message ="", int pos=2, wxColour color = *wxBLACK);
 
 	static void ShowWebSite(wxString url);
 	
@@ -267,7 +264,10 @@ public:
 	virtual const char* GetAlbaBuildNum();
 	/** Get Alba Build Number*/
 	virtual void SetAlbaBuildNum(char* buildNum);
-
+	/** Get the link to the citation Paper */
+	const char *GetCitationPaper() { return m_CitationPaper.GetCStr(); }
+	/** Set the link to the citation Paper */
+	void SetCitationPaper(char *link) { m_CitationPaper = link; }
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -471,6 +471,7 @@ protected:
 
 	albaString m_AlbaBuildNum;
 	albaString m_AppBuildNum;
+	albaString m_CitationPaper;
 	albaString m_Extension;
 
 	albaUser *m_User; ///< Applications' user

@@ -115,6 +115,12 @@ public:
 
 	void SetAlbaBuildNum(char *buildNum) override;
 
+
+	const char *GetCitationPaper() override;
+
+
+	void SetCitationPaper(char *link) override;
+
 protected:
 	
 	std::vector<calls> m_Calls;

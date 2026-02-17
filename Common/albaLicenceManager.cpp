@@ -62,8 +62,30 @@ albaLicenceManager::~albaLicenceManager()
 albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 {
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
-	wxRegKey RegKey(regKeyStr);
-	if (!RegKey.Exists())
+	wxRegKey regKey(regKeyStr);
+	bool ValidKey = false;
+	if(regKey.Exists())
+	{
+		wxString localKey;
+		regKey.QueryValue("LocalKey", localKey);
+		//If the CryptKey is changed the Decription of the string will fail and a new Local Key should be created
+		ValidKey = !DecryptStr(localKey.ToAscii()).empty();
+		
+
+		wxString registredStr;
+		regKey.QueryValue("Registered", registredStr);
+		if (!ValidKey && !registredStr.empty())
+			albaMessageMacro("An old version of this software was already registerd,\nbut is not compatible with the current version.\n\nPlease register again.\n");
+		
+		if (!ValidKey)
+		{
+			//Delete the invalid local key and registered value if there is an attempt to change the crypt key or to rewrite the registry values
+			regKey.DeleteValue("LocalKey");
+			regKey.DeleteValue("Registered");
+		}
+	}
+
+	if (!ValidKey)
 	{
 		char tmp[255];
 
@@ -76,12 +98,10 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		
 		//create a new regkey to store the encrypted string
 		wxLog::EnableLogging(false);
-		bool created = RegKey.Create();
+		bool created = regKey.Create();
 		
 		if(created)
-			RegKey.SetValue("LocalKey", cryptedCode.ToAscii());
-		wxLog::EnableLogging(true);
-		
+			regKey.SetValue("LocalKey", cryptedCode.ToAscii());
 		
 		return TRIAL_MODE;
 	}
@@ -114,13 +134,13 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 {
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
-	wxRegKey RegKey(regKeyStr);
+	wxRegKey regKey(regKeyStr);
 
-	if (!RegKey.HasValue("Registered"))
+	if (!regKey.HasValue("Registered"))
 		return false;
 
 	wxString encriptedExpire;
-	RegKey.QueryValue("Registered", encriptedExpire);
+	regKey.QueryValue("Registered", encriptedExpire);
 	wxString decriptedExpire = DecryptStr(encriptedExpire);
 
 	//if decriptedExpire is empty there can be a rewriting tentative so we set an earlier date to
@@ -138,13 +158,13 @@ bool albaLicenceManager::GetExpireDate( wxDateTime &dateExpire)
 bool albaLicenceManager::IsRegistred()
 {
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
-	wxRegKey RegKey(regKeyStr);
+	wxRegKey regKey(regKeyStr);
 
-	if (!RegKey.HasValue("Registered"))
+	if (!regKey.HasValue("Registered"))
 		return false;
 
 	wxString encriptedRegistered;
-	RegKey.QueryValue("Registered", encriptedRegistered);
+	regKey.QueryValue("Registered", encriptedRegistered);
 	wxString decriptedRegistered = DecryptStr(encriptedRegistered);
 
 	if (decriptedRegistered.empty())
@@ -173,9 +193,9 @@ void albaLicenceManager::AddTimeLicence(wxDateTime expireDate)
 	wxString cryptedDate = EncryptStr(expireDate.FormatISODate());
 	
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
-	wxRegKey RegKey(regKeyStr);
-	RegKey.Create();
-	RegKey.SetValue("Registered", cryptedDate.ToAscii());
+	wxRegKey regKey(regKeyStr);
+	regKey.Create();
+	regKey.SetValue("Registered", cryptedDate.ToAscii());
 }
 
 //----------------------------------------------------------------------------
@@ -184,9 +204,9 @@ void albaLicenceManager::AddBinaryLicence()
 	wxString criptedReg = EncryptStr("REGISTERED");
 
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
-	wxRegKey RegKey(regKeyStr);
-	RegKey.Create();
-	RegKey.SetValue("Registered", criptedReg.ToAscii());
+	wxRegKey regKey(regKeyStr);
+	regKey.Create();
+	regKey.SetValue("Registered", criptedReg.ToAscii());
 }
 
 //----------------------------------------------------------------------------
@@ -195,7 +215,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 	wxString decriptedExpire,decriptedKey;
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
 	wxString localKey;
-	wxRegKey RegKey(regKeyStr);
+	wxRegKey regKey(regKeyStr);
 
 	//if decrypt function return an empty string the registration string is wrong
 	wxString decripRegString = DecryptStr(registrationString);
@@ -204,7 +224,7 @@ albaLicenceManager::addLicenceStatuses albaLicenceManager::CheckCreateLicence(wx
 		return WRONG_LICENCE;
 	}
 
-	RegKey.QueryValue("LocalKey", localKey);
+	regKey.QueryValue("LocalKey", localKey);
 
 	//if the decrypted key is empty is possible to have a manumission and we must return wrong licence
 	decriptedKey = DecryptStr(localKey.ToAscii());
@@ -375,10 +395,10 @@ void albaLicenceManager::ShowRegistrationDialog()
 		HideRegistrationDialog();
 
 	wxString regKeyStr = wxString(m_RegistryBaseKey + m_AppName + "-lic");
-	wxRegKey RegKey(regKeyStr);
-	if (RegKey.Exists())
+	wxRegKey regKey(regKeyStr);
+	if (regKey.Exists())
 	{
-		RegKey.QueryValue("LocalKey", m_FirstKey);
+		regKey.QueryValue("LocalKey", m_FirstKey);
 	}
 
 	wxString imgPath = m_RegImagePath;
