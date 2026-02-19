@@ -2694,7 +2694,8 @@ void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString mes
 {
 	m_SplashScreen = new albaGUISplashScreen(splashImage, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 2000, NULL);
 
-	if (message.IsEmpty()) message = GetTopWin()->GetTitle()  + " is not a medical device.";
+	if (message.IsEmpty()) 
+		message = GetTopWin()->GetTitle()  + " is not a medical device\nand it is not approved for medical usage.";
 
 	m_SplashScreen->SetText(message,(albaGUISplashScreen::SPLASH_SCREEN_POSITION)pos, color);
 	wxMilliSleep(1500);
