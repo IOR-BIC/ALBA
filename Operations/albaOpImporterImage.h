@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include <string>
 #include <vector>
 
@@ -41,14 +41,14 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,std::string);
 // albaOpImporterImage :
 //----------------------------------------------------------------------------
 /** */
-class ALBA_EXPORT albaOpImporterImage: public albaOp
+class ALBA_EXPORT albaOpImporterImage: public albaOpImporterFile
 {
 public:
   albaOpImporterImage(const wxString &label = "ImageImporter");
  ~albaOpImporterImage(); 
 	virtual void OnEvent(albaEventBase *alba_event);
   
-  albaTypeMacro(albaOpImporterImage, albaOp);
+  albaTypeMacro(albaOpImporterImage, albaOpImporterFile);
 
   albaOp* Copy();
 
@@ -58,7 +58,10 @@ public:
   /** Set the filename for the .stl to import */
   void AddFileName(const char *file_name);
 	  
-  void SetBuildVolumeFlag(bool buildVolumeFlag) {m_BuildVolumeFlag = buildVolumeFlag;};
+  void SetFileName(albaString filename);
+
+  void SetBuildVolumeFlag(bool buildVolumeFlag) { m_BuildVolumeFlag = buildVolumeFlag; };
+
   void SetSpacing(double *spacing);;
 
   void Import();
@@ -67,7 +70,21 @@ public:
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
+  /** Import the file, return ALBA_OK on success. */
+  virtual int ImportFile();
 
+  /** Get if X-Flip is enabled */
+  int GetXFlip() { return m_XFlip; }
+  /** Enable/Disable X-Flip */
+  void SetXFlip(int val) { m_XFlip = val; }
+	/** Get if Y-Flip is enabled */
+	int GetYFlip() const { return m_YFlip; }
+	/** Enable/Disable Y-Flip */
+	void SetYFlip(int val) { m_YFlip = val; }
+	/** Get if Z-Flip is enabled */
+	int GetZFlip() const { return m_ZFlip; }
+	/** Enable/Disable Z-Flip */
+	void SetZFlip(int val) { m_ZFlip = val; }
 protected:
 
 	/** Return true for the acceptable vme type. */

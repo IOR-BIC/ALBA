@@ -104,7 +104,7 @@ void albaOpImporterAbaqusFileTest::ImportInputFile(albaString fileName, int numP
   filePath<<"/albaOpImporterAbaqusFileTest/" << fileName;
   importer->SetFileName(filePath.GetCStr());
 	importer->SetInput(root);
-  importer->Import();
+  importer->ImportFile();
 
   // Imported Mesh
   albaVMEMesh *importedMesh = albaVMEMesh::SafeDownCast(importer->GetInput()->GetFirstChild());

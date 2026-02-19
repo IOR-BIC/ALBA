@@ -27,9 +27,20 @@
 class ALBA_EXPORT albaGUISplashScreen : public wxSplashScreen
 {
 public:
+	enum SPLASH_SCREEN_POSITION
+	{
+		SPLASH_SCREEN_TOP_LEFT,
+		SPLASH_SCREEN_TOP_CENTER,
+		SPLASH_SCREEN_TOP_RIGHT,
+		SPLASH_SCREEN_BOTTOM_LEFT,
+		SPLASH_SCREEN_BOTTOM_CENTER,
+		SPLASH_SCREEN_BOTTOM_RIGHT,
+		SPLASH_SCREEN_CENTER
+	};
+
 	albaGUISplashScreen(const wxBitmap& bitmap, long splashStyle, int milliseconds, wxWindow* parent);
 
-	void SetText(const wxString& text, int x = 0, int y = 0, wxColour color = *wxBLACK);
+	void SetText(const wxString& text,SPLASH_SCREEN_POSITION pos, wxColour color = *wxBLACK);
 
 protected:
 	wxBitmap m_noTextBitmap;

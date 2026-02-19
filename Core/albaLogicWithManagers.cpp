@@ -40,8 +40,6 @@
 #ifdef ALBA_USE_VTK
   #include "albaViewVTK.h"
   
-  #include "albaOpImporterVTK.h"
-  #include "albaOpImporterSTL.h"
   #include "albaInteractionManager.h"
   #include "albaInteractionFactory.h"
   #include "albaInteractor.h"
@@ -454,6 +452,7 @@ void albaLogicWithManagers::Init(int argc, char **argv)
 	m_AboutDialog->SetAppBuildNum(m_AppBuildNum.GetCStr());
 	m_AboutDialog->SetAlbaBuildNum(m_AlbaBuildNum.GetCStr());
 	m_AboutDialog->SetWebSite("https://github.com/IOR-BIC/ALBA");
+	m_AboutDialog->SetCitationPaper(m_CitationPaper.GetCStr());
 
 	wxString imagePath = albaGetConfigDirectory().ToAscii();
 	imagePath += "\\" + m_AboutImage;
@@ -2691,19 +2690,14 @@ void albaLogicWithManagers::TreeContextualMenu(albaEvent &e)
 
 // Splash Screen
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ShowSplashScreen()
-{
-	wxBitmap splashImage = albaPictureFactory::GetPictureFactory()->GetBmp("SPLASH_SCREEN");
-	ShowSplashScreen(splashImage);
-}
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message, int x, int y, wxColour color)
+void albaLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage, wxString message, int pos, wxColour color)
 {
 	m_SplashScreen = new albaGUISplashScreen(splashImage, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 2000, NULL);
 
-	if (message.IsEmpty()) message = m_AppBuildNum;
+	if (message.IsEmpty()) 
+		message = GetTopWin()->GetTitle()  + " is not a medical device\nand it is not approved for medical usage.";
 
-	m_SplashScreen->SetText(message, x, y, color);
+	m_SplashScreen->SetText(message,(albaGUISplashScreen::SPLASH_SCREEN_POSITION)pos, color);
 	wxMilliSleep(1500);
 
 	albaYield();
@@ -2739,7 +2733,7 @@ void albaLogicWithManagers::ShowWebSite(wxString url)
 	}
 
 	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
-	command = command + "\"" + url + "/\"";
+	command = command + "\"" + url + "\"";
 	wxExecute(command);
 }
 
@@ -2934,31 +2928,7 @@ void albaLogicWithManagers::UpdateMeasureUnit()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ImportExternalFile(albaString &filename)
 {
-	wxString path, name, ext;
-	wxFileName::SplitPath(filename.GetCStr(), &path, &name, &ext);
-	ext.MakeLower();
-	if (ext == "vtk")
-	{
-		albaOpImporterVTK *vtkImporter = new albaOpImporterVTK("importer");
-		vtkImporter->SetInput(m_VMEManager->GetRoot());
-		vtkImporter->SetListener(m_OpManager);
-		vtkImporter->SetFileName(filename.GetCStr());
-		vtkImporter->ImportVTK();
-		vtkImporter->OpDo();
-		cppDEL(vtkImporter);
-	}
-	else if (ext == "stl")
-	{
-		albaOpImporterSTL *stlImporter = new albaOpImporterSTL("importer");
-		stlImporter->SetInput(m_VMEManager->GetRoot());
-		stlImporter->SetListener(m_OpManager);
-		stlImporter->SetFileName(filename.GetCStr());
-		stlImporter->ImportSTL();
-		stlImporter->OpDo();
-		cppDEL(stlImporter);
-	}
-	else
-		wxMessageBox(_("Can not import this type of file!"), _("Warning"));
+	m_OpManager->ImportFile(filename);
 }
 
 //----------------------------------------------------------------------------

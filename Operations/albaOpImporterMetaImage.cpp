@@ -57,12 +57,12 @@ typedef itk::ImageToVTKImageFilter< InputImageTypeFloat > ConverteritkTOvtk;
 typedef itk::MetaDataObject<std::string> DictString;
 
 //----------------------------------------------------------------------------
-albaOpImporterMetaImage::albaOpImporterMetaImage(const wxString &label) :
-albaOp(label)
+albaOpImporterMetaImage::albaOpImporterMetaImage(const wxString &label) : albaOpImporterFile(label)
 {
+	SetWildc("Meta Data Image(*.mha) | *.mha");
   m_OpType  = OPTYPE_IMPORTER;
 	m_Canundo = true;
-	m_File    = "";
+	m_FileName= "";
 
   //m_VmePointSet = NULL;
   m_VmeImage    = NULL;
@@ -81,24 +81,23 @@ albaOpImporterMetaImage::~albaOpImporterMetaImage()
 albaOp* albaOpImporterMetaImage::Copy()   
 {
   albaOpImporterMetaImage *cp = new albaOpImporterMetaImage(m_Label);
-  cp->m_File			= m_File;
+  cp->m_FileName			= m_FileName;
   return cp;
 }
 //----------------------------------------------------------------------------
 void albaOpImporterMetaImage::OpRun()   
 {
-	albaString wildc = "Meta Data Image (*.mha)|*.mha";
   albaString f;
-  if (m_File.IsEmpty())
+  if (m_FileName.IsEmpty())
   {
-    f = albaGetOpenFile(m_FileDir, wildc, _("Choose VTK file"));
-    m_File = f;
+    f = albaGetOpenFile(m_FileDir, m_Wildc, _("Choose VTK file"));
+    m_FileName = f;
   }
 
   int result = OP_RUN_CANCEL;
-  if(!m_File.IsEmpty())
+  if(!m_FileName.IsEmpty())
 	{
-    if (ImportMetaImage() == ALBA_OK)
+    if (ImportFile() == ALBA_OK)
     {
       result = OP_RUN_OK;
     }
@@ -112,7 +111,7 @@ void albaOpImporterMetaImage::OpRun()
 	OpStop(result);
 }
 //----------------------------------------------------------------------------
-int albaOpImporterMetaImage::ImportMetaImage()
+int albaOpImporterMetaImage::ImportFile()
 {
 	bool success = false;
 	albaGUIBusyInfo wait(_("Loading file..."),m_TestMode);
@@ -121,7 +120,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	using ReaderType = itk::ImageFileReader<InputImageTypeFloat>;
 	ReaderType::Pointer  reader = ReaderType::New();
 
-	reader->SetFileName(m_File.ToAscii());
+	reader->SetFileName(m_FileName.GetCStr());
 	reader->Update();
 	InputImageTypeFloat *itkImage=reader->GetOutput();
 	
@@ -129,7 +128,7 @@ int albaOpImporterMetaImage::ImportMetaImage()
 	if (itkImage != NULL)
 	{
 		wxString path, name, ext;
-		wxFileName::SplitPath(m_File.ToAscii(), &path, &name, &ext);
+		wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 
 		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
 		itkTOvtk->SetInput(itkImage);

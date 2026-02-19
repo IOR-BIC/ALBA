@@ -46,7 +46,6 @@ enum OPERATIONS_TYPE_ID
 
 //----------------------------------------------------------------------------
 // albaOp :
-//----------------------------------------------------------------------------
 class ALBA_EXPORT albaOp : public albaObserver, public albaObject, public albaServiceClient
 {
 public:

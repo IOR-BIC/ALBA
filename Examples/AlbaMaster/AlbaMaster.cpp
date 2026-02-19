@@ -141,6 +141,7 @@ bool AlbaMaster::OnInit()
 
 	m_Logic->SetAlbaBuildNum(ALBA_BUILD);
 	m_Logic->SetAppBuildNum(APP_BUILD);
+	m_Logic->SetCitationPaper("https://doi.org/10.1016/j.softx.2025.102188");
 	m_Logic->Show();
 	
 	m_Logic->Init(argc, argv); // calls FileNew - which create the root

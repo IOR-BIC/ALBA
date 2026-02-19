@@ -175,7 +175,7 @@ void albaOpExporterRAWTest::TestRG()
 	albaString Filename=ALBA_DATA_ROOT;
   Filename<<"/VTK_Volumes/CropTestVolumeRG.vtk";
 	importerVTK->SetFileName(Filename.GetCStr());
-	importerVTK->ImportVTK();
+	importerVTK->ImportFile();
 
 	albaVMEVolumeGray *vmeVolumeGrayImported=albaVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
 	vmeVolumeGrayImported->Update();

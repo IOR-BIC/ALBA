@@ -379,7 +379,7 @@ bool albaOpExporterBmp::WriteImageDataAsMonocromeBitmap(vtkImageData *img, albaS
   //  RGBQUAD             bmiColors[1]; // first element of a ?lenght vector
   //} BITMAPINFO;
 
-  // Row Lenght in File
+  // Row Length in File
   unsigned int BytePerRow=img_w;          
   if (BytePerRow%4 != 0) 
     BytePerRow=( BytePerRow /4 +1 ) * 4;
@@ -424,7 +424,7 @@ bool albaOpExporterBmp::WriteImageDataAsMonocromeBitmap(vtkImageData *img, albaS
   //fill the image body
   unsigned char *p = (unsigned char*)( bi );
   p += (  bih_size + palette_size );
-  for(int j=img_h-1; j>=0; j--) // rows must be written from bottom to top
+  for(int j=0; j<img_h; j++)
   {
     for(int i=0; i<img_w; i++)
     {

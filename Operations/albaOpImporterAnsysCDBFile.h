@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "albaOpImporterAnsysCommon.h"
 
 //----------------------------------------------------------------------------
@@ -36,14 +36,11 @@ public:
 	albaOpImporterAnsysCDBFile(const wxString &label = "MeshImporter");
 	~albaOpImporterAnsysCDBFile(); 
 
-	albaTypeMacro(albaOpImporterAnsysCDBFile, albaOp);
+	albaTypeMacro(albaOpImporterAnsysCDBFile, albaOpImporterFile);
 
 	albaOp* Copy();
 
 protected:
-		 
-  albaString GetWildcard();
-
 	int ParseAnsysFile(albaString fileName);
 };
 #endif

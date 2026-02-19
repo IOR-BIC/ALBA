@@ -43,8 +43,9 @@ albaCxxTypeMacro(albaOpImporterDicFile);
 #define EPSILON 1e-3
 //----------------------------------------------------------------------------
 albaOpImporterDicFile::albaOpImporterDicFile(const wxString &label) :
-albaOp(label)
-{ 
+albaOpImporterFile(label)
+{
+	SetWildc("Digital Image Correlation files (*.dat)|*.dat|All Files (*.*)|*.*");
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
 }
@@ -61,7 +62,7 @@ albaOp* albaOpImporterDicFile::Copy()
 }
 
 //----------------------------------------------------------------------------
-int albaOpImporterDicFile::Import(void)
+int albaOpImporterDicFile::ImportFile()
 {
 	
 	if (ReadInit(m_FileName, GetTestMode(), true, "Please wait parsing DIC File...", m_Listener) == ALBA_ERROR)
@@ -160,6 +161,8 @@ int albaOpImporterDicFile::Import(void)
 	albaDEL(pointCloudVME);
 
 	ReadFinalize();
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
@@ -171,18 +174,17 @@ bool albaOpImporterDicFile::InternalAccept(albaVME *node)
 //----------------------------------------------------------------------------
 void albaOpImporterDicFile::OpRun()
 {
-	albaString wildcard = "Digital Image Correlation files (*.dat)|*.dat|All Files (*.*)|*.*";
 
 	int result = OP_RUN_CANCEL;
 	m_FileName = "";
 
 	wxString f;
-	f = albaGetOpenFile("", wildcard).ToAscii(); 
+	f = albaGetOpenFile("", m_Wildc).ToAscii(); 
 	if(!f.IsEmpty() && wxFileExists(f))
 	{
 		m_FileName = f;
-		Import();
-		result = OP_RUN_OK;
+		if(ImportFile()==ALBA_OK)
+			result = OP_RUN_OK;
 	}
 	albaEventMacro(albaEvent(this,result));  
 }

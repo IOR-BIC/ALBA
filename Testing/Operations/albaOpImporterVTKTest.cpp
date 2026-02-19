@@ -86,7 +86,7 @@ void albaOpImporterVTKTest::TestImportVTKSurface()
 	albaString fileName = ALBA_DATA_ROOT;
 	fileName << "/Surface/sphere.vtk";
 	m_ImporterVTK->SetFileName(fileName);
-	m_ImporterVTK->ImportVTK();
+	m_ImporterVTK->ImportFile();
 	albaVMESurface *surface = albaVMESurface::SafeDownCast(m_ImporterVTK->GetOutput());
 
 	CPPUNIT_ASSERT(surface != NULL);
@@ -111,7 +111,7 @@ void albaOpImporterVTKTest::TestImportVTKMesh()
 	albaString fileName = ALBA_DATA_ROOT;
 	fileName << "/FEM/tet4.vtk";
 	m_ImporterVTK->SetFileName(fileName);
-	m_ImporterVTK->ImportVTK();
+	m_ImporterVTK->ImportFile();
 	albaVMEMesh *surface = albaVMEMesh::SafeDownCast(m_ImporterVTK->GetOutput());
 
 	CPPUNIT_ASSERT(surface != NULL);
@@ -144,7 +144,7 @@ void albaOpImporterVTKTest::TestImportVTKPolyline()
 	albaString fileName = ALBA_DATA_ROOT;
 	fileName << "/PolylineGraph/PolylineGraph.vtk";
 	m_ImporterVTK->SetFileName(fileName);
-	m_ImporterVTK->ImportVTK();
+	m_ImporterVTK->ImportFile();
 	albaVMEPolyline *polyline = albaVMEPolyline::SafeDownCast(m_ImporterVTK->GetOutput());
 
 	CPPUNIT_ASSERT(polyline != NULL);
@@ -168,7 +168,7 @@ void albaOpImporterVTKTest::TestImportVTKVolumeSP()
 	albaString fileName = ALBA_DATA_ROOT;
 	fileName << "/VTK_Volumes/volume.vtk";
 	m_ImporterVTK->SetFileName(fileName);
-	m_ImporterVTK->ImportVTK();
+	m_ImporterVTK->ImportFile();
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_ImporterVTK->GetOutput());
 
 	CPPUNIT_ASSERT(volume != NULL);
@@ -192,7 +192,7 @@ void albaOpImporterVTKTest::TestImportVTKVolumeRG()
 	albaString fileName = ALBA_DATA_ROOT;
 	fileName << "/VTK_Volumes/volumeRG.vtk";
 	m_ImporterVTK->SetFileName(fileName);
-	m_ImporterVTK->ImportVTK();
+	m_ImporterVTK->ImportFile();
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_ImporterVTK->GetOutput());
 
 	CPPUNIT_ASSERT(volume != NULL);
@@ -216,7 +216,7 @@ void albaOpImporterVTKTest::TestImportVTKPointSet()
 	albaString fileName = ALBA_DATA_ROOT;
 	fileName << "/PointSet/pointset.vtk";
 	m_ImporterVTK->SetFileName(fileName);
-	m_ImporterVTK->ImportVTK();
+	m_ImporterVTK->ImportFile();
 	albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(m_ImporterVTK->GetOutput());
 
 	CPPUNIT_ASSERT(lmc != NULL);

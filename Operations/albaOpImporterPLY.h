@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaOp.h"
+#include "albaOpImporterFile.h"
 #include "albaString.h"
 #include <vector>
 
@@ -41,18 +41,18 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,albaVMESurface*);
 // albaOpImporterPLY :
 //----------------------------------------------------------------------------
 /** */
-class ALBA_EXPORT albaOpImporterPLY: public albaOp
+class ALBA_EXPORT albaOpImporterPLY: public albaOpImporterFile
 {
 public:
 	albaOpImporterPLY(const wxString &label = "PLYImporter");
 	~albaOpImporterPLY(); 
 	
-  albaTypeMacro(albaOpImporterPLY, albaOp);
+  albaTypeMacro(albaOpImporterPLY, albaOpImporterFile);
 
   albaOp* Copy();
 
 	/** Set the filename for the .stl to import */
-  void SetFileName(const char *file_name);
+  void SetFileName(albaString filename);
 
   /** Builds operation's interface. */
 	void OpRun();
@@ -63,12 +63,12 @@ public:
   /** Execute the operation. */
   void OpDo();
 
-  /** Import the file. */
-	int ImportPLY();
+  /** Import the file, return ALBA_OK on success. */
+	int ImportFile();
 
   /** Used to retrieve imported data. It is useful when the operation is executed from code.*/
   void GetImportedPLY(std::vector<albaVMESurface*> &importedPLY);
-		
+	
 protected:
 
 	/** Return true for the acceptable vme type. */
