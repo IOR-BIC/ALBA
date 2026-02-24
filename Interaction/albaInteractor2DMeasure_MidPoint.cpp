@@ -320,7 +320,7 @@ void albaInteractor2DMeasure_MidPoint::AddMeasure(double *point1, double *point2
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
+	text.Printf("%.2f mm", DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 
 	// Update Edit Actors

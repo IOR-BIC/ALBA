@@ -175,7 +175,7 @@ void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Distance %.2f mm", DistanceBetweenPoints(point1, point2));
+	text.Printf("%.2f mm", DistanceBetweenPoints(point1, point2));
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
@@ -355,7 +355,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Center (%.2f, %.2f) - Radius %.2f mm", point1[X], point1[Y], DistanceBetweenPoints(point1, point2));
+	text.Printf("(%.2f, %.2f) - Radius %.2f mm", point1[X], point1[Y], DistanceBetweenPoints(point1, point2));
 	m_Measure2DVector[index].Text = text;
 
 	// Update Edit Actors
