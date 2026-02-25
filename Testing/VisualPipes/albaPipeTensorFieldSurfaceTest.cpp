@@ -77,17 +77,23 @@ void albaPipeTensorFieldSurfaceTest::TestCreate()
 
   vtkALBASmartPointer<vtkFloatArray> scalarArray;
   scalarArray->SetName("Scalar");
-  scalarArray->InsertNextTuple1(1.0);
+	scalarArray->SetNumberOfTuples(10 * 10 * 10);
+	for (int i = 0; i < 10 * 10 * 10; i++)
+    scalarArray->SetTuple1(i,1.0);
 
   vtkALBASmartPointer<vtkFloatArray> vectorArray;
   vectorArray->SetNumberOfComponents(3);
+  vectorArray->SetNumberOfTuples(10 * 10 * 10);
   vectorArray->SetName("Vector");
-  vectorArray->InsertNextTuple3(1.0,1.0,1.0);
+	for (int i = 0; i < 10 * 10 * 10; i++)
+    vectorArray->SetTuple3(i,1.0,1.0,1.0);
 
   vtkALBASmartPointer<vtkFloatArray> tensorArray;
   tensorArray->SetNumberOfComponents(9);
+	tensorArray->SetNumberOfTuples(10 * 10 * 10);
   tensorArray->SetName("Tensor");
-  tensorArray->InsertNextTuple9(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0);
+	for (int i = 0; i < 10 * 10 * 10; i++)
+    tensorArray->SetTuple9(i, 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0);
 
   vtkALBASmartPointer<vtkImageData> image;
   image->SetDimensions(10,10,10);
@@ -98,8 +104,6 @@ void albaPipeTensorFieldSurfaceTest::TestCreate()
   volume->SetDataByReference(image, 0.);
   volume->Update();
 
-  volume->GetOutput()->GetVTKData();
-  volume->GetOutput()->GetVTKData()->GetPointData();
   volume->GetOutput()->GetVTKData()->GetPointData()->AddArray(vectorArray);
   volume->GetOutput()->GetVTKData()->GetPointData()->AddArray(tensorArray);
 
@@ -108,7 +112,7 @@ void albaPipeTensorFieldSurfaceTest::TestCreate()
   albaSceneNode *sceneNode = new albaSceneNode(NULL,rootscenenode,volume, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
-  albaPipeTensorFieldSurface *pipe = new albaPipeTensorFieldSurface;
+  albaPipeTensorFieldSurface *pipe = new albaPipeTensorFieldSurface();
   pipe->Create(sceneNode);
 	
   
