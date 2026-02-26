@@ -9,6 +9,9 @@ ALBA is a software library designed to support the development of biomedical app
 - **High Performance**: Optimized for handling large datasets.
 - **Community Driven**: Contributions and collaboration from the open-source community.
 
+## Pre-compiled Binaries
+Pre-compiled binaries can be downloaded from https://alba.ior.it/
+
 ## Installation
 To install ALBA, follow these steps:
 
@@ -27,6 +30,7 @@ For guidance on how to use ALBA, explore the [Examples](./Examples) directory, w
 
 ## Documentation
 Documentation can be found in this page: https://ior-bic.github.io/AlbaDoc/
+AI Generated interactive documentation ia also available at: https://deepwiki.com/IOR-BIC/ALBA 
 
 ## Contributing
 We encourage community contributions! To contribute:
