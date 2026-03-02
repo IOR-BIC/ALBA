@@ -166,7 +166,7 @@ void albaInteractor2DMeasure_Distance::EditMeasure(int index, double *point)
 	if (dist >= m_MinDistance)
 	{
 		albaString text;
-		text.Printf("Distance %.2f mm", dist);
+		text.Printf("%.2f mm", dist);
 		m_Measure2DVector[index].Text = text;
 		m_Measure2DVector[index].Value = dist;
 
@@ -352,7 +352,7 @@ void albaInteractor2DMeasure_Distance::AddMeasure(double *point1, double *point2
 
 	albaString text;
 	double dist = DistanceBetweenPoints(point1, point2);
-	text.Printf("Distance %.2f mm", dist);
+	text.Printf("%.2f mm", dist);
 	m_Measure2DVector[index].Text = text;
 	m_Measure2DVector[index].Value = dist;
 
