@@ -195,7 +195,7 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
       {
         if(m_STLImporter==NULL)
           m_STLImporter = new albaOpImporterSTL();
-        m_STLImporter->SetFileName(m_FilenameSTL1->GetCStr());
+        m_STLImporter->SetFileName(*m_FilenameSTL1);
         m_STLImporter->ImportSTL();
         std::vector<albaVMESurface*> importedSurfaces;
         m_STLImporter->GetImportedSTL(importedSurfaces);
@@ -214,7 +214,7 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
       {
         if(m_STLImporter==NULL)
           m_STLImporter = new albaOpImporterSTL();
-        m_STLImporter->SetFileName(m_FilenameSTL2->GetCStr());
+        m_STLImporter->SetFileName(*m_FilenameSTL2);
         m_STLImporter->ImportSTL();
         std::vector<albaVMESurface*> importedSurfaces;
         m_STLImporter->GetImportedSTL(importedSurfaces);
