@@ -71,9 +71,6 @@ protected:
   /** Do not allow changing the file type from external objects. */
   void SetFileType(const char *filetype) {Superclass::SetFileType(filetype);}
   
-  /** Do not allow changing the file version from external objects. */
-  void SetVersion(const char *version) {Superclass::SetVersion(version);}
-
   albaVMERoot *m_Root; ///< the VME root node
 };
 #endif // _albaVMEStorage_h_

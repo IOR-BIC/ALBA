@@ -322,8 +322,9 @@ protected:
 	virtual void OnFileHistory(int menuId);
 	/** FILE SAVE evt. handler */
 	virtual void OnFileSave();
-	/** FILE SAVEAS evt. handler */
-	virtual void OnFileSaveAs();
+	/** FILE SAVEAS evt. handler, if "legacy" is true saves file as old alba file format */
+	virtual void OnFileSaveAs(bool legacy = false);
+
 	/** Called on Quit event. */
 	virtual void OnQuit();
 
@@ -515,5 +516,7 @@ protected:
 	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
 	bool m_FatalExptionOccurred;
 	bool m_OpeningMSF;
+private:
+	
 };
 #endif

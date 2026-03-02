@@ -798,6 +798,9 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case MENU_FILE_SAVEAS:
 			OnFileSaveAs();
 			break;
+		case MENU_FILE_SAVEAS_LEGACY:
+			OnFileSaveAs(true);
+			break;
 		case MENU_FILE_PRINT:
 			if (m_ViewManager && m_PrintSupport)
 				m_PrintSupport->OnPrint(m_ViewManager->GetSelectedView());
@@ -1444,14 +1447,14 @@ void albaLogicWithManagers::OnFileSave()
   }
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OnFileSaveAs()
+void albaLogicWithManagers::OnFileSaveAs(bool legacy)
 {
   if(m_VMEManager) 
   {
 	  albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
-	  int saved=m_VMEManager->MSFSaveAs();
+	  int saved=m_VMEManager->MSFSaveAs(legacy);
 	  //If there is a wizard running we need to continue it after save operation
 	  if (m_WizardManager && m_WizardRunning)
 		  m_WizardManager->WizardContinue(saved!=ALBA_ERROR);
@@ -2395,6 +2398,7 @@ void albaLogicWithManagers::CreateMenu()
 	albaGUI::AddMenuItem(file_menu, MENU_FILE_OPEN, _("&Open   \tCtrl+O"), FILE_OPEN_xpm);
 	albaGUI::AddMenuItem(file_menu, MENU_FILE_SAVE, _("&Save  \tCtrl+S"), FILE_SAVE_xpm);
 	file_menu->Append(MENU_FILE_SAVEAS, _("Save &As  \tCtrl+Shift+S"));
+	file_menu->Append(MENU_FILE_SAVEAS_LEGACY, _("Save &As  (Legacy mode)"));
 
 	m_ImportMenu = new wxMenu;
 	file_menu->AppendSeparator();
@@ -2630,6 +2634,7 @@ void albaLogicWithManagers::EnableMenuAndToolbar()
 	EnableItem(MENU_FILE_OPEN, enable);
 	EnableItem(MENU_FILE_SAVE, enable);
 	EnableItem(MENU_FILE_SAVEAS, enable);
+	EnableItem(MENU_FILE_SAVEAS_LEGACY, enable);
 	EnableItem(MENU_FILE_MERGE, enable);
 	EnableItem(MENU_FILE_QUIT, enable);
 	EnableItem(wxID_FILE1, enable);

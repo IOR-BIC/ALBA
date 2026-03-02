@@ -53,6 +53,9 @@
 #include <assert.h>
 
 const char *file_extension="vtk";
+int glo_VtkFileVersion = 0;
+
+
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEItemVTK)
@@ -579,6 +582,8 @@ int albaVMEItemVTK::InternalStoreData(const char *url)
       vtkALBASmartPointer<vtkDataSetWriter> writer;
       writer->SetInputData(data);
       writer->SetFileTypeToBinary();
+      if(glo_VtkFileVersion != 0)
+				writer->SetFileVersion(glo_VtkFileVersion);
       writer->SetHeader("# ALBA data file - albaVMEItemVTK output\n");
 
       if (m_IOMode == MEMORY || GetCrypting())
@@ -772,6 +777,19 @@ bool albaVMEItemVTK::StoreToArchive(wxZipOutputStream &zip)
   bool write_res = zip.LastWrite() == m_OutputMemorySize;
   return write_res;
 }
+
+//----------------------------------------------------------------------------
+int albaVMEItemVTK::GetVTKFileVersion()
+{
+	return glo_VtkFileVersion;
+}
+
+//----------------------------------------------------------------------------
+void albaVMEItemVTK::SetVTKFileVersion(int version)
+{
+	glo_VtkFileVersion = version;
+}
+
 //-------------------------------------------------------------------------
 void albaVMEItemVTK::ReleaseOutputMemory()
 //-------------------------------------------------------------------------
