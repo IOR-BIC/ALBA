@@ -483,7 +483,7 @@ int albaXMLStorage::InternalRestore()
             
               if (my_version_f < doc_version_f)
               {
-								albaErrorMessageMacro("File version v" << m_DocumentVersion.GetCStr() << " is newer than supported v\n Please install last version to open this file" << m_Version.GetCStr());
+								albaErrorMessageMacro("File version v" << m_DocumentVersion.GetCStr() << " is newer than supported v" << m_Version.GetCStr() << "\n Please install last version to open this file" );
 								errorCode = IO_WRONG_FILE_VERSION;
               }
               else if(my_version_f == doc_version_f)
