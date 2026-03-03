@@ -697,7 +697,7 @@ albaCxxTypeMacro(albaMSFImporter)
 albaMSFImporter::albaMSFImporter()
 //------------------------------------------------------------------------------
 {
-  SetVersion("1.0");
+  SetVersion("1.2");
   SetFileType("MSF");
   SetDocument(new mmuMSF1xDocument); // create a MSF doc
 }
