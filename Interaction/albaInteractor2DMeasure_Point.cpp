@@ -88,7 +88,7 @@ void albaInteractor2DMeasure_Point::EditMeasure(int index, double *point)
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure
 	albaString text;
-	text.Printf("Point (%.2f, %.2f, %.2f)", point[X], point[Y], point[Z]);
+	text.Printf("(%.2f, %.2f, %.2f)", point[X], point[Y], point[Z]);
 	m_Measure2DVector[index].Text = text;
 
 	// Point
@@ -190,7 +190,7 @@ void albaInteractor2DMeasure_Point::AddMeasure(double *point)
 	int index = m_Measure2DVector.size() - 1;
 
 	albaString text;
-	text.Printf("Point (%.2f, %.2f, %.2f)", point[X], point[Y], point[Z]);
+	text.Printf("(%.2f, %.2f, %.2f)", point[X], point[Y], point[Z]);
 	m_Measure2DVector[m_Measure2DVector.size() - 1].Text = text;
 
 	// Update Edit Actors

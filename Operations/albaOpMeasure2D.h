@@ -70,6 +70,7 @@ public:
 		ID_MEASURE_ENABLE,
 		ID_MEASURE_EDIT,
 		ID_MEASURE_MOVE,
+		ID_EXPORT_CSV,
 	};
 
   albaOpMeasure2D(const wxString &label = "Measure2D");
@@ -88,6 +89,7 @@ public:
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();
 
+
 protected:
 
 	/** Return true for the acceptable vme type. */
@@ -98,6 +100,9 @@ protected:
 
   /** Create the GUI */
   virtual void CreateGui();
+
+	/** exports measure list to CSV */
+	void ExportCSV();
 	
 	albaView* OpenImageView(int viewId);
 

@@ -291,7 +291,7 @@ void albaInteractor2DMeasure_LineDistance::FindAndHighlight(double * point)
 void albaInteractor2DMeasure_LineDistance::UpdateMeasure(int index, double measure)
 {
 	albaString text;
-	text.Printf("Distance %.2f mm", measure);
+	text.Printf("%.2f mm", measure);
 	m_Measure2DVector[index].Text = text;
 	m_Measure2DVector[index].Value = measure;
 }

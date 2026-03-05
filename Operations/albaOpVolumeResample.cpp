@@ -135,8 +135,6 @@ albaOpVolumeResample::~albaOpVolumeResample()
 bool albaOpVolumeResample::InternalAccept(albaVME* vme) 
 //----------------------------------------------------------------------------
 {
-	albaEvent e(this,VIEW_SELECTED);
-	albaEventMacro(e);
   return (vme && vme->IsALBAType(albaVMEVolumeGray));
 }
 //----------------------------------------------------------------------------
