@@ -91,9 +91,22 @@ int albaOpImporterDicFile::ImportFile()
 	vtkCellArray * polys;
 	vtkNEW(polys);
 
-	vtkDoubleArray *newArray;
-	vtkNEW(newArray);
-	newArray->SetName("DIC");
+	vtkDoubleArray *displacementsArray;
+	vtkNEW(displacementsArray);
+	displacementsArray->SetName("Displacements");
+	displacementsArray->SetNumberOfComponents(3);
+
+	vtkDoubleArray *dispMagnitudoArray;
+	vtkNEW(dispMagnitudoArray);
+	dispMagnitudoArray->SetName("Displ Magnitudo");
+	
+	vtkIdTypeArray *xIdsArray;
+	vtkNEW(xIdsArray);
+	xIdsArray->SetName("Index X");
+
+	vtkIdTypeArray *yIdsArray;
+	vtkNEW(yIdsArray);
+	yIdsArray->SetName("Index Y");
 
 
 
@@ -102,7 +115,7 @@ int albaOpImporterDicFile::ImportFile()
 	do 
 	{
 		lineLenght = GetLine();
-	} while (lineLenght > 0 && m_Line[0] == '%');
+	} while (lineLenght > 0 && (m_Line[0] == '%' || (m_Line[0]=='/' && m_Line[1]=='/')));
 	
 	if (lineLenght == 0)
 	{
@@ -111,38 +124,56 @@ int albaOpImporterDicFile::ImportFile()
 		return ALBA_ERROR;
 	}
 
-	double values[12],dist;
+	unsigned long indexes[2];
+	double values[10],dist;
 
 	int pointN = 0;
 
 	do 
 	{
-		int nReaded = sscanf(m_Line,  "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9], &values[10], &values[11]);
+		int nReaded = sscanf(m_Line,  "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9]);
 
 		if (nReaded != 12)
 		{
 			albaErrorMessage("Wrong file: %s", m_FileName.GetCStr());
+			albaDEL(pointCloudVME);
+			vtkDEL(polydata);
+			vtkDEL(newPoints);
+			vtkDEL(polys);
+			vtkDEL(displacementsArray);
+			vtkDEL(dispMagnitudoArray);
+			vtkDEL(xIdsArray);
+			vtkDEL(yIdsArray);
 			ReadFinalize();
 			return ALBA_ERROR;
 		}
 
-		newPoints->InsertNextPoint(&values[2]);
+		newPoints->InsertNextPoint(&values[3]);
 
 		polys->InsertNextCell(3);
 		polys->InsertCellPoint(pointN);
 		polys->InsertCellPoint(pointN);
 		polys->InsertCellPoint(pointN);
 
-		newArray->InsertNextValue(values[11]);
+		xIdsArray->InsertNextValue(indexes[0]);
+		yIdsArray->InsertNextValue(indexes[1]);
+		displacementsArray->InsertNextTuple3(values[6], values[7], values[8]);
+		dispMagnitudoArray->InsertNextValue(values[9]);
 
 		pointN++;
 	} while ((lineLenght = GetLine()) != 0);
 
 
 	vtkPointData *outPointData = polydata->GetPointData();
-	outPointData->AddArray(newArray);
-	vtkDEL(newArray);
 
+	outPointData->AddArray(xIdsArray);
+	vtkDEL(xIdsArray);
+	outPointData->AddArray(yIdsArray);
+	vtkDEL(yIdsArray);
+	outPointData->AddArray(displacementsArray);
+	vtkDEL(displacementsArray);
+	outPointData->AddArray(dispMagnitudoArray);
+	vtkDEL(dispMagnitudoArray);
 	polydata->SetPoints(newPoints);
 	vtkDEL(newPoints);
 
