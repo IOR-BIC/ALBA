@@ -76,6 +76,9 @@ IF (GDCM_SOURCE_PATH)
   ENDIF (GDCM_FORCE_CONFIGURE OR NOT EXISTS ${GDCM_BINARY_DIR}/build.cmake)
   
   IF (EXISTS ${GDCM_BINARY_DIR}/build.cmake)
+  	# recreate build.cmake to enable/disable library compilation
+   	CONFIGURE_FILE("${GDCM_SOURCE_DIR}/build.cmake.in" "${GDCM_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+
     # custom command to build the GDCM library
     IF (GDCM_BUILD_SHARED)
     	MESSAGE(STATUS "Adding custom command for GDCM SHARED library: ${LIBRARY_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}GDCM${CMAKE_SHARED_LIBRARY_SUFFIX}")

@@ -71,12 +71,15 @@ IF (BTK_SOURCE_PATH)
       	STRING (REPLACE "\\" "\\\\"  BTK_MAKECOMMAND "${BTK_MAKECOMMAND}")
       ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
       MESSAGE(STATUS "Creating file ${BTK_BINARY_DIR}/build.cmake")
-    	CONFIGURE_FILE("${BTK_SOURCE_DIR}/build.cmake.in" "${BTK_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+      CONFIGURE_FILE("${BTK_SOURCE_DIR}/build.cmake.in" "${BTK_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
     	
     ENDIF (CMAKE_RETURN)
   ENDIF (BTK_FORCE_CONFIGURE OR NOT EXISTS ${BTK_BINARY_DIR}/build.cmake)
   
   IF (EXISTS ${BTK_BINARY_DIR}/build.cmake)
+   	# recreate build.cmake to enable/disable library compilation
+	CONFIGURE_FILE("${BTK_SOURCE_DIR}/build.cmake.in" "${BTK_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+
     # custom command to build the BTK library
     IF (BTK_BUILD_SHARED)
     	MESSAGE(STATUS "Adding custom command for BTK SHARED library: ${LIBRARY_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}BTK${CMAKE_SHARED_LIBRARY_SUFFIX}")

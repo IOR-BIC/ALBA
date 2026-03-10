@@ -63,13 +63,16 @@ IF (CURL_SOURCE_PATH)
       	STRING (REPLACE "\\" "\\\\"  CURL_MAKECOMMAND "${CURL_MAKECOMMAND}")
       ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
       MESSAGE(STATUS "Creating file ${CURL_BINARY_DIR}/build.cmake")
-    	CONFIGURE_FILE("${CURL_SOURCE_DIR}/build.cmake.in" "${CURL_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+      CONFIGURE_FILE("${CURL_SOURCE_DIR}/build.cmake.in" "${CURL_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
 
     ENDIF (CMAKE_RETURN)
   ENDIF (CURL_FORCE_CONFIGURE OR NOT EXISTS ${CURL_BINARY_DIR}/build.cmake)
   
   
   IF (EXISTS ${CURL_BINARY_DIR}/build.cmake)
+   	# recreate build.cmake to enable/disable library compilation
+   	CONFIGURE_FILE("${CURL_SOURCE_DIR}/build.cmake.in" "${CURL_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+
   
 #    IF (WIN32)
       # custom command to build the CURL library
