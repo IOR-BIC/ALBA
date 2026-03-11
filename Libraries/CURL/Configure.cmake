@@ -71,6 +71,12 @@ IF (CURL_SOURCE_PATH)
   
   IF (EXISTS ${CURL_BINARY_DIR}/build.cmake)
    	# recreate build.cmake to enable/disable library compilation
+    LOAD_CACHE(${CURL_BINARY_PATH} READ_WITH_PREFIX CURL_ MAKECOMMAND)
+	#Split space separated arguments into a semi-colon separated list. Necessary for correct command line generation
+    SEPARATE_ARGUMENTS(CURL_MAKECOMMAND)
+    IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+      STRING (REPLACE "\\" "\\\\"  CURL_MAKECOMMAND "${CURL_MAKECOMMAND}")
+    ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
    	CONFIGURE_FILE("${CURL_SOURCE_DIR}/build.cmake.in" "${CURL_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
 
   
