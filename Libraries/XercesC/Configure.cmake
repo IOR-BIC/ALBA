@@ -81,6 +81,11 @@ IF (XercesC_SOURCE_PATH)
   
   IF (EXISTS ${XercesC_BINARY_DIR}/build.cmake)
 	# recreate build.cmake to enable/disable library compilation
+	LOAD_CACHE(${XercesC_BINARY_PATH} READ_WITH_PREFIX XercesC_ MAKECOMMAND)
+    SEPARATE_ARGUMENTS(XercesC_MAKECOMMAND)
+    IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+      STRING (REPLACE "\\" "\\\\"  XercesC_MAKECOMMAND "${XercesC_MAKECOMMAND}")
+    ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
 	CONFIGURE_FILE("${XercesC_SOURCE_DIR}/build.cmake.in" "${XercesC_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
   
     # custom command to build the XercesC library
