@@ -30,6 +30,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaInteractor2DMeasure_LineDistance.h"
 #include "albaInteractor2DMeasure_Angle.h"
 #include "albaInteractor2DMeasure_AngleLine.h"
+#include "albaInteractor2DMeasure_Ellipse.h"
 
 #include "albaEvent.h"
 #include "albaGUI.h"
@@ -199,6 +200,14 @@ void albaOpMeasure2D::InitInteractors()
 	InteractorAngleLine->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorAngleLine);
 
+	// Create Interactor Ellipse
+	albaInteractor2DMeasure_Ellipse *InteractorEllipse = albaInteractor2DMeasure_Ellipse::New();
+	if (m_CurrentInteractor == ELLIPSE)	albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)InteractorEllipse));
+	InteractorEllipse->SetListener(this);
+	InteractorEllipse->ShowText(m_ShowText);
+	m_InteractorVector.push_back(InteractorEllipse);
+
+
 	m_MaxMeasures = m_InteractorVector[m_CurrentInteractor]->GetMaxMeasures();
 	m_MeasureType = m_InteractorVector[m_CurrentInteractor]->GetMeasureType();
 }
@@ -210,8 +219,8 @@ void albaOpMeasure2D::CreateGui()
 	m_Gui->SetListener(this);
 
 	m_Gui->Divider(1);
-	int const numInter = 8;
-	wxString choises[numInter] = { _("Point"),_("Distance"),_("MidPoint"),_("CenterPoint"),_("Line"),_("Line Distance"),_("Angle"),_("Angle by Line") };
+	int const numInter = 9;
+	wxString choises[numInter] = { _("Point"),_("Distance"),_("MidPoint"),_("CenterPoint"),_("Line"),_("Line Distance"),_("Angle"),_("Angle by Line"), "Ellipse"};
 	m_Gui->Combo(ID_SELECT_INTERACTOR, "", &m_SelectedInteractor, numInter, choises, "Select Measure Type");
 	
 	m_MeasureListBox = m_Gui->ListBox(ID_MEASURE_LIST, "", 200);
