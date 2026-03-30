@@ -4,7 +4,7 @@ Module:    albaInteractor2DMeasure_Ellipse.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
-Authors:   Nicola Vanella
+Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) BIC-IOR 2021 (https://github.com/IOR-BIC)
 
@@ -65,9 +65,8 @@ albaInteractor2DMeasure_Ellipse::albaInteractor2DMeasure_Ellipse() : albaInterac
 albaInteractor2DMeasure_Ellipse::~albaInteractor2DMeasure_Ellipse()
 {
 	// Lines and Points
-	for (int i = 0; i < m_LineStackVector.size(); i++)
+	for (int i = 0; i < m_EllipseStackVector.size(); i++)
 	{
-		cppDEL(m_LineStackVector[i]);
 		cppDEL(m_PointsStackVectorL[i]);
 		cppDEL(m_PointsStackVectorR[i]);
 		cppDEL(m_PointsStackVectorC[i]);		
@@ -89,22 +88,20 @@ void albaInteractor2DMeasure_Ellipse::MoveMeasure(int index, double * point)
 	if (index < 0)
 		return;
 
-	double linePoint1[3];
-	double linePoint2[3];
-
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
-	lineSource->GetPoint1(linePoint1);
-	lineSource->GetPoint2(linePoint2);
+	double point1[3];
+	double point2[3];
+	
+	GetMeasurePoints(index, point1, point2);
 
 	if (!m_MovingMeasure)
 	{
-		m_OldLineP1[X] = linePoint1[X] - m_StartMousePosition[X];
-		m_OldLineP1[Y] = linePoint1[Y] - m_StartMousePosition[Y];
-		m_OldLineP1[Z] = linePoint1[Z] - m_StartMousePosition[Z];
+		m_OldLineP1[X] = point1[X] - m_StartMousePosition[X];
+		m_OldLineP1[Y] = point1[Y] - m_StartMousePosition[Y];
+		m_OldLineP1[Z] = point1[Z] - m_StartMousePosition[Z];
 
-		m_OldLineP2[X] = linePoint2[X] - m_StartMousePosition[X];
-		m_OldLineP2[Y] = linePoint2[Y] - m_StartMousePosition[Y];
-		m_OldLineP2[Z] = linePoint2[Z] - m_StartMousePosition[Z];
+		m_OldLineP2[X] = point2[X] - m_StartMousePosition[X];
+		m_OldLineP2[Y] = point2[Y] - m_StartMousePosition[Y];
+		m_OldLineP2[Z] = point2[Z] - m_StartMousePosition[Z];
 
 		m_MovingMeasure = true;
 	}
@@ -125,7 +122,6 @@ void albaInteractor2DMeasure_Ellipse::MoveMeasure(int index, double * point)
 
 	m_MeasureValue = DistanceBetweenPoints(tmp_pos1, tmp_pos2);
 
-	UpdateLineActors(tmp_pos1, tmp_pos2);
 	// Points
 	UpdatePointsActor(tmp_pos1, tmp_pos2);
 	// Epplise
@@ -153,9 +149,8 @@ void albaInteractor2DMeasure_Ellipse::EditMeasure(int index, double *point)
 	double point1[3];
 	double point2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
-	lineSource->GetPoint1(point1);
-	lineSource->GetPoint2(point2);
+	GetMeasurePoints(index, point1, point2);
+
 
 	if (m_CurrPoint == POINT_1)
 	{
@@ -179,8 +174,6 @@ void albaInteractor2DMeasure_Ellipse::EditMeasure(int index, double *point)
 	//m_MeasureTextVector[index] = text;
 	m_Measure2DVector[index].Text = text;
 
-	// Line
-	UpdateLineActors(point1, point2);
 	// Points
 	UpdatePointsActor(point1, point2);
 	// Ellipse
@@ -206,28 +199,24 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 		
 		for (int i = 0; i < GetMeasureCount(); i++)
 		{
-			albaActor2dStackHelper *lineStackVector = m_LineStackVector[i];
-			if (m_Renderer != lineStackVector->GetRenderer())
+			if (m_Renderer != m_PointsStackVectorL[i]->GetRenderer())
 				continue;
 
-			double linePoint1[3], linePoint2[3];
-
-			vtkLineSource* lineSource = (vtkLineSource*)lineStackVector->GetSource();
-			lineSource->GetPoint1(linePoint1);
-			lineSource->GetPoint2(linePoint2);
-
+			double point1[3], point2[3];
+			GetMeasurePoints(i, point1, point2);
+			
 			double centerPoint[3];
-			GetMidPoint(centerPoint, linePoint1, linePoint2);
+			GetMidPoint(centerPoint, point1, point2);
 
-			double radius = vtkMath::Distance2BetweenPoints(linePoint2, centerPoint);
+			double radius = vtkMath::Distance2BetweenPoints(point2, centerPoint);
 
-			if (DistancePointToLine(point, linePoint1, linePoint2) < m_PointUpdateDist)
+			if (DistancePointToLine(point, point1, point2) < m_PointUpdateDist)
 			{
 				SelectMeasure(i); 
 
-				double p1Dist = DistanceBetweenPoints(point,linePoint1);
-				double p2Dist = DistanceBetweenPoints(point,linePoint2);
-				double p1p2Dist = DistanceBetweenPoints(linePoint1, linePoint2);
+				double p1Dist = DistanceBetweenPoints(point,point1);
+				double p2Dist = DistanceBetweenPoints(point,point2);
+				double p1p2Dist = DistanceBetweenPoints(point1, point2);
 				double minDist = MIN(m_PointUpdateDist, (p1p2Dist/3.0));
 				
 				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
@@ -293,14 +282,7 @@ void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double 
 	pointSourceC->SetCenter(pointC);
 	pointSourceC->Update();
 }
-//----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::UpdateLineActors(double * point1, double * point2)
-{
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSource();
-	lineSource->SetPoint1(point1);
-	lineSource->SetPoint2(point2);
-	lineSource->Update();
-}
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double * point2)
 {
@@ -335,7 +317,7 @@ void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
 	{
 		int index = GetMeasureCount() - 1;
 		double oldPoint1[3], oldPoint2[3];
-		GetMeasureLinePoints(index, oldPoint1, oldPoint2);
+		GetMeasurePoints(index, oldPoint1, oldPoint2);
 
 		bool hasSameRenderer = (m_Renderer == m_Measure2DVector[index].Renderer);
 
@@ -363,10 +345,6 @@ void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
 	// Update Edit Actors
 	UpdateEditActors(point1, point2);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Add Line
-	m_LineStackVector.push_back(new albaActor2dStackHelper(vtkLineSource::New(), m_Renderer));
-
 	// Add Points
 	m_PointsStackVectorL.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
 	m_PointsStackVectorR.push_back(new albaActor2dStackHelper(GetNewPointSource(), m_Renderer));
@@ -378,10 +356,6 @@ void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
 	//////////Setting mapper/actors/proprieties//////////////
 	int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
 	
-	m_LineStackVector[index]->SetColor(m_Colors[col]);
-	m_LineStackVector[index]->GetProperty()->SetLineStipplePattern(0xf0f0);
-	m_LineStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
-
 	//---Points---
 	// Left
 	m_PointsStackVectorL[index]->GetProperty()->SetPointSize(m_PointSize);
@@ -406,7 +380,6 @@ void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
 
 	SelectMeasure(index);
 
-	UpdateLineActors(point1, point2);
 	UpdatePointsActor(point1, point2);
 	UpdateEllipseActor(point1, point2);
 
@@ -423,10 +396,6 @@ void albaInteractor2DMeasure_Ellipse::RemoveMeasure(int index)
 		Superclass::RemoveMeasure(index);
 
 		//////////////////////////////////////////////////////////////////////////
-		// Line
-		cppDEL(m_LineStackVector[index]);
-		m_LineStackVector.erase(m_LineStackVector.begin() + index);
-
 		// POINTS
 		// Left
 		cppDEL(m_PointsStackVectorL[index]);
@@ -458,7 +427,6 @@ void albaInteractor2DMeasure_Ellipse::SelectMeasure(int index)
 		{
 			int col = m_IsEnabled ? COLOR_DEFAULT : COLOR_DISABLE;
 
-			m_LineStackVector[i]->SetColor(m_Colors[col]);
 			m_PointsStackVectorL[i]->SetColor(m_Colors[col]);
 			m_PointsStackVectorR[i]->SetColor(m_Colors[col]);
 			m_PointsStackVectorC[i]->SetColor(m_Colors[col]);
@@ -468,7 +436,6 @@ void albaInteractor2DMeasure_Ellipse::SelectMeasure(int index)
 
 		if (index >= 0)
 		{
-			m_LineStackVector[index]->SetColor(m_Colors[COLOR_SELECTION]);
 			m_PointsStackVectorL[index]->SetColor(m_Colors[COLOR_SELECTION]);
 			m_PointsStackVectorR[index]->SetColor(m_Colors[COLOR_SELECTION]);
 			m_PointsStackVectorC[index]->SetColor(m_Colors[COLOR_SELECTION]);
@@ -485,7 +452,6 @@ void albaInteractor2DMeasure_Ellipse::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
-		m_LineStackVector[i]->SetVisibility(show);
 		m_PointsStackVectorL[i]->SetVisibility(show);
 		m_PointsStackVectorR[i]->SetVisibility(show);
 		m_PointsStackVectorC[i]->SetVisibility(show);
@@ -528,24 +494,22 @@ void albaInteractor2DMeasure_Ellipse::SetLineWidth(double width)
 
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
-		m_LineStackVector[i]->GetProperty()->SetLineWidth(m_LineWidth);
 		m_EllipseStackVector[i]->GetProperty()->SetLineWidth(m_LineWidth);
 	}
 	Render();
 }
 
-/// UTILS ///////////////////////////////////////////////////////////////////
-//---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::GetMeasureLinePoints(int index, double *point1, double *point2)
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_Ellipse::GetMeasurePoints(int index, double *point1, double *point2)
 {
-	// Return line points values
-	if (index >= 0 && index < GetMeasureCount())
-	{
-		vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
-		lineSource->GetPoint1(point1);
-		lineSource->GetPoint2(point2);
-	}
+	vtkPointSource *pointSourceL = (vtkPointSource *)m_PointsStackVectorL[index]->GetSource();
+	pointSourceL->GetCenter(point1);
+	vtkPointSource *pointSourceR = (vtkPointSource *)m_PointsStackVectorR[index]->GetSource();
+	pointSourceR->GetCenter(point2);
 }
+
+/// UTILS ///////////////////////////////////////////////////////////////////
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Ellipse::GetCenter(int index, double *center)
 {
@@ -625,7 +589,7 @@ bool albaInteractor2DMeasure_Ellipse::Save(albaVME *input, wxString tag)
 		for (int i = 0; i < nCenters; i++)
 		{
 			double point1[3], point2[3];
-			GetMeasureLinePoints(i, point1, point2);
+			GetMeasurePoints(i, point1, point2);
 
 			measureTypeTag.SetValue(GetTypeName(), i);
 			measureLabelTag.SetValue(GetMeasureLabel(i), i);

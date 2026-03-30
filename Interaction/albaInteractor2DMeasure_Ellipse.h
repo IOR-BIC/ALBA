@@ -4,7 +4,7 @@ Module:    albaInteractor2DMeasure_Ellipse.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
-Authors:   Nicola Vanella
+Authors:   Gianliugi Crimi
 ==========================================================================
 Copyright (c) BIC-IOR 2021 (https://github.com/IOR-BIC)
 
@@ -56,8 +56,8 @@ public:
 	void SetCenterPointSize(double size);
 	virtual void SetLineWidth(double width);
 
-	/** Get measure line extremity points*/
-	void GetMeasureLinePoints(int index, double *point1, double *point2);
+	/** Get measure extremity points*/
+	void GetMeasurePoints(int index, double *point1, double *point2);
 
 	void GetCenter(int index, double *center);
 	
@@ -75,16 +75,13 @@ protected:
 
 	// RENDERING
 	virtual void UpdatePointsActor(double * point1, double * point2);
-	virtual void UpdateLineActors(double * point1, double * point2);
 	void UpdateEllipseActor(double * point1, double * point2);
 	void UpdateTextActor(double * point1, double * point2);
 
 	//UTILS
 	virtual void FindAndHighlight(double * point);
 
-	// Persistent line
-	std::vector<albaActor2dStackHelper *> m_LineStackVector;
-
+	
 	// Persistent Points
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorL;
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorR;
