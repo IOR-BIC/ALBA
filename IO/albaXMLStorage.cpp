@@ -481,18 +481,23 @@ int albaXMLStorage::InternalRestore()
               double doc_version_f = atof(m_DocumentVersion);
               double my_version_f = atof(m_Version);
             
-              if (my_version_f <= doc_version_f)
+              if (my_version_f < doc_version_f)
               {
-                // Start tree restoring from root node
+								albaErrorMessageMacro("File version v" << m_DocumentVersion.GetCStr() << " is newer than supported v" << m_Version.GetCStr() << "\n Please install last version to open this file" );
+								errorCode = IO_WRONG_FILE_VERSION;
+              }
+              else if(my_version_f == doc_version_f)
+              {
+                // restore document to the actual version
                 if (m_Document->Restore(m_DocumentElement) != ALBA_OK)
                   errorCode = IO_RESTORE_ERROR;
-              }
+							}
               else
               {
                 // Paolo 30-11-2007: due to changes on name for albaVMEScalar (to albaVMEScalarMatrix)
                 if (doc_version_f < 2.0)
                 {
-                  albaErrorMacro("XML parsing error: wrong file version v"<<m_DocumentVersion.GetCStr()<<", should be > v"<<m_Version.GetCStr());
+                  albaErrorMessageMacro("Wrong file version v"<<m_DocumentVersion.GetCStr()<<", should be > v"<<m_Version.GetCStr());
                   errorCode = IO_WRONG_FILE_VERSION;
                 }
                 else
@@ -508,7 +513,7 @@ int albaXMLStorage::InternalRestore()
           }
           else
           {
-            albaErrorMacro("XML parsing error: wrong file type, expected \""<<m_FileType<<"\", found "<<m_DocumentElement->GetName());
+            albaErrorMessageMacro("XML parsing error: wrong file type, expected \""<<m_FileType<<"\", found "<<m_DocumentElement->GetName());
             errorCode = IO_WRONG_FILE_TYPE;
           }
           

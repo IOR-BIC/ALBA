@@ -385,7 +385,7 @@ void albaInteractor2DMeasure_AngleLine::UpdateMeasure(int index, double measure)
 	angleDegree = abs((angleDegree <= 180.0) ? angleDegree : 360.0 - angleDegree);
 
 	albaString text;
-	text.Printf("Angle %.2f°", angleDegree);
+	text.Printf("%.2f°", angleDegree);
 	m_Measure2DVector[index].Text = text;
 	m_Measure2DVector[index].Value = angleDegree;
 }

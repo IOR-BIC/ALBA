@@ -49,6 +49,7 @@ albaLicenceManager::albaLicenceManager(wxString appName)
 	m_SecondKey = "";
 	m_RegMail = "";
 	m_RegImagePath = "";
+	m_ReadUserData = FALSE;
 	SetLicScope(licenceScope::USER_LICENCE);
 }
 
@@ -401,6 +402,11 @@ void albaLicenceManager::ShowRegistrationDialog()
 		regKey.QueryValue("LocalKey", m_FirstKey);
 	}
 
+	wxString registrationString;
+	
+	if (m_ReadUserData == FALSE)
+		registrationString = m_FirstKey;
+
 	wxString imgPath = m_RegImagePath;
 	wxString title = "Register Product";
 
@@ -431,37 +437,109 @@ void albaLicenceManager::ShowRegistrationDialog()
 
 		int vertPanelWidth = 500;
 		wxBoxSizer *mainVertSizer = new wxBoxSizer(wxVERTICAL);
-		mainVertSizer->SetMinSize(wxSize(vertPanelWidth, 200));
 
 		//STEP 1 ////////////////////////////////////////////
 
 		int borderSize = 0;
 
-		// TEXT 1
-		wxString text1 = "\n Step 1\n  This is your personal code.";
+		if (m_ReadUserData == FALSE)
+		{
+			// TEXT 1
+			wxString text1 = "\n Step 1\n  This is your personal code.";
 
-		if (!m_RegMail.IsEmpty())
-			text1 += "Copy and send it to " + m_RegMail + " to receive the activation key.\n";
+			if (!m_RegMail.IsEmpty())
+				text1 += "Copy and send it to " + m_RegMail + " to receive the activation key.\n";
 
-		wxStaticText* staticText1 = new wxStaticText(m_RegistrationDialog, -1, text1, wxPoint(-1, -1), wxSize(vertPanelWidth, 50), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
-		mainVertSizer->Add(staticText1, 0, wxALL | wxALIGN_LEFT | wxEXPAND, borderSize);
+			wxStaticText* staticText1 = new wxStaticText(m_RegistrationDialog, -1, text1, wxPoint(-1, -1), wxSize(vertPanelWidth, 50), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
+			mainVertSizer->Add(staticText1, 0, wxALL | wxALIGN_LEFT | wxEXPAND, borderSize);
 
-		// TEXT CTRL - FIRST KEY
-		m_FirstKey_textCtrl = new wxTextCtrl(m_RegistrationDialog, NULL, m_FirstKey, wxPoint(-1, -1), wxSize(vertPanelWidth, 50), wxALL | wxEXPAND);
-		m_FirstKey_textCtrl->SetEditable(false);
-		m_FirstKey_textCtrl->Enable(true);
-		m_FirstKey_textCtrl->SelectAll();
+			// TEXT CTRL - FIRST KEY
+			m_FirstKey_textCtrl = new wxTextCtrl(m_RegistrationDialog, NULL, registrationString, wxPoint(-1, -1), wxSize(vertPanelWidth, 50), wxALL | wxEXPAND);
+			m_FirstKey_textCtrl->SetEditable(false);
+			m_FirstKey_textCtrl->Enable(true);
+			m_FirstKey_textCtrl->SelectAll();
 
-		// Merging sizers into dialog
-		wxStaticBoxSizer *labelSizer1 = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Your Personal Key");
-		labelSizer1->Add(m_FirstKey_textCtrl, 0, wxALL | wxEXPAND, 0);
-		mainVertSizer->Add(labelSizer1, 0, wxALL | wxEXPAND, 5);
+			// Merging sizers into dialog
+			wxStaticBoxSizer *labelSizer1 = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Your Registration String");
+			labelSizer1->Add(m_FirstKey_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(labelSizer1, 0, wxALL | wxEXPAND, 5);
 
-		// COPY BUTTON
-		albaGUIButton *copyButton = new albaGUIButton(m_RegistrationDialog, ID_COPY_KEY, "Copy", wxPoint(-1, -1)); //Copy to Clipboard
-		copyButton->SetListener(this);
-		mainVertSizer->Add(copyButton, 0, wxALIGN_RIGHT, 5);
+			// COPY BUTTON
+			albaGUIButton *copyButton = new albaGUIButton(m_RegistrationDialog, ID_COPY_KEY, "Copy", wxPoint(-1, -1));
+			copyButton->SetListener(this);
+			mainVertSizer->Add(copyButton, 0, wxALIGN_RIGHT, 5);
+		}
+		else // m_ReadUserData == TRUE
+		{
+			// TEXT 1
+			wxString text1 = "\n Step 1\n  Please fill in all fields to generate your registration code.\n";
+			wxStaticText* staticText1 = new wxStaticText(m_RegistrationDialog, -1, text1, wxPoint(-1, -1), wxSize(vertPanelWidth, 50), wxALIGN_LEFT | wxST_NO_AUTORESIZE);
+			mainVertSizer->Add(staticText1, 0, wxALL | wxALIGN_LEFT | wxEXPAND, borderSize);
 
+			// NAME FIELD
+			wxString nameValue = "";
+			m_Name_textCtrl = new wxTextCtrl(m_RegistrationDialog, ID_NAME_FIELD, nameValue, wxPoint(-1, -1), wxSize(vertPanelWidth, 25), wxALIGN_LEFT | wxEXPAND);
+			m_Name_textCtrl->SetEditable(true);
+			m_Name_textCtrl->Enable(true);
+			m_Name_textCtrl->Bind(wxEVT_TEXT, &albaLicenceManager::OnTextFieldChanged, this);
+
+			wxStaticBoxSizer *nameSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Name");
+			nameSizer->Add(m_Name_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(nameSizer, 0, wxALL | wxEXPAND, 5);
+
+			// SURNAME FIELD
+			wxString surnameValue = "";
+			m_Surname_textCtrl = new wxTextCtrl(m_RegistrationDialog, ID_SURNAME_FIELD, surnameValue, wxPoint(-1, -1), wxSize(vertPanelWidth, 25), wxALIGN_LEFT | wxEXPAND);
+			m_Surname_textCtrl->SetEditable(true);
+			m_Surname_textCtrl->Enable(true);
+			m_Surname_textCtrl->Bind(wxEVT_TEXT, &albaLicenceManager::OnTextFieldChanged, this);
+
+			wxStaticBoxSizer *surnameSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Surname");
+			surnameSizer->Add(m_Surname_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(surnameSizer, 0, wxALL | wxEXPAND, 5);
+
+			// AFFILIATION FIELD
+			wxString affiliationValue = "";
+			m_Affiliation_textCtrl = new wxTextCtrl(m_RegistrationDialog, ID_AFFILIATION_FIELD, affiliationValue, wxPoint(-1, -1), wxSize(vertPanelWidth, 25), wxALIGN_LEFT | wxEXPAND);
+			m_Affiliation_textCtrl->SetEditable(true);
+			m_Affiliation_textCtrl->Enable(true);
+			m_Affiliation_textCtrl->Bind(wxEVT_TEXT, &albaLicenceManager::OnTextFieldChanged, this);
+
+			wxStaticBoxSizer *affiliationSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Affiliation");
+			affiliationSizer->Add(m_Affiliation_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(affiliationSizer, 0, wxALL | wxEXPAND, 5);
+
+			// INTENDED USE FIELD
+			wxString intendedUseValue = "";
+			m_IntendedUse_textCtrl = new wxTextCtrl(m_RegistrationDialog, ID_INTENDED_USE_FIELD, intendedUseValue, wxPoint(-1, -1), wxSize(vertPanelWidth, 80), wxALIGN_LEFT | wxEXPAND | wxTE_MULTILINE);
+			m_IntendedUse_textCtrl->SetEditable(true);
+			m_IntendedUse_textCtrl->Enable(true);
+			m_IntendedUse_textCtrl->Bind(wxEVT_TEXT, &albaLicenceManager::OnTextFieldChanged, this);
+
+			wxStaticBoxSizer *intendedUseSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Intended Use");
+			intendedUseSizer->Add(m_IntendedUse_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(intendedUseSizer, 0, wxALL | wxEXPAND, 5);
+
+			// GENERATE REGISTRATION BUTTON
+			m_GenerateRegistration_Button = new albaGUIButton(m_RegistrationDialog, ID_GENERATE_REGISTRATION, "Generate Registration", wxPoint(-1, -1));
+			m_GenerateRegistration_Button->SetListener(this);
+			m_GenerateRegistration_Button->Enable(false);
+			mainVertSizer->Add(m_GenerateRegistration_Button, 0, wxALIGN_RIGHT, 5);
+
+			// RESULT FIELD (displays generated registration string)
+			m_FirstKey_textCtrl = new wxTextCtrl(m_RegistrationDialog, NULL, "", wxPoint(-1, -1), wxSize(vertPanelWidth, 50), wxALL | wxEXPAND);
+			m_FirstKey_textCtrl->SetEditable(false);
+			m_FirstKey_textCtrl->Enable(true);
+
+			wxStaticBoxSizer *resultSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Your Registration String");
+			resultSizer->Add(m_FirstKey_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(resultSizer, 0, wxALL | wxEXPAND, 5);
+
+			// COPY BUTTON
+			albaGUIButton *copyButton = new albaGUIButton(m_RegistrationDialog, ID_COPY_KEY, "Copy", wxPoint(-1, -1));
+			copyButton->SetListener(this);
+			mainVertSizer->Add(copyButton, 0, wxALIGN_RIGHT, 5);
+		}
 		//STEP 2 ////////////////////////////////////////////
 
 		// TEXT 2
@@ -483,11 +561,18 @@ void albaLicenceManager::ShowRegistrationDialog()
 		// VERIFY BUTTON
 		albaGUIButton *registerButton = new albaGUIButton(m_RegistrationDialog, ID_VERIFY_KEY, "Register", wxPoint(-1, -1));
 		registerButton->SetListener(this);
-		mainVertSizer->Add(registerButton, 0, wxALIGN_RIGHT, 5);		
-
+		
 		mainSizer->Add(mainVertSizer, 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND);
-
+		
 		m_RegistrationDialog->Add(mainSizer, 0, wxALL, 0);
+
+		mainVertSizer->Add(registerButton, 0, wxALIGN_RIGHT, 5);
+		mainVertSizer->Fit(m_RegistrationDialog);
+		mainVertSizer->FitInside(m_RegistrationDialog);
+		mainSizer->FitInside(m_RegistrationDialog);
+		mainSizer->Fit(m_RegistrationDialog);
+
+
 		m_RegistrationDialog->Fit();
 	}
 
@@ -525,7 +610,6 @@ void albaLicenceManager::ShowGenerateLicenceDialog()
 		m_GenerateLicenceDialog->SetListener(this);
 
 		wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-		mainSizer->SetMinSize(wxSize(panelWidth, 200));
 
 		int borderSize = 0;
 
@@ -693,6 +777,21 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 			wxMessageBox(resutlMessage, "Result", wxOK, NULL);
 		}
 		break;
+		case ID_GENERATE_REGISTRATION:
+		{
+			wxString name = m_Name_textCtrl->GetValue();
+			wxString surname = m_Surname_textCtrl->GetValue();
+			wxString affiliation = m_Affiliation_textCtrl->GetValue();
+			wxString intendedUse = m_IntendedUse_textCtrl->GetValue();
+
+			// Create a readable registration data string with clear field labels
+			wxString registrationData = wxString::Format("Name:\n%s\n\nSurname:\n%s\n\nAffilition:\n%s\n\nIntended Use:\n%s\n\nRegistration Key:\n%s\n", name.ToAscii(),	surname.ToAscii(), affiliation.ToAscii(),intendedUse.ToAscii(),m_FirstKey.ToAscii()	);
+
+			
+			m_FirstKey_textCtrl->SetValue(registrationData);
+			m_FirstKey_textCtrl->SelectAll();
+		}
+		break;
 		default:
 			albaEventMacro(*e);
 			break;
@@ -724,4 +823,16 @@ void albaLicenceManager::ToClipboard(HWND hwnd, const std::string &s)
 	SetClipboardData(CF_TEXT, hg);
 	CloseClipboard();
 	GlobalFree(hg);
+}
+
+//----------------------------------------------------------------------------
+void albaLicenceManager::OnTextFieldChanged(wxEvent& event)
+{
+	// Validate all fields are filled
+	bool allFieldsFilled = !m_Name_textCtrl->GetValue().IsEmpty() &&
+		!m_Surname_textCtrl->GetValue().IsEmpty() &&
+		!m_Affiliation_textCtrl->GetValue().IsEmpty() &&
+		!m_IntendedUse_textCtrl->GetValue().IsEmpty();
+
+	m_GenerateRegistration_Button->Enable(allFieldsFilled);
 }

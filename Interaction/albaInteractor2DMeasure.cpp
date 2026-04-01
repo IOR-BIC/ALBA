@@ -417,7 +417,7 @@ void albaInteractor2DMeasure::AddMeasure(double *point1, double *point2 /*= NULL
 	//////////////////////////////////////////////////////////////////////////
 	// Add Measure
 	albaString text;
-	text.Printf("Point (%.2f, %.2f, %.2f)", point1[X], point1[Y], point1[Z]);
+	text.Printf("(%.2f, %.2f, %.2f)", point1[X], point1[Y], point1[Z]);
 
 	Measure2D newMeasure;
 	newMeasure.Active = true;

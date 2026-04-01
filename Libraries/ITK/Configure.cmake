@@ -88,11 +88,21 @@ IF (ITK_SOURCE_PATH)
       ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
       
       MESSAGE(STATUS "Creating file ${ITK_BINARY_DIR}/build.cmake")
-    	CONFIGURE_FILE("${ITK_SOURCE_DIR}/build.cmake.in" "${ITK_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+      CONFIGURE_FILE("${ITK_SOURCE_DIR}/build.cmake.in" "${ITK_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
     ENDIF (CMAKE_RETURN)
   ENDIF (ITK_FORCE_CONFIGURE OR NOT EXISTS ${ITK_BINARY_DIR}/build.cmake)
   
   IF (EXISTS ${ITK_BINARY_DIR}/build.cmake)
+  	# recreate build.cmake to enable/disable library compilation
+    LOAD_CACHE(${ITK_BINARY_PATH} READ_WITH_PREFIX ITK_ MAKECOMMAND)
+    #Split space separated arguments into a semi-colon separated list. Necessary for correct command line generation
+    SEPARATE_ARGUMENTS(ITK_MAKECOMMAND)
+    IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+  	  STRING (REPLACE "\\" "\\\\"  ITK_MAKECOMMAND "${ITK_MAKECOMMAND}")
+    ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+
+   	CONFIGURE_FILE("${ITK_SOURCE_DIR}/build.cmake.in" "${ITK_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+
     # custom command to build the ITK library
     IF (ITK_BUILD_SHARED)
     	MESSAGE(STATUS "Adding custom command for ITK SHARED library: ${LIBRARY_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}itkCommon${CMAKE_SHARED_LIBRARY_SUFFIX}")

@@ -236,9 +236,10 @@ void albaOpMeasure2D::CreateGui()
 	m_Gui->Label("Storage", true);
 	m_Gui->TwoButtons(ID_LOAD_MEASURES, ID_SAVE_MEASURES, "Load", "Save");
 
-	//////////////////////////////////////////////////////////////////////////
-	m_Gui->Enable(ID_MEASURE, false);
-	m_Gui->Enable(ID_REMOVE_MEASURE, m_MeasureListBox->GetCount() != 0);
+	m_Gui->Divider(1);
+	m_Gui->Label("");
+	m_Gui->Button(ID_EXPORT_CSV, "Export to CSV");
+
 
 	m_Gui->Label("");
 	m_Gui->Label("");
@@ -246,7 +247,58 @@ void albaOpMeasure2D::CreateGui()
 
 	m_Gui->OkCancel();
 	m_Gui->Label("");
+
+	//////////////////////////////////////////////////////////////////////////
+	m_Gui->Enable(ID_MEASURE, false);
+	m_Gui->Enable(ID_REMOVE_MEASURE, m_MeasureListBox->GetCount() != 0);
+
 }
+
+//----------------------------------------------------------------------------
+void albaOpMeasure2D::ExportCSV()
+{
+	albaString fileNameFullPath = albaGetDocumentsDirectory();
+	fileNameFullPath.Append("\\MeasuresExport.csv");
+
+	albaString wildc = "Measure file (*.csv)|*.csv";
+	albaString newFileName = albaGetSaveFile(fileNameFullPath.GetCStr(), wildc, "Save Measures", 0, false);
+	if (!newFileName.IsEmpty())
+	{
+		bool firstAcces = !wxFileExists(newFileName.GetCStr());
+
+		FILE *pFile;
+		pFile = fopen(newFileName.GetCStr(), "a+");
+
+		if (pFile != NULL)
+		{
+
+			if (firstAcces) // Header
+				fprintf(pFile, "VME Name;Measure Type;Label;Measure;\n");
+
+			for (int i = 0; i < m_InteractorVector.size(); i++)
+			{
+				int nMeasures = m_InteractorVector[i]->GetMeasureCount();
+				for (int j = 0; j < nMeasures; j++)
+				{
+					albaString vmeName = m_Input->GetName();
+					albaString measureType = m_InteractorVector[i]->GetMeasureType();
+					albaString measureLabel = m_InteractorVector[i]->GetMeasureLabel(j);
+					albaString measureText = m_InteractorVector[i]->GetMeasureText(j);
+					fprintf(pFile, "%s;%s;%s;%s;\n", vmeName.GetCStr(), measureType.GetCStr(), measureLabel.GetCStr(), measureText.GetCStr());
+				}
+			}
+
+			albaOpenWithDefaultApp(newFileName);
+		}
+		else
+		{
+			albaErrorMessage("Cannot open CSV file, it can be opened by an another application.\nPlease close the application or select another file.");
+		}
+
+		fclose(pFile);
+	}
+}
+
 
 //----------------------------------------------------------------------------
 void albaOpMeasure2D::OpStop(int result)
@@ -352,6 +404,11 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 
+			case ID_EXPORT_CSV:
+			{
+				ExportCSV();
+			}
+			break;
 			case wxOK:
 				OpStop(OP_RUN_OK);
 				break;
@@ -432,7 +489,10 @@ void albaOpMeasure2D::UpdateMeasureList()
 		if (m_InteractorVector.size() > 0)
 			for (int i = 0; i < m_InteractorVector[m_CurrentInteractor]->GetMeasureCount(); i++)
 			{
-				wxString measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(i);
+				wxString measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(i);
+				if (!measure.IsEmpty())
+					measure += " ";
+				measure += m_InteractorVector[m_CurrentInteractor]->GetMeasureText(i);
 				m_MeasureListBox->Append(_(measure));
 			}
 
