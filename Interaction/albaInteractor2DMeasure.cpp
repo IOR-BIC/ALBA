@@ -575,6 +575,9 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 		case ACTION_MOVE_MEASURE:
 			cursor = wxCursor(wxCURSOR_SIZING);
 			break;
+		case ACTION_ROTATE_MEASURE:
+			cursor = wxCursor(wxCURSOR_CROSS);
+			break;
 		}
 
 		m_View->GetWindow()->SetCursor(cursor);
