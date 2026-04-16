@@ -25,6 +25,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaInteractorPER.h"
 #include "albaActor2dStackHelper.h"
 #include "albaGeometryUtils.h"
+#include "albaServiceClient.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -50,7 +51,7 @@ class vtkTextActor;
 // #define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
 
 // Class Name: albaInteractor2DMeasure
-class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER
+class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER, public albaServiceClient
 {
 public:
 
@@ -100,7 +101,7 @@ public:
 	virtual void ActivateMeasure(int index = -1 /*-1=All*/, bool activate = true);
 	
 	/** Enable/Disable Measure Interactor*/
-	void Enable(bool enable = true) { m_IsEnabled = enable; SelectMeasure(-1); };
+	virtual void Enable(bool enable = true) { m_IsEnabled = enable; SelectMeasure(-1); };
 
 	/** Enable/Disable Add Mode*/
 	void EnableAddMeasure(bool move = true) { m_AddMeasureEnable = move; };

@@ -64,6 +64,8 @@ albaInteractor2DMeasure_Ellipse::albaInteractor2DMeasure_Ellipse() : albaInterac
 //----------------------------------------------------------------------------
 albaInteractor2DMeasure_Ellipse::~albaInteractor2DMeasure_Ellipse()
 {
+	GetLogicManager()->UnRegisterForKeyEvents(this);
+
 	// Lines and Points
 	for (int i = 0; i < m_EllipseStackVector.size(); i++)
 	{
@@ -307,6 +309,17 @@ void albaInteractor2DMeasure_Ellipse::UpdateTextActor(double * point1, double * 
 	text_pos[X] += m_TextSide *TEXT_W_SHIFT;
 
 	Superclass::UpdateTextActor(m_CurrMeasure, text_pos);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_Ellipse::Enable(bool enable /*= true*/)
+{
+	if (enable)
+		GetLogicManager()->RegisterForKeyEvents(this);
+	else
+		GetLogicManager()->UnRegisterForKeyEvents(this);
+
+	Superclass::Enable(enable);
 }
 
 /// MEASURE //////////////////////////////////////////////////////////////////
@@ -624,4 +637,15 @@ bool albaInteractor2DMeasure_Ellipse::Save(albaVME *input, wxString tag)
 	}
 
 	return result;
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
+{
+	if (event->GetId() == KEY_PRESSED)
+		albaLogMessage("KeyPressed");
+	else if (event->GetId() == KEY_RELEASED)
+		albaLogMessage("KeyReleased");
+	else
+		Superclass::OnEvent(event);
 }

@@ -41,6 +41,9 @@ public:
 	albaTypeMacro(albaInteractor2DMeasure_Ellipse, albaInteractor2DMeasure);
 
 	// MEASURE
+	/** Enable/Disable Measure Interactor*/
+	virtual void Enable(bool enable = true);
+
 	/** Add Measure*/
 	virtual void AddMeasure(double *point1, double *point2);
 	/** Edit Measure*/
@@ -63,6 +66,8 @@ public:
 	
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
+
+	virtual void OnEvent(albaEventBase *event);
 
 protected:
 
