@@ -48,6 +48,7 @@ albaInteractor2DMeasure_Ellipse::albaInteractor2DMeasure_Ellipse() : albaInterac
 {
 	m_ShowText = false;
 	m_TextSide = 1;
+	m_CTRLPressed = false;
 
 	m_MeasureTypeText = "CENTER_POINT";
 
@@ -643,9 +644,23 @@ bool albaInteractor2DMeasure_Ellipse::Save(albaVME *input, wxString tag)
 void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 {
 	if (event->GetId() == KEY_PRESSED)
-		albaLogMessage("KeyPressed");
+	{
+		bool isCTRL = ((albaEvent *)event)->GetArg() == WXK_CONTROL;
+		if (isCTRL)
+		{
+			SetAction(ACTION_ROTATE_MEASURE);
+			albaLogMessage("KeyPressed: CTRL");
+		}
+	}
 	else if (event->GetId() == KEY_RELEASED)
-		albaLogMessage("KeyReleased");
+	{
+		bool isCTRL = ((albaEvent *)event)->GetArg() == WXK_CONTROL;
+		if (isCTRL)
+		{
+			SetAction(ACTION_ADD_MEASURE);
+			albaLogMessage("KeyReleased: CTRL");
+		}
+	}
 	else
 		Superclass::OnEvent(event);
 }
