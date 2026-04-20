@@ -46,9 +46,9 @@ void vtkALBAEllipseSource::Execute()
 {
 	int A = 0, B = 1, C = 2;
 
-	if (m_Plane == 0) { A = 0; B = 1; C = 2; }; //XY
-	if (m_Plane == 1) { A = 1; B = 2; C = 0; }; //YZ
-	if (m_Plane == 2) { A = 0; B = 2; C = 1; }; //XZ
+	if (m_Plane == 0) { A = 0; B = 1; C = 2; } //XY
+	else if (m_Plane == 1) { A = 1; B = 2; C = 0; } //YZ
+	else if (m_Plane == 2) { A = 0; B = 2; C = 1; } //XZ
 
 	int numLines = this->Resolution;
 	int numPts = this->Resolution + 1;
@@ -75,7 +75,7 @@ void vtkALBAEllipseSource::Execute()
 	
 	tc[B] = 0.0;
 	tc[C] = 0.0;
-	x[C] = Center[A];
+	x[C] = Center[C];
 	for (i = 0; i < numPts; i++)
 	{
 		tc[A] = ((double)i / this->Resolution);

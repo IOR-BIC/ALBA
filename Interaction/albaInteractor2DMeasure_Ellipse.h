@@ -96,6 +96,8 @@ protected:
 	std::vector<albaActor2dStackHelper *> m_EllipseStackVector;
 
 	double m_CenterPointSize;
+	double m_LastPoint[3];
+	bool m_CTRLPressed;
 
 private:
 	albaInteractor2DMeasure_Ellipse(const albaInteractor2DMeasure_Ellipse&);   // Not implemented.

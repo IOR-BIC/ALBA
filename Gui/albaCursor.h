@@ -33,6 +33,9 @@ class ALBA_EXPORT albaCursor
 public:
   // Set the application cursor. Uses wxWidgets' wxSetCursor internally.
   static void SetCursor(wxWindow *window, const int cursor);
+  
+  // Call this before application exit to avoid memoryleaks
+	static void DeleteCursors();
 
 private:
 	static void InitCursors(); // Initializes cursor resources, if needed.

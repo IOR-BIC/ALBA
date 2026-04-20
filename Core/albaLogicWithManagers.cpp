@@ -95,6 +95,7 @@
 #include "albaGUI.h"
 #include "albaGUISplashScreen.h"
 #include "albaProsthesesDBManager.h"
+#include "albaCursor.h"
 
 //IMPORTERS
 #include "albaOpImporterASCII.h"
@@ -385,6 +386,8 @@ albaLogicWithManagers::~albaLogicWithManagers()
   //free mem
   if(m_WizardManager)
     delete m_WizardManager;
+
+	albaCursor::DeleteCursors();
 	
   // Managers are destruct in the OnClose
   cppDEL(m_User);

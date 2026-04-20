@@ -48,12 +48,14 @@ albaInteractor2DMeasure_Ellipse::albaInteractor2DMeasure_Ellipse() : albaInterac
 {
 	m_ShowText = false;
 	m_TextSide = 1;
-	m_CTRLPressed = false;
 
 	m_MeasureTypeText = "CENTER_POINT";
 
 	m_CurrPoint = NO_POINT;
+	m_CTRLPressed = false;
 	m_CenterPointSize = 5.0;
+
+	m_LastPoint[0] = m_LastPoint[1] = m_LastPoint[2] = 0.0;
 
 	Color color{ 0.6, 0.0, 0.6, 1.0 };
 
@@ -196,6 +198,10 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
 
+	m_LastPoint[0] = point[0];
+	m_LastPoint[1] = point[1];
+	m_LastPoint[2] = point[2];
+
 	if (m_EditMeasureEnable)
 	{
 		SetUpdateDistance(PixelSizeInWorld()*4.0);
@@ -224,13 +230,19 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 				
 				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 				{
-					SetAction(ACTION_EDIT_MEASURE);
+					if(m_CTRLPressed)
+						SetAction(ACTION_ROTATE_MEASURE);
+					else
+						SetAction(ACTION_EDIT_MEASURE);
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorL[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
 				else if (p2Dist <= minDist)
 				{
-					SetAction(ACTION_EDIT_MEASURE);
+					if (m_CTRLPressed)
+						SetAction(ACTION_ROTATE_MEASURE);
+					else
+						SetAction(ACTION_EDIT_MEASURE);
 					m_CurrPoint = POINT_2;
 					m_PointsStackVectorR[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
@@ -289,8 +301,14 @@ void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double 
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double * point2)
 {
-	double majorAxis = (point1[0] - point2[0]) / 2;
-	double minorAxis = (point1[1] - point2[1]) / 2;
+	int A, B, C;
+
+	if (m_CurrPlane == 0) { A = 0; B = 1; C = 2; } //XY
+	else if (m_CurrPlane == 1) { A = 1; B = 2; C = 0; } //YZ
+	else if (m_CurrPlane == 2) { A = 0; B = 2; C = 1; } //XZ
+	
+	double majorAxis = (point1[A] - point2[A]) / 2;
+	double minorAxis = (point1[B] - point2[B]) / 2;
 
 	double midPoint[3]; 
 	GetMidPoint(midPoint, point1, point2);
@@ -648,8 +666,8 @@ void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 		bool isCTRL = ((albaEvent *)event)->GetArg() == WXK_CONTROL;
 		if (isCTRL)
 		{
-			SetAction(ACTION_ROTATE_MEASURE);
-			albaLogMessage("KeyPressed: CTRL");
+			FindAndHighlight(m_LastPoint);
+			m_CTRLPressed = true;
 		}
 	}
 	else if (event->GetId() == KEY_RELEASED)
@@ -657,8 +675,8 @@ void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 		bool isCTRL = ((albaEvent *)event)->GetArg() == WXK_CONTROL;
 		if (isCTRL)
 		{
-			SetAction(ACTION_ADD_MEASURE);
-			albaLogMessage("KeyReleased: CTRL");
+			FindAndHighlight(m_LastPoint);
+			m_CTRLPressed = false;
 		}
 	}
 	else
