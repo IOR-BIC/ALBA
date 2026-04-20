@@ -75,6 +75,7 @@ public:
 		ACTION_EDIT_MEASURE,
 		ACTION_MOVE_MEASURE,
 		ACTION_ROTATE_MEASURE,
+		ACTION_ROTATING_MEASURE,
 	};
 
 	enum LINE_POINT
@@ -226,6 +227,9 @@ protected:
 	virtual void MoveMeasure(int index, double *pointCoord) {};
 	/** Edit Measure*/
 	virtual void EditMeasure(int index, double *point) {};
+	/** Rotate Measure*/
+	virtual void RotateMeasure(int index, double *point) {};
+
 	/** Find Measure Point and Set Action*/
 	virtual void FindAndHighlight(double *pointCoord) {};
 

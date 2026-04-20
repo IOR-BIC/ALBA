@@ -254,6 +254,11 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 			EditMeasure(m_CurrMeasure, pointCoord);
 		}
 		break;
+		case ACTION_ROTATE_MEASURE:
+		{
+			SetAction(ACTION_ROTATING_MEASURE);
+			RotateMeasure(m_CurrMeasure, pointCoord);
+		}
 		case ACTION_MOVE_MEASURE:
 		{
 			m_StartMousePosition[X] = pointCoord[X];
@@ -295,21 +300,26 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 
 		switch (m_Action)
 		{
-		case ACTION_ADD_MEASURE:
-		{
-			DrawNewMeasure(pointCoord);
-		}
-		break;
-		case ACTION_EDIT_MEASURE:
-		{
-			EditMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
-		case ACTION_MOVE_MEASURE:
-		{
-			MoveMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
+			case ACTION_ADD_MEASURE:
+			{
+				DrawNewMeasure(pointCoord);
+			}
+			break;
+			case ACTION_EDIT_MEASURE:
+			{
+				EditMeasure(m_CurrMeasure, pointCoord);
+			}
+			break;
+			case ACTION_MOVE_MEASURE:
+			{
+				MoveMeasure(m_CurrMeasure, pointCoord);
+			}
+			case ACTION_ROTATING_MEASURE:
+			{
+				RotateMeasure(m_CurrMeasure, pointCoord);
+				SetAction(ACTION_ROTATE_MEASURE);
+			}
+			break;
 		}
 
 		m_EndMeasure = true;
@@ -380,6 +390,11 @@ void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 			case ACTION_MOVE_MEASURE:
 			{
 				MoveMeasure(m_CurrMeasure, pointCoord);
+			}
+			break;
+			case ACTION_ROTATING_MEASURE:
+			{
+				RotateMeasure(m_CurrMeasure, pointCoord);
 			}
 			break;
 			}
@@ -576,6 +591,7 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 			albaCursor::SetCursor(window,wxCURSOR_SIZING);
 			break;
 		case ACTION_ROTATE_MEASURE:
+		case ACTION_ROTATING_MEASURE:
 			albaCursor::SetCursor(window,ALBA_CURSOR_ROTATE);
 			break;
 		default:

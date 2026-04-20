@@ -39,6 +39,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkViewport.h"
+#include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractor2DMeasure_Ellipse)
@@ -190,6 +191,37 @@ void albaInteractor2DMeasure_Ellipse::EditMeasure(int index, double *point)
 
 	//////////////////////////////////////////////////////////////////////////
 	Render();
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
+{
+
+	albaVect3d center,p1,p2, currPoint, v1, v2;
+
+	GetCenter(m_CurrMeasure, center.GetVect());
+
+	GetMeasurePoints(m_CurrMeasure, p1.GetVect(), p2.GetVect());
+
+	currPoint = m_CurrPoint == POINT_1 ? p1 : p2;
+
+	v1 = currPoint - center;
+	v2 = albaVect3d(point) - center;
+
+	double	angle=v1.AngleBetweenVectors(v2, false)*vtkMath::DegreesToRadians();
+
+	albaLogMessage("Angle:%f",angle);
+
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
+
+	ellipseSource->SetTheta(ellipseSource->GetTheta() + angle);
+
+	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
+
+	//////////////////////////////////////////////////////////////////////////
+	Render();
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -666,8 +698,8 @@ void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 		bool isCTRL = ((albaEvent *)event)->GetArg() == WXK_CONTROL;
 		if (isCTRL)
 		{
-			FindAndHighlight(m_LastPoint);
 			m_CTRLPressed = true;
+			FindAndHighlight(m_LastPoint);
 		}
 	}
 	else if (event->GetId() == KEY_RELEASED)
@@ -675,8 +707,8 @@ void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 		bool isCTRL = ((albaEvent *)event)->GetArg() == WXK_CONTROL;
 		if (isCTRL)
 		{
-			FindAndHighlight(m_LastPoint);
 			m_CTRLPressed = false;
+			FindAndHighlight(m_LastPoint);
 		}
 	}
 	else

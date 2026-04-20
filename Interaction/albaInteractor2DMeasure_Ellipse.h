@@ -48,6 +48,9 @@ public:
 	virtual void AddMeasure(double *point1, double *point2);
 	/** Edit Measure*/
 	virtual void EditMeasure(int index, double *point);
+	/** Rotate Measure*/
+	virtual void RotateMeasure(int index, double *point);;
+
 	/** Delete the Measure*/
 	virtual void RemoveMeasure(int index);
 	/** Select a Measure*/
