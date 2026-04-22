@@ -68,7 +68,7 @@ albaCxxTypeMacro(albaPipeVolumeArbSlice);
 #include "vtkTransform.h"
 #include "vtkObject.h"
 
-#define EPSILON 1e-3
+#define EPSILON 2e-3
 
 //----------------------------------------------------------------------------
 albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
@@ -432,6 +432,10 @@ void albaPipeVolumeArbSlice::CreateSlice()
 
 	// apply abs matrix to geometry
 	vtkNEW(m_NormalTranform);
+	m_NormalTranform->Identity();
+	m_NormalTranform->Translate(m_EpisolonNormal);
+	m_NormalTranform->Update();
+
 	
 	// to delete
 	vtkNEW(m_NormalTranformFilter);
@@ -587,7 +591,7 @@ void albaPipeVolumeArbSlice::SetSlice(double* Origin, double* Normal)
     {
       m_NormalVector[i] = (float)m_Normal[i];
       n[i] = m_Normal[i];
-			m_EpisolonNormal[i] = -m_Normal[i] * EPSILON;
+			m_EpisolonNormal[i] = m_Normal[i] * EPSILON * m_SliceViewCorrectionFactor;
     }
         
     vtkMath::Normalize(n);               
@@ -804,12 +808,20 @@ int albaPipeVolumeArbSlice::GetEnableGPU()
 };
 
 //----------------------------------------------------------------------------
-void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val)
+void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val, double factor)
 {
 	m_EnableSliceViewCorrection = val;
+	m_SliceViewCorrectionFactor = factor;
 
-	if (m_EnableSliceViewCorrection)
-		m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
-	else
-		m_SliceMapper->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
+	m_EpisolonNormal[0] = m_NormalVector[0] * EPSILON * m_SliceViewCorrectionFactor;
+	m_EpisolonNormal[1] = m_NormalVector[1] * EPSILON * m_SliceViewCorrectionFactor;
+	m_EpisolonNormal[2] = m_NormalVector[2] * EPSILON * m_SliceViewCorrectionFactor;
+
+	if (m_SliceMapper)
+	{
+		if (m_EnableSliceViewCorrection)
+			m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
+		else
+			m_SliceMapper->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
+	}
 }

@@ -100,6 +100,7 @@ SET(vtkALBA_SRCS
   vtkALBATIFFReader.cxx									vtkALBATIFFReader.h
 
   vtkALBAStructuredPointsAlgorithm.cxx vtkALBAStructuredPointsAlgorithm.h
+  vtkALBAEllipseSource.cxx								vtkALBAEllipseSource.h
 )
 
 

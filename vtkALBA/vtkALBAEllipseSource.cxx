@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program: ALBA
-Module: vtkALBACircleSource
+Module: vtkALBAEllipseSource
 Authors: Gianluigi Crimi
 
 Copyright (c) BIC
@@ -14,7 +14,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#include "vtkALBACircleSource.h"
+#include "vtkALBAEllipseSource.h"
 
 #include "vtkCellArray.h"
 #include "vtkFloatArray.h"
@@ -27,31 +27,31 @@ PURPOSE.  See the above copyright notice for more information.
 #include <math.h>
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
-vtkStandardNewMacro(vtkALBACircleSource);
+vtkStandardNewMacro(vtkALBAEllipseSource);
 
-vtkALBACircleSource::vtkALBACircleSource(int res)
+vtkALBAEllipseSource::vtkALBAEllipseSource(int res)
 {
   this->Center[0] =  0.0;
   this->Center[1] =  0.0;
   this->Center[2] =  0.0;
 
-	this->AngleRange[0] = 0;
-	this->AngleRange[1] = vtkMath::Pi() *2.0;
-
-  this->Resolution = (res < 3 ? 3 : res);
-
+	Theta = 0.0;
+	MajorAxis = MinorAxis = 0.0;
+	
+	this->Resolution = res;
+	
 	m_Plane = 0;
 
 	this->SetNumberOfInputPorts(0);
 }
 
-int vtkALBACircleSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+int vtkALBAEllipseSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int A = 0, B = 1, C = 2;
 
-	if (m_Plane == 0) { A = 0; B = 1; C = 2; }; //XY
-	if (m_Plane == 1) { A = 1; B = 2; C = 0; }; //YZ
-	if (m_Plane == 2) { A = 0; B = 2; C = 1; }; //XZ
+	if (m_Plane == 0) { A = 0; B = 1; C = 2; } //XY
+	else if (m_Plane == 1) { A = 1; B = 2; C = 0; } //YZ
+	else if (m_Plane == 2) { A = 0; B = 2; C = 1; } //XZ
 
 	int numLines = this->Resolution;
 	int numPts = this->Resolution + 1;
@@ -75,20 +75,23 @@ int vtkALBACircleSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInf
 	newLines = vtkCellArray::New();
 	newLines->Allocate(newLines->EstimateSize(numLines, 2));
 
-	double angleSize = AngleRange[1] - AngleRange[0];
+	double fullAngle = vtkMath::Pi() * 2.0;
 	double currentAngle;
 	
 	tc[B] = 0.0;
 	tc[C] = 0.0;
-	x[C] = Center[A];
+	x[C] = Center[C];
 	for (i = 0; i < numPts; i++)
 	{
 		tc[A] = ((double)i / this->Resolution);
 	
-		currentAngle = AngleRange[0] + angleSize*tc[A];
+		currentAngle = fullAngle*tc[A];
 
-		x[A] = Center[A] + sin(currentAngle)*Radius;
-		x[B] = Center[B] + cos(currentAngle)*Radius;
+		// x(t) = cx + a搾os(t)搾os(theta) - b新in(t)新in(theta)
+		x[A] = Center[A] + MajorAxis * cos(currentAngle) * cos(Theta) - MinorAxis * sin(currentAngle) * sin(Theta);
+
+		// y(t) = cy + a搾os(t)新in(theta) + b新in(t)搾os(theta)
+		x[B] = Center[B] + MajorAxis * cos(currentAngle) * sin(Theta) + MinorAxis * sin(currentAngle) * cos(Theta);
 
 		newPoints->InsertPoint(i, x);
 		newTCoords->InsertTuple(i, tc);
@@ -116,7 +119,7 @@ int vtkALBACircleSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInf
 	return 1;
 }
 
-void vtkALBACircleSource::PrintSelf(ostream& os, vtkIndent indent)
+void vtkALBAEllipseSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
@@ -125,10 +128,9 @@ void vtkALBACircleSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Center: (" << this->Center[0] << ", "
                                << this->Center[1] << ", "
                                << this->Center[2] << ")\n";
+	os << indent << "MajorAxis: " << this->MajorAxis << "\n";
 
-  os << indent << "AngleRange: (" << this->AngleRange[0] << ", "
-                               << this->AngleRange[1] << ")\n";
-
-	os << indent << "Radius: " << this->Radius << "\n";
-
+	os << indent << "MinorAxis: " << this->MinorAxis << "\n";
+	
+	os << indent << "Theta: " << this->Theta << "\n";
 }

@@ -49,6 +49,7 @@ public:
 		LINE_DISTANCE,
 		ANGLE,
 		ANGLE_LINE,
+		ELLIPSE
 	};
 
 	//Widgets ID's	

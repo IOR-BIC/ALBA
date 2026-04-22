@@ -268,6 +268,12 @@ public:
 	const char *GetCitationPaper() { return m_CitationPaper.GetCStr(); }
 	/** Set the link to the citation Paper */
 	void SetCitationPaper(char *link) { m_CitationPaper = link; }
+
+	void RegisterForKeyEvents(albaObserver *listener) override;
+
+
+	void UnRegisterForKeyEvents(albaObserver *listener) override;
+
 protected:
 	//---------------------------------------------------------
 	// Description:
@@ -504,6 +510,8 @@ protected:
 	
 	albaGUIApplicationSettings *m_ApplicationSettings;
 	albaGUISettingsTimeBar  *m_TimeBarSettings;
+
+	std::vector<albaObserver *> m_KeyEventListeners; ///< List of the observers that are registered to receive key events.
 
 	bool m_Quitting;    ///< Variable that allows to determine if the application is Quitting or not.
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.

@@ -205,8 +205,11 @@ void albaViewGlobalSliceCompound::VmeSelect(albaVME *node, bool select)
 	{
 		m_ColorLUT = select ? albaVMEVolumeGray::SafeDownCast(node)->GetMaterial()->m_ColorLut : NULL;
 
-		m_LutWidget->SetLut(m_ColorLUT);
-		m_LutWidget->Enable(m_ColorLUT != NULL);
+		if (m_LutWidget)
+		{
+			m_LutWidget->SetLut(m_ColorLUT);
+			m_LutWidget->Enable(m_ColorLUT != NULL);
+		}
 	}
 }
 

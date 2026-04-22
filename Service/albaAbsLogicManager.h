@@ -25,6 +25,7 @@ class albaVMEImage;
 class albaOpManager;
 class albaViewManager;
 class albaProsthesesDBManager;
+class albaObserver;
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -74,6 +75,12 @@ public:
 	/** Expand the VME on the Tree  */
 	virtual void ExpandVME(albaVME *vme) = 0;
 
+	//Key Events
+	/** Register the listener for keydown and keyrelease events */
+	virtual void RegisterForKeyEvents(albaObserver *listener) = 0;
+	/** Unregister the listener for key events */
+	virtual void UnRegisterForKeyEvents(albaObserver *listener) = 0;
+	
 	//Managers
 	virtual albaOpManager * GetOpManager() const = 0;
 

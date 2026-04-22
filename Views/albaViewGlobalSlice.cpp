@@ -62,11 +62,9 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewGlobalSlice);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // constants:
-//----------------------------------------------------------------------------
 enum PLANE_ID
 {
 	ID_XY = 0,
@@ -77,7 +75,6 @@ enum PLANE_ID
 //----------------------------------------------------------------------------
 albaViewGlobalSlice::albaViewGlobalSlice(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
 : albaViewVTK(label,camera_position,show_axes,show_grid, stereo)
-//----------------------------------------------------------------------------
 {
 	m_SliceOrigin[0] = m_SliceOrigin[1] = m_SliceOrigin[2] = 0.0;
 	m_IDPlane = ID_XY;
@@ -135,7 +132,6 @@ albaViewGlobalSlice::albaViewGlobalSlice(wxString label, int camera_position, bo
 }
 //----------------------------------------------------------------------------
 albaViewGlobalSlice::~albaViewGlobalSlice()
-//----------------------------------------------------------------------------
 {
 	if(m_Rwi && m_TextActor)
 		m_Rwi->m_RenFront->RemoveActor2D(m_TextActor);
@@ -188,7 +184,6 @@ albaViewGlobalSlice::~albaViewGlobalSlice()
 }
 //----------------------------------------------------------------------------
 albaView *albaViewGlobalSlice::Copy(albaObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   albaViewGlobalSlice *v = new albaViewGlobalSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType);
@@ -201,7 +196,6 @@ albaView *albaViewGlobalSlice::Copy(albaObserver *Listener, bool lightCopyEnable
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::Create()
-//----------------------------------------------------------------------------
 {
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
@@ -236,7 +230,6 @@ void albaViewGlobalSlice::Create()
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::InizializePlane()
-//----------------------------------------------------------------------------
 {
   vtkPlaneSource* boundsPlane;
 	vtkNEW(boundsPlane);
@@ -279,7 +272,6 @@ void albaViewGlobalSlice::InizializePlane()
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::VmeSelect(albaVME *vme,bool select)
-//----------------------------------------------------------------------------
 {
 	assert(m_Sg); 
   m_Sg->VmeSelect(vme,select);
@@ -308,7 +300,6 @@ void albaViewGlobalSlice::VmeSelect(albaVME *vme,bool select)
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::VmeCreatePipe(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   albaString pipe_name = "";
   GetVisualPipeName(vme, pipe_name);
@@ -364,28 +355,28 @@ void albaViewGlobalSlice::VmeCreatePipe(albaVME *vme)
       pipe->SetListener(this);
       if (pipe_name.Equals("albaPipeVolumeArbSlice"))
       {
-        ((albaPipeVolumeArbSlice *)pipe)->InitializeSliceParameters(applied_origin,applied_xVector,applied_yVector,true,false);
+				int volNum = m_Volumes.size();
+				m_Volumes.push_back(vme);
+				
+				((albaPipeVolumeArbSlice *)pipe)->InitializeSliceParameters(applied_origin, applied_xVector, applied_yVector, true, false);
+				((albaPipeVolumeArbSlice *)pipe)->SetEnableSliceViewCorrection(volNum > 0, volNum * -1.0);
 			}
       else if(pipe_name.Equals("albaPipeSurfaceSlice"))
       {
 				((albaPipeSurfaceSlice *)pipe)->ShowBoxSelectionOn();
-				double DoubleNormal[3];
-				DoubleNormal[0]=(double)m_SliceNormal[0];
-				DoubleNormal[1]=(double)m_SliceNormal[1];
-				DoubleNormal[2]=(double)m_SliceNormal[2];
-				((albaPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin, DoubleNormal);
+				double doubleNormal[3];
+				doubleNormal[0]=(double)m_SliceNormal[0];
+				doubleNormal[1]=(double)m_SliceNormal[1];
+				doubleNormal[2]=(double)m_SliceNormal[2];
+				((albaPipeSurfaceSlice *)pipe)->SetSlice(m_SliceOrigin, doubleNormal);
 			}
       else if(pipe_name.Equals("albaPipeMeshSlice"))
       {
-        double DoubleNormal[3];
-        DoubleNormal[0]=(double)m_SliceNormal[0];
-        DoubleNormal[1]=(double)m_SliceNormal[1];
-        DoubleNormal[2]=(double)m_SliceNormal[2];
-        double positionSlice[3];
-        positionSlice[0] = m_SliceOrigin[0];
-        positionSlice[1] = m_SliceOrigin[1];
-        positionSlice[2] = m_SliceOrigin[2];
-        ((albaPipeMeshSlice *)pipe)->SetSlice(positionSlice, DoubleNormal);
+        double doubleNormal[3];
+        doubleNormal[0]=(double)m_SliceNormal[0];
+        doubleNormal[1]=(double)m_SliceNormal[1];
+        doubleNormal[2]=(double)m_SliceNormal[2];
+        ((albaPipeMeshSlice *)pipe)->SetSlice(m_SliceOrigin, doubleNormal);
       }
       pipe->Create(n);
 
@@ -418,7 +409,6 @@ void albaViewGlobalSlice::VmeCreatePipe(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::VmeDeletePipe(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   m_GlobalBoundsValid = false;
   albaSceneNode *n = m_Sg->Vme2Node(vme);
@@ -428,9 +418,17 @@ void albaViewGlobalSlice::VmeDeletePipe(albaVME *vme)
   if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
   {
     if (m_AttachCamera)
-    {
       m_AttachCamera->SetVme(NULL);
-    }
+
+		// Remove vme from m_Volumes
+		for (int i = 0; i < m_Volumes.size(); ++i)
+		{
+			if (m_Volumes[i] == vme)
+			{
+				m_Volumes.erase(m_Volumes.begin() + i);
+				break;
+			}
+		}
   }
 	if (m_SelectedVolume == n)
   {
@@ -452,7 +450,6 @@ void albaViewGlobalSlice::VmeDeletePipe(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
@@ -499,7 +496,6 @@ void albaViewGlobalSlice::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::UpdateSliceParameters()
-//----------------------------------------------------------------------------
 {
 	if(!m_GlobalBoundsInitialized)
 	{
@@ -569,7 +565,6 @@ void albaViewGlobalSlice::UpdateSliceParameters()
 }
 //----------------------------------------------------------------------------
 albaGUI* albaViewGlobalSlice::CreateGui()
-//----------------------------------------------------------------------------
 {
 	wxString Views[3] = {"XY","XZ","YZ"};
 
@@ -602,7 +597,6 @@ albaGUI* albaViewGlobalSlice::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::UpdateSlice()
-//----------------------------------------------------------------------------
 {
 	if(!albaEquals(m_Dn, 0.0))
 	{
@@ -623,7 +617,6 @@ void albaViewGlobalSlice::UpdateSlice()
 		if(m_SliceOrigin[2] < m_GlobalBounds[4])
 			m_SliceOrigin[2] = m_GlobalBounds[4];
 	}
-
 	for(albaSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
 	{
     if(node->GetPipe())
@@ -655,27 +648,41 @@ void albaViewGlobalSlice::UpdateSlice()
 		  {
 				albaPipeSurfaceSlice * pipe = (albaPipeSurfaceSlice *)node->GetPipe();
         
-				double DoubleNormal[3];
-				DoubleNormal[0]=(double)m_SliceNormal[0];
-				DoubleNormal[1]=(double)m_SliceNormal[1];
-				DoubleNormal[2]=(double)m_SliceNormal[2];
-				pipe->SetSlice(m_SliceOrigin,DoubleNormal);
+				double doubleNormal[3];
+				doubleNormal[0]=(double)m_SliceNormal[0];
+				doubleNormal[1]=(double)m_SliceNormal[1];
+				doubleNormal[2]=(double)m_SliceNormal[2];
+				pipe->SetSlice(m_SliceOrigin,doubleNormal);
       }
       if(vme->IsA("albaVMEMesh"))
       {
 				albaPipeMeshSlice * pipe = (albaPipeMeshSlice *)node->GetPipe();
-        double DoubleNormal[3];
-        DoubleNormal[0]=(double)m_SliceNormal[0];
-        DoubleNormal[1]=(double)m_SliceNormal[1];
-        DoubleNormal[2]=(double)m_SliceNormal[2];
-				pipe->SetSlice(m_SliceOrigin, DoubleNormal);
+        double doubleNormal[3];
+        doubleNormal[0]=(double)m_SliceNormal[0];
+        doubleNormal[1]=(double)m_SliceNormal[1];
+        doubleNormal[2]=(double)m_SliceNormal[2];
+				pipe->SetSlice(m_SliceOrigin, doubleNormal);
       }
       else if (output->IsA("albaVMEOutputVolume"))
 			{
+				double doubleNormal[3];
+				doubleNormal[0] = (double)m_SliceNormal[0];
+				doubleNormal[1] = (double)m_SliceNormal[1];
+				doubleNormal[2] = (double)m_SliceNormal[2];
+
 				albaPipeVolumeArbSlice * pipe = (albaPipeVolumeArbSlice *)node->GetPipe();
-				pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
+
+				int volumePos = -1;
+				for (int i = 0; i < m_Volumes.size(); ++i) {
+					if (m_Volumes[i] == vme) {
+						volumePos = i;
+						break; //found the volume, exit the loop
+					}
+				}
+
+				pipe->SetEnableSliceViewCorrection(volumePos>0, volumePos * -1.0);
+				pipe->SetSlice(applied_origin, doubleNormal);
 				pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-				//pipe->UpdateSlice();
 			}
 			transform->Delete();
 			transform = NULL;
