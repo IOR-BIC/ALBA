@@ -24,6 +24,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVME.h"
 #include "albaVMEOutput.h"
 #include "albaView.h"
+#include "albaCursor.h"
 
 #include "vtkALBATextActorMeter.h"
 #include "vtkActor2D.h"
@@ -253,6 +254,12 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 			EditMeasure(m_CurrMeasure, pointCoord);
 		}
 		break;
+		case ACTION_ROTATE_MEASURE:
+		{
+			SetAction(ACTION_ROTATING_MEASURE);
+			RotateMeasure(m_CurrMeasure, pointCoord);
+		}
+		break;
 		case ACTION_MOVE_MEASURE:
 		{
 			m_StartMousePosition[X] = pointCoord[X];
@@ -294,21 +301,27 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 
 		switch (m_Action)
 		{
-		case ACTION_ADD_MEASURE:
-		{
-			DrawNewMeasure(pointCoord);
-		}
-		break;
-		case ACTION_EDIT_MEASURE:
-		{
-			EditMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
-		case ACTION_MOVE_MEASURE:
-		{
-			MoveMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
+			case ACTION_ADD_MEASURE:
+			{
+				DrawNewMeasure(pointCoord);
+			}
+			break;
+			case ACTION_EDIT_MEASURE:
+			{
+				EditMeasure(m_CurrMeasure, pointCoord);
+			}
+			break;
+			case ACTION_MOVE_MEASURE:
+			{
+				MoveMeasure(m_CurrMeasure, pointCoord);
+			}
+			break;
+			case ACTION_ROTATING_MEASURE:
+			{
+				RotateMeasure(m_CurrMeasure, pointCoord);
+				SetAction(ACTION_ROTATE_MEASURE);
+			}
+			break;
 		}
 
 		m_EndMeasure = true;
@@ -379,6 +392,11 @@ void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 			case ACTION_MOVE_MEASURE:
 			{
 				MoveMeasure(m_CurrMeasure, pointCoord);
+			}
+			break;
+			case ACTION_ROTATING_MEASURE:
+			{
+				RotateMeasure(m_CurrMeasure, pointCoord);
 			}
 			break;
 			}
@@ -561,23 +579,28 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 
 	if (m_View)
 	{
-		// Set Mouse Cursor
-		wxCursor cursor = wxCursor(wxCURSOR_ARROW);
 		
-		switch (m_Action)
+		wxWindow *window = m_View->GetWindow();
+				switch (m_Action)
 		{
 		case ACTION_ADD_MEASURE:
-			cursor = wxCursor(wxCURSOR_PENCIL);
+			albaCursor::SetCursor(window,wxCURSOR_PENCIL);
 			break;
 		case ACTION_EDIT_MEASURE:
-			cursor = wxCursor(wxCURSOR_HAND);
+			albaCursor::SetCursor(window,wxCURSOR_HAND);
 			break;
 		case ACTION_MOVE_MEASURE:
-			cursor = wxCursor(wxCURSOR_SIZING);
+			albaCursor::SetCursor(window,wxCURSOR_SIZING);
+			break;
+		case ACTION_ROTATE_MEASURE:
+		case ACTION_ROTATING_MEASURE:
+			albaCursor::SetCursor(window,ALBA_CURSOR_ROTATE);
+			break;
+		default:
+			albaCursor::SetCursor(window,wxCURSOR_ARROW);
 			break;
 		}
 
-		m_View->GetWindow()->SetCursor(cursor);
 		Update();
 	}
 }
