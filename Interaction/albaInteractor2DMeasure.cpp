@@ -259,6 +259,7 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 			SetAction(ACTION_ROTATING_MEASURE);
 			RotateMeasure(m_CurrMeasure, pointCoord);
 		}
+		break;
 		case ACTION_MOVE_MEASURE:
 		{
 			m_StartMousePosition[X] = pointCoord[X];
@@ -314,6 +315,7 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 			{
 				MoveMeasure(m_CurrMeasure, pointCoord);
 			}
+			break;
 			case ACTION_ROTATING_MEASURE:
 			{
 				RotateMeasure(m_CurrMeasure, pointCoord);

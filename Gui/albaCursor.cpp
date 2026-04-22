@@ -101,8 +101,8 @@ void albaCursor::InitCursors()
 	"                        " };
 
 	wxImage rotation_img(rotation_xpm);
-	rotation_img.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 20);
-	rotation_img.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
+	rotation_img.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y,12);
+	rotation_img.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 15);
 
 
   // Initialize custom cursors if needed. For example, if CURSOR_ROTATE is defined as a custom cursor:

@@ -3009,5 +3009,5 @@ int albaLogicWithManagers::AppEventFilter(wxEvent& event)
 		}
 	}
 
-	else return -1;
+	return -1;
 }
