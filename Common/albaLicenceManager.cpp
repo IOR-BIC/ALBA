@@ -74,9 +74,12 @@ albaLicenceManager::licenceStatuses albaLicenceManager::GetCurrentMode()
 		
 
 		wxString registredStr;
-		regKey.QueryValue("Registered", registredStr);
-		if (!ValidKey && !registredStr.empty())
-			albaMessageMacro("An old version of this software was already registerd,\nbut is not compatible with the current version.\n\nPlease register again.\n");
+		if (regKey.HasValue("Registered"))
+		{
+			regKey.QueryValue("Registered", registredStr);
+			if (!ValidKey && !registredStr.empty())
+				albaMessageMacro("An old version of this software was already registerd,\nbut is not compatible with the current version.\n\nPlease register again.\n");
+		}
 		
 		if (!ValidKey)
 		{

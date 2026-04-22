@@ -420,6 +420,9 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 									MINID,
 									MAXID = MINID + MAXWIDGET,
 
+																													KEY_PRESSED,  ///< used to send a key press event to the listener
+																													KEY_RELEASED, ///< used to send a key release event to the listener
+
 									ID_GUI_UPDATE,
 
 									ALBA_BASE_ID ///< base numeric ID used by albaIdFactory. This must be the LAST ONE!!!

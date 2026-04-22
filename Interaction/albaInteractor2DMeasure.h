@@ -25,6 +25,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaInteractorPER.h"
 #include "albaActor2dStackHelper.h"
 #include "albaGeometryUtils.h"
+#include "albaServiceClient.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -50,7 +51,7 @@ class vtkTextActor;
 // #define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
 
 // Class Name: albaInteractor2DMeasure
-class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER
+class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER, public albaServiceClient
 {
 public:
 
@@ -73,6 +74,8 @@ public:
 		ACTION_ADD_MEASURE,
 		ACTION_EDIT_MEASURE,
 		ACTION_MOVE_MEASURE,
+		ACTION_ROTATE_MEASURE,
+		ACTION_ROTATING_MEASURE,
 	};
 
 	enum LINE_POINT
@@ -99,7 +102,7 @@ public:
 	virtual void ActivateMeasure(int index = -1 /*-1=All*/, bool activate = true);
 	
 	/** Enable/Disable Measure Interactor*/
-	void Enable(bool enable = true) { m_IsEnabled = enable; SelectMeasure(-1); };
+	virtual void Enable(bool enable = true) { m_IsEnabled = enable; SelectMeasure(-1); };
 
 	/** Enable/Disable Add Mode*/
 	void EnableAddMeasure(bool move = true) { m_AddMeasureEnable = move; };
@@ -224,6 +227,9 @@ protected:
 	virtual void MoveMeasure(int index, double *pointCoord) {};
 	/** Edit Measure*/
 	virtual void EditMeasure(int index, double *point) {};
+	/** Rotate Measure*/
+	virtual void RotateMeasure(int index, double *point) {};
+
 	/** Find Measure Point and Set Action*/
 	virtual void FindAndHighlight(double *pointCoord) {};
 
