@@ -334,22 +334,24 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
+		albaInteractor2DMeasure *currInter = m_InteractorVector[m_CurrentInteractor];
 		if (e->GetSender() == m_Gui) // FROM GUI
 		{
+			
 			switch (e->GetId())
 			{
 			case ID_SELECT_INTERACTOR:
 			{
 				SetMeasureInteractor(m_SelectedInteractor);
-				m_SelectedMeasure = (m_InteractorVector[m_CurrentInteractor]->GetMeasureCount() > 0) ? 0 : -1;
-				m_MeasureLabel = (m_SelectedMeasure >= 0) ? m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure) : "";
+				m_SelectedMeasure = (currInter->GetMeasureCount() > 0) ? 0 : -1;
+				m_MeasureLabel = (m_SelectedMeasure >= 0) ? currInter->GetMeasureLabel(m_SelectedMeasure) : "";
 				m_Gui->Update();
 			}
 			break;
 			case ID_MEASURE_LIST:
 			{
 				int selection = m_MeasureListBox->GetSelection();
-				m_InteractorVector[m_CurrentInteractor]->SelectMeasure(selection);
+				currInter->SelectMeasure(selection);
 				m_Gui->Update();
 				GetLogicManager()->CameraUpdate();
 			}
@@ -358,18 +360,18 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			case ID_MEASURE_MAX:
 			{
 				int selection = m_MeasureListBox->GetSelection();
-				m_InteractorVector[m_CurrentInteractor]->SetMaxMeasures(m_MaxMeasures);
+				currInter->SetMaxMeasures(m_MaxMeasures);
 				m_Gui->Update();
 			}
 			break;
 			
 			case ID_MEASURE_LAB:
 			{
-				int nMeasures = m_InteractorVector[m_CurrentInteractor]->GetMeasureCount();
+				int nMeasures = currInter->GetMeasureCount();
 				if (nMeasures > 0 && m_SelectedMeasure >= 0 && m_SelectedMeasure < nMeasures)
 				{
-					m_InteractorVector[m_CurrentInteractor]->SetMeasureLabel(m_SelectedMeasure, m_MeasureLabel);
-					m_InteractorVector[m_CurrentInteractor]->Update(m_SelectedMeasure);
+					currInter->SetMeasureLabel(m_SelectedMeasure, m_MeasureLabel);
+					currInter->Update(m_SelectedMeasure);
 					UpdateMeasureList();
 					m_Gui->Update();
 				}
@@ -383,9 +385,9 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			{
 				int selection = m_MeasureListBox->GetSelection();
 			
-				m_InteractorVector[m_CurrentInteractor]->Enable(m_Enable);
-				m_InteractorVector[m_CurrentInteractor]->EnableEditMeasure(m_Edit);
-				m_InteractorVector[m_CurrentInteractor]->EnableMoveMeasure(m_Move);
+				currInter->Enable(m_Enable);
+				currInter->EnableEditMeasure(m_Edit);
+				currInter->EnableMoveMeasure(m_Move);
 				for(int i=0;i<m_InteractorVector.size();i++)
 					m_InteractorVector[i]->ShowText(m_ShowText);
 				GetLogicManager()->CameraUpdate();
@@ -432,12 +434,11 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			switch (e->GetId()) // FROM INTERACTOR
 			{
 			case albaInteractor2DMeasure::ID_MEASURE_ADDED:
-			case albaInteractor2DMeasure::ID_MEASURE_CHANGED:
 			{
 				// Update Measure Gui Entry
-				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasure();
-				m_Measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(m_SelectedMeasure);
-				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
+				m_SelectedMeasure = currInter->GetSelectedMeasure();
+				m_Measure = currInter->GetMeasureText(m_SelectedMeasure);
+				m_MeasureLabel = currInter->GetMeasureLabel(m_SelectedMeasure);
 
 				UpdateMeasureList();
 				if (m_SelectedMeasure >= 0 && m_SelectedMeasure < m_MeasureListBox->GetCount())
@@ -448,12 +449,23 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				}
 			}
 			break;
+ 			case albaInteractor2DMeasure::ID_MEASURE_CHANGED:
+			{
+				m_SelectedMeasure = currInter->GetSelectedMeasure();
+				m_Measure = currInter->GetMeasureText(m_SelectedMeasure);
+				m_MeasureLabel = currInter->GetMeasureLabel(m_SelectedMeasure);
+
+				m_MeasureListBox->SetString(m_SelectedMeasure, currInter->GetMeasureText(m_SelectedMeasure).GetCStr());
+				m_MeasureListBox->Update();
+				m_Gui->Update();
+			}
+			break;
 			case albaInteractor2DMeasure::ID_MEASURE_SELECTED:
 			{				
 				// Update Measure Gui Entry
-				m_SelectedMeasure = m_InteractorVector[m_CurrentInteractor]->GetSelectedMeasure();
-				m_Measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureText(m_SelectedMeasure);
-				m_MeasureLabel = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(m_SelectedMeasure);
+				m_SelectedMeasure = currInter->GetSelectedMeasure();
+				m_Measure = currInter->GetMeasureText(m_SelectedMeasure);
+				m_MeasureLabel = currInter->GetMeasureLabel(m_SelectedMeasure);
 
 				if (m_SelectedMeasure >= 0 && m_SelectedMeasure < m_MeasureListBox->GetCount())
 				{

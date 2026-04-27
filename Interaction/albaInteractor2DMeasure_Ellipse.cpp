@@ -196,11 +196,9 @@ void albaInteractor2DMeasure_Ellipse::EditMeasure(int index, double *point)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
 {
-
-	albaVect3d center,p1,p2, currPoint, v1, v2;
+	albaVect3d center, p1, p2, currPoint, v1, v2;
 
 	GetCenter(m_CurrMeasure, center.GetVect());
-
 	GetMeasurePoints(m_CurrMeasure, p1.GetVect(), p2.GetVect());
 
 	currPoint = m_CurrPoint == POINT_1 ? p1 : p2;
@@ -208,20 +206,54 @@ void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
 	v1 = currPoint - center;
 	v2 = albaVect3d(point) - center;
 
-	double	angle=v1.AngleBetweenVectors(v2, false)*vtkMath::DegreesToRadians();
+	int A, B, C;
 
-	albaLogMessage("Angle:%f",angle);
+	if (m_CurrPlane == 0) { A = 0; B = 1; C = 2; } //XY
+	else if (m_CurrPlane == 1) { A = 1; B = 2; C = 0; } //YZ
+	else if (m_CurrPlane == 2) { A = 0; B = 2; C = 1; } //XZ
 
+	// Calculate angle between v1 and v2 in the current plane
+	
+	double angle1 = atan2(v1[B], v1[A]);
+	double angle2 = atan2(v2[B], v2[A]);
+	double angle = angle2 - angle1;
+
+	// Update ellipse rotation
 	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
-
 	ellipseSource->SetTheta(ellipseSource->GetTheta() + angle);
 
+	// Create transform for rotation
+	vtkTransform *transform = vtkTransform::New();
+	transform->Translate(center[0], center[1], center[2]);
+
+	// Set rotation axis based on current plane
+	double rotAxis[3] = { 0.0, 0.0, 1.0 }; // Default: Z-axis (XY plane)
+	if (m_CurrPlane == 1) // YZ plane
+		rotAxis[0] = 1.0, rotAxis[2] = 0.0; // X-axis
+	else if (m_CurrPlane == 2) // XZ plane
+		rotAxis[1] = 1.0, rotAxis[2] = 0.0; // Y-axis
+
+	transform->RotateWXYZ(angle * vtkMath::RadiansToDegrees(), rotAxis[0], rotAxis[1], rotAxis[2]);
+	transform->Translate(-center[0], -center[1], -center[2]);
+	transform->Update();
+
+	// Apply transformation to both points
+	double newP1[3], newP2[3];
+	transform->TransformPoint(p1.GetVect(), newP1);
+	transform->TransformPoint(p2.GetVect(), newP2);
+
+	// Update visual elements
+	UpdatePointsActor(newP1, newP2);
+	UpdateEllipseActor(newP1, newP2);
+	UpdateTextActor(newP1, newP2);
+
+	// Clean up
+	vtkDEL(transform);
+	
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 
 	//////////////////////////////////////////////////////////////////////////
 	Render();
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -234,7 +266,7 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 	m_LastPoint[1] = point[1];
 	m_LastPoint[2] = point[2];
 
-	if (m_EditMeasureEnable)
+	if (m_EditMeasureEnable && GetAction()!=albaInteractor2DMeasure::ACTION_ROTATING_MEASURE)
 	{
 		SetUpdateDistance(PixelSizeInWorld()*4.0);
 		
@@ -284,15 +316,6 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 					m_CurrPoint = POINT_1;
 					m_PointsStackVectorC[i]->SetColor(m_Colors[COLOR_EDIT]);
 				}
-// 				else
-// 				{
-// 					m_CurrMeasure = i;
-// 					if (m_MoveMeasureEnable)
-// 					{
-// 						m_LineStackVector[i]->SetColor(m_Colors[COLOR_EDIT]);
-// 						SetAction(ACTION_MOVE_MEASURE);
-// 					}
-// 				}
 				Render();
 				return;
 			}
@@ -333,19 +356,47 @@ void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double 
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double * point2)
 {
+
 	int A, B, C;
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
 
 	if (m_CurrPlane == 0) { A = 0; B = 1; C = 2; } //XY
 	else if (m_CurrPlane == 1) { A = 1; B = 2; C = 0; } //YZ
 	else if (m_CurrPlane == 2) { A = 0; B = 2; C = 1; } //XZ
-	
-	double majorAxis = (point1[A] - point2[A]) / 2;
-	double minorAxis = (point1[B] - point2[B]) / 2;
+
+	double angle = ellipseSource->GetTheta();
+
 
 	double midPoint[3]; 
 	GetMidPoint(midPoint, point1, point2);
 
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
+	// Create transform for rotation
+	vtkTransform *transform = vtkTransform::New();
+	transform->Translate(midPoint[0], midPoint[1], midPoint[2]);
+
+	// Set rotation axis based on current plane
+	double rotAxis[3] = { 0.0, 0.0, 1.0 }; // Default: Z-axis (XY plane)
+	if (m_CurrPlane == 1) // YZ plane
+		rotAxis[0] = 1.0, rotAxis[2] = 0.0; // X-axis
+	else if (m_CurrPlane == 2) // XZ plane
+		rotAxis[1] = 1.0, rotAxis[2] = 0.0; // Y-axis
+
+	//Rotating back to obtain ortho Axiss
+	transform->RotateWXYZ(-angle * vtkMath::RadiansToDegrees(), rotAxis[0], rotAxis[1], rotAxis[2]);
+	transform->Translate(-midPoint[0], -midPoint[1], -midPoint[2]);
+	transform->Update();
+
+	// Apply transformation to both points
+	double unRotatedP1[3], unRotatedP2[3];
+	transform->TransformPoint(point1, unRotatedP1);
+	transform->TransformPoint(point2, unRotatedP2);
+
+
+
+	double majorAxis = (unRotatedP1[A] - unRotatedP2[A]) / 2;
+	double minorAxis = (unRotatedP1[B] - unRotatedP2[B]) / 2;
+
+
 	ellipseSource->SetPlane(m_CurrPlane);
 	ellipseSource->SetMajorAxis(fabs(majorAxis));
 	ellipseSource->SetMinorAxis(fabs(minorAxis));
