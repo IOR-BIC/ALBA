@@ -127,3 +127,36 @@ void vtkALBAEllipseSource::PrintSelf(ostream& os, vtkIndent indent)
 	
 	os << indent << "Theta: " << this->Theta << "\n";
 }
+
+//----------------------------------------------------------------------------
+bool vtkALBAEllipseSource::IsPointInEllipse(double point[3])
+{
+	// Translate point relative to ellipse center
+	double translatedPoint[3];
+	translatedPoint[0] = point[0] - Center[0];
+	translatedPoint[1] = point[1] - Center[1];
+	translatedPoint[2] = point[2] - Center[2];
+
+	// Determine axes based on plane orientation
+	int A = 0, B = 1, C = 2;
+	if (m_Plane == 0) { A = 0; B = 1; C = 2; } //XY
+	else if (m_Plane == 1) { A = 1; B = 2; C = 0; } //YZ
+	else if (m_Plane == 2) { A = 0; B = 2; C = 1; } //XZ
+
+	// Rotate point back by -Theta to align with ellipse axes
+	double cosTheta = cos(-Theta);
+	double sinTheta = sin(-Theta);
+
+	double rotatedA = translatedPoint[A] * cosTheta - translatedPoint[B] * sinTheta;
+	double rotatedB = translatedPoint[A] * sinTheta + translatedPoint[B] * cosTheta;
+
+	// Check ellipse equation: (x/a)^2 + (y/b)^2 <= 1
+	if (MajorAxis > 0.0 && MinorAxis > 0.0)
+	{
+		double normalizedA = rotatedA / MajorAxis;
+		double normalizedB = rotatedB / MinorAxis;
+		return (normalizedA * normalizedA + normalizedB * normalizedB) <= 1.0;
+	}
+
+	return false;
+}
