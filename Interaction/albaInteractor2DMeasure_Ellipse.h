@@ -73,7 +73,14 @@ public:
 	virtual void OnEvent(albaEventBase *event);
 
 	/** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
-	bool IsPointInsideMeasure(double *point);
+	bool IsPointInsideMeasure(double *point, int measureIndex=-1);
+
+	/** Gets mesure bounds*/
+	void GetMeasureBounds(double bounds[6], int measureIndex=-1);
+
+	/** Gets measure perimeter*/
+	double GetMeasurePerimeter(int measureIndex=-1);
+
 
 protected:
 
