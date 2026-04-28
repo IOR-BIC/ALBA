@@ -160,3 +160,65 @@ bool vtkALBAEllipseSource::IsPointInEllipse(double point[3])
 
 	return false;
 }
+
+//----------------------------------------------------------------------------
+void vtkALBAEllipseSource::GetBounds(double bounds[6])
+{
+	// Determine axes based on plane orientation
+	int A = 0, B = 1, C = 2;
+	if (m_Plane == 0) { A = 0; B = 1; C = 2; } //XY
+	else if (m_Plane == 1) { A = 1; B = 2; C = 0; } //YZ
+	else if (m_Plane == 2) { A = 0; B = 2; C = 1; } //XZ
+
+	// Calculate the extent of rotated ellipse in the plane
+	double cosTheta = cos(Theta);
+	double sinTheta = sin(Theta);
+
+	// Maximum extent from center in A and B directions
+	double extentA = sqrt(MajorAxis * MajorAxis * cosTheta * cosTheta + 
+	                       MinorAxis * MinorAxis * sinTheta * sinTheta);
+	double extentB = sqrt(MajorAxis * MajorAxis * sinTheta * sinTheta + 
+	                       MinorAxis * MinorAxis * cosTheta * cosTheta);
+
+	// Set bounds in each direction
+	double minA = Center[A] - extentA;
+	double maxA = Center[A] + extentA;
+	double minB = Center[B] - extentB;
+	double maxB = Center[B] + extentB;
+	double minC = Center[C];
+	double maxC = Center[C];
+
+	// Map back to XYZ coordinates
+	bounds[2 * A] = minA;
+	bounds[2 * A + 1] = maxA;
+	bounds[2 * B] = minB;
+	bounds[2 * B + 1] = maxB;
+	bounds[2 * C] = minC;
+	bounds[2 * C + 1] = maxC;
+}
+
+//----------------------------------------------------------------------------
+double vtkALBAEllipseSource::GetPerimeter()
+{
+	// Handle degenerate cases
+	if (MajorAxis <= 0.0 || MinorAxis <= 0.0)
+	{
+		return 0.0;
+	}
+
+
+	// Use Ramanujan's approximation for ellipse perimeter
+	// P = pi(a + b)[1 + 3h/(10 + sqrt(4 - 3h))]
+	// where h = (a-b)^2/(a+b)^2
+	
+	double a = MajorAxis;
+	double b = MinorAxis;
+	double sumAB = a + b;
+	double diffAB = a - b;
+	
+	double h = (diffAB * diffAB) / (sumAB * sumAB);
+	double denominator = 10.0 + sqrt(4.0 - 3.0 * h);
+	double perimeter = vtkMath::Pi() * sumAB * (1.0 + (3.0 * h) / denominator);
+	
+	return perimeter;
+}
