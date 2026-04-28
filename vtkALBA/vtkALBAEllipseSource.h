@@ -56,6 +56,8 @@ public:
 	/* 0=XY, 1=YZ, 2=XZ*/
 	void SetPlane(int plane) { m_Plane = plane; };
 
+	bool IsPointInEllipse(double point[3]);
+
 protected:
   vtkALBAEllipseSource(int res=1);
   ~vtkALBAEllipseSource() {};

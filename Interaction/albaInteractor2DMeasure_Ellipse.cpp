@@ -765,3 +765,10 @@ void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 	else
 		Superclass::OnEvent(event);
 }
+
+//----------------------------------------------------------------------------
+bool albaInteractor2DMeasure_Ellipse::IsPointIsideMeasure(double *point)
+{
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
+	return ellipseSource->IsPointInEllipse(point);
+}
