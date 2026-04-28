@@ -56,6 +56,7 @@ public:
 	/* 0=XY, 1=YZ, 2=XZ*/
 	void SetPlane(int plane) { m_Plane = plane; };
 
+  /** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
 	bool IsPointInEllipse(double point[3]);
 
 protected:

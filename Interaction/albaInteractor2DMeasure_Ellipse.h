@@ -72,6 +72,9 @@ public:
 
 	virtual void OnEvent(albaEventBase *event);
 
+	/** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
+	bool IsPointInsideMeasure(double *point);
+
 protected:
 
 	albaInteractor2DMeasure_Ellipse();
