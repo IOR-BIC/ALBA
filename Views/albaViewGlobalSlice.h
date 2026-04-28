@@ -147,6 +147,7 @@ protected:
   std::vector<vtkProperty*>             m_BoundsOutlineProperty;
   std::vector<vtkPolyDataMapper*>       m_BoundsOutlineMapper;
   std::vector<vtkActor*>	              m_BoundsOutlineActor;
+	std::vector<albaVME *>                m_Volumes;
 
   int m_TrilinearInterpolationOn;
 };

@@ -16,6 +16,7 @@ SET (DEBUG FALSE)
 SET (MFL_TARGETS "")
 
 # options for configuring MFL libraries
+OPTION(COMPILE_LIBRARIES "Complie Libraries on build (you can disable this after first compilation to speedup build time)" ON)
 OPTION(ALBA_USE_VTK "Find and Link the VTK library." ON)
 OPTION(ALBA_USE_ITK "Find and Link the ITK library." ON)
 OPTION(ALBA_USE_WX "Find and Link the wxWidgets library." ON)

@@ -122,6 +122,6 @@ void vtkALBACircleSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AngleRange: (" << this->AngleRange[0] << ", "
                                << this->AngleRange[1] << ")\n";
 
-	os << indent << "Radius: " << this->Resolution << "\n";
+	os << indent << "Radius: " << this->Radius << "\n";
 
 }

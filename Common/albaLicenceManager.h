@@ -70,6 +70,11 @@ public:
 		ID_COPY_KEY = MINID,
 		ID_VERIFY_KEY,
 		ID_GENERATE_KEY,
+		ID_NAME_FIELD,
+		ID_SURNAME_FIELD,
+		ID_AFFILIATION_FIELD,
+		ID_INTENDED_USE_FIELD,
+		ID_GENERATE_REGISTRATION
 	};
 	
 	/** returns current registration status */
@@ -114,6 +119,8 @@ public:
 
 	void SetLicScope(albaLicenceManager::licenceScope scope);
 
+	/** Sets Read User Data, if true a */
+	void SetReadUserData(bool val) { m_ReadUserData = val; }
 protected:
 
 	/** encrypts the input string */
@@ -142,6 +149,9 @@ protected:
 	/** license the software to expireDate*/
 	void AddBinaryLicence();
 
+	/** handle text field changes */
+	void OnTextFieldChanged(wxEvent &event);
+
 	wxString m_AppName;
 	wxString m_CryptKey;
 	wxString m_RegistryBaseKey;
@@ -160,6 +170,8 @@ protected:
 	wxString				m_FirstKey;
 	wxString				m_SecondKey;
 
+	bool m_ReadUserData;
+
 	albaGUIDialog		*m_RegistrationDialog;
 	albaGUIDialog		*m_GenerateLicenceDialog;
 
@@ -168,6 +180,13 @@ protected:
 	wxTextCtrl			*m_FirstKey_textCtrl;
 	wxTextCtrl			*m_Result_textCtrl;
 	wxCalendarCtrl	*m_CalendarCtrl;
+
+	// Member variables (add to private section)
+	wxTextCtrl *m_Name_textCtrl;
+	wxTextCtrl *m_Surname_textCtrl;
+	wxTextCtrl *m_Affiliation_textCtrl;
+	wxTextCtrl *m_IntendedUse_textCtrl;
+	albaGUIButton *m_GenerateRegistration_Button;
 
 	licenceModalities m_LicModality;
 };

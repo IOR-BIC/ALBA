@@ -54,6 +54,14 @@ public:
   /** Function that clones instance of the object. */
   virtual albaView *Copy(albaObserver *Listener, bool lightCopyEnabled = false);
 
+  /** Function that handles events sent from other objects. */
+  virtual void     OnEvent(albaEventBase *alba_event);
+
+  /** Show/Hide VMEs into plugged sub-views*/
+  virtual void VmeShow(albaVME *vme, bool show);
+
+  virtual void VmeSelect(albaVME *node, bool select);
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
@@ -69,5 +77,10 @@ protected:
 
   albaViewGlobalSlice	*m_ViewGlobalSlice;
 
+	std::vector<albaVME *>	m_VisibleVMEs;
+	std::vector<vtkLookupTable *> m_LUTs;
+
+private:
+  void UpdateLutSlider();
 };
 #endif

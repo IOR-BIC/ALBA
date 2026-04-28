@@ -121,6 +121,12 @@ public:
 
 	void SetCitationPaper(char *link) override;
 
+
+	void RegisterForKeyEvents(albaObserver *listener) override;
+
+
+	void UnRegisterForKeyEvents(albaObserver *listener) override;
+
 protected:
 	
 	std::vector<calls> m_Calls;
