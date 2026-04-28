@@ -56,7 +56,14 @@ public:
 	/* 0=XY, 1=YZ, 2=XZ*/
 	void SetPlane(int plane) { m_Plane = plane; };
 
+  /** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
 	bool IsPointInEllipse(double point[3]);
+
+  /** Get Bounds */
+  void GetBounds(double bounds[6]);
+
+	/** Returns the perimeter of the ellipse */
+	double GetPerimeter();
 
 protected:
   vtkALBAEllipseSource(int res=1);
