@@ -22,7 +22,7 @@
 //---------------------------------------------
 // includes:
 //---------------------------------------------
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "albaConfigure.h"
 #include "vtkPlane.h"
 #include <vector>
@@ -45,11 +45,12 @@ Differences from vtkCutter():
 2) since the points are dimensionless, by cut we mean all the points that are less than a specific distance from the plane
 3) input and outputs does not have cells
 */
-class ALBA_EXPORT vtkALBAPointCloudCutter : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAPointCloudCutter : public vtkPolyDataAlgorithm
 {
 public:
   /** RTTI macro*/
-  vtkTypeRevisionMacro(vtkALBAPointCloudCutter, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAPointCloudCutter, vtkPolyDataAlgorithm);
+
   /** return object instance */
   static vtkALBAPointCloudCutter *New() ;
   
@@ -58,7 +59,7 @@ public:
 
    /** Overload standard modified time function. If cut function is modified,
   then this object is modified as well. */
-  unsigned long GetMTime();
+  vtkMTimeType GetMTime();
 
   /** Set the cutting plane (but does not register the object) */
   void SetCutFunction(vtkPlane *P) ;
@@ -81,9 +82,9 @@ protected:
   /** destructor */                                                           
   ~vtkALBAPointCloudCutter() ;                                                             
 
-  /** execute method */
-  void Execute();
-		
+  /** Request Data method */
+	int RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  		
   /** transfer the scalars by interpolation from input to output */
   void TransferScalars() ;  
 

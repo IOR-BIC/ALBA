@@ -770,7 +770,7 @@ bool albaInteractor2DMeasure_Ellipse::IsPointInsideMeasure(double *point, int me
 {
 	if(measureIndex < 0)
 		measureIndex = m_CurrMeasure;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSourceAlgorithm();
 	return ellipseSource->IsPointInEllipse(point);
 }
 
@@ -779,7 +779,7 @@ void albaInteractor2DMeasure_Ellipse::GetMeasureBounds(double bounds[6], int mea
 {
 	if (measureIndex < 0)
 		measureIndex = m_CurrMeasure;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSourceAlgorithm();
 	ellipseSource->GetBounds(bounds);
 }
 
@@ -788,6 +788,6 @@ double albaInteractor2DMeasure_Ellipse::GetMeasurePerimeter(int measureIndex/*=-
 {
 	if (measureIndex < 0)
 		measureIndex = m_CurrMeasure;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSourceAlgorithm();
 	return ellipseSource->GetPerimeter();
 }

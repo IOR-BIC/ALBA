@@ -47,7 +47,7 @@ public:
   /** destructor */
 	virtual     ~albaPipePointCloudSlice();
 
-	virtual vtkPolyData* GetInputAsPolyData();
+	virtual vtkAlgorithmOutput* GetPolyDataOutputPort();
   
   /** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */

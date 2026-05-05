@@ -25,11 +25,8 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkPlane.h"
 #include "vtkPolyData.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkMatrix4x4.h"
-#include <unordered_map>
-#include <unordered_set>
 
 #include <ostream>
 #include "albaDefines.h"
@@ -39,11 +36,13 @@
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkALBAPointCloudCutter, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAPointCloudCutter);
+
 //------------------------------------------------------------------------------
 #include "albaMemDbg.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -66,11 +65,11 @@ vtkALBAPointCloudCutter::~vtkALBAPointCloudCutter()
 //------------------------------------------------------------------------------
 // Overload standard modified time function. If cut function is modified,
 // then this object is modified as well.
-unsigned long vtkALBAPointCloudCutter::GetMTime()
+vtkMTimeType vtkALBAPointCloudCutter::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mTime = this->vtkPolyDataToPolyDataFilter::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime = this->vtkAlgorithm::GetMTime();
+  vtkMTimeType time;
 
   if (CutFunction != NULL )
   {
@@ -83,20 +82,23 @@ unsigned long vtkALBAPointCloudCutter::GetMTime()
 
 //------------------------------------------------------------------------------
 // Execute method
-void vtkALBAPointCloudCutter::Execute()
-//------------------------------------------------------------------------------
+int  vtkALBAPointCloudCutter::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
-  // Set pointer to Input
-  InPolydata = this->GetInput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // Set pointer to Output
-  OutPolydata = this->GetOutput();
-
+	// Initialize some frequently used values.
+  InPolydata = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  OutPolydata = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  
   // Make sure the cutter is cleared of previous data before you run it !
   Initialize() ;
     
   // Run the cutter
-  CreateSlice();  
+  CreateSlice();
+
+  return 1;
 }
 
 //------------------------------------------------------------------------------

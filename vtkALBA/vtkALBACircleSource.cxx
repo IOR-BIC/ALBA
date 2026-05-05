@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <math.h>
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
+
 vtkStandardNewMacro(vtkALBACircleSource);
 
 vtkALBACircleSource::vtkALBACircleSource(int res)
