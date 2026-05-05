@@ -105,6 +105,7 @@ SET(vtkALBA_SRCS
   vtkALBATIFFReader.cxx									vtkALBATIFFReader.h
   
   vtkALBAEllipseSource.cxx								vtkALBAEllipseSource.h
+  vtkALBAPointCloudCutter.cxx								vtkALBAPointCloudCutter.h
 )
 
 IF(WIN32)
