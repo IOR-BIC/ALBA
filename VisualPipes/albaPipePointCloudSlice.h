@@ -32,6 +32,13 @@ class vtkPlane;
 class ALBA_EXPORT albaPipePointCloudSlice : public albaPipePointCloud, public albaPipeSlice
 {
 public:
+	/** IDs for the GUI */
+	enum PIPE_POINT_CLOUD_SLICE_ID
+	{
+		ID_TOLERANCE = Superclass::ID_LAST,
+		ID_LAST,
+	};
+
   /** RTTI macro*/
 	albaTypeMacro(albaPipePointCloudSlice,albaPipePointCloud);
 
@@ -44,11 +51,17 @@ public:
   
   /** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
-  /*virtual*/ void SetSlice(double* Origin, double* Normal);  
+  /*virtual*/ void SetSlice(double* Origin, double* Normal);
+
+	/** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
+	albaGUI *CreateGui();
+
+	/** process events coming from Gui */
+	virtual void OnEvent(albaEventBase *alba_event);
 
 protected:
   vtkPlane				        *m_Plane;
   vtkALBAPointCloudCutter		    *m_Cutter;
-
+	double m_Tolerance;
 };  
 #endif // __albaPipePointCloudSlice_H__B
