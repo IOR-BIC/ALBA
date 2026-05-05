@@ -90,6 +90,7 @@
 #include <string>
 #include <ostream>
 #include "albaPipeRefSys.h"
+#include "albaPipePointCloudSlice.h"
 
 //albaPipeFactoryVME *albaPipeFactoryVME::m_Instance=NULL;
 
@@ -185,6 +186,8 @@ albaPipeFactoryVME::albaPipeFactoryVME()
 	albaPlugPipeMacro(albaPipeSurfaceSlice, "albaPipeSurfaceSlice.");
   albaPlugPipeMacro(albaPipePolylineSlice, "albaPipePolylineSlice.");
   albaPlugPipeMacro(albaPipeMeshSlice, "albaPipeMeshSlice.");
+	albaPlugPipeMacro(albaPipePointCloudSlice, "albaPipePointCloudSlice.");
+
   albaPlugPipeMacro(albaPipeRayCast, "Pipe for RayCast Volume rendering of bone-blood-muscle");
 }
 

@@ -764,3 +764,30 @@ void albaInteractor2DMeasure_Ellipse::OnEvent(albaEventBase *event)
 	else
 		Superclass::OnEvent(event);
 }
+
+//----------------------------------------------------------------------------
+bool albaInteractor2DMeasure_Ellipse::IsPointInsideMeasure(double *point, int measureIndex)
+{
+	if(measureIndex < 0)
+		measureIndex = m_CurrMeasure;
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	return ellipseSource->IsPointInEllipse(point);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor2DMeasure_Ellipse::GetMeasureBounds(double bounds[6], int measureIndex)
+{
+	if (measureIndex < 0)
+		measureIndex = m_CurrMeasure;
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	ellipseSource->GetBounds(bounds);
+}
+
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure_Ellipse::GetMeasurePerimeter(int measureIndex/*=-1*/)
+{
+	if (measureIndex < 0)
+		measureIndex = m_CurrMeasure;
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	return ellipseSource->GetPerimeter();
+}

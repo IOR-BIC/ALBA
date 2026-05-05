@@ -525,7 +525,7 @@ void albaViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("albaVMEPolylineSpline", "albaPipePolylineSlice");
       m_Views[v]->PlugVisualPipe("albaVMEMeter", "albaPipePolyline");
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "albaPipeSurfaceSlice",MUTEX);
-			m_Views[v]->PlugVisualPipe("albaVMEPointCloud", "albaPipeBox", NON_VISIBLE);
+			m_Views[v]->PlugVisualPipe("albaVMEPointCloud", "albaPipePointCloudSlice");
 			m_Views[v]->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
 
     }
