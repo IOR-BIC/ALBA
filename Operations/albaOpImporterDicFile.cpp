@@ -131,8 +131,21 @@ int albaOpImporterDicFile::ImportFile()
 
 	do 
 	{
-		int nReaded = sscanf(m_Line,  "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9]);
-
+		int nReaded;
+		
+		if (true) //TODO Add gui and manage modality
+		{
+			//X, -Z, Y
+			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[2], &values[1], &values[3], &values[5], &values[4], &values[6], &values[8], &values[7], &values[9]);
+			values[2] = -values[2];
+			values[5] = -values[5];
+			values[8] = -values[8];
+		}
+		else
+		{
+			//X, Y, Z
+			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9]);
+		}
 		if (nReaded != 12)
 		{
 			albaErrorMessage("Wrong file: %s", m_FileName.GetCStr());
