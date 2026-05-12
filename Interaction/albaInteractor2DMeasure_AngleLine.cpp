@@ -493,7 +493,7 @@ albaString albaInteractor2DMeasure_AngleLine::GetMeasureText(int index)
 {
 	albaString str;
 	if (index >= 0 && index < m_Angles.size())
-		str.Printf("%.2f", m_Angles[index]*vtkMath::RadiansToDegrees());
+		str.Printf("%.2f",vtkMath::DegreesFromRadians(m_Angles[index]));
 	else str = "No Measure";
 
 	return str;
