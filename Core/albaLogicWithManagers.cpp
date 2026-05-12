@@ -95,6 +95,7 @@
 #include "albaGUI.h"
 #include "albaGUISplashScreen.h"
 #include "albaProsthesesDBManager.h"
+#include "albaCursor.h"
 
 //IMPORTERS
 #include "albaOpImporterASCII.h"
@@ -125,6 +126,7 @@
 #include "albaOpImporterAbaqusFile.h"
 #include "albaOpMeshScarlarsImporter.h"
 #include "albaOpImporterDicFile.h"
+#include "albaOpExporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
 #include "albaOpImporterScancoImageIO.h"
 
@@ -385,6 +387,8 @@ albaLogicWithManagers::~albaLogicWithManagers()
   //free mem
   if(m_WizardManager)
     delete m_WizardManager;
+
+	albaCursor::DeleteCursors();
 	
   // Managers are destruct in the OnClose
   cppDEL(m_User);
@@ -2031,6 +2035,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	Plug(new albaOpExporterAbaqusFile("Abaqus File"), "Finite Element");
 	Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
+	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
 
 	Plug(new albaOpImporterEmgWS("EmgWS"), "TMP to test");
 	Plug(new albaOpImporterExternalFile(), "TMP to test");
@@ -2317,6 +2322,20 @@ const char* albaLogicWithManagers::GetAlbaBuildNum()
 void albaLogicWithManagers::SetAlbaBuildNum(char* buildNum)
 {
 	m_AlbaBuildNum = buildNum;
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::RegisterForKeyEvents(albaObserver *listener)
+{
+	m_KeyEventListeners.push_back(listener);
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::UnRegisterForKeyEvents(albaObserver *listener)
+{
+  std::vector<albaObserver *>::iterator it = std::find(m_KeyEventListeners.begin(), m_KeyEventListeners.end(), listener);
+	if (it != m_KeyEventListeners.end())
+		m_KeyEventListeners.erase(it);
 }
 
 //----------------------------------------------------------------------------
@@ -2973,6 +2992,24 @@ int albaLogicWithManagers::AppEventFilter(wxEvent& event)
 {
 	if (m_EventFilterFunc)
 		return (*m_EventFilterFunc)(event);
-		
-	else return -1;
+
+	if (m_KeyEventListeners.size() > 0 && (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP))
+	{
+		albaEvent keyEvent;
+
+		if (event.GetEventType() == wxEVT_KEY_DOWN)
+			keyEvent.SetId(KEY_PRESSED);
+		else
+			keyEvent.SetId(KEY_RELEASED);
+		keyEvent.SetArg(((wxKeyEvent &)event).GetKeyCode());
+		keyEvent.SetSender(this);
+
+		for (std::vector<albaObserver *>::iterator it = m_KeyEventListeners.begin(); it != m_KeyEventListeners.end(); ++it)
+		{
+			albaObserver *listener = *it;
+			listener->OnEvent(&keyEvent);
+		}
+	}
+
+	return -1;
 }

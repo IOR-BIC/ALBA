@@ -49,6 +49,7 @@ SET(PROJECT_SRCS
   albaPipeWithScalar.cpp 					albaPipeWithScalar.h
   albaPipeVolumeArbOrthoSlice.cpp			albaPipeVolumeArbOrthoSlice.h
   albaPipePointCloud.cpp					albaPipePointCloud.h
+  albaPipePointCloudSlice.cpp					albaPipePointCloudSlice.h
 )
 
 

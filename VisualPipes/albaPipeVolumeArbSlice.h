@@ -92,7 +92,7 @@ public:
 
   /** Initialize the slicing parameter to show the volume box, cut origin and orientation.*/
   void InitializeSliceParameters( double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
-  
+
   /** Create the VTK rendering pipeline*/
   virtual void Create(albaSceneNode *n);
 
@@ -158,8 +158,8 @@ public:
   /** Set tri-linear interpolation to on */
   void SetTrilinearInterpolationOn(){SetTrilinearInterpolation(1);};
 
-	bool isEnabledSliceViewCorrection() const { return m_EnableSliceViewCorrection; }
-	void SetEnableSliceViewCorrection(bool val);
+	bool IsEnabledSliceViewCorrection() const { return m_EnableSliceViewCorrection; }
+	void SetEnableSliceViewCorrection(bool val, double factor=1.0);
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice();
@@ -222,6 +222,7 @@ protected:
 	bool										m_ShowTICKs;
   bool                    m_Interpolate;
 	bool										m_EnableSliceViewCorrection;
+	double									m_SliceViewCorrectionFactor;
   int m_TrilinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 };
 #endif // __albaPipeVolumeArbSlice_H__B
