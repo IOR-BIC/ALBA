@@ -34,6 +34,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "wx/filename.h"
+#include "albaTagArray.h"
 
 
 //----------------------------------------------------------------------------
@@ -167,7 +168,7 @@ int albaOpImporterDicFile::ImportFile()
 			return ALBA_ERROR;
 		}
 
-		newPoints->InsertNextPoint(&values[3]);
+		newPoints->InsertNextPoint(&values[0]);
 
 		polys->InsertNextCell(3);
 		polys->InsertCellPoint(pointN);

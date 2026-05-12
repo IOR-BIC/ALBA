@@ -181,6 +181,7 @@ IF (ALBA_USE_VTK)
 	albaOpMeasureAxisRotations.cpp albaOpMeasureAxisRotations.cpp
 	albaOpTransformAtoB.cpp	albaOpTransformAtoB.h
 	albaOpImporterFile.cpp albaOpImporterFile.h
+	albaOpExporterDicFile.cpp albaOpExporterDicFile.h
   )
 ENDIF (ALBA_USE_VTK)
 
