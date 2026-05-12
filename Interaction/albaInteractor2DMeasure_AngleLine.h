@@ -38,6 +38,10 @@ public:
 	// MEASURE
 	/** Add Measure*/
 	virtual void AddMeasure(double *point1, double *point2, double *point3, double * point4);
+	
+	/** Edit Measure*/
+	virtual void EditMeasure(int index, double *point1, double *point2, double *point3, double *point4);
+
 	/** Edit Measure*/
 	virtual void EditMeasure(int index, double *point);
 	/** Delete the Measure*/
@@ -78,6 +82,9 @@ protected:
 	virtual void UpdatePointsActor(double * point1, double * point2, double * point3, double * point4);
 	void UpdateCircleActor(double * point, double angle, double radius);
 	void UpdateTextActor(double * point1, double * point2);
+
+	/** Get Measure Text Value*/
+	virtual albaString GetMeasureText(int index);
 	
 	// UTILS
 	virtual void FindAndHighlight(double * point);
