@@ -108,6 +108,7 @@ SET(PROJECT_SRCS
 	
 	albaInteractorCompositorMouseFloatVME.cpp albaInteractorCompositorMouseFloatVME.h
 	albaInteractorGenericMouseFloatVME.cpp	albaInteractorGenericMouseFloatVME.h
+	albaInteractor2DMeasure_Ellipse.cpp albaInteractor2DMeasure_Ellipse.h
 )
 
 IF (ALBA_USE_P5_GLOVE)

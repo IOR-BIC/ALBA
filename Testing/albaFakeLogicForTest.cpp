@@ -192,3 +192,15 @@ void albaFakeLogicForTest::SetCitationPaper(char *link)
 {
 	return;
 }
+
+//----------------------------------------------------------------------------
+void albaFakeLogicForTest::RegisterForKeyEvents(albaObserver *listener)
+{
+	return;
+}
+
+//----------------------------------------------------------------------------
+void albaFakeLogicForTest::UnRegisterForKeyEvents(albaObserver *listener)
+{
+	return;
+}

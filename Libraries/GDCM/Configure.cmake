@@ -70,12 +70,21 @@ IF (GDCM_SOURCE_PATH)
       	STRING (REPLACE "\\" "\\\\"  GDCM_MAKECOMMAND "${GDCM_MAKECOMMAND}")
       ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
       MESSAGE(STATUS "Creating file ${GDCM_BINARY_DIR}/build.cmake")
-    	CONFIGURE_FILE("${GDCM_SOURCE_DIR}/build.cmake.in" "${GDCM_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+      CONFIGURE_FILE("${GDCM_SOURCE_DIR}/build.cmake.in" "${GDCM_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
     	
     ENDIF (CMAKE_RETURN)
   ENDIF (GDCM_FORCE_CONFIGURE OR NOT EXISTS ${GDCM_BINARY_DIR}/build.cmake)
   
   IF (EXISTS ${GDCM_BINARY_DIR}/build.cmake)
+  	# recreate build.cmake to enable/disable library compilation
+    LOAD_CACHE(${GDCM_BINARY_PATH} READ_WITH_PREFIX GDCM_ MAKECOMMAND)
+	#Split space separated arguments into a semi-colon separated list. Necessary for correct command line generation
+	SEPARATE_ARGUMENTS(GDCM_MAKECOMMAND)
+    IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+      STRING (REPLACE "\\" "\\\\"  GDCM_MAKECOMMAND "${GDCM_MAKECOMMAND}")
+    ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.0)
+   	CONFIGURE_FILE("${GDCM_SOURCE_DIR}/build.cmake.in" "${GDCM_BINARY_DIR}/build.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+
     # custom command to build the GDCM library
     IF (GDCM_BUILD_SHARED)
     	MESSAGE(STATUS "Adding custom command for GDCM SHARED library: ${LIBRARY_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}GDCM${CMAKE_SHARED_LIBRARY_SUFFIX}")
