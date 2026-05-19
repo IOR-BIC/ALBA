@@ -102,6 +102,7 @@
 #include "vtkALBARGtoSPImageFilterTest.h"
 #include "vtkALBADistanceFilterTest.h"
 #include "vtkALBACircleSourceTest.h"
+#include "vtkALBAPointCloudCutterTest.h"
 
 #ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
 #include "vtkALBAVolumeTextureMapper2DTest.h"
@@ -228,6 +229,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBARGtoSPImageFilterTest::suite());
 	runner.addTest(vtkALBADistanceFilterTest::suite());
 	runner.addTest(vtkALBACircleSourceTest::suite());
+	runner.addTest(vtkALBAPointCloudCutterTest::suite());
 	/* */ 
 	runner.run( controller );
 

@@ -75,7 +75,7 @@ public:
 	vtkSetMacro(PlaneTolerance, double);
 	vtkGetMacro(PlaneTolerance, double);
 
-
+  
 protected:
   /** constructor */
   vtkALBAPointCloudCutter() ;   
@@ -119,7 +119,8 @@ protected:
 
 	double PlaneTolerance;          //<tolerance for cutting plane (distance from plane to consider a point as cut)
 private:
-  //----------------------------------------------------------------------------
   void SlicePoints();
+  
+  friend class vtkALBAPointCloudCutterTest;
 };
 #endif

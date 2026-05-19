@@ -94,6 +94,7 @@ SET(PROJECT_SRCS
 	vtkALBARGtoSPImageFilterTest.h vtkALBARGtoSPImageFilterTest.cpp
 	vtkALBADistanceFilterTest.h	vtkALBADistanceFilterTest.cpp
 	vtkALBACircleSourceTest.h	vtkALBACircleSourceTest.cpp
+	vtkALBAPointCloudCutterTest.cpp vtkALBAPointCloudCutterTest.h
 )
 
 IF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)

@@ -66,6 +66,7 @@
 #include "albaVisualPipePolylineGraphTest.h"
 #include "albaVisualPipeSlicerSliceTest.h"
 #include "albaPipePointCloudTest.h"
+#include "albaPipePointCloudSliceTest.h"
 
 #ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
 #include "albaPipeVolumeDRRTest.h"
@@ -167,6 +168,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeVectorFieldTest::suite());
 	runner.addTest(albaVisualPipeSlicerSliceTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
+	runner.addTest(albaPipePointCloudSliceTest::suite());
 	/* */
 
 

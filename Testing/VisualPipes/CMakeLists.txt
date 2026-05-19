@@ -55,6 +55,7 @@ SET(PROJECT_SRCS
 	albaVisualPipeSlicerSliceTest.h albaVisualPipeSlicerSliceTest.cpp
 	albaPipeCompoundVolumeIsosurfaceTest.h albaPipeCompoundVolumeIsosurfaceTest.cpp
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
+	albaPipePointCloudSliceTest.h albaPipePointCloudSliceTest.cpp
 )
 
 IF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)

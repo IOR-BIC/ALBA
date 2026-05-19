@@ -40,6 +40,7 @@ albaPipePointCloud::albaPipePointCloud()
 :albaPipeGenericPolydata()
 //----------------------------------------------------------------------------
 {
+	m_TrivialProd = NULL;
 	m_Representation = POINTS_REP;
 	m_SkipNormalFilter = true;
 }
