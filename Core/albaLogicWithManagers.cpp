@@ -126,6 +126,7 @@
 #include "albaOpImporterAbaqusFile.h"
 #include "albaOpMeshScarlarsImporter.h"
 #include "albaOpImporterDicFile.h"
+#include "albaOpExporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
 #include "albaOpImporterScancoImageIO.h"
 
@@ -2034,6 +2035,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	Plug(new albaOpExporterAbaqusFile("Abaqus File"), "Finite Element");
 	Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
+	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
 
 	Plug(new albaOpImporterEmgWS("EmgWS"), "TMP to test");
 	Plug(new albaOpImporterExternalFile(), "TMP to test");
