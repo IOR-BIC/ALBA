@@ -76,7 +76,7 @@ void vtkALBAPointCloudCutterTest::TestInitialize()
 
   // Create simple input
   vtkPolyData *input = CreateSimplePointCloud(10);
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
 
   // Execute to populate output
   cutter->Update();
@@ -119,7 +119,7 @@ void vtkALBAPointCloudCutterTest::TestSlicePointsSimple()
   plane->SetOrigin(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
@@ -163,7 +163,7 @@ void vtkALBAPointCloudCutterTest::TestSlicePointsWithTolerance()
   plane->SetOrigin(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
@@ -205,7 +205,7 @@ void vtkALBAPointCloudCutterTest::TestSlicePointsWithTransform()
   plane->SetNormal(0.0, 0.0, 1.0);
   plane->SetTransform(transform);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
@@ -247,7 +247,7 @@ void vtkALBAPointCloudCutterTest::TestGetIntersectionOfBoundsWithPlane()
   plane->SetOrigin(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
 	cutter->Update();
 
@@ -289,7 +289,7 @@ void vtkALBAPointCloudCutterTest::TestGetIntersectionOfBoundsWithPlane_NoInterse
   input->SetPoints(points);
   input->SetVerts(verts);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->Update();
 
   // Plane far away from the bounding box (z=100)
@@ -315,7 +315,7 @@ void vtkALBAPointCloudCutterTest::TestTransferScalars()
   plane->SetOrigin(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
@@ -345,7 +345,7 @@ void vtkALBAPointCloudCutterTest::TestTransferScalarsMultipleArrays()
   plane->SetOrigin(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
@@ -367,7 +367,7 @@ void vtkALBAPointCloudCutterTest::TestCreateSlice()
   plane->SetOrigin(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
@@ -413,7 +413,7 @@ void vtkALBAPointCloudCutterTest::TestPrintSelf()
   plane->SetNormal(0.0, 0.0, 1.0);
 
   vtkPolyData *input = CreateSimplePointCloud(5);
-  cutter->SetInput(input);
+  cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
   cutter->Update();
 
