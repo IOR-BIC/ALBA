@@ -143,9 +143,9 @@ int albaOpImporterDicFile::ImportFile()
 		{
 			//X, -Z, Y
 			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[2], &values[1], &values[3], &values[5], &values[4], &values[6], &values[8], &values[7], &values[9]);
-			values[2] = -values[2];
-			values[5] = -values[5];
-			values[8] = -values[8];
+			values[1] = -values[1];
+			values[4] = -values[4];
+			values[7] = -values[7];
 		}
 		else
 		{
