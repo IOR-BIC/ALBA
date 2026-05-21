@@ -2009,7 +2009,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterGRFWS("GRF"));
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
-	Plug(new albaOpImporterScancoImageIO("Scanco IO"));
 	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
 
 	//------------------------------------------------------------
