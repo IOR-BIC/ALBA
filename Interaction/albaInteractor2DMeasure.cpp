@@ -217,7 +217,8 @@ void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 	m_AltPressed = e->GetModifier(ALBA_ALT_KEY) ? 1 : 0;
 	m_ButtonDownInside = m_IsInBound;
 
-	if (m_ShiftPressed)
+	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
+ 	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
 	{
 		Superclass::OnLeftButtonDown(e);
 	}
@@ -285,7 +286,8 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 		return;
 	}
 
-	if (m_ShiftPressed)
+	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
+ 	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
 	{
 		Superclass::OnLeftButtonUp(e);
 	}
@@ -316,7 +318,7 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 			case ACTION_ROTATING_MEASURE:
 			{
 				RotateMeasure(m_CurrMeasure, pointCoord);
-				SetAction(ACTION_ROTATE_MEASURE);
+				SetAction(ACTION_NONE); //Setting action to none in order to set the right action on FindAndHighlight
 			}
 			break;
 		}
@@ -348,20 +350,23 @@ void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 
 	InitRenderer(e);
 
-	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY) ? 1 : 0;
-	m_AltPressed = e->GetModifier(ALBA_ALT_KEY) ? 1 : 0;
+	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY);
+	m_AltPressed = e->GetModifier(ALBA_ALT_KEY);
+	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
 
-	if (m_ShiftPressed)
+	double pos_2d[2];
+	e->Get2DPosition(pos_2d);
+	double pointCoord[3];
+	ScreenToWorld(pos_2d, pointCoord);
+
+	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
 	{
+		FindAndHighlight(pointCoord);
 		Superclass::OnMove(e);
 	}
 	else if(m_ParallelView)
 	{
-		double pos_2d[2];
-		e->Get2DPosition(pos_2d);
-		double pointCoord[3];
-		ScreenToWorld(pos_2d, pointCoord);
-
+		
 		if (m_IsInBound != IsInBound(pointCoord))
 		{
 			if (m_Renderer)
@@ -414,6 +419,8 @@ void albaInteractor2DMeasure::OnEvent(albaEventBase *event)
 			albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
 
 			OnMove(e);
+			if (m_Action != ACTION_ADD_MEASURE)
+				return;
 		}
 	}
 
