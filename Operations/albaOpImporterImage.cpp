@@ -193,15 +193,15 @@ void albaOpImporterImage::SetSpacing(double* spacing)
 void albaOpImporterImage::Import()
 //----------------------------------------------------------------------------
 {
-  wxString path, name, ext;
-	std::vector<vtkImageData*> images;
+	wxString path, name, ext;
+	std::vector<vtkImageData *> images;
 
 	albaGUIBusyInfo busy("Importing Images.\nPlease wait...", m_TestMode);
-	
+
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
-	vtkImageReader2* reader = NULL;
+	vtkImageReader2 *reader = NULL;
 
 	int numFiles = m_Files.size();
 	if (!m_BuildVolumeFlag)
@@ -240,18 +240,23 @@ void albaOpImporterImage::Import()
 			{
 				albaLogMessage(msg.GetCStr());
 			}
-		else
+			else
 			{
-				albaGUIDialogWarnAndSkipOthers* dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongType);
+				albaGUIDialogWarnAndSkipOthers *dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongType);
 				dialog->ShowModal();
 			}
 		}
+
+		vtkImageData *finalImage;
 
 		if (reader)
 		{
 			reader->SetFileName(m_Files[index].c_str());
 			reader->SetDataSpacing(m_Spacing);
 			reader->Update();
+			double *sr = reader->GetOutput()->GetScalarRange();
+			double *ori;
+
 
 			vtkALBASmartPointer<vtkImageLuminance> lumFilter;
 			if (reader->GetOutput()->GetNumberOfScalarComponents() == 4)
@@ -262,37 +267,49 @@ void albaOpImporterImage::Import()
 				extract->Update();
 				lumFilter->SetInputConnection(extract->GetOutputPort());
 			}
+			else if (reader->GetOutput()->GetNumberOfScalarComponents() == 1)
+			{
+				finalImage = reader->GetOutput();
+				finalImage->SetOrigin(0, 0, 0);
+			}
 			else
-		{
+			{
 				lumFilter->SetInputConnection(reader->GetOutputPort());
-		} 
-			lumFilter->Update();
-			vtkImageData* finalImage = lumFilter->GetOutput();
+				lumFilter->Update();
+
+				finalImage = lumFilter->GetOutput();
+				//luminance filter does not mantain spacing
+				finalImage->SetSpacing(m_Spacing);
+				ori = finalImage->GetOrigin();
+			}
+			
+
+			sr=finalImage->GetScalarRange();
 			
 			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
 			if (m_XFlip)
-		{
+			{
 				xFlipFilter->SetInputData(finalImage);
 				xFlipFilter->SetFilteredAxis(0); // X
 				xFlipFilter->Update();
 				finalImage = xFlipFilter->GetOutput();
-		}
+			}
 
 			vtkALBASmartPointer<vtkImageFlip> yFlipFilter;
 			if (!m_YFlip) //invert Y flip logic for image coordinate system
-		{
+			{
 				yFlipFilter->SetInputData(finalImage);
 				yFlipFilter->SetFilteredAxis(1); // Y
 				yFlipFilter->Update();
 				finalImage = yFlipFilter->GetOutput();
-		}
+			}
 
 
 			if (m_BuildVolumeFlag)
-		{
+			{
 				AddImageToList(images, finalImage, name.ToAscii());
-		}
-		else
+			}
+			else
 			{
 				importedImage->SetData(finalImage, m_Input->GetMTime());
 				importedImage->SetName(name);
@@ -327,9 +344,9 @@ void albaOpImporterImage::Import()
 			origin[2] = i * m_Spacing[2];
 			accumulate.SetSlice(i, images[i], origin);
 			vtkDEL(images[i]);
-	}
+		}
 
-		vtkDataSet* acc_out;
+		vtkDataSet *acc_out;
 		acc_out = accumulate.GetNewOutput();
 
 		albaNEW(m_ImportedVolume);
@@ -339,7 +356,7 @@ void albaOpImporterImage::Import()
 
 		m_Output = m_ImportedVolume;
 	}
-  else
+	else
 	{
 		m_Output = m_ImportedGroup;
 	}

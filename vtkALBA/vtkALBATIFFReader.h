@@ -30,7 +30,7 @@ protected:
   vtkALBATIFFReader();
   ~vtkALBATIFFReader();
 
-  virtual void ExecuteData(vtkDataObject *out);
+	void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo) override;
 
   void LoadDataFromWX();
 

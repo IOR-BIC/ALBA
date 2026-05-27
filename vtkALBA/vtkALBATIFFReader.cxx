@@ -47,52 +47,51 @@ vtkStandardNewMacro(vtkALBATIFFReader);
 //----------------------------------------------------------------------------
 // This function reads a data from a file.  The datas extent/axes
 // are assumed to be the same as the file extent/order.
-void vtkALBATIFFReader::ExecuteData(vtkDataObject *output)
+void vtkALBATIFFReader::ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo)
 {
-	Superclass::ExecuteData(output);
+	Superclass::ExecuteDataWithInformation(out, outInfo);
 
 	vtkImageData *outputImg = GetOutput();
-	if (outputImg->GetScalarRange()[0] != 0 || outputImg->GetScalarRange()[1] != 0)
+	using ReaderType = itk::ImageFileReader<ImageType>;
+	ReaderType::Pointer reader = ReaderType::New();
+
+	itk::TIFFImageIO::Pointer tiffIO = itk::TIFFImageIO::New();
+	reader->SetImageIO(tiffIO);
+
+	reader->SetFileName(FileName);
+
+	try
 	{
+		reader->Update();
+	}
+	catch (itk::ExceptionObject &ex)
+	{
+		vtkErrorMacro("Cannot Read %s \n %s", m_Files[i].c_str(), ex.GetDescription());
 		return;
 	}
-	else
-	{
-		using ReaderType = itk::ImageFileReader<ImageType>;
-		ReaderType::Pointer reader = ReaderType::New();
 
-		itk::TIFFImageIO::Pointer tiffIO = itk::TIFFImageIO::New();
-		reader->SetImageIO(tiffIO);
+	using FlipFilterType = itk::FlipImageFilter<ImageType>;
+	FlipFilterType::Pointer flipFilter = FlipFilterType::New();
 
-		reader->SetFileName(FileName);
+	FlipFilterType::FlipAxesArrayType flipAxes;
+	flipAxes[0] = false;
+	flipAxes[1] = true;
+	flipFilter->SetFlipAxes(flipAxes);
 
-		try
-		{
-			reader->Update();
-		}
-		catch (itk::ExceptionObject& ex)
-		{
-			vtkErrorMacro("Cannot Read %s \n %s", m_Files[i].c_str(), ex.GetDescription());
-			return;
-		}
+	flipFilter->SetInput(reader->GetOutput());
+	flipFilter->Update();
 
-		using FlipFilterType = itk::FlipImageFilter<ImageType>;
-		FlipFilterType::Pointer flipFilter = FlipFilterType::New();
+	ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
+	itkTOvtk->SetInput(flipFilter->GetOutput());
+	itkTOvtk->Update();
 
-		FlipFilterType::FlipAxesArrayType flipAxes;
-		flipAxes[0] = false;
-		flipAxes[1] = true;
-		flipFilter->SetFlipAxes(flipAxes);
+	vtkImageData *output = itkTOvtk->GetOutput();
 
-		flipFilter->SetInput(reader->GetOutput());
-		flipFilter->Update();
+	double *sr=output->GetScalarRange();
+	outputImg->DeepCopy(output);
 
-		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-		itkTOvtk->SetInput(flipFilter->GetOutput());
-		itkTOvtk->Update();
+	sr = outputImg->GetScalarRange();
 
-		outputImg->DeepCopy(itkTOvtk->GetOutput());
-	}
 }
 
 
