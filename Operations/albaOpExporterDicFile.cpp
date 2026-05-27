@@ -233,9 +233,9 @@ void albaOpExporterDicFile::SaveDICData()
 			rotTra->MultiplyPoint(displacem, displacem);
 		}
 		
-		fprintf(file, "%.6f %.6f %.6f ", point[0], -point[2], point[1]);
-		fprintf(file, "%.6f %.6f %.6f ", deformed[0], -deformed[2], deformed[1]);
-		fprintf(file, "%.6f %.6f %.6f ", displacem[0], -displacem[2], displacem[1]);
+		fprintf(file, "%.6f %.6f %.6f ", point[0], point[2], -point[1]);
+		fprintf(file, "%.6f %.6f %.6f ", deformed[0], deformed[2], -deformed[1]);
+		fprintf(file, "%.6f %.6f %.6f ", displacem[0], displacem[2], -displacem[1]);
 		fprintf(file, "%.6f\n", displMagnitudo->GetTuple1(i));
 
 		progressHelper.UpdateProgressBar(((float)i / numPoints)*100);

@@ -69,12 +69,12 @@ albaOpImporterScancoImageIO::albaOpImporterScancoImageIO(const wxString &label)
 	m_HeaderSize = 0;
 	m_RawHeader = NULL;
 	m_TagArray = NULL;
+	SetWildc("Scanco ISQ (*.isq)|*.isq|Scanco AIM (*.aim)|*.aim");
 }
 
 //----------------------------------------------------------------------------
 albaOpImporterScancoImageIO::~albaOpImporterScancoImageIO()
 {
-	SetWildc("Scanco ISQ (*.isq)|*.isq|Scanco AIM (*.aim)|*.aim");
   delete[] this->m_RawHeader;
 }
 
