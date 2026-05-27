@@ -28,7 +28,10 @@ void albaCursor::SetCursor(wxWindow *window, const int cursor)
     InitCursors();
 
 	if (cursor > 0 && cursor < wxCURSOR_MAX + GLO_Cursors.size())
-		window->SetCursor(*GLO_Cursors[cursor-1]);
+	{
+		window->SetCursor(*GLO_Cursors[cursor - 1]);
+		window->Update();
+	}
 }
 
 //----------------------------------------------------------------------------
