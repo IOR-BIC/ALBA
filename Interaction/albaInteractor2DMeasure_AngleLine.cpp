@@ -255,6 +255,38 @@ void albaInteractor2DMeasure_AngleLine::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
+void albaInteractor2DMeasure_AngleLine::EditMeasure(int index, double *point1, double *point2, double *point3, double *point4)
+{
+		if (index < 0 || index >= GetMeasureCount())
+			return;
+
+		if (!m_Measure2DVector[index].Active)
+			return;
+
+		m_MovingMeasure = true;
+		m_LastEditing = index;
+
+		//////////////////////////////////////////////////////////////////////////
+		// Update Measure
+		double angle = CalculateAngle(point1, point2, point3, point4);
+
+		// Measure
+		UpdateMeasure(index, angle);
+
+		// Points
+		UpdatePointsActor(point1, point2, point3, point4);
+		// Lines
+		UpdateLineActors(point1, point2, point3, point4);
+		// Circle
+		UpdateCircleActor(point1, angle, 10);
+		// Text
+		UpdateTextActor(point1, point2);
+
+		albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
+		Render();
+}
+
+//----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
@@ -457,6 +489,17 @@ void albaInteractor2DMeasure_AngleLine::UpdateTextActor(double * point1, double 
 }
 
 
+//----------------------------------------------------------------------------
+albaString albaInteractor2DMeasure_AngleLine::GetMeasureText(int index)
+{
+	albaString str;
+	if (index >= 0 && index < m_Angles.size())
+		str.Printf("%.2f", m_Angles[index]*vtkMath::RadiansToDegrees());
+	else str = "No Measure";
+
+	return str;
+}
+
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point2, double *point3, double * point4)
@@ -525,12 +568,14 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 
 	if (m_AddModeCompleted)
 	{
-		Superclass::AddMeasure(point1, point2);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Update Measure
-		int index = m_Measure2DVector.size() - 1;
 		double angle = CalculateAngle(point1, point2, point3, point4);
+		m_Angles.push_back(angle);
+
+		Superclass::AddMeasure(point1, point2);
+		int index = m_Measure2DVector.size() - 1;
 
 		// Update Measure
 		UpdateMeasure(index, angle);
@@ -552,7 +597,6 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		// Add Circle
 		m_CircleStackVector.push_back(new albaActor2dStackHelper(vtkALBACircleSource::New(), m_Renderer));
 
-		m_Angles.push_back(0);
 		m_SecondLineP1Added.push_back(false);
 		m_SecondLineP2Added.push_back(false);
 
@@ -602,6 +646,7 @@ void albaInteractor2DMeasure_AngleLine::AddMeasure(double *point1, double *point
 		UpdatePointsActor(point1, point2, point3, point4);
 		UpdateLineActors(point1, point2, point3, point4);
 		UpdateCircleActor(point1, angle, 10);
+		//UpdateTextActor();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	albaEventMacro(albaEvent(this, ID_MEASURE_ADDED, GetMeasureText(GetMeasureCount() - 1)));

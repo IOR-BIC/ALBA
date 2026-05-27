@@ -535,9 +535,11 @@ albaString albaInteractor2DMeasure::GetMeasureLabel(int index)
 void albaInteractor2DMeasure::SetMeasureLabel(int index, albaString text)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
+	{
 		m_Measure2DVector[index].Label = text;
-
-	Update(index);
+		m_TextActorVector[index]->SetText(text);
+		Update(index);
+	}
 }
 
 //----------------------------------------------------------------------------

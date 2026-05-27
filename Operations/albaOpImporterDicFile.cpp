@@ -34,6 +34,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "wx/filename.h"
+#include "albaTagArray.h"
 
 
 //----------------------------------------------------------------------------
@@ -91,6 +92,11 @@ int albaOpImporterDicFile::ImportFile()
 	vtkCellArray * polys;
 	vtkNEW(polys);
 
+	vtkDoubleArray *deformedArray;
+	vtkNEW(deformedArray);
+	deformedArray->SetName("Deformed Coordinates");
+	deformedArray->SetNumberOfComponents(3);
+
 	vtkDoubleArray *displacementsArray;
 	vtkNEW(displacementsArray);
 	displacementsArray->SetName("Displacements");
@@ -131,8 +137,21 @@ int albaOpImporterDicFile::ImportFile()
 
 	do 
 	{
-		int nReaded = sscanf(m_Line,  "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9]);
-
+		int nReaded;
+		
+		if (true) //TODO Add gui and manage modality
+		{
+			//X, -Z, Y
+			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[2], &values[1], &values[3], &values[5], &values[4], &values[6], &values[8], &values[7], &values[9]);
+			values[1] = -values[1];
+			values[4] = -values[4];
+			values[7] = -values[7];
+		}
+		else
+		{
+			//X, Y, Z
+			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9]);
+		}
 		if (nReaded != 12)
 		{
 			albaErrorMessage("Wrong file: %s", m_FileName.GetCStr());
@@ -140,6 +159,7 @@ int albaOpImporterDicFile::ImportFile()
 			vtkDEL(polydata);
 			vtkDEL(newPoints);
 			vtkDEL(polys);
+			vtkDEL(deformedArray);
 			vtkDEL(displacementsArray);
 			vtkDEL(dispMagnitudoArray);
 			vtkDEL(xIdsArray);
@@ -148,7 +168,7 @@ int albaOpImporterDicFile::ImportFile()
 			return ALBA_ERROR;
 		}
 
-		newPoints->InsertNextPoint(&values[3]);
+		newPoints->InsertNextPoint(&values[0]);
 
 		polys->InsertNextCell(3);
 		polys->InsertCellPoint(pointN);
@@ -157,6 +177,7 @@ int albaOpImporterDicFile::ImportFile()
 
 		xIdsArray->InsertNextValue(indexes[0]);
 		yIdsArray->InsertNextValue(indexes[1]);
+		deformedArray->InsertNextTuple3(values[3], values[4], values[5]);
 		displacementsArray->InsertNextTuple3(values[6], values[7], values[8]);
 		dispMagnitudoArray->InsertNextValue(values[9]);
 
@@ -172,6 +193,8 @@ int albaOpImporterDicFile::ImportFile()
 	vtkDEL(yIdsArray);
 	outPointData->AddArray(displacementsArray);
 	vtkDEL(displacementsArray);
+	outPointData->AddArray(deformedArray);
+	vtkDEL(deformedArray);
 	outPointData->AddArray(dispMagnitudoArray);
 	vtkDEL(dispMagnitudoArray);
 	polydata->SetPoints(newPoints);
@@ -184,6 +207,8 @@ int albaOpImporterDicFile::ImportFile()
 	polydata->Update();
 	pointCloudVME->SetData(polydata,0);
 	vtkDEL(polydata);
+
+	pointCloudVME->GetTagArray()->SetTag("DIC Point Cloud", "1");
 
 	pointCloudVME->ReparentTo(m_Input);
 

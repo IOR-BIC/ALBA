@@ -263,6 +263,7 @@ void albaViewGlobalSliceCompound::PackageView()
   m_ViewGlobalSlice->PlugVisualPipe("albaVMEAnalog", "albaPipeBox", NON_VISIBLE);
   m_ViewGlobalSlice->PlugVisualPipe("albaVMELandmark", "albaPipeSurfaceSlice");
   m_ViewGlobalSlice->PlugVisualPipe("albaVMELandmarkCloud", "albaPipeSurfaceSlice");
+	m_ViewGlobalSlice->PlugVisualPipe("albaVMEPointCloud", "albaPipePointCloudSlice");
 	m_ViewGlobalSlice->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
 
 	PlugChildView(m_ViewGlobalSlice);

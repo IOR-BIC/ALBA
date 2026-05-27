@@ -122,7 +122,7 @@ public:
 	/** Get Measure Value*/
 	double GetMeasureValue(int index);
 	/** Get Measure Text Value*/
-	albaString GetMeasureText(int index);	
+	virtual albaString GetMeasureText(int index);	
 	/** Get Measure Extra Label*/
 	albaString GetMeasureLabel(int index);
 	/** Get a string type of measure*/
