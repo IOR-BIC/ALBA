@@ -142,8 +142,10 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 		if (m_ViewPlaneNormal[X] != 0) m_CurrPlane = 1;// YZ;
 		if (m_ViewPlaneNormal[Y] != 0) m_CurrPlane = 2;// XZ;
 		if (m_ViewPlaneNormal[Z] != 0) m_CurrPlane = 0;// XY;
-	
+
+#ifdef _DEBUG	
 		albaLogMessage("new plane %d", m_CurrPlane);
+#endif
 
 		//albaLogMessage("ViewPlaneNormal (%.2f, %.2f, %.2f)", m_ViewPlaneNormal[X], m_ViewPlaneNormal[Y], m_ViewPlaneNormal[Z]);
 
@@ -585,6 +587,11 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 		return;
 
 	m_Action = action;
+
+#ifdef _DEBUG
+	albaString strs[] = { "NONE","ADD","EDIT","MOVE","ROTATE","ROTATING" };
+	albaLogMessage("Set Mes:%s", strs[action].GetCStr());
+#endif
 
 	if (m_View)
 	{
