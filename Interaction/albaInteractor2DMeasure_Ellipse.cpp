@@ -197,6 +197,9 @@ void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
 {
 	albaVect3d center, p1, p2, currPoint, v1, v2;
 
+	if (m_CurrMeasure < 0)
+		return;
+
 	GetCenter(m_CurrMeasure, center.GetVect());
 	GetMeasurePoints(m_CurrMeasure, p1.GetVect(), p2.GetVect());
 
@@ -323,6 +326,7 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 		if (m_CurrMeasure >= 0)
 		{
 			SelectMeasure(-1);
+			SetAction(ACTION_ADD_MEASURE);
 			m_CurrPoint = NO_POINT;
 			Render();
 		}
