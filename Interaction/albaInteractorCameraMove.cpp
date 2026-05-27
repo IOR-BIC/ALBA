@@ -284,7 +284,7 @@ void albaInteractorCameraMove::Spin()
           (double)m_LastMousePose[0] - (double)center[0]);
   
   newAngle = vtkMath::DegreesFromRadians(newAngle);
-  oldAngle = vtkMath::DegreesFromRadians(newAngle);
+  oldAngle = vtkMath::DegreesFromRadians(oldAngle);
 
 	double rollAngle;
 	double angleDiff = newAngle - oldAngle;
