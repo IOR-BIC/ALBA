@@ -254,10 +254,7 @@ void albaOpImporterImage::Import()
 			reader->SetFileName(m_Files[index].c_str());
 			reader->SetDataSpacing(m_Spacing);
 			reader->Update();
-			double *sr = reader->GetOutput()->GetScalarRange();
-			double *ori;
-
-
+			
 			vtkALBASmartPointer<vtkImageLuminance> lumFilter;
 			if (reader->GetOutput()->GetNumberOfScalarComponents() == 4)
 			{
@@ -266,10 +263,14 @@ void albaOpImporterImage::Import()
 				extract->SetComponents(0, 1, 2);
 				extract->Update();
 				lumFilter->SetInputConnection(extract->GetOutputPort());
+				finalImage = lumFilter->GetOutput();
+				//luminance filter does not maintain spacing
+				finalImage->SetSpacing(m_Spacing);
 			}
 			else if (reader->GetOutput()->GetNumberOfScalarComponents() == 1)
 			{
 				finalImage = reader->GetOutput();
+				//some readers changes the image origin from 0,0,0 we reset this value for compatibility with volume import
 				finalImage->SetOrigin(0, 0, 0);
 			}
 			else
@@ -278,14 +279,10 @@ void albaOpImporterImage::Import()
 				lumFilter->Update();
 
 				finalImage = lumFilter->GetOutput();
-				//luminance filter does not mantain spacing
+				//luminance filter does not maintain spacing
 				finalImage->SetSpacing(m_Spacing);
-				ori = finalImage->GetOrigin();
 			}
-			
-
-			sr=finalImage->GetScalarRange();
-			
+					
 			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
 			if (m_XFlip)
 			{
