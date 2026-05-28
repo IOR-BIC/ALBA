@@ -58,7 +58,7 @@ vtkDataSet *albaDataPipeCustom::GetVTKData()
 {
   m_VTKDataPipe->UpdateInformation();
   m_VTKDataPipe->Update();
-  return m_VTKDataPipe->GetOutput();
+  return (vtkDataSet *)m_VTKDataPipe->GetOutput();
 }
 
 //----------------------------------------------------------------------------
@@ -84,8 +84,9 @@ void albaDataPipeCustom::UpdateBounds()
   {
 		m_VTKDataPipe->UpdateInformation();
 		m_VTKDataPipe->Update();
-	  m_VTKDataPipe->GetOutput()->ComputeBounds();
-	  m_Bounds.DeepCopy(m_VTKDataPipe->GetOutput()->GetBounds());
+    vtkDataSet *output = (vtkDataSet *)m_VTKDataPipe->GetOutput();
+	  output->ComputeBounds();
+	  m_Bounds.DeepCopy(output->GetBounds());
   }
 }
 //------------------------------------------------------------------------------

@@ -67,7 +67,7 @@ vtkDataSet *albaDataPipeInterpolatorVTK::GetVTKData()
 {
 	m_VTKDataPipe->UpdateInformation();
   m_VTKDataPipe->Update();
-  return m_VTKDataPipe->GetOutput();
+  return (vtkDataSet *) m_VTKDataPipe->GetOutput();
 }
 
 //----------------------------------------------------------------------------

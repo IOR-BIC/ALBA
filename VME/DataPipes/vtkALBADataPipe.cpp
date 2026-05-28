@@ -120,83 +120,16 @@ void vtkALBADataPipe::UpdateInformation()
 }
 
 //------------------------------------------------------------------------------
-int vtkALBADataPipe::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+int vtkALBADataPipe::RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
 {
-  this->SetErrorCode( vtkErrorCode::NoError );
+	if(m_DataPipe && m_DataPipe->IsA("albaDataPipeCustom"))
+     m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
+
+  int retValue=Superclass::RequestData(request,inputVector,outputVector);
   
-	// get the info objects
-	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  // forward event to ALBA data pipe
+  if(m_DataPipe && !m_DataPipe->IsA("albaDataPipeCustom"))
+    m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
 
-	// Initialize some frequently used values.
-	vtkDataObject *output = vtkDataObject::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  // check if output array is still empty
-  if (output==NULL)
-  {
-    // create a new object of the same type of those in the array
-    if (GetNumberOfInputPorts()>0)
-    {
-      for (int i=0;i<GetNumberOfInputPorts();i++)
-      {
-        
-				vtkInformation *nthInInfo = inputVector[0]->GetInformationObject(0);
-				vtkDataSet  *input = vtkDataSet::SafeDownCast(nthInInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-        if (input)
-        {
-          UpdateInformation();
-          vtkDataSet *new_data=input->NewInstance();
-          
-					this->GetExecutive()->SetOutputData(i,new_data);
-          new_data->Delete();
-        }
-      }
-    }
-  } 
-  
- return Superclass::RequestInformation(request, inputVector, outputVector);
-}
-
-//------------------------------------------------------------------------------
-int vtkALBADataPipe::RequestData(vtkInformation *vtkNotUsed(request),	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
-{
-	// get the info objects
-	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-
-	// Initialize some frequently used values.
-	vtkDataObject  *input = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-
-  if (input)
-  {
-		if(m_DataPipe && m_DataPipe->IsA("albaDataPipeCustom"))
-      m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
-
-    for (int i=0;i<GetNumberOfInputPorts();i++)
-    {
-      if (GetNumberOfOutputPorts()>i)
-      {
-				vtkInformation *nthInInfo = inputVector[i]->GetInformationObject(0);
-				vtkDataSet  *nthInput = vtkDataSet::SafeDownCast(nthInInfo->Get(vtkDataObject::DATA_OBJECT()));
-			
-				// get the info objects
-				vtkInformation *nthOutInfo = outputVector->GetInformationObject(i);
-
-				// Initialize some frequently used values.
-				vtkDataObject *nthOutput = vtkDataObject::SafeDownCast(nthOutInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-				if(nthOutput)
-					nthOutput->DeepCopy(nthInput);
-      }
-      else
-      {
-        vtkErrorMacro("DEBUG: NULL output pointer!");
-      }
-    }
-    // forward event to ALBA data pipe
-    if(m_DataPipe && !m_DataPipe->IsA("albaDataPipeCustom"))
-      m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
-  }
-
-	return 1;
+  return retValue;
 }

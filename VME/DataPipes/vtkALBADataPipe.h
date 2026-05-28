@@ -19,7 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaObserver.h"
-#include "vtkDataSetAlgorithm.h"
+#include "vtkPassThrough.h"
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
@@ -34,10 +34,10 @@ class vtkDataSet;
   @todo
   -
 */
-class ALBA_EXPORT vtkALBADataPipe : public vtkDataSetAlgorithm 
+class ALBA_EXPORT vtkALBADataPipe : public vtkPassThrough
 {
 public:
-  vtkTypeMacro(vtkALBADataPipe,vtkDataSetAlgorithm );
+  vtkTypeMacro(vtkALBADataPipe, vtkPassThrough);
 
   static vtkALBADataPipe *New();
 
@@ -66,8 +66,7 @@ protected:
   vtkALBADataPipe();
   virtual ~vtkALBADataPipe();
 
-  virtual int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
-  int RequestData(vtkInformation *vtkNotUsed(request),	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
+  int RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
   albaDataPipe *m_DataPipe; ///< the data pipe this object is linked to
 
