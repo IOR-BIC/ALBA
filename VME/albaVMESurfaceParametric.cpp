@@ -340,8 +340,9 @@ void albaVMESurfaceParametric::OnEvent(albaEventBase *alba_event)
       {  
 				SetGeometryType(m_GeometryType);
         InternalUpdate();
+				GetLogicManager()->CameraUpdate();
       }
-
+			break;
       case CHANGE_VALUE_SPHERE:
       case CHANGE_VALUE_CUBE:
       case CHANGE_VALUE_CONE:
@@ -351,9 +352,9 @@ void albaVMESurfaceParametric::OnEvent(albaEventBase *alba_event)
 			case CHANGE_VALUE_TRUNCATED_CONE:
 			case CHANGE_VALUE_ELLIPTIC_CYLINDER:
       {
+				Modified();
         InternalUpdate();
-        e->SetId(CAMERA_UPDATE);
-        ForwardUpEvent(e);
+				GetLogicManager()->CameraUpdate();
       }
       break;
       
@@ -660,8 +661,8 @@ void albaVMESurfaceParametric::CreateTruncatedCone()
 	vtkDEL(polyData);
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
-
- 	m_DataPipe->Update();
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateEllipsoid()
@@ -698,6 +699,8 @@ void albaVMESurfaceParametric::CreateEllipsoid()
 	ptf->Update();
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreatePlane()
@@ -713,6 +716,8 @@ void albaVMESurfaceParametric::CreatePlane()
 	triangle->SetInputData(surf->GetOutput());
 	triangle->Update();
 	m_PolyData->DeepCopy(triangle->GetOutput());
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateCube()
@@ -723,6 +728,8 @@ void albaVMESurfaceParametric::CreateCube()
 	surf->SetYLength(m_CubeZLength);
 	surf->Update();
 	m_PolyData->DeepCopy(surf->GetOutput());
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateCylinder()
@@ -758,6 +765,8 @@ void albaVMESurfaceParametric::CreateCylinder()
 	ptf->Update();
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateCone()
@@ -794,6 +803,8 @@ void albaVMESurfaceParametric::CreateCone()
 	ptf->Update();
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateSphere()
@@ -804,6 +815,8 @@ void albaVMESurfaceParametric::CreateSphere()
 	surf->SetThetaResolution(m_SphereTheRes);
 	surf->Update();
 	m_PolyData->DeepCopy(surf->GetOutput());
+	m_DataPipe->Modified();
+	m_DataPipe->Update();
 }
 //-------------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateEllipticCylinder()
@@ -912,6 +925,7 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 	vtkDEL(polyData);
 
 	m_PolyData->DeepCopy(ptf->GetOutput());
+	m_DataPipe->Modified();
 	m_DataPipe->Update();
 }
 
@@ -1186,7 +1200,9 @@ void albaVMESurfaceParametric::EnableParametricSurfaceGui( int surfaceTypeID )
 		m_GuiTruncatedCone->FitGui();
 		m_GuiEllipticCylinder->FitGui();
 
+		m_Gui->Update(); 
 		m_Gui->FitGui();
-		m_Gui->Update();
+		m_Gui->FitInside();
+		
 	}
 }

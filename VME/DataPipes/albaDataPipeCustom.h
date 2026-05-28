@@ -62,6 +62,14 @@ public:
 	/** sets the N-th input connection of the datapipe */
 	void SetInputConnection(int n, vtkAlgorithmOutput *input);
 
+  /**
+  * Update the modification time for this object. Many filters rely on
+  * the modification time to determine if they need to recompute their
+  * data. The modification time is a unique monotonically increasing
+  * unsigned long integer.
+  */
+  virtual void Modified();
+
 protected:
   albaDataPipeCustom();
   virtual ~albaDataPipeCustom();

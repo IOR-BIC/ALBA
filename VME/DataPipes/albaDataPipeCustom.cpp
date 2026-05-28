@@ -134,6 +134,11 @@ void albaDataPipeCustom::SetInputConnection(vtkAlgorithmOutput *input)
 //----------------------------------------------------------------------------
 void albaDataPipeCustom::SetInputConnection(int n, vtkAlgorithmOutput *input)
 {
-	vtkALBADataPipe * vtkDataPipe = GetVTKDataPipe();
-	vtkDataPipe->SetInputConnection(n, input);
+	m_VTKDataPipe->SetInputConnection(n, input);
+}
+
+//----------------------------------------------------------------------------
+void albaDataPipeCustom::Modified()
+{
+  m_VTKDataPipe->Modified();
 }
