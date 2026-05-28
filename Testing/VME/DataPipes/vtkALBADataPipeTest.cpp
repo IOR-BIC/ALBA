@@ -76,12 +76,12 @@ void vtkALBADataPipeTest::TestGetOutput()
 
 	vdp->SetNthInput(0, poly0->GetOutput());
 
-  pDataSet = vdp->GetOutput();
+  pDataSet = (vtkDataSet *)vdp->GetOutput();
 
 	CPPUNIT_ASSERT(pDataSet != NULL);
 	
 
-	pDataSet = vdp->GetOutput(0);
+	pDataSet = (vtkDataSet *)vdp->GetOutput(0);
 
 	CPPUNIT_ASSERT(pDataSet != NULL);
 

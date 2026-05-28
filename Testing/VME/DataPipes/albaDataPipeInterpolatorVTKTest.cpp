@@ -180,8 +180,9 @@ void albaDataPipeInterpolatorVTKTest::TestUpdate()
 
   di->Update();
 
-  result = di->GetVTKDataPipe()->GetOutput()->GetNumberOfPoints() == sphere->GetOutput()->GetNumberOfPoints() &&
-           di->GetVTKDataPipe()->GetOutput()->GetNumberOfPoints() == dataset->GetNumberOfPoints();
+  vtkDataSet *output = (vtkDataSet*)di->GetVTKDataPipe()->GetOutput();
+  result = output->GetNumberOfPoints() == sphere->GetOutput()->GetNumberOfPoints() &&
+           output->GetNumberOfPoints() == dataset->GetNumberOfPoints();
 
   TEST_RESULT;
 }
