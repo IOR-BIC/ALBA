@@ -50,6 +50,7 @@ class vtkColorTransferFunction;
 class vtkPolyData;
 class vtkCaptionActor2D;
 class vtkSplineFilter;
+class vtkALBAConnectedRegionsContourTriangulator;
 
 /**
   class name: albaPipePolylineSlice.
@@ -199,18 +200,13 @@ public:
 	void SetSphereRadius(double radius) { m_SphereRadius = radius; };
 
 protected:
-  /** cap the regions*/
-  vtkPolyData *RegionsCapping(vtkPolyData* inputCutters);
-  /** apply a capping filter  */
-  vtkPolyData *CappingFilter(vtkPolyData* inputBorder);
-
+  
   vtkPolyDataMapper								*m_Mapper;
   vtkActor												*m_Actor;
   vtkPlane												*m_Plane;
-  vtkALBAFixedCutter								*m_Cutter;
-  vtkPolyData											*m_PolyFilteredLine;
+  vtkALBAFixedCutter							*m_Cutter;
   vtkALBAPolyDataToSinglePolyLine	*m_PolydataToPolylineFilter;
-  vtkALBAToLinearTransform					*m_VTKTransform;
+  vtkALBAToLinearTransform				*m_VTKTransform;
 	vtkSphereSource									*m_Sphere;
 	vtkGlyph3D											*m_Glyph;
 	vtkALBATubeFilter								*m_Tube;
@@ -219,12 +215,9 @@ protected:
 	vtkProperty											*m_OutlineProperty;
 	vtkActor												*m_OutlineActor;
 	vtkAppendPolyData								*m_AppendPolyData;
-	vtkAppendPolyData								*m_CappingPolyData;
 	vtkSplineFilter									*m_SplineFilter;
+	vtkALBAConnectedRegionsContourTriangulator *m_ContourTriangulator;
 	  
-	vtkClipPolyData									*m_ClipPolyData;
-	vtkClipPolyData									*m_ClipPolyDataUp;
-	vtkClipPolyData									*m_ClipPolyDataDown;
 
 	vtkPolyData											*m_PolyData;
 

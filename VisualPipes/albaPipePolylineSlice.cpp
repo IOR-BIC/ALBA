@@ -64,6 +64,7 @@
 #include "vtkRenderer.h"
 #include "vtkSphereSource.h"
 #include "vtkSplineFilter.h"
+#include "vtkALBAConnectedRegionsContourTriangulator.h"
 
 #include <vector>
 
@@ -76,9 +77,6 @@ albaPipePolylineSlice::albaPipePolylineSlice()
 	:albaPipeSlice()
 {
 	m_Cutter										= NULL;
-	m_ClipPolyData							= NULL;
-	m_ClipPolyDataUp						= NULL;
-	m_ClipPolyDataDown					= NULL;
 	m_Plane											= NULL;
 	m_PolydataToPolylineFilter	= NULL;
 	m_Sphere										= NULL;
@@ -91,7 +89,6 @@ albaPipePolylineSlice::albaPipePolylineSlice()
 	m_OutlineProperty						= NULL;
 	m_OutlineActor							= NULL;
 	m_AppendPolyData						= NULL;
-	m_CappingPolyData						= NULL;
 	m_SplineFilter							= NULL;
 
 	m_Normal[2]				= 0;  //rest is initialized in albaPipeSlice
@@ -123,7 +120,6 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 	m_OutlineMapper			= NULL;
 	m_OutlineProperty		= NULL;
 	m_OutlineActor			= NULL;
-	m_PolyFilteredLine	= NULL;
 
 	m_Vme->AddObserver(this);
 
@@ -172,7 +168,6 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 	m_SplineFilter->SetLength(5.0);
 	m_SplineFilter->SetInputConnection(m_PolydataToPolylineFilter->GetOutputPort());
 	m_SplineFilter->SetSpline(spline);
-/*	m_SplineFilter->Update();*/
 
 	//////////////////////////////////
 	vtkNEW(m_Tube);
@@ -197,10 +192,7 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 
 	//////////////////////////////////
 	vtkNEW(m_AppendPolyData);
-	vtkNEW(m_CappingPolyData);
-	vtkNEW(m_ClipPolyData);
-	vtkNEW(m_ClipPolyDataUp);
-	vtkNEW(m_ClipPolyDataDown);
+	vtkNEW(m_ContourTriangulator);
 
 	//////////////////////////////////
 	m_Mapper = vtkPolyDataMapper::New();
@@ -252,12 +244,8 @@ albaPipePolylineSlice::~albaPipePolylineSlice()
 	m_AssemblyFront->RemovePart(m_OutlineActor);
 
 	vtkDEL(m_Cutter);
-	vtkDEL(m_ClipPolyData);
-	vtkDEL(m_ClipPolyDataUp);
-	vtkDEL(m_ClipPolyDataDown);
 	vtkDEL(m_Plane);
 	vtkDEL(m_VTKTransform);
-	vtkDEL(m_PolyFilteredLine);
 	vtkDEL(m_Sphere);
 	vtkDEL(m_Glyph);
 	vtkDEL(m_Tube);
@@ -269,8 +257,9 @@ albaPipePolylineSlice::~albaPipePolylineSlice()
 	vtkDEL(m_OutlineActor);
 	vtkDEL(m_SplineFilter);
 	vtkDEL(m_AppendPolyData);
-	vtkDEL(m_CappingPolyData);
+	vtkDEL(m_ContourTriangulator);
 }
+	
 //----------------------------------------------------------------------------
 void albaPipePolylineSlice::Select(bool sel)
 {
@@ -536,11 +525,15 @@ void albaPipePolylineSlice::UpdateProperty()
 	m_Cutter->Update();
 
 	if (m_Fill)
-		m_PolyData = RegionsCapping(m_Cutter->GetOutput());
+	{
+		m_ContourTriangulator->SetInputConnection(m_Cutter->GetOutputPort());
+		m_Mapper->SetInputConnection(m_ContourTriangulator->GetOutputPort());
+	}
 	else
-		m_PolyData = m_Cutter->GetOutput();
+	{
+		m_Mapper->SetInputConnection(m_Cutter->GetOutputPort());
+	}
 		
-	m_Mapper->SetInputData(m_PolyData);
 	m_Mapper->Update();
 
 	if (m_Actor)
@@ -747,108 +740,7 @@ void albaPipePolylineSlice::SetRepresentation(int representation)
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData *albaPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
-{
-	m_CappingPolyData->RemoveAllInputs();
-
-  vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-  connectivityFilter->SetInputData(inputBorder);
-  connectivityFilter->SetExtractionModeToSpecifiedRegions();
-  connectivityFilter->Update();
-  int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
-
-  for(int region = 0; region < regionNumbers; region++)
-  {
-    connectivityFilter->InitializeSpecifiedRegionList();
-    connectivityFilter->AddSpecifiedRegion(region);
-    connectivityFilter->Update();
-
-    vtkALBASmartPointer<vtkPolyData> p;
-
-    //write polydata
-
-    p->SetPoints(connectivityFilter->GetOutput()->GetPoints());
-    p->SetLines(connectivityFilter->GetOutput()->GetLines());
-    /*albaString filename1 = "C:\\conn_";
-    filename1 << region;
-    filename1 << ".vtk";
-    vtkALBASmartPointer<vtkPolyDataWriter> pdWriter;
-    pdWriter->SetInput(p);
-    pdWriter->SetFileName(filename1);
-    pdWriter->Update();*/
-    //end write polydata
-
-    p->DeepCopy(CappingFilter(p));
-
-    /*albaString filename2 = "C:\\connCAPP_";
-    filename2 << region;
-    filename2 << ".vtk";
-
-    pdWriter->SetInput(p);
-    pdWriter->SetFileName(filename2);
-    pdWriter->Update();*/
-    //end write polydata
-
-    m_CappingPolyData->AddInputData(p);
-		m_CappingPolyData->Update();
-  }
-
-	return  m_CappingPolyData->GetOutput();
-}
-//----------------------------------------------------------------------------
-vtkPolyData *albaPipePolylineSlice::CappingFilter(vtkPolyData* inputBorder)
-//----------------------------------------------------------------------------
-{
-  int i, iCell;
-  // prerequisites: connected polydata with line cells that represent the edge of the hole to be capped. 
-  // search average point
-  double averagePoint[3] = {0.0,0.0,0.0};
-  vtkALBASmartPointer<vtkPoints>outputPoints;
-  vtkALBASmartPointer<vtkCellArray> outputCellArray;
-  vtkPolyData *output;
-  vtkNEW(output);
-  outputPoints->DeepCopy(inputBorder->GetPoints());
-
-  for(i = 0;i<inputBorder->GetNumberOfPoints();i++)
-  {
-    double currentPoint[3];
-    inputBorder->GetPoint(i, currentPoint);
-    averagePoint[0] += currentPoint[0];
-    averagePoint[1] += currentPoint[1];
-    averagePoint[2] += currentPoint[2];
-  }
-  // the new polydata that represents capping has input->NPoints + 1 points: the averagePoint
-  double center[3];
-  inputBorder->GetCenter(center);
-
-  averagePoint[0] /= inputBorder->GetNumberOfPoints(); 
-  averagePoint[1] /= inputBorder->GetNumberOfPoints();
-  averagePoint[2] /= inputBorder->GetNumberOfPoints();
-  outputPoints->InsertNextPoint(center);
-  output->SetPoints(outputPoints);
-  // create triangular cells with the new point.
-  for(int i=0; i<inputBorder->GetNumberOfCells();i++)
-  {
-    //each line of the inputPolydata should be transformed into a triangle.
-    vtkALBASmartPointer<vtkIdList> currentCellIds;
-    for (iCell = 0; iCell < inputBorder->GetCell(i)->GetNumberOfPoints(); iCell++)
-    {
-      currentCellIds->InsertNextId(inputBorder->GetCell(i)->GetPointIds()->GetId(iCell));
-    }
-    // write the last id (the averagePoint) in the current cell Id list
-    currentCellIds->InsertNextId(inputBorder->GetNumberOfPoints());
-    // insert the Id list in the cell array
-    outputCellArray->InsertNextCell(currentCellIds);
-  }
-  // set the cell array to the polydata
-  output->SetPolys(outputCellArray);
-
-  return output;
-}
-
-//----------------------------------------------------------------------------
 void albaPipePolylineSlice::SetActorPicking(int enable)
-//----------------------------------------------------------------------------
 {
   m_Actor->SetPickable(enable);
   m_Actor->Modified();
