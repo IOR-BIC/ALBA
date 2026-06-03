@@ -110,7 +110,7 @@ public:
   virtual vtkDataSet *GetVTKData();
 
 	/** returns the VTK Data Pipe Output Port */
-	inline vtkAlgorithmOutput *GetVTKOutputPort();
+	virtual vtkAlgorithmOutput *GetVTKOutputPort();
 #endif
 
   /**

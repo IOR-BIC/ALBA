@@ -38,11 +38,9 @@
 
 //-------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaVMEOutput)
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 albaVMEOutput::albaVMEOutput()
-//-------------------------------------------------------------------------
 {
   m_VME = NULL;
   m_Transform = albaTransform::New(); // Transform is created by VME 
@@ -51,7 +49,6 @@ albaVMEOutput::albaVMEOutput()
 
 //-------------------------------------------------------------------------
 albaVMEOutput::~albaVMEOutput()
-//-------------------------------------------------------------------------
 {
   cppDEL(m_Gui);
 }
@@ -59,7 +56,6 @@ albaVMEOutput::~albaVMEOutput()
 #ifdef ALBA_USE_VTK
 //-------------------------------------------------------------------------
 vtkDataSet *albaVMEOutput::GetVTKData()
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   return m_VME&&m_VME->GetDataPipe()?m_VME->GetDataPipe()->GetVTKData():NULL;
@@ -70,12 +66,10 @@ vtkAlgorithmOutput *albaVMEOutput::GetVTKOutputPort()
 {
   return (m_VME &&m_VME->GetDataPipe()) ? m_VME->GetDataPipe()->GetVTKOutputPort() : NULL;
 }
-
 #endif
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::Update()
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
 
@@ -84,20 +78,17 @@ void albaVMEOutput::Update()
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::SetTransform(albaTransformBase *trans)
-//-------------------------------------------------------------------------
 {
   assert(trans);
   m_Transform=trans;
 }
 //-------------------------------------------------------------------------
 void albaVMEOutput::SetBounds(const albaOBB &bounds)
-//-------------------------------------------------------------------------
 {
   m_Bounds=bounds;
 }
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetLocalTimeBounds(albaTimeStamp tbounds[2]) const
-//-------------------------------------------------------------------------
 {
   
   m_VME->GetLocalTimeBounds(tbounds);
@@ -105,7 +96,6 @@ void albaVMEOutput::GetLocalTimeBounds(albaTimeStamp tbounds[2]) const
 }
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetTimeBounds(albaTimeStamp tbounds[2]) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   
@@ -133,7 +123,6 @@ void albaVMEOutput::GetTimeBounds(albaTimeStamp tbounds[2]) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetVME4DBounds(double bounds[6]) const
-//-------------------------------------------------------------------------
 {
   albaOBB myBounds;
   GetVME4DBounds(myBounds);
@@ -142,7 +131,6 @@ void albaVMEOutput::GetVME4DBounds(double bounds[6]) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetVME4DBounds(albaOBB &bounds) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
 
@@ -182,7 +170,6 @@ void albaVMEOutput::GetVME4DBounds(albaOBB &bounds) const
 }
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetVMEBounds(double bounds[6]) const
-//-------------------------------------------------------------------------
 {
   albaOBB myBounds;
   GetVMEBounds(myBounds);
@@ -191,7 +178,6 @@ void albaVMEOutput::GetVMEBounds(double bounds[6]) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetVMEBounds(albaOBB &bounds,albaTimeStamp t, albaVMEIterator *iter) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   if ((iter&&iter->IsVisible(m_VME))||(!iter&&m_VME->IsVisible()))
@@ -208,7 +194,6 @@ void albaVMEOutput::GetVMEBounds(albaOBB &bounds,albaTimeStamp t, albaVMEIterato
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetVMELocalBounds(double bounds[6]) const
-//-------------------------------------------------------------------------
 {
   albaOBB myBounds;
   GetVMELocalBounds(myBounds);
@@ -217,7 +202,6 @@ void albaVMEOutput::GetVMELocalBounds(double bounds[6]) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetVMELocalBounds(albaOBB &bounds,albaTimeStamp t, albaVMEIterator *iter) const
-//-------------------------------------------------------------------------
 {
   if (t<0)
     t=m_VME->GetTimeStamp();
@@ -232,7 +216,6 @@ void albaVMEOutput::GetVMELocalBounds(albaOBB &bounds,albaTimeStamp t, albaVMEIt
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetDataBounds(albaOBB &bounds,albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   if (m_VME->GetDataPipe()) // allocate data pipe if not done yet
@@ -267,7 +250,6 @@ void albaVMEOutput::GetDataBounds(albaOBB &bounds,albaTimeStamp t) const
 }
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetBounds(double bounds[6]) const
-//-------------------------------------------------------------------------
 {
   albaOBB myBounds;
   GetBounds(myBounds);
@@ -276,7 +258,6 @@ void albaVMEOutput::GetBounds(double bounds[6]) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetBounds(albaOBB &bounds,albaTimeStamp t, albaVMEIterator *iter) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
 
@@ -299,7 +280,6 @@ void albaVMEOutput::GetBounds(albaOBB &bounds,albaTimeStamp t, albaVMEIterator *
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::Get4DBounds(double bounds[6]) const
-//-------------------------------------------------------------------------
 {
   albaOBB myBounds;
   Get4DBounds(myBounds);
@@ -308,7 +288,6 @@ void albaVMEOutput::Get4DBounds(double bounds[6]) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::Get4DBounds(albaOBB &bounds) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
 
@@ -329,7 +308,6 @@ void albaVMEOutput::Get4DBounds(albaOBB &bounds) const
 
 //-------------------------------------------------------------------------
 albaTransformBase * albaVMEOutput::GetTransform() const
-//-------------------------------------------------------------------------
 {
   // if VME supports a matrix pipe return its pointer
   if (m_VME)
@@ -347,14 +325,12 @@ albaTransformBase * albaVMEOutput::GetTransform() const
 }
 //-------------------------------------------------------------------------
 albaMatrix *albaVMEOutput::GetMatrix() const
-//-------------------------------------------------------------------------
 {
   return GetTransform()->GetMatrixPointer();
 }
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetMatrix(albaMatrix &matrix,albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   if (albaMatrixPipe *mpipe=m_VME->GetMatrixPipe()) // check if a matrix pipe is present
@@ -386,7 +362,6 @@ void albaVMEOutput::GetMatrix(albaMatrix &matrix,albaTimeStamp t) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetPose(double xyz[3],double rxyz[3],albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   albaMatrix mat;
   
@@ -399,7 +374,6 @@ void albaVMEOutput::GetPose(double xyz[3],double rxyz[3],albaTimeStamp t) const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   double xyz[3],rxyz[3];
 
@@ -417,7 +391,6 @@ void albaVMEOutput::GetPose(double &x,double &y,double &z,double &rx,double &ry,
 
 //-------------------------------------------------------------------------
 albaTransformBase * albaVMEOutput::GetAbsTransform() const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   return m_VME->GetAbsMatrixPipe();
@@ -425,7 +398,6 @@ albaTransformBase * albaVMEOutput::GetAbsTransform() const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetAbsMatrix(albaMatrix &matrix,albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
 
@@ -452,7 +424,6 @@ void albaVMEOutput::GetAbsMatrix(albaMatrix &matrix,albaTimeStamp t) const
 
 //-------------------------------------------------------------------------
 albaMatrix *albaVMEOutput::GetAbsMatrix() const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   m_VME->GetAbsMatrixPipe()->Update();
@@ -461,7 +432,6 @@ albaMatrix *albaVMEOutput::GetAbsMatrix() const
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetAbsPose(double xyz[3],double rxyz[3],albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   assert(m_VME);
   albaMatrix mat;
@@ -476,7 +446,6 @@ void albaVMEOutput::GetAbsPose(double xyz[3],double rxyz[3],albaTimeStamp t) con
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::GetAbsPose(double &x,double &y,double &z,double &rx,double &ry,double &rz,albaTimeStamp t) const
-//-------------------------------------------------------------------------
 {
   double xyz[3],rxyz[3];
 
@@ -494,14 +463,12 @@ void albaVMEOutput::GetAbsPose(double &x,double &y,double &z,double &rx,double &
 
 //-------------------------------------------------------------------------
 albaTimeStamp albaVMEOutput::GetTimeStamp() const
-//-------------------------------------------------------------------------
 {
   return m_VME->GetTimeStamp();
 }
 
 //-------------------------------------------------------------------------
 void albaVMEOutput::Print(std::ostream& os, const int tabs)// const
-//-------------------------------------------------------------------------
 {
   albaIndent indent(tabs);
 
@@ -532,7 +499,6 @@ void albaVMEOutput::Print(std::ostream& os, const int tabs)// const
 
 //-------------------------------------------------------------------------
 albaGUI *albaVMEOutput::GetGui()
-//-------------------------------------------------------------------------
 {
   if (m_Gui==NULL) CreateGui();
   assert(m_Gui);
@@ -540,13 +506,11 @@ albaGUI *albaVMEOutput::GetGui()
 }
 //-------------------------------------------------------------------------
 void albaVMEOutput::DeleteGui()
-//-------------------------------------------------------------------------
 {
   cppDEL(m_Gui);
 }
 //-------------------------------------------------------------------------
 albaGUI* albaVMEOutput::CreateGui()
-//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = new albaGUI(m_VME);

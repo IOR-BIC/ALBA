@@ -68,7 +68,7 @@ vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
 		assert(mesh_output);
 		mesh_output->Update();
 		vtkAlgorithmOutput *port = mesh_output->GetVTKOutputPort();
-		assert(data);
+		assert(port);
 
 		m_Plane = vtkPlane::New();
 		m_Cutter = vtkALBAMeshCutter::New();

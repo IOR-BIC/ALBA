@@ -31,6 +31,7 @@ class albaVME;
 
 #ifdef ALBA_USE_VTK
   class vtkDataSet;
+  class vtkAlgorithmOutput;
 #endif
 
 /** abstract class for process objects producing data as output of a VME.
