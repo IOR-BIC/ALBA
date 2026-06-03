@@ -64,6 +64,13 @@ vtkDataSet *albaVMEOutput::GetVTKData()
   assert(m_VME);
   return m_VME&&m_VME->GetDataPipe()?m_VME->GetDataPipe()->GetVTKData():NULL;
 }
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput *albaVMEOutput::GetVTKOutputPort()
+{
+  return (m_VME &&m_VME->GetDataPipe()) ? m_VME->GetDataPipe()->GetVTKOutputPort() : NULL;
+}
+
 #endif
 
 //-------------------------------------------------------------------------

@@ -42,7 +42,10 @@ public:
   virtual vtkDataSet *GetVTKData();
 
   /** return the bridge object between VTK datapipe and ALBA update mechanism */
-  vtkALBADataPipe *GetVTKDataPipe();
+  inline vtkALBADataPipe *GetVTKDataPipe();
+
+  /** returns the VTK Data Pipe Output Port */
+	inline vtkAlgorithmOutput *GetVTKOutputPort();
 
   /** update the data pipe output */
   virtual void Update();

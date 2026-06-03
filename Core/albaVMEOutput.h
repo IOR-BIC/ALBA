@@ -38,6 +38,7 @@ class albaVMEIterator;
 class albaGUI;
 #ifdef ALBA_USE_VTK
 class vtkDataSet;
+class vtkAlgorithmOutput;
 #endif //ALBA_USE_VTK
 
 #ifdef ALBA_EXPORTS
@@ -107,6 +108,9 @@ public:
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
   virtual vtkDataSet *GetVTKData();
+
+	/** returns the VTK Data Pipe Output Port */
+	inline vtkAlgorithmOutput *GetVTKOutputPort();
 #endif
 
   /**

@@ -69,6 +69,12 @@ vtkALBADataPipe *albaDataPipeCustom::GetVTKDataPipe()
 }
 
 //----------------------------------------------------------------------------
+vtkAlgorithmOutput *albaDataPipeCustom::GetVTKOutputPort()
+{
+	return m_VTKDataPipe->GetOutputPort();
+}
+
+//----------------------------------------------------------------------------
 void albaDataPipeCustom::Update()
 //----------------------------------------------------------------------------
 {
