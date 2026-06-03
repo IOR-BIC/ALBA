@@ -61,11 +61,11 @@ void albaPipePointSet::Create(albaSceneNode *n)
   albaVMEOutputPointSet *pointset_output = albaVMEOutputPointSet::SafeDownCast(m_Vme->GetOutput());
   assert(pointset_output);
   pointset_output->Update();
-  vtkPolyData *data = pointset_output->GetPointSetData();
-  assert(data);
+  vtkPolyData *port = pointset_output->GetVTKOutputPort();
+  assert(port);
 
   m_PointSetMapper = vtkPolyDataMapper::New();
-	m_PointSetMapper->SetInputData(data);
+	m_PointSetMapper->SetInputConnection(port);
 	m_PointSetMapper->ScalarVisibilityOff();
   
   m_PointSetActor = vtkActor::New();
@@ -77,7 +77,7 @@ void albaPipePointSet::Create(albaSceneNode *n)
 
   // selection hilight
 	m_OutlineFilter = vtkOutlineCornerFilter::New();
-	m_OutlineFilter->SetInputData(data);
+	m_OutlineFilter->SetInputConnection(port);
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
 	m_OutlineMapper->SetInputConnection(m_OutlineFilter->GetOutputPort());

@@ -67,7 +67,7 @@ vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
 		albaVMEOutputMesh *mesh_output = albaVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
 		assert(mesh_output);
 		mesh_output->Update();
-		vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
+		vtkAlgorithmOutput *port = mesh_output->GetVTKOutputPort();
 		assert(data);
 
 		m_Plane = vtkPlane::New();
@@ -80,7 +80,7 @@ vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
 		m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 		m_Plane->SetTransform(m_VTKTransform);
 
-		m_Cutter->SetInputData(data);
+		m_Cutter->SetInputConnection(port);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
 

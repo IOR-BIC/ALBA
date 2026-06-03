@@ -69,8 +69,8 @@ vtkAlgorithmOutput* albaPipePointCloudSlice::GetPolyDataOutputPort()
 	{
 		assert(m_Vme->GetOutput()->IsALBAType(albaVMEOutputSurface));
 		
-		vtkPolyData *data = vtkPolyData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
-		assert(data);
+		vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
+		assert(port);
 
 		m_Plane = vtkPlane::New();
 		m_Cutter = vtkALBAPointCloudCutter::New();
@@ -82,7 +82,7 @@ vtkAlgorithmOutput* albaPipePointCloudSlice::GetPolyDataOutputPort()
 		m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 		m_Plane->SetTransform(m_VTKTransform);
 
-		m_Cutter->SetInputData(data);
+		m_Cutter->SetInputConnection(port);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->SetPlaneTolerance(m_Tolerance);
 		m_Cutter->Update();

@@ -78,13 +78,14 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 	inputVMEGizmo = albaVMEGizmo::SafeDownCast(m_Vme);
 	assert(inputVMEGizmo);
 	inputVMEGizmo->Update();
-	vtkPolyData *data = vtkPolyData::SafeDownCast(inputVMEGizmo->GetOutput()->GetVTKData());
-	assert(data);
+	vtkAlgorithmOutput *port = inputVMEGizmo->GetOutput()->GetVTKOutputPort();
+
+	assert(port);
 
 	m_Vme->AddObserver(this);
 
 	m_Mapper = vtkPolyDataMapper::New();
-	m_Mapper->SetInputData(data);
+	m_Mapper->SetInputConnection(port);
 
 	m_GizmoActor = vtkActor::New();
 	m_GizmoActor->SetMapper(m_Mapper);
@@ -126,7 +127,7 @@ void albaPipeGizmo::Create(albaSceneNode *n)
 
 	// selection highlight
 	vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInputData(data);  
+	corner->SetInputConnection(port);  
 
 	vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInputConnection(corner->GetOutputPort());

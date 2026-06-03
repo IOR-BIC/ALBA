@@ -64,12 +64,12 @@ vtkAlgorithmOutput* albaPipeMesh::GetPolyDataOutputPort()
 		albaVMEOutputMesh* mesh_output = albaVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
 		assert(mesh_output);
 		mesh_output->Update();
-		vtkUnstructuredGrid* data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
-		assert(data);
+		vtkAlgorithmOutput* port = mesh_output->GetVTKOutputPort();
+		assert(port);
 
 		// create the linearization filter
 		vtkNEW(m_LinearizationFilter);
-		m_LinearizationFilter->SetInputData(data);
+		m_LinearizationFilter->SetInputConnection(port);
 		m_LinearizationFilter->Update();
 
 		vtkNEW(m_GeometryFilter);

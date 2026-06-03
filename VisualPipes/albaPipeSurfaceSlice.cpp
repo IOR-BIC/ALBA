@@ -152,7 +152,7 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 			m_SphereSource->Update();
 
 			glyph->SetSource(m_SphereSource->GetOutput());
-      glyph->SetInputData(landmark_cloud_output->GetVTKData());
+      glyph->SetInputConnection(landmark_cloud_output->GetVTKData());
 			glyph->OrientOff();
 			glyph->ScalingOff();
 			glyph->ScalarVisibilityOn();

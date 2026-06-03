@@ -202,7 +202,7 @@ vtkAlgorithmOutput* albaPipeIsosurface::GetPolyDataOutputPort()
 		if (vtkImageData::SafeDownCast(volData))
 		{
 			vtkNEW(m_ContourFilter);
-			m_ContourFilter->SetInputData(volData);
+			m_ContourFilter->SetInputConnection(vol_output->GetVTKOutputPort());
 			m_ContourFilter->SetComputeScalars(false);
 			m_ContourFilter->SetComputeGradients(false);
 			m_ContourFilter->SetComputeNormals(false);
@@ -214,7 +214,7 @@ vtkAlgorithmOutput* albaPipeIsosurface::GetPolyDataOutputPort()
 		else //Rectilinear Grid
 		{
 			vtkNEW(m_RGContourFilter);
-			m_RGContourFilter->SetInputData(volData);
+			m_RGContourFilter->SetInputConnection(vol_output->GetVTKOutputPort());
 			m_RGContourFilter->SetComputeScalars(false);
 			m_RGContourFilter->SetComputeGradients(false);
 			m_RGContourFilter->SetComputeNormals(false);

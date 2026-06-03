@@ -116,12 +116,12 @@ void albaPipeDensityDistance::Create(albaSceneNode *n/*, bool use_axes*/)
   albaVMEOutputSurface *surface_output = albaVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   assert(surface_output);
   surface_output->Update();
-  vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
-  assert(data);
+	vtkAlgorithmOutput *port = surface_output->GetVTKOutputPort();
+	assert(port);
 
   m_Vme->AddObserver(this);
 
-	m_TriangleFilter->SetInputData(data);
+	m_TriangleFilter->SetInputConnection(port);
 	m_TriangleFilter->Update();
 
 	m_Normals->SetInputConnection(m_TriangleFilter->GetOutputPort());

@@ -28,7 +28,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 class albaVMELandmarkCloud;
 class albaVMELandmark;
-class vtkDataSet;
+class vtkAlgorithmOutput;
 class albaGUIMaterialButton;
 class vtkALBALandmarkCloudOutlineCornerFilter;
 
@@ -87,7 +87,7 @@ protected:
   albaGUIMaterialButton *m_MaterialButton;
 
   /** Create visual-pipe for closed cloud or single landmark */
-  virtual void CreateCloudPipe(vtkDataSet *data, double radius, double resolution);
+  virtual void CreateCloudPipe(vtkAlgorithmOutput *port, double radius, double resolution);
 
   /** Remove visual-pipe for closed cloud */
   virtual void RemoveClosedCloudPipe();

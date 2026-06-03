@@ -98,11 +98,11 @@ void albaPipeLandmarkCloud::Create(albaSceneNode *n)
   
   if (m_Cloud)
   {
-    CreateCloudPipe(m_Cloud->GetOutput()->GetVTKData(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
+    CreateCloudPipe(m_Cloud->GetOutput()->GetVTKOutputPort(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
   }
   else
   {
-    CreateCloudPipe(m_Landmark->GetOutput()->GetVTKData(), m_Landmark->GetRadius(), m_Landmark->GetSphereResolution());
+    CreateCloudPipe(m_Landmark->GetOutput()->GetVTKOutputPort(), m_Landmark->GetRadius(), m_Landmark->GetSphereResolution());
   }
 }
 //----------------------------------------------------------------------------
@@ -198,7 +198,7 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
   
 }
 //----------------------------------------------------------------------------
-void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, double resolution)
+void albaPipeLandmarkCloud::CreateCloudPipe(vtkAlgorithmOutput *port, double radius, double resolution)
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_SphereSource);
@@ -212,7 +212,7 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
   m_Normals->Update();
 
   vtkNEW(m_Glyph);
-  m_Glyph->SetInputData(data);
+  m_Glyph->SetInputConnection(port);
   m_Glyph->SetSource(m_Normals->GetOutput());
   m_Glyph->OrientOff();
   m_Glyph->ScalingOff();
@@ -246,7 +246,7 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
 
   // selection highlight
   vtkNEW(m_CloundCornerFilter);
-  m_CloundCornerFilter->SetInputData(data);
+  m_CloundCornerFilter->SetInputConnection(port);
 	m_CloundCornerFilter->SetCloudRadius(radius);
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;

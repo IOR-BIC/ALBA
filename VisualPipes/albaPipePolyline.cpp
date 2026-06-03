@@ -111,6 +111,11 @@ void albaPipePolyline::Create(albaSceneNode *n)
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
 	assert(data);
 
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
+	assert(data);
+
+
+
 	m_ObjectMaterial = out_polyline->GetMaterial();
 	m_Vme->AddObserver(this);
 
@@ -120,14 +125,13 @@ void albaPipePolyline::Create(albaSceneNode *n)
 	vtkDataArray *scalarArray = data->GetPointData()->GetScalars();
 	if (scalarArray)
 		scalarArray->GetRange(sr);
-
 	vtkNEW(m_Sphere);
 	m_Sphere->SetRadius(m_SphereRadius);
 	m_Sphere->SetPhiResolution(m_SphereResolution);
 	m_Sphere->SetThetaResolution(m_SphereResolution);
 
 	vtkNEW(m_Glyph);
-	m_Glyph->SetInputData(data);
+	m_Glyph->SetInputConnection(port);
 	m_Glyph->SetSourceConnection(m_Sphere->GetOutputPort());
 
 	m_Glyph->SetScaleModeToDataScalingOff();
@@ -137,13 +141,13 @@ void albaPipePolyline::Create(albaSceneNode *n)
 	vtkNEW(m_SplineFilter);
 	m_SplineFilter->SetSubdivideToLength();
 	m_SplineFilter->SetLength(5.0);
-	m_SplineFilter->SetInputData(data);
+	m_SplineFilter->SetInputConnection(port);
 	m_SplineFilter->SetSpline(spline);
 	m_SplineFilter->Update();
 
 	vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOff();
-	m_Tube->SetInputData(data);
+	m_Tube->SetInputConnection(port);
 	m_Tube->SetRadius(m_TubeRadius);
 	m_Tube->SetCapping(m_Capping);
 	m_Tube->SetNumberOfSides(m_TubeResolution);
@@ -183,7 +187,7 @@ void albaPipePolyline::Create(albaSceneNode *n)
 
 	// selection highlight
 	m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInputData(data);  
+	m_OutlineBox->SetInputConnection(port);  
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
 	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
@@ -427,6 +431,7 @@ void albaPipePolyline::UpdateProperty(bool fromTag)
 	albaVMEOutputPolyline *out_polyline = albaVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
 	out_polyline->Update();
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
 
 	if (data->GetNumberOfPoints() <= 0) return;
 	data->Modified();
@@ -436,17 +441,17 @@ void albaPipePolyline::UpdateProperty(bool fromTag)
 		m_AppendPolyData->RemoveAllInputs();
 
 		if (m_SplineMode == true)
-			data = m_SplineFilter->GetOutput();
+			port = m_SplineFilter->GetOutputPort();
 
 		if (m_Representation == TUBES)
 		{
-			m_Tube->SetInputData(data);
+			m_Tube->SetInputConnection(port);
 			m_AppendPolyData->SetInputConnection(m_Tube->GetOutputPort());
 		}
 
 		if (m_Representation == LINES)
 		{
-			m_AppendPolyData->AddInputData(data);
+			m_AppendPolyData->AddInputConnection(port);
 		}
 
 		if (m_ShowSpheres)
