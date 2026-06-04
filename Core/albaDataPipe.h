@@ -79,7 +79,7 @@ public:
   virtual vtkDataSet *GetVTKData() {return NULL;}
 
 	/** returns the VTK Data Pipe Output Port */
-  inline vtkAlgorithmOutput *GetVTKOutputPort() { return NULL; };
+  virtual vtkAlgorithmOutput *GetVTKOutputPort() { return NULL; };
 #endif
 
   /** Set/Get the current time */

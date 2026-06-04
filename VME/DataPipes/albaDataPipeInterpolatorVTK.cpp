@@ -71,6 +71,12 @@ vtkDataSet *albaDataPipeInterpolatorVTK::GetVTKData()
 }
 
 //----------------------------------------------------------------------------
+vtkAlgorithmOutput *albaDataPipeInterpolatorVTK::GetVTKOutputPort()
+{
+	return m_VTKDataPipe->GetOutputPort();
+}
+
+//----------------------------------------------------------------------------
 void albaDataPipeInterpolatorVTK::Update()
 //----------------------------------------------------------------------------
 {

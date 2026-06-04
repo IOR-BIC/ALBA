@@ -56,6 +56,10 @@ public:
   /** return the VTK dataset generated as output to this data pipe */
   virtual vtkDataSet *GetVTKData();
 
+
+	/** returns the VTK Data Pipe Output Port */
+	virtual vtkAlgorithmOutput *GetVTKOutputPort();
+
   /** update the data pipe output */
   virtual void Update();
 
