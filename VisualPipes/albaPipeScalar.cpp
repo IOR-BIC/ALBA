@@ -65,14 +65,15 @@ void albaPipeScalar::Create(albaSceneNode *n)
   
   m_Selected = false;
 
-  vtkDataSet *ds = m_Vme->GetOutput()->GetVTKData();
+	vtkDataSet *ds = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
   vtkALBASmartPointer<vtkTextProperty> tprop;
   tprop->SetColor(1, 1, 1);
   tprop->ShadowOn();
 
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInputData((vtkPolyData *)ds);
+	mapper->SetInputConnection(port);
   mapper->ScalarVisibilityOn();
   mapper->SetScalarRange(ds->GetScalarRange());
 
@@ -82,7 +83,7 @@ void albaPipeScalar::Create(albaSceneNode *n)
   m_AssemblyFront->AddPart(m_Actor);
 
   vtkNEW(m_CubeAxes);
-  m_CubeAxes->SetInputData(ds);
+  m_CubeAxes->SetInputConnection(port);
   m_CubeAxes->SetCamera(m_RenFront->GetActiveCamera());
   m_CubeAxes->SetLabelFormat("%6.4g");
   m_CubeAxes->SetNumberOfLabels(5);

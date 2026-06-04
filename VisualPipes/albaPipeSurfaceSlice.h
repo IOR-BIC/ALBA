@@ -40,6 +40,10 @@ class vtkPlane;
 class vtkSphereSource;
 class vtkALBAToLinearTransform;
 class vtkLookupTable;
+class vtkALBAExtendedGlyph3D;
+class vtkTextureMapToPlane;
+class vtkTextureMapToCylinder;
+class vtkTextureMapToSphere;
 
 /** 
   class name: albaPipeSurfaceSlice 
@@ -123,6 +127,8 @@ protected:
   vtkALBAFixedCutter		      *m_Cutter;
 
   vtkSphereSource         *m_SphereSource;
+
+	vtkALBAExtendedGlyph3D *m_Glyph;
 	vtkLookupTable *m_Table;
 
   double				           m_Border;
@@ -135,6 +141,10 @@ protected:
   albaGUIMaterialButton *m_MaterialButton;
 
 	vtkALBAToLinearTransform* m_VTKTransform;
+
+  vtkTextureMapToPlane *m_PlaneTextureMapper;
+  vtkTextureMapToCylinder *m_CylinderTextureMapper;
+  vtkTextureMapToSphere *m_SphereTextureMapper;
 
 //@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
 

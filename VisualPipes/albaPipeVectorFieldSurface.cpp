@@ -189,7 +189,7 @@ void albaPipeVectorFieldSurface::OnEvent(albaEventBase *alba_event)
   m_ColorMappingLUT->Build(); 
 
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInputData(m_Vme->GetOutput()->GetVTKData());
+  filter->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 
   m_SurfaceMapper = vtkPolyDataMapper::New();
   m_SurfaceMapper->SetInputConnection(filter->GetOutputPort());

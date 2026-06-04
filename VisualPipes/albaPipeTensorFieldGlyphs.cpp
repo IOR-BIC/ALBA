@@ -451,7 +451,6 @@ albaGUI *albaPipeTensorFieldGlyphs::CreateGui()
 //----------------------------------------------------------------------------
 // init items of this gui when load vme--[7/31/2009 weih]
 void albaPipeTensorFieldGlyphs::InitFilterList(int nScalars){
-	//----------------------------------------------------------------------------
 	wxString cols[2] = { wxT("filter name T"), wxT("range value") };
 	for (int i = 0; i < 2; i++){
 		m_RangeCtrl->InsertColumn(i, cols[i]);
@@ -709,7 +708,6 @@ void albaPipeTensorFieldGlyphs::OnShowFilter(int mode){
 //-----------------------------------------------------------------------
 //Add a range item
 void albaPipeTensorFieldGlyphs::OnAddItem(int idx){
-	//-----------------------------------------------------------------------
 
 	CreateAddItemDlg(idx);
 
@@ -834,7 +832,6 @@ bool albaPipeTensorFieldGlyphs::AddItem(){
 //-----------------------------------------------------------------------
 //create dialog ,same as vector
 void albaPipeTensorFieldGlyphs::CreateAddItemDlg(int idx){
-	//-----------------------------------------------------------------------
 	/*vtkDataArray *dataArr = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	double range[2];
 	dataArr->GetRange(range);*/
@@ -981,6 +978,7 @@ bool albaPipeTensorFieldGlyphs::DoCondition(int mode,double tensorScaleValue,dou
 }
 void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *rangeValue2){
 	
+	/** TO DO: update this method as a new vtkALBA filter and use only SetInputPort instead of SetInputData*/
 
 	double origin[3],spacing[3];
 	int dim[3];
@@ -1095,7 +1093,7 @@ void albaPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ra
 			}
 
 
-		}else if (orgData->IsA("vtkImageData") || orgData->IsA("vtkImageData"))
+		}else if (orgData->IsA("vtkImageData") || orgData->IsA("vtkStructuredPoints"))
 		{
 			vtkImageData *orgDataS =vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
 			orgDataS->GetOrigin(origin) ;
@@ -1392,7 +1390,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
 		{
 			if (m_ShowAll)
 			{
-				m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
+				m_Glyphs->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 			}
 		}else if (e->GetId()==ID_CHOOSE_ANDOR)
 		{
@@ -1452,7 +1450,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
   m_GlyphArrow->SetTipLength(0.5);     
 
   m_Glyphs = vtkTensorGlyph::New();
-  m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());  
+  m_Glyphs->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());  
   m_Glyphs->SetScaleFactor(1.0);
   m_Glyphs->ClampScalingOff();
   m_Glyphs->SymmetricOff();  

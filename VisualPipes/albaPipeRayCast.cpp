@@ -86,6 +86,8 @@ albaPipeRayCast::albaPipeRayCast(double skinOpacity,double fatMassOpacity,double
 
   m_RayCastCleaner  = NULL;
 
+	m_ResampleFilter = NULL;
+
   //Setting Opacity 
   //Default values 0.15 - 0.8 - 0.2  
   m_SkinOpacity=skinOpacity;
@@ -116,6 +118,7 @@ void albaPipeRayCast::Create(albaSceneNode *n)
   m_Vme->AddObserver(this);
 
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
   
   //If the volume is not loaded this dataset->update() calls update-event
   //in this case we disable temporary the call to UpdateFromData() in order
@@ -136,7 +139,7 @@ void albaPipeRayCast::Create(albaSceneNode *n)
     
   // selection box
   vtkNEW(m_OutlineBox);
-  m_OutlineBox->SetInputData(dataset);
+  m_OutlineBox->SetInputConnection(port);
 
   vtkNEW(m_OutlineMapper);
   m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
@@ -182,6 +185,7 @@ albaPipeRayCast::~albaPipeRayCast()
   vtkDEL(m_OutlineBox);
 	vtkDEL(m_OutlineMapper);
   vtkDEL(m_RayCastCleaner);
+	vtkDEL(m_ResampleFilter);
 
 }
 
@@ -330,9 +334,10 @@ void albaPipeRayCast::SetThresholding()
 void albaPipeRayCast::UpdateFromData()
 //----------------------------------------------------------------------------
 {
-  vtkALBAVolumeResample		 *resampleFilter;	
+
 
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
   int resampled=false;
 
@@ -349,7 +354,8 @@ void albaPipeRayCast::UpdateFromData()
       
     
     resampled=true;
-    vtkNEW(resampleFilter);
+    if(m_ResampleFilter == NULL)
+    	vtkNEW(m_ResampleFilter);
 
     // the resample filter
     double bounds[6];
@@ -376,15 +382,15 @@ void albaPipeRayCast::UpdateFromData()
     double l = (sr[1] + sr[0]) * 0.5;
 
     //Setting Filter parameters 
-		resampleFilter->SetZeroValue(0);
-    resampleFilter->SetWindow(w);
-    resampleFilter->SetLevel(l);
-		resampleFilter->SetVolumeOrigin(bounds[0], bounds[2], bounds[4]);
-		resampleFilter->SetOutputSpacing(volSpacing);
-    resampleFilter->SetInputData(rgrid);
-		resampleFilter->SetOutputExtent(output_extent);
-    resampleFilter->AutoSpacingOff();
-    resampleFilter->Update();
+		m_ResampleFilter->SetZeroValue(0);
+    m_ResampleFilter->SetWindow(w);
+    m_ResampleFilter->SetLevel(l);
+		m_ResampleFilter->SetVolumeOrigin(bounds[0], bounds[2], bounds[4]);
+		m_ResampleFilter->SetOutputSpacing(volSpacing);
+    m_ResampleFilter->SetInputConnection(port);
+		m_ResampleFilter->SetOutputExtent(output_extent);
+    m_ResampleFilter->AutoSpacingOff();
+    m_ResampleFilter->Update();
 
 		cppDEL(wait);
   }
@@ -402,9 +408,9 @@ void albaPipeRayCast::UpdateFromData()
     vtkNEW(m_RayCastCleaner);
 
 	if (resampled)
-		m_RayCastCleaner->SetInputConnection(resampleFilter->GetOutputPort());
+		m_RayCastCleaner->SetInputConnection(m_ResampleFilter->GetOutputPort());
 	else
-		m_RayCastCleaner->SetInputData(dataset);
+		m_RayCastCleaner->SetInputConnection(port);
   m_RayCastCleaner->SetBloodLowerThreshold(m_BloodLowerThreshold);
   m_RayCastCleaner->SetBloodUpperThreshold(m_BloodUpperThreshold);
   m_RayCastCleaner->SetBoneLowerThreshold(m_BoneLowerThreshold);
@@ -414,10 +420,7 @@ void albaPipeRayCast::UpdateFromData()
     m_RayCastCleaner->SetModalityToMR();
   m_RayCastCleaner->Update();
 
-  //Deleting unnecessary stuff
-  if (resampled)
-    vtkDEL(resampleFilter);
-
+  
   //Create Raycast Mapper and relative functions
   if (m_RayCastMapper == NULL)
     m_RayCastMapper = vtkGPUVolumeRayCastMapper::New();

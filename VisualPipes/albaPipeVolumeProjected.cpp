@@ -48,6 +48,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkOutlineCornerFilter.h"
+#include "vtkALBATicksGenerator.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeProjected);
@@ -142,7 +143,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 		dims[0]=0;
 	}
 
-	m_ProjectFilter->SetInputData(vtk_data); 
+	m_ProjectFilter->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort()); 
 	if (m_CamPosition == CAMERA_RX_FRONT )
 			m_ProjectFilter->SetProjectionSideToY();
 	else
@@ -165,83 +166,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 	m_RXActor->SetMapper(RXPlaneMapper);
 	m_RXActor->SetTexture(RXTexture);
   
-	//---- TICKs creation --------------------------
-	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
-	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
-	vtkCellArray *CTCells        = vtkCellArray::New();
-	vtkIdType points_id[2];
-	int	counter = 0;
-  vtkRectilinearGrid *rg_data = vtkRectilinearGrid::SafeDownCast(vtk_data);
-	if (rg_data)
-	{
-    vtkDoubleArray* z_fa = vtkDoubleArray::SafeDownCast(rg_data->GetZCoordinates());
-		if(z_fa)
-		{
-			for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
-			{
-				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
-				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa->GetValue(i));
-				points_id[0] = counter;
-				points_id[1] = counter+1;
-				counter+=2;
-				CTCells->InsertNextCell(2 , points_id);
-			}
-		}
-		else
-		{
-			vtkFloatArray* z_fa_f = vtkFloatArray::SafeDownCast(rg_data->GetZCoordinates());
-			for (int i = 0; i < z_fa_f->GetNumberOfTuples(); i++)
-			{
-				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa_f->GetValue(i));
-				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa_f->GetValue(i));
-				points_id[0] = counter;
-				points_id[1] = counter+1;
-				counter+=2;
-				CTCells->InsertNextCell(2 , points_id);
-			}
-		}
-	}
-  vtkImageData *sp_data = vtkImageData::SafeDownCast(vtk_data);
-	if (sp_data)
-	{
-		int dim[3];
-		double origin[3];
-		double spacing[3];
-		sp_data->GetDimensions(dim);
-		sp_data->GetOrigin(origin);
-		sp_data->GetSpacing(spacing);
-
-		for (int i=0; i < dim[2]; i++)
-		{
-			float z_i = origin[2] + i*spacing[2];	//?
-			CTLinesPoints->InsertNextPoint(xmax, ymax, z_i);
-			CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30,ymax+(ymax-ymin)/30,z_i);
-			
-			points_id[0] = counter;
-			points_id[1] = counter+1;
-			counter+=2;
-			CTCells->InsertNextCell(2 , points_id);
-		}	
-	}
-	CTLinesPD->SetPoints(CTLinesPoints);
-	CTLinesPD->SetLines(CTCells); 
-	CTLinesPD->Modified();	  
-
-	//Add tick to scene
-  vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-  TickMapper->SetInputData(CTLinesPD);
-
-	vtkProperty	*TickProperty = vtkProperty::New();
-	TickProperty->SetColor(1,0,0);
-	TickProperty->SetAmbient(1);
-	TickProperty->SetRepresentationToWireframe();
-	TickProperty->SetInterpolationToFlat();
-
-	m_TickActor = vtkActor::New();
-	m_TickActor->SetMapper(TickMapper);
-	m_TickActor->VisibilityOn();
-	m_TickActor->PickableOff();
-	m_TickActor->SetProperty(TickProperty);
+	CreateTICKs();
 
   //-----------------------------------------------
 	m_UsedAssembly->AddPart(m_TickActor);
@@ -249,7 +174,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 
   // selection pipeline ////////////////////////////////
 	vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInputData(m_Vme->GetOutput()->GetVTKData());
+	corner->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 
 	vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInputConnection(corner->GetOutputPort());
@@ -273,15 +198,10 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
     m_Ghost->GetProperty()->SetInterpolationToFlat();
 		m_AssemblyFront->AddPart(m_Ghost);
   }
-  vtkDEL(CTLinesPoints);
-  vtkDEL(CTCells);
-  vtkDEL(CTLinesPD);
-	
+
 	vtkDEL(RXPlane);
 	vtkDEL(RXPlaneMapper);
 	vtkDEL(RXTexture);
-	vtkDEL(TickMapper);
-	vtkDEL(TickProperty);
 }
 
 
@@ -399,4 +319,36 @@ void albaPipeVolumeProjected::SetActorPicking(int enable)
   m_RXActor->Modified();
 	
 	GetLogicManager()->CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeVolumeProjected::CreateTICKs()
+{
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
+
+	// ---- TICKs creation with filter --------------------------
+	vtkNEW(m_TicksGenerator);
+	m_TicksGenerator->SetInputConnection(port);
+	m_TicksGenerator->Update();
+
+	// Add tick to scene
+	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
+	TickMapper->SetInputConnection(m_TicksGenerator->GetOutputPort());
+
+	vtkProperty *TickProperty = vtkProperty::New();
+	TickProperty->SetColor(1, 0, 0);
+	TickProperty->SetAmbient(1);
+	TickProperty->SetRepresentationToWireframe();
+	TickProperty->SetInterpolationToFlat();
+
+	m_TickActor = vtkActor::New();
+	m_TickActor->SetMapper(TickMapper);
+	m_TickActor->VisibilityOn();
+	m_TickActor->PickableOff();
+	m_TickActor->SetProperty(TickProperty);
+
+	m_UsedAssembly->AddPart(m_TickActor);
+
+	vtkDEL(TickMapper);
+	vtkDEL(TickProperty);
 }

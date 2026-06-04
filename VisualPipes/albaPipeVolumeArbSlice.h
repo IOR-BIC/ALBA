@@ -43,6 +43,7 @@ class albaLODActor;
 class albaVMEOutputVolume;
 class vtkTransformFilter;
 class vtkTransform;
+class vtkALBATicksGenerator;
 
 
 /** 
@@ -192,6 +193,7 @@ protected:
 
 	vtkTransform					*m_NormalTranform;
 	vtkTransformFilter		*m_NormalTranformFilter;
+  vtkALBATicksGenerator *m_TicksGenerator;
 	vtkImageData					 *m_Image;
 	vtkTexture						 *m_Texture;
 	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)

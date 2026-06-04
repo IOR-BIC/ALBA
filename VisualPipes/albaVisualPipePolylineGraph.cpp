@@ -137,6 +137,9 @@ void albaVisualPipePolylineGraph::ExecutePipe()
   poly_output->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(poly_output->GetVTKData());
   assert(data);
+	vtkAlgorithmOutput *port = poly_output->GetVTKOutputPort();
+	assert(port);
+
 
   vtkNEW(m_Sphere);
   m_Sphere->SetRadius(m_SphereRadius);
@@ -144,14 +147,14 @@ void albaVisualPipePolylineGraph::ExecutePipe()
   m_Sphere->SetThetaResolution(m_SphereResolution);
 
   vtkNEW(m_Glyph);
- 	m_Glyph->SetInputData(data);
+ 	m_Glyph->SetInputConnection(port);
   m_Glyph->SetSourceConnection(m_Sphere->GetOutputPort());
   m_Glyph->SetVectorModeToUseNormal();
   m_Glyph->SetScaleModeToScaleByScalar();
 
   vtkNEW(m_Tube);
   m_Tube->UseDefaultNormalOff();
-  m_Tube->SetInputData(data);
+  m_Tube->SetInputConnection(port);
   m_Tube->SetRadius(m_TubeRadius);
   m_Tube->SetCapping(m_Capping);
   m_Tube->SetNumberOfSides(m_TubeResolution);
@@ -202,7 +205,7 @@ void albaVisualPipePolylineGraph::ExecutePipe()
   {
     m_Glyph->Update();
     vtkAppendPolyData *apd = vtkAppendPolyData::New();
-    apd->AddInputData(data);
+    apd->AddInputConnection(port);
     apd->AddInputConnection(m_Glyph->GetOutputPort());
     apd->Update();
     m_Mapper->SetInputConnection(apd->GetOutputPort());
@@ -220,7 +223,7 @@ void albaVisualPipePolylineGraph::ExecutePipe()
   else
   {
     vtkAppendPolyData *apd = vtkAppendPolyData::New();
-    apd->AddInputData(data);
+    apd->AddInputConnection(port);
     apd->Update();
     m_Mapper->SetInputConnection(apd->GetOutputPort());
     apd->Delete();
@@ -245,7 +248,7 @@ void albaVisualPipePolylineGraph::ExecutePipe()
 
   // selection highlight
   vtkNEW(m_OutlineBox);
-  m_OutlineBox->SetInputData(data);  
+  m_OutlineBox->SetInputConnection(port);  
 
   vtkNEW(m_OutlineMapper);
   m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
@@ -264,7 +267,7 @@ void albaVisualPipePolylineGraph::ExecutePipe()
 
 
   vtkALBASmartPointer<vtkCellCenters> centers;
-  centers->SetInputData(data);
+  centers->SetInputConnection(port);
   centers->Update();
   vtkALBASmartPointer<vtkLabeledDataMapper> mapperLabel;
   mapperLabel->SetInputConnection(centers->GetOutputPort());
@@ -444,6 +447,8 @@ void albaVisualPipePolylineGraph::UpdateProperty(bool fromTag)
   albaVMEOutputPolyline *out_polyline = albaVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
   out_polyline->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
+
 
   if (m_Representation == TUBE)
   {
@@ -463,7 +468,7 @@ void albaVisualPipePolylineGraph::UpdateProperty(bool fromTag)
     m_Glyph->Modified();
     vtkAppendPolyData *apd = vtkAppendPolyData::New();
     apd->AddInputConnection(m_Glyph->GetOutputPort());
-    apd->AddInputData(data);
+    apd->AddInputConnection(port);
     apd->Update();
     m_Mapper->SetInputConnection(apd->GetOutputPort());
     apd->Delete();
@@ -488,7 +493,7 @@ void albaVisualPipePolylineGraph::UpdateProperty(bool fromTag)
   else
   {
     vtkAppendPolyData *apd = vtkAppendPolyData::New();
-    apd->AddInputData(data);
+    apd->AddInputConnection(port);
     apd->Update();
     m_Mapper->SetInputConnection(apd->GetOutputPort());
     apd->Delete();

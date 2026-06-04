@@ -59,6 +59,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkTransformFilter.h"
+#include "vtkALBATicksGenerator.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeArbSlice);
@@ -81,6 +82,7 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
   m_Texture		      = NULL;
   m_SliceMapper		  = NULL;
   m_SliceActor      = NULL;
+	m_TicksGenerator  = NULL;
 
 	m_SliceParametersInitialized  = false;
   m_ShowVolumeBox               = false;
@@ -199,6 +201,7 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
 
 
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
   double b[6];
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
@@ -233,7 +236,7 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
 	CreateTICKs();
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInputData(data);
+	corner->SetInputConnection(port);
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInputConnection(corner->GetOutputPort());
@@ -278,90 +281,20 @@ void albaPipeVolumeArbSlice::Create(albaSceneNode *n)
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbSlice::CreateTICKs()
-//----------------------------------------------------------------------------
 {
-	//---- TICKs creation --------------------------
-	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
-	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
-	vtkCellArray *CTCells        = vtkCellArray::New();
-	vtkIdType points_id[2];
-	int	counter = 0;
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
-	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
+	// ---- TICKs creation with filter --------------------------
+	vtkNEW(m_TicksGenerator);
+	m_TicksGenerator->SetInputConnection(port);
+	m_TicksGenerator->Update();
 
-	double bounds[6];
-	vtk_data->GetBounds(bounds);
-
-	double xmin, xmax, ymin, ymax, zmin, zmax;
-	xmin = bounds[0];
-	xmax = bounds[1];
-	ymin = bounds[2];
-	ymax = bounds[3];
-	zmin = bounds[4];
-	zmax = bounds[5];
-
-	vtkRectilinearGrid *rg_data = vtkRectilinearGrid::SafeDownCast(vtk_data);
-	if (rg_data)
-	{
-		vtkDoubleArray* z_fa = vtkDoubleArray::SafeDownCast(rg_data->GetZCoordinates());
-		if(z_fa)
-		{
-			for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
-			{
-				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
-				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa->GetValue(i));
-				points_id[0] = counter;
-				points_id[1] = counter+1;
-				counter+=2;
-				CTCells->InsertNextCell(2 , points_id);
-			}
-		}
-		else
-		{
-			vtkFloatArray* z_fa_f = vtkFloatArray::SafeDownCast(rg_data->GetZCoordinates());
-			for (int i = 0; i < z_fa_f->GetNumberOfTuples(); i++)
-			{
-				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa_f->GetValue(i));
-				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa_f->GetValue(i));
-				points_id[0] = counter;
-				points_id[1] = counter+1;
-				counter+=2;
-				CTCells->InsertNextCell(2 , points_id);
-			}
-		}
-	}
-	vtkImageData *sp_data = vtkImageData::SafeDownCast(vtk_data);
-	if (sp_data)
-	{
-		int dim[3];
-		double origin[3];
-		double spacing[3];
-		sp_data->GetDimensions(dim);
-		sp_data->GetOrigin(origin);
-		sp_data->GetSpacing(spacing);
-
-		for (int i=0; i < dim[2]; i++)
-		{
-			float z_i = origin[2] + i*spacing[2];	//?
-			CTLinesPoints->InsertNextPoint(xmax, ymax, z_i);
-			CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30,ymax+(ymax-ymin)/30,z_i);
-
-			points_id[0] = counter;
-			points_id[1] = counter+1;
-			counter+=2;
-			CTCells->InsertNextCell(2 , points_id);
-		}	
-	}
-	CTLinesPD->SetPoints(CTLinesPoints);
-	CTLinesPD->SetLines(CTCells); 
-	CTLinesPD->Modified();	  
-
-	//Add tick to scene
+	// Add tick to scene
 	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-	TickMapper->SetInputData(CTLinesPD);
+	TickMapper->SetInputConnection(m_TicksGenerator->GetOutputPort());
 
-	vtkProperty	*TickProperty = vtkProperty::New();
-	TickProperty->SetColor(1,0,0);
+	vtkProperty *TickProperty = vtkProperty::New();
+	TickProperty->SetColor(1, 0, 0);
 	TickProperty->SetAmbient(1);
 	TickProperty->SetRepresentationToWireframe();
 	TickProperty->SetInterpolationToFlat();
@@ -374,13 +307,8 @@ void albaPipeVolumeArbSlice::CreateTICKs()
 
 	m_AssemblyUsed->AddPart(m_TickActor);
 
-	vtkDEL(CTLinesPoints);
-	vtkDEL(CTCells);
-	vtkDEL(CTLinesPD);
-
 	vtkDEL(TickMapper);
 	vtkDEL(TickProperty);
-
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbSlice::CreateSlice()
@@ -389,7 +317,8 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	double xspc = 0.33, yspc = 0.33, zspc = 1.0;
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-  if(vtk_data->IsA("vtkImageData") || vtk_data->IsA("vtkImageData"))
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
+  if(vtk_data->IsA("vtkImageData") || vtk_data->IsA("vtkStructuredPoints"))
   {
     ((vtkImageData *)vtk_data)->GetSpacing(xspc,yspc,zspc);
   }
@@ -402,8 +331,8 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	m_SlicerImage->SetPlaneAxisY(m_YVector);
 	m_SlicerPolygonal->SetPlaneAxisX(m_XVector);
 	m_SlicerPolygonal->SetPlaneAxisY(m_YVector);
-	m_SlicerImage->SetInputData(vtk_data);
-	m_SlicerPolygonal->SetInputData(vtk_data);
+	m_SlicerImage->SetInputConnection(port);
+	m_SlicerPolygonal->SetInputConnection(port);
   
 	m_SlicerImage->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
 	m_SlicerImage->SetOutputSpacing(xspc, yspc, zspc);
@@ -497,6 +426,7 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
 	vtkDEL(m_TickActor);
+	vtkDEL(m_TicksGenerator);
 
 	albaDEL(m_VolInverseMtr);
 	albaDEL(m_VolInvRotMtr);

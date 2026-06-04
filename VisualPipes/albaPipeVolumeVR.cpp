@@ -104,6 +104,8 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
   m_Created = true;
 
   m_Vme->Update();
+  
+  vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
   albaString vmeControl = m_Vme->GetOutput()->GetVTKData()->GetClassName();
   if(vmeControl == "vtkRectilinearGrid")
@@ -135,9 +137,9 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
 
     m_StructuredImage->SetSpacing(spaceInt_x,spaceInt_y,spaceInt_z);
 
-
+		//m_StructuredImage is a static image created to be the input of the probe filter, it is not updated during the time, so we can set it as input data
     m_Probe->SetInputData(0,m_StructuredImage);
-    m_Probe->SetInputData(1,m_Vme->GetOutput()->GetVTKData());
+    m_Probe->SetInputConnection(1,port);
 
     m_Probe->Update();
 
@@ -189,9 +191,8 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
     }
     else 
     {
-      vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
       vtkNEW(m_ResampleFilter);
-      m_ResampleFilter->SetInputData(data);
+      m_ResampleFilter->SetInputConnection(port);
       for(int i=0;i<3;i++)
         m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
       m_ResampleFilter->Update();
@@ -222,9 +223,8 @@ void albaPipeVolumeVR::Create(albaSceneNode *n)
 
     else 
     {
-      vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
       vtkNEW(m_ResampleFilter);
-      m_ResampleFilter->SetInputData(data);
+      m_ResampleFilter->SetInputConnection(port);
       for(int i=0;i<3;i++)
         m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
       m_ResampleFilter->Update();
@@ -450,8 +450,9 @@ void albaPipeVolumeVR::SetNumberPoints(int n)
 
   m_Probe = vtkProbeFilter::New();
 
+	//m_StructuredImage is a static image created to be the input of the probe filter, it is not updated during the time, so we can set it as input data
   m_Probe->SetInputData(0,m_StructuredImage);
-  m_Probe->SetInputData(1,m_Vme->GetOutput()->GetVTKData());
+  m_Probe->SetInputConnection(1,m_Vme->GetOutput()->GetVTKOutputPort());
 
   m_Probe->Update();	
 }

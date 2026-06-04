@@ -123,22 +123,23 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
   assert(m_Vme->IsALBAType(albaVMEVolume));
   double b[6];
   //Update input data
-  m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetVMELocalBounds(b);
+  albaVMEOutput *vmeOutput = m_Vme->GetOutput();
+  
+  vmeOutput->Update();
+  vmeOutput->GetVMELocalBounds(b);
 
+  double sr[2];
+  vmeOutput->GetVTKData()->GetScalarRange(sr);
+  
   mmaVolumeMaterial *material = ((albaVMEVolume *)m_Vme)->GetMaterial();
   //If material has a valid table range use it
   if (material->GetTableRange()[1] < material->GetTableRange()[0]) 
-  {
-		material->SetTableRange(m_Vme->GetOutput()->GetVTKData()->GetScalarRange());
-  }
+		material->SetTableRange(sr);
 
   //Update material
   m_ColorLUT = material->m_ColorLut;
   material->UpdateProp();
-
-  double sr[2];
-  m_Vme->GetOutput()->GetVTKData()->GetScalarRange(sr);
+  
   m_ColorLUT->SetTableRange(sr[0], sr[1]);
   material->UpdateFromTables();
   if (!m_SliceParametersInitialized)
@@ -157,7 +158,7 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
 
   //Create selection actor
   vtkNEW(m_VolumeBox);
-  m_VolumeBox->SetInputData(m_Vme->GetOutput()->GetVTKData());
+  m_VolumeBox->SetInputConnection(vmeOutput->GetVTKOutputPort());
 
   vtkNEW(m_VolumeBoxMapper);
   m_VolumeBoxMapper->SetInputConnection(m_VolumeBox->GetOutputPort());
@@ -174,11 +175,8 @@ void albaPipeVolumeSliceBlend::Create(albaSceneNode *n)
 
   if(m_ShowBounds)
   {
-    double bounds[6];
-    m_Vme->GetOutput()->Update();
-    m_Vme->GetOutput()->GetVMELocalBounds(bounds);
     vtkNEW(m_Box);
-    m_Box->SetBounds(bounds);
+    m_Box->SetBounds(b);
     vtkNEW(m_Mapper);
     m_Mapper->SetInputConnection(m_Box->GetOutputPort());
     vtkNEW(m_Actor);
@@ -210,6 +208,7 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
 	double xmin, xmax, ymin, ymax, zmin, zmax;
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
  	vtk_data->GetBounds(bounds);
 		
 	xmin = bounds[0];
@@ -223,7 +222,7 @@ void albaPipeVolumeSliceBlend::CreateSlice(int direction)
     vtkNEW(m_Slicer[i][direction]);
 		m_Slicer[i][direction]->SetSclicingMode(direction);
     m_Slicer[i][direction]->SetPlaneOrigin(m_Origin[i]);
-    m_Slicer[i][direction]->SetInputData(vtk_data);
+    m_Slicer[i][direction]->SetInputConnection(port);
 
 
 

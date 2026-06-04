@@ -195,7 +195,7 @@ void albaPipeTensorFieldSurface::OnEvent(albaEventBase *alba_event)
   m_ColorMappingLUT->Build(); 
 
   vtkNEW(m_GeometricFilter);
-  m_GeometricFilter->SetInputData(m_Vme->GetOutput()->GetVTKData());
+  m_GeometricFilter->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 
   m_SurfaceMapper = vtkPolyDataMapper::New();
   m_SurfaceMapper->SetInputConnection(m_GeometricFilter->GetOutputPort());
@@ -229,45 +229,6 @@ void albaPipeTensorFieldSurface::OnEvent(albaEventBase *alba_event)
 //------------------------------------------------------------------------
 {
  
-  /*vtkFloatArray *tensors ;
-
-  tensors = vtkFloatArray::New() ;
-  tensors->SetNumberOfComponents(9) ;
-  
-  const char* tensor_name = GetTensorFieldName(m_TensorFieldIndex);
-  tensors->SetName(tensor_name); //("tensors") ;
-
-  vtkDataArray* da = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetTensors(tensor_name);
-  
-  int num =  m_Vme->GetOutput()->GetVTKData()->GetNumberOfPoints();
-  for (int i=0;i<num;i++)
-  {
-	double *tens = da->GetTuple9(i);
-	m_covariance[0][0] = tens[0];
-	m_covariance[1][0] = tens[1];
-	m_covariance[2][0] = tens[2];
-	m_covariance[0][1] = tens[3];
-	m_covariance[1][1] = tens[4];
-	m_covariance[2][1] = tens[5];
-	m_covariance[0][2] = tens[6];
-	m_covariance[1][2] = tens[7];
-	m_covariance[2][2] = tens[8];
-
-	EigenVectors3x3(m_covariance, m_lambda, m_V) ;
-
-	double sd[3] ;
-	sd[0] = sqrt(m_lambda[0]) ;
-	sd[1] = sqrt(m_lambda[1]) ;
-	sd[2] = sqrt(m_lambda[2]) ;
-
-	//double Vmat[9] ;
-	MultiplyColumnsByScalars(sd,tens,tens);
-	tensors->InsertNextTuple(tens);
-  }
-
-  m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetTensors(tensors);
-  */
-
   const char* tensor_name = GetTensorFieldName(m_TensorFieldIndex);
 
   double sr[2];

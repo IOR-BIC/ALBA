@@ -99,6 +99,7 @@ void albaPipeVolumeDRR::Create(albaSceneNode *n)
   // image pipeline
   m_Vme->GetOutput()->Update();
   vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
   double sr[2];
 	data->GetScalarRange(sr);
@@ -121,14 +122,14 @@ void albaPipeVolumeDRR::Create(albaSceneNode *n)
 	vtkNEW(m_VolumeMapper);
 	if(vtkImageData::SafeDownCast(data))
 	{
-		m_ResampleFilter->SetInputData((vtkImageData*)data);
+		m_ResampleFilter->SetInputConnection(port);
 		for(int i=0;i<3;i++)
 			m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 		m_ResampleFilter->Update();
-		m_VolumeMapper->SetInput(m_ResampleFilter->GetOutput());
+		m_VolumeMapper->SetInputConnection(m_ResampleFilter->GetOutputPort());
 	}
 	else
-		m_VolumeMapper->SetInput(data);
+		m_VolumeMapper->SetInputConnection(port);
 
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
   vtkNEW(m_Volume);
@@ -138,7 +139,7 @@ void albaPipeVolumeDRR::Create(albaSceneNode *n)
   m_AssemblyFront->AddPart(m_Volume);
   
   vtkALBASmartPointer<vtkOutlineCornerFilter> selection_filter;
-  selection_filter->SetInputData(data);  
+  selection_filter->SetInputConnection(port);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> selection_papper;
   selection_papper->SetInputConnection(selection_filter->GetOutputPort());

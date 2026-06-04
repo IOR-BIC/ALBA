@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInformation.h"
 vtkStandardNewMacro(vtkALBAEllipseSource);
 
+//----------------------------------------------------------------------------
 vtkALBAEllipseSource::vtkALBAEllipseSource(int res)
 {
   this->Center[0] =  0.0;
@@ -45,6 +46,7 @@ vtkALBAEllipseSource::vtkALBAEllipseSource(int res)
 	this->SetNumberOfInputPorts(0);
 }
 
+//----------------------------------------------------------------------------
 int vtkALBAEllipseSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int A = 0, B = 1, C = 2;
@@ -119,6 +121,7 @@ int vtkALBAEllipseSource::RequestData(vtkInformation *vtkNotUsed(request), vtkIn
 	return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkALBAEllipseSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

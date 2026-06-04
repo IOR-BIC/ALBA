@@ -34,6 +34,9 @@ class albaLODActor;
 class albaGUIMaterialButton;
 class mmaMaterial;
 class vtkActor;
+class vtkTextureMapToPlane;
+class vtkTextureMapToCylinder;
+class vtkTextureMapToSphere;
 
 //----------------------------------------------------------------------------
 // albaPipeSurfaceTextured :
@@ -112,6 +115,10 @@ protected:
   albaLODActor             *m_OutlineActor;
   albaAxes                 *m_Axes;
   vtkActor               *m_GhostActor;
+
+	vtkTextureMapToPlane *m_PlaneTextureMapper;
+	vtkTextureMapToCylinder *m_CylinderTextureMapper;
+	vtkTextureMapToSphere *m_SphereTextureMapper;
 
   int m_UseVTKProperty;
   int m_UseTexture;

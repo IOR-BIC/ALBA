@@ -694,7 +694,7 @@ void albaPipeVectorFieldGlyphs::OnEvent(albaEventBase *alba_event)
 	  {
 		  if (m_ShowAll)
 		  {
-			  m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
+			  m_Glyphs->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 		  }
 	  }else if (e->GetId()==ID_CHOOSE_ANDOR)
 	  {
@@ -1429,7 +1429,7 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
 
   m_Glyphs = vtkGlyph3D::New();
 
-  m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
+  m_Glyphs->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 
   m_Glyphs->SetVectorModeToUseVector();
 
@@ -1497,7 +1497,7 @@ bool albaPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pO
     m_Glyphs->SetScaleModeToScaleByScalar();
 
   if (m_ShowAll){
-	m_Glyphs->SetInputData(m_Vme->GetOutput()->GetVTKData());
+	m_Glyphs->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 	m_GlyphsMapper->ColorByArrayComponent(GetScalarFieldName(m_ScalarFieldIndex),1);
   }
   

@@ -84,6 +84,9 @@ void albaPipePolylineGraphEditor::Create(albaSceneNode *n)
 	assert(out_polyline);
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
 	assert(data);
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
+	assert(port);
+
 
 	double range[2]={0.0,1.0};
 
@@ -102,7 +105,7 @@ void albaPipePolylineGraphEditor::Create(albaSceneNode *n)
 	VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(VTKTransform);
 
-	m_Cutter->SetInputData(data);
+	m_Cutter->SetInputConnection(port);
 	m_Cutter->SetCutFunction(m_Plane);
 	m_Cutter->Update();
 
@@ -110,7 +113,7 @@ void albaPipePolylineGraphEditor::Create(albaSceneNode *n)
 	if(m_Modality==ID_SLICE)
 		m_Mapper->SetInputConnection(m_Cutter->GetOutputPort());
 	else if(m_Modality==ID_PERSPECTIVE)
-		m_Mapper->SetInputData(data);
+		m_Mapper->SetInputConnection(port);
 	m_Mapper->SetLookupTable(m_LUT);
 	m_Mapper->SetScalarRange(range);
 	if(data->GetPointData()->GetScalars())
@@ -167,10 +170,10 @@ void albaPipePolylineGraphEditor::SetModalityPerspective()
 	{	
 		albaVMEOutputPolylineEditor *out_polyline = albaVMEOutputPolylineEditor::SafeDownCast(m_Vme->GetOutput());
 		assert(out_polyline);
-		vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
-		assert(data);
+		vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
+		assert(port);
 
-		m_Mapper->SetInputData(data);
+		m_Mapper->SetInputConnection(port);
 		m_Mapper->Update();
 	}
 }

@@ -35,6 +35,7 @@ class vtkImageCast;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkALBARayCastCleaner;
+class vtkALBAVolumeResample;
 
 //----------------------------------------------------------------------------
 // albaPipeIsosurface :
@@ -130,6 +131,7 @@ protected:
   vtkPiecewiseFunction     *m_OpacityFunction;
   vtkColorTransferFunction *m_ColorFunction;
   vtkGPUVolumeRayCastMapper *m_RayCastMapper;
+  vtkALBAVolumeResample *m_ResampleFilter;
   vtkALBARayCastCleaner     *m_RayCastCleaner;
   vtkVolume                *m_Volume;
   
@@ -145,7 +147,7 @@ protected:
   double m_MuscleLowerThreshold;
   double m_MuscleUpperThreshold;
   
-  vtkOutlineCornerFilter   *m_OutlineBox;
+    vtkOutlineCornerFilter   *m_OutlineBox;
   vtkPolyDataMapper        *m_OutlineMapper;
   vtkActor                 *m_OutlineActor;
 

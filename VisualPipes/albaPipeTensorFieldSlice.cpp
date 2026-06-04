@@ -165,7 +165,7 @@ void albaPipeTensorFieldSlice::OnEvent(albaEventBase *alba_event)
   vtkNEW(m_CutPlane);
 
   vtkCutter* cutter = vtkCutter::New();
-	cutter->SetInputData(m_Vme->GetOutput()->GetVTKData());
+	cutter->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
   cutter->SetCutFunction(m_CutPlane);
 
 	m_SurfaceMapper->SetInputConnection(cutter->GetOutputPort());

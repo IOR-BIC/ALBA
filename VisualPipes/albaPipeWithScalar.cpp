@@ -216,7 +216,7 @@ void albaPipeWithScalar::CreateProbeMapStack()
 	
 	m_ProbeFilter->SetDistanceModeToScalar();
 	m_ProbeFilter->SetSource(m_ProbeVolume->GetOutput()->GetVTKData());
-	m_ProbeFilter->SetInputData(m_Mapper->GetInput());
+	m_ProbeFilter->SetInputConnection(m_Mapper->GetInputConnection(0,0));
 	m_ProbeFilter->SetFilterModeToDensity();
 	m_ProbeFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 	m_ProbeFilter->SetOutOfBoundsDensity(-9999);
@@ -360,7 +360,7 @@ void albaPipeWithScalar::SetScalarRange(double * sr)
 void albaPipeWithScalar::DestroyProbeMapStack()
 {
 	//restore old mapper input
-	m_Mapper->SetInputData(m_ProbeFilter->GetInput());
+	m_Mapper->SetInputConnection(m_ProbeFilter->GetInputConnection(0,0));
 
 	m_Mapper->SetScalarVisibility(m_ScalarMapActive);
 	if (m_ScalarBarActor)

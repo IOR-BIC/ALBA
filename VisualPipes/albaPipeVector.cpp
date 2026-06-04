@@ -64,7 +64,6 @@ albaPipeVector::albaPipeVector()
   m_Sphere          = NULL;
   m_ArrowTip        = NULL;
   m_Apd             = NULL;
-  m_Data            = NULL;
   m_Mapper          = NULL;
   m_Actor           = NULL;
   m_OutlineActor    = NULL;
@@ -92,6 +91,7 @@ void albaPipeVector::Create(albaSceneNode *n)
   assert(out_polyline);
   m_Data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
   assert(m_Data);
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
 
   m_Vector = albaVMEVector::SafeDownCast(m_Vme);
   m_Vector->GetTimeStamps(m_TimeVector);
@@ -113,10 +113,9 @@ void albaPipeVector::Create(albaSceneNode *n)
 
   m_Sphere->Update();
   m_Apd = vtkAppendPolyData::New();
-	m_Apd->AddInputData(m_Data);
-	//Here AddInputData is used because we need to remove the input
-	m_Apd->AddInputData(m_Sphere->GetOutput());
-  m_Apd->AddInputData(m_ArrowTip->GetOutput());
+	m_Apd->AddInputConnection(port);
+	m_Apd->AddInputConnection(m_Sphere->GetOutputPort());
+  m_Apd->AddInputConnection(m_ArrowTip->GetOutputPort ());
   m_Apd->Update();
   m_Mapper->SetInputConnection(m_Apd->GetOutputPort());
  
@@ -136,7 +135,7 @@ void albaPipeVector::Create(albaSceneNode *n)
   m_AssemblyFront->AddPart(m_ActorBunch);
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-  corner->SetInputData(m_Data);  
+  corner->SetInputConnection(port);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
   corner_mapper->SetInputConnection(corner->GetOutputPort());
@@ -319,13 +318,13 @@ void albaPipeVector::OnEvent(albaEventBase *alba_event)
       case ID_USE_ARROW:
         if (m_UseArrow == false)
         {
-          m_Apd->RemoveInputData(m_ArrowTip->GetOutput());
+          m_Apd->RemoveInputConnection(0,m_ArrowTip->GetOutputPort());
           m_Apd->Update();
         }
         else
         {
           UpdateProperty();
-          m_Apd->AddInputData(m_ArrowTip->GetOutput());
+          m_Apd->AddInputConnection(m_ArrowTip->GetOutputPort());
           m_Apd->Update();
         }
 				GetLogicManager()->CameraUpdate();
@@ -333,13 +332,13 @@ void albaPipeVector::OnEvent(albaEventBase *alba_event)
       case ID_USE_SPHERE:
         if (m_UseSphere == false)
         {
-          m_Apd->RemoveInputData(m_Sphere->GetOutput());
+          m_Apd->RemoveInputConnection(0,m_Sphere->GetOutputPort());
           m_Apd->Update();
         }
         else
         {
           UpdateProperty();
-					m_Apd->AddInputData(m_Sphere->GetOutput());
+					m_Apd->AddInputConnection(m_Sphere->GetOutputPort());
           m_Apd->Update();
         }
 				GetLogicManager()->CameraUpdate();

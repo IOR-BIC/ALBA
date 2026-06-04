@@ -130,7 +130,7 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
     material = surface_output->GetMaterial();
   }
   
-  
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
   
   assert(data);
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
@@ -154,11 +154,11 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 	m_Plane1->SetTransform(m_VTKTransform);
   m_Plane2->SetTransform(m_VTKTransform);
 
-	m_Cutter1->SetInputData(data);
+	m_Cutter1->SetInputConnection(port);
 	m_Cutter1->SetCutFunction(m_Plane1);
 	m_Cutter1->Update();
 
-  m_Cutter2->SetInputData(data);
+  m_Cutter2->SetInputConnection(port);
   m_Cutter2->SetCutFunction(m_Plane2);
   m_Cutter2->Update();
 
@@ -225,7 +225,7 @@ void albaVisualPipeSlicerSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInputData(data);  
+	m_OutlineBox->SetInputConnection(port);  
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
 	m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());

@@ -495,7 +495,7 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
 
   // transform dataset to polydata
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInputData(m_Vme->GetOutput()->GetVTKData());
+  filter->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 
   // build surface mapper
   m_SurfaceMapper = vtkPolyDataMapper::New();
@@ -629,7 +629,7 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
 
   // build glyph
 	m_AttributeAssigner = vtkAssignAttribute::New();
-	m_AttributeAssigner->SetInputData(m_Vme->GetOutput()->GetVTKData());
+	m_AttributeAssigner->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 	m_AttributeAssigner->Assign(da_normals->GetName(), vtkDataSetAttributes::NORMALS, m_DataType);
 	m_AttributeAssigner->Assign(GetVectorFieldName(m_VectorFieldIndex), vtkDataSetAttributes::VECTORS, m_DataType);
 	m_AttributeAssigner->Assign(GetScalarFieldName(m_ScalarFieldIndex), vtkDataSetAttributes::SCALARS, m_DataType);
@@ -682,6 +682,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   }
 
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
   vtkPointData* pd = ds->GetPointData();
   vtkCellData* cd = ds->GetCellData();
   if (pd == NULL || cd == NULL)
@@ -697,7 +698,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
 
   // transform dataset to polydata
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInputData(ds);
+  filter->SetInputConnection(port);
   
   // get normals from cells or points
   vtkDataArray* da_normals;

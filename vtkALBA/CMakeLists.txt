@@ -103,7 +103,8 @@ SET(vtkALBA_SRCS
   vtkALBAEllipseSource.cxx								vtkALBAEllipseSource.h
   vtkALBAPointCloudCutter.cxx								vtkALBAPointCloudCutter.h
   
-  vtkALBAConnectedRegionsContourTriangulator.cxx				vtkALBAConnectedRegionsContourTriangulator.h
+  vtkALBAConnectedRegionsContourTriangulator.cxx			vtkALBAConnectedRegionsContourTriangulator.h
+  vtkALBATicksGenerator.cpp									vtkALBATicksGenerator.h
 )
 
 

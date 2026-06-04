@@ -132,10 +132,12 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 
 	vtkPolyData *data = vtkPolyData::SafeDownCast(polyline_output->GetVTKData());
 	assert(data);
+	vtkAlgorithmOutput *port = polyline_output->GetVTKOutputPort();
+	assert(port);
 
 	//////////////////////////////////
 	vtkNEW(m_PolydataToPolylineFilter);
-	m_PolydataToPolylineFilter->SetInputData(data);
+	m_PolydataToPolylineFilter->SetInputConnection(port);
 	m_PolydataToPolylineFilter->Update();
 
 	//////////////////////////////////
@@ -146,7 +148,7 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 
 	//////////////////////////////////
 	vtkNEW(m_Glyph);
-	m_Glyph->SetInputData(data);
+	m_Glyph->SetInputConnection(port);
 	m_Glyph->SetSourceConnection(m_Sphere->GetOutputPort());
 	m_Glyph->SetScaleModeToDataScalingOff();
 
@@ -213,7 +215,7 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 
 	// Selection highlight
 	m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInputData(data);
+	m_OutlineBox->SetInputConnection(port);
 
 	//////////////////////////////////
 	m_OutlineMapper = vtkPolyDataMapper::New();
@@ -483,29 +485,28 @@ void albaPipePolylineSlice::UpdateProperty()
 	if (out_polyline == NULL) return;
 	out_polyline->Update();
 	
-	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
-	if (data == NULL) return;
-	data->Modified();
-
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
+	if (port == NULL) return;
+	
 	//////////////////////////////////	
 	if (m_Mapper)
 	{
 		m_AppendPolyData->RemoveAllInputs();
 
 		if (m_SplineMode)
-			data = m_SplineFilter->GetOutput();
+			port = m_SplineFilter->GetOutputPort();
 // 		else
 // 			data = m_PolydataToPolylineFilter->GetOutput();
 
 		if (m_Representation == TUBES)
 		{
-			m_Tube->SetInputData(data);
+			m_Tube->SetInputConnection(port);
 			m_AppendPolyData->AddInputConnection(m_Tube->GetOutputPort());
 		}
 
 		if (m_Representation == LINES)
 		{
-			m_AppendPolyData->AddInputData(data);
+			m_AppendPolyData->AddInputConnection(port);
 		}
 
 		if (m_ShowSpheres)

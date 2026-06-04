@@ -34,6 +34,7 @@ class albaGUIFloatSlider;
 class vtkLookupTable;
 class vtkOutlineSource;
 class albaLODActor;
+class vtkALBATicksGenerator;
 
 
 /** 
@@ -153,6 +154,7 @@ protected:
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
   albaLODActor            *m_Actor;
+	vtkALBATicksGenerator *m_TicksGenerator;
 
 	albaPipeVolumeArbSlice *m_SlicingPipes[3];
 

@@ -69,6 +69,8 @@ void albaPipeSurfaceEditor::Create(albaSceneNode *n)
 	m_Vme->AddObserver(this);
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
 	assert(data);
+	vtkAlgorithmOutput *port = out_polyline->GetVTKOutputPort();
+
 
 	double range[2];
 	data->GetScalarRange(range);
@@ -79,7 +81,7 @@ void albaPipeSurfaceEditor::Create(albaSceneNode *n)
 	m_LUT->Build();
 
 	vtkNEW(m_Mapper);
-	m_Mapper->SetInputData(data);
+	m_Mapper->SetInputConnection(port);
 	m_Mapper->SetLookupTable(out_polyline->GetMaterial()->m_ColorLut);
 	m_Mapper->SetScalarRange(range);
 	m_Mapper->ScalarVisibilityOn();

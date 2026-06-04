@@ -123,13 +123,15 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
 
   vtkImageData *image_data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   assert(image_data);
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
+
   image_data->GetScalarRange(sr);
 
   vtkNEW(m_ResampleFilter);
   double image_data_spacing[3];
   image_data->GetSpacing(image_data_spacing);
   m_ResampleFilter->SetInformationInput(image_data);
-  m_ResampleFilter->SetInputData(image_data);
+  m_ResampleFilter->SetInputConnection(port);
   m_ResampleFilter->SetDimensionality(3);
   m_ResampleFilter->SetOutputSpacing(image_data_spacing[0]/m_ResampleFactor,image_data_spacing[1]/m_ResampleFactor,image_data_spacing[2]/m_ResampleFactor);
   m_ResampleFilter->SetAxisMagnificationFactor(0,0.5);

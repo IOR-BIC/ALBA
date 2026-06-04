@@ -64,12 +64,10 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeSurfaceSlice);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaPipeSurfaceSlice::albaPipeSurfaceSlice()
 :albaPipeSlice()
-//----------------------------------------------------------------------------
 {
   m_Texture         = NULL;
   m_Mapper          = NULL;
@@ -80,6 +78,11 @@ albaPipeSurfaceSlice::albaPipeSurfaceSlice()
   m_Plane			= NULL;
 
   m_SphereSource = NULL;
+	m_Glyph = NULL;
+
+	m_PlaneTextureMapper = NULL;
+	m_CylinderTextureMapper = NULL;
+	m_SphereTextureMapper = NULL;
   
 
   m_ScalarVisibility = 0;
@@ -107,11 +110,11 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 		|| m_Vme->GetOutput()->IsALBAType(albaVMEOutputPointSet)\
 		|| m_Vme->GetOutput()->IsALBAType(albaVMEOutputLandmarkCloud));
 	vtkPolyData *data = NULL;
+	vtkAlgorithmOutput *port = NULL;
 	mmaMaterial *material = NULL;
 
 	m_Vme->AddObserver(this);
 
-	vtkALBASmartPointer<vtkALBAExtendedGlyph3D> glyph;
 
 	if (m_Vme->GetOutput()->IsALBAType(albaVMEOutputSurface))
 	{
@@ -119,6 +122,7 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 		assert(surface_output);
 		surface_output->Update();
 		data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+		port = surface_output->GetVTKOutputPort();
 
 
 		material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
@@ -151,14 +155,16 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 			m_SphereSource->SetPhiResolution(lmc->GetSphereResolution());
 			m_SphereSource->Update();
 
-			glyph->SetSource(m_SphereSource->GetOutput());
-      glyph->SetInputConnection(landmark_cloud_output->GetVTKOutputPort());
-			glyph->OrientOff();
-			glyph->ScalingOff();
-			glyph->ScalarVisibilityOn();
-			glyph->Update();
+			vtkNEW(m_Glyph);
+			m_Glyph->SetSource(m_SphereSource->GetOutput());
+      m_Glyph->SetInputConnection(landmark_cloud_output->GetVTKOutputPort());
+			m_Glyph->OrientOff();
+			m_Glyph->ScalingOff();
+			m_Glyph->ScalarVisibilityOn();
+			m_Glyph->Update();
 
-			data = vtkPolyData::SafeDownCast(glyph->GetOutput());
+			data = vtkPolyData::SafeDownCast(m_Glyph->GetOutput());
+			port = m_Glyph->GetOutputPort();
 
 			material = landmark_cloud_output->GetMaterial();
 		}
@@ -178,7 +184,7 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 	m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
 
-	m_Cutter->SetInputData(data);
+	m_Cutter->SetInputConnection(port);
 	m_Cutter->SetCutFunction(m_Plane);
 	m_Cutter->Update();
 	if (scalars != NULL)
@@ -218,12 +224,14 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 	{
 		if (material->GetMaterialTexture() != NULL)
 		{
+			// if the material has the texture already set as vtkImageData, use it
+			// this set input data to the texture, and not input connection, because the texture is already a static vtkImageData, and not a filter output
       m_Texture->SetInputData(material->GetMaterialTexture());
 		}
 		else if (material->GetMaterialTextureID() != -1)
 		{
 			albaVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID());
-      m_Texture->SetInputData((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
+      m_Texture->SetInputConnection(texture_vme->GetOutput()->GetVTKOutputPort());
 		}
 		else
 		{
@@ -249,7 +257,7 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 
 	// selection highlight
 	vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInputData(data);  
+	corner->SetInputConnection(port);  
 
 	vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInputConnection(corner->GetOutputPort());
@@ -273,7 +281,6 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 }
 //----------------------------------------------------------------------------
 albaPipeSurfaceSlice::~albaPipeSurfaceSlice()
-//----------------------------------------------------------------------------
 {
   m_Vme->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
@@ -288,11 +295,13 @@ albaPipeSurfaceSlice::~albaPipeSurfaceSlice()
   vtkDEL(m_Cutter);
   cppDEL(m_Axes);
   vtkDEL(m_SphereSource);
-	//@@@ if(m_use_axes) wxDEL(m_axes);  
+  vtkDEL(m_Glyph);
+	vtkDEL(m_PlaneTextureMapper);
+	vtkDEL(m_CylinderTextureMapper);
+	vtkDEL(m_SphereTextureMapper);
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::Select(bool sel)
-//----------------------------------------------------------------------------
 {
 	m_Selected = sel;
 	if(m_Actor && m_Actor->GetVisibility() && m_ShowSelection) 
@@ -325,7 +334,6 @@ void albaPipeSurfaceSlice::SetLookupTable(vtkLookupTable *table)
 
 //----------------------------------------------------------------------------
 albaGUI *albaPipeSurfaceSlice::CreateGui()
-//----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = new albaGUI(this);
@@ -335,7 +343,6 @@ albaGUI *albaPipeSurfaceSlice::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
@@ -413,10 +420,6 @@ void albaPipeSurfaceSlice::UpdateScalars()
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::UpdateLUTAndMapperFromNewActiveScalars()
 {
-	vtkPolyData *data = vtkPolyData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
-	double sr[2];
-
-
 	m_Mapper->SetLookupTable(m_Table);
 	m_Mapper->UseLookupTableScalarRangeOn();
 	m_Mapper->Update();
@@ -427,41 +430,39 @@ void albaPipeSurfaceSlice::UpdateLUTAndMapperFromNewActiveScalars()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::GenerateTextureMapCoordinate()
-//----------------------------------------------------------------------------
 {
   albaVMEOutputSurface *surface_output = albaVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
   mmaMaterial *material = surface_output->GetMaterial();
-  vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+  vtkAlgorithmOutput *port = surface_output->GetVTKOutputPort();
 
   if (material->m_TextureMappingMode == mmaMaterial::PLANE_MAPPING)
   {
-    vtkALBASmartPointer<vtkTextureMapToPlane> plane_texture_mapper;
-    plane_texture_mapper->SetInputData(data);
-    m_Mapper->SetInputConnection(plane_texture_mapper->GetOutputPort());
+    vtkNEW(m_PlaneTextureMapper);
+    m_PlaneTextureMapper->SetInputConnection(port);
+    m_Mapper->SetInputConnection(m_PlaneTextureMapper->GetOutputPort());
   }
   else if (material->m_TextureMappingMode == mmaMaterial::CYLINDER_MAPPING)
   {
-    vtkALBASmartPointer<vtkTextureMapToCylinder> cylinder_texture_mapper;
-    cylinder_texture_mapper->SetInputData(data);
-    cylinder_texture_mapper->PreventSeamOff();
-    m_Mapper->SetInputConnection(cylinder_texture_mapper->GetOutputPort());
+		vtkNEW(m_CylinderTextureMapper);
+    m_CylinderTextureMapper->SetInputConnection(port);
+    m_CylinderTextureMapper->PreventSeamOff();
+    m_Mapper->SetInputConnection(m_CylinderTextureMapper->GetOutputPort());
   }
   else if (material->m_TextureMappingMode == mmaMaterial::SPHERE_MAPPING)
   {
-    vtkALBASmartPointer<vtkTextureMapToSphere> sphere_texture_mapper;
-    sphere_texture_mapper->SetInputData(data);
-    sphere_texture_mapper->PreventSeamOff();
-    m_Mapper->SetInputConnection(sphere_texture_mapper->GetOutputPort());
+    vtkNEW(m_SphereTextureMapper);
+    m_SphereTextureMapper->SetInputConnection(port);
+    m_SphereTextureMapper->PreventSeamOff();
+    m_Mapper->SetInputConnection(m_SphereTextureMapper->GetOutputPort());
   }
   else
   {
-    m_Mapper->SetInputData(data);
+    m_Mapper->SetInputConnection(port);
   }
 }
 
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::SetSlice(double *Origin, double *Normal)
-//----------------------------------------------------------------------------
 {
   if (Origin != NULL)
   {
@@ -488,13 +489,11 @@ void albaPipeSurfaceSlice::SetSlice(double *Origin, double *Normal)
 
 //----------------------------------------------------------------------------
 double albaPipeSurfaceSlice::GetThickness()
-//----------------------------------------------------------------------------
 {
 	return m_Border;
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::SetThickness(double thickness)
-//----------------------------------------------------------------------------
 {
 	m_Border=thickness;
 	m_Actor->GetProperty()->SetLineWidth(m_Border);

@@ -94,12 +94,12 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
   m_WrappedMeterVME->AddObserver(this);
   assert(m_WrappedMeterVME->GetWrappedMeterOutput());
   m_WrappedMeterVME->GetWrappedMeterOutput()->Update();
-  vtkPolyData *data = m_WrappedMeterVME->GetWrappedMeterOutput()->GetPolylineData();
-  assert(data);
+  vtkAlgorithmOutput *port = m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKOutputPort();
+  assert(port);
 
   vtkNEW(m_Tube);
   m_Tube->UseDefaultNormalOff();
-  m_Tube->SetInputData(data);
+  m_Tube->SetInputConnection(port);
   m_Tube->SetRadius(m_WrappedMeterVME->GetMeterRadius());
   m_Tube->SetCapping(m_WrappedMeterVME->GetMeterCapping());
   m_Tube->SetNumberOfSides(20);
@@ -116,7 +116,7 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_DataMapper);
   if (m_WrappedMeterVME->GetMeterRepresentation() == albaVMEWrappedMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInputData(data);
+    m_DataMapper->SetInputConnection(port);
   else
   {
     m_Tube->Update();
@@ -134,7 +134,7 @@ void albaPipeWrappedMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection hilight
 	vtkNEW(m_SelectionBox);
-	m_SelectionBox->SetInputData(data);  
+	m_SelectionBox->SetInputConnection(port);  
 
 	vtkNEW(m_SelectionMapper);
 	m_SelectionMapper->SetInputConnection(m_SelectionBox->GetOutputPort());
@@ -329,11 +329,11 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
 
   if (!m_Caption)
     return;
-
   
-	vtkPolyData *data =vtkPolyData::SafeDownCast(m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKData());
+	vtkAlgorithmOutput *port = m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKOutputPort();
+	
   if (m_WrappedMeterVME->GetMeterRepresentation() == albaVMEWrappedMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInputData(data);
+    m_DataMapper->SetInputConnection(port);
   else
   {
     m_Tube->Update();
@@ -381,7 +381,7 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
 
   GetGui()->Update();
 
-  m_SelectionBox->SetInputData(data); 
+  m_SelectionBox->SetInputConnection(port); 
   m_SelectionBox->Update();
 
 }
