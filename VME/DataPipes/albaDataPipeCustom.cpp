@@ -146,5 +146,6 @@ void albaDataPipeCustom::SetInputConnection(int n, vtkAlgorithmOutput *input)
 //----------------------------------------------------------------------------
 void albaDataPipeCustom::Modified()
 {
+  Superclass::Modified();
   m_VTKDataPipe->Modified();
 }
