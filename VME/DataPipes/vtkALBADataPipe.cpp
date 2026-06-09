@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBADataPipe
- Authors: Marco Petrone
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -68,15 +68,21 @@ void vtkALBADataPipe::SetDataPipe(albaDataPipe *dpipe)
 }
 
 //----------------------------------------------------------------------------
+void vtkALBADataPipe::SetNumberOfInputs(int n)
+{
+	this->SetNumberOfInputPorts(n);
+	this->SetNumberOfOutputPorts(n);
+}
+
+//----------------------------------------------------------------------------
 void vtkALBADataPipe::SetNthInput(int num, vtkDataSet *input)
 {
 	int currentPortNum=this->GetNumberOfInputPorts();
+
 	if (num>currentPortNum-1)
-	{
-		SetNumberOfInputPorts(num+1);
-		SetNumberOfOutputPorts(num+1);
-	}
-  Superclass::SetInputData(num,input);
+    SetNumberOfInputs(num+1);
+
+  SetInputData(num,input);
 }
 
 //----------------------------------------------------------------------------
@@ -108,7 +114,6 @@ unsigned long vtkALBADataPipe::GetInformationTime()
 
 }
 
-
 //------------------------------------------------------------------------------
 void vtkALBADataPipe::UpdateInformation()
 {
@@ -125,11 +130,33 @@ int vtkALBADataPipe::RequestData(vtkInformation *request,	vtkInformationVector *
 	if(m_DataPipe && m_DataPipe->IsA("albaDataPipeCustom"))
      m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
 
-  int retValue=Superclass::RequestData(request,inputVector,outputVector);
-  
+
+	for (int i = 0; i < this->GetNumberOfInputPorts(); ++i)
+	{
+		vtkDataObject *input = vtkDataObject::GetData(inputVector[i]);
+		vtkInformation *out_info = outputVector->GetInformationObject(i);
+		vtkDataObject *output = vtkDataObject::GetData(out_info);
+
+		if (!input)
+			return 0;
+
+		// se il tipo non corrisponde, rimpiazza l'output
+		if (!output || !output->IsA(input->GetClassName()))
+		{
+			vtkSmartPointer<vtkDataObject> new_output;
+			new_output.TakeReference(input->NewInstance());
+			out_info->Set(vtkDataObject::DATA_OBJECT(), new_output);
+			output = new_output;
+		}
+
+		output->ShallowCopy(input);
+	}
+
+
   // forward event to ALBA data pipe
   if(m_DataPipe && !m_DataPipe->IsA("albaDataPipeCustom"))
     m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
 
-  return retValue;
+  return 1;
 }
+
