@@ -87,7 +87,7 @@ void albaDataPipeCustomProber::SetSurface(albaVME *surface)
   }
   else
   {
-    m_Normals->SetInputData(NULL);
+    m_Normals->RemoveAllInputs();
 		m_Normals->Modified();
   }
 }

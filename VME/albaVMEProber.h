@@ -52,6 +52,9 @@ public:
   /** Precess events coming from other objects */ 
   virtual void OnEvent(albaEventBase *alba_event);
 
+	/** Set/Get the data pipe object, i.e. the source of the output dataset. */
+  virtual int SetDataPipe(albaDataPipe *dpipe);
+
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual albaString GetVisualPipe() {return albaString("albaPipeSurface");};
 
