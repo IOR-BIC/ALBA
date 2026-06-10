@@ -101,7 +101,8 @@ protected:
   std::vector<std::string>	m_Files;
   int           m_BuildVolumeFlag;
   double        m_Spacing[3];
-	int          m_SkipWrongSize;
+  int          m_UniformSpacing;
+  int          m_SkipWrongSize;
 	int          m_SkipWrongType;
 	int          m_XFlip;
 	int          m_YFlip;

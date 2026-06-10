@@ -52,46 +52,49 @@ void vtkALBATIFFReader::ExecuteDataWithInformation(vtkDataObject *out, vtkInform
 	Superclass::ExecuteDataWithInformation(out, outInfo);
 
 	vtkImageData *outputImg = GetOutput();
-	using ReaderType = itk::ImageFileReader<ImageType>;
-	ReaderType::Pointer reader = ReaderType::New();
-
-	itk::TIFFImageIO::Pointer tiffIO = itk::TIFFImageIO::New();
-	reader->SetImageIO(tiffIO);
-
-	reader->SetFileName(FileName);
-
-	try
+	if (outputImg->GetScalarRange()[0] != 0 || outputImg->GetScalarRange()[1] != 0)
 	{
-		reader->Update();
-	}
-	catch (itk::ExceptionObject &ex)
-	{
-		vtkErrorMacro("Cannot Read %s \n %s", m_Files[i].c_str(), ex.GetDescription());
 		return;
 	}
-
-	using FlipFilterType = itk::FlipImageFilter<ImageType>;
-	FlipFilterType::Pointer flipFilter = FlipFilterType::New();
-
-	FlipFilterType::FlipAxesArrayType flipAxes;
-	flipAxes[0] = false;
-	flipAxes[1] = true;
-	flipFilter->SetFlipAxes(flipAxes);
-
-	flipFilter->SetInput(reader->GetOutput());
-	flipFilter->Update();
-
-	ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-	itkTOvtk->SetInput(flipFilter->GetOutput());
-	itkTOvtk->Update();
-
-	vtkImageData *output = itkTOvtk->GetOutput();
-
-	double *sr=output->GetScalarRange();
-	outputImg->DeepCopy(output);
-
-	sr = outputImg->GetScalarRange();
-
+	else
+	{
+		using ReaderType = itk::ImageFileReader<ImageType>;
+		ReaderType::Pointer reader = ReaderType::New();
+	
+		itk::TIFFImageIO::Pointer tiffIO = itk::TIFFImageIO::New();
+		reader->SetImageIO(tiffIO);
+	
+		reader->SetFileName(FileName);
+	
+		try
+		{
+			reader->Update();
+		}
+		catch (itk::ExceptionObject &ex)
+		{
+			vtkErrorMacro("Cannot Read %s \n %s", m_Files[i].c_str(), ex.GetDescription());
+			return;
+		}
+	
+		using FlipFilterType = itk::FlipImageFilter<ImageType>;
+		FlipFilterType::Pointer flipFilter = FlipFilterType::New();
+	
+		FlipFilterType::FlipAxesArrayType flipAxes;
+		flipAxes[0] = false;
+		flipAxes[1] = true;
+		flipFilter->SetFlipAxes(flipAxes);
+	
+		flipFilter->SetInput(reader->GetOutput());
+		flipFilter->Update();
+	
+		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
+		itkTOvtk->SetInput(flipFilter->GetOutput());
+		itkTOvtk->Update();
+	
+		vtkImageData *output = itkTOvtk->GetOutput();
+	
+		outputImg->DeepCopy(output);
+	}
 }
 
 

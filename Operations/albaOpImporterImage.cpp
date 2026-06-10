@@ -68,7 +68,8 @@ albaOpImporterImage::albaOpImporterImage(const wxString& label) : albaOpImporter
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Files.clear();
-	m_BuildVolumeFlag = false;
+	m_BuildVolumeFlag = true;
+	m_UniformSpacing = true;
 
 	m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = 1.0;
 
@@ -91,8 +92,10 @@ albaOpImporterImage::~albaOpImporterImage()
 //----------------------------------------------------------------------------
 enum IMAGE_IMPORTER_ID
 {
-  ID_BUILD_VOLUME = MINID,
-  ID_SPACING,
+	ID_BUILD_VOLUME = MINID,
+	ID_UNIFORM_SPACING,
+	ID_SPACING,
+	ID_SINGLE_SPACING,
 	ID_XFLIP,
 	ID_YFLIP,
 	ID_ZFLIP,
@@ -134,7 +137,12 @@ void albaOpImporterImage::OpRun()
 			else
 				m_BuildVolumeFlag = false;
 
+			m_Gui->Label("");
+			m_Gui->Bool(ID_UNIFORM_SPACING, "Uniform Spacing", &m_UniformSpacing, true);
+
 			m_Gui->Vector(ID_SPACING, "Spacing:", m_Spacing, 0);
+			m_Gui->Double(ID_SINGLE_SPACING, "XYZ Spacing:", m_Spacing);
+
 			m_Gui->Label("");
 			m_Gui->Bool(ID_XFLIP, "Flip around X axis", &m_XFlip, 1);
 			m_Gui->Bool(ID_YFLIP, "Flip around Y axis", &m_YFlip, 1);
@@ -144,6 +152,9 @@ void albaOpImporterImage::OpRun()
       m_Gui->OkCancel();
 
       m_Gui->Update();
+
+			m_Gui->Enable(ID_SPACING, !m_UniformSpacing);
+			m_Gui->Enable(ID_SINGLE_SPACING, m_UniformSpacing);
 
       ShowGui();
     }
@@ -170,6 +181,10 @@ void albaOpImporterImage::OnEvent(albaEventBase *alba_event)
   {
     switch(e->GetId())
     {
+			case ID_UNIFORM_SPACING:
+				m_Gui->Enable(ID_SPACING, !m_UniformSpacing);
+				m_Gui->Enable(ID_SINGLE_SPACING, m_UniformSpacing);
+			break;
       case wxOK:
         Import();
         OpStop(OP_RUN_OK);
@@ -187,7 +202,7 @@ void albaOpImporterImage::SetSpacing(double* spacing)
 	m_Spacing[0] = spacing[0];
 	m_Spacing[1] = spacing[1];
 	m_Spacing[2] = spacing[2];
-  }
+}
 
 //----------------------------------------------------------------------------
 void albaOpImporterImage::Import()
@@ -202,6 +217,9 @@ void albaOpImporterImage::Import()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
 	vtkImageReader2 *reader = NULL;
+
+	if (m_UniformSpacing)
+		m_Spacing[2] = m_Spacing[1] = m_Spacing[0];
 
 	int numFiles = m_Files.size();
 	if (!m_BuildVolumeFlag)
@@ -264,14 +282,10 @@ void albaOpImporterImage::Import()
 				extract->Update();
 				lumFilter->SetInputConnection(extract->GetOutputPort());
 				finalImage = lumFilter->GetOutput();
-				//luminance filter does not maintain spacing
-				finalImage->SetSpacing(m_Spacing);
 			}
 			else if (reader->GetOutput()->GetNumberOfScalarComponents() == 1)
 			{
 				finalImage = reader->GetOutput();
-				//some readers changes the image origin from 0,0,0 we reset this value for compatibility with volume import
-				finalImage->SetOrigin(0, 0, 0);
 			}
 			else
 			{
@@ -279,9 +293,13 @@ void albaOpImporterImage::Import()
 				lumFilter->Update();
 
 				finalImage = lumFilter->GetOutput();
-				//luminance filter does not maintain spacing
-				finalImage->SetSpacing(m_Spacing);
 			}
+
+			//some readers changes the image origin from 0,0,0 we reset this value for compatibility with volume import
+			finalImage->SetOrigin(0, 0, 0);
+
+			//luminance filter does not maintain spacing
+			finalImage->SetSpacing(m_Spacing);
 					
 			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
 			if (m_XFlip)

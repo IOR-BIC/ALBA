@@ -32,8 +32,6 @@ protected:
 
 	void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo) override;
 
-  void LoadDataFromWX();
-
 private:
   vtkALBATIFFReader(const vtkALBATIFFReader&);  // Not implemented.
   void operator=(const vtkALBATIFFReader&);  // Not implemented.
