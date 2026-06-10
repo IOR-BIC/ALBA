@@ -18,16 +18,16 @@
 #ifndef __vtkALBATicksGenerator_h
 #define __vtkALBATicksGenerator_h
 
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkDataSetAlgorithm.h"
   
 /**
  * VTK algorithm for generating tick marks on geometric objects.
  *
- * vtkALBATicksGenerator is a vtkPolyDataAlgorithm that generates tick marks
- * suitable for annotating or marking positions on polydata geometry. It processes
- * input polydata and produces output polydata containing the generated tick geometry.
+ * vtkALBATicksGenerator is a vtkDataSetAlgorithm that generates tick marks
+ * suitable for annotating or marking positions on data. It processes
+ * input data and produces output polydata containing the generated tick geometry.
  */
-class vtkALBATicksGenerator : public vtkPolyDataAlgorithm
+class vtkALBATicksGenerator : public vtkDataSetAlgorithm
 {
 public:
   /**
@@ -35,7 +35,7 @@ public:
    * @return A new vtkALBATicksGenerator object.
    */
   static vtkALBATicksGenerator* New();
-  vtkTypeMacro(vtkALBATicksGenerator, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkALBATicksGenerator, vtkDataSetAlgorithm);
 
 protected:
   /** Constructor. */
@@ -44,18 +44,22 @@ protected:
   /* Destructor. */
   ~vtkALBATicksGenerator();
 
+	int FillOutputPortInformation(int, vtkInformation *info);
+
+
   /**
    * Process the input data to generate tick marks.
    *
    * This method is called by the VTK pipeline to execute the algorithm.
-   * It takes the input polydata and generates the corresponding tick marks.
+   * It takes the input data and generates the corresponding tick marks.
    *
    * @param request The VTK request object.
    * @param inputVector The input data vector.
    * @param outputVector The output data vector.
    * @return VTK_OK if the execution was successful, VTK_ERROR otherwise.
    */
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+	virtual int RequestData(vtkInformation *request, vtkInformationVector **inputVector,
+		vtkInformationVector *outputVector);
 
 private:
   vtkALBATicksGenerator(const vtkALBATicksGenerator&);

@@ -140,7 +140,7 @@ int vtkALBADataPipe::RequestData(vtkInformation *request,	vtkInformationVector *
 		if (!input)
 			return 0;
 
-		// se il tipo non corrisponde, rimpiazza l'output
+		// if the data type is different recreate the output
 		if (!output || !output->IsA(input->GetClassName()))
 		{
 			vtkSmartPointer<vtkDataObject> new_output;

@@ -38,9 +38,15 @@ vtkALBATicksGenerator::~vtkALBATicksGenerator()
 }
 
 //----------------------------------------------------------------------------
-int vtkALBATicksGenerator::RequestData(vtkInformation* vtkNotUsed(request),
-                                       vtkInformationVector** inputVector,
-                                       vtkInformationVector* outputVector)
+int vtkALBATicksGenerator::FillOutputPortInformation(int, vtkInformation *info)
+{
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+	return 1;
+}
+
+
+//----------------------------------------------------------------------------
+int vtkALBATicksGenerator::RequestData(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector,vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -128,7 +134,6 @@ int vtkALBATicksGenerator::RequestData(vtkInformation* vtkNotUsed(request),
 
   output->SetPoints(tickPoints);
   output->SetLines(tickCells);
-  output->Modified();
 
   tickPoints->Delete();
   tickCells->Delete();
