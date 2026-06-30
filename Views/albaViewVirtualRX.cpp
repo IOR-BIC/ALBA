@@ -199,14 +199,16 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 	{
 		switch (alba_event->GetId())
 		{
+
 			// events from the slider
 		case ID_RANGE_MODIFIED:
 		{
+			// PROJECTION SLIDERS
+			double min, max, low, hi;
 			// LUT SLIDERS
 			// is the volume visible?
 			if (((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
 			{
-				double low, hi;
 
 				// from which lut slider the event is coming?
 				if (alba_event->GetSender() == m_LutSliders[RX_FRONT_VIEW])
@@ -222,10 +224,7 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 
 				CameraUpdate();
 			}
-
-			// PROJECTION SLIDERS
-			double min, max;
-			if (e->GetSender() == m_ProjectionRangeGuiSliderX)
+			else if (e->GetSender() == m_ProjectionRangeGuiSliderX)
 			{
 				m_ProjectionRangeGuiSliderX->GetSubRange(&min, &max);
 				m_GizmoPoints[0] = min;

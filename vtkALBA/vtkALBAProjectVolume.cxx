@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkALBARGtoSPImageFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkALBAProjectVolume);
 
@@ -37,6 +38,7 @@ vtkStandardNewMacro(vtkALBAProjectVolume);
 //----------------------------------------------------------------------------
 void vtkALBAProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
 {
+	albaLogMessage("PROPAGATE");
 }
 
 //----------------------------------------------------------------------------
@@ -58,49 +60,48 @@ int vtkALBAProjectVolume::FillOutputPortInformation(int port, vtkInformation* in
 }
 
 //----------------------------------------------------------------------------
-int vtkALBAProjectVolume::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+int vtkALBAProjectVolume::RequestInformation(
+	vtkInformation *request,
+	vtkInformationVector **inputVector,
+	vtkInformationVector *outputVector)
 {
-	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
-	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
-  int dims[3], outDims[3], extent[6];
-  
-	if (inputID == NULL && inputRG == NULL)
+	// Get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	if (inInfo == NULL)
 	{
 		vtkErrorMacro("Missing input");
 		return 0;
 	}
 
-	if (output == NULL)
-	{
-		vtkErrorMacro("Output error");
-		return 0;
-	}
+	int extent[6];
+	int dims[3], outDims[3];
 
-	if (inputRG)
-		inputRG->GetExtent(extent);
-	else
-		inputID->GetExtent(extent);
+	// Retrieve the whole extent from the input pipeline information
+	inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
 
 	dims[0] = extent[1] - extent[0] + 1;
 	dims[1] = extent[3] - extent[2] + 1;
 	dims[2] = extent[5] - extent[4] + 1;
 
-	switch (this->ProjectionSide) {
-		case VTK_PROJECT_FROM_X:
-			outDims[0] = dims[1];
-			outDims[1] = dims[2];
-			outDims[2] = 1;
-			break;
-		case VTK_PROJECT_FROM_Y:
-			outDims[0] = dims[0];
-			outDims[1] = dims[2];
-			outDims[2] = 1;
-			break;
-		case VTK_PROJECT_FROM_Z:
-			outDims[0] = dims[0];
-			outDims[1] = dims[1];
-			outDims[2] = 1;
+	switch (this->ProjectionSide)
+	{
+	case VTK_PROJECT_FROM_X:
+		outDims[0] = dims[1];
+		outDims[1] = dims[2];
+		outDims[2] = 1;
+		break;
+	case VTK_PROJECT_FROM_Y:
+		outDims[0] = dims[0];
+		outDims[1] = dims[2];
+		outDims[2] = 1;
+		break;
+	case VTK_PROJECT_FROM_Z:
+		outDims[0] = dims[0];
+		outDims[1] = dims[1];
+		outDims[2] = 1;
+		break;
 	}
 
 	extent[0] = 0;
@@ -109,7 +110,10 @@ int vtkALBAProjectVolume::RequestInformation(vtkInformation *request, vtkInforma
 	extent[3] = outDims[1] - 1;
 	extent[4] = 0;
 	extent[5] = outDims[2] - 1;
-  output->SetExtent( extent );
+
+	// Set the whole extent on the output pipeline information,
+	// NOT directly on the output data object
+	outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
 
 	return 1;
 }

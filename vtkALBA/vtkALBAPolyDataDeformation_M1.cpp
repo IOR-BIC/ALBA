@@ -611,27 +611,25 @@ void vtkALBAPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
 //unmodified from the input to the output.
 /*virtual*/int vtkALBAPolyDataDeformation_M1::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------
+//------------------------------------------------------------------------
 {
 	// get the info objects
 	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
 
-	// Initialize some frequently used values.
-	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *input = vtkPolyData::SafeDownCast(
+		inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  if (input == NULL)
-  {
-    vtkErrorMacro(<< "Invalid input for vtkALBAPolyDataDeformation_M1.");
-    return 1;   //we have no input
-  }
+	if (input == NULL)
+	{
+		vtkErrorMacro(<< "Invalid input for vtkALBAPolyDataDeformation.");
+		return 0; // missing/invalid input: report failure to the pipeline
+	}
 
-  //check output
-  vtkPolyData* output = GetOutput();
-  if (output == NULL)
-    SetOutput(vtkPolyData::New());
-
-  //copy input to output
-  return Superclass::RequestInformation(request,inputVector,outputVector);  
+	// For polydata there is no extent/spacing/origin to propagate,
+	// so we simply forward to the superclass implementation.
+	return Superclass::RequestInformation(request, inputVector, outputVector);
 }
+
 
 #ifdef DEBUG_vtkALBAPolyDataDeformation_M1
 #include "vtkCharArray.h"

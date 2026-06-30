@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMath.h"
 #include "vtkALBARGtoSPImageFilter.h"
 #include "vtkInformation.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformationVector.h"
 
 vtkStandardNewMacro(vtkALBAVolumeOrthoSlicer);
 
@@ -46,7 +48,7 @@ void vtkALBAVolumeOrthoSlicer::PropagateUpdateExtent(vtkDataObject *output)
 {
 }
 
-//=========================================================================
+//----------------------------------------------------------------------------
 vtkALBAVolumeOrthoSlicer::vtkALBAVolumeOrthoSlicer()
 {
   SclicingMode = ORTHOSLICER_X_SLICE;
@@ -62,50 +64,45 @@ int vtkALBAVolumeOrthoSlicer::FillOutputPortInformation(int port, vtkInformation
 }
 
 
-//=========================================================================
-int vtkALBAVolumeOrthoSlicer::RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+//----------------------------------------------------------------------------
+int vtkALBAVolumeOrthoSlicer::RequestInformation(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
 {
-	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
-	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
-  int dims[3], outDims[3], wholeExtent[6];
-  
-	if (inputID == NULL && inputRG == NULL)
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	if (inInfo == NULL)
 	{
-		vtkErrorMacro(<<"Missing input");
+		vtkErrorMacro(<< "Missing input");
 		return 0;
 	}
 
-	if (output == NULL)
-	{
-		vtkErrorMacro(<<"Output error");
-		return 0;
-	}
+	int dims[3], outDims[3], wholeExtent[6];
 
-	if (inputRG)
-		inputRG->GetExtent(wholeExtent);
-	else
-		inputID->GetExtent(wholeExtent);
+	// Retrieve the whole extent from the input pipeline information
+	inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
 
 	dims[0] = wholeExtent[1] - wholeExtent[0] + 1;
 	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
 	dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
 
-	switch (this->SclicingMode) {
-		case ORTHOSLICER_X_SLICE:
-			outDims[0] = dims[1];
-			outDims[1] = dims[2];
-			outDims[2] = 1;
-			break;
-		case ORTHOSLICER_Y_SLICE:
-			outDims[0] = dims[0];
-			outDims[1] = dims[2];
-			outDims[2] = 1;
-			break;
-		case ORTHOSLICER_Z_SLICE:
-			outDims[0] = dims[0];
-			outDims[1] = dims[1];
-			outDims[2] = 1;
+	switch (this->SclicingMode)
+	{
+	case ORTHOSLICER_X_SLICE:
+		outDims[0] = dims[1];
+		outDims[1] = dims[2];
+		outDims[2] = 1;
+		break;
+	case ORTHOSLICER_Y_SLICE:
+		outDims[0] = dims[0];
+		outDims[1] = dims[2];
+		outDims[2] = 1;
+		break;
+	case ORTHOSLICER_Z_SLICE:
+		outDims[0] = dims[0];
+		outDims[1] = dims[1];
+		outDims[2] = 1;
+		break;
 	}
 
 	wholeExtent[0] = 0;
@@ -114,12 +111,15 @@ int vtkALBAVolumeOrthoSlicer::RequestInformation(vtkInformation *request, vtkInf
 	wholeExtent[3] = outDims[1] - 1;
 	wholeExtent[4] = 0;
 	wholeExtent[5] = outDims[2] - 1;
-  output->SetExtent( wholeExtent );
+
+	// Set the whole extent on the output pipeline information,
+	// NOT directly on the output data object.
+	outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent, 6);
 
 	return 1;
 }
 
-//=========================================================================
+//----------------------------------------------------------------------------
 int vtkALBAVolumeOrthoSlicer::RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int inputDims[3], projectedDims[3];

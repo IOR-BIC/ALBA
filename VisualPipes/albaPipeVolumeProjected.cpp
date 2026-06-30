@@ -239,9 +239,12 @@ void albaPipeVolumeProjected::SetLutRange(double low, double hi)
 {
 	if(!m_Lut) 
     return;
-	m_Lut->SetWindow(hi - low); 
-	m_Lut->SetLevel((low + hi)/2);
-	m_Lut->Build();
+	double *tr=m_Lut->GetTableRange();
+	if (tr[0] != low || tr[1] != hi)
+	{
+		m_Lut->SetTableRange(low, hi);
+		m_Lut->Build();
+	}
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeProjected::GetLutRange(double range[2])

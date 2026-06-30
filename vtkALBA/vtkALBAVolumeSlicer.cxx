@@ -203,190 +203,197 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 //----------------------------------------------------------------------------
 //By default, UpdateInformation calls this method to copy information
 //unmodified from the input to the output.
-/*virtual*/ int vtkALBAVolumeSlicer::RequestInformation(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-//----------------------------------------------------------------------------
+/*virtual*/ int vtkALBAVolumeSlicer::RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
-  vtkDataSet* input = vtkDataSet::SafeDownCast(GetInput());
-  if (input == NULL || this->GetNumberOfOutputPorts() == 0)
-    return 1; //nothing to cut, or we have no output -> exit
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkDataSet *input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  this->NumComponents = input->GetPointData()->GetScalars()->GetNumberOfComponents();
+	if (input == NULL || this->GetNumberOfOutputPorts() == 0)
+		return 1; //nothing to cut, or we have no output -> exit
 
-  //first, perform transformation of Plane
-  if (TransformSlice)
-  {
-    TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-    TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-    TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-  }
-  else
-  {
-    memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
-    memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(PlaneAxisX));
-    memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(PlaneAxisY));
-  }
+	this->NumComponents = input->GetPointData()->GetScalars()->GetNumberOfComponents();
 
-  assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisX) - 1.f) < 1.e-5);
-  assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisY) - 1.f) < 1.e-5);
+	//first, perform transformation of Plane
+	if (TransformSlice)
+	{
+		TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
+		TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
+		TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
+	}
+	else
+	{
+		memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
+		memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(PlaneAxisX));
+		memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(PlaneAxisY));
+	}
 
-  //compute normal for the plane determined by PlaneAxisX and PlaneAxisY
-  vtkMath::Cross(this->GlobalPlaneAxisX, this->GlobalPlaneAxisY, this->GlobalPlaneAxisZ);
-  vtkMath::Normalize(this->GlobalPlaneAxisZ);
+	assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisX) - 1.f) < 1.e-5);
+	assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisY) - 1.f) < 1.e-5);
 
-  //now copy the important information from input, e.g., bounding box
-  vtkImageData* imageData = vtkImageData::SafeDownCast(input);
-  if (imageData != NULL)
-  {
-    //regular grid, it is a bit easier    
-    imageData->GetDimensions(this->DataDimensions);
-    imageData->GetOrigin(this->DataOrigin);
+	//compute normal for the plane determined by PlaneAxisX and PlaneAxisY
+	vtkMath::Cross(this->GlobalPlaneAxisX, this->GlobalPlaneAxisY, this->GlobalPlaneAxisZ);
+	vtkMath::Normalize(this->GlobalPlaneAxisZ);
 
-    double dataSpacing[3];
-    imageData->GetSpacing(dataSpacing);
-    for (int i = 0; i < 3; i++)
-    {
-      dataSpacing[i] *= (this->DataDimensions[i] - 1);
-      this->DataBounds[i][0] = this->DataOrigin[i];
-      this->DataBounds[i][1] = this->DataOrigin[i] + dataSpacing[i];
-    }
-  }
-  else
-  {
-    vtkRectilinearGrid* gridData = vtkRectilinearGrid::SafeDownCast(input);
-    if (gridData == NULL)
-    {
-      vtkDebugMacro("Invalid input for vtkALBAVolumeSlicer");
-      return 1;
-    }
+	//now copy the important information from input, e.g., bounding box
+	vtkImageData *imageData = vtkImageData::SafeDownCast(input);
+	if (imageData != NULL)
+	{
+		//regular grid, it is a bit easier    
+		imageData->GetDimensions(this->DataDimensions);
+		imageData->GetOrigin(this->DataOrigin);
 
-    //rectilinear grid
-    gridData->GetDimensions(this->DataDimensions);
-    this->DataOrigin[0] = gridData->GetXCoordinates()->GetTuple(0)[0];
-    this->DataOrigin[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
-    this->DataOrigin[2] = gridData->GetZCoordinates()->GetTuple(0)[0];
+		double dataSpacing[3];
+		imageData->GetSpacing(dataSpacing);
+		for (int i = 0; i < 3; i++)
+		{
+			dataSpacing[i] *= (this->DataDimensions[i] - 1);
+			this->DataBounds[i][0] = this->DataOrigin[i];
+			this->DataBounds[i][1] = this->DataOrigin[i] + dataSpacing[i];
+		}
+	}
+	else
+	{
+		vtkRectilinearGrid *gridData = vtkRectilinearGrid::SafeDownCast(input);
+		if (gridData == NULL)
+		{
+			vtkDebugMacro("Invalid input for vtkALBAVolumeSlicer");
+			return 1;
+		}
 
-    this->DataBounds[0][0] = min(this->DataOrigin[0],
-      gridData->GetXCoordinates()->GetTuple(this->DataDimensions[0] - 1)[0]);
-    this->DataBounds[0][1] = max(this->DataOrigin[0],
-      gridData->GetXCoordinates()->GetTuple(this->DataDimensions[0] - 1)[0]);
+		//rectilinear grid
+		gridData->GetDimensions(this->DataDimensions);
+		this->DataOrigin[0] = gridData->GetXCoordinates()->GetTuple(0)[0];
+		this->DataOrigin[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
+		this->DataOrigin[2] = gridData->GetZCoordinates()->GetTuple(0)[0];
 
-    this->DataBounds[1][0] = min(this->DataOrigin[1],
-      gridData->GetYCoordinates()->GetTuple(this->DataDimensions[1] - 1)[0]);
-    this->DataBounds[1][1] = max(this->DataOrigin[1],
-      gridData->GetYCoordinates()->GetTuple(this->DataDimensions[1] - 1)[0]);
+		this->DataBounds[0][0] = min(this->DataOrigin[0],
+			gridData->GetXCoordinates()->GetTuple(this->DataDimensions[0] - 1)[0]);
+		this->DataBounds[0][1] = max(this->DataOrigin[0],
+			gridData->GetXCoordinates()->GetTuple(this->DataDimensions[0] - 1)[0]);
 
-    this->DataBounds[2][0] = min(this->DataOrigin[2],
-      gridData->GetZCoordinates()->GetTuple(this->DataDimensions[2] - 1)[0]);
-    this->DataBounds[2][1] = max(this->DataOrigin[2],
-      gridData->GetZCoordinates()->GetTuple(this->DataDimensions[2] - 1)[0]);
-  }
+		this->DataBounds[1][0] = min(this->DataOrigin[1],
+			gridData->GetYCoordinates()->GetTuple(this->DataDimensions[1] - 1)[0]);
+		this->DataBounds[1][1] = max(this->DataOrigin[1],
+			gridData->GetYCoordinates()->GetTuple(this->DataDimensions[1] - 1)[0]);
 
-  for (int i = 0; i < this->GetNumberOfOutputPorts(); i++)
-  {
-    vtkImageData* output = vtkImageData::SafeDownCast(this->GetOutput(i));
-    if (output != NULL)
-    {
-      vtkInformation* outInfo = this->GetOutputInformation(0);
-      int wholeExtent[6];
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
-      outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
+		this->DataBounds[2][0] = min(this->DataOrigin[2],
+			gridData->GetZCoordinates()->GetTuple(this->DataDimensions[2] - 1)[0]);
+		this->DataBounds[2][1] = max(this->DataOrigin[2],
+			gridData->GetZCoordinates()->GetTuple(this->DataDimensions[2] - 1)[0]);
+	}
+
+	for (int i = 0; i < this->GetNumberOfOutputPorts(); i++)
+	{
+		vtkImageData *output = vtkImageData::SafeDownCast(this->GetOutput(i));
+		if (output != NULL)
+		{
+			// FIX: use the current port index i, not always 0
+			vtkInformation *outInfo = outputVector->GetInformationObject(i);
+			int wholeExtent[6];
+			outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+			outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
 
 
-      //if the cut should fill the whole output, we will need to get intersections
-      if (this->AutoSpacing)
-      {
-        //intersect the cutting plane ax + by + cz + d = 0, where (a,b,c) is normal GlobalPlaneAxisZ
-        //and d can is computed so the plane goes through GlobalPlaneOrigin with the bounding box
-        const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] +
-          this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] +
-          this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
+			//if the cut should fill the whole output, we will need to get intersections
+			if (this->AutoSpacing)
+			{
+				//intersect the cutting plane ax + by + cz + d = 0, where (a,b,c) is normal GlobalPlaneAxisZ
+				//and d can is computed so the plane goes through GlobalPlaneOrigin with the bounding box
+				const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] +
+					this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] +
+					this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
 
-        //set initial spacing to 1,1,1
-        double spacing[3] = { 1.0f, 1.0f, 1.0f };
-        float minT = VTK_FLOAT_MAX, maxT = VTK_FLOAT_MIN, minS = VTK_FLOAT_MAX, maxS = VTK_FLOAT_MIN;
-        int numberOfPoints = 0;
+				//set initial spacing to 1,1,1
+				double spacing[3] = { 1.0f, 1.0f, 1.0f };
+				float minT = VTK_FLOAT_MAX, maxT = VTK_FLOAT_MIN, minS = VTK_FLOAT_MAX, maxS = VTK_FLOAT_MIN;
+				int numberOfPoints = 0;
 
-        //bounding box is symmetric => we will compute intersections
-        //for every rotation of the coordinate system [i, j, k]
-        //i.e., for [0,1,2], [1,2,0], [2,0,1], i.e., [x,y,z],[y,z,x],[z,x,y]
-        for (int i = 0; i < 3; i++)
-        {
-          //check if the i-axis is not parallel to the plane
-          if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
-            continue; //there is no intersection => continue
+				//bounding box is symmetric => we will compute intersections
+				//for every rotation of the coordinate system [i, j, k]
+				//i.e., for [0,1,2], [1,2,0], [2,0,1], i.e., [x,y,z],[y,z,x],[z,x,y]
+				for (int i = 0; i < 3; i++)
+				{
+					//check if the i-axis is not parallel to the plane
+					if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
+						continue; //there is no intersection => continue
 
-          //i-axis is the major direction where we want to compute intersections
-          //the box has 4 edges parallel to this axis, 2 of them intersect j-axis and 2 k-axis,
-          //thus we will compute P[i, 0, 0], P[i, 0, bbox corner on k-axis], 
-          //P[i, bbox corner on j-axis, 0] and P[i, bbox corner on j-axis, bbox corner on k-axis]
-          const int j = (i + 1) % 3, k = (i + 2) % 3;
-          for (int jj = 0; jj < 2; jj++)
-          {
-            for (int kk = 0; kk < 2; kk++)
-            {
-              //compute intersection of the bounding box edge denoted by i, j, k coordinate system and
-              //the index (jj, kk) with the cutting plane
-              float p[3];
-              p[j] = this->DataBounds[j][jj];
-              p[k] = this->DataBounds[k][kk];
-              p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]) /
-                this->GlobalPlaneAxisZ[i];
+					//i-axis is the major direction where we want to compute intersections
+					//the box has 4 edges parallel to this axis, 2 of them intersect j-axis and 2 k-axis,
+					//thus we will compute P[i, 0, 0], P[i, 0, bbox corner on k-axis], 
+					//P[i, bbox corner on j-axis, 0] and P[i, bbox corner on j-axis, bbox corner on k-axis]
+					const int j = (i + 1) % 3, k = (i + 2) % 3;
+					for (int jj = 0; jj < 2; jj++)
+					{
+						for (int kk = 0; kk < 2; kk++)
+						{
+							//compute intersection of the bounding box edge denoted by i, j, k coordinate system and
+							//the index (jj, kk) with the cutting plane
+							float p[3];
+							p[j] = this->DataBounds[j][jj];
+							p[k] = this->DataBounds[k][kk];
+							p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]) /
+								this->GlobalPlaneAxisZ[i];
 
-              // check that p[i] is in inside the box
-              float dbi0 = ((float)(this->DataBounds[i][0]));//Added by Losi 07.15.2009:	Bug #1721 fix
-              float dbi1 = ((float)(this->DataBounds[i][1]));
-              //Bug #1721: No image at the boundary box extremes
-              //http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1721
-              //cause: float, double comparsion
-              if (p[i] < dbi0 || p[i] > dbi1 && (p[i] != dbi0 && p[i] != dbi1))
-              {
-                continue; //the supporting line intersects the plane but the edge does not
-              }
-              numberOfPoints++;    //some intersection detected
+							// check that p[i] is in inside the box
+							float dbi0 = ((float)(this->DataBounds[i][0]));//Added by Losi 07.15.2009:	Bug #1721 fix
+							float dbi1 = ((float)(this->DataBounds[i][1]));
+							//Bug #1721: No image at the boundary box extremes
+							//http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1721
+							//cause: float, double comparsion
+							if (p[i] < dbi0 || p[i] > dbi1 && (p[i] != dbi0 && p[i] != dbi1))
+							{
+								continue; //the supporting line intersects the plane but the edge does not
+							}
+							numberOfPoints++;    //some intersection detected
 
-              float ts[2];
-              this->CalculateTextureCoordinates(p, (int*)OutputDimentions, spacing, ts);
-              if (ts[0] > maxT)
-                maxT = ts[0];
-              if (ts[0] < minT)
-                minT = ts[0];
-              if (ts[1] > maxS)
-                maxS = ts[1];
-              if (ts[1] < minS)
-                minS = ts[1];
-            }
-          }
-        }
+							float ts[2];
+							this->CalculateTextureCoordinates(p, (int *)OutputDimentions, spacing, ts);
+							if (ts[0] > maxT)
+								maxT = ts[0];
+							if (ts[0] < minT)
+								minT = ts[0];
+							if (ts[1] > maxS)
+								maxS = ts[1];
+							if (ts[1] < minS)
+								minS = ts[1];
+						}
+					}
+				}
 
-        //RELEASE NOTE: we have 3 numberOfPoints if the plane cuts or touches one corner. The latter one
-        //is not considered to be an intersection, however, it is a singular case that we will not distinguish
-        if (BNoIntersection = (numberOfPoints <= 2))
-          SetOutputSpacing(spacing);  //spacing will be 1:1:1
-        else
-        {
-          // find spacing now
-          float maxSpacing = max(maxS - minS, maxT - minT);
-          spacing[0] = spacing[1] = max(maxSpacing, 1.e-8f);
-          SetOutputSpacing(spacing);
-          // http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1427
-          // Totally heuristic bug fix: magicNumber was 1.e-3 before.
-          const float magicNumber = 1.e-5;
-          if (fabs(minT) > magicNumber || fabs(minS) > magicNumber)
-          {
-            this->GlobalPlaneOrigin[0] += minT * this->GlobalPlaneAxisX[0] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[0] * OutputDimentions[1];
-            this->GlobalPlaneOrigin[1] += minT * this->GlobalPlaneAxisX[1] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[1] * OutputDimentions[1];
-            this->GlobalPlaneOrigin[2] += minT * this->GlobalPlaneAxisX[2] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[2] * OutputDimentions[1];
-            this->Modified();
-          }
-        }
-      }
+				//RELEASE NOTE: we have 3 numberOfPoints if the plane cuts or touches one corner. The latter one
+				//is not considered to be an intersection, however, it is a singular case that we will not distinguish
+				if (BNoIntersection = (numberOfPoints <= 2))
+				{
+					SetOutputSpacing(spacing);  //spacing will be 1:1:1
+					// Propagate spacing to the pipeline information as well
+					outInfo->Set(vtkDataObject::SPACING(), spacing, 3);
+				}
+				else
+				{
+					// find spacing now
+					float maxSpacing = max(maxS - minS, maxT - minT);
+					spacing[0] = spacing[1] = max(maxSpacing, 1.e-8f);
+					SetOutputSpacing(spacing);
+					// Propagate spacing to the pipeline information as well
+					outInfo->Set(vtkDataObject::SPACING(), spacing, 3);
+					// http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1427
+					// Totally heuristic bug fix: magicNumber was 1.e-3 before.
+					const float magicNumber = 1.e-5;
+					if (fabs(minT) > magicNumber || fabs(minS) > magicNumber)
+					{
+						this->GlobalPlaneOrigin[0] += minT * this->GlobalPlaneAxisX[0] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[0] * OutputDimentions[1];
+						this->GlobalPlaneOrigin[1] += minT * this->GlobalPlaneAxisX[1] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[1] * OutputDimentions[1];
+						this->GlobalPlaneOrigin[2] += minT * this->GlobalPlaneAxisX[2] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[2] * OutputDimentions[1];
+						this->Modified();
+					}
+				}
+			}
 
-    }
-  }
+		}
+	}
 
-  return 1;
+	return 1;
 }
-
 //------------------------------------------------------------------------
 //BES: 15.12.2008 - when using albaOpCrop in albaViewOrthoSlice, the input
 //dimensions change between ExecuteInformation and ExecuteData 

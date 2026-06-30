@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMath.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkALBARGtoSPImageFilter);
 
@@ -46,39 +47,35 @@ vtkALBARGtoSPImageFilter::vtkALBARGtoSPImageFilter()
 }
 
 //--------------------------------------------------------------------------------------
-int vtkALBARGtoSPImageFilter::RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+int vtkALBARGtoSPImageFilter::RequestInformation(
+	vtkInformation *vtkNotUsed(request),
+	vtkInformationVector **inputVector,
+	vtkInformationVector *outputVector)
 {
 	// get the info objects
 	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
 	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
 	// Initialize some frequently used values.
-	vtkRectilinearGrid  *input = vtkRectilinearGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-	
-  int dims[3], outDims[3], extent[6];
-	double bestSpacing[3], outputSpacing[3],bounds[6];
-  
+	vtkRectilinearGrid *input = vtkRectilinearGrid::SafeDownCast(
+		inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
 	if (input == NULL)
 	{
 		vtkErrorMacro("Missing input");
 		return 0;
 	}
 
-	if (output == NULL)
-	{
-		vtkErrorMacro("Output error");
-		return 0;
-	}
-	
+	int dims[3], outDims[3];
+	double bestSpacing[3], outputSpacing[3], bounds[6];
+
 	input->GetDimensions(dims);
 	if (dims[2] != 1)
 	{
 		vtkErrorMacro("Wrong input type");
 		return 0;
 	}
-		
-	input->GetExtent(extent);
+
 	input->GetBounds(bounds);
 	GetBestSpacing(input, bestSpacing);
 
@@ -86,21 +83,22 @@ int vtkALBARGtoSPImageFilter::RequestInformation(vtkInformation *vtkNotUsed(requ
 	outDims[1] = ((bounds[3] - bounds[2]) / bestSpacing[1]) + 1;
 	outDims[2] = 1;
 
-	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)(outDims[0]-1);
-	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)(outDims[1]-1);
+	outputSpacing[0] = (bounds[1] - bounds[0]) / (double)(outDims[0] - 1);
+	outputSpacing[1] = (bounds[3] - bounds[2]) / (double)(outDims[1] - 1);
 	outputSpacing[2] = 1;
 
-	//output->SetDimensions(outDims);
-	output->SetSpacing(outputSpacing);
-	output->SetOrigin(bounds[0], bounds[2], bounds[4]);
-
-	
 	OutputExtent[0] = 0;
-	OutputExtent[1] = outDims[0]-1;
+	OutputExtent[1] = outDims[0] - 1;
 	OutputExtent[2] = 0;
-	OutputExtent[3] = outDims[1]-1;
+	OutputExtent[3] = outDims[1] - 1;
 	OutputExtent[4] = 0;
-	OutputExtent[5] = outDims[2]-1;
+	OutputExtent[5] = outDims[2] - 1;
+
+	// Propagate extent, spacing and origin through the pipeline information,
+	// NOT directly on the output data object.
+	outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), OutputExtent, 6);
+	outInfo->Set(vtkDataObject::SPACING(), outputSpacing, 3);
+	outInfo->Set(vtkDataObject::ORIGIN(), bounds[0], bounds[2], bounds[4]);
 
 	return 1;
 }
