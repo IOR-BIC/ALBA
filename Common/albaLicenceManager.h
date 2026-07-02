@@ -73,6 +73,7 @@ public:
 		ID_NAME_FIELD,
 		ID_SURNAME_FIELD,
 		ID_AFFILIATION_FIELD,
+		ID_INSTITUTIONAL_EMAIL_FIELD,
 		ID_INTENDED_USE_FIELD,
 		ID_GENERATE_REGISTRATION
 	};
@@ -185,6 +186,7 @@ protected:
 	wxTextCtrl *m_Name_textCtrl;
 	wxTextCtrl *m_Surname_textCtrl;
 	wxTextCtrl *m_Affiliation_textCtrl;
+	wxTextCtrl *m_InstitutionalEmail_textCtrl;
 	wxTextCtrl *m_IntendedUse_textCtrl;
 	albaGUIButton *m_GenerateRegistration_Button;
 

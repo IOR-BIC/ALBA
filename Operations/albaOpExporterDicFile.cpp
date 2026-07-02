@@ -107,12 +107,17 @@ void albaOpExporterDicFile::OpRun()
 	m_File = m_FileDir + "\\" + m_Input->GetName() + ".dat";
 
 	m_Gui = new albaGUI(this);
+	m_Gui->Label("");
 	m_Gui->FileSave(ID_CHOOSE_FILENAME, _("DIC file"), &m_File, wildc);
 /*	m_Gui->Label("File type", true);*/
 	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
+	m_Gui->Label("Warning:",true);
+	m_Gui->Label("The internal coordinates will be\nautomatically converted to the DIC\ncoordinate system using the inverse\ntransformation (X, Z, -Y)",false,true);
+	m_Gui->Label("");
+
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
 	m_Gui->Label("");
