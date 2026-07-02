@@ -160,6 +160,7 @@ void albaPipeVolumeProjected::Create(albaSceneNode *n)
 	m_Lut->SetLevel((range[1] + range[0])/2.0);
 	m_Lut->Build();
 
+	RXTexture->SetColorModeToMapScalars();
 	RXTexture->SetLookupTable(m_Lut);
 
   m_RXActor = vtkActor::New();
