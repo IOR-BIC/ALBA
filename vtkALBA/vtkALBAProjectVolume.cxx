@@ -205,8 +205,8 @@ int vtkALBAProjectVolume::RequestData(vtkInformation *request, vtkInformationVec
 template<typename DataType>
 void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars)
 {
-	int x, y, z, idx, newIdx, range[2];
-	int sliceSize, jOffset, kOffset;
+	vtkIdType x, y, z, idx, newIdx, range[2];
+	vtkIdType sliceSize, jOffset, kOffset;
 	float acc, rangeSize;
 
 	//Set Projection Range
