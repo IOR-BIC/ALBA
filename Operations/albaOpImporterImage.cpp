@@ -342,8 +342,11 @@ void albaOpImporterImage::Import()
 
 		if (sliceNum < 2)
 		{
-			wxMessageBox("Unable to create a Volume, too few images");
-			for (int i = 0; i < sliceNum + 1; i++)
+			if (m_TestMode)
+				albaLogMessage("Unable to create a Volume, too few images");
+			else
+				albaErrorMessage("Unable to create a Volume, too few images");
+			for (int i = 0; i < sliceNum; i++)
 				vtkDEL(images[i]);
 			return;
 		}
