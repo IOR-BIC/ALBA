@@ -63,8 +63,8 @@ void albaOpImporterDICFileTest::Test()
 
   
   double x = -12.349327;
-  double y = 8.346818;
-  double z = 0.964494;
+  double y = -0.964494;
+	double z = 8.346818;
 
   CPPUNIT_ASSERT( fabs(xyz[0] - x) < 0.01 &&
                   fabs(xyz[1] - y) < 0.01 &&
@@ -73,7 +73,7 @@ void albaOpImporterDICFileTest::Test()
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
 
-	double scalarValue = polyData->GetPointData()->GetScalars("DIC")->GetTuple1(19);
+	double scalarValue = polyData->GetPointData()->GetScalars("Displ Magnitudo")->GetTuple1(19);
 
 	CPPUNIT_ASSERT(fabs(scalarValue - 0.159694) < 0.01);
 
