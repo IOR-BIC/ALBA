@@ -182,7 +182,7 @@ int vtkALBAVolumeOrthoSlicer::RequestData(vtkInformation *request, vtkInformatio
 			SliceScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
 			break;
 		default:
-			vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
+			vtkErrorMacro(<< "vtkALBAVolumeOrthoSlicer: Scalar type is not supported");
 			return 0;
 	}
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program: ALBA
-Module: vtkALBAVolumeSlicer
+Module: vtkALBAProjectVolume
 Authors: Gianluigi Crimi
 
 Copyright (c) BIC

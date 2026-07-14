@@ -76,8 +76,8 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
     this->StOffsets[i] = NULL;
 		DataOrigin[i]=0;
 		DataBounds[i][0] = DataBounds[i][1] = 0;
-		DataDimensions[3] = 0;
-		SamplingTableMultiplier[3] = 0;
+		DataDimensions[i] = 0;
+		SamplingTableMultiplier[i] = 0;
   }  
 
   LastPreprocessedInput = NULL; 

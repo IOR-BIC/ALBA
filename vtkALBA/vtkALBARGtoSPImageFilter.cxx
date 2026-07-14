@@ -149,7 +149,7 @@ int vtkALBARGtoSPImageFilter::RequestData(vtkInformation *vtkNotUsed(request), v
 			FillSP(input, output, (double*)inputPointer, (double*)outputPointer);
 			break;
 		default:
-			vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
+			vtkErrorMacro(<< "vtkALBARGtoSPImageFilter: Scalar type is not supported");
 			return 0;
 	}
 	output->GetPointData()->SetScalars(outScalars);
@@ -196,7 +196,7 @@ void vtkALBARGtoSPImageFilter::FillSP(vtkRectilinearGrid * input, vtkImageData *
 			FillSP(input, output, inputScalars, outScalars, (double *)xCoordPointer, (double *)yCoordPointer);
 			break;
 		default:
-			vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
+			vtkErrorMacro(<< "vtkALBARGtoSPImageFilter: Scalar type is not supported");
 			return;
 	}
 
