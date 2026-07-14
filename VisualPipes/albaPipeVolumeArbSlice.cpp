@@ -76,8 +76,7 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
 :albaPipeSlice()
 //----------------------------------------------------------------------------
 { 
-  m_SlicerPolygonal	= NULL;
-  m_SlicerImage			= NULL;
+  m_ArbSlicer	= NULL;
   m_Image           = NULL;
   m_Texture		      = NULL;
   m_SliceMapper		  = NULL;
@@ -323,21 +322,15 @@ void albaPipeVolumeArbSlice::CreateSlice()
     ((vtkImageData *)vtk_data)->GetSpacing(xspc,yspc,zspc);
   }
 
-	vtkNEW(m_SlicerPolygonal);
-	vtkNEW(m_SlicerImage);
-	m_SlicerImage->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
-	m_SlicerPolygonal->SetPlaneOrigin(m_SlicerImage->GetPlaneOrigin());
-	m_SlicerImage->SetPlaneAxisX(m_XVector);
-	m_SlicerImage->SetPlaneAxisY(m_YVector);
-	m_SlicerPolygonal->SetPlaneAxisX(m_XVector);
-	m_SlicerPolygonal->SetPlaneAxisY(m_YVector);
-	m_SlicerImage->SetInputConnection(port);
-	m_SlicerPolygonal->SetInputConnection(port);
-  
-	m_SlicerImage->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
-	m_SlicerImage->SetOutputSpacing(xspc, yspc, zspc);
-	m_SlicerImage->SetGPUEnabled(m_EnableGPU);
-  m_SlicerImage->Update();
+	vtkNEW(m_ArbSlicer);
+	m_ArbSlicer->SetPlaneOrigin(m_Origin);
+	m_ArbSlicer->SetPlaneAxisX(m_XVector);
+	m_ArbSlicer->SetPlaneAxisY(m_YVector);
+	m_ArbSlicer->SetInputConnection(port);
+	m_ArbSlicer->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
+	m_ArbSlicer->SetOutputSpacing(xspc, yspc, zspc);
+	m_ArbSlicer->SetGPUEnabled(m_EnableGPU);
+	m_ArbSlicer->Update();
 
 	vtkNEW(m_Texture);
 	m_Texture->RepeatOff();
@@ -350,14 +343,8 @@ void albaPipeVolumeArbSlice::CreateSlice()
     m_Texture->InterpolateOff();
   }
 	m_Texture->SetQualityTo32Bit();
-	m_Texture->SetInputConnection(m_SlicerImage->GetOutputPort());
+	m_Texture->SetInputConnection(m_ArbSlicer->GetTextureOutputPort());
   m_Texture->SetLookupTable(m_ColorLUT);
-
-	m_SlicerPolygonal->SetOutputTypeToPolyData();
-	m_SlicerPolygonal->SetTextureConnection(m_SlicerImage->GetOutputPort());
-
-  m_SlicerPolygonal->SetGPUEnabled(m_EnableGPU);
-	m_SlicerPolygonal->Update();
 
 	// apply abs matrix to geometry
 	vtkNEW(m_NormalTranform);
@@ -369,7 +356,7 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	// to delete
 	vtkNEW(m_NormalTranformFilter);
 
-	m_NormalTranformFilter->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
+	m_NormalTranformFilter->SetInputConnection(m_ArbSlicer->GetPolydataOutputPort());
 	m_NormalTranformFilter->SetTransform(m_NormalTranform);
 	m_NormalTranformFilter->Update();
 
@@ -378,7 +365,7 @@ void albaPipeVolumeArbSlice::CreateSlice()
 	if (m_EnableSliceViewCorrection)
 		m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
 	else
-		m_SliceMapper->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
+		m_SliceMapper->SetInputConnection(m_ArbSlicer->GetPolydataOutputPort());
 
 	m_SliceMapper->ScalarVisibilityOff();
 
@@ -406,8 +393,7 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
 	if(m_SliceActor)
     m_AssemblyUsed->RemovePart(m_SliceActor);
 
-  vtkDEL(m_SlicerImage);
-	vtkDEL(m_SlicerPolygonal);
+  vtkDEL(m_ArbSlicer);
 	vtkDEL(m_Image);
 	vtkDEL(m_Texture);
 	vtkDEL(m_SliceMapper);
@@ -529,14 +515,11 @@ void albaPipeVolumeArbSlice::SetSlice(double* Origin, double* Normal)
   }
 
 	
-	if(m_SlicerImage)
+	if(m_ArbSlicer)
 	{
-		m_SlicerImage->SetPlaneOrigin(m_Origin[0], m_Origin[1], m_Origin[2]);
-		m_SlicerPolygonal->SetPlaneOrigin(m_SlicerImage->GetPlaneOrigin());
-		m_SlicerImage->SetPlaneAxisX(m_XVector);
-		m_SlicerImage->SetPlaneAxisY(m_YVector);
-		m_SlicerPolygonal->SetPlaneAxisX(m_XVector);
-		m_SlicerPolygonal->SetPlaneAxisY(m_YVector);      
+		m_ArbSlicer->SetPlaneOrigin(m_Origin);
+		m_ArbSlicer->SetPlaneAxisX(m_XVector);
+		m_ArbSlicer->SetPlaneAxisY(m_YVector);
   }
 	
 	if(m_NormalTranformFilter && m_EnableSliceViewCorrection)
@@ -698,18 +681,11 @@ void albaPipeVolumeArbSlice::ShowTICKsOff()
 void albaPipeVolumeArbSlice::UpdateSlice()
 //------------------------------------------------------------------------
 {
-	if (m_SlicerImage != NULL)
+	if (m_ArbSlicer != NULL)
 	{
-		m_SlicerImage->SetGPUEnabled(m_EnableGPU);
-		m_SlicerImage->SetTrilinearInterpolation(m_TrilinearInterpolationOn == 1);
-		m_SlicerImage->Update();
-	}
-
-	if (m_SlicerPolygonal != NULL)
-	{
-		m_SlicerPolygonal->SetGPUEnabled(m_EnableGPU);
-		m_SlicerPolygonal->SetTrilinearInterpolation(m_TrilinearInterpolationOn == 1);
-		m_SlicerPolygonal->Update();
+		m_ArbSlicer->SetGPUEnabled(m_EnableGPU);
+		m_ArbSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == 1);
+		m_ArbSlicer->Update();
 	}
 }
 
@@ -743,6 +719,6 @@ void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val, double facto
 		if (m_EnableSliceViewCorrection)
 			m_SliceMapper->SetInputConnection(m_NormalTranformFilter->GetOutputPort());
 		else
-			m_SliceMapper->SetInputConnection(m_SlicerPolygonal->GetOutputPort());
+			m_SliceMapper->SetInputConnection(m_ArbSlicer->GetPolydataOutputPort());
 	}
 }

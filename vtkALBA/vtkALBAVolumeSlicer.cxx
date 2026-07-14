@@ -55,7 +55,6 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
   PlaneAxisY[0] = PlaneAxisY[2] = 0.f;
   PlaneAxisY[1] = 1.f;
 
-	Window = Level = 0;
  
   this->AutoSpacing = 1;    //Autospacing is enabled by the default
   this->LastGPUEnabled = this->GPUEnabled = 1;     //GPU is enabled by the default
@@ -78,10 +77,9 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
 #endif
 
   m_TriLinearInterpolationOn = true;
-	this->SetNumberOfInputPorts(2);
-	this->GetInputPortInformation(1)->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
-
-	SetOutputTypeToImageData();
+	this->SetNumberOfInputPorts(1);
+	this->SetNumberOfOutputPorts(2);
+	
 	m_TextureHelper = new albaGPU3DTextureProviderHelper();
 }
 //----------------------------------------------------------------------------
@@ -135,11 +133,10 @@ void vtkALBAVolumeSlicer::SetPlaneOrigin(double origin[3])
 void vtkALBAVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
-  double plane_origin[3];
-  plane_origin[0] = x;
-  plane_origin[1] = y;
-  plane_origin[2] = z;
-  SetPlaneOrigin(plane_origin);
+  PlaneOrigin[0] = x;
+  PlaneOrigin[1] = y;
+  PlaneOrigin[2] = z;
+  this->Modified();
 }
 
 
@@ -390,21 +387,24 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
 {
 	// get the info objects
 	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+	vtkInformation *outInfoImg = outputVector->GetInformationObject(0);
+	vtkInformation *outInfoPoly = outputVector->GetInformationObject(1);
 
 	// Initialize some frequently used values.
 	vtkDataObject  *input = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-	vtkDataObject *output = vtkDataObject::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkDataObject *outputImg = vtkDataObject::SafeDownCast(outInfoImg->Get(vtkDataObject::DATA_OBJECT()));
+	vtkDataObject *outputPoly = vtkDataObject::SafeDownCast(outInfoPoly->Get(vtkDataObject::DATA_OBJECT()));
 
 
   //BES: 15.12.2008 - when using mafOpCrop in mafViewOrthoSlice, the input
   //dimensions change between ExecuteInformation and ExecuteData
   RequestDataHotFix(request,inputVector,outputVector); 
 
-  if (vtkImageData::SafeDownCast(output) != NULL)
-    this->RequestData(outInfo,(vtkImageData*)output);
-  else if (vtkPolyData::SafeDownCast(output) != NULL)
-    this->RequestData(outInfo,(vtkPolyData*)output);
+  if (vtkImageData::SafeDownCast(outputImg) != NULL)
+    this->RequestData(outInfoImg,(vtkImageData*)outputImg);
+  
+  if (vtkPolyData::SafeDownCast(outputPoly) != NULL)
+    this->RequestData(outInfoPoly,(vtkPolyData*)outputPoly);
   
 	return 1;
 }
@@ -417,14 +417,10 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
   output->Reset();
 
   //get the cutting plane (from associated texture)
-  vtkImageData* texture = this->GetTexture();
-  if (texture != NULL) 
+  vtkImageData* texture = this->GetTextureOutput();
+  if (texture == NULL) 
   {
-    memcpy(this->PlaneOrigin, texture->GetOrigin(), sizeof(this->PlaneOrigin));
-  }
-  else
-  {
-    vtkErrorMacro(<<"No texture specified");
+    vtkErrorMacro(<<"No texture created");
     return;
   }
 
@@ -635,9 +631,7 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
 /*virtual*/ void vtkALBAVolumeSlicer::RequestData(vtkInformation *outInfo,vtkImageData *outputObject) 
 //----------------------------------------------------------------------------
 {
- 
-
-	vtkDataSet *inputPD = vtkDataSet::SafeDownCast(this->GetInput());
+ 	vtkDataSet *inputPD = vtkDataSet::SafeDownCast(this->GetInput());
 
 	OutputDimentions[2] = 1; 
 	int extent[6]={0,OutputDimentions[0]-1, 0,OutputDimentions[1]-1,0, OutputDimentions[2]-1};
@@ -1095,25 +1089,22 @@ void vtkALBAVolumeSlicer::SetGPUEnabled(int enable)
 
 }
 
-void vtkALBAVolumeSlicer::SetOutputType(char *vtkType)
-{
-	strncpy(OutputVtkType, vtkType, 100);
-}
-
-void vtkALBAVolumeSlicer::SetOutputTypeToImageData()
-{
-	SetOutputType("vtkImageData");
-}
-
-void vtkALBAVolumeSlicer::SetOutputTypeToPolyData()
-{
-	SetOutputType("vtkPolyData");
-}
-
 //----------------------------------------------------------------------------
 int vtkALBAVolumeSlicer::FillOutputPortInformation(int port, vtkInformation* info)
 {
-	// now add our info
-	info->Set(vtkDataObject::DATA_TYPE_NAME(), OutputVtkType); 
+  if (port == 0)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+  }
+  else if(port == 1)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+  }
+  else
+  {
+    return 0;
+	}
 	return 1;
 }

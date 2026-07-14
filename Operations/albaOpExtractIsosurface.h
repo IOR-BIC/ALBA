@@ -143,8 +143,7 @@ protected:
   vtkOutlineCornerFilter  *m_OutlineFilter;
   vtkPolyDataMapper       *m_OutlineMapper;
 
-  vtkALBAVolumeSlicer   *m_VolumeSlicer;
-  vtkALBAVolumeSlicer   *m_PolydataSlicer;
+  vtkALBAVolumeSlicer   *m_ArbSlicer;
   vtkImageData      *m_SliceImage;
   vtkTexture        *m_SliceTexture;
   vtkPolyData       *m_Polydata;          // copy of polydata used by slicer
