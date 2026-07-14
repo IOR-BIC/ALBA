@@ -63,8 +63,6 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
 	GlobalPlaneAxisZ[0] = GlobalPlaneAxisZ[1] = 0.f;
 	GlobalPlaneAxisZ[2] = 1.f;
 
-  TransformSlice = NULL;
-
 	Window = Level = 0;
  
   this->AutoSpacing = 1;    //Autospacing is enabled by the default
@@ -116,14 +114,8 @@ void vtkALBAVolumeSlicer::SetPlaneAxisX(float axis[3])
     return;
   memcpy(this->PlaneAxisX, axis, sizeof(this->PlaneAxisX));
   vtkMath::Normalize(this->PlaneAxisX);
-  if (TransformSlice)
-  {
-    TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-  }
-  else
-  {
-    memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
-  }
+  memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
+  
   this->Modified();
 }
 //----------------------------------------------------------------------------
@@ -138,14 +130,7 @@ void vtkALBAVolumeSlicer::SetPlaneAxisY(float axis[3])
   vtkMath::Normalize(this->PlaneAxisZ);
   vtkMath::Cross(this->PlaneAxisZ, this->PlaneAxisX, this->PlaneAxisY);
   vtkMath::Normalize(this->PlaneAxisY);
-  if (TransformSlice)
-  {
-    TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-  }
-  else
-  {
-    memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(this->PlaneAxisY));
-  }
+  memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(this->PlaneAxisY));
   this->Modified();
 }
 //----------------------------------------------------------------------------
@@ -153,14 +138,7 @@ void vtkALBAVolumeSlicer::SetPlaneOrigin(double origin[3])
 //----------------------------------------------------------------------------
 {
 	memcpy(PlaneOrigin, origin, sizeof(PlaneOrigin));
-  if (TransformSlice)
-  {
-    TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-  }
-  else
-  {
-    memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
-  }
+  memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
   this->Modified();
 }
 //----------------------------------------------------------------------------
@@ -174,16 +152,6 @@ void vtkALBAVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
   SetPlaneOrigin(plane_origin);
 }
 
-//----------------------------------------------------------------------------
-//Return this object's modified time.
-/*virtual*/vtkMTimeType vtkALBAVolumeSlicer::GetMTime()
-//----------------------------------------------------------------------------
-{
-	vtkMTimeType time = Superclass::GetMTime();
-  if (this->TransformSlice != NULL && this->TransformSlice->GetMTime() > time)
-    time = this->TransformSlice->GetMTime();
-  return time;
-}
 
 //----------------------------------------------------------------------------
 //By default copy the output update extent to the input.
@@ -214,19 +182,10 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 	this->NumComponents = input->GetPointData()->GetScalars()->GetNumberOfComponents();
 
 	//first, perform transformation of Plane
-	if (TransformSlice)
-	{
-		TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-		TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-		TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-	}
-	else
-	{
-		memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
-		memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(PlaneAxisX));
-		memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(PlaneAxisY));
-	}
-
+	memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
+	memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(PlaneAxisX));
+	memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(PlaneAxisY));
+	
 	assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisX) - 1.f) < 1.e-5);
 	assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisY) - 1.f) < 1.e-5);
 
@@ -1130,16 +1089,6 @@ void vtkALBAVolumeSlicer::CalculateTextureCoordinates(const float point[3], cons
   ts[0] =  tx / (size[0] * spacing[0]);
   ts[1] = -ty / (size[1] * spacing[1]);
 }
-
-
-//----------------------------------------------------------------------------
-void vtkALBAVolumeSlicer::SetSliceTransform(vtkLinearTransform *trans)
-//----------------------------------------------------------------------------
-{
-  TransformSlice = trans;
-  Modified();
-}
-
 
 
 //----------------------------------------------------------------------------

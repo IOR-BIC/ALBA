@@ -128,10 +128,7 @@ public:
     return vtkImageData::SafeDownCast(this->GetInputDataObject(1,0));
   };
 
-  /** 
-  Transform slicer plane according to the given transformation before slicing.*/
-  void SetSliceTransform(vtkLinearTransform *trans);
-
+  
 	void SetOutputType(char *vtkType);
 
 	void SetOutputTypeToImageData();
@@ -141,9 +138,6 @@ public:
 protected:
   vtkALBAVolumeSlicer();
   ~vtkALBAVolumeSlicer();
-
-  /** Return this object's modified time. */  
-  /*virtual*/ vtkMTimeType GetMTime();
 
   /** By default copy the output update extent to the input. */
 	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
@@ -224,8 +218,6 @@ protected:
   float GlobalPlaneAxisX[3];
   float GlobalPlaneAxisY[3];
   float GlobalPlaneAxisZ[3];
-
-  vtkLinearTransform *TransformSlice;
 
   // color mapping
   double Window;
