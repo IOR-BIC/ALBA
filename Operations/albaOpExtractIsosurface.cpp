@@ -477,26 +477,21 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
   m_SliceYVect[1] = 1.0;
   m_SliceYVect[2] = 0.0;
 
-  m_PolydataSlicer = vtkALBAVolumeSlicer::New();
-  m_VolumeSlicer	= vtkALBAVolumeSlicer::New();
-  m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
-  m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
-  m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
-  m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
-  m_VolumeSlicer->SetInputData(dataset);
-  m_PolydataSlicer->SetInputData(dataset);
+  m_ArbSlicer = vtkALBAVolumeSlicer::New();
+  m_ArbSlicer->SetPlaneOrigin(m_SliceOrigin);
+  m_ArbSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_ArbSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_ArbSlicer->SetInputData(dataset);
 
 	
   m_SliceImage = vtkImageData::New();
 
-  double textureRes=512;
-	m_VolumeSlicer->SetOutputDimentions(textureRes,textureRes,1);
-	m_VolumeSlicer->SetOutputSpacing(xspc, yspc, 1.0f);
-  m_VolumeSlicer->Update();
+  double textureRes = 512;
+	m_ArbSlicer->SetOutputDimentions(textureRes,textureRes,1);
+	m_ArbSlicer->SetOutputSpacing(xspc, yspc, 1.0f);
+  m_ArbSlicer->Update();
 
-	m_SliceImage->DeepCopy(m_VolumeSlicer->GetOutput());
+	m_SliceImage->DeepCopy(m_ArbSlicer->GetTextureOutput());
 
   mmaVolumeMaterial *material = ((albaVMEVolume *)m_Input)->GetMaterial();
   double sr[2];
@@ -529,10 +524,7 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
   m_SliceTexture->SetInputData(m_SliceImage);
 
   m_Polydata	= vtkPolyData::New();
-  m_PolydataSlicer->SetOutputTypeToPolyData();
-  m_PolydataSlicer->SetTexture(m_SliceImage);
-  m_PolydataSlicer->Update();
-	m_Polydata->DeepCopy(m_PolydataSlicer->GetOutput());
+	m_Polydata->DeepCopy(m_ArbSlicer->GetPolyDataOutput());
 
   m_SlicerMapper	= vtkPolyDataMapper::New();
   m_SlicerMapper->SetInputData(m_Polydata);
@@ -587,8 +579,7 @@ void albaOpExtractIsosurface::DeleteOpDialog()
   m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
 
   vtkDEL(m_PIPRen);
-  vtkDEL(m_VolumeSlicer);
-  vtkDEL(m_PolydataSlicer);
+  vtkDEL(m_ArbSlicer);
   vtkDEL(m_SliceImage);
   vtkDEL(m_SliceTexture);
   vtkDEL(m_Polydata);
@@ -723,7 +714,7 @@ void albaOpExtractIsosurface::OnEvent(albaEventBase *alba_event)
       break;
     case ID_TRILINEAR_INTERPOLATION_ON:
       {
-        m_VolumeSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == true);
+        m_ArbSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == true);
         m_Rwi->CameraUpdate();
       }
     default:
@@ -779,17 +770,13 @@ void albaOpExtractIsosurface::UpdateSurface()
 void albaOpExtractIsosurface::UpdateSlice()
 {
   m_SliceOrigin[2] = m_Slice;
-  m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin[0], m_SliceOrigin[1], m_SliceOrigin[2]);
-  m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
-  m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
-  m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_ArbSlicer->SetPlaneOrigin(m_SliceOrigin[0], m_SliceOrigin[1], m_SliceOrigin[2]);
+  m_ArbSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_ArbSlicer->SetPlaneAxisY(m_SliceYVect);
 
-  m_VolumeSlicer->Update();
-  m_PolydataSlicer->Update();
+  m_ArbSlicer->Update();
 
-  m_CutterPlane->SetOrigin(m_VolumeSlicer->GetPlaneOrigin());
+  m_CutterPlane->SetOrigin(m_ArbSlicer->GetPlaneOrigin());
   m_IsosurfaceCutter->Update();
 
   this->m_PIPRen->ResetCameraClippingRange();

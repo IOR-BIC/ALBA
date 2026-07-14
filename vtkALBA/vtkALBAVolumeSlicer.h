@@ -22,9 +22,9 @@
 //   color mapping: window and level of color mapping
 //   
 // Outputs of the filter are:
-//   image (vtkImageData): The resolution and spacing of the image should be specified by consumer. 
+//   texture (vtkImageData): The resolution and spacing of the image should be specified by consumer. 
 //                         The origin will be automatically set to zero.
-//   polyline slice (vtkPolyData): This output includes both the polyline that define the cut and corresponded triangles. The texture coordinates are provided as well.
+//   Polydata (vtkPolyData): This output includes both the polyline that define the cut and corresponded triangles. The texture coordinates are provided as well.
 // .SECTION See Also
 // vtkProbeFilter, vtkPlaneSource
 
@@ -43,10 +43,6 @@
 class vtkRectilinearGrid;
 class vtkLinearTransform;
 #ifdef _WIN32
-//RELEASE NOTE: BES - 4.4.2008 - if you include <wx/string.h> (included by GPUOGL.h) here,
-//VS 2008 C++ compiler will produce an incorrect code (compiler BUG), 
-//when GetPlaneOrigin() is called from albaPipeVolumeSlice, function GetPlaneOrigin(double data[3])
-//is called instead of it
 class albaGPU3DTextureProviderHelper;
 #endif
 
@@ -72,20 +68,6 @@ public:
   void SetPlaneAxisY(float axis[3]);
   vtkGetVectorMacro(PlaneAxisY, float, 3);
 
-  /**
-  Set / Get the Window for color modulation. The formula for modulation is 
-  (S - (L - W/2))/ W where S is the scalar value, L is the level and W is the window.
-  BES: It is used nowhere, to be removed */
-  vtkSetMacro( Window, double );
-  vtkGetMacro( Window, double );
-
-  /**
-  Set / Get the Level to use -> modulation will be performed on the 
-  color based on (S - (L - W/2))/W where S is the scalar value, L is
-  the level and W is the window.
-  BES: It is used nowhere, to be removed */
-  vtkSetMacro( Level, double );
-  vtkGetMacro( Level, double );
 
   /** Set/get auto-spacing feature. 
   In this mode the image spacing is selected automatically to fit the whole slice*/
@@ -118,36 +100,26 @@ public:
   
   /** Set tri-linear interpolation */
   void SetTrilinearInterpolation(bool on){m_TriLinearInterpolationOn = on;};
-
-	/**
-  specify the image to be used for texturing output polydata object*/
-  void SetTexture(vtkImageData *data) {this->SetInputData(1, data);};
-	void SetTextureConnection(vtkAlgorithmOutput *connection) {this->SetInputConnection(1, connection);};
-	 
-  vtkImageData *GetTexture() { 
-    return vtkImageData::SafeDownCast(this->GetInputDataObject(1,0));
+  	 
+  vtkImageData *GetTextureOutput() { 
+    return vtkImageData::SafeDownCast(this->GetOutputDataObject(0));
   };
 
-  /** 
-  Transform slicer plane according to the given transformation before slicing.*/
-  void SetSliceTransform(vtkLinearTransform *trans);
+  vtkPolyData *GetPolyDataOutput() { 
+    return vtkPolyData::SafeDownCast(this->GetOutputDataObject(1));
+	};
 
-	void SetOutputType(char *vtkType);
+	vtkAlgorithmOutput *GetTextureOutputPort() { return this->GetOutputPort(0); }
 
-	void SetOutputTypeToImageData();
+  vtkAlgorithmOutput *GetPolydataOutputPort() { return this->GetOutputPort(1); }
 
-	void SetOutputTypeToPolyData();
-
+  
 protected:
   vtkALBAVolumeSlicer();
   ~vtkALBAVolumeSlicer();
 
-  /** Return this object's modified time. */  
-  /*virtual*/ vtkMTimeType GetMTime();
-
   /** By default copy the output update extent to the input. */
 	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
-
 
   /** 
   By default, UpdateInformation calls this method to copy information
@@ -213,23 +185,13 @@ protected:
 
 	char OutputVtkType[100];
 
-  int   NumComponents;
+  int   NumComponents;  //ID ONLY
+  
   // plane coordinates
   double PlaneOrigin[3];
   float PlaneAxisX[3];
   float PlaneAxisY[3];
   float PlaneAxisZ[3];
-
-  double GlobalPlaneOrigin[3];
-  float GlobalPlaneAxisX[3];
-  float GlobalPlaneAxisY[3];
-  float GlobalPlaneAxisZ[3];
-
-  vtkLinearTransform *TransformSlice;
-
-  // color mapping
-  double Window;
-  double Level;
 
   int AutoSpacing;
   int GPUEnabled;         //<Non-zero if GPU processing should be used whenever it is possible

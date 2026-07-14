@@ -55,17 +55,6 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
   PlaneAxisY[0] = PlaneAxisY[2] = 0.f;
   PlaneAxisY[1] = 1.f;
 
-  GlobalPlaneOrigin[0] = GlobalPlaneOrigin[1] = GlobalPlaneOrigin[2] = 0.f;
-  GlobalPlaneAxisX[0] = 1.f;
-  GlobalPlaneAxisX[1] = GlobalPlaneAxisX[2] = 0.f;
-  GlobalPlaneAxisY[0] = GlobalPlaneAxisY[2] = 0.f;
-  GlobalPlaneAxisY[1]  = 1.f;
-	GlobalPlaneAxisZ[0] = GlobalPlaneAxisZ[1] = 0.f;
-	GlobalPlaneAxisZ[2] = 1.f;
-
-  TransformSlice = NULL;
-
-	Window = Level = 0;
  
   this->AutoSpacing = 1;    //Autospacing is enabled by the default
   this->LastGPUEnabled = this->GPUEnabled = 1;     //GPU is enabled by the default
@@ -76,8 +65,8 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
     this->StOffsets[i] = NULL;
 		DataOrigin[i]=0;
 		DataBounds[i][0] = DataBounds[i][1] = 0;
-		DataDimensions[3] = 0;
-		SamplingTableMultiplier[3] = 0;
+		DataDimensions[i] = 0;
+		SamplingTableMultiplier[i] = 0;
   }  
 
   LastPreprocessedInput = NULL; 
@@ -88,10 +77,9 @@ vtkALBAVolumeSlicer::vtkALBAVolumeSlicer()
 #endif
 
   m_TriLinearInterpolationOn = true;
-	this->SetNumberOfInputPorts(2);
-	this->GetInputPortInformation(1)->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
-
-	SetOutputTypeToImageData();
+	this->SetNumberOfInputPorts(1);
+	this->SetNumberOfOutputPorts(2);
+	
 	m_TextureHelper = new albaGPU3DTextureProviderHelper();
 }
 //----------------------------------------------------------------------------
@@ -116,14 +104,8 @@ void vtkALBAVolumeSlicer::SetPlaneAxisX(float axis[3])
     return;
   memcpy(this->PlaneAxisX, axis, sizeof(this->PlaneAxisX));
   vtkMath::Normalize(this->PlaneAxisX);
-  if (TransformSlice)
-  {
-    TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-  }
-  else
-  {
-    memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
-  }
+  memcpy(PlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
+  
   this->Modified();
 }
 //----------------------------------------------------------------------------
@@ -138,14 +120,6 @@ void vtkALBAVolumeSlicer::SetPlaneAxisY(float axis[3])
   vtkMath::Normalize(this->PlaneAxisZ);
   vtkMath::Cross(this->PlaneAxisZ, this->PlaneAxisX, this->PlaneAxisY);
   vtkMath::Normalize(this->PlaneAxisY);
-  if (TransformSlice)
-  {
-    TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-  }
-  else
-  {
-    memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(this->PlaneAxisY));
-  }
   this->Modified();
 }
 //----------------------------------------------------------------------------
@@ -153,37 +127,18 @@ void vtkALBAVolumeSlicer::SetPlaneOrigin(double origin[3])
 //----------------------------------------------------------------------------
 {
 	memcpy(PlaneOrigin, origin, sizeof(PlaneOrigin));
-  if (TransformSlice)
-  {
-    TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-  }
-  else
-  {
-    memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
-  }
   this->Modified();
 }
 //----------------------------------------------------------------------------
 void vtkALBAVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
-  double plane_origin[3];
-  plane_origin[0] = x;
-  plane_origin[1] = y;
-  plane_origin[2] = z;
-  SetPlaneOrigin(plane_origin);
+  PlaneOrigin[0] = x;
+  PlaneOrigin[1] = y;
+  PlaneOrigin[2] = z;
+  this->Modified();
 }
 
-//----------------------------------------------------------------------------
-//Return this object's modified time.
-/*virtual*/vtkMTimeType vtkALBAVolumeSlicer::GetMTime()
-//----------------------------------------------------------------------------
-{
-	vtkMTimeType time = Superclass::GetMTime();
-  if (this->TransformSlice != NULL && this->TransformSlice->GetMTime() > time)
-    time = this->TransformSlice->GetMTime();
-  return time;
-}
 
 //----------------------------------------------------------------------------
 //By default copy the output update extent to the input.
@@ -213,26 +168,12 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 
 	this->NumComponents = input->GetPointData()->GetScalars()->GetNumberOfComponents();
 
-	//first, perform transformation of Plane
-	if (TransformSlice)
-	{
-		TransformSlice->TransformPoint(PlaneOrigin, GlobalPlaneOrigin);
-		TransformSlice->TransformNormal(PlaneAxisX, GlobalPlaneAxisX);
-		TransformSlice->TransformNormal(PlaneAxisY, GlobalPlaneAxisY);
-	}
-	else
-	{
-		memcpy(GlobalPlaneOrigin, PlaneOrigin, sizeof(PlaneOrigin));
-		memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(PlaneAxisX));
-		memcpy(GlobalPlaneAxisY, PlaneAxisY, sizeof(PlaneAxisY));
-	}
-
-	assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisX) - 1.f) < 1.e-5);
-	assert(fabs(vtkMath::Norm(this->GlobalPlaneAxisY) - 1.f) < 1.e-5);
+	assert(fabs(vtkMath::Norm(this->PlaneAxisX) - 1.f) < 1.e-5);
+	assert(fabs(vtkMath::Norm(this->PlaneAxisY) - 1.f) < 1.e-5);
 
 	//compute normal for the plane determined by PlaneAxisX and PlaneAxisY
-	vtkMath::Cross(this->GlobalPlaneAxisX, this->GlobalPlaneAxisY, this->GlobalPlaneAxisZ);
-	vtkMath::Normalize(this->GlobalPlaneAxisZ);
+	vtkMath::Cross(this->PlaneAxisX, this->PlaneAxisY, this->PlaneAxisZ);
+	vtkMath::Normalize(this->PlaneAxisZ);
 
 	//now copy the important information from input, e.g., bounding box
 	vtkImageData *imageData = vtkImageData::SafeDownCast(input);
@@ -297,11 +238,11 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 			//if the cut should fill the whole output, we will need to get intersections
 			if (this->AutoSpacing)
 			{
-				//intersect the cutting plane ax + by + cz + d = 0, where (a,b,c) is normal GlobalPlaneAxisZ
-				//and d can is computed so the plane goes through GlobalPlaneOrigin with the bounding box
-				const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] +
-					this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] +
-					this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
+				//intersect the cutting plane ax + by + cz + d = 0, where (a,b,c) is normal PlaneAxisZ
+				//and d can is computed so the plane goes through PlaneOrigin with the bounding box
+				const float d = -(this->PlaneAxisZ[0] * this->PlaneOrigin[0] +
+					this->PlaneAxisZ[1] * this->PlaneOrigin[1] +
+					this->PlaneAxisZ[2] * this->PlaneOrigin[2]);
 
 				//set initial spacing to 1,1,1
 				double spacing[3] = { 1.0f, 1.0f, 1.0f };
@@ -314,7 +255,7 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 				for (int i = 0; i < 3; i++)
 				{
 					//check if the i-axis is not parallel to the plane
-					if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
+					if (fabs(this->PlaneAxisZ[i]) < 1.e-10)
 						continue; //there is no intersection => continue
 
 					//i-axis is the major direction where we want to compute intersections
@@ -331,8 +272,8 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 							float p[3];
 							p[j] = this->DataBounds[j][jj];
 							p[k] = this->DataBounds[k][kk];
-							p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]) /
-								this->GlobalPlaneAxisZ[i];
+							p[i] = -(d + this->PlaneAxisZ[j] * p[j] + this->PlaneAxisZ[k] * p[k]) /
+								this->PlaneAxisZ[i];
 
 							// check that p[i] is in inside the box
 							float dbi0 = ((float)(this->DataBounds[i][0]));//Added by Losi 07.15.2009:	Bug #1721 fix
@@ -381,9 +322,9 @@ int	vtkALBAVolumeSlicer::RequestUpdateExtent(vtkInformation* request, vtkInforma
 					const float magicNumber = 1.e-5;
 					if (fabs(minT) > magicNumber || fabs(minS) > magicNumber)
 					{
-						this->GlobalPlaneOrigin[0] += minT * this->GlobalPlaneAxisX[0] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[0] * OutputDimentions[1];
-						this->GlobalPlaneOrigin[1] += minT * this->GlobalPlaneAxisX[1] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[1] * OutputDimentions[1];
-						this->GlobalPlaneOrigin[2] += minT * this->GlobalPlaneAxisX[2] * OutputDimentions[0] + minS * this->GlobalPlaneAxisY[2] * OutputDimentions[1];
+						this->PlaneOrigin[0] += minT * this->PlaneAxisX[0] * OutputDimentions[0] + minS * this->PlaneAxisY[0] * OutputDimentions[1];
+						this->PlaneOrigin[1] += minT * this->PlaneAxisX[1] * OutputDimentions[0] + minS * this->PlaneAxisY[1] * OutputDimentions[1];
+						this->PlaneOrigin[2] += minT * this->PlaneAxisX[2] * OutputDimentions[0] + minS * this->PlaneAxisY[2] * OutputDimentions[1];
 						this->Modified();
 					}
 				}
@@ -446,21 +387,24 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
 {
 	// get the info objects
 	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+	vtkInformation *outInfoImg = outputVector->GetInformationObject(0);
+	vtkInformation *outInfoPoly = outputVector->GetInformationObject(1);
 
 	// Initialize some frequently used values.
 	vtkDataObject  *input = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-	vtkDataObject *output = vtkDataObject::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkDataObject *outputImg = vtkDataObject::SafeDownCast(outInfoImg->Get(vtkDataObject::DATA_OBJECT()));
+	vtkDataObject *outputPoly = vtkDataObject::SafeDownCast(outInfoPoly->Get(vtkDataObject::DATA_OBJECT()));
 
 
   //BES: 15.12.2008 - when using mafOpCrop in mafViewOrthoSlice, the input
   //dimensions change between ExecuteInformation and ExecuteData
   RequestDataHotFix(request,inputVector,outputVector); 
 
-  if (vtkImageData::SafeDownCast(output) != NULL)
-    this->RequestData(outInfo,(vtkImageData*)output);
-  else if (vtkPolyData::SafeDownCast(output) != NULL)
-    this->RequestData(outInfo,(vtkPolyData*)output);
+  if (vtkImageData::SafeDownCast(outputImg) != NULL)
+    this->RequestData(outInfoImg,(vtkImageData*)outputImg);
+  
+  if (vtkPolyData::SafeDownCast(outputPoly) != NULL)
+    this->RequestData(outInfoPoly,(vtkPolyData*)outputPoly);
   
 	return 1;
 }
@@ -473,22 +417,18 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
   output->Reset();
 
   //get the cutting plane (from associated texture)
-  vtkImageData* texture = this->GetTexture();
-  if (texture != NULL) 
+  vtkImageData* texture = this->GetTextureOutput();
+  if (texture == NULL) 
   {
-    memcpy(this->GlobalPlaneOrigin, texture->GetOrigin(), sizeof(this->GlobalPlaneOrigin));
-  }
-  else
-  {
-    vtkErrorMacro(<<"No texture specified");
+    vtkErrorMacro(<<"No texture created");
     return;
   }
 
-  //plane: ax + by + cz + d = 0, where (a,b,c) is plane normal, which is stored in GlobalPlaneAxisZ
+  //plane: ax + by + cz + d = 0, where (a,b,c) is plane normal, which is stored in PlaneAxisZ
   //plane goes through the origin => compute d
-  const float d = -(this->GlobalPlaneAxisZ[0] * this->GlobalPlaneOrigin[0] + 
-    this->GlobalPlaneAxisZ[1] * this->GlobalPlaneOrigin[1] + 
-    this->GlobalPlaneAxisZ[2] * this->GlobalPlaneOrigin[2]);
+  const float d = -(this->PlaneAxisZ[0] * this->PlaneOrigin[0] + 
+    this->PlaneAxisZ[1] * this->PlaneOrigin[1] + 
+    this->PlaneAxisZ[2] * this->PlaneOrigin[2]);
 
   //intersect plane with the bounding box
   //we will have at most one intersection per one box edge
@@ -501,7 +441,7 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
   for (int i = 0; i < 3; i++) 
   {
     //check if the i-axis is not parallel to the plane
-    if (fabs(this->GlobalPlaneAxisZ[i]) < 1.e-10)
+    if (fabs(this->PlaneAxisZ[i]) < 1.e-10)
       continue; //there is no intersection => continue
     
     //i-axis is the major direction where we want to compute intersections
@@ -518,8 +458,8 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
         float (&p)[3] = points[numberOfPoints];
         p[j] = this->DataBounds[j][jj];
         p[k] = this->DataBounds[k][kk];
-        p[i] = -(d + this->GlobalPlaneAxisZ[j] * p[j] + this->GlobalPlaneAxisZ[k] * p[k]) / 
-          this->GlobalPlaneAxisZ[i];
+        p[i] = -(d + this->PlaneAxisZ[j] * p[j] + this->PlaneAxisZ[k] * p[k]) / 
+          this->PlaneAxisZ[i];
 
         // check that p[i] is in inside the box
         float dbi0 = ((float)(this->DataBounds[i][0]));//Added by Losi 07.15.2009:	Bug #1721 fix
@@ -658,10 +598,10 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
 
       //vtkMath::Norm(angleVector) gives abs(sin(alpha))*|n|
       //thus additional correction is necessary, for alpha in the range 180-360 degrees,
-      //angleVector is opposite to GlobalPlaneAxisZ, thus using dot product we can distinguish
+      //angleVector is opposite to PlaneAxisZ, thus using dot product we can distinguish
       //between intervals 0-180 and 180-360 
 			double norm = vtkMath::Norm(angleVector);
-      if (vtkMath::Dot(angleVector, this->GlobalPlaneAxisZ) > 0.0)
+      if (vtkMath::Dot(angleVector, this->PlaneAxisZ) > 0.0)
         norm = -norm;   //if angle(angleVector, plane normal) > 90 degrees
 
       //now, norm variable ranges from -|n| to |n| for angles from -90 to 90 and 
@@ -691,9 +631,7 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
 /*virtual*/ void vtkALBAVolumeSlicer::RequestData(vtkInformation *outInfo,vtkImageData *outputObject) 
 //----------------------------------------------------------------------------
 {
- 
-
-	vtkDataSet *inputPD = vtkDataSet::SafeDownCast(this->GetInput());
+ 	vtkDataSet *inputPD = vtkDataSet::SafeDownCast(this->GetInput());
 
 	OutputDimentions[2] = 1; 
 	int extent[6]={0,OutputDimentions[0]-1, 0,OutputDimentions[1]-1,0, OutputDimentions[2]-1};
@@ -704,7 +642,7 @@ int vtkALBAVolumeSlicer::RequestData(vtkInformation *request,	vtkInformationVect
   outputObject->SetExtent(extent);
 	outputObject->AllocateScalars(inputPD->GetPointData()->GetScalars()->GetDataType(),inputPD->GetPointData()->GetScalars()->GetNumberOfComponents());
 	outputObject->SetSpacing(OutputSpacing);
-	outputObject->SetOrigin(this->GlobalPlaneOrigin);
+	outputObject->SetOrigin(this->PlaneOrigin);
 
 	
   if (BNoIntersection)
@@ -937,7 +875,7 @@ void vtkALBAVolumeSlicer::CreateImage(const InputDataType *inputPointer, vtkImag
  #ifdef _WIN32
 	if (m_bGPUProcessing)
 	{
-		m_TextureHelper->CreateImage(outputObject, GlobalPlaneAxisX, GlobalPlaneAxisY, GlobalPlaneAxisZ, GlobalPlaneOrigin);
+		m_TextureHelper->CreateImage(outputObject, PlaneAxisX, PlaneAxisY, PlaneAxisZ, PlaneOrigin);
 	}
 	else
 	{
@@ -995,29 +933,29 @@ void vtkALBAVolumeSlicer::CreateImage(const InputDataType *input, OutputDataType
 
   assert(this->NumComponents == outputObject->GetNumberOfScalarComponents());
 
-  //the first pixel of the texture, i.e., the pixel at [0,0], has coordinates GlobalPlaneOrigin
+  //the first pixel of the texture, i.e., the pixel at [0,0], has coordinates PlaneOrigin
   //the pixel [i+1,j] has coordinates equal to the coordinates of the pixel [i,j] + 
-  //GlobalPlaneAxisX*dx; the pixel [i, j+1] has coordinates equal to the coordinates 
-  //of the pixel [i,j] + GlobalPlaneAxisY*dy
+  //PlaneAxisX*dx; the pixel [i, j+1] has coordinates equal to the coordinates 
+  //of the pixel [i,j] + PlaneAxisY*dy
   
   //if the scene is translated so the first voxel has coordinates [0.0, 0.0, 0.0]
-  //the first pixel has coordinates GlobalPlaneOrigin - DataOrigin
+  //the first pixel has coordinates PlaneOrigin - DataOrigin
   //as there is SamplingTableMultiplier samples per one mm, pixel coordinates to 
   //sample indices can be simply obtained using these variables:
   const float xaxis[3] = { 
-    this->GlobalPlaneAxisX[0] * dx * this->SamplingTableMultiplier[0], 
-    this->GlobalPlaneAxisX[1] * dx * this->SamplingTableMultiplier[1], 
-    this->GlobalPlaneAxisX[2] * dx * this->SamplingTableMultiplier[2]};
+    this->PlaneAxisX[0] * dx * this->SamplingTableMultiplier[0], 
+    this->PlaneAxisX[1] * dx * this->SamplingTableMultiplier[1], 
+    this->PlaneAxisX[2] * dx * this->SamplingTableMultiplier[2]};
 
   const float yaxis[3] = { 
-    this->GlobalPlaneAxisY[0] * dy * this->SamplingTableMultiplier[0], 
-    this->GlobalPlaneAxisY[1] * dy * this->SamplingTableMultiplier[1], 
-    this->GlobalPlaneAxisY[2] * dy * this->SamplingTableMultiplier[2]};
+    this->PlaneAxisY[0] * dy * this->SamplingTableMultiplier[0], 
+    this->PlaneAxisY[1] * dy * this->SamplingTableMultiplier[1], 
+    this->PlaneAxisY[2] * dy * this->SamplingTableMultiplier[2]};
 
   const float offset[3] = {
-    (this->GlobalPlaneOrigin[0] - this->DataOrigin[0]) * this->SamplingTableMultiplier[0],
-    (this->GlobalPlaneOrigin[1] - this->DataOrigin[1]) * this->SamplingTableMultiplier[1],
-    (this->GlobalPlaneOrigin[2] - this->DataOrigin[2]) * this->SamplingTableMultiplier[2]};
+    (this->PlaneOrigin[0] - this->DataOrigin[0]) * this->SamplingTableMultiplier[0],
+    (this->PlaneOrigin[1] - this->DataOrigin[1]) * this->SamplingTableMultiplier[1],
+    (this->PlaneOrigin[2] - this->DataOrigin[2]) * this->SamplingTableMultiplier[2]};
       
   memset(output, 0, sizeof(OutputDataType) * xs * ys * numComp);
   OutputDataType* pixel = output;
@@ -1087,10 +1025,10 @@ void vtkALBAVolumeSlicer::CreateImage(const InputDataType *input, OutputDataType
 
 //----------------------------------------------------------------------------
 //Calculates the coordinates for the given point and texture denoted by its size and spacing.
-//Texture is considered to have an origin at GlobalPlaneOrigin, to be oriented according to GlobalPlaneAxisX
-//and GlobalPlaneAxisY and to cover area of size*spacing mm. Actually, this routine computes intersection of
-//the line going through the given point and having vector GlobalPlaneAxisY with the line going through
-//the origin of texture and having vector GlobalPlaneAxisY. The computed times are stored in ts.
+//Texture is considered to have an origin at PlaneOrigin, to be oriented according to PlaneAxisX
+//and PlaneAxisY and to cover area of size*spacing mm. Actually, this routine computes intersection of
+//the line going through the given point and having vector PlaneAxisY with the line going through
+//the origin of texture and having vector PlaneAxisY. The computed times are stored in ts.
 void vtkALBAVolumeSlicer::CalculateTextureCoordinates(const float point[3], const int size[2], const double spacing[2], float ts[2]) 
 //----------------------------------------------------------------------------
 { 
@@ -1103,14 +1041,14 @@ void vtkALBAVolumeSlicer::CalculateTextureCoordinates(const float point[3], cons
   int iX = 0, iY = 1;
   
   float dens[3], den;
-  den = dens[0] = GlobalPlaneAxisX[0]*GlobalPlaneAxisY[1] - GlobalPlaneAxisY[0]*GlobalPlaneAxisX[1];
+  den = dens[0] = PlaneAxisX[0]*PlaneAxisY[1] - PlaneAxisY[0]*PlaneAxisX[1];
   
-  dens[1] = GlobalPlaneAxisX[0]*GlobalPlaneAxisY[2] - GlobalPlaneAxisY[0]*GlobalPlaneAxisX[2];
+  dens[1] = PlaneAxisX[0]*PlaneAxisY[2] - PlaneAxisY[0]*PlaneAxisX[2];
   if (fabs(dens[1]) > fabs(den)) {
     den = dens[1]; iY = 2;
   }
 
-  dens[2] = GlobalPlaneAxisX[1]*GlobalPlaneAxisY[2] - GlobalPlaneAxisY[1]*GlobalPlaneAxisX[2];
+  dens[2] = PlaneAxisX[1]*PlaneAxisY[2] - PlaneAxisY[1]*PlaneAxisX[2];
   if (fabs(dens[2]) > fabs(den)) {
     den = dens[2]; iX = 1; iY = 2;
   }
@@ -1118,28 +1056,18 @@ void vtkALBAVolumeSlicer::CalculateTextureCoordinates(const float point[3], cons
   assert(fabs(den) >= 1e-10);
   
   //we will use iX and iY only
-  float cX = point[iX] - GlobalPlaneOrigin[iX];
-  float cY = point[iY] - GlobalPlaneOrigin[iY];  
+  float cX = point[iX] - PlaneOrigin[iX];
+  float cY = point[iY] - PlaneOrigin[iY];  
 
   //now we can compute t, s
-  float tx = (cX*GlobalPlaneAxisY[iY] - cY*GlobalPlaneAxisY[iX]) / den;
-  float ty = (cX*GlobalPlaneAxisX[iY] - cY*GlobalPlaneAxisX[iX]) / den;
+  float tx = (cX*PlaneAxisY[iY] - cY*PlaneAxisY[iX]) / den;
+  float ty = (cX*PlaneAxisX[iY] - cY*PlaneAxisX[iX]) / den;
 
-  //both GlobalPlaneAxisX and GlobalPlaneAxisY are unit vectors, i.e., tx and ty are texture coordinates
+  //both PlaneAxisX and PlaneAxisY are unit vectors, i.e., tx and ty are texture coordinates
   //for texture covering area 1x1 => map coordinates to the current texture area
   ts[0] =  tx / (size[0] * spacing[0]);
   ts[1] = -ty / (size[1] * spacing[1]);
 }
-
-
-//----------------------------------------------------------------------------
-void vtkALBAVolumeSlicer::SetSliceTransform(vtkLinearTransform *trans)
-//----------------------------------------------------------------------------
-{
-  TransformSlice = trans;
-  Modified();
-}
-
 
 
 //----------------------------------------------------------------------------
@@ -1161,25 +1089,22 @@ void vtkALBAVolumeSlicer::SetGPUEnabled(int enable)
 
 }
 
-void vtkALBAVolumeSlicer::SetOutputType(char *vtkType)
-{
-	strncpy(OutputVtkType, vtkType, 100);
-}
-
-void vtkALBAVolumeSlicer::SetOutputTypeToImageData()
-{
-	SetOutputType("vtkImageData");
-}
-
-void vtkALBAVolumeSlicer::SetOutputTypeToPolyData()
-{
-	SetOutputType("vtkPolyData");
-}
-
 //----------------------------------------------------------------------------
 int vtkALBAVolumeSlicer::FillOutputPortInformation(int port, vtkInformation* info)
 {
-	// now add our info
-	info->Set(vtkDataObject::DATA_TYPE_NAME(), OutputVtkType); 
+  if (port == 0)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+  }
+  else if(port == 1)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+  }
+  else
+  {
+    return 0;
+	}
 	return 1;
 }

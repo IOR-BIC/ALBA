@@ -68,17 +68,13 @@ albaVMESlicer::albaVMESlicer()
   m_TextureRes = 512;
   m_Xspc = m_Yspc = 0.3;
 
-  vtkNEW(m_PSlicer);
-  vtkNEW(m_ISlicer);
-	m_PSlicer->SetOutputTypeToPolyData();
+  vtkNEW(m_ArbSlicer);
 
-	m_ISlicer->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
-	m_ISlicer->SetOutputSpacing(m_Xspc, m_Yspc, 1.0f);
-
-  m_PSlicer->SetTextureConnection(m_ISlicer->GetOutputPort());
+	m_ArbSlicer->SetOutputDimentions(m_TextureRes,m_TextureRes,1);
+	m_ArbSlicer->SetOutputSpacing(m_Xspc, m_Yspc, 1.0f);
   
   vtkNEW(m_BackTransform);
-  m_BackTransform->SetInputConnection(m_PSlicer->GetOutputPort());
+  m_BackTransform->SetInputConnection(m_ArbSlicer->GetOutputPort(1));
 
   DependsOnLinkedNodeOn();
 
@@ -105,8 +101,7 @@ albaVMESlicer::~albaVMESlicer()
   albaDEL(m_Transform);
   SetOutput(NULL);
 
-  vtkDEL(m_PSlicer);
-  vtkDEL(m_ISlicer);
+  vtkDEL(m_ArbSlicer);
 }
 
 //-------------------------------------------------------------------------
@@ -147,10 +142,10 @@ int albaVMESlicer::DeepCopy(albaVME *a)
     {
       dpipe->SetDependOnAbsPose(true);
       dpipe->SetInput(m_BackTransform->GetOutput());
-      dpipe->SetNthInput(1,m_PSlicer->GetTexture());
-    }
+      dpipe->SetNthInput(1,m_ArbSlicer->GetTextureOutput());
+    } 
     m_SlicedName      = slicer->m_SlicedName;
-    GetMaterial()->SetMaterialTexture(m_PSlicer->GetTexture());
+    GetMaterial()->SetMaterialTexture(m_ArbSlicer->GetTextureOutput());
     return ALBA_OK;
   }  
   return ALBA_ERROR;
@@ -311,13 +306,13 @@ void albaVMESlicer::InternalPreUpdate()
 				return;
 			}
 
-			m_ISlicer->SetInputData(vtkdata);
-			m_ISlicer->SetPlaneOrigin(pos);
-			m_ISlicer->SetPlaneAxisX(vectX);
-			m_ISlicer->SetPlaneAxisY(vectY);
-			m_ISlicer->Update();
+			m_ArbSlicer->SetInputData(vtkdata);
+			m_ArbSlicer->SetPlaneOrigin(pos);
+			m_ArbSlicer->SetPlaneAxisX(vectX);
+			m_ArbSlicer->SetPlaneAxisY(vectY);
+			m_ArbSlicer->Update();
 
-			vtkImageData *texture = m_PSlicer->GetTexture();
+			vtkImageData *texture = m_ArbSlicer->GetTextureOutput();
 			texture->AllocateScalars(scalars->GetDataType(), scalars->GetNumberOfComponents());
 			texture->Modified();
 
@@ -338,13 +333,7 @@ void albaVMESlicer::InternalPreUpdate()
 
 			if (m_UpdateVTKPropertiesFromMaterial)
 				material->UpdateProp();
-
-			m_PSlicer->SetInputData(vtkdata);
-			m_PSlicer->SetPlaneOrigin(pos);
-			m_PSlicer->SetPlaneAxisX(vectX);
-			m_PSlicer->SetPlaneAxisY(vectY);
-			m_PSlicer->Update();
-			
+	
    
       m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
@@ -358,7 +347,7 @@ void albaVMESlicer::InternalPreUpdate()
 			albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
 
 			dpipe->SetInput(m_BackTransform->GetOutput());
-			dpipe->SetNthInput(1,m_ISlicer->GetOutput());
+			dpipe->SetNthInput(1,m_ArbSlicer->GetOutput());
 			GetSurfaceOutput()->SetTexture((vtkImageData *)((albaDataPipeCustom *)GetDataPipe())->GetVTKDataPipe()->GetOutput(1));
     }
   }
@@ -374,8 +363,7 @@ void albaVMESlicer::InternalUpdate()
 		vol->Update();
 		if (vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData())
 		{
-			m_PSlicer->Update();
-			m_ISlicer->Update();
+			m_ArbSlicer->Update();
 			m_BackTransform->Update();
 
 			vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
@@ -384,7 +372,7 @@ void albaVMESlicer::InternalUpdate()
 				return;
 			}
 
-			vtkImageData *texture = m_PSlicer->GetTexture();
+			vtkImageData *texture = m_ArbSlicer->GetTextureOutput();
 
 			mmaMaterial * material = GetMaterial();
 
@@ -456,14 +444,14 @@ char** albaVMESlicer::GetIcon()
 void albaVMESlicer::SetTrilinearInterpolation(bool on) 
 {
   m_TrilinearInterpolationOn = on;
-  if(m_ISlicer)
-    m_ISlicer->SetTrilinearInterpolation(on);
+  if(m_ArbSlicer)
+    m_ArbSlicer->SetTrilinearInterpolation(on);
 }
 
 //-------------------------------------------------------------------------
 void albaVMESlicer::SetEnableGPU(bool val)
 {
 	m_EnableGPU = val;
-	if (m_ISlicer)
-		m_ISlicer->SetGPUEnabled(m_EnableGPU);
+	if (m_ArbSlicer)
+		m_ArbSlicer->SetGPUEnabled(m_EnableGPU);
 }

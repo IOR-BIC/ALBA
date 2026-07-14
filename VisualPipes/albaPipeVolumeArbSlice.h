@@ -147,7 +147,7 @@ public:
 
 	/** Get ImageData */
 	vtkImageData *GetImageData() { return m_Image; };
-	vtkALBAVolumeSlicer *GetSliceImageData() { return m_SlicerImage; };
+	vtkALBAVolumeSlicer *GetSliceImageData() { return m_ArbSlicer; };
 	vtkTexture *GetTexture() { return m_Texture; };
 
   /** Set tri-linear interpolation */  
@@ -188,9 +188,8 @@ protected:
   vtkALBAAssembly *m_AssemblyUsed;
   albaVMEOutputVolume *m_VolumeOutput;
 
-  vtkALBAVolumeSlicer				 *m_SlicerImage;
-	vtkALBAVolumeSlicer				 *m_SlicerPolygonal;
-
+  vtkALBAVolumeSlicer		*m_ArbSlicer;
+	
 	vtkTransform					*m_NormalTranform;
 	vtkTransformFilter		*m_NormalTranformFilter;
   vtkALBATicksGenerator *m_TicksGenerator;
