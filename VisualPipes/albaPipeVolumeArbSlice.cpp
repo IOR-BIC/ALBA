@@ -403,18 +403,9 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
 		m_AssemblyUsed->RemovePart(m_Actor);
 	if(m_TickActor)
 		m_AssemblyUsed->RemovePart(m_TickActor);
-
-	
 	if(m_SliceActor)
     m_AssemblyUsed->RemovePart(m_SliceActor);
-	if (m_SlicerImage)
-	{
-    m_SlicerImage->SetSliceTransform(NULL);
-	}
-  if (m_SlicerPolygonal)
-  {
-    m_SlicerPolygonal->SetSliceTransform(NULL);
-  }
+
   vtkDEL(m_SlicerImage);
 	vtkDEL(m_SlicerPolygonal);
 	vtkDEL(m_Image);

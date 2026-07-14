@@ -142,7 +142,6 @@ protected:
   /** By default copy the output update extent to the input. */
 	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
-
   /** 
   By default, UpdateInformation calls this method to copy information
   unmodified from the input to the output.*/
@@ -207,17 +206,13 @@ protected:
 
 	char OutputVtkType[100];
 
-  int   NumComponents;
+  int   NumComponents;  //ID ONLY
+  
   // plane coordinates
   double PlaneOrigin[3];
   float PlaneAxisX[3];
   float PlaneAxisY[3];
   float PlaneAxisZ[3];
-
-  double GlobalPlaneOrigin[3];
-  float GlobalPlaneAxisX[3];
-  float GlobalPlaneAxisY[3];
-  float GlobalPlaneAxisZ[3];
 
   // color mapping
   double Window;
