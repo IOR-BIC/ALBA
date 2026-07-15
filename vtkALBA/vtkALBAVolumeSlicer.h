@@ -118,9 +118,7 @@ protected:
   vtkALBAVolumeSlicer();
   ~vtkALBAVolumeSlicer();
 
-  /** By default copy the output update extent to the input. */
-	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
-
+  
   /** 
   By default, UpdateInformation calls this method to copy information
   unmodified from the input to the output.*/
