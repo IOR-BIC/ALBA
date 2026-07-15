@@ -384,7 +384,9 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, in
 	m_SlicingOrigin[1] += translation[1];
 	m_SlicingOrigin[2] += translation[2];
 	
-	SetSlices();
+	//It's not necessary to update the slice of the plane on which the gizmo moves. 
+	//Even if the origin or rotation changes, the slice on that plane remains the same.
+	SetSlices(planeSkip);
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip)
@@ -397,10 +399,12 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int p
 
 	UpdateConesPosition();
 
-	SetSlices();
+	//It's not necessary to update the slice of the plane on which the gizmo moves. 
+	//Even if the origin or rotation changes, the slice on that plane remains the same.
+	SetSlices(planeSkip);
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::SetSlices()
+void albaViewArbitraryOrthoSlice::SetSlices(int skipPlane)
 {
 	albaPipeVolumeArbOrthoSlice *pipeOrthoSlice = albaPipeVolumeArbOrthoSlice::SafeDownCast(m_ChildViewList[PERSPECTIVE_VIEW]->GetNodePipe(m_InputVolume));
 
@@ -411,6 +415,9 @@ void albaViewArbitraryOrthoSlice::SetSlices()
 		
 	for (int i = X; i <= Z; i++)
 	{
+		if(i==skipPlane)
+			continue;
+
 		m_SlicingOriginGUI[i] = m_SlicingOrigin[i];
 
 		double normal[4];

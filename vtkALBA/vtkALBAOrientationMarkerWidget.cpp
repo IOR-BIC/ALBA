@@ -68,6 +68,9 @@ vtkALBAOrientationMarkerWidget::vtkALBAOrientationMarkerWidget()
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetViewport( 0.0, 0.0, 0.2, 0.2 );
   this->Renderer->SetLayer( 0 );
+	//To avoid the color buffer to be cleared when the render window is rendered, we set the PreserveColorBuffer flag to 1
+	//Without this we obtain a black background in the viewport when the orientation marker is enabled
+  this->Renderer->SetPreserveColorBuffer(1);
   this->Renderer->InteractiveOff();
 
   this->Priority = 0.55;
