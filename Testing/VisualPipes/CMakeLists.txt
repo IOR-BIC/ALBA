@@ -63,6 +63,7 @@ SET(PROJECT_SRCS
 	albaPipeCompoundVolumeIsosurfaceTest.h albaPipeCompoundVolumeIsosurfaceTest.cpp
 	albaPipeRayCastTest.h albaPipeRayCastTest.cpp
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
+	albaPipePointCloudSliceTest.h albaPipePointCloudSliceTest.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})

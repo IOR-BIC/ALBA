@@ -52,6 +52,8 @@ vtkALBAPointCloudCutter::vtkALBAPointCloudCutter()
 {
   CutFunction = NULL ;
   InPolydata = NULL ;
+  CutTranformedNormal[0] = CutTranformedNormal[1] = CutTranformedNormal[2] = CutTranformedOrigin[0] = CutTranformedOrigin[1] = CutTranformedOrigin[2] = 0;
+  CutTranformedNormal[3] = CutTranformedOrigin[3] = 1; //for point multiplication purpose 
   PlaneTolerance = 0.05;
 }
 
@@ -159,8 +161,8 @@ bool vtkALBAPointCloudCutter::GetIntersectionOfBoundsWithPlane(const double *ori
         pts[k] = DataBounds[k][kk];
         pts[i] = -(d + norm[j] * pts[j] + norm[k] * pts[k]) / norm[i];
 
-        // check that p[i] is in inside the box
-        if (pts[i] < DataBounds[i][0] || pts[i] > DataBounds[i][1])
+        // check that p[i] is in inside the box, with tolerance applied
+        if (pts[i] < DataBounds[i][0] - PlaneTolerance || pts[i] > DataBounds[i][1] + PlaneTolerance)
           continue; //the supporting line intersects the plane but the edge does not
 
         return true;
@@ -179,9 +181,6 @@ void vtkALBAPointCloudCutter::SlicePoints()
 		return;
 
   PointsMapping.clear();
-
-  if(!GetIntersectionOfBoundsWithPlane(CutTranformedOrigin, CutTranformedNormal))
-		return; //the cutting plane does not intersect the bounding box of the mesh => return
 
   vtkPoints* outPoints = vtkPoints::New();
   vtkCellArray* outVerts = vtkCellArray::New();
@@ -205,44 +204,44 @@ void vtkALBAPointCloudCutter::SlicePoints()
     return;
   }
 
-
-  
+	
   // Loop through all input points
-  for (vtkIdType i = 0; i < npts; i++)
-  {
-    double point[3];
-    InPolydata->GetPoint(i, point);
-    
-    // Calculate vector from plane origin to point
-    double toPoint[3];
-    toPoint[0] = point[0] - CutTranformedOrigin[0];
-    toPoint[1] = point[1] - CutTranformedOrigin[1];
-    toPoint[2] = point[2] - CutTranformedOrigin[2];
-    
-    // Calculate signed distance from point to plane
-    double distance = toPoint[0] * normalizedNormal[0] + 
-                      toPoint[1] * normalizedNormal[1] + 
-                      toPoint[2] * normalizedNormal[2];
-    
-    // Check if distance is within tolerance
-    if (fabs(distance) < PlaneTolerance)
+	if (GetIntersectionOfBoundsWithPlane(CutTranformedOrigin, CutTranformedNormal))
+    for (vtkIdType i = 0; i < npts; i++)
     {
-      // Project point onto plane
-      double projectedPoint[3];
-      projectedPoint[0] = point[0] - distance * normalizedNormal[0];
-      projectedPoint[1] = point[1] - distance * normalizedNormal[1];
-      projectedPoint[2] = point[2] - distance * normalizedNormal[2];
-      
-      // Add projected point to output
-      vtkIdType outId = outPoints->InsertNextPoint(projectedPoint);
-      
-      // Add vertex cell
-      outVerts->InsertNextCell(1, &outId);
-      
-      // Store mapping for scalars transfer
-      PointsMapping.push_back(i);
+      double point[3];
+      InPolydata->GetPoint(i, point);
+
+      // Calculate vector from plane origin to point
+      double toPoint[3];
+      toPoint[0] = point[0] - CutTranformedOrigin[0];
+      toPoint[1] = point[1] - CutTranformedOrigin[1];
+      toPoint[2] = point[2] - CutTranformedOrigin[2];
+
+      // Calculate signed distance from point to plane
+      double distance = toPoint[0] * normalizedNormal[0] +
+        toPoint[1] * normalizedNormal[1] +
+        toPoint[2] * normalizedNormal[2];
+
+      // Check if distance is within tolerance
+      if (fabs(distance) < PlaneTolerance)
+      {
+        // Project point onto plane
+        double projectedPoint[3];
+        projectedPoint[0] = point[0] - distance * normalizedNormal[0];
+        projectedPoint[1] = point[1] - distance * normalizedNormal[1];
+        projectedPoint[2] = point[2] - distance * normalizedNormal[2];
+
+        // Add projected point to output
+        vtkIdType outId = outPoints->InsertNextPoint(projectedPoint);
+
+        // Add vertex cell
+        outVerts->InsertNextCell(1, &outId);
+
+        // Store mapping for scalars transfer
+        PointsMapping.push_back(i);
+      }
     }
-  }
 
   OutPolydata->SetPoints(outPoints);
   OutPolydata->SetVerts(outVerts);
@@ -264,6 +263,9 @@ void vtkALBAPointCloudCutter::TransferScalars()
   OutPolydata->GetPointData()->CopyStructure(InPolydata->GetPointData()) ;
 
   // allocate tuples for every point
+  if (OutPolydata->GetPoints() == NULL)
+    return;
+
   int npts = OutPolydata->GetPoints()->GetNumberOfPoints() ;
   OutPolydata->GetPointData()->SetNumberOfTuples(npts) ;
 
@@ -348,6 +350,11 @@ void vtkALBAPointCloudCutter::ToRotationMatrix(vtkMatrix4x4 *matrix)
 //------------------------------------------------------------------------------
 void vtkALBAPointCloudCutter::CalculateLocalCutCoord()
 {
+  if (CutFunction == NULL)
+  {
+    CutTranformedNormal[0] = CutTranformedNormal[1] = CutTranformedNormal[2] = CutTranformedOrigin[0] = CutTranformedOrigin[1] = CutTranformedOrigin[2] = 0;
+    return;
+  }
 	//Getting Mesh coordinates
 	vtkLinearTransform *trans = vtkLinearTransform::SafeDownCast(CutFunction->GetTransform());
 	if (trans)

@@ -91,6 +91,7 @@ void albaOpExporterBMPTest::TestExportBMP()
   filenameExporter << "\\albaOpExporterBMPTest_1024x1024_0002.bmp";
   importerBMP->TestModeOn();
   importerBMP->SetInput(storage->GetRoot());
+  importerBMP->SetBuildVolumeFlag(false);
   importerBMP->AddFileName(filenameExporter);
   importerBMP->Import();
   
@@ -109,6 +110,7 @@ void albaOpExporterBMPTest::TestExportBMP()
   filenameOriginal << "/Test_ExporterBMP/Bn_2295_bc_0012.bmp"; ///
   importerBMPOriginal->TestModeOn();
 	importerBMPOriginal->SetYFlip(true);
+  importerBMPOriginal->SetBuildVolumeFlag(false);
   importerBMPOriginal->SetInput(storage->GetRoot());
 	importerBMPOriginal->AddFileName(filenameOriginal);
   importerBMPOriginal->Import();

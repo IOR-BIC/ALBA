@@ -107,12 +107,17 @@ void albaOpExporterDicFile::OpRun()
 	m_File = m_FileDir + "\\" + m_Input->GetName() + ".dat";
 
 	m_Gui = new albaGUI(this);
+	m_Gui->Label("");
 	m_Gui->FileSave(ID_CHOOSE_FILENAME, _("DIC file"), &m_File, wildc);
 /*	m_Gui->Label("File type", true);*/
 	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
+	m_Gui->Label("Warning:",true);
+	m_Gui->Label("The internal coordinates will be\nautomatically converted to the DIC\ncoordinate system using the inverse\ntransformation (X, Z, -Y)",false,true);
+	m_Gui->Label("");
+
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
 	m_Gui->Label("");
@@ -233,9 +238,9 @@ void albaOpExporterDicFile::SaveDICData()
 			rotTra->MultiplyPoint(displacem, displacem);
 		}
 		
-		fprintf(file, "%.6f %.6f %.6f ", point[0], -point[2], point[1]);
-		fprintf(file, "%.6f %.6f %.6f ", deformed[0], -deformed[2], deformed[1]);
-		fprintf(file, "%.6f %.6f %.6f ", displacem[0], -displacem[2], displacem[1]);
+		fprintf(file, "%.6f %.6f %.6f ", point[0], point[2], -point[1]);
+		fprintf(file, "%.6f %.6f %.6f ", deformed[0], deformed[2], -deformed[1]);
+		fprintf(file, "%.6f %.6f %.6f ", displacem[0], displacem[2], -displacem[1]);
 		fprintf(file, "%.6f\n", displMagnitudo->GetTuple1(i));
 
 		progressHelper.UpdateProgressBar(((float)i / numPoints)*100);
