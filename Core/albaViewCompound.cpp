@@ -217,6 +217,13 @@ albaRWIBase *albaViewCompound::GetRWI()
   //return ((albaViewVTK *)m_ChildViewList[m_DefauldChildView])->GetRWI();
   return GetSubView()->GetRWI();
 }
+
+//----------------------------------------------------------------------------
+albaPipe *albaViewCompound::GetNodePipe(albaVME *vme)
+{
+  return  (m_ChildViewList.size() >0 && m_ChildViewList[0]) ? m_ChildViewList[0]->GetNodePipe(vme) : NULL;
+}
+
 //----------------------------------------------------------------------------
 bool albaViewCompound::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
