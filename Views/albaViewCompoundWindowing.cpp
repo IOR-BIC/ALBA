@@ -247,16 +247,3 @@ void albaViewCompoundWindowing::VolumeWindowing(albaVME *volume)
   m_LutSlider->SetSubRange((long)currentSurfaceMaterial->GetTableRange()[0],(long)currentSurfaceMaterial->GetTableRange()[1]);
 
 }
-
-//-------------------------------------------------------------------------
-albaPipe* albaViewCompoundWindowing::GetNodePipe(albaVME *vme)
-//-------------------------------------------------------------------------
-{
-	albaPipe* rtn = NULL;
-	if (m_NumOfChildView ==1)
-	{
-	rtn = m_ChildViewList[0]->GetNodePipe(vme);
-	}
-	return rtn;
-
-}
