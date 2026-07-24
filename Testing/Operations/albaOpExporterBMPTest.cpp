@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaOpExporterBMPTest.h"
 
-#include "albaOpExporterBmp.h"
+#include "albaOpExporterImages.h"
 #include "albaOpImporterImage.h"
 #include "albaOpImporterVTK.h"
 
