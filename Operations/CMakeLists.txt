@@ -20,7 +20,7 @@ IF (ALBA_USE_VTK)
 	albaOp2DMeasure.cpp	    					albaOp2DMeasure.h
 	albaOpMeasure2D.cpp	    					albaOpMeasure2D.h
 	albaOpAddLandmark.cpp	    				albaOpAddLandmark.h
-	albaOpExporterBmp.cpp	    				albaOpExporterBmp.h
+	albaOpExporterImages.cpp	    				albaOpExporterImages.h
 	albaOpClipSurface.cpp	    				albaOpClipSurface.h
 	albaOpCreateGroup.cpp	    				albaOpCreateGroup.h
 	albaOpCreateInfoText.cpp					albaOpCreateInfoText.h
