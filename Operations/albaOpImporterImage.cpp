@@ -68,7 +68,8 @@ albaOpImporterImage::albaOpImporterImage(const wxString& label) : albaOpImporter
 	m_OpType = OPTYPE_IMPORTER;
 	m_Canundo = true;
 	m_Files.clear();
-	m_BuildVolumeFlag = false;
+	m_BuildVolumeFlag = true;
+	m_UniformSpacing = true;
 
 	m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = 1.0;
 
@@ -92,7 +93,9 @@ albaOpImporterImage::~albaOpImporterImage()
 enum IMAGE_IMPORTER_ID
 {
   ID_BUILD_VOLUME = MINID,
+	ID_UNIFORM_SPACING,
   ID_SPACING,
+	ID_SINGLE_SPACING,
 	ID_XFLIP,
 	ID_YFLIP,
 	ID_ZFLIP,
@@ -134,7 +137,12 @@ void albaOpImporterImage::OpRun()
 			else
 				m_BuildVolumeFlag = false;
 
+			m_Gui->Label("");
+			m_Gui->Bool(ID_UNIFORM_SPACING, "Uniform Spacing", &m_UniformSpacing, true);
+
 			m_Gui->Vector(ID_SPACING, "Spacing:", m_Spacing, 0);
+			m_Gui->Double(ID_SINGLE_SPACING, "XYZ Spacing:", m_Spacing);
+
 			m_Gui->Label("");
 			m_Gui->Bool(ID_XFLIP, "Flip around X axis", &m_XFlip, 1);
 			m_Gui->Bool(ID_YFLIP, "Flip around Y axis", &m_YFlip, 1);
@@ -144,6 +152,9 @@ void albaOpImporterImage::OpRun()
 			m_Gui->OkCancel();
 
 			m_Gui->Update();
+
+			m_Gui->Enable(ID_SPACING, !m_UniformSpacing);
+			m_Gui->Enable(ID_SINGLE_SPACING, m_UniformSpacing);
 
 			ShowGui();
 		}
@@ -170,6 +181,10 @@ void albaOpImporterImage::OnEvent(albaEventBase *alba_event)
   {
     switch(e->GetId())
     {
+			case ID_UNIFORM_SPACING:
+				m_Gui->Enable(ID_SPACING, !m_UniformSpacing);
+				m_Gui->Enable(ID_SINGLE_SPACING, m_UniformSpacing);
+			break;
       case wxOK:
         Import();
         OpStop(OP_RUN_OK);
@@ -202,6 +217,9 @@ void albaOpImporterImage::Import()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
 	vtkImageReader2* reader = NULL;
+
+	if (m_UniformSpacing)
+		m_Spacing[2] = m_Spacing[1] = m_Spacing[0];
 
 	int numFiles = m_Files.size();
 	if (!m_BuildVolumeFlag)
@@ -268,6 +286,10 @@ void albaOpImporterImage::Import()
 			}
 			lumFilter->Update();
 			vtkImageData* finalImage = lumFilter->GetOutput();
+
+			double *sr;
+			sr = finalImage->GetScalarRange();
+			albaLogMessage("SR: [%f,%f] LUM", sr[0], sr[1]);
 			
 			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
 			if (m_XFlip)
@@ -310,8 +332,11 @@ void albaOpImporterImage::Import()
 
 		if (sliceNum < 2)
 		{
-			wxMessageBox("Unable to create a Volume, too few images");
-			for (int i = 0; i < sliceNum + 1; i++)
+			if (m_TestMode)
+				albaLogMessage("Unable to create a Volume, too few images");
+			else
+				albaErrorMessage("Unable to create a Volume, too few images");
+			for (int i = 0; i < sliceNum; i++)
 				vtkDEL(images[i]);
 			return;
 		}

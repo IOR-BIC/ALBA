@@ -34,11 +34,11 @@
 /** Export a volume as a stack bmp images. User can choose to export two 
 different bmp format files: 24 bit file or 8 bit gray scale format file, 
 compatible with microCT software. */
-class ALBA_EXPORT albaOpExporterBmp: public albaOp
+class ALBA_EXPORT albaOpExporterImages: public albaOp
 {
 public:
-  albaOpExporterBmp(const wxString &label);
- ~albaOpExporterBmp(); 
+  albaOpExporterImages(const wxString &label);
+ ~albaOpExporterImages(); 
   albaOp* Copy();
 
 	/** Builds operation's interface. */
@@ -55,14 +55,11 @@ public:
 	//Set the directory where export the .bmp files
   void SetDirName(const char *dir_name){m_DirName = dir_name;};
 
-  /** Set the format of exported bmp file: "false" for 24 bit file, "true" for 8 bit gray scale file. */
-  void SetGrayscale(bool grayScale){m_Bit8 = grayScale;};
-
   /** Export the volume as a stack of 24 bit bmp images. */
   void SaveBmp();
 
-  /** Export the volume as a stack of 8 bit gray scale bmp images. */
-  bool WriteImageDataAsMonocromeBitmap( vtkImageData *img, albaString filename);
+	/** Return an xpm-icon that can be used to represent this operation */
+	virtual char **GetIcon();
 
 protected:
 
@@ -72,9 +69,8 @@ protected:
   wxString		m_ProposedDirectory;///<Default directory where to save file .bmp
   albaString		m_FileName;///<Name of the file/files where the exporter will save bmp dat
   albaString m_DirName;
-  int m_Offset;
   double m_ScalarRange[2];
+  int m_FileFormat; 
   vtkImageData *m_Image;
-  int m_Bit8;
  };
 #endif

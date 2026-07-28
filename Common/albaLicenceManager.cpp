@@ -391,7 +391,7 @@ albaLicenceManager::CreateNewLicenceStatuses albaLicenceManager::CreateNewBinary
 }
 
 
-//GUI - Show Licence Dialog
+// GUI - Show Licence Dialog
 //----------------------------------------------------------------------------
 void albaLicenceManager::ShowRegistrationDialog()
 {
@@ -511,6 +511,17 @@ void albaLicenceManager::ShowRegistrationDialog()
 			wxStaticBoxSizer *affiliationSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Affiliation");
 			affiliationSizer->Add(m_Affiliation_textCtrl, 0, wxALL | wxEXPAND, 0);
 			mainVertSizer->Add(affiliationSizer, 0, wxALL | wxEXPAND, 5);
+
+			// INSTITUTIONAL EMAIL FIELD
+			wxString institutionalEmailValue = "";
+			m_InstitutionalEmail_textCtrl = new wxTextCtrl(m_RegistrationDialog, ID_INSTITUTIONAL_EMAIL_FIELD, institutionalEmailValue, wxPoint(-1, -1), wxSize(vertPanelWidth, 25), wxALIGN_LEFT | wxEXPAND);
+			m_InstitutionalEmail_textCtrl->SetEditable(true);
+			m_InstitutionalEmail_textCtrl->Enable(true);
+			m_InstitutionalEmail_textCtrl->Bind(wxEVT_TEXT, &albaLicenceManager::OnTextFieldChanged, this);
+
+			wxStaticBoxSizer *institutionalEmailSizer = new wxStaticBoxSizer(wxVERTICAL, m_RegistrationDialog, "Institutional Email");
+			institutionalEmailSizer->Add(m_InstitutionalEmail_textCtrl, 0, wxALL | wxEXPAND, 0);
+			mainVertSizer->Add(institutionalEmailSizer, 0, wxALL | wxEXPAND, 5);
 
 			// INTENDED USE FIELD
 			wxString intendedUseValue = "";
@@ -785,12 +796,12 @@ void albaLicenceManager::OnEvent(albaEventBase *alba_event)
 			wxString name = m_Name_textCtrl->GetValue();
 			wxString surname = m_Surname_textCtrl->GetValue();
 			wxString affiliation = m_Affiliation_textCtrl->GetValue();
+			wxString institutionalEmail = m_InstitutionalEmail_textCtrl->GetValue();
 			wxString intendedUse = m_IntendedUse_textCtrl->GetValue();
 
 			// Create a readable registration data string with clear field labels
-			wxString registrationData = wxString::Format("Name:\n%s\n\nSurname:\n%s\n\nAffilition:\n%s\n\nIntended Use:\n%s\n\nRegistration Key:\n%s\n", name.ToAscii(),	surname.ToAscii(), affiliation.ToAscii(),intendedUse.ToAscii(),m_FirstKey.ToAscii()	);
+			wxString registrationData = wxString::Format("Name:\n%s\n\nSurname:\n%s\n\nAffiliation:\n%s\n\nInstitutional Email:\n%s\n\nIntended Use:\n%s\n\nRegistration Key:\n%s\n", name.ToAscii(), surname.ToAscii(), affiliation.ToAscii(), institutionalEmail.ToAscii(), intendedUse.ToAscii(), m_FirstKey.ToAscii());
 
-			
 			m_FirstKey_textCtrl->SetValue(registrationData);
 			m_FirstKey_textCtrl->SelectAll();
 		}
@@ -835,6 +846,7 @@ void albaLicenceManager::OnTextFieldChanged(wxEvent& event)
 	bool allFieldsFilled = !m_Name_textCtrl->GetValue().IsEmpty() &&
 		!m_Surname_textCtrl->GetValue().IsEmpty() &&
 		!m_Affiliation_textCtrl->GetValue().IsEmpty() &&
+		!m_InstitutionalEmail_textCtrl->GetValue().IsEmpty() &&
 		!m_IntendedUse_textCtrl->GetValue().IsEmpty();
 
 	m_GenerateRegistration_Button->Enable(allFieldsFilled);

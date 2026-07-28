@@ -133,7 +133,7 @@
 //EXPORTERS
 #include "albaOpExporterAnsysCDBFile.h"
 #include "albaOpExporterAnsysInputFile.h"
-#include "albaOpExporterBmp.h"
+#include "albaOpExporterImages.h"
 #ifdef ALBA_USE_GDCM
 #include "albaOpExporterDicom.h"
 #endif 
@@ -2025,7 +2025,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterDicom("Dicom"), "", true, dicomSettings);
 #endif
 	Plug(new albaOpExporterRAW("Raw"));
-	Plug(new albaOpExporterBmp("Bmp"));
+	Plug(new albaOpExporterImages("Images"));
 	Plug(new albaOpExporterLandmark("Landmark"));
 	Plug(new albaOpExporterWrappedMeter());
 	Plug(new albaOpExporterGRFWS());

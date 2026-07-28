@@ -142,9 +142,7 @@ public:
 	Show/Hide VMEs into plugged sub-views*/
 	/*virtual*/ void VmeShow(albaVME *vme, bool show);
   
-  /** return the current pipe for the specified vme (if any exist at this moment) */
-  /*virtual*/ albaPipe* GetNodePipe(albaVME *vme);
-
+  
 	/** 
 	return the status of the vme within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
 	having albaViewCompound::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph */

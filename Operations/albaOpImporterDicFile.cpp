@@ -135,23 +135,18 @@ int albaOpImporterDicFile::ImportFile()
 
 	int pointN = 0;
 
+	albaLogMessage("\n\nWarning: DIC coordinate system automatically aligned with the FEM coordinate system using the transformation (X, -Z, Y).\n");
+
 	do 
 	{
 		int nReaded;
 		
-		if (true) //TODO Add gui and manage modality
-		{
-			//X, -Z, Y
-			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[2], &values[1], &values[3], &values[5], &values[4], &values[6], &values[8], &values[7], &values[9]);
-			values[1] = -values[1];
-			values[4] = -values[4];
-			values[7] = -values[7];
-		}
-		else
-		{
-			//X, Y, Z
-			nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9]);
-		}
+		//X, -Z, Y
+		nReaded = sscanf(m_Line, "%lu %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &indexes[0], &indexes[1], &values[0], &values[2], &values[1], &values[3], &values[5], &values[4], &values[6], &values[8], &values[7], &values[9]);
+		values[1] = -values[1];
+		values[4] = -values[4];
+		values[7] = -values[7];
+		
 		if (nReaded != 12)
 		{
 			albaErrorMessage("Wrong file: %s", m_FileName.GetCStr());

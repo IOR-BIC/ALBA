@@ -274,14 +274,6 @@ int albaViewSliceOnCurveCompound::GetNodeStatus(albaVME *vme)
 
   return m_ChildViewList[MAIN_VIEW]->GetNodeStatus(vme);
 }
-
-//------------------------------------------------------------------------
-//return the current pipe for the specified vme (if any exist at this moment) */
-/*virtual*/ albaPipe* albaViewSliceOnCurveCompound::GetNodePipe(albaVME *vme)
-//------------------------------------------------------------------------
-{
-  return m_ChildViewList[MAIN_VIEW]->GetNodePipe(vme);
-}
 #pragma endregion //VME manipulation
 
 

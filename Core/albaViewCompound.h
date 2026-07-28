@@ -131,6 +131,9 @@ public:
   virtual albaSceneGraph *GetSceneGraph();
   virtual albaRWIBase    *GetRWI();
 
+	/** return the current pipe for the specified vme from the first sub-view (if any exist at this moment) */
+	virtual albaPipe *GetNodePipe(albaVME *vme);
+
   /** 
   Return a pointer to the image of all sub-views.*/
   void GetImage(wxBitmap &bmp, int magnification = 1);

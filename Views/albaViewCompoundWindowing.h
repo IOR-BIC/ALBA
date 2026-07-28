@@ -103,9 +103,5 @@ protected:
 	albaGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
 	albaGUILutSlider		*m_LutSlider;
 	vtkLookupTable	        *m_ColorLUT;
-	
-	/** Function that get vme pipe of first child     */
-	virtual albaPipe* GetNodePipe(albaVME *vme);
-
-};
+	};
 #endif

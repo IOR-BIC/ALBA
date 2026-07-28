@@ -28,7 +28,7 @@ SET(PROJECT_SRCS
 	albaOpRemoveCellsTest.h albaOpRemoveCellsTest.cpp
 	albaOpBooleanSurfaceTest.h albaOpBooleanSurfaceTest.cpp
 	albaOpEditNormalsTest.h albaOpEditNormalsTest.cpp
-	albaOpExporterBMPTest.h albaOpExporterBMPTest.cpp
+	albaOpExporterImagesTest.h albaOpExporterImagesTest.cpp
 	albaOpImporterMSFTest.h albaOpImporterMSFTest.cpp
 	albaOpImporterExternalFileTest.h albaOpImporterExternalFileTest.cpp
 	albaOpOpenExternalFileTest.h albaOpOpenExternalFileTest.cpp

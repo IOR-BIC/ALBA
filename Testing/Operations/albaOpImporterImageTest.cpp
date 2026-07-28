@@ -48,6 +48,7 @@ void albaOpImporterImageTest::Test_Single()
 	albaOpImporterImage *importer=new albaOpImporterImage("importer");
 	importer->TestModeOn();
   importer->SetInput(storage->GetRoot());
+  importer->SetBuildVolumeFlag(false);
 	albaString filename=ALBA_DATA_ROOT;
   filename<<"/Image/imageTest.jpg";
 	importer->AddFileName(filename.GetCStr());
@@ -95,6 +96,7 @@ void albaOpImporterImageTest::Test_Multi_No_Volume()
   importer->AddFileName(filename.GetCStr());
 
   importer->OpRun();
+	importer->SetBuildVolumeFlag(false);
   importer->Import();
   albaVME* node = importer->GetOutput();
 
