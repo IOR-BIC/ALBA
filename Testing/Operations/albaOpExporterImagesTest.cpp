@@ -71,7 +71,7 @@ void albaOpExporterImagesTest::TestExportBMP()
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_ExporterBMP/VolTestImages.vtk";
+  filename << "/Test_ExporterImages/VolTestImages.vtk";
   importerVTK->SetFileName(filename.GetCStr());
   importerVTK->ImportFile();
 
