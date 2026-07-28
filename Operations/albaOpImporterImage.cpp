@@ -222,6 +222,11 @@ void albaOpImporterImage::Import()
 		m_Spacing[2] = m_Spacing[1] = m_Spacing[0];
 
 	int numFiles = m_Files.size();
+	
+	//Disable Build Volume Flag when a sigle image is loaded 
+	if (numFiles == 1)
+		m_BuildVolumeFlag = false;
+	
 	if (!m_BuildVolumeFlag)
 	{
 		albaNEW(m_ImportedGroup);
