@@ -56,7 +56,7 @@
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnsysCDBFileTest.h"
 #include "albaOpExporterAnsysInputFileTest.h" 
-#include "albaOpExporterBMPTest.h"
+#include "albaOpExporterImagesTest.h"
 #include "albaOpExporterGRFWSTest.h"
 #include "albaOpExporterLandmarkTest.h"
 #include "albaOpExporterLandmarkWSTest.h"
@@ -225,7 +225,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpRemoveCellsTest::suite());
 	runner.addTest(albaOpBooleanSurfaceTest::suite());
 	runner.addTest(albaOpEditNormalsTest::suite()); 
-	runner.addTest(albaOpExporterBMPTest::suite()); 
+	runner.addTest(albaOpExporterImagesTest::suite()); 
 	runner.addTest(albaOpImporterMSFTest::suite());
 	runner.addTest(albaOpImporterExternalFileTest::suite());
 	runner.addTest(albaOpOpenExternalFileTest::suite());
