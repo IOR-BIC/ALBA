@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpExporterBMPTest
+ Module: albaOpExporterImagesTest
  Authors: Roberto Mucci
  
  Copyright (c) BIC
@@ -19,11 +19,11 @@
 
 #include "albaTest.h"
 
-class albaOpExporterBMPTest : public albaTest
+class albaOpExporterImagesTest : public albaTest
 {
 public:
 
-  CPPUNIT_TEST_SUITE( albaOpExporterBMPTest );
+  CPPUNIT_TEST_SUITE( albaOpExporterImagesTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestConstructor );
   CPPUNIT_TEST( TestExportBMP );
