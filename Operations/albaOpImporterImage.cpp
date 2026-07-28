@@ -236,11 +236,24 @@ void albaOpImporterImage::Import()
 
 		progressHelper.UpdateProgressBar((i * 100) / numFiles);
 
+		if (!wxFileExists(m_Files[index].c_str()))
+		{
+			if (m_TestMode)
+				albaLogMessage("Error file %s does not exists", m_Files[index].c_str());
+			else
+				albaErrorMessage("Error file %s does not exists", m_Files[index].c_str());
+
+			//skip this file
+			continue;
+		}
+
+
 		wxFileName::SplitPath(m_Files[index].c_str(), &path, &name, &ext);
 		ext.MakeUpper();
 
 		albaSmartPointer <albaVMEImage> importedImage;
 
+		
 
 		if (ext == "BMP")
 			reader = vtkBMPReader::New();
@@ -287,10 +300,6 @@ void albaOpImporterImage::Import()
 			lumFilter->Update();
 			vtkImageData* finalImage = lumFilter->GetOutput();
 
-			double *sr;
-			sr = finalImage->GetScalarRange();
-			albaLogMessage("SR: [%f,%f] LUM", sr[0], sr[1]);
-			
 			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
 			if (m_XFlip)
 			{
