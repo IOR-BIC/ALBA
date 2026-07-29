@@ -274,7 +274,6 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 		imageWriter->SetInput(imgToComp);
 		imageWriter->SetFileName(imageFileStored);
 		imageWriter->Write();
-		return;
 	}
 
 	vtkDEL(imageWriter);
