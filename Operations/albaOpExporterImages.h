@@ -37,7 +37,7 @@ compatible with microCT software. */
 class ALBA_EXPORT albaOpExporterImages: public albaOp
 {
 public:
-  albaOpExporterImages(const wxString &label);
+  albaOpExporterImages(const wxString &label="Images");
  ~albaOpExporterImages(); 
   albaOp* Copy();
 
@@ -56,10 +56,25 @@ public:
   void SetDirName(const char *dir_name){m_DirName = dir_name;};
 
   /** Export the volume as a stack of 24 bit bmp images. */
-  void SaveBmp();
+  void SaveImages();
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char **GetIcon();
+
+  /**< File format enumeration for export */
+  enum FileFormat
+  {
+    BMP,
+    JPEG,
+    PNG,
+    TIFF
+  };
+
+  /** Getter for GetFileFormat */
+  int GetFileFormat() { return m_FileFormat; }
+
+  /** Setter for SetFileFormat */
+  void SetFileFormat(FileFormat val) { m_FileFormat = val; }
 
 protected:
 
