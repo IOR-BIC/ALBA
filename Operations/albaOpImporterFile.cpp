@@ -53,6 +53,8 @@ int albaOpImporterFile::AcceptFile(albaString fileName)
 {
 		wxString file(fileName.GetCStr());
 		wxString ext = "." + file.AfterLast('.');
+
+		ext.MakeLower();
 					
 		wxString wildcards(m_Wildc.GetCStr());
 		
