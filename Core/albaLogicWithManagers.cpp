@@ -2007,7 +2007,9 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
 	Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
 	Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
+#ifdef ALBA_USE_BTK
 	Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
+#endif
 	Plug(new albaOpImporterAnalogWS("EMG"));
 	Plug(new albaOpImporterGRFWS("GRF"));
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));

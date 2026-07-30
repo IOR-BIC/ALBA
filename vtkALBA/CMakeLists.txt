@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 # Set the project/library name here.  Classes should be declared as
 # "class vtkALBA_EXPORT vtkFoo", where vtkALBA is the name of the
@@ -275,6 +275,3 @@ ENDIF(VTK_FOUND)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
 
-IF (ALBA_USE_WX)
-  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (ALBA_USE_WX)
