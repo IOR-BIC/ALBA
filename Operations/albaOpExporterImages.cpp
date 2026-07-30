@@ -57,7 +57,7 @@ albaOp(label)
   m_OpType = OPTYPE_EXPORTER;
   m_Canundo = true;
   m_Input = NULL;
-	m_FileFormat = 0;
+	m_FileFormat = BMP;
 	m_DirName = "";
 }
 //----------------------------------------------------------------------------
@@ -91,7 +91,8 @@ void albaOpExporterImages::OpRun()
 
 		const wxString fileFormats[] = { "BMP", "JPEG", "PNG", "TIFF"};
 
-		m_Gui->Radio(ID_SINGLE_FILE, "file format", &m_FileFormat, 4, fileFormats);
+		//Tiff export does not work well in VTK 4.4, so it is disabled for now, set numchoises to 4 to re-enable it
+		m_Gui->Radio(ID_SINGLE_FILE, "file format", &m_FileFormat, 3, fileFormats);
 
     m_Gui->Label("");
     m_Gui->OkCancel(); 
@@ -106,7 +107,7 @@ void albaOpExporterImages::OpRun()
 void albaOpExporterImages::OpDo()   
 {					
 	assert(m_Input);
-	this->SaveBmp();
+	this->SaveImages();
 }
 //----------------------------------------------------------------------------
 void albaOpExporterImages::OpUndo()   
@@ -119,7 +120,7 @@ albaOp* albaOpExporterImages::Copy()
     return cp;
 }
 //----------------------------------------------------------------------------
-void albaOpExporterImages::SaveBmp()
+void albaOpExporterImages::SaveImages()
 {
   assert(m_DirName != "");
 
@@ -255,31 +256,34 @@ void albaOpExporterImages::SaveBmp()
 
   switch (m_FileFormat)
   {
-  case 0:
+  case FileFormat::BMP:
     exporter = vtkBMPWriter::New();
+    exporter->SetFilePattern("%s_%04d.bmp");
     break;
-  case 1:
+  case FileFormat::JPEG:
     exporter = vtkJPEGWriter::New();
+    exporter->SetFilePattern("%s_%04d.jpeg");
     break;
-  case 2:
+  case FileFormat::PNG:
     exporter = vtkPNGWriter::New();
+    exporter->SetFilePattern("%s_%04d.png");
     break;
-  case 3:
+  case FileFormat::TIFF:
     exporter = vtkTIFFWriter::New();
+    exporter->SetFilePattern("%s_%04d.tiff");
     break;
   default:
     exporter = vtkBMPWriter::New();
+    exporter->SetFilePattern("%s_%04d.bmp");
     break;
   }
   
 
   exporter->SetInput(imageFlip->GetOutput());
   exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
-  exporter->SetFilePattern("%s_%04d.bmp");
   exporter->SetFilePrefix((char *)prefix.GetCStr());
 
   exporter->Write();
-
 }
 
 //----------------------------------------------------------------------------

@@ -27,12 +27,20 @@ public:
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestConstructor );
   CPPUNIT_TEST( TestExportBMP );
+  CPPUNIT_TEST( TestExportTIFF );
+  CPPUNIT_TEST( TestExportPNG );
+  CPPUNIT_TEST( TestExportJPEG );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
   void TestConstructor();
   void TestExportBMP();
+  void TestExportTIFF();
+  void TestExportPNG();
+  void TestExportJPEG();
+
+  void TestExport(int fileFormat);
 };
 
 #endif
