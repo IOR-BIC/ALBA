@@ -210,7 +210,7 @@ void albaOpExporterImagesTest::TestExport(int fileFormat)
 		albaString filenameDiff = filenameDir;
 		filenameDiff << "\\ImageDiff_02.png";
 
-		imageWriter->SetInput(math->GetOutput());
+		imageWriter->SetInputConnection(math->GetOutputPort());
 		imageWriter->SetFileName(filenameDiff.GetCStr());
 		imageWriter->Write();
 		vtkDEL(imageWriter);
