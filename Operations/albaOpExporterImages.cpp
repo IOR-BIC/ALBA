@@ -91,8 +91,7 @@ void albaOpExporterImages::OpRun()
 
 		const wxString fileFormats[] = { "BMP", "JPEG", "PNG", "TIFF"};
 
-		//Tiff export does not work well in VTK 4.4, so it is disabled for now, set numchoises to 4 to re-enable it
-		m_Gui->Radio(ID_SINGLE_FILE, "file format", &m_FileFormat, 3, fileFormats);
+		m_Gui->Radio(ID_SINGLE_FILE, "file format", &m_FileFormat, 4, fileFormats);
 
     m_Gui->Label("");
     m_Gui->OkCancel(); 
@@ -279,7 +278,6 @@ void albaOpExporterImages::SaveImages()
   exporter->SetFilePrefix((char *)prefix.GetCStr());
 
   exporter->Write();
-
 }
 
 //----------------------------------------------------------------------------

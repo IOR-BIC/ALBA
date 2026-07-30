@@ -65,8 +65,7 @@ void albaOpExporterImagesTest::TestExportBMP()
 //-----------------------------------------------------------
 void albaOpExporterImagesTest::TestExportTIFF()
 {
-	//Test disabled for a bug in vtkTIFFWriter in VTK 4.4
-	//TestExport(albaOpExporterImages::TIFF);
+	TestExport(albaOpExporterImages::TIFF);
 }
 
 //-----------------------------------------------------------
@@ -81,7 +80,7 @@ void albaOpExporterImagesTest::TestExportJPEG()
 	TestExport(albaOpExporterImages::JPEG);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------
 void albaOpExporterImagesTest::TestExport(int fileFormat)
 {
 	//Initialize storage
