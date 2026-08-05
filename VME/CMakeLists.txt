@@ -96,11 +96,6 @@ IF (ALBA_USE_VTK)
   albaVMERawMotionData.cpp  					albaVMERawMotionData.h
   albaVMEAnalog.cpp  						albaVMEAnalog.h
   
-  #add for stent
-  albaVMEStent.cpp  							albaVMEStent.h
-
-  #stent used tool, to find nearest point
-  kdtree.c  								kdtree.h
   )
 ENDIF (ALBA_USE_VTK)
 

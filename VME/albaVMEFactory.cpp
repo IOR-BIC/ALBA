@@ -78,7 +78,6 @@
 #ifdef ALBA_USE_ITK
 #include "albaVMERawMotionData.h"
 #include "albaVMEAnalog.h"
-#include "albaVMEStent.h"
 #endif
 
 
@@ -177,7 +176,6 @@ albaVMEFactory::albaVMEFactory()
 #ifdef ALBA_USE_ITK
   albaPlugVMEMacro(albaVMERawMotionData,"Raw Motion Data");
   albaPlugVMEMacro(albaVMEAnalog,"EMG scalar data");
-  albaPlugVMEMacro(albaVMEStent,"Stent");
 #endif
 
 }
