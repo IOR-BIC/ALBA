@@ -59,10 +59,8 @@ SET(vtkALBA_SRCS
   vtkALBAPoissonSurfaceReconstruction.cxx  				vtkALBAPoissonSurfaceReconstruction.h
   vtkALBAPolyDataMirror.cxx  							vtkALBAPolyDataMirror.h
   vtkALBAPolyDataNavigator.h  							vtkALBAPolyDataNavigator.cxx
-  vtkALBARegionGrowingLocalGlobalThreshold.cxx  			vtkALBARegionGrowingLocalGlobalThreshold.h
-  vtkALBAHalfTubeRemoval.cxx  							vtkALBAHalfTubeRemoval.h
-  vtkALBAInteractorStyleEnableRotation.cxx  				vtkALBAInteractorStyleEnableRotation.h
-  vtkALBASubdividePolylines.cxx  						vtkALBASubdividePolylines.h
+  vtkALBARegionGrowingLocalGlobalThreshold.cxx  		vtkALBARegionGrowingLocalGlobalThreshold.h
+  vtkALBAInteractorStyleEnableRotation.cxx  			vtkALBAInteractorStyleEnableRotation.h
   vtkALBALandmarkCloudPolydataFilter.cxx  				vtkALBALandmarkCloudPolydataFilter.h
   vtkBox.cxx  											vtkBox.h
   vtkMaskPolyDataFilter.cxx  							vtkMaskPolyDataFilter.h
@@ -129,9 +127,6 @@ SET(vtkALBA_FULL_SRCS
   vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
   vtkBoundingBox.cxx  									vtkBoundingBox.h
   vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
-  vtkALBAStentModelSource.cpp  							vtkALBAStentModelSource.h
-  vtkALBADeformableSimplexMeshFilter.h
-  vtkALBADeformableSimplexMeshFilter_Impl.h
   albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
   vtkALBAIdType64.h
   )
