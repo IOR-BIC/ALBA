@@ -136,7 +136,6 @@
 #include "albaVMEDataSetAttributesImporterTest.h"
 #include "albaVMEMeshAnsysTextExporterTest.h"
 #include "albaVMEMeshAnsysTextImporterTest.h"
-#include "albaOpImporterDICFileTest.h"
 #include "albaOpImporterPointCloudTest.h"
 #include "albaOpFilterImageTest.h"
 
@@ -151,6 +150,8 @@
 #include "vtkFileOutputWindow.h"
 #include "vtkALBASmartPointer.h"
 #include "albaVMEOutputNULL.h"
+#include "albaOpExporterDicFileTest.h"
+#include "albaOpImporterDicFileTest.h"
 
 // Visual Leak Detector
 //#include <vld.h>
@@ -326,6 +327,10 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterDICFileTest::suite());
 	runner.addTest(albaOpImporterPointCloudTest::suite());
 	runner.addTest(albaOpFilterImageTest::suite()); /* */
+
+runner.addTest(albaOpExporterDicFileTest::suite());
+	
+
 
 	runner.run( controller );
 
