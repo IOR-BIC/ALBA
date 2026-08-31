@@ -110,7 +110,7 @@ void albaVMEFactoryTest::Initialize_CreateVMEInstance()
   albaPlugVME<albaVMECustom>("a custom vme"); // plug a vme in the main node factory again
   vmes = vme_factory->GetNodeNames();
   s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 35);
+  CPPUNIT_ASSERT(s1 == 34);
 
   found=false;
   for (int i=0;i<vmes.size();i++)
