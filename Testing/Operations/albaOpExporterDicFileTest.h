@@ -1,9 +1,9 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpImporterDICFileTest
+ Module: albaOpExporterDicFileTest
  Authors: Gianluigi Crimi
- 
+
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
 
@@ -14,21 +14,26 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_albaOpImporterDICFileTest_H
-#define CPP_UNIT_albaOpImporterDICFileTest_H
+#ifndef CPP_UNIT_albaOpExporterDicFileTEST_H
+#define CPP_UNIT_albaOpExporterDicFileTEST_H
 
 #include "albaTest.h"
 
-class albaOpImporterDICFileTest : public albaTest
+class albaOpExporterDicFileTest : public albaTest
 {
-  CPPUNIT_TEST_SUITE( albaOpImporterDICFileTest );
-  CPPUNIT_TEST( Test );
-  CPPUNIT_TEST( TestScalarsPreservation );
+
+public:
+
+  CPPUNIT_TEST_SUITE( albaOpExporterDicFileTest );
+  CPPUNIT_TEST( TestExportDicFile );
+  CPPUNIT_TEST( TestExportDicFileWithABSMatrix );
+  CPPUNIT_TEST( TestExportAndReimport );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-    void Test();
-    void TestScalarsPreservation();
+    void TestExportDicFile();
+    void TestExportDicFileWithABSMatrix();
+    void TestExportAndReimport();
 };
 
 #endif
