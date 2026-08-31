@@ -166,7 +166,6 @@ void albaOpExporterDicFileTest::TestExportAndReimport()
   // Get scalar data from original
   inputNode->GetOutput()->Update();
   vtkPolyData *inputPolyData = vtkPolyData::SafeDownCast(inputNode->GetOutput()->GetVTKData());
-  inputPolyData->Update();
 
   vtkDataArray *inputScalars = inputPolyData->GetPointData()->GetScalars("Deformed Coordinates");
   CPPUNIT_ASSERT(inputScalars != NULL);
@@ -196,7 +195,6 @@ void albaOpExporterDicFileTest::TestExportAndReimport()
   // Verify scalars are preserved
   outputNode->GetOutput()->Update();
   vtkPolyData *outputPolyData = vtkPolyData::SafeDownCast(outputNode->GetOutput()->GetVTKData());
-  outputPolyData->Update();
 
   albaString scalarNames[] = { "Deformed Coordinates", "Displacements", "Displ Magnitudo", "Index X", "Index Y" };
 

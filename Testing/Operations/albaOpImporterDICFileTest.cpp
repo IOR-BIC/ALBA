@@ -101,7 +101,6 @@ void albaOpImporterDICFileTest::TestScalarsPreservation()
 	// Get the polydata and update
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	albaString scalarNames[] = { "Deformed Coordinates", "Displacements", "Displ Magnitudo", "Index X", "Index Y" };
 	
