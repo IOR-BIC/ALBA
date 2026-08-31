@@ -102,7 +102,7 @@ void albaVMEFactoryTest::Initialize_CreateVMEInstance()
 
   std::vector<std::string> vmes = vme_factory->GetNodeNames();
   int s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 35); //35 VMES are registered in constructor actually, 
+  CPPUNIT_ASSERT(s1 == 34); //34 VMES are registered in constructor actually, 
                             //please modify also the test when (un)plugged inside alba and update this number
            
   // test factory contents
