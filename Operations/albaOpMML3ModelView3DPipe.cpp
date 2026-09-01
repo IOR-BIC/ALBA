@@ -65,7 +65,6 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
   // Calculate scalar lut
   //----------------------------------------------------------------------------
   double r[2] ;
-  volume->Update() ;
   volume->GetScalarRange(r) ;
   m_LutWindow = (r[1]-r[0]);
   m_LutLevel = (r[1]+r[0]) / 2.0 ;
@@ -87,7 +86,6 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
   // NB If this is preview, make sure the muscle has data in it.
   //----------------------------------------------------------------------------
   double bnds[6], siz[3], minSize ;
-  muscle->Update() ;
   muscle->GetBounds(bnds) ;
   siz[0] = bnds[1] - bnds[0] ;
   siz[1] = bnds[3] - bnds[2] ;
@@ -102,11 +100,11 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
   // volume bounding box
   //----------------------------------------------------------------------------
   m_BoxFilter = vtkOutlineCornerFilter::New() ;
-  m_BoxFilter->SetInput(volume) ;
+  m_BoxFilter->SetInputData(volume) ;
   m_BoxFilter->SetCornerFactor(0.05) ;
 
   m_BoxMapper = vtkPolyDataMapper::New() ;
-  m_BoxMapper->SetInput(m_BoxFilter->GetOutput()) ;
+  m_BoxMapper->SetInputConnection(m_BoxFilter->GetOutputPort()) ;
 
   m_BoxActor = vtkActor::New() ;
   m_BoxActor->SetMapper(m_BoxMapper) ;
@@ -117,7 +115,7 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
   // muscle polydata
   //----------------------------------------------------------------------------
   m_MuscleMapper = vtkPolyDataMapper::New() ;
-  m_MuscleMapper->SetInput(muscle) ;
+  m_MuscleMapper->SetInputData(muscle) ;
 
   m_MuscleActor = vtkActor::New() ;
   m_MuscleActor->SetMapper(m_MuscleMapper) ;
@@ -136,7 +134,7 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
     m_LmarkSource[i]->SetRadius(m_LandmarkSize) ;
 
     m_LmarkMapper[i] = vtkPolyDataMapper::New() ;
-    m_LmarkMapper[i]->SetInput(m_LmarkSource[i]->GetOutput()) ;
+    m_LmarkMapper[i]->SetInputConnection(m_LmarkSource[i]->GetOutputPort()) ;
 
     m_LmarkActor[i] = vtkActor::New() ;
     m_LmarkActor[i]->SetMapper(m_LmarkMapper[i]) ;
@@ -156,7 +154,7 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
     m_AxisMarkSource[i]->SetRadius(m_LandmarkSize) ;
 
     m_AxisMarkMapper[i] = vtkPolyDataMapper::New() ;
-    m_AxisMarkMapper[i]->SetInput(m_AxisMarkSource[i]->GetOutput()) ;
+    m_AxisMarkMapper[i]->SetInputConnection(m_AxisMarkSource[i]->GetOutputPort()) ;
 
     m_AxisMarkActor[i] = vtkActor::New() ;
     m_AxisMarkActor[i]->SetMapper(m_AxisMarkMapper[i]) ;
@@ -182,12 +180,12 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
   axisLineCells->Delete() ;
 
   m_AxisLineTubeFilter = vtkTubeFilter::New() ;
-  m_AxisLineTubeFilter->SetInput(m_AxisLinePolydata) ;
+  m_AxisLineTubeFilter->SetInputData(m_AxisLinePolydata) ;
   m_AxisLineTubeFilter->SetRadius(m_TubeSize) ;
 
 
   m_AxisLineMapper = vtkPolyDataMapper::New() ;
-  m_AxisLineMapper->SetInput(m_AxisLineTubeFilter->GetOutput()) ;
+  m_AxisLineMapper->SetInputConnection(m_AxisLineTubeFilter->GetOutputPort()) ;
 
   m_AxisLineActor = vtkActor::New() ;
   m_AxisLineActor->SetMapper(m_AxisLineMapper) ;
@@ -230,7 +228,7 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
   m_SliceTransformScale->Identity() ;
 
   m_SliceTransformScaleFilter = vtkTransformPolyDataFilter::New() ;
-  m_SliceTransformScaleFilter->SetInput(m_SliceSource->GetOutput()) ;
+  m_SliceTransformScaleFilter->SetInputConnection(m_SliceSource->GetOutputPort()) ;
   m_SliceTransformScaleFilter->SetTransform(m_SliceTransformScale) ;
 
   m_SliceTransform = new (vtkTransform*[m_NumberOfSlices]) ;
@@ -244,15 +242,15 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
     m_SliceTransform[i]->Identity() ;
 
     m_SliceTransformFilter[i] = vtkTransformPolyDataFilter::New() ;
-    m_SliceTransformFilter[i]->SetInput(m_SliceTransformScaleFilter->GetOutput()) ;
+    m_SliceTransformFilter[i]->SetInputConnection(m_SliceTransformScaleFilter->GetOutputPort()) ;
     m_SliceTransformFilter[i]->SetTransform(m_SliceTransform[i]) ;
 
     m_SliceProbeFilter[i] = vtkProbeFilter::New() ;
-    m_SliceProbeFilter[i]->SetSource(volume) ;
-    m_SliceProbeFilter[i]->SetInput(m_SliceTransformFilter[i]->GetOutput()) ;
+		m_SliceProbeFilter[i]->SetSourceData(volume) ;
+    m_SliceProbeFilter[i]->SetInputConnection(m_SliceTransformFilter[i]->GetOutputPort()) ;
 
     m_SliceMapper[i] = vtkPolyDataMapper::New() ;
-    m_SliceMapper[i]->SetInput((vtkPolyData*)m_SliceProbeFilter[i]->GetOutput()) ;
+    m_SliceMapper[i]->SetInputConnection(m_SliceProbeFilter[i]->GetOutputPort()) ;
     m_SliceMapper[i]->SetLookupTable(m_Lut);
     m_SliceMapper[i]->UseLookupTableScalarRangeOn();
     m_SliceMapper[i]->SetColorModeToMapScalars();
@@ -301,17 +299,17 @@ albaOpMML3ModelView3DPipe::albaOpMML3ModelView3DPipe
     m_ContourPlane[i]->SetTransform(m_ContourCutterTransform[i]) ;
 
     m_ContourCutter[i] = vtkCutter::New() ;
-    m_ContourCutter[i]->SetInput(muscle) ;
+    m_ContourCutter[i]->SetInputData(muscle) ;
     m_ContourCutter[i]->SetCutFunction(m_ContourPlane[i]) ;
     m_ContourCutter[i]->SetNumberOfContours(1) ;
     m_ContourCutter[i]->SetValue(0, 0.0) ;
 
     m_ContourTubeFilter[i] = vtkTubeFilter::New() ;
-    m_ContourTubeFilter[i]->SetInput(m_ContourCutter[i]->GetOutput()) ;
+    m_ContourTubeFilter[i]->SetInputConnection(m_ContourCutter[i]->GetOutputPort()) ;
     m_ContourTubeFilter[i]->SetRadius(m_TubeSize) ;
 
     m_ContourMapper[i] = vtkPolyDataMapper::New() ;
-    m_ContourMapper[i]->SetInput(m_ContourTubeFilter[i]->GetOutput()) ;
+    m_ContourMapper[i]->SetInputConnection(m_ContourTubeFilter[i]->GetOutputPort()) ;
 
     m_ContourActor[i] = vtkActor::New() ;
     m_ContourActor[i]->SetMapper(m_ContourMapper[i]) ;
@@ -611,7 +609,6 @@ void albaOpMML3ModelView3DPipe::SetTubeRadius(double r)
 void albaOpMML3ModelView3DPipe::GetContourBounds(double *bounds)
 //------------------------------------------------------------------------------
 {
-  m_ContourCutter[m_CurrentSliceId]->GetOutput()->Update() ;
   m_ContourCutter[m_CurrentSliceId]->GetOutput()->GetBounds(bounds) ;
 }
 
@@ -621,7 +618,6 @@ void albaOpMML3ModelView3DPipe::GetContourBounds(double *bounds)
 void albaOpMML3ModelView3DPipe::GetContourCenter(double *center)
 //------------------------------------------------------------------------------
 {
-  m_ContourCutter[m_CurrentSliceId]->GetOutput()->Update() ;
   m_ContourCutter[m_CurrentSliceId]->GetOutput()->GetCenter(center) ;
 }
 

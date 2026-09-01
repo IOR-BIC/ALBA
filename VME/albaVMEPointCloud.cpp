@@ -232,7 +232,6 @@ int albaVMEPointCloud::GetPoint(int idx, double xyz[3],albaTimeStamp t)
 
   if (polydata)
   {
-    polydata->Update();
     ret=this->GetPoint(polydata,idx,xyz);
   }
     
@@ -375,9 +374,6 @@ int albaVMEPointCloud::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
   
-  if (polydata)
-    polydata->Update();
-
   if (polydata)
   {
     return albaVMEGeneric::SetData(data,t,mode);

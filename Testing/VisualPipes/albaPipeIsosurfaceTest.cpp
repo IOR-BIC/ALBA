@@ -77,7 +77,6 @@ void albaPipeIsosurfaceTest::TestPipeExecution()
   albaVMEVolumeGray *volumeInput;
   albaNEW(volumeInput);
   volumeInput->SetData((vtkRectilinearGrid*)Importer->GetOutput(),0.0);
-  volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
 
@@ -88,9 +87,9 @@ void albaPipeIsosurfaceTest::TestPipeExecution()
 
   //Assembly will be create when instancing albaSceneNode
   albaSceneNode *sceneNode;
-  sceneNode = new albaSceneNode(NULL,NULL,volumeInput, NULL);
+  sceneNode = new albaSceneNode(NULL,NULL,volumeInput, m_Renderer);
 
-  double scalarValue[2] = {1.0,0.0};
+  double scalarValue[2] = {1.0,0.1};
 
   for (int v = 0 ; v<2;v++)
   {
@@ -114,12 +113,12 @@ void albaPipeIsosurfaceTest::TestPipeExecution()
     volumeInput->GetOutput()->GetVTKData()->GetBounds(b);
     m_Renderer->ResetCamera(b);
     m_RenderWindow->Render();
-    
+
     printf("\n Visualization: \n");
 
 		COMPARE_IMAGES("TestPipeExecution", v);
 
-    m_Renderer->RemoveAllProps();
+    m_Renderer->RemoveAllViewProps();
 		sceneNode->DeletePipe();
   }
 

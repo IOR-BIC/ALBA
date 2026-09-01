@@ -127,8 +127,6 @@ void albaVMEOutputWrappedMeterTest::TestGetPolylineData_Update()
   vmeWrappedMeter->SetMeterLink("EndVME1", surface2);
   vmeWrappedMeter->SetMeterLink("WrappedVME", surface3);
 
-  vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
-
   albaVMEOutputWrappedMeter *outputWrappedMeter = NULL;
   outputWrappedMeter = albaVMEOutputWrappedMeter::SafeDownCast(vmeWrappedMeter->GetOutput());
   outputWrappedMeter->Update();

@@ -40,6 +40,11 @@
 #include "vtkRenderWindow.h"
 
 #include <iostream>
+#include "vtkDataSetAttributes.h"
+#include "vtkDataArray.h"
+#include "vtkDataSet.h"
+#include "vtkImageAlgorithm.h"
+
 
 //----------------------------------------------------------------------------
 void vtkXRayVolumeMapperTest::TestFixture()
@@ -74,7 +79,7 @@ void vtkXRayVolumeMapperTest::TestPipeExecution()
   //volumeProperty->SetColor(m_ColorTransferFunction);
   volumeProperty->SetInterpolationTypeToLinear();
 
-	  vtkXRayVolumeMapper *volumeMapper;
+	vtkXRayVolumeMapper *volumeMapper;
   vtkNEW(volumeMapper);
   volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
 

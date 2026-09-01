@@ -29,7 +29,7 @@ class ALBA_EXPORT vtkALBAInteractorStyleEnableRotation : public vtkInteractorSty
 {
 public:
   static vtkALBAInteractorStyleEnableRotation *New();
-  vtkTypeRevisionMacro(vtkALBAInteractorStyleEnableRotation, vtkInteractorStyleTrackballCamera);
+  vtkTypeMacro(vtkALBAInteractorStyleEnableRotation, vtkInteractorStyleTrackballCamera);
 
   void EnableRotation(bool enable) {m_RotationEnabled = enable ;  this->Modified() ;}
   virtual void Rotate();

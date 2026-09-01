@@ -183,7 +183,6 @@ void albaOpEqualizeHistogram::CreateHistogramDialog()
   m_Histogram = new albaGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL,true);
   m_Histogram->SetListener(this);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeOutput->GetOutput()->GetVTKData());
-  hd->Update();
   m_Histogram->SetData(hd->GetPointData()->GetScalars());
 
   albaGUI *gui = new albaGUI(this);
@@ -267,11 +266,10 @@ void albaOpEqualizeHistogram::Algorithm()
 //----------------------------------------------------------------------------
 {
   vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  im->Update();
 
   vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToFloat ();
-  vtkImageToFloat->SetInput(im);
+  vtkImageToFloat->SetInputData(im);
   vtkImageToFloat->Modified();
   vtkImageToFloat->Update();
 
@@ -298,10 +296,9 @@ void albaOpEqualizeHistogram::Algorithm()
 
   vtkALBASmartPointer<vtkImageData> imOut;
   imOut->DeepCopy(itkTOvtk->GetOutput());
-  imOut->Update();
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> imTosp;
-  imTosp->SetInput(imOut);
+  imTosp->SetInputData(imOut);
   imTosp->Update();
 
   m_VolumeOutput->SetData((vtkImageData *)imTosp->GetOutput(),m_VolumeInput->GetTimeStamp());

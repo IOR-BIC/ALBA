@@ -74,7 +74,6 @@ void albaOpFreezeVMETest::TestFreezeVMESurfaceParametric()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
   vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
@@ -86,7 +85,6 @@ void albaOpFreezeVMETest::TestFreezeVMESurfaceParametric()
 
   albaVMESurface *surface=(albaVMESurface *)(freezeOp->GetOutput());
   surface->ReparentTo(root);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->Update();
 
   CPPUNIT_ASSERT(surface && surface->GetOutput()->GetVTKData()->GetNumberOfPoints() == vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->GetNumberOfPoints());
@@ -112,14 +110,12 @@ void albaOpFreezeVMETest::TestFreezeVMEMeter()
 	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
 	albaNEW(vmeParametricSurfaceSTART);
 	vmeParametricSurfaceSTART->ReparentTo(root);
-	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceEND1;
 	albaNEW(vmeParametricSurfaceEND1);	
 	vmeParametricSurfaceEND1->ReparentTo(root);
-	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
@@ -142,14 +138,12 @@ void albaOpFreezeVMETest::TestFreezeVMEMeter()
 	meter->Modified();
 	meter->Update();
 
-  meter->GetOutput()->GetVTKData()->Update();
 
 	freezeOp->SetInput(meter);
 	freezeOp->OpRun();
 
 	albaVMEPolyline *polyline2=(albaVMEPolyline *)(freezeOp->GetOutput());
 	polyline2->ReparentTo(root);
-	polyline2->GetOutput()->GetVTKData()->Update();
 	polyline2->Update();
 	CPPUNIT_ASSERT(polyline2 && polyline2->GetOutput()->GetVTKData()->GetNumberOfPoints() == meter->GetOutput()->GetVTKData()->GetNumberOfPoints());
 
@@ -180,14 +174,12 @@ void albaOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
 	albaNEW(vmeParametricSurfaceSTART);
 	vmeParametricSurfaceSTART->ReparentTo(root);
-	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	albaVMESurfaceParametric *vmeParametricSurfaceEND1;
 	albaNEW(vmeParametricSurfaceEND1);	
 	vmeParametricSurfaceEND1->ReparentTo(root);
-	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
@@ -205,7 +197,6 @@ void albaOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	wrappedMeter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
 	wrappedMeter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
 	wrappedMeter->ReparentTo(storage->GetRoot());
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 
@@ -215,7 +206,6 @@ void albaOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 
 	albaVMEPolyline *polyline1=(albaVMEPolyline *)(freezeOp->GetOutput());
 	polyline1->ReparentTo(root);
-	polyline1->GetOutput()->GetVTKData()->Update();
 	polyline1->Update();
 	CPPUNIT_ASSERT(polyline1 && polyline1->GetOutput()->GetVTKData()->GetNumberOfPoints() == wrappedMeter->GetOutput()->GetVTKData()->GetNumberOfPoints());
 	
@@ -253,7 +243,6 @@ void albaOpFreezeVMETest::TestFreezeVMESlicer()
 	importer->OpRun();
 
 	albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 
@@ -276,7 +265,6 @@ void albaOpFreezeVMETest::TestFreezeVMESlicer()
 
 	albaVMESurface *sliceSurface=(albaVMESurface *)(freezeOp->GetOutput());
 	sliceSurface->ReparentTo(volume);
-	sliceSurface->GetOutput()->GetVTKData()->Update();
 	sliceSurface->Update();
 	int numSrc = sliceSurface->GetOutput()->GetVTKData()->GetNumberOfPoints();
 	int numDst = slicer->GetOutput()->GetVTKData()->GetNumberOfPoints();
@@ -337,12 +325,10 @@ void albaOpFreezeVMETest::TestFreezeVMEProber()
 	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
 	albaNEW(vmeParametricSurfaceSTART);
 	vmeParametricSurfaceSTART->ReparentTo(root);
-	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
 	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 
@@ -359,7 +345,6 @@ void albaOpFreezeVMETest::TestFreezeVMEProber()
 	prober->SetVolumeLink(volume);
 	prober->SetSurfaceLink(vmeParametricSurfaceSTART);
 	prober->ReparentTo(storage->GetRoot());
-	prober->GetOutput()->GetVTKData()->Update();
 	prober->Modified();
 	prober->Update();
 
@@ -368,8 +353,9 @@ void albaOpFreezeVMETest::TestFreezeVMEProber()
 
 	albaVMESurface *probSurface=(albaVMESurface *)(freezeOp->GetOutput());
 	probSurface->ReparentTo(root);
-	probSurface->GetOutput()->GetVTKData()->Update();
 	probSurface->Update();
+	//	probSurface->GetOutput()->Update();
+
 	int numSrc = probSurface->GetOutput()->GetVTKData()->GetNumberOfPoints();
 	int numDst = prober->GetOutput()->GetVTKData()->GetNumberOfPoints();
 
@@ -436,7 +422,6 @@ void albaOpFreezeVMETest::TestFreezeVMEProfileSpline()
 
   polydata->SetPoints(points);
   polydata->SetLines(cells);
-  polydata->Update();
   vmePolyline->SetData(polydata, 0.0);
   vmePolyline->ReparentTo(root);
   vmePolyline->Update();
@@ -448,7 +433,6 @@ void albaOpFreezeVMETest::TestFreezeVMEProfileSpline()
   albaNEW(spline);
   spline->SetPolylineLink(vmePolyline);
   spline->ReparentTo(root);
-  spline->GetOutput()->GetVTKData()->Update();
   spline->Modified();
   spline->Update();
 
@@ -457,7 +441,6 @@ void albaOpFreezeVMETest::TestFreezeVMEProfileSpline()
 
   albaVMEPolyline *polyline2=(albaVMEPolyline *)(freezeOp->GetOutput());
   polyline2->ReparentTo(root);
-  polyline2->GetOutput()->GetVTKData()->Update();
   polyline2->Update();
   int value1 = spline->GetOutput()->GetVTKData()->GetNumberOfPoints();
   int value2 = polyline2->GetOutput()->GetVTKData()->GetNumberOfPoints();
@@ -491,7 +474,6 @@ void albaOpFreezeVMETest::TestFreezeVMERefSys()
   albaVMERefSys *vmeRefSys;
   albaNEW(vmeRefSys);
   vmeRefSys->ReparentTo(root);
-  vmeRefSys->GetOutput()->GetVTKData()->Update();
   vmeRefSys->ReparentTo(storage->GetRoot());
   vmeRefSys->Update();
 
@@ -503,7 +485,6 @@ void albaOpFreezeVMETest::TestFreezeVMERefSys()
 
   albaVMESurface *surface=(albaVMESurface *)(freezeOp->GetOutput());
   surface->ReparentTo(root);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->Update();
 
   int num1 = surface->GetOutput()->GetVTKData()->GetNumberOfPoints();

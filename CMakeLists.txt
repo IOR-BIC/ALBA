@@ -8,7 +8,7 @@
 # Description:
 # CMake Project file for the ALBA.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4) 
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10) 
 
 PROJECT (ALBA)
 
@@ -290,19 +290,17 @@ ENDIF(WIN32)
 	ENDIF(WIN32)
 
   # Export Build settings and library dependences
-  INCLUDE(CMakeExportBuildSettings)
+  #INCLUDE(CMakeExportBuildSettings)
   
-  CMAKE_EXPORT_BUILD_SETTINGS(
-  ${ALBA_BINARY_DIR}/ALBABuildSettings.cmake
-  )
+  #CMAKE_EXPORT_BUILD_SETTINGS(
+  #${ALBA_BINARY_DIR}/ALBABuildSettings.cmake
+  #)
   
-  IF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
-    cmake_policy(SET CMP0033 OLD)
-  ENDIF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
+
   
-  EXPORT_LIBRARY_DEPENDENCIES(
-  ${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
-  )
+  #EXPORT_LIBRARY_DEPENDENCIES(
+  #${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
+  #)
 
   CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
   

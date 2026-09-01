@@ -79,7 +79,7 @@ void albaVMEOutputMeshTest::TestGetUnstructuredGridData()
   //Delaunay3D is used to triangulate the points
   //the output of the filter is an unstructured grid
   vtkALBASmartPointer<vtkDelaunay3D> triangulation;
-  triangulation->SetInput(pointsToTriangulate);
+  triangulation->SetInputData(pointsToTriangulate);
   triangulation->SetTolerance(0.01);
   triangulation->SetAlpha(0.2);
   triangulation->BoundingTriangulationOff();
@@ -90,7 +90,6 @@ void albaVMEOutputMeshTest::TestGetUnstructuredGridData()
   albaNEW(vmeMesh);
   vmeMesh->SetData(triangulation->GetOutput(), -1);
 
-  vmeMesh->GetOutput()->GetVTKData()->Update();
   vmeMesh->Update();
 
   albaVMEOutputMesh *outputMesh = NULL;
@@ -118,7 +117,7 @@ void albaVMEOutputMeshTest::TestSetGetMaterial()
   //Delaunay3D is used to triangulate the points
   //the output of the filter is an unstructured grid
   vtkALBASmartPointer<vtkDelaunay3D> triangulation;
-  triangulation->SetInput(pointsToTriangulate);
+  triangulation->SetInputData(pointsToTriangulate);
   triangulation->SetTolerance(0.01);
   triangulation->SetAlpha(0.2);
   triangulation->BoundingTriangulationOff();
@@ -129,7 +128,6 @@ void albaVMEOutputMeshTest::TestSetGetMaterial()
   albaNEW(vmeMesh);
   vmeMesh->SetData(triangulation->GetOutput(), -1);
 
-  vmeMesh->GetOutput()->GetVTKData()->Update();
   vmeMesh->Update();
 
   albaVMEOutputMesh *outputMesh = (albaVMEOutputMesh*)vmeMesh->GetOutput();

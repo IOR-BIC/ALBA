@@ -1,9 +1,0 @@
-441c441,444
-<     
----
-> 
-> #if (defined(WIN64) || defined(_WIN64))    
-> 		long length = EmbeddedFonts[tprop->GetFontFamily()][tprop->GetBold()][tprop->GetItalic()].length;
-> #else
-442a446
-> #endif

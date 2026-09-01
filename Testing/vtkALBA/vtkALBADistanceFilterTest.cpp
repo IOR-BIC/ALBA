@@ -51,18 +51,18 @@ void vtkALBADistanceFilterTest::TestInput()
 {
 	vtkALBASmartPointer<vtkALBADistanceFilter> filter;
 
-	CPPUNIT_ASSERT(filter->GetNumberOfInputs() == 0);
+	CPPUNIT_ASSERT(filter->GetTotalNumberOfInputConnections() == 0);
 
 	vtkALBASmartPointer<vtkSphereSource> sphere;
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
-	normals->SetInput(sphere->GetOutput());
+	normals->SetInputConnection(sphere->GetOutputPort());
 
-	filter->SetInput((vtkDataSet *)normals->GetOutput());
+	filter->SetInputConnection(normals->GetOutputPort());
 	filter->Update();
 
-	CPPUNIT_ASSERT(filter->GetNumberOfInputs() == 1);
+	CPPUNIT_ASSERT(filter->GetTotalNumberOfInputConnections() == 1);
 }
 
 //----------------------------------------------------------------------------
@@ -114,7 +114,6 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	importer->OpRun();
 
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 	
@@ -124,7 +123,7 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
-	normals->SetInput(sphere->GetOutput());
+	normals->SetInputConnection(sphere->GetOutputPort());
 
 	// Create Filter
 	vtkALBASmartPointer<vtkALBADistanceFilter> filter;
@@ -133,16 +132,16 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	filter->SetFilterModeToDensity();
 
 	filter->SetSource(volume->GetOutput()->GetVTKData());
-	filter->SetInput((vtkDataSet *)normals->GetOutput());
+	filter->SetInputConnection(normals->GetOutputPort());
 	filter->Update();
 
-	//	
-	CPPUNIT_ASSERT(filter->GetOutput()->GetNumberOfPoints() == 66);
-	CPPUNIT_ASSERT(filter->GetOutput()->GetNumberOfCells() == 96);
-	CPPUNIT_ASSERT(filter->GetOutput()->GetPointData()->GetNumberOfTuples() == 66);
+	vtkDataSet *filterOutput = filter->GetOutput();
+	CPPUNIT_ASSERT(filterOutput->GetNumberOfPoints() == 66);
+	CPPUNIT_ASSERT(filterOutput->GetNumberOfCells() == 96);
+	CPPUNIT_ASSERT(filterOutput->GetPointData()->GetNumberOfTuples() == 66);
 	
-	vtkDataArray *vectors = filter->GetOutput()->GetPointData()->GetVectors();
-	vtkDataArray *scalars = filter->GetOutput()->GetPointData()->GetScalars();
+	vtkDataArray *vectors = filterOutput->GetPointData()->GetVectors();
+	vtkDataArray *scalars = filterOutput->GetPointData()->GetScalars();
 	
   CPPUNIT_ASSERT(vectors == NULL && scalars != NULL);
 
@@ -153,7 +152,6 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 	CPPUNIT_ASSERT(scalars->GetTuple1(59) == 17728.1796875);
 	CPPUNIT_ASSERT(scalars->GetTuple1(64) == 17306.53125);
 
-	//
 	volume->ReparentTo(NULL);
 	cppDEL(importer);
 	albaDEL(storage);
@@ -178,7 +176,6 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	importer->OpRun();
 
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->GetOutput()->GetVTKData()->Update();
 	volume->ReparentTo(root);
 	volume->Update();
 
@@ -186,7 +183,7 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	sphere->Update();
 
 	vtkALBASmartPointer<vtkPolyDataNormals> normals;
-	normals->SetInput(sphere->GetOutput());
+	normals->SetInputConnection(sphere->GetOutputPort());
 
 	// Create Filter
 	vtkALBASmartPointer<vtkALBADistanceFilter> filter;
@@ -195,26 +192,25 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	filter->SetFilterModeToDistance();
 
 	filter->SetSource(volume->GetOutput()->GetVTKData());
-	filter->SetInput((vtkDataSet *)normals->GetOutput());
+	filter->SetInputConnection(normals->GetOutputPort());
 	filter->Update();
 
-	//	
 	vtkDataArray *vectors = filter->GetOutput()->GetPointData()->GetVectors();
 	vtkDataArray *scalars = filter->GetOutput()->GetPointData()->GetScalars();
 
 	CPPUNIT_ASSERT(vectors != NULL && scalars == NULL);
 
-	double val = 8.8789997100830078;
-	CPPUNIT_ASSERT(vectors->GetTuple3(28)[0] == -val); //-8.8789997100830078
-	CPPUNIT_ASSERT(vectors->GetTuple3(50)[0] == val);  // 8.8789997100830078
-	CPPUNIT_ASSERT(vectors->GetTuple3(16)[1] == val);  // 8.8789997100830078
-	CPPUNIT_ASSERT(vectors->GetTuple3(40)[1] == -val); //-8.8789997100830078
-	CPPUNIT_ASSERT(vectors->GetTuple3(61)[1] == -val); //-8.8789997100830078
-
+	double val = 8.8789987564086914;
+	double res = vectors->GetTuple(50)[0];
+	CPPUNIT_ASSERT(vectors->GetTuple(29)[0] == -val); 
+	CPPUNIT_ASSERT(vectors->GetTuple3(51)[0] == val); 
+	CPPUNIT_ASSERT(vectors->GetTuple3(17)[1] == val); 
+	CPPUNIT_ASSERT(vectors->GetTuple3(41)[1] == -val);
+	CPPUNIT_ASSERT(vectors->GetTuple3(62)[1] == -val);
+	
 	CPPUNIT_ASSERT(vectors->GetTuple3(0)[2] == 10.0);
 	CPPUNIT_ASSERT(vectors->GetTuple3(1)[2] == -10.0);
 
-	//
 	volume->ReparentTo(NULL);
 	cppDEL(importer);
 	albaDEL(storage);

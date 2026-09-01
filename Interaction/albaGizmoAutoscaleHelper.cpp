@@ -99,14 +99,14 @@ int albaGizmoAutoscaleHelper::DeepCopy(albaGizmoAutoscaleHelper *trans)
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration m_Renderer, m_Camera and m_Bounds modification time
-unsigned long albaGizmoAutoscaleHelper::GetMTime()
+vtkMTimeType albaGizmoAutoscaleHelper::GetMTime()
 //------------------------------------------------------------------------------
 {
-	unsigned long mtime = this->Superclass::GetMTime();
+	vtkMTimeType mtime = this->Superclass::GetMTime();
 
 	if (m_Camera)
 	{
-		unsigned long cameraMTime = m_Camera->GetMTime();
+		vtkMTimeType cameraMTime = m_Camera->GetMTime();
 		if (cameraMTime > mtime)
 			mtime=cameraMTime;
 	}
@@ -130,7 +130,7 @@ unsigned long albaGizmoAutoscaleHelper::GetMTime()
 
 	if (m_Bounds)
 	{
-		unsigned long boundsMTime = m_Bounds->GetMTime();
+		vtkMTimeType boundsMTime = m_Bounds->GetMTime();
 		if (boundsMTime > mtime)
 			mtime=boundsMTime;
 	}

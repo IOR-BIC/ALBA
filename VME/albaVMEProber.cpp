@@ -484,6 +484,16 @@ void albaVMEProber::OnEvent(albaEventBase *alba_event)
     Superclass::OnEvent(alba_event);
   }
 }
+
+//----------------------------------------------------------------------------
+int albaVMEProber::SetDataPipe(albaDataPipe *dpipe)
+{
+  albaDataPipeCustomProber *probPipe = albaDataPipeCustomProber::SafeDownCast(dpipe);
+  assert(probPipe);
+  m_ProbingDataPipe = probPipe;
+  return Superclass::SetDataPipe(dpipe);
+}
+
 //-------------------------------------------------------------------------
 char** albaVMEProber::GetIcon() 
 //-------------------------------------------------------------------------

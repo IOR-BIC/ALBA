@@ -16,7 +16,7 @@
 #pragma once
 
 #include "albaConfigure.h"
-#include "vtkPolyDataSource.h"
+#include "vtkPolyDataAlgorithm.h"
 
 /** This class generates polydata with model of erythrocyte (blood cell).
 The technique behind it is general enough to be generalized for other
@@ -24,10 +24,10 @@ types of cells, if needed. Model is based on the paper:
 S. Mu?oz San Martín, J.L. Sebastián,M. Sancho and G. Álvarez:
 Modeling Human Erythrocyte Shape and Size Abnormalities
 http://arxiv.org/ftp/q-bio/papers/0507/0507024.pdf*/
-class ALBA_EXPORT vtkALBAErythrocyteSource : public vtkPolyDataSource
+class ALBA_EXPORT vtkALBAErythrocyteSource : public vtkPolyDataAlgorithm
 {
 public:  
-  vtkTypeRevisionMacro(vtkALBAErythrocyteSource,vtkPolyDataSource);
+  vtkTypeMacro(vtkALBAErythrocyteSource,vtkPolyDataAlgorithm);
   static vtkALBAErythrocyteSource *New();
   
 protected:
@@ -63,7 +63,7 @@ protected:
   /**
   This method is the one that should be used by subclasses, right now the 
   default implementation is to call the backwards compatibility method */
-  /*virtual*/void ExecuteData(vtkDataObject *output);
+  /*virtual*/int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   /** Computes Jacobi elliptic functions sn(u,k), cn(u,k) and dn(u,k).
   In order to speedup the computation, parameters are uu = u, emmc = 1-k^2.

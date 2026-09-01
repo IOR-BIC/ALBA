@@ -31,19 +31,19 @@
 #ifndef __vtkMaskPolyDataFilter_h
 #define __vtkMaskPolyDataFilter_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 #include "vtkPolyData.h"
 #include "vtkMath.h"
 #include "vtkPolygon.h"
 #include "albaConfigure.h"
 //#include "vtkSVTKWin32Header.h"
 
-class ALBA_EXPORT vtkMaskPolyDataFilter : public vtkDataSetToDataSetFilter
+class ALBA_EXPORT vtkMaskPolyDataFilter : public vtkDataSetAlgorithm 
 {
 public:
   
   /** RTTI macro */
-  vtkTypeMacro(vtkMaskPolyDataFilter,vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkMaskPolyDataFilter,vtkDataSetAlgorithm );
 
   const char *GetClassName() {return "vtkMaskPolyDataFilter";};
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -91,8 +91,8 @@ public:
 
   /**
   Specify the polygonal dataset to perform the masking.*/
-  void SetMask(vtkPolyData *mask) {this->SetNthInput(1, mask);};
-  vtkPolyData *GetMask() { return (vtkPolyData *)(this->Inputs[1]);};
+  void SetMask(vtkPolyData *mask) {this->SetInputData(1, mask);};
+  vtkPolyData *GetMask();
 
 	/**
 	Set / get the Inside value*/
@@ -119,9 +119,14 @@ protected:
   vtkMaskPolyDataFilter(const vtkMaskPolyDataFilter&);
   void operator=(const vtkMaskPolyDataFilter&);
 
-  void Execute();
+	/**  Mask through data generating surface. */
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
-	void StandardAlgorithm();
+	/**Execute standard Algorithm*/
+	int StandardAlgorithm(vtkDataSet *input, vtkDataSet *output);
+
+	/**Execute Triple pass Algorithm to reduce glitches */
+	int TriplePassAlgorithm(vtkDataSet *input, vtkDataSet *output);
 
 	vtkPolyData *Mask;
 	vtkPolyData *CurrentSliceMask;
@@ -133,8 +138,6 @@ protected:
 	int Binarize;
 	int InsideOut;
 	int TriplePass;
-private:
-	void TriplePassAlgorithm();
 };
 
 #endif

@@ -192,10 +192,8 @@ void albaSnapshotManager::CreateSnapshot(albaVME *root, albaView *selectedView)
 
 	vtkImageData *vtkimg;
 	vtkNEW(vtkimg);
-	vtkimg->SetNumberOfScalarComponents(NumberOfComponents);
-	vtkimg->SetScalarTypeToUnsignedChar();
+	vtkimg->AllocateScalars(VTK_UNSIGNED_CHAR, NumberOfComponents);
 	vtkimg->SetDimensions(img.GetWidth(), img.GetHeight(), 1);
-	vtkimg->SetUpdateExtentToWholeExtent();
 	assert(vtkimg->GetPointData());
 	vtkimg->GetPointData()->SetScalars(buffer);
 

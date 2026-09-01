@@ -129,7 +129,7 @@ void albaAttachCameraTest::CreateTestData()
   axes->SetScaleFactor(2.5);
 
   vtkALBASmartPointer<vtkTubeFilter> tube;
-  tube->SetInput(axes->GetOutput());
+  tube->SetInputConnection(axes->GetOutputPort());
   tube->SetRadius(0.1);
   tube->CappingOn();
   tube->SetNumberOfSides(20);
@@ -150,7 +150,7 @@ void albaAttachCameraTest::RenderVMESurface( albaVMESurface *vme )
 {
   vtkDataSetMapper *mapper = vtkDataSetMapper::New();
   mapper->ScalarVisibilityOn();
-  mapper->SetInput(vme->GetOutput()->GetVTKData());
+  mapper->SetInputData(vme->GetOutput()->GetVTKData());
 
   vtkActor *actor = vtkActor::New();
   actor->SetMapper(mapper);

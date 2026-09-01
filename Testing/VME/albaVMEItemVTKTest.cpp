@@ -92,6 +92,7 @@ void albaVMEItemVTKTest::TestSetData()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   item->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
@@ -124,6 +125,7 @@ void albaVMEItemVTKTest::TestEquals()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   itemSphere->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
@@ -132,6 +134,7 @@ void albaVMEItemVTKTest::TestEquals()
 
   vtkCubeSource *cube;
   vtkNEW(cube);
+	cube->Update();
 
   itemCube->SetData(vtkDataSet::SafeDownCast(cube->GetOutput()));
 
@@ -145,6 +148,7 @@ void albaVMEItemVTKTest::TestEquals()
 
   vtkSphereSource *sphereToCompare;
   vtkNEW(sphereToCompare);
+	sphereToCompare->Update();
 
   itemSphereToCompare->SetData(vtkDataSet::SafeDownCast(sphereToCompare->GetOutput()));
 
@@ -171,6 +175,7 @@ void albaVMEItemVTKTest::TestIsDataPresent()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   result = !itemSphere->IsDataPresent();
   TEST_RESULT;
@@ -210,6 +215,7 @@ void albaVMEItemVTKTest::TestDeepCopy()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   item1->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
@@ -251,6 +257,7 @@ void albaVMEItemVTKTest::TestShallowCopy()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   item1->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
@@ -310,6 +317,7 @@ void albaVMEItemVTKTest::TestInternalStoreData()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   item->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
@@ -363,6 +371,7 @@ void albaVMEItemVTKTest::TestStoreToArchive()
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
+	sphere->Update();
 
   item->SetData(vtkDataSet::SafeDownCast(sphere->GetOutput()));
 
@@ -410,9 +419,7 @@ void albaVMEItemVTKTest::TestStoreToArchive()
   itemRead->ReadData(filenameZip);
 
   vtkPolyData *itemReadData = vtkPolyData::SafeDownCast(itemRead->GetData());
-  itemReadData->Update();
   vtkPolyData *itemData = vtkPolyData::SafeDownCast(item->GetData());
-  itemData->Update();
 
   result = itemReadData->GetNumberOfPoints() == itemData->GetNumberOfPoints();
   TEST_RESULT;

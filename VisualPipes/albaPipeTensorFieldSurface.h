@@ -30,6 +30,7 @@ class vtkLookupTable;
 class vtkActor;
 class vtkScalarBarActor;
 class vtkImageData;
+class vtkGeometryFilter;
 
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
@@ -74,6 +75,7 @@ protected:
   vtkScalarBarActor* m_MappingActor;  ///<actor that displays the mapping bar
 
   vtkPolyDataMapper* m_SurfaceMapper;  ///<mapper for glyphs
+  vtkGeometryFilter* m_GeometricFilter;
   vtkActor* m_SurfaceActor;            ///<actor for glyphs  
 
   wxComboBox* m_ComboColorBy;           ///<combo box with list of components

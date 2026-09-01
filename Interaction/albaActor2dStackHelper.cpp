@@ -17,12 +17,12 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPolyDataMapper2D.h"
 #include "vtkActor2D.h"
 #include "vtkRenderer.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProperty2D.h"
+#include "vtkPolyDataAlgorithm.h"
 
 
 //----------------------------------------------------------------------------
-albaActor2dStackHelper::albaActor2dStackHelper(vtkPolyDataSource *source, vtkRenderer *renderer)
+albaActor2dStackHelper::albaActor2dStackHelper(vtkPolyDataAlgorithm *source, vtkRenderer *renderer)
 {
 	m_Source = source;
 	m_Renderer = renderer;
@@ -32,7 +32,7 @@ albaActor2dStackHelper::albaActor2dStackHelper(vtkPolyDataSource *source, vtkRen
 	//Mapper
 	vtkCoordinate *coordinate = vtkCoordinate::New();
 	coordinate->SetCoordinateSystemToWorld();
-	m_Mapper->SetInput(source->GetOutput());
+	m_Mapper->SetInputConnection(source->GetOutputPort());
 	m_Mapper->SetTransformCoordinate(coordinate);
 
 	//Actor

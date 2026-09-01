@@ -160,13 +160,12 @@ wxBitmap *mmaMaterial::MakeIcon()
 	vtkALBASmartPointer<vtkTexture> texture;
   if (m_MaterialType == USE_TEXTURE)
   {
-    texture->SetInput(m_TextureImage);
+    texture->SetInputData(m_TextureImage);
   }
   
   vtkALBASmartPointer<vtkPolyDataMapper> pdm;
-	pdm->SetInput(ss->GetOutput());
-	pdm->SetImmediateModeRendering(0);
-
+	pdm->SetInputConnection(ss->GetOutputPort());
+	
 	vtkALBASmartPointer<vtkActor> actor;
   actor->SetMapper(pdm);
   if (m_MaterialType == USE_VTK_PROPERTY)
@@ -197,7 +196,7 @@ wxBitmap *mmaMaterial::MakeIcon()
 
   //flip it - windows Bitmap are upside-down
   vtkALBASmartPointer<vtkImageExport> ie;
-	ie->SetInput(w2i->GetOutput());
+	ie->SetInputConnection(w2i->GetOutputPort());
   ie->ImageLowerLeftOff();
   ie->SetExportVoidPointer(buffer);
 	ie->Export();

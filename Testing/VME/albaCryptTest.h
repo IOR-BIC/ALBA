@@ -25,17 +25,17 @@ class albaCryptTest : public albaTest
 public:
 
  CPPUNIT_TEST_SUITE( albaCryptTest );
-//  CPPUNIT_TEST(TestFixture);
-//  CPPUNIT_TEST(TestMafCalculateteChecksumFromString);
-//  CPPUNIT_TEST(TestMafCalculateteChecksumFromFile);
-//  CPPUNIT_TEST(TestMafEncryptMafDecryptFile);
-//  CPPUNIT_TEST(TestMafDecryptFileInMemory);
-//  CPPUNIT_TEST(TestMafEncryptFileFromMemory);
-//  CPPUNIT_TEST(TestMafDefaultEncryptFileMafDefaultDecryptFile);
-//  CPPUNIT_TEST(TestMafDefaultDecryptFileInMemory);
-//  CPPUNIT_TEST(TestMafDefaultEncryptFileFromMemory);
+ CPPUNIT_TEST(TestFixture);
+ CPPUNIT_TEST(TestMafCalculateteChecksumFromString);
+ CPPUNIT_TEST(TestMafCalculateteChecksumFromFile);
+ CPPUNIT_TEST(TestMafEncryptMafDecryptFile);
+ CPPUNIT_TEST(TestMafDecryptFileInMemory);
+ CPPUNIT_TEST(TestMafEncryptFileFromMemory);
+ CPPUNIT_TEST(TestMafDefaultEncryptFileMafDefaultDecryptFile);
+ CPPUNIT_TEST(TestMafDefaultDecryptFileInMemory);
+ CPPUNIT_TEST(TestMafDefaultEncryptFileFromMemory);
  CPPUNIT_TEST(TestMafEncryptFromMemoryMafDecryptInMemory);
-//  CPPUNIT_TEST(TestMafDefaultEncryptFromMemoryMafDefaultDecryptInMemory);
+ CPPUNIT_TEST(TestMafDefaultEncryptFromMemoryMafDefaultDecryptInMemory);
  CPPUNIT_TEST_SUITE_END();
 
 protected:

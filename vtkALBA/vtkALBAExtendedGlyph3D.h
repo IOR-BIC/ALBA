@@ -27,7 +27,7 @@
 #ifndef __vtkALBAExtendedGlyph3D_h
 #define __vtkALBAExtendedGlyph3D_h
 
-#include "vtkDataSetToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "albaConfigure.h"
 
 #define VTK_SCALE_BY_SCALAR 0
@@ -47,11 +47,14 @@
 #define VTK_INDEXING_BY_SCALAR 1
 #define VTK_INDEXING_BY_VECTOR 2
 
-class ALBA_EXPORT vtkALBAExtendedGlyph3D : public vtkDataSetToPolyDataFilter
+class ALBA_EXPORT vtkALBAExtendedGlyph3D : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAExtendedGlyph3D,vtkDataSetToPolyDataFilter);
+  vtkTypeMacro(vtkALBAExtendedGlyph3D,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+	/** Set Input port information to accept the right type */
+	int FillInputPortInformation(int, vtkInformation *info);
 
   /**
   Construct object with scaling on, scaling mode is by scalar value, 
@@ -179,9 +182,10 @@ protected:
   vtkALBAExtendedGlyph3D();
   ~vtkALBAExtendedGlyph3D();
 
-  void Execute();
-  void ExecuteInformation();
-  void ComputeInputUpdateExtents(vtkDataObject *output);
+	int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
+  int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
   int NumberOfSources; // Number of source objects
   vtkPolyData **Source; // Geometry to copy to each point

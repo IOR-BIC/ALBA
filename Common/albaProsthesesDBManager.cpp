@@ -589,7 +589,7 @@ void albaProDBComponent::SetVTKData(vtkPolyData *vtkData)
 		prosthesesDBManager->RemoveComponentFile(m_Filename);
 	
 	vtkALBASmartPointer<vtkDataSetWriter> writer;
-	writer->SetInput(vtkData);
+	writer->SetInputData(vtkData);
 	writer->SetFileTypeToBinary();
 	writer->SetHeader("# ALBA Prosthesis component data file \n");
 

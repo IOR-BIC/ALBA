@@ -20,7 +20,6 @@ See the COPYINGS file for license details
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkUnstructuredGridToPolyDataFilter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkIntArray.h"
@@ -35,11 +34,12 @@ See the COPYINGS file for license details
 
 
 
-vtkCxxRevisionMacro(vtkALBAPolyDataDeformation, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkALBAPolyDataDeformation);
 
 #include "albaMemDbg.h"
 #include "albaDbg.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 #pragma region //Nested Classes
 
@@ -622,13 +622,13 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
 
 //------------------------------------------------------------------------
 //Return this object's modified time.
-/*virtual*/ unsigned long int vtkALBAPolyDataDeformation::GetMTime()
+/*virtual*/ vtkMTimeType vtkALBAPolyDataDeformation::GetMTime()
 //------------------------------------------------------------------------
 {
-  unsigned long mtime = Superclass::GetMTime();
+	vtkMTimeType mtime = Superclass::GetMTime();
   for (int i = 0; i < NumberOfSkeletons; i++)
   {
-    unsigned long t1;
+		vtkMTimeType t1;
     if (Skeletons[i].pPolyLines[0] != NULL)
     {
       t1 = Skeletons[i].pPolyLines[0]->GetMTime();
@@ -655,26 +655,24 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
 }
 
 //------------------------------------------------------------------------
-//By default, UpdateInformation calls this method to copy information
-//unmodified from the input to the output.
-/*virtual*/void vtkALBAPolyDataDeformation::ExecuteInformation()
+int vtkALBAPolyDataDeformation::RequestInformation( vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
 //------------------------------------------------------------------------
 {
-  //check input
-  vtkPolyData* input = GetInput();
-  if (input == NULL)
-  {
-    vtkErrorMacro(<< "Invalid input for vtkALBAPolyDataDeformation.");
-    return;   //we have no input
-  }
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
 
-  //check output
-  vtkPolyData* output = GetOutput();
-  if (output == NULL)
-    SetOutput(vtkPolyData::New());
+	vtkPolyData *input = vtkPolyData::SafeDownCast(
+		inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  //copy input to output
-  Superclass::ExecuteInformation();  
+	if (input == NULL)
+	{
+		vtkErrorMacro(<< "Invalid input for vtkALBAPolyDataDeformation.");
+		return 0; // missing/invalid input: report failure to the pipeline
+	}
+
+	// For polydata there is no extent/spacing/origin to propagate,
+	// so we simply forward to the superclass implementation.
+	return Superclass::RequestInformation(request, inputVector, outputVector);
 }
 
 //------------------------------------------------------------------------
@@ -683,7 +681,7 @@ vtkALBAPolyDataDeformation::~vtkALBAPolyDataDeformation()
 /*virtual*/void vtkALBAPolyDataDeformation::ExecuteData(vtkDataObject *output)
 {
   //check whether output is valid
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   if (input == NULL)
     return;
 
@@ -1791,7 +1789,7 @@ double vtkALBAPolyDataDeformation::GetDistance( vtkIdType nPtStartId,
 //------------------------------------------------------------------------
 {
   const static double dblStep = 0.01;   //constant sampling
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
 
   double ptStart[3];
   input->GetPoint(nPtStartId, ptStart);
@@ -1838,21 +1836,24 @@ double vtkALBAPolyDataDeformation::GetDistance( vtkIdType nPtStartId,
     {
       //there is an intersection (at x) with the mesh
       //find the closest mesh point 
-      vtkIdType nPtIds, *pPtIds;
-      input->GetCellPoints(nCellId, nPtIds, pPtIds);
+      vtkIdType nPtIds;
+      vtkSmartPointer<vtkIdList> pPtIds = vtkSmartPointer<vtkIdList>::New();
+      input->GetCellPoints(nCellId, pPtIds);
+
+      nPtIds = pPtIds->GetNumberOfIds();
 
       int iMinPos = 0;
-      double dblMinDist = vtkMath::Distance2BetweenPoints(x, input->GetPoint(pPtIds[0]));
+      double dblMinDist = vtkMath::Distance2BetweenPoints(x, input->GetPoint(pPtIds->GetId(0)));
       for (int i = 1; i < nPtIds; i++)
       {
-        double dblDist = vtkMath::Distance2BetweenPoints(x, input->GetPoint(pPtIds[i]));
+        double dblDist = vtkMath::Distance2BetweenPoints(x, input->GetPoint(pPtIds->GetId(i)));
         if (dblDist < dblMinDist) {
           iMinPos = i; dblMinDist = dblDist;
         }
       }
-      
+
       //now we have the end point
-      vtkIdType nNextPtId = pPtIds[iMinPos];
+      vtkIdType nNextPtId = pPtIds->GetId(iMinPos);
       dblDist = GetPathLength(nPtStartId, nNextPtId, dblMaxDist);
       dblRetDist += dblDist;
 
@@ -1887,7 +1888,7 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
                                       vtkIdType nPtTo, double dblMaxDist)
 //------------------------------------------------------------------------
 {
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   int nPoints = input->GetNumberOfPoints();
 
   //initialize path distance
@@ -1931,22 +1932,25 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
     input->GetPoint(nCurItemId, coords);
 
     //now get all neighbors for the vertex u
-    vtkIdType *pCellsIds;
-    unsigned short nCellsIds;
-    input->GetPointCells(nCurItemId, nCellsIds, pCellsIds);
+    vtkSmartPointer<vtkIdList> pCellsIds = vtkSmartPointer<vtkIdList>::New();
+    input->GetPointCells(nCurItemId, pCellsIds);
+    unsigned short nCellsIds = pCellsIds->GetNumberOfIds();
+
     for (int i = 0; i < nCellsIds; i++)
     {
-      vtkIdType nPtsIds, *pPtsIds;
-      input->GetCellPoints(pCellsIds[i], nPtsIds, pPtsIds);
+      vtkSmartPointer<vtkIdList> pPtsIds = vtkSmartPointer<vtkIdList>::New();
+      input->GetCellPoints(pCellsIds->GetId(i), pPtsIds);
+      vtkIdType nPtsIds = pPtsIds->GetNumberOfIds();
+
       for (int j = 0; j < nPtsIds; j++)
       {
-        if (pPtsIds[j] == nCurItemId)
+        if (pPtsIds->GetId(j) == nCurItemId)
         {
           //cells fill the area around the vertex fully, so we need
           //to process only one edge per cell as the other will be
           //processed in the next iteration
-          vtkIdType nNbPtId = pPtsIds[(j + 1) % nPtsIds];
-          double dblDist = sqrt(vtkMath::Distance2BetweenPoints(coords,            
+          vtkIdType nNbPtId = pPtsIds->GetId((j + 1) % nPtsIds);
+          double dblDist = sqrt(vtkMath::Distance2BetweenPoints(coords,
             input->GetPoint(nNbPtId))) + pCurItem->dblWeight;
 
           DIJKSTRA_ITEM* pNbItem = &pDIPool[nNbPtId];
@@ -1962,7 +1966,7 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
 
             pNbItem->dblWeight = dblDist;
             if (pNbItem != pHead)
-            {              
+            {
               //if we are not already at head of the list, we will need to
               //move the item to its new ordered position
               DIJKSTRA_ITEM* pAfter = pNbItem->pPrev;
@@ -1970,7 +1974,7 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
               while (pAfter != NULL && dblDist < pAfter->dblWeight){
                 pAfter = pAfter->pPrev;
               }
-            
+
               //pNbItem should be after pAfter, check if it needs change
               if (pAfter != pNbItem->pPrev)
               {
@@ -1982,13 +1986,13 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
 
                 pNbItem->pPrev = pAfter;
                 if (pAfter == NULL)
-                {                  
+                {
                   pNbItem->pNext = pHead;
                   pHead->pPrev = pNbItem;
                   pHead = pNbItem;
                 }
                 else
-                {                  
+                {
                   pNbItem->pNext = pAfter->pNext;
                   if (pAfter->pNext != NULL)
                     pAfter->pNext->pPrev = pNbItem;
@@ -1999,7 +2003,7 @@ double vtkALBAPolyDataDeformation::GetPathLength(vtkIdType nPtFrom,
           } //end if (pNbItem->dblWeight > dblDist)
 
           break;  //continue with the next cell
-        } //end if (pPtsIds[j] == pCurItem->nId)
+        } //end if (pPtsIds->GetId(j) == pCurItem->nId)
       } //end for points of the current cell
     } //end for cells around the current vertex
   } //end while (pHead != NULL)
@@ -2058,7 +2062,7 @@ void vtkALBAPolyDataDeformation
 void vtkALBAPolyDataDeformation::ComputeMeshParametrization()
 //------------------------------------------------------------------------
 { 
-  vtkPolyData* input = GetInput();    
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());    
   int nPoints = input->GetNumberOfPoints();
   int nCount = (int)SuperSkeleton->POCSkel->Edges.size();
 
@@ -2369,9 +2373,9 @@ vtkALBAPolyDataDeformation::CreateSkeleton(vtkPolyData* pPoly)
   int nEdgeId = 0;
   for (int i = 0; i < nCells; i++)
   {
-    vtkIdType* pIds;
-    vtkIdType nCount;    
-    pPoly->GetCellPoints(i, nCount, pIds);
+    vtkSmartPointer<vtkIdList> pIds = vtkSmartPointer<vtkIdList>::New();
+    pPoly->GetCellPoints(i, pIds);
+    vtkIdType nCount = pIds->GetNumberOfIds();
 
     //create edges
     for (int j = 1; j < nCount; j++)
@@ -2379,8 +2383,8 @@ vtkALBAPolyDataDeformation::CreateSkeleton(vtkPolyData* pPoly)
       //get the next edge
       CSkeletonEdge* pEdge = new CSkeletonEdge();
       pEdge->Id = nEdgeId++;
-      pEdge->Verts[0] = pSkel->Vertices[pIds[j - 1]];
-      pEdge->Verts[1] = pSkel->Vertices[pIds[j]];
+      pEdge->Verts[0] = pSkel->Vertices[pIds->GetId(j - 1)];
+      pEdge->Verts[1] = pSkel->Vertices[pIds->GetId(j)];
 
       pEdge->Verts[0]->OneRingEdges.push_back(pEdge);
       pEdge->Verts[1]->OneRingEdges.push_back(pEdge);
@@ -2452,19 +2456,20 @@ double vtkALBAPolyDataDeformation::ComputeInputMeshAvgEdgeLength()
   double dblEdgeLen = 0.0;
   int nEdges = 0;
 
-  vtkPolyData* input = GetInput();
+  vtkPolyData* input = vtkPolyData::SafeDownCast(GetInput());
   input->BuildCells();  //just for sure
 
   int nCells = input->GetNumberOfCells();
   for (int i = 0; i < nCells; i++)
   {
-    vtkIdType nPoints, *ptIds;
-    input->GetCellPoints(i, nPoints, ptIds);
+    vtkSmartPointer<vtkIdList> ptIds = vtkSmartPointer<vtkIdList>::New();
+    input->GetCellPoints(i, ptIds);
+    vtkIdType nPoints = ptIds->GetNumberOfIds();
     for (int j = 0; j < nPoints; j++)
     {
       double coords1[3], coords2[3];
-      input->GetPoint(ptIds[j], coords1);
-      input->GetPoint(ptIds[(j + 1) % nPoints], coords2);
+      input->GetPoint(ptIds->GetId(j), coords1);
+      input->GetPoint(ptIds->GetId((j + 1) % nPoints), coords2);
 
       dblEdgeLen += sqrt(vtkMath::Distance2BetweenPoints(coords1, coords2));
     }

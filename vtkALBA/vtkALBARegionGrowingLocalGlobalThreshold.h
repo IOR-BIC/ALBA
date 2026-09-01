@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 class vtkImageData;
 
-#include "vtkProcessObject.h"
 #include "albaConfigure.h"
+#include "vtkDataObject.h"
 
-class ALBA_EXPORT vtkALBARegionGrowingLocalGlobalThreshold : public vtkProcessObject
+class ALBA_EXPORT vtkALBARegionGrowingLocalGlobalThreshold : public vtkDataObject
 {
 public:
-  vtkTypeRevisionMacro(vtkALBARegionGrowingLocalGlobalThreshold,vtkProcessObject);
+  vtkTypeMacro(vtkALBARegionGrowingLocalGlobalThreshold,vtkDataObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

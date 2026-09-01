@@ -102,7 +102,6 @@ int albaVMEGenericAbstract::DeepCopyVmeLarge(albaVME *a)
     {
       //////////////////////////////////////////////////////////////////////////
       albaDataPipeInterpolatorVTK::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->RemoveAllInputs();
-      albaDataPipeInterpolatorVTK::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->UnRegisterAllOutputs();
       //////////////////////////////////////////////////////////////////////////
 
       if(m_DataVector == NULL)

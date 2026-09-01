@@ -22,7 +22,6 @@
 #include "albaIndent.h"
 #include "albaRefSys.h"
 
-#include "vtkDoubleArray.h"
 #include <assert.h>
 
 //------------------------------------------------------------------------------

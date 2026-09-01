@@ -98,11 +98,11 @@ void albaPipeLandmarkCloud::Create(albaSceneNode *n)
   
   if (m_Cloud)
   {
-    CreateCloudPipe(m_Cloud->GetOutput()->GetVTKData(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
+    CreateCloudPipe(m_Cloud->GetOutput()->GetVTKOutputPort(), m_Cloud->GetRadius(), m_Cloud->GetSphereResolution());
   }
   else
   {
-    CreateCloudPipe(m_Landmark->GetOutput()->GetVTKData(), m_Landmark->GetRadius(), m_Landmark->GetSphereResolution());
+    CreateCloudPipe(m_Landmark->GetOutput()->GetVTKOutputPort(), m_Landmark->GetRadius(), m_Landmark->GetSphereResolution());
   }
 }
 //----------------------------------------------------------------------------
@@ -139,7 +139,6 @@ albaGUI *albaPipeLandmarkCloud::CreateGui()
 		m_Gui->Divider();
 		m_MaterialButton = new albaGUIMaterialButton(m_Vme,this);
 		m_Gui->AddGui(m_MaterialButton->GetGui());
-		m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,_("display list"),&m_RenderingDisplayListFlag,0,_("turn on/off \nrendering displaylist calculation"));
 		m_Gui->Divider();
 	}
 
@@ -172,10 +171,6 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
 				GetLogicManager()->CameraUpdate();
       }
       break;
-      case ID_RENDERING_DISPLAY_LIST:
-        m_CloudMapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
-				GetLogicManager()->CameraUpdate();
-      break;
       default:
         albaEventMacro(*e);
       break;
@@ -203,7 +198,7 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
   
 }
 //----------------------------------------------------------------------------
-void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, double resolution)
+void albaPipeLandmarkCloud::CreateCloudPipe(vtkAlgorithmOutput *port, double radius, double resolution)
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_SphereSource);
@@ -213,11 +208,11 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
   m_SphereSource->Update();
 
   vtkNEW(m_Normals);
-  m_Normals->SetInput(m_SphereSource->GetOutput());
+  m_Normals->SetInputConnection(m_SphereSource->GetOutputPort());
   m_Normals->Update();
 
   vtkNEW(m_Glyph);
-  m_Glyph->SetInput(data);
+  m_Glyph->SetInputConnection(port);
   m_Glyph->SetSource(m_Normals->GetOutput());
   m_Glyph->OrientOff();
   m_Glyph->ScalingOff();
@@ -225,13 +220,9 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
   m_Glyph->Update();
 
   vtkNEW(m_CloudMapper);
-  m_CloudMapper->SetInput(m_Glyph->GetOutput());
+  m_CloudMapper->SetInputConnection(m_Glyph->GetOutputPort());
   m_CloudMapper->ScalarVisibilityOff();
-  if(m_Vme->IsAnimated())				
-    m_CloudMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-  else
-    m_CloudMapper->ImmediateModeRenderingOff();
-
+ 
   vtkNEW(m_CloudActor);
   if (m_Cloud)
   {
@@ -255,11 +246,11 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, dou
 
   // selection highlight
   vtkNEW(m_CloundCornerFilter);
-  m_CloundCornerFilter->SetInput(data);
+  m_CloundCornerFilter->SetInputConnection(port);
 	m_CloundCornerFilter->SetCloudRadius(radius);
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-  corner_mapper->SetInput(m_CloundCornerFilter->GetOutput());
+  corner_mapper->SetInputConnection(m_CloundCornerFilter->GetOutputPort());
 
   vtkALBASmartPointer<vtkProperty> corner_props;
   corner_props->SetColor(1,1,1);

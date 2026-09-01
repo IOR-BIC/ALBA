@@ -52,12 +52,10 @@ void albaOpEditNormalsTest::Test()
 	reader->Update();
   albaSmartPointer<albaVMESurface> surface;
 	surface->SetData(reader->GetOutput(),0.0);
-	surface->GetOutput()->GetVTKData()->Update();
 	surface->Update();
 
 	vtkALBASmartPointer<vtkPolyData>originalPolydata;
 	originalPolydata->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-	originalPolydata->Update();
 
 	albaOpEditNormals *editNormals1 = new albaOpEditNormals();
 	editNormals1->TestModeOn();
@@ -66,11 +64,9 @@ void albaOpEditNormalsTest::Test()
 	editNormals1->OnGenerateNormals();
 	editNormals1->OpDo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 	
 	vtkALBASmartPointer<vtkPolyData> resultPolydata1;
 	resultPolydata1->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData())); 
-	resultPolydata1->Update();
 
 	vtkFloatArray *pointNormals1=vtkFloatArray::SafeDownCast(resultPolydata1->GetPointData()->GetNormals());
 
@@ -84,11 +80,9 @@ void albaOpEditNormalsTest::Test()
 	editNormals2->OnGenerateNormals();
 	editNormals2->OpDo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 
 	vtkALBASmartPointer<vtkPolyData> resultPolydata2;
 	resultPolydata2->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-	resultPolydata2->Update();
 
 	vtkFloatArray *pointNormals2=vtkFloatArray::SafeDownCast(resultPolydata2->GetPointData()->GetNormals());
 
@@ -131,12 +125,10 @@ void albaOpEditNormalsTest::TestUndo1()
 	reader->Update();
 	albaSmartPointer<albaVMESurface> surface;
 	surface->SetData(reader->GetOutput(),0.0);
-	surface->GetOutput()->GetVTKData()->Update();
 	surface->Update();
 
 	vtkALBASmartPointer<vtkPolyData>originalPolydata;
 	originalPolydata->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-	originalPolydata->Update();
 
 	albaOpEditNormals *editNormals = new albaOpEditNormals();
 	editNormals->TestModeOn();
@@ -146,15 +138,12 @@ void albaOpEditNormalsTest::TestUndo1()
 	editNormals->OnGenerateNormals();
 	editNormals->OpDo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 
 	editNormals->OpUndo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 
 	vtkALBASmartPointer<vtkPolyData>resultPolydata1;
 	resultPolydata1->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData())); 
-	resultPolydata1->Update();
 
 	vtkFloatArray *pointNormalsResult1=vtkFloatArray::SafeDownCast(resultPolydata1->GetPointData()->GetNormals());
 	vtkFloatArray *pointNormalsOriginal1=vtkFloatArray::SafeDownCast(originalPolydata->GetPointData()->GetNormals());
@@ -175,7 +164,6 @@ void albaOpEditNormalsTest::TestUndo2()
 	reader->Update();
 	albaSmartPointer<albaVMESurface> surface;
 	surface->SetData(reader->GetOutput(),0.0);
-	surface->GetOutput()->GetVTKData()->Update();
 	surface->Update();
 
 	albaOpEditNormals *editNormals1 = new albaOpEditNormals();
@@ -186,11 +174,9 @@ void albaOpEditNormalsTest::TestUndo2()
 	editNormals1->OnGenerateNormals();
 	editNormals1->OpDo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 
 	vtkALBASmartPointer<vtkPolyData>originalPolydata;
 	originalPolydata->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-	originalPolydata->Update();
 
 	albaOpEditNormals *editNormals2 = new albaOpEditNormals();
 	editNormals2->TestModeOn();
@@ -200,15 +186,13 @@ void albaOpEditNormalsTest::TestUndo2()
 	editNormals2->OnGenerateNormals();
 	editNormals2->OpDo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 
 	editNormals2->OpUndo();
 
-	surface->GetOutput()->GetVTKData()->Update();
 
 	vtkALBASmartPointer<vtkPolyData>resultPolydata2;
 	resultPolydata2->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-	resultPolydata2->Update();
+
 	resultPolydata2->GetPointData()->Update();
 	originalPolydata->GetPointData()->Update();
 

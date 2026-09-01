@@ -33,7 +33,6 @@ using namespace std;
 
 #include "vtkCell.h"
 #include "vtkIdList.h"
-#include "vtkIdType.h"
 #include "vtkPoints.h"
 #include "vtkTriangle.h"
 #include "vtkDataSet.h"
@@ -42,12 +41,11 @@ using namespace std;
 #include "vtkUnstructuredGrid.h"
 #include "vtkMassProperties.h"
 #include "vtkGeometryFilter.h"
-#include "vtkALBACellLocator.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransform.h"
-
+#include "vtkIdList.h"
 
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -378,10 +376,9 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 	if (node->GetOutput() == NULL || node->GetOutput()->GetVTKData() == NULL)
 		return OP_RUN_CANCEL;
 	node->GetOutput()->Update();
-	node->GetOutput()->GetVTKData()->Update();
 	
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> tranformFilter;
-  tranformFilter->SetInput((vtkPolyData *)node->GetOutput()->GetVTKData());
+  tranformFilter->SetInputData((vtkPolyData *)node->GetOutput()->GetVTKData());
   tranformFilter->SetTransform(node->GetOutput()->GetAbsTransform()->GetVTKTransform());
   tranformFilter->Update();
 
@@ -406,7 +403,7 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
 	progressHelper.SetBarText(str);
 
   // initialize variables
-  int pId, qId, rId;
+  int pId=0, qId=0, rId=0;
   double p[3],q[3],r[3];
 
 	LocalInertiaTensor lit; 
@@ -424,30 +421,43 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
     int cellId = i;
     vtkCell* cell = ds->GetCell(cellId);
     int type = cell->GetCellType();
-    
     vtkIdType numPts = 0;
-    vtkIdType *ptIds = 0;
+    vtkNew<vtkIdList> ptIds;
 
-    // get cell points
+    // Get cell points based on dataset type
     switch (ds->GetDataObjectType())
-      {
-      case VTK_POLY_DATA:
-        ((vtkPolyData *)ds)->GetCellPoints( cellId, numPts, ptIds );
-        break;
-      case VTK_UNSTRUCTURED_GRID:
-        ((vtkUnstructuredGrid *)ds)->GetCellPoints( cellId, numPts, ptIds );
-        break;
-      default:
-        break;
-      }
+    {
+    case VTK_POLY_DATA:
+      ((vtkPolyData*)ds)->GetCellPoints(cellId, ptIds);
+      break;
+    case VTK_UNSTRUCTURED_GRID:
+      ((vtkUnstructuredGrid*)ds)->GetCellPoints(cellId, ptIds);
+      break;
+    default:
+      break;
+    }
+
+    // Retrieve the number of points
+    numPts = ptIds->GetNumberOfIds();
+
     for (int j=0; j<numPts-2; j++ )
     {
-      // trianglize cells
-      vtkCELLTRIANGLES( ptIds, type, j, pId, qId, rId );
-      if ( pId < 0 )
-        {
+      vtkNew<vtkIdList> triangleIds;
+      vtkNew<vtkPoints> trianglePoints;
+
+      vtkCell* cell = ds->GetCell(cellId);  
+
+			if (cell->Triangulate(0, triangleIds, trianglePoints))
+			{
+				pId = triangleIds->GetId(0);
+				qId = triangleIds->GetId(1);
+				rId = triangleIds->GetId(2);
+			}
+      else
+      {
         continue;
-        }
+      }
+
       ds->GetPoint(pId, p);
       ds->GetPoint(qId, q);
       ds->GetPoint(rId, r);

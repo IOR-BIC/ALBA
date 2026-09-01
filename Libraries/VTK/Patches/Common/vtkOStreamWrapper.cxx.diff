@@ -1,4 +1,0 @@
-53c53
-< VTKOSTREAM_OPERATOR(ostream&);
----
-> //VTKOSTREAM_OPERATOR(ostream&);	//BES: 15.8.2014 - meaningless code impossible to build with VS 2013

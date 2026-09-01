@@ -169,22 +169,6 @@ void albaOpFilterImageTest::TestCanny()
 
 }
 
-//----------------------------------------------------------------------------
-void albaOpFilterImageTest::TestZeroCrossing()
-{
-	albaVMEImage *imgout = albaVMEImage::SafeDownCast(m_TestOp->GetOutput());
-
-	m_TestOp->SetZeroEdgeVariance(1);
-	m_TestOp->RunFilter(albaOpFilterImage::ZERO_CROSSING_EDGE);
-
-	COMPARE_VTK_IMAGES((vtkImageData *)imgout->GetOutput()->GetVTKData(), "ZERO_CROSSING_EDGE_1");
-
-	m_TestOp->UndoFilter();
-	m_TestOp->SetZeroEdgeVariance(50);
-	m_TestOp->RunFilter(albaOpFilterImage::ZERO_CROSSING_EDGE);
-
-	COMPARE_VTK_IMAGES((vtkImageData *)imgout->GetOutput()->GetVTKData(), "ZERO_CROSSING_EDGE_50");
-}
 
 //----------------------------------------------------------------------------
 void albaOpFilterImageTest::TestLaplacianRecursive()

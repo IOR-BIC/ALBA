@@ -173,7 +173,6 @@ vtkDataSet* albaOpImporterDicomSliceAccHelper::GetNewOutput()
 		id->SetOrigin(m_Origin);
 		id->SetSpacing(m_Spacing);
 		id->GetPointData()->SetScalars(m_Scalars);
-		id->SetScalarType(m_Scalars->GetDataType());
 
 		return id;
 	}

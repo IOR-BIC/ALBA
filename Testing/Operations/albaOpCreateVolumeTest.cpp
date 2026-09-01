@@ -99,7 +99,6 @@ void albaOpCreateVolumeTest::VolumeCreatedTest()
   op->CreateVolume();
   albaVMEVolumeGray *vol = albaVMEVolumeGray::SafeDownCast(op->GetOutput());
   vtkImageData *sp = vtkImageData::SafeDownCast(vol->GetVolumeOutput()->GetVTKData());
-  sp->Update();
   
   double spc[3], sr[2], dim[3], b[6];
   sp->GetSpacing(spc);

@@ -30,7 +30,6 @@
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkALBAMatrixVectorMath, "$Revision: 1.0 $");
 vtkStandardNewMacro(vtkALBAMatrixVectorMath);
 //------------------------------------------------------------------------------
 
@@ -1670,7 +1669,4 @@ void vtkALBAMatrixVectorMath::CopyMatrixTo2DArray4x4(const double *A,  double ar
     for (int i = 0 ;  i < 4 ;  i++, k++)
       arr2d[i][j] = A[k] ; 
 }
-
-
-
 

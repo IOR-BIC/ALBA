@@ -135,16 +135,14 @@ enum VOI_DENSITY_WIDGET_ID
 };
 
 //----------------------------------------------------------------------------
-void albaOpVOIDensity::OpRun()
+void albaOpVOIDensity::OpRun()   
 {
-	vtkNEW(m_VOIScalars);
+  vtkNEW(m_VOIScalars);
 
-	vtkALBASmartPointer<vtkDataSet> volumeData = m_Input->GetOutput()->GetVTKData();
-	volumeData->Update();
+		vtkALBASmartPointer<vtkDataSet> volumeData = m_Input->GetOutput()->GetVTKData();
+		volumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
 
-	volumeData->GetPointData()->GetScalars()->GetRange(m_SubRange);
-
-	m_ImagedataVol = vtkImageData::SafeDownCast(volumeData) ? true : false;
+		m_ImagedataVol = vtkImageData::SafeDownCast(volumeData) ? true : false;
 
 	if (!this->m_TestMode)
 	{
@@ -248,7 +246,7 @@ void albaOpVOIDensity::OpStop(int result)
 		SetDoubleTag("Area:", m_SurfaceArea);
 
 		if(m_CreatePointCloudOutput)
-			CreatePointSamplingOutput();
+		CreatePointSamplingOutput();
 		
 		if (m_CreateSegOutput)
 			CreateSegmentationOutput();
@@ -303,13 +301,13 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	{
 		newArray->InsertNextValue(m_VOIScalars->GetTuple1(i));
 
-			newPoints->InsertNextPoint(m_VOICoords[i].GetVect());
+		newPoints->InsertNextPoint(m_VOICoords[i].GetVect());
 
-			polys->InsertNextCell(3);
-			polys->InsertCellPoint(i);
-			polys->InsertCellPoint(i);
-			polys->InsertCellPoint(i);
-		}
+		polys->InsertNextCell(3);
+		polys->InsertCellPoint(i);
+		polys->InsertCellPoint(i);
+		polys->InsertCellPoint(i);
+	}
 
 
 	vtkPointData *outPointData = polydata->GetPointData();
@@ -325,7 +323,6 @@ void albaOpVOIDensity::CreatePointSamplingOutput()
 	vtkDEL(polys);
 
 	polydata->Modified();
-	polydata->Update();
 	m_PointCloud->SetData(polydata, 0);
 	vtkDEL(polydata);
 
@@ -352,10 +349,10 @@ void albaOpVOIDensity::CalculateSurfaceArea()
 
 	vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
 	vtkTriangleFilter *triangulator = vtkTriangleFilter::New();
-	cleaner->SetInput(surface);
+	cleaner->SetInputData(surface);
 	cleaner->ConvertPolysToLinesOff();
-	cleaner->GetOutput()->Update();
-	triangulator->SetInput(cleaner->GetOutput());
+	cleaner->Update();
+	triangulator->SetInputConnection(cleaner->GetOutputPort());
 	triangulator->Update();
 	vtkPolyData *triSurface = triangulator->GetOutput();
 
@@ -472,7 +469,7 @@ int albaOpVOIDensity::CheckSurface()
 	{
 		m_Surface->Update();
 		vtkALBASmartPointer<vtkFeatureEdges> FE;
-		FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
+		FE->SetInputData((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
 		FE->SetFeatureAngle(30);
 		FE->SetBoundaryEdges(1);
 		FE->SetColoring(0);
@@ -549,7 +546,7 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 			case ID_RANGE_UPDATED:
 				SortSubRange();
 				EnableDisableGUI(false);
-				break;
+			break;
 			case ID_EXPORT_REPORT:
 				WriteReport();
 				break; 
@@ -621,7 +618,7 @@ void albaOpVOIDensity::EvaluateSurface()
 		vtkDEL(m_FillHoleFilter);
 		vtkNEW(m_FillHoleFilter);
 
-		m_FillHoleFilter->SetInput(polydata);
+		m_FillHoleFilter->SetInputData(polydata);
 		m_FillHoleFilter->SetFillAllHole();
 		m_FillHoleFilter->Update();
 		polydata = m_FillHoleFilter->GetOutput();
@@ -629,14 +626,14 @@ void albaOpVOIDensity::EvaluateSurface()
 
 	vtkALBASmartPointer<vtkCleanPolyData> cleanPolydata;
 	cleanPolydata->SetTolerance(0.0);
-	cleanPolydata->SetInput(polydata);
+	cleanPolydata->SetInputData(polydata);
 	cleanPolydata->Update();
 
 	polydata=cleanPolydata->GetOutput();
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
 	TransformDataFilter->SetTransform(transform);
-	TransformDataFilter->SetInput(polydata);
+	TransformDataFilter->SetInputData(polydata);
 	TransformDataFilter->Update();
 
 	vtkALBASmartPointer<vtkALBAImplicitPolyData> ImplicitSurface;
@@ -649,7 +646,6 @@ void albaOpVOIDensity::EvaluateSurface()
 	ImplicitBox->Modified();
 
 	vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
-	VolumeData->Update();
 	numberVoxels = VolumeData->GetNumberOfPoints();
 
 	albaProgressBarHelper progressHelper(m_Listener);
@@ -669,7 +665,7 @@ void albaOpVOIDensity::EvaluateSurface()
 			{
 				//store the corresponding point's scalar value
 				pointId = VolumeData->FindPoint(point);
-				insideScalar = VolumeData->GetPointData()->GetTuple(pointId)[0];
+				insideScalar = VolumeData->GetPointData()->GetScalars()->GetTuple(pointId)[0];
 				if (!m_EvaluateInSubRange || (insideScalar >= m_SubRange[0] && insideScalar <= m_SubRange[1]))
 				{
 					sumScalars += insideScalar;

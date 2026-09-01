@@ -40,8 +40,8 @@ public:
   /** destructor */
 	virtual     ~albaPipeMeshSlice();
 
-	virtual vtkPolyData* GetInputAsPolyData();
-  
+	virtual vtkAlgorithmOutput* GetPolyDataOutputPort();
+
   /** Set the origin and normal of the slice.
   Both, Origin and Normal may be NULL, if the current value is to be preserved. */
   /*virtual*/ void SetSlice(double* Origin, double* Normal);  
@@ -49,6 +49,5 @@ public:
 protected:
   vtkPlane				        *m_Plane;
   vtkALBAMeshCutter		    *m_Cutter;
-
 };  
 #endif // __albaPipeMeshSlice_H__B

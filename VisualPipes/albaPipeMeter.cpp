@@ -91,12 +91,12 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
   m_MeterVME->AddObserver(this);
   assert(m_MeterVME->GetPolylineOutput());
   m_MeterVME->GetPolylineOutput()->Update();
-  vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
-  assert(data);
+  vtkAlgorithmOutput *port = m_MeterVME->GetPolylineOutput()->GetVTKOutputPort();
+  assert(port);
 
   vtkNEW(m_Tube);
   m_Tube->UseDefaultNormalOff();
-  m_Tube->SetInput(data);
+  m_Tube->SetInputConnection(port);
   m_Tube->SetRadius(m_MeterVME->GetMeterRadius());
   m_Tube->SetCapping(m_MeterVME->GetMeterCapping());
   m_Tube->SetNumberOfSides(20);
@@ -113,14 +113,13 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_DataMapper);
   if (m_MeterVME->GetMeterRepresentation() == albaVMEMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInput(data);
+    m_DataMapper->SetInputConnection(port);
   else
   {
     m_Tube->Update();
-    m_DataMapper->SetInput(m_Tube->GetOutput());
+    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
     
-	m_DataMapper->ImmediateModeRenderingOff();
   if(m_MeterVME->GetMeterColorMode() == albaVMEMeter::RANGE_COLOR)
     m_DataMapper->SetLookupTable(m_Lut);
 
@@ -132,10 +131,10 @@ void albaPipeMeter::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection hilight
 	vtkNEW(m_SelectionBox);
-	m_SelectionBox->SetInput(data);  
+	m_SelectionBox->SetInputConnection(port);  
 
 	vtkNEW(m_SelectionMapper);
-	m_SelectionMapper->SetInput(m_SelectionBox->GetOutput());
+	m_SelectionMapper->SetInputConnection(m_SelectionBox->GetOutputPort());
 
 	vtkNEW(m_SelectionProperty);
 	m_SelectionProperty->SetColor(1,1,1);
@@ -370,15 +369,15 @@ void albaPipeMeter::UpdateProperty(bool fromTag)
   if (NULL == m_DataMapper || NULL == m_DataActor || NULL == m_Caption)
     return;
   
-  vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
+	vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
   if (m_MeterVME->GetMeterRepresentation() == albaVMEMeter::LINE_REPRESENTATION)
   {
-    m_DataMapper->SetInput(data);
+    m_DataMapper->SetInputConnection(m_MeterVME->GetOutput()->GetVTKOutputPort());
   }
   else
   {
     m_Tube->Update();
-    m_DataMapper->SetInput(m_Tube->GetOutput());
+    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
   }
 
   double distance_value = m_MeterVME->GetDistance();

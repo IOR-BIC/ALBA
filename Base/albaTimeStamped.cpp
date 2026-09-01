@@ -26,7 +26,7 @@ void albaTimeStamped::Modified()
 }
 
 //-------------------------------------------------------------------------
-unsigned long albaTimeStamped::GetMTime()
+vtkMTimeType albaTimeStamped::GetMTime()
 //-------------------------------------------------------------------------
 {
   return m_MTime.GetMTime();

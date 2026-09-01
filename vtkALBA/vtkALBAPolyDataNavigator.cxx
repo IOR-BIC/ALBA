@@ -14,7 +14,6 @@ University of Bedfordshire
 #include "vtkObjectFactory.h"
 #include "vtkObject.h"
 #include "vtkPolyData.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkCell.h"
 #include "vtkCellArray.h"
@@ -43,7 +42,6 @@ University of Bedfordshire
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkALBAPolyDataNavigator, "$Revision: 1.1.2.7 $");
 vtkStandardNewMacro(vtkALBAPolyDataNavigator);
 //------------------------------------------------------------------------------
 
@@ -3714,8 +3712,8 @@ void vtkALBAPolyDataNavigator::MergePoints(vtkPolyData *polydata, vtkIdList *ids
 
   // use vtkCleanPolydata to remove unused points
   vtkCleanPolyData *clean = vtkCleanPolyData::New() ;
-  clean->SetInput(polydata) ;
-  clean->GetOutput()->Update() ;
+  clean->SetInputData(polydata) ;
+  clean->Update();
   polydata->DeepCopy(clean->GetOutput()) ;
   clean->Delete() ;
 

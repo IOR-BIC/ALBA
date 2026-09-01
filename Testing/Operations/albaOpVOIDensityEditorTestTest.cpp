@@ -67,7 +67,6 @@ void albaOpVOIDensityEditorTestTest::EditVolumeScalarsTest()
 
   double sr[2];
   vtkImageData *data = vtkImageData::SafeDownCast(vol->GetOutput()->GetVTKData());
-  data->Update();
   data->GetScalarRange(sr);
   result = albaEquals(sr[0], sr[1]);
   TEST_RESULT;
@@ -87,7 +86,6 @@ void albaOpVOIDensityEditorTestTest::EditVolumeScalarsTest()
   editDensity->EditVolumeScalars();
   
   data = vtkImageData::SafeDownCast(vol->GetOutput()->GetVTKData());
-  data->Update();
   data->GetScalarRange(sr);
   result = !albaEquals(sr[0], sr[1]);
   TEST_RESULT;

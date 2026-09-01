@@ -147,12 +147,10 @@ void albaOpLabelizeSurface::OpRun()
 
 	vtkPolyData *inputPolydata=vtkPolyData::SafeDownCast(m_VmeEditor->GetOutput()->GetVTKData());
 	inputPolydata->Modified();
-	inputPolydata->Update();
 
 	vtkNEW(m_OriginalPolydata);
 	m_OriginalPolydata->DeepCopy(inputPolydata);
 	m_OriginalPolydata->Modified();
-	m_OriginalPolydata->Update();
 
 	if(!inputPolydata->GetCellData()->GetArray("CELL_LABEL"))
 	{
@@ -173,13 +171,11 @@ void albaOpLabelizeSurface::OpRun()
 		inputPolydata->GetCellData()->Update();
 
 		inputPolydata->Modified();
-		inputPolydata->Update();
 	}
 	else
 	{
 		inputPolydata->GetCellData()->SetActiveScalars("CELL_LABEL");
 		inputPolydata->Modified();
-		inputPolydata->Update();
 	}
 
 	m_VmeEditor->Modified();
@@ -354,8 +350,8 @@ void albaOpLabelizeSurface::ShowClipPlane(bool show)
 			m_ArrowShape->SetTipResolution(40);
 
 			vtkNEW(m_Arrow);
-			m_Arrow->SetInput(m_PlaneSource->GetOutput());
-			m_Arrow->SetSource(m_ArrowShape->GetOutput());
+			m_Arrow->SetInputConnection(m_PlaneSource->GetOutputPort());
+			m_Arrow->SetSourceConnection(m_ArrowShape->GetOutputPort());
 			m_Arrow->SetVectorModeToUseNormal();
 
 			int clip_sign = m_LabelInside ? 1 : -1;
@@ -363,8 +359,8 @@ void albaOpLabelizeSurface::ShowClipPlane(bool show)
 			m_Arrow->Update();
 
 			vtkNEW(m_Gizmo);
-			m_Gizmo->AddInput(m_PlaneSource->GetOutput());
-			m_Gizmo->AddInput(m_Arrow->GetOutput());
+			m_Gizmo->AddInputConnection(m_PlaneSource->GetOutputPort());
+			m_Gizmo->AddInputConnection(m_Arrow->GetOutputPort());
 			m_Gizmo->Update();
 
 			albaNEW(m_ImplicitPlaneGizmo);
@@ -665,31 +661,30 @@ void albaOpLabelizeSurface::Labelize()
 	if(m_LabelInside==1)//if clip reverse is necessary rotate plane
 	{
 		before_transform_plane->SetTransform(rotate);
-		before_transform_plane->SetInput(m_PlaneSource->GetOutput());
+		before_transform_plane->SetInputConnection(m_PlaneSource->GetOutputPort());
 		before_transform_plane->Update();
 
-		transform_plane->SetInput(before_transform_plane->GetOutput());
+		transform_plane->SetInputConnection(before_transform_plane->GetOutputPort());
 	}
 	else
-		transform_plane->SetInput(m_PlaneSource->GetOutput());
+		transform_plane->SetInputConnection(m_PlaneSource->GetOutputPort());
 
 
 	transform_plane->SetTransform(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform());
 	transform_plane->Update();
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_input;
-	transform_data_input->SetTransform(m_VmeEditor->GetAbsMatrixPipe()->GetVTKTransform());
-	transform_data_input->SetInput((vtkPolyData *)m_VmeEditor->GetOutput()->GetVTKData());
+	transform_data_input->SetTransform(((albaVME*)m_VmeEditor)->GetAbsMatrixPipe()->GetVTKTransform());
+	transform_data_input->SetInputData((vtkPolyData *)((albaVME *)m_VmeEditor)->GetOutput()->GetVTKData());
 	transform_data_input->Update();
 
-	m_ClipperBoundingBox->SetInput(transform_data_input->GetOutput());
+	m_ClipperBoundingBox->SetInputConnection(transform_data_input->GetOutputPort());
 	m_ClipperBoundingBox->SetMask(transform_plane->GetOutput());
 	m_ClipperBoundingBox->SetClipInside(1);
 	m_ClipperBoundingBox->Update();
 
 	vtkALBASmartPointer<vtkPolyData> newPolyData1;
 	newPolyData1->DeepCopy(m_ClipperBoundingBox->GetOutput());
-	newPolyData1->Update();
 
 	vtkDoubleArray *cellScalar = vtkDoubleArray::SafeDownCast(newPolyData1->GetCellData()->GetArray("CELL_LABEL"));
 	if(cellScalar)
@@ -710,21 +705,20 @@ void albaOpLabelizeSurface::Labelize()
 
 	vtkALBASmartPointer<vtkPolyData> newPolyData2;
 	newPolyData2->DeepCopy(m_ClipperBoundingBox->GetOutput());
-	newPolyData2->Update();
 
 	vtkALBASmartPointer<vtkAppendPolyData> append;
-	append->SetInput(newPolyData1);
-	append->AddInput(newPolyData2);
+	append->SetInputData(newPolyData1);
+	append->AddInputData(newPolyData2);
 	append->Update();
 
 
 	vtkALBASmartPointer<vtkCleanPolyData> clean;
-	clean->SetInput(append.GetPointer()->GetOutput());
+	clean->SetInputConnection(append.GetPointer()->GetOutputPort());
 	clean->Update();
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> transform_data_output;
-	transform_data_output->SetTransform(m_VmeEditor->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
-	transform_data_output->SetInput(clean->GetOutput());
+	transform_data_output->SetTransform(((albaVME*)m_VmeEditor)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+	transform_data_output->SetInputConnection(clean->GetOutputPort());
 	transform_data_output->Update();
 
 	int result=(m_VmeEditor)->SetData(transform_data_output->GetOutput(),m_VmeEditor->GetTimeStamp());
@@ -734,7 +728,6 @@ void albaOpLabelizeSurface::Labelize()
 		vtkPolyData *poly;
 		vtkNEW(poly);
 		poly->DeepCopy(transform_data_output->GetOutput());
-		poly->Update();
 		m_ResultPolyData.push_back(poly);
 	}
 

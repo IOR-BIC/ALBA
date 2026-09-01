@@ -40,7 +40,6 @@
 #include "vtkImageCast.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
-#include "vtkVolumeRayCastMIPFunction.h"
 #include "vtkLODProp3D.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"
@@ -55,7 +54,12 @@
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
-#include "vtkALBAVolumeRayCastMapper.h"
+#include "vtkGPUVolumeRayCastMapper.h"
+#include "vtkAlgorithm.h"
+
+//force moudule init to avoid a crash on shallowcopy
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeMIP);
@@ -69,7 +73,6 @@ albaPipeVolumeMIP::albaPipeVolumeMIP()
   //m_ColorTransferFunction = NULL;
   m_OpacityTransferFunction = NULL;
   m_VolumeProperty    = NULL;
-  m_MIPFunction       = NULL;
   m_VolumeMapper      = NULL;
   m_Volume	         = NULL;
   m_ResampleFactor = 0.5;
@@ -108,12 +111,7 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
     m_Box->SetBounds(b);
 
     vtkNEW(m_Mapper);
-    m_Mapper->SetInput(m_Box->GetOutput());
-
-    if(m_Vme->IsAnimated())
-      m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-    else
-      m_Mapper->ImmediateModeRenderingOff();
+    m_Mapper->SetInputConnection(m_Box->GetOutputPort());
 
     vtkNEW(m_Actor);
     m_Actor->SetMapper(m_Mapper);
@@ -125,14 +123,15 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
 
   vtkImageData *image_data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   assert(image_data);
-  image_data->Update();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
+
   image_data->GetScalarRange(sr);
 
   vtkNEW(m_ResampleFilter);
   double image_data_spacing[3];
   image_data->GetSpacing(image_data_spacing);
   m_ResampleFilter->SetInformationInput(image_data);
-  m_ResampleFilter->SetInput(image_data);
+  m_ResampleFilter->SetInputConnection(port);
   m_ResampleFilter->SetDimensionality(3);
   m_ResampleFilter->SetOutputSpacing(image_data_spacing[0]/m_ResampleFactor,image_data_spacing[1]/m_ResampleFactor,image_data_spacing[2]/m_ResampleFactor);
   m_ResampleFilter->SetAxisMagnificationFactor(0,0.5);
@@ -141,7 +140,7 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
   m_ResampleFilter->Update();
 
   vtkNEW(m_Caster);
-  m_Caster->SetInput(m_ResampleFilter->GetOutput());
+  m_Caster->SetInputConnection(m_ResampleFilter->GetOutputPort());
   m_Caster->SetNumberOfThreads(1);
   m_Caster->SetOutputScalarType(VTK_UNSIGNED_SHORT);
   m_Caster->ClampOverflowOn();
@@ -167,18 +166,15 @@ void albaPipeVolumeMIP::Create(albaSceneNode *n)
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
-  vtkNEW(m_MIPFunction);
-  m_MIPFunction->SetMaximizeMethodToOpacity();
 
   vtkNEW(m_VolumeMapper);
-  m_VolumeMapper->SetInput(m_Caster->GetOutput());
+  m_VolumeMapper->SetInputConnection(m_Caster->GetOutputPort());
 
-  m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
+  m_VolumeMapper->SetBlendModeToMaximumIntensity();
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
   m_VolumeMapper->SetImageSampleDistance(1/m_ResampleFactor);
   m_VolumeMapper->SetMaximumImageSampleDistance(10);
   m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
-  m_VolumeMapper->SetNumberOfThreads(1);
   m_VolumeMapper->SetSampleDistance(1);
 
   m_VolumeMapper->Update();	
@@ -211,7 +207,6 @@ albaPipeVolumeMIP::~albaPipeVolumeMIP()
   vtkDEL(m_ResampleFilter);
   vtkDEL(m_VolumeProperty);
   vtkDEL(m_ColorLUT);
-  vtkDEL(m_MIPFunction);
   vtkDEL(m_VolumeMapper);
   vtkDEL(m_Volume);
   vtkDEL(m_Caster);
@@ -304,7 +299,6 @@ void albaPipeVolumeMIP::UpdateMIPFromLUT()
 //      m_ColorTransferFunction->AddRGBPoint(p, rgba[0], rgba[1], rgba[2]);
       m_OpacityTransferFunction->AddPoint(p, (double)v/(double)tv);
     }
-    m_OpacityTransferFunction->Update();
 		GetLogicManager()->CameraUpdate();
   }
 

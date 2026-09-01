@@ -18,9 +18,9 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+#include "albaTestDefines.h"
 #include "vtkALBATests.h"
 
-#include "vtkALBAContourVolumeMapperTest.h"
 #include "vtkALBARemoveCellsFilterTest.h"
 #include "vtkALBAPolyDataToSinglePolyLineTest.h"
 #include "vtkALBATextOrientatorTest.h"
@@ -34,8 +34,6 @@
 #include "vtkALBAGridActorTest.h"
 #include "vtkALBAProjectVolumeTest.h"
 #include "vtkALBAClipSurfaceBoundingBoxTest.h"
-#include "vtkALBARectilinearGridToRectilinearGridFilterTest.h"
-#include "vtkALBADummyRectilinearGridToRectilinearGridFilter.h"
 #include "vtkALBAProfilingActorTest.h"
 #include "vtkALBARulerActor2DTest.h"
 #include "vtkALBASimpleRulerActor2DTest.h"
@@ -52,9 +50,7 @@
 #include "vtkALBARegionGrowingLocalGlobalThresholdTest.h"
 #include "vtkImageUnPackerTest.h"
 #include "vtkPackedImageTest.h"
-#include "vtkALBAVolumeRayCastMapperTest.h"
 #include "vtkXRayVolumeMapperTest.h"
-#include "vtkALBAVolumeTextureMapper2DTest.h"
 #include "vtkALBADataArrayDescriptorTest.h"
 #include "vtkALBAErythrocyteSourceTest.h"
 #include "vtkALBAMeshCutterTest.h"
@@ -108,6 +104,10 @@
 #include "vtkALBACircleSourceTest.h"
 #include "vtkALBAPointCloudCutterTest.h"
 
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
+#include "vtkALBAVolumeTextureMapper2DTest.h"
+#endif
+
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
@@ -144,22 +144,23 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-	/*  */
-	runner.addTest(vtkALBAContourVolumeMapperTest::suite());
+	/* */
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
+	runner.addTest(vtkALBAVolumeTextureMapper2DTest::suite());
+#endif
 	runner.addTest(vtkALBARemoveCellsFilterTest::suite());
-	runner.addTest(vtkALBAPolyDataToSinglePolyLineTest::suite());
+	runner.addTest(vtkALBAPolyDataToSinglePolyLineTest::suite()); 
 	runner.addTest(vtkALBATextOrientatorTest::suite());
 	runner.addTest(vtkALBAGlobalAxisCoordinateTest::suite());
 	runner.addTest(vtkALBALocalAxisCoordinateTest::suite());
 	runner.addTest(vtkALBAVolumeResampleTest::suite());
 	runner.addTest(vtkALBADOFMatrixTest::suite());
-	runner.addTest(vtkALBAImplicitPolyDataTest::suite()); 
-	runner.addTest(vtkALBATextActorMeterTest::suite()); 
+	runner.addTest(vtkALBAImplicitPolyDataTest::suite());
+	runner.addTest(vtkALBATextActorMeterTest::suite());
 	runner.addTest(vtkALBACellsFilterTest::suite());
 	runner.addTest(vtkALBAGridActorTest::suite());
 	runner.addTest(vtkALBAProjectVolumeTest::suite());
 	runner.addTest(vtkALBAClipSurfaceBoundingBoxTest::suite());
-	//runner.addTest(vtkALBARectilinearGridToRectilinearGridFilterTest::suite());
 	runner.addTest(vtkALBAProfilingActorTest::suite());
 	runner.addTest(vtkALBARulerActor2DTest::suite());
 	runner.addTest(vtkALBASimpleRulerActor2DTest::suite());
@@ -168,17 +169,15 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBAExtendedGlyph3DTest::suite());
 	runner.addTest(vtkALBATransferFunction2DTest::suite());
 	runner.addTest(vtkHoleConnectivityTest::suite());
-	runner.addTest(vtkTriangleQualityRatioTest::suite());
+	runner.addTest(vtkTriangleQualityRatioTest::suite()); 
 	runner.addTest(vtkMaskPolyDataFilterTest::suite());
 	runner.addTest(vtkALBAExtrudeToCircleTest::suite());
 	runner.addTest(vtkALBAPastValuesListTest::suite());
 	runner.addTest(vtkALBAPolyDataMirrorTest::suite());
 	runner.addTest(vtkALBARegionGrowingLocalGlobalThresholdTest::suite());
 	runner.addTest(vtkImageUnPackerTest::suite());
-	runner.addTest(vtkPackedImageTest::suite());
-	//runner.addTest(vtkALBAVolumeRayCastMapperTest::suite());
+	runner.addTest(vtkPackedImageTest::suite()); 
 	runner.addTest(vtkXRayVolumeMapperTest::suite());
-	runner.addTest(vtkALBAVolumeTextureMapper2DTest::suite());
 	runner.addTest(vtkALBADataArrayDescriptorTest::suite());
 	runner.addTest(vtkALBAErythrocyteSourceTest::suite());
 	runner.addTest(vtkALBAMeshCutterTest::suite());

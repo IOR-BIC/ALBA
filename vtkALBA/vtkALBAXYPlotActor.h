@@ -55,7 +55,7 @@ class vtkTextProperty;
 class ALBA_EXPORT vtkALBAXYPlotActor : public vtkActor2D
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAXYPlotActor,vtkActor2D);
+  vtkTypeMacro(vtkALBAXYPlotActor,vtkActor2D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -387,7 +387,7 @@ public:
   
   // Description:
   // Take into account the modified time of internal helper classes.
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
   
 //BTX  
   // Description:

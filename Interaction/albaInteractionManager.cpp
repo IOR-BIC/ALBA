@@ -359,11 +359,11 @@ void albaInteractionManager::CameraUpdate(albaView *view)
     if (view)
     {
       // avoid too much renderings which would trash the CPU
-      if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
+      if((vtkTimerLog::GetUniversalTime()-m_LastRenderTime)>m_IntraFrameTime)
       {
         // render requested view
         view->CameraUpdate();
-        m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+        m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
       }
       
     }
@@ -371,7 +371,7 @@ void albaInteractionManager::CameraUpdate(albaView *view)
     {
       // ask logic->view_mgr to perform a global update
       albaEventMacro(albaEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
     }
   }
 }
@@ -502,18 +502,18 @@ void albaInteractionManager::OnEndDispatching()
     m_CameraUpdateRequests.clear();
     
     // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
+    if((vtkTimerLog::GetUniversalTime()-m_LastRenderTime)>m_IntraFrameTime)
     {
       // ask logic->view_mgr to perform a global update
       albaEventMacro(albaEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
     }
     
   }
   else
   {
     // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetCurrentTime()-m_LastRenderTime)>m_IntraFrameTime)
+    if((vtkTimerLog::GetUniversalTime()-m_LastRenderTime)>m_IntraFrameTime)
     {
       // traverse the list and perform all requested updates
       for (std::set<albaView *>::iterator it=m_CameraUpdateRequests.begin(); \
@@ -524,7 +524,7 @@ void albaInteractionManager::OnEndDispatching()
       }
       // clear the queue
       m_CameraUpdateRequests.clear();
-      m_LastRenderTime=vtkTimerLog::GetCurrentTime(); // store time at end of rendering
+      m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
     }
   }
 }

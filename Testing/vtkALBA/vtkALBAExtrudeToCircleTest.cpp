@@ -88,7 +88,7 @@ void vtkALBAExtrudeToCircleTest::RenderExtrusion()
 
   // set up pipeline to visualize original data
   vtkPolyDataMapper *mapper1 = vtkPolyDataMapper::New();
-  mapper1->SetInput(m_testData) ;
+  mapper1->SetInputData(m_testData) ;
 
   vtkActor *A1 = vtkActor::New();
   A1->SetMapper(mapper1);
@@ -96,7 +96,7 @@ void vtkALBAExtrudeToCircleTest::RenderExtrusion()
 
   // set up pipeline to visualize the extrusion
   vtkPolyDataMapper *mapper2 = vtkPolyDataMapper::New();
-  mapper2->SetInput(m_extrusion);
+  mapper2->SetInputData(m_extrusion);
 
   vtkActor *A2 = vtkActor::New();
   A2->SetMapper(mapper2);
@@ -142,7 +142,7 @@ void vtkALBAExtrudeToCircleTest::CreateTestData()
   cyl->SetRadius(1.0) ;
   cyl->SetCapping(0) ;
 
-  cyl->GetOutput()->Update() ;
+  cyl->Update() ;
   m_testData = vtkPolyData::New() ;
   m_testData->DeepCopy(cyl->GetOutput()) ;
 
@@ -196,19 +196,19 @@ void vtkALBAExtrudeToCircleTest::TestExtrusion()
   fEdges1->FeatureEdgesOff() ;
   fEdges1->NonManifoldEdgesOff() ;
   fEdges1->ManifoldEdgesOff() ;
-  fEdges1->SetInput(m_testData) ;
+  fEdges1->SetInputData(m_testData) ;
 
   // This filter extracts connected regions of the polydata.
   // Note: it does this by changing the cells, but it does not delete the points !!
   vtkPolyDataConnectivityFilter *PDCF = vtkPolyDataConnectivityFilter::New() ;
-  PDCF->SetInput(fEdges1->GetOutput()) ;
+  PDCF->SetInputConnection(fEdges1->GetOutputPort()) ;
   PDCF->SetExtractionModeToSpecifiedRegions() ; // sets mode to extract only requested regions
   PDCF->InitializeSpecifiedRegionList() ;
   PDCF->AddSpecifiedRegion(0) ;                 // request this region to be extracted
 
   // Clean the unused points from the polydata
   vtkCleanPolyData *CPD = vtkCleanPolyData::New() ;
-  CPD->SetInput(PDCF->GetOutput()) ;
+  CPD->SetInputConnection(PDCF->GetOutputPort()) ;
 
 
 
@@ -217,10 +217,10 @@ void vtkALBAExtrudeToCircleTest::TestExtrusion()
   //----------------------------------------------------------------------------
 
   vtkALBAExtrudeToCircle *ETC = vtkALBAExtrudeToCircle::New() ;
-  ETC->SetInput(CPD->GetOutput()) ;
+  ETC->SetInputConnection(CPD->GetOutputPort()) ;
   double direc[3] = {0.0, -1.0, 0.0} ;
   ETC->SetDirection(direc) ;
-  ETC->GetOutput()->Update() ;
+  ETC->Update() ;
   m_extrusion = vtkPolyData::New() ;
   m_extrusion->DeepCopy(ETC->GetOutput()) ;
 

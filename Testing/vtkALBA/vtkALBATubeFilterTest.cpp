@@ -35,15 +35,15 @@ void vtkALBATubeFilterTest::TestInput()
 {  
 	vtkALBASmartPointer<vtkALBATubeFilter> filter;
 
-	CPPUNIT_ASSERT(filter->GetNumberOfInputs() == 0);
+	CPPUNIT_ASSERT(filter->GetTotalNumberOfInputConnections() == 0);
 
 	vtkALBASmartPointer<vtkSphereSource> sphere;
 	sphere->Update();
 
-	filter->SetInput(sphere->GetOutput());
+	filter->SetInputConnection(sphere->GetOutputPort());
 	filter->Update();
 
-	CPPUNIT_ASSERT(filter->GetNumberOfInputs() == 1);
+	CPPUNIT_ASSERT(filter->GetTotalNumberOfInputConnections() == 1);
 }
 
 //----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ void vtkALBATubeFilterTest::TestSides()
 
 	lineStrip->Update();
 
-	filter->SetInput(lineStrip->GetOutput());
+	filter->SetInputConnection(lineStrip->GetOutputPort());
 	filter->Update();
 
 	CPPUNIT_ASSERT(filter->GetOutput()->GetNumberOfPoints() == nPoints * filter->GetNumberOfSides());
@@ -222,9 +222,9 @@ void vtkALBATubeFilterTest::TestOldVersion()
 
 	newLineStrip->Update();
 
-	newFilter->SetInput(newLineStrip->GetOutput());
+	newFilter->SetInputConnection(newLineStrip->GetOutputPort());
 	newFilter->Update();
-	oldFilter->SetInput(newLineStrip->GetOutput());
+	oldFilter->SetInputConnection(newLineStrip->GetOutputPort());
 	oldFilter->Update();
 	
 	int n1 = newFilter->GetOutput()->GetNumberOfPoints();
@@ -249,9 +249,9 @@ void vtkALBATubeFilterTest::TestOldVersion()
 	newLineStrip->Update();
 	oldLineStrip->Update();
 
-	newFilter->SetInput(newLineStrip->GetOutput());
+	newFilter->SetInputConnection(newLineStrip->GetOutputPort());
 	newFilter->Update();
-	oldFilter->SetInput(oldLineStrip->GetOutput());
+	oldFilter->SetInputConnection(oldLineStrip->GetOutputPort());
 	oldFilter->Update();
 
 	// newTubeFilter ignore repeated points

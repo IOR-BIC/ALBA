@@ -3,7 +3,7 @@ PROJECT (albaVMETests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS XercesC albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaVME albaVisualPipes albaDataPipes GPUAPI vtkRendering vtkGraphics albaService)
+  SET(PROJECT_LIBS albaTests albaVME albaVisualPipes albaDataPipes GPUAPI albaService ${VTK_LIBRARIES})
 ENDIF(ALBA_BUILD_ALBADLL)
 
 

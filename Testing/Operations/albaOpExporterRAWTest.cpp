@@ -72,7 +72,6 @@ void albaOpExporterRAWTest::Test()
 
 	albaVMEVolumeGray *vmeVolumeGrayImported = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	vmeVolumeGrayImported->Update();
-	((vtkImageData *)(vmeVolumeGrayImported->GetOutput()->GetVTKData()))->UpdateData();
 
 	//Initialize exporter and export the volume imported
 	albaOpExporterRAW *exporter=new albaOpExporterRAW("exporter raw");
@@ -109,19 +108,16 @@ void albaOpExporterRAWTest::Test()
 
 	albaVMEVolumeGray *vmeVolumeGrayExported = albaVMEVolumeGray::SafeDownCast(importer2->GetOutput());
 	vmeVolumeGrayExported->Update();
-	((vtkRectilinearGrid *)(vmeVolumeGrayExported->GetOutput()->GetVTKData()))->UpdateData();
 
 	vmeVolumeGrayImported->SetName("");
 	vmeVolumeGrayExported->SetName("");
 
 	//Check if the volume imported and the volume exported are equal
 	vtkImageData *DataExported=vtkImageData::SafeDownCast(vmeVolumeGrayExported->GetOutput()->GetVTKData());
-	DataExported->UpdateData();
 	DataExported->ComputeBounds();
 	CPPUNIT_ASSERT(DataExported);
 
 	vtkImageData *DataImported=vtkImageData::SafeDownCast(vmeVolumeGrayImported->GetOutput()->GetVTKData());
-	DataImported->UpdateData();
 	DataImported->ComputeBounds();
 	CPPUNIT_ASSERT(DataImported);
 
@@ -179,7 +175,6 @@ void albaOpExporterRAWTest::TestRG()
 
 	albaVMEVolumeGray *vmeVolumeGrayImported=albaVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
 	vmeVolumeGrayImported->Update();
-	((vtkRectilinearGrid *)(vmeVolumeGrayImported->GetOutput()->GetVTKData()))->UpdateData();
 	CPPUNIT_ASSERT(vmeVolumeGrayImported);
 
 	double bounds[6];
@@ -235,16 +230,13 @@ void albaOpExporterRAWTest::TestRG()
 
 	albaVMEVolumeGray *vmeVolumeGrayExported = albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	vmeVolumeGrayExported->Update();
-	((vtkImageData *)(vmeVolumeGrayExported->GetOutput()->GetVTKData()))->UpdateData();
 
 	//Check if the volume imported and the volume exported are equal
 	vtkImageData *DataExported=vtkImageData::SafeDownCast(vmeVolumeGrayExported->GetOutput()->GetVTKData());
-	DataExported->UpdateData();
 	DataExported->ComputeBounds();
 	CPPUNIT_ASSERT(DataExported);
 
 	vtkRectilinearGrid *DataImported=vtkRectilinearGrid::SafeDownCast(vmeVolumeGrayImported->GetOutput()->GetVTKData());
-	DataImported->UpdateData();
 	DataImported->ComputeBounds();
 	CPPUNIT_ASSERT(DataImported);
 

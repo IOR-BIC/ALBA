@@ -1,9 +1,11 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 # Set the project/library name here.  Classes should be declared as
 # "class vtkALBA_EXPORT vtkFoo", where vtkALBA is the name of the
 # project set here.
 PROJECT(vtkALBA)
+
+MESSAGE(STATUS "ALBA: Configuring vtkALBA")
 
 # Set your list of sources here.  Do not change the name of the
 # vtkALBA_SRCS variable.
@@ -16,8 +18,6 @@ SET(vtkALBA_SRCS
   vtkALBACellsFilter.cxx  								vtkALBACellsFilter.h  
   vtkALBARemoveCellsFilter.cxx  							vtkALBARemoveCellsFilter.h
   vtkALBAClipSurfaceBoundingBox.cxx  					vtkALBAClipSurfaceBoundingBox.h
-  vtkALBAContourVolumeMapper.cxx  						vtkALBAContourVolumeMapper.h
-  vtkALBAContourVolumeMapperAdv.cxx  					vtkALBAContourVolumeMapperAdv.h
   vtkALBADistanceFilter.cxx  							vtkALBADistanceFilter.h
   vtkALBADOFMatrix.cxx  									vtkALBADOFMatrix.h
   vtkALBAExtendedGlyph3D.cxx  							vtkALBAExtendedGlyph3D.h
@@ -27,12 +27,10 @@ SET(vtkALBA_SRCS
   vtkALBAHistogram.cxx  									vtkALBAHistogram.h
   vtkALBAImplicitPolyData.cxx  							vtkALBAImplicitPolyData.h
   vtkALBALocalAxisCoordinate.cxx  						vtkALBALocalAxisCoordinate.h
-  vtkALBAAdaptiveVolumeMapper.cxx  						vtkALBAAdaptiveVolumeMapper.h
   vtkALBAImageMapToWidgetColors.cxx  					vtkALBAImageMapToWidgetColors.h
   vtkALBAPolyDataSingleSourceShortestPath.cxx  			vtkALBAPolyDataSingleSourceShortestPath.h
   vtkALBAProjectVolume.cxx  									vtkALBAProjectVolume.h
   vtkALBARayCast3DPicker.cxx  							vtkALBARayCast3DPicker.h
-  vtkALBARectilinearGridToRectilinearGridFilter.cxx  	vtkALBARectilinearGridToRectilinearGridFilter.h
   vtkALBARulerActor2D.cxx  								vtkALBARulerActor2D.h
   vtkALBASimpleRulerActor2D.cxx  						vtkALBASimpleRulerActor2D.h
   vtkALBATextActorMeter.cxx  							vtkALBATextActorMeter.h
@@ -49,7 +47,6 @@ SET(vtkALBA_SRCS
   vtkXRayVolumeMapper.cxx    							vtkXRayVolumeMapper.h
   vtkWeightedLandmarkTransform.cxx    					vtkWeightedLandmarkTransform.h
   vtkTriangleQualityRatio.cxx  							vtkTriangleQualityRatio.h
-  vtkALBACellLocator.cxx  								vtkALBACellLocator.h
   vtkALBAAddScalarsFilter.cxx  							vtkALBAAddScalarsFilter.h
   vtkALBAExtrudeToCircle.cxx  							vtkALBAExtrudeToCircle.h
   vtkALBAFillingHole.cxx  								vtkALBAFillingHole.h
@@ -62,7 +59,6 @@ SET(vtkALBA_SRCS
   vtkALBARegionGrowingLocalGlobalThreshold.cxx  		vtkALBARegionGrowingLocalGlobalThreshold.h
   vtkALBAInteractorStyleEnableRotation.cxx  			vtkALBAInteractorStyleEnableRotation.h
   vtkALBALandmarkCloudPolydataFilter.cxx  				vtkALBALandmarkCloudPolydataFilter.h
-  vtkBox.cxx  											vtkBox.h
   vtkMaskPolyDataFilter.cxx  							vtkMaskPolyDataFilter.h
   vtkHoleConnectivity.cxx  								vtkHoleConnectivity.h
   vtkPatchLine.h  										vtkPatchLine.cpp
@@ -73,7 +69,6 @@ SET(vtkALBA_SRCS
   vtkALBAFile.cxx  										vtkALBAFile.h	
   
   ###############################################
-  vtkALBAVolumeRayCastMapper.cxx  						vtkALBAVolumeRayCastMapper.h
   vtkALBAVolumeTextureMapper2D.cxx  						vtkALBAVolumeTextureMapper2D.h
   vtkALBAVolumeSlicer.cxx  								vtkALBAVolumeSlicer.h
 	vtkALBAVolumeOrthoSlicer.cxx 			vtkALBAVolumeOrthoSlicer.h
@@ -95,23 +90,21 @@ SET(vtkALBA_SRCS
   vtkALBACollisionDetectionFilter.cxx  					vtkALBACollisionDetectionFilter.h  
   vtkALBARayCastCleaner.cpp  							vtkALBARayCastCleaner.h  
   vtkALBAVolumeToClosedSmoothSurface.cxx  				vtkALBAVolumeToClosedSmoothSurface.h
-
+  
   ###############################################
   vtkALBATubeFilter.cxx 									vtkALBATubeFilter.h
   vtkALBALandmarkCloudOutlineCornerFilter.cxx 			vtkALBALandmarkCloudOutlineCornerFilter.h
   vtkALBACircleSource.cxx								vtkALBACircleSource.h
   vtkALBATIFFReader.cxx									vtkALBATIFFReader.h
-  
+
+  vtkALBAStructuredPointsAlgorithm.cxx vtkALBAStructuredPointsAlgorithm.h
   vtkALBAEllipseSource.cxx								vtkALBAEllipseSource.h
   vtkALBAPointCloudCutter.cxx								vtkALBAPointCloudCutter.h
+  
+  vtkALBAConnectedRegionsContourTriangulator.cxx			vtkALBAConnectedRegionsContourTriangulator.h
+  vtkALBATicksGenerator.cpp									vtkALBATicksGenerator.h
 )
 
-IF(WIN32)
-SET(vtkALBA_SRCS
-	${vtkALBA_SRCS}
-  vtkALBAContourVolumeMapperGPU.cxx  					vtkALBAContourVolumeMapperGPU.h
-  )
-ENDIF(WIN32)
 
 IF (ALBA_USE_ITK)
 SET(vtkALBA_SRCS  ${vtkALBA_SRCS}
@@ -125,7 +118,6 @@ ENDIF (ALBA_USE_ITK)
 SET(vtkALBA_FULL_SRCS
 	${vtkALBA_SRCS}
   vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
-  vtkBoundingBox.cxx  									vtkBoundingBox.h
   vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
   albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
   vtkALBAIdType64.h
@@ -133,7 +125,8 @@ SET(vtkALBA_FULL_SRCS
 
 
 # List the kits from VTK that are needed by this project.
-SET(vtkALBA_LIBS vtkCommon  vtkRendering  vtkFiltering  vtkGraphics  vtkHybrid ${wxWidgets_LIBRARIES})
+SET(vtkALBA_LIBS ${VTK_LIBRARIES})
+
 
 IF(WIN32)
 SET(vtkALBA_LIBS
@@ -202,20 +195,7 @@ IF(VTK_FOUND)
     ENDIF (USE_VTK_OUTPUT_PATHS)
   ENDIF (EXISTS ${VTK_DIR}/bin)
 
-  # Create the header to configure the classes.
-  # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/albaConfigure.h.in
-  #                ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
-  #                @ONLY IMMEDIATE)
-				 
-
-  # Create the instantiator for these classes.
-  SET(VTK_USE_INSTANTIATOR_NEW 1)
-  VTK_MAKE_INSTANTIATOR2("${PROJECT_NAME}Instantiator" vtkALBAInstantiator_SRCS
-                         ${vtkALBA_SRCS}
-                         EXPORT_MACRO "ALBA_EXPORT"
-                         HEADER_LOCATION ${PROJECT_BINARY_DIR}
-                         INCLUDES "albaConfigure.h")
-
+ 
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${vtkALBA_FULL_SRCS} ${vtkALBAInstantiator_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${vtkALBA_LIBS})
@@ -290,6 +270,3 @@ ENDIF(VTK_FOUND)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
 
-IF (ALBA_USE_WX)
-  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (ALBA_USE_WX)

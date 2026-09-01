@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBADataPipe
- Authors: Marco Petrone
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -34,47 +34,66 @@
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkErrorCode.h"
+#include "vtkAlgorithm.h"
+#include "vtkExecutive.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "vtkDemandDrivenPipeline.h"
+
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkALBADataPipe)
-//------------------------------------------------------------------------------
+
+class vtkALBADemandDrivenPipeline : public vtkDemandDrivenPipeline
+{
+	public:
+		vtkMTimeType GetInformationTime(){ return this->InformationTime.GetMTime();};
+};
 
 //------------------------------------------------------------------------------
 vtkALBADataPipe::vtkALBADataPipe()
-//------------------------------------------------------------------------------
 {
+	SetNumberOfOutputPorts(2);
   m_DataPipe = NULL;
 }
 
 //------------------------------------------------------------------------------
 vtkALBADataPipe::~vtkALBADataPipe()
-//------------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
 void vtkALBADataPipe::SetDataPipe(albaDataPipe *dpipe)
-//----------------------------------------------------------------------------
 {
   m_DataPipe=dpipe;
 }
 
 //----------------------------------------------------------------------------
-void vtkALBADataPipe::SetNthInput(int num, vtkDataSet *input)
-//----------------------------------------------------------------------------
+void vtkALBADataPipe::SetNumberOfInputs(int n)
 {
-  Superclass::SetNthInput(num,input);
+	this->SetNumberOfInputPorts(n);
+	this->SetNumberOfOutputPorts(n);
+}
+
+//----------------------------------------------------------------------------
+void vtkALBADataPipe::SetNthInput(int num, vtkDataSet *input)
+{
+	int currentPortNum=this->GetNumberOfInputPorts();
+
+	if (num>currentPortNum-1)
+    SetNumberOfInputs(num+1);
+
+  SetInputData(num,input);
 }
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration also modifications to the ALBA data pipe
-unsigned long vtkALBADataPipe::GetMTime()
-//------------------------------------------------------------------------------
+vtkMTimeType vtkALBADataPipe::GetMTime()
 {
-  unsigned long mtime = this->Superclass::GetMTime();
+	vtkMTimeType mtime = this->Superclass::GetMTime();
 
   if (m_DataPipe)
   {
-    unsigned long dpipeMTime = m_DataPipe->GetMTime();
+		vtkMTimeType dpipeMTime = m_DataPipe->GetMTime();
     if (dpipeMTime > mtime)
     {
       mtime = dpipeMTime;
@@ -86,99 +105,58 @@ unsigned long vtkALBADataPipe::GetMTime()
 
 //------------------------------------------------------------------------------
 unsigned long vtkALBADataPipe::GetInformationTime()
-//------------------------------------------------------------------------------
 {
-  return InformationTime.GetMTime();
-}
-
-//------------------------------------------------------------------------------
-vtkDataSet *vtkALBADataPipe::GetOutput(int idx)
-//------------------------------------------------------------------------------
-{
-  if (this->NumberOfOutputs < idx+1)
+	vtkDemandDrivenPipeline* ddp = vtkDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+	if (ddp)
   {
-    UpdateInformation(); // force creating the outputs
+		return ((vtkALBADemandDrivenPipeline *)ddp)->GetInformationTime();
   }
-  return Superclass::GetOutput(idx);
-}
 
-//------------------------------------------------------------------------------
-vtkDataSet *vtkALBADataPipe::GetOutput()
-//------------------------------------------------------------------------------
-{
-  if (this->NumberOfOutputs == 0)
-  {
-    UpdateInformation(); // force creating the outputs
-  }
-  return Superclass::GetOutput();
 }
 
 //------------------------------------------------------------------------------
 void vtkALBADataPipe::UpdateInformation()
-//------------------------------------------------------------------------------
 {
   // forward event to ALBA data pipe
   if (m_DataPipe)
     m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_PREUPDATE));
 
-  this->Superclass::UpdateInformation();
+  this->Superclass::UpdateInformation();	
 }
 
 //------------------------------------------------------------------------------
-void vtkALBADataPipe::ExecuteInformation()
-//------------------------------------------------------------------------------
+int vtkALBADataPipe::RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
 {
-  this->SetErrorCode( vtkErrorCode::NoError );
-  
-  // check if output array is still empty
-  if (this->Outputs==NULL||this->Outputs[0]==NULL)
-  {
-    // create a new object of the same type of those in the array
-    if (GetNumberOfInputs()>0)
-    {
-      for (int i=0;i<GetNumberOfInputs();i++)
-      {
-        
-        vtkDataSet *data=(vtkDataSet *)GetInputs()[i];
-        if (data)
-        {
-          data->UpdateInformation();
-          vtkDataSet *new_data=data->NewInstance();
-          new_data->CopyInformation(data);
-          this->SetNthOutput(i,new_data);
-          new_data->Delete();
-        }
-      }
-    }
-  } 
-  
-  if (GetNumberOfInputs()>0&&GetInput()) // work around to skip vtkDataSet bug with zero inputs
-    Superclass::ExecuteInformation(); 
+	if(m_DataPipe && m_DataPipe->IsA("albaDataPipeCustom"))
+     m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
+
+
+	for (int i = 0; i < this->GetNumberOfInputPorts(); ++i)
+	{
+		vtkDataObject *input = vtkDataObject::GetData(inputVector[i]);
+		vtkInformation *out_info = outputVector->GetInformationObject(i);
+		vtkDataObject *output = vtkDataObject::GetData(out_info);
+
+		if (!input)
+			return 0;
+
+		// if the data type is different recreate the output
+		if (!output || !output->IsA(input->GetClassName()))
+		{
+			vtkSmartPointer<vtkDataObject> new_output;
+			new_output.TakeReference(input->NewInstance());
+			out_info->Set(vtkDataObject::DATA_OBJECT(), new_output);
+			output = new_output;
+		}
+
+		output->ShallowCopy(input);
+	}
+
+
+  // forward event to ALBA data pipe
+  if(m_DataPipe && !m_DataPipe->IsA("albaDataPipeCustom"))
+    m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
+
+  return 1;
 }
 
-//------------------------------------------------------------------------------
-void vtkALBADataPipe::Execute()
-//------------------------------------------------------------------------------
-{
-  if (GetInput())
-  {
-    if(m_DataPipe->IsA("albaDataPipeCustom"))
-      m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
-    for (int i=0;i<GetNumberOfInputs();i++)
-    {
-      if (GetNumberOfOutputs()>i)
-      {
-        vtkDataSet *input=(vtkDataSet *)GetInputs()[i];
-        input->Update();
-        this->Outputs[i]->ShallowCopy(input);
-      }
-      else
-      {
-        vtkErrorMacro("DEBUG: NULL output pointer!");
-      }
-    }
-    // forward event to ALBA data pipe
-    if(!m_DataPipe->IsA("albaDataPipeCustom"))
-      m_DataPipe->OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_UPDATE));
-  }
-}

@@ -27,6 +27,7 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEVolumeRGB)
@@ -63,7 +64,6 @@ albaVMEOutput *albaVMEVolumeRGB::GetOutput()
 int albaVMEVolumeRGB::SetData(vtkRectilinearGrid *data, albaTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  data->Update();
   if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==3)
     return Superclass::SetData(data,t,mode);
 
@@ -75,7 +75,6 @@ int albaVMEVolumeRGB::SetData(vtkRectilinearGrid *data, albaTimeStamp t, int mod
 int albaVMEVolumeRGB::SetData(vtkImageData *data, albaTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  data->Update();
   if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==3)
     return Superclass::SetData(data,t,mode);
 
@@ -89,9 +88,8 @@ int albaVMEVolumeRGB::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   assert(data);
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid"))
   {
-    data->Update();
     if (data->GetPointData()&&data->GetPointData()->GetScalars() != NULL &&
-      data->GetPointData()->GetScalars()->GetNumberOfComponents()==3)  //BES: 28.5.2009 - GetNumberOfComponents must be called on scalars
+      data->GetPointData()->GetScalars()->GetNumberOfComponents()==3)
       return Superclass::SetData(data,t,mode);
   }
   

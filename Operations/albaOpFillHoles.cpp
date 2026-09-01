@@ -126,12 +126,10 @@ void albaOpFillHoles::OpRun()
 	albaVMESurface *surface=albaVMESurface::SafeDownCast(m_Input);
 	vtkNEW(m_OriginalPolydata);
 	m_OriginalPolydata->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-	m_OriginalPolydata->Update();
 
   vtkPolyData *newPoly;
   vtkNEW(newPoly);
   newPoly->DeepCopy(vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData()));
-  newPoly->Update();
   m_VTKResult.push_back(newPoly);
 
 	vtkNEW(m_ExctractHole);
@@ -179,14 +177,13 @@ void albaOpFillHoles::OnEvent(albaEventBase *alba_event)
 		{
     case ID_UNDO:
       {
-        m_MapperSurface->SetInput(m_VTKResult[m_VTKResult.size()-2]);
+        m_MapperSurface->SetInputData(m_VTKResult[m_VTKResult.size()-2]);
         m_MapperSurface->Update();
 
-        m_ExctractFreeEdges->SetInput(m_VTKResult[m_VTKResult.size()-2]);
+        m_ExctractFreeEdges->SetInputData(m_VTKResult[m_VTKResult.size()-2]);
         m_ExctractFreeEdges->Update();
 
         vtkPolyData *poly = m_VTKResult[m_VTKResult.size()-1];
-        poly->Update();
 
         vtkDEL(m_VTKResult[m_VTKResult.size()-1]);
         m_VTKResult.pop_back();
@@ -390,7 +387,7 @@ void albaOpFillHoles::Fill()
 	vtkALBAFillingHole *fillingHoleFilter;
 	vtkNEW(fillingHoleFilter);
 	//fillingHoleFilter->SetInput(m_ResultPolydata);
-  fillingHoleFilter->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+  fillingHoleFilter->SetInputData(m_VTKResult[m_VTKResult.size()-1]);
 	if(m_AllHoles)
 		fillingHoleFilter->SetFillAllHole();  
 	else
@@ -436,17 +433,16 @@ void albaOpFillHoles::Fill()
   vtkNEW(newPoly);
   newPoly->DeepCopy(fillingHoleFilter->GetOutput());
   newPoly->Modified();
-  newPoly->Update();
   m_VTKResult.push_back(newPoly);
 
   if (!m_TestMode)
   {
     m_ButtonUndo->Enable(m_VTKResult.size()>1);
 
-    m_MapperSurface->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+    m_MapperSurface->SetInputData(m_VTKResult[m_VTKResult.size()-1]);
     m_MapperSurface->Update();
 
-    m_ExctractFreeEdges->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+    m_ExctractFreeEdges->SetInputData(m_VTKResult[m_VTKResult.size()-1]);
     m_ExctractFreeEdges->Update();
 
 	  m_Rwi->m_RenFront->RemoveActor(m_ActorSelectedHole);
@@ -467,21 +463,20 @@ void albaOpFillHoles::SelectHole(int pointID)
 {
 	/*m_ResultPolydata->Update();
 	m_ResultPolydata->GetPoint(pointID,m_CoordPointSelected);*/
-  m_VTKResult[m_VTKResult.size()-1]->Update();
   m_VTKResult[m_VTKResult.size()-1]->GetPoint(pointID,m_CoordPointSelected);
 
-	m_ExctractHole->SetInput(m_ExctractFreeEdges->GetOutput()); 
+	m_ExctractHole->SetInputConnection(m_ExctractFreeEdges->GetOutputPort()); 
 	m_ExctractHole->SetPoint(m_CoordPointSelected);
 
 	m_Rwi->m_RenFront->RemoveActor(m_ActorSelectedHole);
 
 	vtkGlyph3D *glyph;
 	vtkNEW(glyph);
-	glyph->SetInput(m_ExctractHole->GetOutput());
-	glyph->SetSource(m_Sphere->GetOutput());
+	glyph->SetInputConnection(m_ExctractHole->GetOutputPort());
+	glyph->SetSourceConnection(m_Sphere->GetOutputPort());
 
 	vtkNEW(m_MapperSelectedHole);
-	m_MapperSelectedHole->SetInput(glyph->GetOutput());
+	m_MapperSelectedHole->SetInputConnection(glyph->GetOutputPort());
 
 	//Show the selected hole - selected hole is red
 	vtkNEW(m_ActorSelectedHole);
@@ -517,7 +512,7 @@ void albaOpFillHoles::CreatePolydataPipeline()
 	
 	//Exctract Holes from the input surface
 	vtkNEW(m_ExctractFreeEdges);
-	m_ExctractFreeEdges->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+	m_ExctractFreeEdges->SetInputData(m_VTKResult[m_VTKResult.size()-1]);
 	m_ExctractFreeEdges->SetBoundaryEdges(1);
 	m_ExctractFreeEdges->SetFeatureEdges(0);
 	m_ExctractFreeEdges->SetNonManifoldEdges(0);
@@ -529,11 +524,11 @@ void albaOpFillHoles::CreatePolydataPipeline()
 
 	//Create a m_Glyph to highlight the holes
 	vtkNEW(m_Glyph);
-	m_Glyph->SetInput(m_ExctractFreeEdges->GetOutput());
-	m_Glyph->SetSource(m_Sphere->GetOutput());
+	m_Glyph->SetInputConnection(m_ExctractFreeEdges->GetOutputPort());
+	m_Glyph->SetSourceConnection(m_Sphere->GetOutputPort());
 
 	vtkNEW(m_MapperHoles);
-	m_MapperHoles->SetInput(m_Glyph->GetOutput());
+	m_MapperHoles->SetInputConnection(m_Glyph->GetOutputPort());
 	
 	vtkNEW(m_ActorHoles);
 	m_ActorHoles->SetMapper(m_MapperHoles);
@@ -541,7 +536,7 @@ void albaOpFillHoles::CreatePolydataPipeline()
 	m_ActorHoles->PickableOff();
 
 	vtkNEW(m_MapperSurface);
-	m_MapperSurface->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+	m_MapperSurface->SetInputData(m_VTKResult[m_VTKResult.size()-1]);
 
 	vtkNEW(m_ActorSurface);
 	m_ActorSurface->SetMapper(m_MapperSurface);

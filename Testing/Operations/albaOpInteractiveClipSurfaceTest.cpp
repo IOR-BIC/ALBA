@@ -51,13 +51,12 @@ void albaOpInteractiveClipSurfaceTest::TestOpRun()
   vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->Update();
   vtkAppendPolyData *append = vtkAppendPolyData::New();
-  append->SetInput(sphere->GetOutput());
+  append->SetInputConnection(sphere->GetOutputPort());
   append->Update();
 
   albaVMESurface *surfaceInput;
   albaNEW(surfaceInput);
   surfaceInput->SetData(append->GetOutput(),0.0);
-  surfaceInput->GetOutput()->GetVTKData()->Update();
   surfaceInput->GetOutput()->Update();
   surfaceInput->Update();
 
@@ -72,7 +71,6 @@ void albaOpInteractiveClipSurfaceTest::TestOpRun()
   int result = clip->Clip();
   CPPUNIT_ASSERT(result==ALBA_OK);
 
-  surfaceInput->GetOutput()->GetVTKData()->Update();
   surfaceInput->GetOutput()->Update();
   surfaceInput->Update();
 

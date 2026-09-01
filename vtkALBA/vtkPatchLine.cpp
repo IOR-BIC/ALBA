@@ -22,22 +22,30 @@ See the COPYINGS file for license details
 #include "vtkMath.h"
 #include "vtkPolyLine.h"
 #include <list>
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkCellArrayIterator.h"
 #pragma warning(pop)
 
 
-vtkCxxRevisionMacro(vtkPatchLine, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkPatchLine);
 
-void vtkPatchLine::ExecuteData(vtkDataObject *output)
+int vtkPatchLine::RequestData(vtkInformation *vtkNotUsed(request),	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
 {	
-	vtkSmartPointer<vtkPolyData> source = this->GetInput();
-	source->Update();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkDataObject *output = vtkDataObject::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 	
 	//Remove duplicate points etc.
 	vtkALBASmartPointer<vtkCleanPolyData> cleaner;
-	cleaner->SetInput(source.GetPointer());
+	cleaner->SetInputData(input);
 	cleaner->Update();  
-	source = cleaner->GetOutput();	
+	vtkPolyData* source = cleaner->GetOutput();
+	
 	//source->Register(NULL); - not needed, reference is added by SmartPointer
 	cleaner->SetOutput(NULL);
 	
@@ -46,7 +54,7 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 		vtkSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
 		newLine->SetPoints(source->GetPoints());
 		newLine->SetLines(source->GetLines());
-		return;
+		return 1;
 	}
 	
 	vtkSmartPointer<vtkCellArray> origLines = source->GetLines();
@@ -81,23 +89,26 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 	beginVertices.erase(beginVerticesArray[nNumPoints-1]);
 	endVertices.erase(endVerticesArray[0]);
 	
-	//Erase id's of points that are already starting/end points and set the value of 'segments'
-	for(int i = 0; i < nNumLines; i++)
+	vtkSmartPointer<vtkCellArrayIterator> it = origLines->NewIterator();
+
+	// Erase id's of points that are already starting/end points and set the value of 'segments'
+	for (int i = 0; i < nNumLines && !it->IsDoneWithTraversal(); i++)
 	{
-		vtkIdType npts;
-		vtkIdType* pts;
-		origLines->GetNextCell(npts, pts);
+		vtkIdList* pts = it->GetCurrentCell(); 
+		vtkIdType npts = pts->GetNumberOfIds(); // Numero di punti nella cella
 
-		if(i == 0)
-			startingPoint = pts[0];
+		if (i == 0)
+			startingPoint = pts->GetId(0);
 
-		for(int i = 0; i < npts-1; i++)
+		for (int j = 0; j < npts - 1; j++)
 		{
-			beginVertices.erase(beginVerticesArray[pts[i]]);
-			endVertices.erase(endVerticesArray[pts[i+1]]);
+			beginVertices.erase(beginVerticesArray[pts->GetId(j)]);
+			endVertices.erase(endVerticesArray[pts->GetId(j + 1)]);
 
-			segments[pts[i]] = pts[i+1];
+			segments[pts->GetId(j)] = pts->GetId(j + 1);
 		}
+
+		it->GoToNextCell(); 
 	}
 	
 	//Find apropriate endpoints for leftover starting points
@@ -141,4 +152,5 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 	delete[] endVerticesArray;
 	delete[] segments;
 
+	return 1;
 }

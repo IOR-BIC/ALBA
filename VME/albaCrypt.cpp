@@ -244,8 +244,8 @@ void albaCalculateteChecksum(const char *filename, std::string &checksum_result)
 {
   try
   {
-		MD5 hashMD5;
-		HashFilter filterMD5(hashMD5);
+    MD5 hashMD5;
+    HashFilter filterMD5(hashMD5);
 
     std::auto_ptr<ChannelSwitch>
       channelSwitch(new ChannelSwitch);
@@ -288,3 +288,4 @@ void albaCalculateteChecksum(const char *input_string, int input_len, std::strin
   }
 }
 #endif
+

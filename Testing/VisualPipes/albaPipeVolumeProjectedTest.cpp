@@ -80,7 +80,6 @@ void albaPipeVolumeProjectedTest::TestPipeExecution()
   albaVMEVolumeGray *volumeInput;
   albaNEW(volumeInput);
   volumeInput->SetData((vtkImageData*)Importer->GetOutput(),0.0);
-  volumeInput->GetOutput()->GetVTKData()->Update();
   volumeInput->GetOutput()->Update();
   volumeInput->Update();
 
@@ -120,7 +119,7 @@ void albaPipeVolumeProjectedTest::TestPipeExecution()
     m_RenderWindow->Render();
 		COMPARE_IMAGES("TestPipeExecution", testNum);
 
-    m_Renderer->RemoveAllProps();
+    m_Renderer->RemoveAllViewProps();
     vtkDEL(actorList);
 		sceneNode->DeletePipe();
 
@@ -147,7 +146,6 @@ void albaPipeVolumeProjectedTest::TestProjectionRange()
 	albaVMEVolumeGray *volumeInput;
 	albaNEW(volumeInput);
 	volumeInput->SetData((vtkImageData*)Importer->GetOutput(), 0.0);
-	volumeInput->GetOutput()->GetVTKData()->Update();
 	volumeInput->GetOutput()->Update();
 	volumeInput->Update();
 	
@@ -197,7 +195,7 @@ void albaPipeVolumeProjectedTest::TestProjectionRange()
 		m_RenderWindow->Render();
 		COMPARE_IMAGES("TestProjectionRange", testNum);
 
-		m_Renderer->RemoveAllProps();
+		m_Renderer->RemoveAllViewProps();
 		vtkDEL(actorList);
 		sceneNode->DeletePipe();
 

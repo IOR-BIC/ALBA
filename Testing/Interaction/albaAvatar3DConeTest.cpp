@@ -36,6 +36,12 @@
 #include "vtkDiskSource.h"
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkPolyDataReader.h"
+#include "albaVMESurface.h"
+#include "albaSceneNode.h"
+#include "albaPipeBox.h"
+#include "vtkALBAAssembly.h"
 
 #include "vtkPropCollection.h"
 #include "vtkRenderer.h"
@@ -56,7 +62,7 @@ void albaAvatar3DConeTest::AfterTest()
 void albaAvatar3DConeTest::TestFixture()
 //----------------------------------------------------------------------------
 {
-
+	
 }
 //----------------------------------------------------------------------------
 void albaAvatar3DConeTest::TestConstructorDestructor()
@@ -104,7 +110,7 @@ void albaAvatar3DConeTest::TestPick()
   disk->SetRadialResolution(80);
   disk->Update();
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput(disk->GetOutput());
+  mapper->SetInputConnection(disk->GetOutputPort());
   vtkALBASmartPointer<vtkActor> actor;
   actor->SetMapper(mapper);
   actor->SetPosition(0,0,0);

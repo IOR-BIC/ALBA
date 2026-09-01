@@ -28,7 +28,6 @@
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPoints.h"
-#include "vtkIdType.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkTextActor.h"
@@ -38,7 +37,6 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkALBARulerActor2D, "$Revision: 1.5.2.3 $");
 vtkStandardNewMacro(vtkALBARulerActor2D);
 //------------------------------------------------------------------------------
 vtkALBARulerActor2D::vtkALBARulerActor2D()
@@ -85,7 +83,7 @@ vtkALBARulerActor2D::vtkALBARulerActor2D()
   a->SetPoint1(10,10,10);
   a->SetPoint1(10,10,10);
   vtkPolyDataMapper2D *a_pdm = vtkPolyDataMapper2D::New();
-  a_pdm->SetInput(a->GetOutput());
+  a_pdm->SetInputConnection(a->GetOutputPort());
   this->SetMapper(a_pdm); 
   this->PickableOff();
   a->Delete();
@@ -258,7 +256,7 @@ void vtkALBARulerActor2D::RulerCreate()
 	tick_pd->SetLines(tick_cell);
 
   vtkPolyDataMapper2D *tick_pdm = vtkPolyDataMapper2D::New();
-  tick_pdm->SetInput(tick_pd);
+  tick_pdm->SetInputData(tick_pd);
 
   vtkProperty2D *tick_p = vtkProperty2D::New();
   tick_p->SetColor(1,0,0);
@@ -287,7 +285,7 @@ void vtkALBARulerActor2D::RulerCreate()
   axis_pd->SetLines(axis_cell);
 
   vtkPolyDataMapper2D *axis_pdm = vtkPolyDataMapper2D::New();
-  axis_pdm->SetInput(axis_pd);
+  axis_pdm->SetInputData(axis_pd);
 
   vtkProperty2D *axis_p = vtkProperty2D::New();
   axis_p->SetColor(1,0.0,0.0);
@@ -309,31 +307,28 @@ void vtkALBARulerActor2D::RulerCreate()
   //Label //////////////////////////
   ScaleLabel = vtkTextActor::New();
 	ScaleLabel->GetProperty()->SetColor(1,0,0);
-  ScaleLabel->GetTextProperty()->AntiAliasingOff();
   ScaleLabel->GetTextProperty()->SetFontSize(12);
   ScaleLabel->GetTextProperty()->SetFontFamilyToArial();
   ScaleLabel->GetTextProperty()->SetJustificationToLeft();
-	ScaleLabel->ScaledTextOff();
+	ScaleLabel->SetTextScaleModeToNone();
 	ScaleLabel->SetDisplayPosition(Position[0] + Margin + 4,Position[1] + Margin + 4);
 	ScaleLabel->SetInput("");
 
   HorizontalAxesLabel = vtkTextActor::New();
   HorizontalAxesLabel->GetProperty()->SetColor(1,0,0);
-  HorizontalAxesLabel->GetTextProperty()->AntiAliasingOff();
   HorizontalAxesLabel->GetTextProperty()->SetFontSize(12);
   HorizontalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   HorizontalAxesLabel->GetTextProperty()->SetJustificationToRight();
-  HorizontalAxesLabel->ScaledTextOff();
+  HorizontalAxesLabel->SetTextScaleModeToNone();
   HorizontalAxesLabel->SetDisplayPosition(Position[0],Position[1]);
   HorizontalAxesLabel->SetInput("");
 
   VerticalAxesLabel = vtkTextActor::New();
   VerticalAxesLabel->GetProperty()->SetColor(1,0,0);
-  VerticalAxesLabel->GetTextProperty()->AntiAliasingOff();
   VerticalAxesLabel->GetTextProperty()->SetFontSize(12);
   VerticalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   VerticalAxesLabel->GetTextProperty()->SetJustificationToLeft();
-  VerticalAxesLabel->ScaledTextOff();
+  VerticalAxesLabel->SetTextScaleModeToNone();
   VerticalAxesLabel->SetDisplayPosition(Position[0],Position[1]);
   VerticalAxesLabel->SetInput("");
 
@@ -341,25 +336,23 @@ void vtkALBARulerActor2D::RulerCreate()
   {
     Labx[i] = vtkTextActor::New();
     Labx[i]->GetProperty()->SetColor(1,1,1);
-    Labx[i]->GetTextProperty()->AntiAliasingOff();
     Labx[i]->GetTextProperty()->SetFontSize(12);
     Labx[i]->GetTextProperty()->SetFontFamilyToArial();
     Labx[i]->GetTextProperty()->SetJustificationToCentered();
     Labx[i]->GetTextProperty()->SetVerticalJustificationToTop();
-    Labx[i]->ScaledTextOff();
+    Labx[i]->SetTextScaleModeToNone();
     Labx[i]->SetDisplayPosition(Position[0],Position[1]);
     Labx[i]->SetInput("");
 
 
     Laby[i] = vtkTextActor::New();
     Laby[i]->GetProperty()->SetColor(1,1,1);
-    Laby[i]->GetTextProperty()->AntiAliasingOff();
     Laby[i]->GetTextProperty()->SetFontSize(12);
     Laby[i]->GetTextProperty()->SetFontFamilyToArial();
   //Laby[i]->GetTextProperty()->SetJustificationToRight();
     Laby[i]->GetTextProperty()->SetJustificationToLeft();
     Laby[i]->GetTextProperty()->SetVerticalJustificationToCentered();
-    Laby[i]->ScaledTextOff();
+    Laby[i]->SetTextScaleModeToNone();
     Laby[i]->SetDisplayPosition(Position[0],Position[1]);
     Laby[i]->SetInput("");
   }

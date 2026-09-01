@@ -225,8 +225,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpConnectivitySurfaceTest::suite());
 	runner.addTest(albaOpRemoveCellsTest::suite());
 	runner.addTest(albaOpBooleanSurfaceTest::suite());
-	runner.addTest(albaOpEditNormalsTest::suite());
-	runner.addTest(albaOpExporterImagesTest::suite());
+	runner.addTest(albaOpEditNormalsTest::suite()); 
+	runner.addTest(albaOpExporterImagesTest::suite()); 
 	runner.addTest(albaOpImporterMSFTest::suite());
 	runner.addTest(albaOpImporterExternalFileTest::suite());
 	runner.addTest(albaOpOpenExternalFileTest::suite());
@@ -313,8 +313,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterVTKXMLTest::suite());
 	runner.addTest(albaOpInteractiveClipSurfaceTest::suite());
 	runner.addTest(albaOpCreateEditSkeletonTest::suite());
-	runner.addTest(albaOpRegisterClustersTest::suite());
-	runner.addTest(albaOpClassicICPRegistrationTest::suite());
+	runner.addTest(albaOpRegisterClustersTest::suite()); 
+	runner.addTest(albaOpClassicICPRegistrationTest::suite()); 
 	runner.addTest(albaOpMML3ParameterViewTest::suite());
 	runner.addTest(albaOpInteractionDebuggerTest::suite());
 	runner.addTest(albaOpIterativeRegistrationTest::suite()); 

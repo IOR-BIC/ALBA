@@ -1,0 +1,3 @@
+3022a3023,3024
+>     if (input==NULL)
+>       input = this->Parent->GetInput(port);

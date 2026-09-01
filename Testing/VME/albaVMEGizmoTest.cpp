@@ -110,7 +110,7 @@ int albaVMEGizmoTest::PlayTree(albaVMERoot *root, bool ignoreVisibleToTraverse)
       {
         vtkDataSet *vmedata=node->GetOutput()->GetVTKData();
         vtkALBASmartPointer<vtkDataSetMapper> mapper;
-        mapper->SetInput((vtkPolyData *)vmedata);
+        mapper->SetInputData((vtkPolyData *)vmedata);
 
         vtkALBASmartPointer<vtkActor> vmeact;
         vmeact->SetMapper(mapper);
@@ -236,7 +236,7 @@ void albaVMEGizmoTest::TestGizmoVisualizatioAlone()
 
   gizmo->SetData(sphere->GetOutput());
 
-  mapper->SetInput(gizmo->GetSurfaceOutput()->GetVTKData());
+  mapper->SetInputData(gizmo->GetSurfaceOutput()->GetVTKData());
   
   renWin->Render();
   
@@ -299,6 +299,8 @@ void albaVMEGizmoTest::CreateVMETestTree()
 
   vtkALBASmartPointer<vtkSphereSource> sphere;
   vtkALBASmartPointer<vtkConeSource> cone;
+	cone->Update();
+	sphere->Update();
 
   int i;
   for (i=0;i<100;i++)
@@ -325,7 +327,7 @@ void albaVMEGizmoTest::CreateVMETestTree()
 
     vcone->SetPose(trans.GetMatrix(),i*.5+75);
 
-    vtkPolyDataSource *morph;
+    vtkPolyDataAlgorithm *morph;
 
     // the morphing tube
     if (i<50)
@@ -345,6 +347,7 @@ void albaVMEGizmoTest::CreateVMETestTree()
       morph=cube;
     }
 
+		morph->Update();
     vmorph->SetData(morph->GetOutput(),log10((double)(100-i))*50);
     morph->Delete();
   }

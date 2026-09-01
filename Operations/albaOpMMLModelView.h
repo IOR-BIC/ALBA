@@ -77,6 +77,8 @@
 #include "vtkPolyDataNormals.h"
 #include "vtkDataSet.h"
 
+class vtkPolyDataWriter;
+
 //----------------------------------------------------------------------------
 // albaOpMMLModelView     :
 //----------------------------------------------------------------------------

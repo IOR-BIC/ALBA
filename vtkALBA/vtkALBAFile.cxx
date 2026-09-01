@@ -12,7 +12,6 @@
 */
 
 #include "albaDefines.h"
-#include "albaString.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -21,15 +20,14 @@
 //----------------------------------------------------------------------------
 
 #include "vtkALBAFile.h"
+#include "albaString.h"
 
 #if defined(_MSC_VER)
   #include <share.h>
 #endif
 
-vtkCxxRevisionMacro(vtkALBAFile, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAFile);
 
-vtkCxxRevisionMacro(vtkALBAFile2, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAFile2);
 
 //creates a new file
@@ -109,7 +107,7 @@ void vtkALBAFile2::Create(const char* fname) throw(...)
   if (!vtkALBAFile::Create(fname))
   {
     throw std::ios::failure(
-      (const char*)albaString::Format(_("Cannot create '%s'. Error: %d"), fname, errno));
+      (const char*)albaString::Format("Cannot create '%s'. Error: %d", fname, errno));
   }
 }
 
@@ -120,7 +118,7 @@ void vtkALBAFile2::Open(const char* fname, bool bRO) throw(...)
   if (!vtkALBAFile::Open(fname))
   {
     throw std::ios::failure(
-      (const char*)albaString::Format(_("Cannot open '%s'. Error: %d"), fname, errno));
+      (const char*)albaString::Format("Cannot open '%s'. Error: %d", fname, errno));
   }
 }
 

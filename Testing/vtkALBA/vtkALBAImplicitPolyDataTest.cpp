@@ -56,7 +56,7 @@ void vtkALBAImplicitPolyDataTest::RenderData( vtkPolyData *data )
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput(data);
+  mapper->SetInputData(data);
   mapper->ScalarVisibilityOn();
   
   vtkALBASmartPointer<vtkActor> actor;
@@ -83,11 +83,11 @@ void vtkALBAImplicitPolyDataTest::TestClipSphere1PolydataWithSphere2PolydataUsed
 
   // triangulate sphere 1 for input to subdivision filter
   vtkTriangleFilter *tf1 = vtkTriangleFilter::New();
-  tf1->SetInput( s1->GetOutput() );
+  tf1->SetInputConnection( s1->GetOutputPort() );
 
   // subdivide triangles in sphere 1 to get better clipping
   vtkLinearSubdivisionFilter *lsf1 = vtkLinearSubdivisionFilter::New();
-  lsf1->SetInput( tf1->GetOutput() );
+  lsf1->SetInputConnection( tf1->GetOutputPort() );
   lsf1->SetNumberOfSubdivisions( 1 );	// use this (0-3+) to see improvement in clipping
 
   // polygonal sphere 2, this will clip sphere 1
@@ -96,6 +96,7 @@ void vtkALBAImplicitPolyDataTest::TestClipSphere1PolydataWithSphere2PolydataUsed
   s2->SetPhiResolution (  6 );
   s2->SetCenter( 0, 1, 0 );	// offset position from sphere 1
   s2->SetRadius( 1.0 );
+	s2->Update();
 
   // use sphere 2 polydata as an implicit function
   vtkALBAImplicitPolyData *ip2 = vtkALBAImplicitPolyData::New();
@@ -103,7 +104,7 @@ void vtkALBAImplicitPolyDataTest::TestClipSphere1PolydataWithSphere2PolydataUsed
 
   // clip sphere 1 with sphere 2 polydata
   vtkClipPolyData *cpd1 = vtkClipPolyData::New();
-  cpd1->SetInput( lsf1->GetOutput() );
+  cpd1->SetInputConnection( lsf1->GetOutputPort() );
   cpd1->SetClipFunction( ip2 );
   cpd1->SetGenerateClipScalars ( 0 );	// 0 outputs input data scalars, 1 outputs implicit function values
   cpd1->SetInsideOut( 0 );		// use 0/1 to reverse sense of clipping
@@ -257,7 +258,7 @@ void vtkALBAImplicitPolyDataTest::TestGenerateOffsetSurfaceFromPolydata()
   sf1->ComputeNormalsOff();
 
   vtkContourFilter *cf1 = vtkContourFilter::New();
-  cf1->SetInput( sf1->GetOutput() );
+  cf1->SetInputConnection( sf1->GetOutputPort() );
   cf1->SetValue( 0, offset );
   
   int numCells = cf1->GetOutput()->GetNumberOfCells();
@@ -288,12 +289,14 @@ void vtkALBAImplicitPolyDataTest::TestUnionBetweenTwoPolydata()
   s1->SetPhiResolution (  6 );
   s1->SetCenter( 0, 0, 0 );
   s1->SetRadius( 1.0 );
+	s1->Update();
 
   vtkSphereSource *s2 = vtkSphereSource::New();
   s2->SetThetaResolution( 6 );
   s2->SetPhiResolution (  6 );
   s2->SetCenter( 0.7, 0, 0 );
   s2->SetRadius( 1.0 );
+	s2->Update();
 
   // treat users polydata as an implicit function
   vtkALBAImplicitPolyData *ip1 = vtkALBAImplicitPolyData::New();
@@ -330,7 +333,7 @@ void vtkALBAImplicitPolyDataTest::TestUnionBetweenTwoPolydata()
   double offset = 0;
 
   vtkContourFilter *cf1 = vtkContourFilter::New();
-  cf1->SetInput( sf1->GetOutput() );
+  cf1->SetInputConnection( sf1->GetOutputPort() );
   cf1->SetValue( 0, offset );
   
   int numCells = cf1->GetOutput()->GetNumberOfCells();
@@ -341,8 +344,6 @@ void vtkALBAImplicitPolyDataTest::TestUnionBetweenTwoPolydata()
   numCells = cf1->GetOutput()->GetNumberOfCells();
   CPPUNIT_ASSERT(numCells == 716);
 
-  // rendering for debug purposes...
-  // RenderData(cf1->GetOutput());
 
   s1->Delete();
   s2->Delete();

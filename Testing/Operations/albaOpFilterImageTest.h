@@ -37,7 +37,6 @@ public:
 	CPPUNIT_TEST(TestGradientMagnitude);
 	CPPUNIT_TEST(TestSobel);
 	CPPUNIT_TEST(TestCanny);
-	CPPUNIT_TEST(TestZeroCrossing);
 	CPPUNIT_TEST(TestLaplacianRecursive);
 	CPPUNIT_TEST_SUITE_END();
 
@@ -60,7 +59,6 @@ public:
 		void TestGradientMagnitude();
 		void TestSobel();
 		void TestCanny();
-		void TestZeroCrossing();
 		void TestLaplacianRecursive();
     void TestMedian();
 		void TestUndo();

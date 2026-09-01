@@ -41,6 +41,7 @@
 #include "vtkRectilinearGridReader.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridReader.h"
+#include "vtkImageData.h"
 #include "vtkStructuredPoints.h"
 #include "vtkStructuredPointsReader.h"
 #include "vtkUnstructuredGrid.h"
@@ -52,6 +53,9 @@
 #include <assert.h>
 
 const char *file_extension="vtk";
+int glo_VtkFileVersion = 0;
+
+
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEItemVTK)
@@ -107,7 +111,7 @@ void albaVMEItemVTK::DeepCopyVmeLarge(albaVMEItem *a)
       vtkDataSetWriter *w;
       vtkNEW(w);
       w->SetFileName("TMP.vtk");
-      w->SetInput(vtk_item->GetData());
+      w->SetInputData(vtk_item->GetData());
       w->SetFileTypeToBinary();
       w->Write();
       vtkDEL(w);
@@ -156,9 +160,6 @@ bool albaVMEItemVTK::Equals(albaVMEItem *a)
 
     vtkDataSet *data1=GetData();
     vtkDataSet *data2=item->GetData();
-
-    data1->Update();
-    data2->Update();
 
     if (data1&&data2)
     {
@@ -233,7 +234,6 @@ void albaVMEItemVTK::SetData(vtkDataSet *data)
       this->SetDataType(data->GetClassName());
 
       double bounds[6];
-      data->Update();
       data->ComputeBounds();
       data->GetBounds(bounds);
       m_Bounds.DeepCopy(bounds);
@@ -265,7 +265,6 @@ void albaVMEItemVTK::UpdateData()
   // pipeline to update.
   if (IsDataModified()&&m_Data.GetPointer())
   {
-    m_Data->Update();
     //this->UpdateBounds();
     return;
   }
@@ -295,7 +294,6 @@ void albaVMEItemVTK::UpdateBounds()
     {
       double bounds[6];
 
-      m_Data->Update();
       //m_Data->Modified();
       m_Data->GetBounds(bounds);
 
@@ -440,8 +438,6 @@ int albaVMEItemVTK::ReadData(albaString &filename, int resolvedURL)
     else
     {
       //BES: 23.5.2008 - detach data from its reader, so we can destroy the reader
-      data->SetSource(NULL);
-
       SetData(data);
       m_IsLoadingData = false;
     }
@@ -584,8 +580,10 @@ int albaVMEItemVTK::InternalStoreData(const char *url)
       ReleaseOutputMemory();
 
       vtkALBASmartPointer<vtkDataSetWriter> writer;
-      writer->SetInput(data);
+      writer->SetInputData(data);
       writer->SetFileTypeToBinary();
+      if(glo_VtkFileVersion != 0)
+				writer->SetFileVersion(glo_VtkFileVersion);
       writer->SetHeader("# ALBA data file - albaVMEItemVTK output\n");
 
       if (m_IOMode == MEMORY || GetCrypting())
@@ -779,6 +777,19 @@ bool albaVMEItemVTK::StoreToArchive(wxZipOutputStream &zip)
   bool write_res = zip.LastWrite() == m_OutputMemorySize;
   return write_res;
 }
+
+//----------------------------------------------------------------------------
+int albaVMEItemVTK::GetVTKFileVersion()
+{
+	return glo_VtkFileVersion;
+}
+
+//----------------------------------------------------------------------------
+void albaVMEItemVTK::SetVTKFileVersion(int version)
+{
+	glo_VtkFileVersion = version;
+}
+
 //-------------------------------------------------------------------------
 void albaVMEItemVTK::ReleaseOutputMemory()
 //-------------------------------------------------------------------------
@@ -793,8 +804,5 @@ void albaVMEItemVTK::ReleaseOutputMemory()
 void albaVMEItemVTK::Print(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
-  albaIndent indent(tabs);
-
-  // to do: implement DUMP of internally stored data
-  strstream ostr;
+  
 }

@@ -47,7 +47,7 @@ void vtkHoleConnectivityTest::TestPrintSelf()
 //-------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkHoleConnectivity> hc;  
-  hc->PrintSelf(std::cout, 5);
+  hc->PrintSelf(std::cout, vtkIndent(5));
 }
 //-------------------------------------------------------------------------
 void vtkHoleConnectivityTest::TestGetClassName()
@@ -90,14 +90,14 @@ void vtkHoleConnectivityTest::TestExecution()
 
 
   vtkALBASmartPointer<vtkHoleConnectivity> hc;
-  hc->SetInput(preader->GetOutput());
+  hc->SetInputConnection(preader->GetOutputPort());
   double point[3] = {0.,0.,0.};
   hc->SetPoint(point);
 
   hc->Update();
 
   vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-  connectivityFilter->SetInput(preader->GetOutput());
+  connectivityFilter->SetInputConnection(preader->GetOutputPort());
   connectivityFilter->SetExtractionModeToClosestPointRegion ();
   connectivityFilter->SetClosestPoint(point);
   connectivityFilter->Modified();

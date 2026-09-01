@@ -90,7 +90,7 @@ void albaView::OnEvent(albaEventBase *alba_event)
     {
       case ID_PRINT_INFO:
       {
-        std::strstream ss1;
+        std::stringstream ss1;
         Print(ss1);
         ss1 << std::ends;  
         albaLogMessage("[VIEW PRINTOUT:]\n%s\n", ss1.str()); 
@@ -181,7 +181,7 @@ bool albaView::FindPickedVme(vtkAssemblyPath *ap)
       vtkAssemblyNode *an = (vtkAssemblyNode*)ap->GetItemAsObject(i);
       if (an)
       {
-        vtkProp *p = an->GetProp();
+        vtkProp *p = an->GetViewProp();
         if(p && p->IsA("vtkALBAAssembly"))
         {
           as = (vtkALBAAssembly*)p;

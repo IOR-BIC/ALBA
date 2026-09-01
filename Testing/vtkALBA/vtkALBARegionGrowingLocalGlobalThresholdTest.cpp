@@ -44,7 +44,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::BeforeTest()
 
   m_Image->SetDimensions(X_DIM,Y_DIM,Z_DIM);
   m_Image->SetSpacing(1.0,1.0,1.0);
-  m_Image->Update();
 
   vtkDoubleArray *scalars = vtkDoubleArray::New();
   scalars->SetNumberOfTuples(4*3*2);
@@ -57,7 +56,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::BeforeTest()
 
   m_Image->GetPointData()->AddArray(scalars);
   m_Image->GetPointData()->SetActiveScalars("Scalars");
-  m_Image->Update();
 
   scalars->Delete();
 }
@@ -83,7 +81,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestExecute()
 
   imageToExecute->SetDimensions(X_DIM,Y_DIM,Z_DIM);
   imageToExecute->SetSpacing(1.0,1.0,1.0);
-  imageToExecute->Update();
 
   vtkDoubleArray *scalars = vtkDoubleArray::New();
   scalars->SetNumberOfTuples(4*3*2);
@@ -104,7 +101,6 @@ void vtkALBARegionGrowingLocalGlobalThresholdTest::TestExecute()
 
   imageToExecute->GetPointData()->AddArray(scalars);
   imageToExecute->GetPointData()->SetActiveScalars("Scalars");
-  imageToExecute->Update();
 
   m_Filter = vtkALBARegionGrowingLocalGlobalThreshold::New();
   m_Filter->SetInput(imageToExecute);

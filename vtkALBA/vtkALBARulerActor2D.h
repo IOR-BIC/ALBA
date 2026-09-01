@@ -58,7 +58,7 @@ class ALBA_EXPORT vtkALBARulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:
-  vtkTypeRevisionMacro(vtkALBARulerActor2D,vtkActor2D);
+  vtkTypeMacro(vtkALBARulerActor2D,vtkActor2D);
   void PrintSelf(ostream& os, vtkIndent indent);
   static	vtkALBARulerActor2D *New();
 

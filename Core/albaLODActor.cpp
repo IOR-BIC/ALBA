@@ -40,7 +40,6 @@
 #include "vtkMath.h"
 #include "vtkCamera.h"
 
-vtkCxxRevisionMacro(albaLODActor, "$Revision: 1.3.10.1 $");
 vtkStandardNewMacro(albaLODActor);
 
 //------------------------------------------------------------------------
@@ -59,7 +58,7 @@ albaLODActor::albaLODActor()
   m_FlagShape->SetDistribution(1);
 
   m_FlagMapper = vtkPolyDataMapper::New();
-  m_FlagMapper->SetInput(m_FlagShape->GetOutput());
+  m_FlagMapper->SetInputConnection(m_FlagShape->GetOutputPort());
   m_FlagMapper->SetScalarVisibility(0);
 
   m_FlagActor = vtkActor::New();

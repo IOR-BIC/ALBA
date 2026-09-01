@@ -25,41 +25,41 @@ class albaVMERoot;
 
 class albaGizmoScaleIsotropicTest : public albaTest
 {
-
-public:
-
+  
+  public:
+  
   // Executed before each test
   void BeforeTest();
 
   // Executed after each test
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE(albaGizmoScaleIsotropicTest);
-  CPPUNIT_TEST(TestFixture);
-  CPPUNIT_TEST(TestConstructor);
-  CPPUNIT_TEST(TestSetGetCubeLength);
-  CPPUNIT_TEST(TestSetListener);
-  CPPUNIT_TEST(TestSetInput);
-  CPPUNIT_TEST(TestSetGetAbsPose);
-  CPPUNIT_TEST(TestShow);
+  CPPUNIT_TEST_SUITE( albaGizmoScaleIsotropicTest );
+  CPPUNIT_TEST( TestFixture );
+  CPPUNIT_TEST( TestConstructor );
+  CPPUNIT_TEST( TestSetGetCubeLength );
+  CPPUNIT_TEST( TestSetListener);
+  CPPUNIT_TEST( TestSetInput );
+  CPPUNIT_TEST( TestSetGetAbsPose );
+  CPPUNIT_TEST( TestShow );
   CPPUNIT_TEST_SUITE_END();
 
-protected:
+  protected:
+    
+    void CreateTestData();
 
-  void CreateTestData();
+    void TestFixture();
+    void TestConstructor();
+    void TestSetGetCubeLength();
+    void TestSetListener();
+    void TestSetInput();
+    void TestShow();
+    void TestSetGetAbsPose();
+  
+    void RenderGizmo( albaGizmoScaleIsotropic * gizmoScaleIsotropic );
 
-  void TestFixture();
-  void TestConstructor();
-  void TestSetGetCubeLength();
-  void TestSetListener();
-  void TestSetInput();
-  void TestShow();
-  void TestSetGetAbsPose();
-
-  void RenderGizmo(albaGizmoScaleIsotropic *gizmoScaleIsotropic);
-
-  albaVMESurface *m_GizmoInputSurface;
-  albaVMERoot *m_Root;
+    albaVMESurface *m_GizmoInputSurface;
+    albaVMERoot *m_Root;
 
 };
 

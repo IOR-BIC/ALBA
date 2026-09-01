@@ -57,9 +57,6 @@ int albaVMEPolylineEditor::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
 	assert(data);
 	vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
 
-	if (polydata)
-		polydata->Update();
-
 	return Superclass::SetData(data,t,mode);
 }
 //-------------------------------------------------------------------------

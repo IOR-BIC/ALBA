@@ -15,7 +15,7 @@ University of Bedfordshire
 #define __vtkALBAAddScalarsFilter_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "vtkPolyData.h"
 #include <ostream>
 #include <vector>
@@ -28,10 +28,10 @@ University of Bedfordshire
 //
 // Version 18.2.14
 //------------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBAAddScalarsFilter : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAAddScalarsFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAAddScalarsFilter,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAAddScalarsFilter,vtkPolyDataAlgorithm);
   static vtkALBAAddScalarsFilter *New();
   void PrintSelf(ostream& os, vtkIndent indent) const {}
 
@@ -84,7 +84,8 @@ protected:
   vtkALBAAddScalarsFilter();
   ~vtkALBAAddScalarsFilter() {};
 
-  void Execute();
+	/** Execute method */
+	int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   float m_Color[4] ;
   char m_ScalarName[256] ;
@@ -114,4 +115,5 @@ protected:
 };
 
 #endif
+
 

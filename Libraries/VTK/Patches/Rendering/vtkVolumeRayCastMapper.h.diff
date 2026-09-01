@@ -1,4 +1,0 @@
-81c81
-< VTK_THREAD_RETURN_TYPE VolumeRayCastMapper_CastRays( void *arg );
----
-> VTK_RENDERING_EXPORT VTK_THREAD_RETURN_TYPE VolumeRayCastMapper_CastRays( void *arg );

@@ -45,7 +45,7 @@ public:
 
   /**
     Get the MTime: this is the bit of magic that makes everything work.*/
-  //virtual unsigned long GetMTime();
+  //virtual vtkMTimeType GetMTime();
 
   /** process events coming from vtkALBADataPipe bridge component */
   void OnEvent(albaEventBase *e);
@@ -55,6 +55,10 @@ public:
 
   /** return the VTK dataset generated as output to this data pipe */
   virtual vtkDataSet *GetVTKData();
+
+
+	/** returns the VTK Data Pipe Output Port */
+	virtual vtkAlgorithmOutput *GetVTKOutputPort();
 
   /** update the data pipe output */
   virtual void Update();

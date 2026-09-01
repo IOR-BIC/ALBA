@@ -69,12 +69,12 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
   ////// import vtkData ////////////////////
-  vtkDataSetReader *Importer;
-  vtkNEW(Importer);
+  vtkDataSetReader *importer;
+  vtkNEW(importer);
   albaString filename=ALBA_DATA_ROOT;
   filename<<"/VTK_Volumes/volume.vtk";
-  Importer->SetFileName(filename);
-  Importer->Update();
+  importer->SetFileName(filename);
+  importer->Update();
   
   vtkVolumeProperty *volumeProperty = NULL;
   vtkNEW(volumeProperty);  
@@ -83,11 +83,11 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 
   vtkALBAVolumeTextureMapper2D *volumeMapper;
   vtkNEW(volumeMapper);
-  volumeMapper->SetInput(vtkImageData::SafeDownCast(Importer->GetOutput()));
+  volumeMapper->SetInputConnection(importer->GetOutputPort());
 
-  volumeMapper->SetMaximumNumberOfPlanes(100);
-  volumeMapper->SetTargetTextureSize(512,512);
-  volumeMapper->SetMaximumStorageSize(64*1024*1024);  //BES 2.6.2008 - enable texture saving using up to 64 MB
+  volumeMapper->SetMaxMemoryInBytes(64 * 1024 * 1024);
+  volumeMapper->SetMaxMemoryFraction(0.5);
+  volumeMapper->SetSampleDistance(0.5);
 
   volumeMapper->Update();	
 
@@ -96,7 +96,7 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
 
   double MaxR;
   double unsignRange[2];
-  Importer->GetOutput()->GetScalarRange(unsignRange);
+  importer->GetOutput()->GetScalarRange(unsignRange);
   if (unsignRange[1] < 256.0)
   {    
     piecewiseFunction->AddPoint(  0, 0.0);
@@ -139,21 +139,21 @@ void vtkALBAVolumeTextureMapper2DTest::TestPipeExecution()
   volume->PickableOff();
 
   m_Renderer->AddVolume(volume);
-  
+	m_Renderer->ResetCamera(volume->GetBounds());
+
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   camera->Azimuth(60);
   camera->Elevation(30);
 
-	m_Renderer->ResetCamera();
-	m_RenderWindow->Render();
-  COMPARE_IMAGES("TestPipeExecution");
+  m_RenderWindow->Render();
+	COMPARE_IMAGES("TestPipeExecution");
 
   vtkDEL(volumeProperty);
   vtkDEL(volume);
   vtkDEL(colorTransferFunction);
   vtkDEL(piecewiseFunction);
   vtkDEL(volumeMapper);
-  vtkDEL(Importer);
+  vtkDEL(importer);
 }
 
 //----------------------------------------------------------------------------

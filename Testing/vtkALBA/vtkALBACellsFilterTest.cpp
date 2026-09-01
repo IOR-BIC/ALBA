@@ -22,7 +22,7 @@
 #include "vtkALBACellsFilter.h"
 #include "vtkALBACellsFilterTest.h"
 
-//#include <assert.h>
+#include <assert.h>
 
 void vtkALBACellsFilterTest::TestFixture()
 {
@@ -35,7 +35,7 @@ void vtkALBACellsFilterTest::TestMarkCell()
   sphere->Update();
 
 	vtkALBASmartPointer<vtkALBACellsFilter> mc;
-  mc->SetInput(sphere->GetOutput());
+  mc->SetInputConnection(sphere->GetOutputPort());
   mc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -62,7 +62,7 @@ void vtkALBACellsFilterTest::TestUnmarkCell()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBACellsFilter> mc;
-  mc->SetInput(sphere->GetOutput());
+  mc->SetInputConnection(sphere->GetOutputPort());
   mc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -97,7 +97,7 @@ void vtkALBACellsFilterTest::TestToggleCell()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBACellsFilter> mc;
-  mc->SetInput(sphere->GetOutput());
+  mc->SetInputConnection(sphere->GetOutputPort());
   mc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -132,7 +132,7 @@ void vtkALBACellsFilterTest::TestUndoMarks()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBACellsFilter> mc;
-  mc->SetInput(sphere->GetOutput());
+  mc->SetInputConnection(sphere->GetOutputPort());
   mc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -163,7 +163,7 @@ void vtkALBACellsFilterTest::TestGetNumberOfMarkedCells()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBACellsFilter> mc;
-  mc->SetInput(sphere->GetOutput());
+  mc->SetInputConnection(sphere->GetOutputPort());
   mc->Update();
   
   CPPUNIT_ASSERT(mc->GetNumberOfMarkedCells() == 0);
@@ -190,7 +190,7 @@ void vtkALBACellsFilterTest::TestGetIdMarkedCell()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBACellsFilter> mc;
-  mc->SetInput(sphere->GetOutput());
+  mc->SetInputConnection(sphere->GetOutputPort());
   mc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();

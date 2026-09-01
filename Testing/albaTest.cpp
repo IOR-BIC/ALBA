@@ -28,8 +28,6 @@
 
 #include "vtkWindowToImageFilter.h"
 #include "vtkImageMathematics.h"
-#include "vtkImageSource.h"
-
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataArray.h"
@@ -49,7 +47,9 @@
 #include "vtkPointData.h"
 #include "vtkDataSetMapper.h"
 #include "vtkTimerLog.h"
+
 #include "vtkActor2D.h"
+#include "vtkRendererCollection.h"
 
 
 
@@ -97,6 +97,7 @@ void albaTest::setUp()
 
 	//NOTE, wxLog produces some memory leaks, set false during test
 	wxLog::EnableLogging(true);
+	
 
 	//add return line to avoid wrong log info
 	printf("\n");
@@ -115,12 +116,12 @@ void albaTest::setUp()
 //----------------------------------------------------------------------------
 void albaTest::tearDown()
 {
-	// Test-specific cleanup
+	//Clean Test Specific Stuff
 	AfterTest();
-
+		
 	// Remove props from renderer to avoid references during delete
 	if (m_Renderer)
-		m_Renderer->RemoveAllProps();
+		m_Renderer->RemoveAllViewProps();
 
 	// Safely stop and detach interactor
 	if (m_RenderWindowInteractor)
@@ -145,11 +146,12 @@ void albaTest::tearDown()
 	vtkDEL(m_RenderWindowInteractor);
 
 	// 6) Cleanup VTK timer log
+	vtkTimerLog::ResetLog();
 	vtkTimerLog::CleanupLog();
 
 	// 7) Destroy the application and reset wx app instance
 	cppDEL(m_App);  // Destroy the application
-	wxAppConsole::SetInstance(NULL);
+	wxAppConsole::SetInstance(NULL);	
 }
 
 //----------------------------------------------------------------------------
@@ -166,19 +168,29 @@ void albaTest::CompareImage(albaString suiteName, albaString imageName, int inde
 	CPPUNIT_ASSERT(m_RenderWindow);
 
 	// Visualization control
+	void * genericDisplayId = m_RenderWindow->GetGenericDisplayId();
+	vtkRendererCollection * renderers = m_RenderWindow->GetRenderers();
 	m_RenderWindow->OffScreenRenderingOn();
 	vtkWindowToImageFilter *windowToImage;
 	vtkNEW(windowToImage);
 	windowToImage->SetInput(m_RenderWindow);
 	//w2i->SetMagnification(magnification);
 	windowToImage->Update();
-	m_RenderWindow->OffScreenRenderingOff();
-
 	vtkImageData *imDataComp = windowToImage->GetOutput();
-
 	CompareVTKImage(imDataComp, suiteName, imageName, index);
-
 	vtkDEL(windowToImage);
+
+	m_RenderWindow->OffScreenRenderingOff();
+	
+	vtkRenderer * renderer;
+	vtkCollectionSimpleIterator rsit;
+	renderers->InitTraversal(rsit);
+	renderer = renderers->GetNextRenderer(rsit);
+	while (renderer)
+	{
+		renderer->SetRenderWindow(m_RenderWindow);
+		renderer = renderers->GetNextRenderer(rsit);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -192,7 +204,7 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	{
 		albaLogMessage("Converting image tho unsigned short in order to save it as PNG format");
 		vtkImageToUChar->SetOutputScalarTypeToUnsignedChar();
-		vtkImageToUChar->SetInput(imDataComp);
+		vtkImageToUChar->SetInputData(imDataComp);
 		vtkImageToUChar->Modified();
 		vtkImageToUChar->Update();
 		imgToComp = vtkImageToUChar->GetOutput();
@@ -232,8 +244,8 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 
 		// Compare
 		vtkImageMathematics *imageMath = vtkImageMathematics::New();
-		imageMath->SetInput1(imDataOrig);
-		imageMath->SetInput2(imgToComp);
+		imageMath->SetInput1Data(imDataOrig);
+		imageMath->SetInput2Data(imgToComp);
 		imageMath->SetOperationToSubtract();
 		imageMath->Update();
 
@@ -252,10 +264,10 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 
 		if (!result)
 		{
-			imageWriter->SetInput(imageMath->GetOutput());
+			imageWriter->SetInputData(imageMath->GetOutput());
 			imageWriter->SetFileName(imageFileDiff);
 			imageWriter->Write();
-			imageWriter->SetInput(imgToComp);
+			imageWriter->SetInputData(imgToComp);
 			imageWriter->SetFileName(imageFileNew);
 			imageWriter->Write();
 
@@ -271,7 +283,7 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	else
 	{
 		//First run storing file
-		imageWriter->SetInput(imgToComp);
+		imageWriter->SetInputData(imgToComp);
 		imageWriter->SetFileName(imageFileStored);
 		imageWriter->Write();
 	}
@@ -279,6 +291,7 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	vtkDEL(imageWriter);
 }
 
+//----------------------------------------------------------------------------
 void albaTest::InitializeRenderWindow()
 {
 	vtkNEW(m_Renderer);
@@ -302,7 +315,7 @@ void albaTest::RenderData(vtkDataSet *data)
 {
 	vtkDataSetMapper *mapper = vtkDataSetMapper::New();
 	mapper->ScalarVisibilityOn();
-	mapper->SetInput(data);
+	mapper->SetInputData(data);
 
 	vtkActor *actor = vtkActor::New();
 	actor->SetMapper(mapper);

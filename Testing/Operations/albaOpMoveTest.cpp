@@ -80,7 +80,6 @@ void albaOpMoveTest::TestReset()
 
   albaSmartPointer<albaVMESurface> surface;
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 

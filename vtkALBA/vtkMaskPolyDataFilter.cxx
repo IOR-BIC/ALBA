@@ -49,6 +49,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCellLocator.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredPoints.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkAlgorithm.h"
+#include "vtkExecutive.h"
 
 vtkStandardNewMacro(vtkMaskPolyDataFilter);
 
@@ -57,43 +61,51 @@ vtkStandardNewMacro(vtkMaskPolyDataFilter);
 // generating mask scalars turned off.
 vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
 {
+	this->SetNumberOfInputPorts(2);
 	this->CurrentSliceMask=NULL;
   this->SetMask(mask);
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
   this->InsideOut = this->Binarize = this->TriplePass = 0;
   this->InsideValue=this->OutsideValue=0.0;
-
+	this->IdConversionTable = NULL;
 }
 
 vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
 {
 	vtkDEL(this->CurrentSliceMask);
 	delete [] IdConversionTable;
-  this->SetMask(NULL);  
+	IdConversionTable = NULL;
 }
 
 
 
-//
-// Mask through data generating surface.
-//
-void vtkMaskPolyDataFilter::Execute()
+//------------------------------------------------------------------------------
+int vtkMaskPolyDataFilter::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkDataSet  *input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkDataSet *output = vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+	
 	if (this->TriplePass)
-		TriplePassAlgorithm();
+		return TriplePassAlgorithm(input, output);
 	else
-		StandardAlgorithm();
+		return StandardAlgorithm(input, output);
 }
 
 
 
 //----------------------------------------------------------------------------
-void vtkMaskPolyDataFilter::StandardAlgorithm()
+int vtkMaskPolyDataFilter::StandardAlgorithm(vtkDataSet *input, vtkDataSet *output)
 {
+	
+
 	int i, j, k, abortExecute = 0;
-	vtkDataSet *output = this->GetOutput();
-	vtkDataSet *input = this->GetInput();
+
 	int numPts = input->GetNumberOfPoints();
 	vtkPointData *inPointData = input->GetPointData(), *outPointData = output->GetPointData();
 	vtkCellData *inCellData = input->GetCellData(), *outCellData = output->GetCellData();
@@ -119,7 +131,7 @@ void vtkMaskPolyDataFilter::StandardAlgorithm()
 	if (!this->GetMask())
 	{
 		//	vtkErrorMacro(<<"No mask specified");
-		return;
+		return 1;
 	}
 
 	Mask = this->GetMask();
@@ -132,7 +144,7 @@ void vtkMaskPolyDataFilter::StandardAlgorithm()
 	if (numPts < 1)
 	{
 		//vtkErrorMacro(<<"No data to Mask");
-		return;
+		return 1;
 	}
 
 
@@ -255,14 +267,14 @@ void vtkMaskPolyDataFilter::StandardAlgorithm()
 	delete inTuple;
 	delete outTuple;
 	cellIds->Delete();
+
+	return 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkMaskPolyDataFilter::TriplePassAlgorithm()
+int vtkMaskPolyDataFilter::TriplePassAlgorithm(vtkDataSet *input, vtkDataSet *output)
 {
 	int i, j, k, abortExecute = 0;
-	vtkDataSet *output = this->GetOutput();
-	vtkDataSet *input = this->GetInput();
 	int numPts = input->GetNumberOfPoints();
 	vtkPointData *inPointData = input->GetPointData(), *outPointData = output->GetPointData();
 	vtkCellData *inCellData = input->GetCellData(), *outCellData = output->GetCellData();
@@ -287,7 +299,7 @@ void vtkMaskPolyDataFilter::TriplePassAlgorithm()
 	if (!this->GetMask())
 	{
 		//	vtkErrorMacro(<<"No mask specified");
-		return;
+		return 1;
 	}
 
 	Mask = this->GetMask();
@@ -300,7 +312,7 @@ void vtkMaskPolyDataFilter::TriplePassAlgorithm()
 	if (numPts < 1)
 	{
 		//vtkErrorMacro(<<"No data to Mask");
-		return;
+		return 1;
 	}
 
 
@@ -440,16 +452,24 @@ void vtkMaskPolyDataFilter::TriplePassAlgorithm()
 	delete inTuple;
 	delete outTuple;
 	cellIds->Delete();
+
+  return 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkMaskPolyDataFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkDataSetToDataSetFilter::PrintSelf(os,indent);
+  vtkDataSetAlgorithm ::PrintSelf(os,indent);
 
   os << indent << "Mask Function: " << this->GetMask() << "\n";
 
   os << indent << "Distance: " << this->Distance << "\n";
 
+}
+
+vtkPolyData * vtkMaskPolyDataFilter::GetMask()
+{
+	return (vtkPolyData *)(this->GetExecutive()->GetInputData(1,0));
 }
 
 void vtkMaskPolyDataFilter::InitCurrentSliceMask()
@@ -458,11 +478,11 @@ void vtkMaskPolyDataFilter::InitCurrentSliceMask()
 	vtkNEW(CurrentSliceMask);
 	//init data by coping mask data
 	CurrentSliceMask->DeepCopy(Mask);
-	CurrentSliceMask->Update();
 	//allocating memory for id conversion table
 	IdConversionTable= new vtkIdType[Mask->GetNumberOfPoints()];
 }
 
+//----------------------------------------------------------------------------
 void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 {
 	int nPoints=Mask->GetNumberOfPoints();
@@ -479,32 +499,34 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 	//reset conversion table values
 	memset(IdConversionTable,-1,sizeof(vtkIdType)*nPoints);
 	
-	vtkIdType cellId;
 	vtkIdType pointOverBound, pointUnderBound, cellNPoints, addedPoints;
 
-	cellId=addedPoints=0;
+	addedPoints=0;
 
 	vtkCellArray *polys;
 	polys=Mask->GetPolys();
 	int nCell=polys->GetNumberOfCells();
 	
 	//Searching cells that intersect current z-plane
-	for(int i=0;i<nCell;i++)
+	for(vtkIdType cellId =0; cellId <nCell; cellId++)
 	{
-		polys->GetCell(cellId,cellNPoints,cellIds);
-		cellId+=cellNPoints+1;
-		pointOverBound=pointUnderBound=0;
-	
-		//If there is at least one point under current z value and a point over
-		//the cell will intersect the plane
-		for(int j=0;j<cellNPoints;j++)
+		vtkIdType cellNPoints;
+		vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
+
+		polys->GetCellAtId(cellId, cellIds);
+		cellNPoints = cellIds->GetNumberOfIds();
+		pointOverBound = pointUnderBound = 0;
+
+		// If there is at least one point under current z value and a point over
+		// the cell will intersect the plane
+		for (int j = 0; j < cellNPoints; j++)
 		{
-			double *point=Mask->GetPoint(cellIds[j]);
-			if(point[plane]<=value)
-				pointUnderBound=true;
-			if(point[plane]>=value)
-				pointOverBound=true;
-			if(pointUnderBound && pointOverBound)
+			double* point = Mask->GetPoint(cellIds->GetId(j));
+			if (point[plane] <= value)
+				pointUnderBound = true;
+			if (point[plane] >= value)
+				pointOverBound = true;
+			if (pointUnderBound && pointOverBound)
 				break;
 		}
 
@@ -517,7 +539,7 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 			for(int j=0;j<cellNPoints;j++)
 			{
 				//get the Mask point Id
-				int pointId=cellIds[j];
+				int pointId=cellIds->GetId(j);
 				
 				//if the conversion table of that point is < 0 the point is not inserted to the new points
 				if(IdConversionTable[pointId]<0)
@@ -542,6 +564,4 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double value, int plane)
 	vtkDEL(new_cells);
 	CurrentSliceMask->SetPoints(new_points);
 	vtkDEL(new_points);
-
-	CurrentSliceMask->Update();
 }

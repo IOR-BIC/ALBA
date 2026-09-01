@@ -71,7 +71,7 @@ albaGizmoScaleIsotropic::albaGizmoScaleIsotropic(albaVME *input, albaObserver *l
   // cube gizmo
   m_CubeGizmo = albaVMEGizmo::New();  
   m_CubeGizmo->SetName("CubeGizmo");
-  m_CubeGizmo->SetData(m_Cube->GetOutput());
+  m_CubeGizmo->SetDataConnection(m_Cube->GetOutputPort());
   m_CubeGizmo->SetMediator(m_Listener);
 
   // assign isa to cube

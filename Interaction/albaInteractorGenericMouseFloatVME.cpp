@@ -74,12 +74,12 @@ void albaInteractorGenericMouseFloatVME::TrackballRotate()
 	albaVect3d newVectY = newMouseY - pivotVect;
 
 	//Calculate X Angle
-	double angleX = newVectX.AngleBetweenVectors(oldVect)* vtkMath::RadiansToDegrees();
+	double angleX = vtkMath::DegreesFromRadians(newVectX.AngleBetweenVectors(oldVect));
 	if (newPos[0] - oldPos[0] > 0)
 		angleX = -angleX;
 
 	//Calculate Y Angle
-	double angleY = newVectY.AngleBetweenVectors(oldVect)* vtkMath::RadiansToDegrees();
+	double angleY = vtkMath::DegreesFromRadians(newVectY.AngleBetweenVectors(oldVect));
 	if (newPos[1] - oldPos[1] > 0)
 		angleY = -angleY;
 
@@ -158,8 +158,8 @@ void albaInteractorGenericMouseFloatVME::TrackballRoll()
      atan2((double)m_LastMousePointer2DPosition[1] - (double)disp_refSysCenter[1],
            (double)m_LastMousePointer2DPosition[0] - (double)disp_refSysCenter[0]);
    
-   newAngle *= vtkMath::RadiansToDegrees();
-   oldAngle *= vtkMath::RadiansToDegrees();
+   newAngle = vtkMath::DegreesFromRadians(newAngle);
+   oldAngle = vtkMath::DegreesFromRadians(oldAngle);
    
    albaTransform t;
    t.Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2],POST_MULTIPLY);

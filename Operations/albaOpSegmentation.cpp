@@ -305,7 +305,7 @@ void albaOpSegmentation::OpDo()
 	}
 	  
   vtkALBASmartPointer<vtkALBAVolumeToClosedSmoothSurface> volToSurface;
-  volToSurface->SetInput(m_SegmentationVolume->GetOutput()->GetVTKData());
+  volToSurface->SetInputData(m_SegmentationVolume->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();
   
@@ -518,7 +518,6 @@ void albaOpSegmentation::InitVolumeDimensions()
 
 	if (inputDataSet)
 	{
-		inputDataSet->Update();
 		inputDataSet->GetBounds(m_VolumeBounds);
 
 		vtkImageData *sp = vtkImageData::SafeDownCast(inputDataSet);
@@ -615,8 +614,7 @@ void albaOpSegmentation::CreateOpDialog()
 	vtkNEW(m_AutomaticThresholdTextMapper);
 	m_AutomaticThresholdTextMapper->SetInput(_("Threshold  = "));
 	m_AutomaticThresholdTextMapper->GetTextProperty()->SetColor(0.0, 1.0, 1.0);
-	m_AutomaticThresholdTextMapper->GetTextProperty()->AntiAliasingOff();
-
+	
 	vtkNEW(m_AutomaticThresholdTextActor);
 	m_AutomaticThresholdTextActor->SetMapper(m_AutomaticThresholdTextMapper);
 	m_AutomaticThresholdTextActor->SetPosition(3, viewSize[1] - labelOffset[1]);
@@ -630,7 +628,6 @@ void albaOpSegmentation::CreateOpDialog()
 	vtkNEW(m_AutomaticScalarTextMapper);
 	m_AutomaticScalarTextMapper->SetInput(_("Scalar  = "));
 	m_AutomaticScalarTextMapper->GetTextProperty()->SetColor(0.0, 1.0, 0.0);
-	m_AutomaticScalarTextMapper->GetTextProperty()->AntiAliasingOff();
 
 	vtkNEW(m_AutomaticScalarTextActor);
 	m_AutomaticScalarTextActor->SetMapper(m_AutomaticScalarTextMapper);
@@ -647,7 +644,6 @@ void albaOpSegmentation::CreateOpDialog()
 
 	m_AutomaticSliceTextMapper->SetInput(text);
 	m_AutomaticSliceTextMapper->GetTextProperty()->SetColor(1.0, 1.0, 0.0);
-	m_AutomaticSliceTextMapper->GetTextProperty()->AntiAliasingOff();
 
 	vtkNEW(m_AutomaticSliceTextActor);
 	m_AutomaticSliceTextActor->SetMapper(m_AutomaticSliceTextMapper);
@@ -1238,7 +1234,7 @@ void albaOpSegmentation::UpdateThresholdRealTimePreview()
 bool albaOpSegmentation::ApplyRefinementFilter2(vtkImageData *inputImage, vtkImageData *outputImage)
 {
   vtkALBAImageFillHolesRemoveIslands *filter = vtkALBAImageFillHolesRemoveIslands::New();
-  filter->SetInput(inputImage);
+  filter->SetInputData(inputImage);
   filter->SetEdgeSize(m_RefinementRegionsSize);
   filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == true);
   if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
@@ -1251,7 +1247,6 @@ bool albaOpSegmentation::ApplyRefinementFilter2(vtkImageData *inputImage, vtkIma
   }
   filter->Update();
   outputImage->DeepCopy((vtkImageData*)filter->GetOutput());
-  outputImage->Update();
   filter->Delete();
   return true;
 }
@@ -1269,7 +1264,7 @@ bool albaOpSegmentation::ApplyRefinementFilter(vtkImageData *inputImage, vtkImag
 
   vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToUnsignedChar();
-  vtkImageToFloat->SetInput(inputImage);
+  vtkImageToFloat->SetInputData(inputImage);
   vtkImageToFloat->Modified();
   vtkImageToFloat->Update();
   //////////////////////////////////////////////////////////////////////////
@@ -1348,7 +1343,6 @@ bool albaOpSegmentation::ApplyRefinementFilter(vtkImageData *inputImage, vtkImag
   //////////////////////////////////////////////////////////////////////////
 
   refinedImage = ((vtkImageData*)itkTOvtk->GetOutput());
-  refinedImage->Update();
 
   outputImage->DeepCopy(refinedImage);
 	
@@ -1996,7 +1990,7 @@ void albaOpSegmentation::OnLoadMask()
 		// to delete
 		transformFilter = vtkTransformFilter::New();
 
-		transformFilter->SetInput(maskPolydata);
+		transformFilter->SetInputData(maskPolydata);
 		transformFilter->SetTransform(transform);
 		transformFilter->Update();
 
@@ -2007,7 +2001,7 @@ void albaOpSegmentation::OnLoadMask()
 
 	vtkNEW(maskPolydataFilter);
 	albaVMEVolumeGray *volume = albaVMEVolumeGray::SafeDownCast(m_SegmentationVolume);
-	maskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
+	maskPolydataFilter->SetInputData(volume->GetOutput()->GetVTKData());
 	maskPolydataFilter->SetDistance(0);
 	maskPolydataFilter->SetInsideValue(255);
 	maskPolydataFilter->SetOutsideValue(0);
@@ -2038,7 +2032,6 @@ bool albaOpSegmentation::SegmentedVolumeAccept(albaVME*node)
 		vtkImageData * imageData = vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData());
 		if (imageData == NULL)
 			return false;
-		imageData->Update();
 
 		/* loaded volume must have the same bounds of the input volume */
 		double checkVolBounds[6];
@@ -2252,7 +2245,6 @@ void albaOpSegmentation::OnRefinementSegmentationEvent(albaEvent *e)
 			vtkDataArray *undoScalars = m_RefinementUndoList[numOfChanges - 1];
 
 			dataSet->GetPointData()->SetScalars(undoScalars);
-			dataSet->Update();
 
 			vtkALBASmartPointer<vtkImageData> newDataSet;
 			newDataSet->DeepCopy(dataSet);
@@ -2284,7 +2276,6 @@ void albaOpSegmentation::OnRefinementSegmentationEvent(albaEvent *e)
 			vtkDataArray *redoScalars = m_RefinementRedoList[numOfChanges - 1];
 
 			dataSet->GetPointData()->SetScalars(redoScalars);
-			dataSet->Update();
 
 			vtkALBASmartPointer<vtkImageData> newDataSet;
 			newDataSet->DeepCopy(dataSet);
@@ -2529,8 +2520,6 @@ bool albaOpSegmentation::Refinement()
 
 	if (inputDataSet)
 	{
-		inputDataSet->Update();
-
 		long progress = 0;
 		m_ProgressBar->SetValue(progress);
 		m_ProgressBar->Show(true);
@@ -2567,8 +2556,6 @@ bool albaOpSegmentation::Refinement()
 				im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
 				im->GetPointData()->AddArray(scalars);
 				im->GetPointData()->SetActiveScalars("SCALARS");
-				im->SetScalarTypeToUnsignedChar();
-				im->Update();
 
 				vtkALBASmartPointer<vtkImageData> filteredImage;
 				if (ApplyRefinementFilter2(im, filteredImage) && filteredImage)
@@ -2610,8 +2597,6 @@ bool albaOpSegmentation::Refinement()
 					im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
 					im->GetPointData()->AddArray(scalars);
 					im->GetPointData()->SetActiveScalars("SCALARS");
-					im->SetScalarTypeToUnsignedChar();
-					im->Update();
 
 					vtkALBASmartPointer<vtkImageData> filteredImage;
 					if (ApplyRefinementFilter2(im, filteredImage) && filteredImage)
@@ -2630,15 +2615,11 @@ bool albaOpSegmentation::Refinement()
 
 		vtkALBASmartPointer<vtkImageData> newSP;
 		newSP->CopyStructure(vtkImageData::SafeDownCast(inputDataSet));
-		newSP->Update();
 		newSP->GetPointData()->AddArray(newScalars);
 		newSP->GetPointData()->SetActiveScalars("SCALARS");
-		newSP->SetScalarTypeToUnsignedChar();
-		newSP->Update();
 
 		m_SegmentationVolume->SetData(newSP, m_Volume->GetTimeStamp());
 		vtkImageData *spVME = vtkImageData::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
-		spVME->Update();
 
 		m_SegmentationVolume->Update();
 
@@ -2658,7 +2639,6 @@ bool albaOpSegmentation::Refinement()
 void albaOpSegmentation::GetSliceOrigin(double *origin)
 {
 	vtkImageData *sp = vtkImageData::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
-	sp->Update();
 	double spc[3];
 	sp->GetSpacing(spc);
 	sp->GetOrigin(origin);

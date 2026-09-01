@@ -109,7 +109,6 @@ void albaOpImporterMSFTest::TestImporter()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_volume") == 0);
 			vtkDataSet *data=child->GetOutput()->GetVTKData();
-			data->Update();
 			double range[2];
 
       //check the range of the volume
@@ -126,7 +125,6 @@ void albaOpImporterMSFTest::TestImporter()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_mesh_tetra10") == 0);
       vtkDataSet *data=child->GetOutput()->GetVTKData();
-      data->Update();
 
       //check the number of cells
       int cells=data->GetNumberOfCells();
@@ -140,7 +138,6 @@ void albaOpImporterMSFTest::TestImporter()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_surface") == 0);
 			vtkDataSet *data=child->GetOutput()->GetVTKData();
-			data->Update();
 
       //check the number of triangles of the surface
 			int cells=data->GetNumberOfCells();
@@ -154,7 +151,6 @@ void albaOpImporterMSFTest::TestImporter()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_vector_GRFtimevar") == 0);
       vtkDataSet *data=child->GetOutput()->GetVTKData();
-      data->Update();
 
       //check the length of the vector
       double length = data->GetLength();
@@ -249,7 +245,6 @@ void albaOpImporterMSFTest::TestImporterMAF()
 			name = child->GetName();
 			CPPUNIT_ASSERT(name.Compare("test_volume") == 0);
 			vtkDataSet *data = child->GetOutput()->GetVTKData();
-			data->Update();
 			double range[2];
 
 			//check the range of the volume
@@ -266,7 +261,6 @@ void albaOpImporterMSFTest::TestImporterMAF()
 			name = child->GetName();
 			CPPUNIT_ASSERT(name.Compare("test_mesh_tetra10") == 0);
 			vtkDataSet *data = child->GetOutput()->GetVTKData();
-			data->Update();
 
 			//check the number of cells
 			int cells = data->GetNumberOfCells();
@@ -280,7 +274,6 @@ void albaOpImporterMSFTest::TestImporterMAF()
 			name = child->GetName();
 			CPPUNIT_ASSERT(name.Compare("test_surface") == 0);
 			vtkDataSet *data = child->GetOutput()->GetVTKData();
-			data->Update();
 
 			//check the number of triangles of the surface
 			int cells = data->GetNumberOfCells();
@@ -294,7 +287,6 @@ void albaOpImporterMSFTest::TestImporterMAF()
 			name = child->GetName();
 			CPPUNIT_ASSERT(name.Compare("test_vector_GRFtimevar") == 0);
 			vtkDataSet *data = child->GetOutput()->GetVTKData();
-			data->Update();
 
 			//check the length of the vector
 			double length = data->GetLength();
@@ -463,7 +455,6 @@ void albaOpImporterMSFTest::TestImporterZMSF()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_volume") == 0);
       vtkDataSet *data=child->GetOutput()->GetVTKData();
-      data->Update();
       double range[2];
       data->GetScalarRange(range);
       CPPUNIT_ASSERT(range[0]==-137 && range[1]==1738);
@@ -475,7 +466,6 @@ void albaOpImporterMSFTest::TestImporterZMSF()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_mesh_tetra10") == 0);
       vtkDataSet *data=child->GetOutput()->GetVTKData();
-      data->Update();
       int cells=data->GetNumberOfCells();
       CPPUNIT_ASSERT(cells==2);
       int n=child->GetNumberOfChildren();
@@ -486,7 +476,6 @@ void albaOpImporterMSFTest::TestImporterZMSF()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_surface") == 0);
       vtkDataSet *data=child->GetOutput()->GetVTKData();
-      data->Update();
       int cells=data->GetNumberOfCells();
       CPPUNIT_ASSERT(cells==12);
       int n=child->GetNumberOfChildren();
@@ -497,7 +486,6 @@ void albaOpImporterMSFTest::TestImporterZMSF()
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_vector_GRFtimevar") == 0);
       vtkDataSet *data=child->GetOutput()->GetVTKData();
-      data->Update();
       double length = data->GetLength();
       CPPUNIT_ASSERT(fabs(length - 824.56) < 0.01);
       int n=child->GetNumberOfChildren();

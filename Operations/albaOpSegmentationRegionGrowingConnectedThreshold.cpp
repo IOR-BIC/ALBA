@@ -142,7 +142,8 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpRun()
 	  m_Sphere->ReparentTo(m_ResampleInput->GetParent());
 
 	  vtkNEW(m_SphereVTK);
-    double bounds[6];m_ResampleInput->GetOutput()->GetBounds(bounds);
+    double bounds[6];
+		m_ResampleInput->GetOutput()->GetBounds(bounds);
 	  m_SphereVTK->SetRadius((bounds[5]-bounds[4])/256);
     albaLogMessage("Sphere radius = %f",(bounds[5]-bounds[4])/256);
 	  m_SphereVTK->Update();
@@ -253,7 +254,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   
   vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToFloat ();
-  vtkImageToFloat->SetInput(im);
+  vtkImageToFloat->SetInputData(im);
   vtkImageToFloat->Modified();
   vtkImageToFloat->Update();
 
@@ -310,11 +311,9 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   m_VolumeOut->SetName("Connected Threshold");
 
   vtkImageData *image = ((vtkImageData*)itkTOvtk->GetOutput());
-  image->Update();
-
 
   vtkALBASmartPointer<vtkImageToStructuredPoints> image_to_sp;
-  image_to_sp->SetInput(image);
+  image_to_sp->SetInputData(image);
   image_to_sp->Update();
   m_VolumeOut->SetData((vtkImageData*)image_to_sp->GetOutput(),m_ResampleInput->GetTimeStamp());
 
@@ -330,7 +329,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 
   
   vtkALBASmartPointer<vtkALBAVolumeToClosedSmoothSurface> volToSurface;
-  volToSurface->SetInput(m_VolumeOut->GetOutput()->GetVTKData());
+  volToSurface->SetInputData(m_VolumeOut->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();
   vtkPolyData *surface=volToSurface->GetOutput();
@@ -343,8 +342,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   m_SurfaceOut->Modified();
   m_SurfaceOut->Update();
 
-  vtkDEL(surface);
-  
   //Volume output is a child of surface out
   //The result tree is Input
   //                     |-Surface
@@ -369,7 +366,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
         albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetBounds(b);
 
         vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
-        sp->Update();
 
         sp->GetSpacing(spacing);
         sp->GetOrigin(origin);
@@ -407,7 +403,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
 					GetLogicManager()->CameraUpdate();
 
           vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
-          sp->Update();
 
           int id;
           id = e->GetArg();
@@ -504,7 +499,6 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     m_Resample->Resample();
      
     albaVME *Output = m_Resample->GetOutput();
-    Output->GetOutput()->GetVTKData()->Update();
     m_ResampleInput=albaVMEVolumeGray::SafeDownCast(Output);
     m_ResampleInput->Update();
 

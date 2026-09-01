@@ -57,7 +57,6 @@ void albaOpDecimateSurfaceTest::Test()
   CPPUNIT_ASSERT(surface);
 
   surface->Update();
-	surface->GetOutput()->GetVTKData()->Update();
 
 	albaOpDecimateSurface *decimate=new albaOpDecimateSurface;
 	decimate->TestModeOn();
@@ -67,11 +66,9 @@ void albaOpDecimateSurfaceTest::Test()
 	decimate->OnDecimate();
 	decimate->OnPreview();
 	surface->Update();
-	surface->GetOutput()->GetVTKData()->Update();
 	vtkPolyData *data=vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
   CPPUNIT_ASSERT(data);
 
-  data->Update();
 	CPPUNIT_ASSERT(data->GetNumberOfPoints()==94);
 
 	albaDEL(decimate);

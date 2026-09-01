@@ -20,7 +20,7 @@
 #define _WINSOCKAPI_ 
 
 #include "albaConfigure.h"
-#include "vtkStructuredPointsToStructuredPointsFilter.h"
+#include "vtkALBAStructuredPointsAlgorithm.h"
 
 class vtkImageData;
 class vtkImageData;
@@ -36,13 +36,13 @@ if a blood voxel is in bone boundary the corresponding scalar output contains th
 the effect of this filter is like a bone sanding.
 */
 //---------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBARayCastCleaner : public vtkStructuredPointsToStructuredPointsFilter
+class ALBA_EXPORT vtkALBARayCastCleaner : public vtkALBAStructuredPointsAlgorithm
 //---------------------------------------------------------------------------
 {
 public:
   
   /** Add collect revision method */
-  vtkTypeRevisionMacro(vtkALBARayCastCleaner,vtkStructuredPointsToStructuredPointsFilter);
+  vtkTypeMacro(vtkALBARayCastCleaner,vtkALBAStructuredPointsAlgorithm);
 
   /** Dynamic constructor */
   static vtkALBARayCastCleaner *New();
@@ -80,7 +80,7 @@ public:
 protected:
 
   /** Execute this filter */
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
 private:
 

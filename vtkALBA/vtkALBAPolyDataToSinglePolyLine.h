@@ -18,20 +18,18 @@
 #define __vtkALBAPolyDataToSinglePolyLine_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 //----------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBAPolyDataToSinglePolyLine : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAPolyDataToSinglePolyLine : public vtkPolyDataAlgorithm
 //----------------------------------------------------------------------------
 {
 public:
-  //vtkTypeRevisionMacro(vtkALBAFixedCutter,vtkCutter);
-
            vtkALBAPolyDataToSinglePolyLine();
   virtual ~vtkALBAPolyDataToSinglePolyLine();
   static vtkALBAPolyDataToSinglePolyLine* New();
 
 protected:
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
 private:
 	vtkALBAPolyDataToSinglePolyLine(const vtkALBAPolyDataToSinglePolyLine&);  // Not implemented.

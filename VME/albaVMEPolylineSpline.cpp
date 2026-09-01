@@ -108,7 +108,6 @@ int albaVMEPolylineSpline::DeepCopy(albaVME *a)
     if (dpipe)
     {
       dpipe->SetInput(m_Polyline);
-      m_Polyline->Update();
     }
     m_SplineCoefficient = splinePolyline->m_SplineCoefficient;
     m_OrderByAxisMode = splinePolyline->m_OrderByAxisMode;
@@ -231,7 +230,7 @@ void albaVMEPolylineSpline::InternalUpdate() //Multi
 		poly->SetPoints(in_points);
 		poly->SetLines(in_cells);
 		poly->Modified();
-		poly->Update();
+
 
 		albaMatrix *vmeAbsPose = vmeLC->GetOutput()->GetAbsMatrix();
 
@@ -239,14 +238,12 @@ void albaVMEPolylineSpline::InternalUpdate() //Multi
 			this->SetAbsMatrix(*vmeAbsPose, vmeLC->GetTimeStamp());
 	}
 	
-  poly->Update();
 
   this->SplinePolyline(poly); // generate a "splined" polyline 
 
   this->OrderPolyline(poly); // create orderer sequence of points and cells
 
   m_Polyline->DeepCopy(poly);
-	m_Polyline->Update();
 
 	Modified();
 }
@@ -401,7 +398,6 @@ void albaVMEPolylineSpline::OrderPolyline(vtkPolyData *polyline)
 
   polyline->SetLines(cellArray);
   polyline->Modified();
-  polyline->Update();
 }
 
 //-------------------------------------------------------------------------
@@ -445,7 +441,6 @@ void albaVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
     OptimizeMinimumSpacingSpline();*/
 
   polyline->SetPoints(m_PointsSplined);
-  polyline->Update();
 }
 
 /*/-------------------------------------------------------------------------
@@ -517,7 +512,6 @@ void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
 {
   vtkALBASmartPointer<vtkPolyData> poly;
   poly->DeepCopy(polyline);
-  poly->Update();
 
   vtkALBASmartPointer<vtkPoints> points;
   points->DeepCopy(poly->GetPoints());
@@ -617,8 +611,6 @@ void albaVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
 
   poly->SetPoints(newPoints);
   poly->SetLines(newLines);
-  poly->Update();
 
   polyline->DeepCopy(poly);
-  polyline->Update();
 }

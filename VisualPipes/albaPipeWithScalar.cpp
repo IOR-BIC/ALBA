@@ -216,15 +216,16 @@ void albaPipeWithScalar::CreateProbeMapStack()
 	
 	m_ProbeFilter->SetDistanceModeToScalar();
 	m_ProbeFilter->SetSource(m_ProbeVolume->GetOutput()->GetVTKData());
-	m_ProbeFilter->SetInput(m_Mapper->GetInput());
+	m_ProbeFilter->SetInputConnection(m_Mapper->GetInputConnection(0,0));
 	m_ProbeFilter->SetFilterModeToDensity();
 	m_ProbeFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 	m_ProbeFilter->SetOutOfBoundsDensity(-9999);
 	m_ProbeFilter->Update();
 
-	m_Mapper->SetInput(m_ProbeFilter->GetOutput());
+	m_Mapper->SetInputConnection(m_ProbeFilter->GetOutputPort());
 	m_Mapper->SetScalarVisibility(true);
 	m_MapsStackActive = true;
+
 
 	UpdateActiveScalarsInVMEDataVectorItems();
 }
@@ -359,7 +360,7 @@ void albaPipeWithScalar::SetScalarRange(double * sr)
 void albaPipeWithScalar::DestroyProbeMapStack()
 {
 	//restore old mapper input
-	m_Mapper->SetInput(m_ProbeFilter->GetInput());
+	m_Mapper->SetInputConnection(m_ProbeFilter->GetInputConnection(0,0));
 
 	m_Mapper->SetScalarVisibility(m_ScalarMapActive);
 	if (m_ScalarBarActor)
@@ -452,8 +453,8 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 		return;
 
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
-  data->Update();
-	vtkDataArray *scalars;
+	vtkDataArray *scalars = NULL;
+
   double sr[2]={0,1};
 	if (m_MapsStackActive || (m_ActiveScalarType == POINT_TYPE && m_PointCellArraySeparation > 0))
 	{
@@ -477,7 +478,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 	if (!scalars)
 		return;
 
-	if (m_Histogram)
+		if (m_Histogram)
 		m_Histogram->SetData(scalars,m_ComponentIndex);
 
   m_Table->SetTableRange(sr);
@@ -506,7 +507,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 
   m_Actor->Modified();
   if(m_ScalarBarActor)
-		m_ScalarBarActor->Modified();
+	m_ScalarBarActor->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -558,7 +559,12 @@ vtkDataArray *albaPipeWithScalar::GetCurrentScalars()
 albaString albaPipeWithScalar::GetComponentName(vtkDataArray *scalars, int compNum)
 {
 	albaString compStr;
-	compStr.Printf("Comp %d", compNum + 1);
+
+	if(scalars->HasAComponentName())
+		compStr = scalars->GetComponentName(compNum);
+	else
+		compStr.Printf("Comp %d", compNum + 1);
+	
 	return compStr;
 }
 
@@ -657,7 +663,6 @@ void albaPipeWithScalar::SetLookupTableToMapper()
 	m_Mapper->SetLookupTable(m_Table);
 }
 
-
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::CreateScalarBarActor()
 {
@@ -677,14 +682,15 @@ void albaPipeWithScalar::CreateScalarBarActor()
 
 	SetScalarBarPos(m_ScalarBarPos);
 	
-
-	m_RenFront->AddActor2D(m_ScalarBarActor);
+	if(m_RenFront)
+		m_RenFront->AddActor2D(m_ScalarBarActor);
 }
 
 //----------------------------------------------------------------------------
 void albaPipeWithScalar::DeleteScalarBarActor()
 {
-	m_RenFront->RemoveActor2D(m_ScalarBarActor);
+	if(m_RenFront)
+		m_RenFront->RemoveActor2D(m_ScalarBarActor);
 	vtkDEL(m_ScalarBarActor);
 }
 

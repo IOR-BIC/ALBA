@@ -31,13 +31,16 @@
 //----------------------------------------------------------------------------
 // Includes: albaConfigure should be first, albaIncludeWX second
 //----------------------------------------------------------------------------
-#include "albaConfigure.h"
-#include "albaIncludeWX.h" // must be after albaConfigure.h
-
+#include <mutex>
 #include <string.h>
 #include <typeinfo>
 #include <iosfwd>
 #include <sstream>
+
+#include "albaConfigure.h"
+#include "albaIncludeWX.h" // must be after albaConfigure.h
+
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------

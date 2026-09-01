@@ -41,7 +41,7 @@ public:
 
 protected:
 
-	vtkPolyData *GetInputAsPolyData();
+	virtual vtkAlgorithmOutput* GetPolyDataOutputPort();
 
 	vtkGeometryFilter                  *m_GeometryFilter;
   albaParabolicMeshToLinearMeshFilter *m_LinearizationFilter;

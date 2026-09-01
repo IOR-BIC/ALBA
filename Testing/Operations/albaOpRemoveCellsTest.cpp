@@ -66,7 +66,6 @@ void albaOpRemoveCellsTest::BeforeTest()
   CPPUNIT_ASSERT(m_Surface->GetOutput()->GetVTKData());
 
   // generate vtk data
-  m_Surface->GetOutput()->GetVTKData()->Update();
   CPPUNIT_ASSERT(m_Surface->GetOutput()->GetVTKData()->GetNumberOfCells());
   
 }
@@ -104,7 +103,7 @@ void albaOpRemoveCellsTest::RenderData( vtkPolyData *data )
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput(data);
+  mapper->SetInputData(data);
   mapper->ScalarVisibilityOn();
 
   vtkALBASmartPointer<vtkActor> actor;
@@ -139,7 +138,6 @@ void albaOpRemoveCellsTest::TestRemoveCells()
   // RenderData(vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData()));
   
   // need to update vtk data again
-  m_Surface->GetOutput()->GetVTKData()->Update();
   int numOutputTriangles = m_Surface->GetOutput()->GetVTKData()->GetNumberOfCells();
 
   CPPUNIT_ASSERT_EQUAL(84,numOutputTriangles);

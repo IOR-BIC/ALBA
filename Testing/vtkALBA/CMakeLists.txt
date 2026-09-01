@@ -1,9 +1,10 @@
 PROJECT (vtkALBATests)
 
+
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaDLL vtkALBA albaTests)
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests vtkALBA vtkGraphics vtkRendering albaCommon albaService)
+  SET(PROJECT_LIBS albaTests vtkALBA ${VTK_LIBRARIES} albaCommon albaService)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 
@@ -12,7 +13,6 @@ ENDIF(ALBA_BUILD_ALBADLL)
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
 	vtkALBATests.h vtkALBATests.cpp
-	vtkALBAContourVolumeMapperTest.h vtkALBAContourVolumeMapperTest.cpp
 	vtkALBARemoveCellsFilterTest.h vtkALBARemoveCellsFilterTest.cpp
 	vtkALBAPolyDataToSinglePolyLineTest.h vtkALBAPolyDataToSinglePolyLineTest.cpp
 	vtkALBATextOrientatorTest.h vtkALBATextOrientatorTest.cpp
@@ -26,8 +26,6 @@ SET(PROJECT_SRCS
 	vtkALBAGridActorTest.h vtkALBAGridActorTest.cpp
 	vtkALBAProjectVolumeTest.h vtkALBAProjectVolumeTest.cpp
 	vtkALBAClipSurfaceBoundingBoxTest.h vtkALBAClipSurfaceBoundingBoxTest.cpp
-	vtkALBARectilinearGridToRectilinearGridFilterTest.h vtkALBARectilinearGridToRectilinearGridFilterTest.cpp
-	vtkALBADummyRectilinearGridToRectilinearGridFilter.h vtkALBADummyRectilinearGridToRectilinearGridFilter.cpp
 	vtkALBAProfilingActorTest.h vtkALBAProfilingActorTest.cpp
 	vtkALBARulerActor2DTest.h vtkALBARulerActor2DTest.cpp
 	vtkALBASimpleRulerActor2DTest.h vtkALBASimpleRulerActor2DTest.cpp
@@ -45,9 +43,7 @@ SET(PROJECT_SRCS
 	vtkALBARegionGrowingLocalGlobalThresholdTest.h vtkALBARegionGrowingLocalGlobalThresholdTest.cpp
 	vtkImageUnPackerTest.h vtkImageUnPackerTest.cpp
 	vtkPackedImageTest.h vtkPackedImageTest.cpp
-	vtkALBAVolumeRayCastMapperTest.h vtkALBAVolumeRayCastMapperTest.cpp
 	vtkXRayVolumeMapperTest.h vtkXRayVolumeMapperTest.cpp
-	vtkALBAVolumeTextureMapper2DTest.h vtkALBAVolumeTextureMapper2DTest.cpp
 	vtkALBADataArrayDescriptorTest.h vtkALBADataArrayDescriptorTest.cpp
 	vtkALBAErythrocyteSourceTest.h vtkALBAErythrocyteSourceTest.cpp
 	vtkALBAMeshCutterTest.h vtkALBAMeshCutterTest.cpp
@@ -100,6 +96,13 @@ SET(PROJECT_SRCS
 	vtkALBACircleSourceTest.h	vtkALBACircleSourceTest.cpp
 	vtkALBAPointCloudCutterTest.cpp vtkALBAPointCloudCutterTest.h
 )
+
+IF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)
+SET(PROJECT_SRCS ${PROJECT_SRCS}
+	vtkALBAVolumeTextureMapper2DTest.h vtkALBAVolumeTextureMapper2DTest.cpp
+)
+ENDIF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)
+	
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})

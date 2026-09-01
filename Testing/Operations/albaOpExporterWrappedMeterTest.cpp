@@ -58,7 +58,6 @@ void albaOpExporterWrappedMeterTest::meterImplement(){
 
 	albaVMESurfaceParametric *vmeSphere;
 	albaNEW(vmeSphere);	
-	vmeSphere->GetOutput()->GetVTKData()->Update();
 	vmeSphere->ReparentTo(storage->GetRoot());
 	vmeSphere->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_SPHERE);
 	vmeSphere->SetSphereRadius(5.0);
@@ -67,7 +66,6 @@ void albaOpExporterWrappedMeterTest::meterImplement(){
 	//create a start vme 
 	albaVMESurfaceParametric *vmeSTART;
 	albaNEW(vmeSTART);	
-	vmeSTART->GetOutput()->GetVTKData()->Update();
 	vmeSTART->ReparentTo(storage->GetRoot());
 	vmeSTART->Update();
 
@@ -80,7 +78,6 @@ void albaOpExporterWrappedMeterTest::meterImplement(){
 	//create a end vme 
 	albaVMESurfaceParametric *vmeEND;
 	albaNEW(vmeEND);	
-	vmeEND->GetOutput()->GetVTKData()->Update();
 	vmeEND->ReparentTo(storage->GetRoot());
 	vmeEND->Update();
 
@@ -102,7 +99,6 @@ void albaOpExporterWrappedMeterTest::meterImplement(){
 
 	wrappedMeter->ReparentTo(storage->GetRoot());
 
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 

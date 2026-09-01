@@ -112,7 +112,6 @@ albaString inputELISTFileName /*= "ELIST.lis"*/, albaString inputMPLISTFileName 
   CPPUNIT_ASSERT(reader->GetOutput() != NULL);
 
   vtkUnstructuredGrid* data = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  data->Update();
   
 	albaString outputDir = GET_TEST_DATA_DIR();
   SaveUnstructuredGridToFile(outputDir, outputFileName, data);
@@ -123,7 +122,7 @@ void albaVMEMeshAnsysTextExporterTest::SaveUnstructuredGridToFile(albaString &di
 {
   // save output to file
   vtkALBASmartPointer<vtkUnstructuredGridWriter> writer;
-  writer->SetInput(data) ;
+  writer->SetInputData(data) ;
   writer->SetFileTypeToASCII();
 
   albaString gridFileName = dirPrefix;
@@ -168,7 +167,6 @@ void albaVMEMeshAnsysTextExporterTest::ReadAndDisplay( albaString &dirPrefix, in
 
   vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::New();
   vtkUnstructuredGrid* data = reader->GetOutput()->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  data->Update();
 
   // some tests on the geometry...
 
@@ -317,7 +315,7 @@ void albaVMEMeshAnsysTextExporterTest::RenderData(  vtkUnstructuredGrid *data, i
   mapper->UseLookupTableScalarRangeOff();
   mapper->SetScalarRange(reverseLut->GetTableRange());
   mapper->SetLookupTable(reverseLut);
-  mapper->SetInput(data);
+  mapper->SetInputData(data);
 
   vtkALBASmartPointer<vtkActor> actor;
   actor->SetMapper(mapper);

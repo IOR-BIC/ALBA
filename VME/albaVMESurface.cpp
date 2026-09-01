@@ -93,7 +93,6 @@ int albaVMESurface::SetData(vtkPolyData *data, albaTimeStamp t, int mode)
 
   if(polydata)
   {
-    polydata->Update();
     if (polydata->GetPoints() && (polydata->GetVerts()==NULL || polydata->GetVerts()->GetNumberOfCells()==0) && \
       ((polydata->GetPolys()!=NULL && polydata->GetPolys()->GetNumberOfCells() > 0) || (polydata->GetStrips()!=NULL && polydata->GetStrips()->GetNumberOfCells() > 0)) && \
       (polydata->GetLines()==NULL || polydata->GetLines()->GetNumberOfCells() == 0))
@@ -111,8 +110,6 @@ int albaVMESurface::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
-
-  if (polydata) polydata->Update();
 
   if (polydata && polydata->GetPoints() && polydata->GetVerts()->GetNumberOfCells()==0 && \
      (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \

@@ -38,7 +38,6 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-vtkCxxRevisionMacro(vtkALBAHistogram, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkALBAHistogram);
 //------------------------------------------------------------------------------
 vtkALBAHistogram::vtkALBAHistogram()
@@ -110,14 +109,14 @@ void vtkALBAHistogram::SetInputData(vtkDataArray* inputData, int component)
 {
   if(InputData != inputData || Component !=component) 
   {
-    if (InputData != inputData)
-    {
+  if (InputData != inputData)
+  {
       if (this->InputData != NULL)
       {
         this->InputData->UnRegister(this);
       }
 
-      this->InputData = inputData;
+    this->InputData = inputData;
 
       if (this->InputData != NULL)
       {
@@ -187,10 +186,9 @@ int vtkALBAHistogram::RenderOpaqueGeometry(vtkViewport *viewport)
 //----------------------------------------------------------------------------
 void vtkALBAHistogram::HistogramCreate()
 {
-  TextMapper = vtkTextMapper::New(); 
+  TextMapper = vtkTextMapper::New();
   TextMapper->SetInput("");
 	vtkTextProperty * textProperty = TextMapper->GetTextProperty();
-  textProperty->AntiAliasingOff();
   textProperty->SetFontFamily(VTK_TIMES);
   textProperty->SetColor(1,1,1);
   textProperty->SetLineOffset(0.5);
@@ -236,16 +234,15 @@ void vtkALBAHistogram::HistogramCreate()
   LineRepresentation->Update();
   
   Glyph = vtkGlyph3D::New();
-  Glyph->SetSource(LineRepresentation->GetOutput());
+  Glyph->SetSourceData(LineRepresentation->GetOutput());
   Glyph->SetScaleModeToScaleByScalar();
   Glyph->OrientOn();
 	
-  
   vtkCoordinate *coordinate = vtkCoordinate::New();
   coordinate->SetCoordinateSystemToNormalizedDisplay();
 
   vtkPolyDataMapper2D *mapper2d = vtkPolyDataMapper2D::New();
-  mapper2d->SetInput(Glyph->GetOutput());
+  mapper2d->SetInputConnection(Glyph->GetOutputPort());
   mapper2d->SetTransformCoordinate(coordinate);
   mapper2d->ScalarVisibilityOff();
   
@@ -264,7 +261,7 @@ void vtkALBAHistogram::HistogramCreate()
   Line1->Update();
 
   vtkPolyDataMapper2D *mapperLine1 = vtkPolyDataMapper2D::New();
-  mapperLine1->SetInput(Line1->GetOutput());
+  mapperLine1->SetInputConnection(Line1->GetOutputPort());
 
   Line1Actor = vtkActor2D::New();
   Line1Actor->SetMapper(mapperLine1);
@@ -276,7 +273,7 @@ void vtkALBAHistogram::HistogramCreate()
   Line2->Update();
 
   vtkPolyDataMapper2D *mapperLine2 = vtkPolyDataMapper2D::New();
-  mapperLine2->SetInput(Line2->GetOutput());
+  mapperLine2->SetInputConnection(Line2->GetOutputPort());
 
   Line2Actor = vtkActor2D::New();
   Line2Actor->SetMapper(mapperLine2);
@@ -332,14 +329,13 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
   ExtractComponent();
 
   double sr[2];
-  ImageData->SetDimensions(ExtractedCompArray->GetNumberOfTuples(),1,1);
-  ImageData->SetScalarType(ExtractedCompArray->GetDataType());
+  ImageData->SetDimensions(InputData->GetNumberOfTuples(),1,1);
+  ImageData->AllocateScalars(InputData->GetDataType(),1);
   ImageData->GetPointData()->SetScalars(ExtractedCompArray);
-  ImageData->Update();
   ImageData->GetScalarRange(sr);
   double srw = sr[1]-sr[0]+1;
 	
-  Accumulate->SetInput(ImageData);
+  Accumulate->SetInputData(ImageData);
   Accumulate->SetComponentOrigin(sr[0],0,0);  
   Accumulate->SetComponentExtent(0,NumberOfBins,0,0,0,0);
   Accumulate->SetComponentSpacing(srw/NumberOfBins,0,0); // bins maps all the Scalars Range
@@ -351,11 +347,15 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
     double m = VTK_DOUBLE_MIN;
     double as;
     vtkDataArray *arr = Accumulate->GetOutput()->GetPointData()->GetScalars();
+		printf("\n");
     for (int s = 1; s < arr->GetNumberOfTuples(); s++)
     {
       arr->GetTuple(s,&as);
+			printf("%.4f, ", as);
       m = as>m ? as : m;
     }
+		printf("\n");
+
     double mean = m;
     if (mean < 0) mean = -mean;
     
@@ -376,12 +376,12 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
     }
   }
 
-  ChangeInfo->SetInput(Accumulate->GetOutput());
+  ChangeInfo->SetInputConnection(Accumulate->GetOutputPort());
   ChangeInfo->SetOutputSpacing(1.0/NumberOfBins,1,1);  // Histogram width = 1
   ChangeInfo->Update();
 
   LogScale->SetConstant(LogScaleConstant);
-  LogScale->SetInput(ChangeInfo->GetOutput());
+  LogScale->SetInputConnection(ChangeInfo->GetOutputPort());
   LogScale->Update();
 
   if (LogHistogram)
@@ -392,11 +392,11 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
 //       if (mean < 0) mean = -mean;
 //       ScaleFactor = .5 / log(1 + mean);
 //     }
-    Glyph->SetInput(LogScale->GetOutput());
+    Glyph->SetInputConnection(LogScale->GetOutputPort());
   }
   else
   {
-    Glyph->SetInput(ChangeInfo->GetOutput());
+    Glyph->SetInputConnection(ChangeInfo->GetOutputPort());
   }
   Glyph->SetScaleFactor(ScaleFactor);
 
@@ -408,18 +408,18 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
 
   if (HisctogramRepresentation == BAR_REPRESENTATION) 
   {
-    Glyph->SetSource(LineRepresentation->GetOutput());
+    Glyph->SetSourceData(LineRepresentation->GetOutput());
     float line_width = RenderWidth / (float)(NumberOfBins - 1);
     HistActor->GetProperty()->SetLineWidth(line_width+1);
   }
   else if (HisctogramRepresentation == POINT_REPRESENTATION) 
   {
-    Glyph->SetSource(PointsRepresentation);
+    Glyph->SetSourceData(PointsRepresentation);
     HistActor->GetProperty()->SetPointSize(1);
   }
   else
   {
-    Glyph->SetSource(LineRepresentation->GetOutput());
+    Glyph->SetSourceData(LineRepresentation->GetOutput());
     HistActor->GetProperty()->SetLineWidth(1);
   }
 
@@ -436,20 +436,23 @@ void vtkALBAHistogram::HistogramUpdate(vtkRenderer *ren)
 }
 //----------------------------------------------------------------------------
 void vtkALBAHistogram::UpdateLines(double range[2])
-//----------------------------------------------------------------------------
+{
+	UpdateLines(range[0], range[1]);
+}
+void vtkALBAHistogram::UpdateLines(double low, double hi)
 {
   double sr[2],rangeSize,scaledRange[2];
 	int line1X, line2X;
 
-	CurrRange[0] = range[0];
-	CurrRange[1] = range[1];
+	CurrRange[0] = low;
+	CurrRange[1] = hi;
 
   ExtractedCompArray->GetRange(sr);
 
 	rangeSize = sr[1] - sr[0];
   
-  scaledRange[0] = range[0]-sr[0];
-  scaledRange[1] = range[1]-sr[0];
+  scaledRange[0] = low-sr[0];
+  scaledRange[1] = hi-sr[0];
 
   line1X = ((scaledRange[0]/rangeSize) * (RenderWidth-1))+1;
   line2X = ((scaledRange[1]/rangeSize) * (RenderWidth-1))+1;

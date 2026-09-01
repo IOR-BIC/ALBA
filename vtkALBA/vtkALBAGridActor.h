@@ -58,7 +58,7 @@ class ALBA_EXPORT vtkALBAGridActor : public vtkActor
 {
  public:
   /** RTTI macro. */
-  vtkTypeRevisionMacro(vtkALBAGridActor,vtkActor);
+  vtkTypeMacro(vtkALBAGridActor,vtkActor);
   /** Print information regarding the status of the object. */
   void PrintSelf(ostream& os, vtkIndent indent);
   /** Create an instance of the object. */

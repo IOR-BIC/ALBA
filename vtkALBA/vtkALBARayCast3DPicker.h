@@ -50,7 +50,7 @@ class ALBA_EXPORT vtkALBARayCast3DPicker : public vtkAbstractPropPicker
 {
 public:
   static vtkALBARayCast3DPicker *New();
-  vtkTypeRevisionMacro(vtkALBARayCast3DPicker,vtkAbstractPropPicker);
+  vtkTypeMacro(vtkALBARayCast3DPicker,vtkAbstractPropPicker);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**

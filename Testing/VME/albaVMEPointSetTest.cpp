@@ -78,7 +78,6 @@ void albaVMEPointSetTest::TestSetData()
   }
   
   polydata->SetPoints(pts);
-  polydata->Update();
 
   result = m_PointSetVme->SetData(polydata,0.0) == ALBA_OK;
 
@@ -92,7 +91,6 @@ void albaVMEPointSetTest::TestSetData()
   }
 
   polydata->SetLines(cells);
-  polydata->Update();
 
   result = m_PointSetVme->SetData(polydata,0.0) == ALBA_ERROR;
 
@@ -118,7 +116,6 @@ void albaVMEPointSetTest::TestAppendPoint()
   }
 
   polydata1->SetPoints(pts1);
-  polydata1->Update();
 
   result = m_PointSetVme->SetData(polydata1,0.0) == ALBA_OK;
 
@@ -133,7 +130,6 @@ void albaVMEPointSetTest::TestAppendPoint()
   }
 
   polydata2->SetPoints(pts2);
-  polydata2->Update();
 
   result = m_PointSetVme->SetData(polydata2,1.0) == ALBA_OK;
 
@@ -143,7 +139,6 @@ void albaVMEPointSetTest::TestAppendPoint()
   m_PointSetVme->AppendPoint(newPoint[0],newPoint[1],newPoint[2],0.0);
 
   vtkPolyData *newPolydata1 = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata1->Update();
 
   result = newPolydata1->GetNumberOfPoints() == NUM_OF_POINTS+1;
 
@@ -158,7 +153,6 @@ void albaVMEPointSetTest::TestAppendPoint()
 
   m_PointSetVme->SetTimeStamp(1.0);
   vtkPolyData *newPolydata2 = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata2->Update();
 
   result = newPolydata2->GetNumberOfPoints() == NUM_OF_POINTS;
 
@@ -177,7 +171,6 @@ void albaVMEPointSetTest::TestRemovePoint()
   }
 
   polydata1->SetPoints(pts1);
-  polydata1->Update();
 
   result = m_PointSetVme->SetData(polydata1,0.0) == ALBA_OK;
 
@@ -192,7 +185,6 @@ void albaVMEPointSetTest::TestRemovePoint()
   }
 
   polydata2->SetPoints(pts2);
-  polydata2->Update();
 
   result = m_PointSetVme->SetData(polydata2,1.0) == ALBA_OK;
 
@@ -202,7 +194,6 @@ void albaVMEPointSetTest::TestRemovePoint()
   m_PointSetVme->RemovePoint(0,0.0);
 
   vtkPolyData *newPolydata = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata->Update();
 
   result = newPolydata->GetNumberOfPoints() == NUM_OF_POINTS-1;
 
@@ -217,7 +208,6 @@ void albaVMEPointSetTest::TestRemovePoint()
 
   m_PointSetVme->SetTimeStamp(1.0);
   vtkPolyData *newPolydata2 = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata2->Update();
 
   result = newPolydata2->GetNumberOfPoints() == NUM_OF_POINTS;
 
@@ -236,7 +226,6 @@ void albaVMEPointSetTest::TestSetPoint()
   }
 
   polydata1->SetPoints(pts1);
-  polydata1->Update();
 
   result = m_PointSetVme->SetData(polydata1,0.0) == ALBA_OK;
 
@@ -251,7 +240,6 @@ void albaVMEPointSetTest::TestSetPoint()
   }
 
   polydata2->SetPoints(pts2);
-  polydata2->Update();
 
   result = m_PointSetVme->SetData(polydata2,1.0) == ALBA_OK;
 
@@ -260,7 +248,6 @@ void albaVMEPointSetTest::TestSetPoint()
   m_PointSetVme->SetPoint(2,0.0,0.0,1.0,0.0);
 
   vtkPolyData *newPolydata = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata->Update();
 
   result = newPolydata->GetNumberOfPoints() == NUM_OF_POINTS;
 
@@ -275,7 +262,6 @@ void albaVMEPointSetTest::TestSetPoint()
 
   m_PointSetVme->SetTimeStamp(1.0);
   vtkPolyData *newPolydata2 = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata2->Update();
 
   newPolydata->GetPoint(2,pointToCheck);
 
@@ -296,7 +282,6 @@ void albaVMEPointSetTest::TestGetPoint()
   }
 
   polydata1->SetPoints(pts1);
-  polydata1->Update();
 
   result = m_PointSetVme->SetData(polydata1,0.0) == ALBA_OK;
 
@@ -311,7 +296,6 @@ void albaVMEPointSetTest::TestGetPoint()
   }
 
   polydata2->SetPoints(pts2);
-  polydata2->Update();
 
   result = m_PointSetVme->SetData(polydata2,1.0) == ALBA_OK;
 
@@ -345,7 +329,6 @@ void albaVMEPointSetTest::TestGetNumberOfPoints()
   }
 
   polydata->SetPoints(pts);
-  polydata->Update();
 
   result = m_PointSetVme->SetData(polydata,0.0) == ALBA_OK;
 
@@ -368,7 +351,6 @@ void albaVMEPointSetTest::TestSetNumberOfPoints()
   }
 
   polydata->SetPoints(pts);
-  polydata->Update();
 
   result = m_PointSetVme->SetData(polydata,0.0) == ALBA_OK;
 
@@ -377,7 +359,6 @@ void albaVMEPointSetTest::TestSetNumberOfPoints()
   m_PointSetVme->SetNumberOfPoints(5,0.0);;
 
   vtkPolyData *newPolydata = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata->Update();
 
   result = newPolydata->GetNumberOfPoints() == 5;
 
@@ -387,7 +368,6 @@ void albaVMEPointSetTest::TestSetNumberOfPoints()
   m_PointSetVme->SetNumberOfPoints(1,1.0);
 
   newPolydata = vtkPolyData::SafeDownCast(m_PointSetVme->GetOutput()->GetVTKData());
-  newPolydata->Update();
 
   result = newPolydata->GetNumberOfPoints() == 1;
 

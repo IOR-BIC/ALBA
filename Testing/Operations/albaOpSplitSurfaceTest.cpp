@@ -55,7 +55,6 @@ void albaOpSplitSurfaceTest::TestClip()
 	surfaceParametric->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_SPHERE);
 	surfaceParametric->SetSphereRadius(5.);
 	surfaceParametric->Update();
-	surfaceParametric->GetOutput()->GetVTKData()->Update();
  
   albaVMESurface *surface;
   albaNEW(surface);
@@ -67,7 +66,6 @@ void albaOpSplitSurfaceTest::TestClip()
   albaNEW(surfaceParametricClip);
   surfaceParametricClip->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_PLANE);
   surfaceParametricClip->Update();
-  surfaceParametricClip->GetOutput()->GetVTKData()->Update();
 
   albaOpSplitSurface *split=new albaOpSplitSurface();
   split->TestModeOn();

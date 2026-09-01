@@ -77,7 +77,6 @@ void albaOpImporterMeshTest::TestImportGenericMesh()
   vtkDataSet* data;
 
   data = albaVMEMesh::SafeDownCast(node)->GetUnstructuredGridOutput()->GetVTKData();
-  data->Update();
 
   int cells=data->GetNumberOfCells();
   CPPUNIT_ASSERT(cells==2);

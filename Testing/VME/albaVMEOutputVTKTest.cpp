@@ -49,7 +49,6 @@ void albaVMEOutputVTKTest::TestGetVTKData()
   data->SetDimensions(5, 5, 1);
   data->SetOrigin(0, 0, 0);
   data->SetSpacing(1,1,1);
-  data->Update();
 
   albaTimeStamp timestamp;
   timestamp = time(0);
@@ -58,7 +57,6 @@ void albaVMEOutputVTKTest::TestGetVTKData()
   vme->Update();
 
   albaVMEOutputVTK *output = albaVMEOutputVTK::SafeDownCast(vme->GetVTKOutput());
-  output->GetVTKData()->Update();
   output->Update();
   
   m_Result = output != NULL;

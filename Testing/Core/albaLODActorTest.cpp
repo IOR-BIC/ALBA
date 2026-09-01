@@ -55,7 +55,7 @@ void albaLODActorTest::RenderData(albaLODActor *actor)
 {
 	vtkALBASmartPointer<vtkSphereSource> sphere;
 	vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-	mapper->SetInput(sphere->GetOutput());
+	mapper->SetInputConnection(sphere->GetOutputPort());
 	actor->SetMapper(mapper);
 	actor->Modified();
 
@@ -75,7 +75,7 @@ void albaLODActorTest::RenderData(albaLODActor *actor)
 	actor->Register(renderer);
   renderWindow->Render();
 
-  renderer->RemoveAllProps();
+  renderer->RemoveAllViewProps();
   renderWindow->RemoveRenderer(renderer);
   renderWindowInteractor->SetRenderWindow(NULL);
 }

@@ -127,7 +127,7 @@ public:
   //virtual int CircuitCheck(albaTransformBase *transform);
 
   /** Return current modification time. */
-  virtual unsigned long GetMTime() {return m_MTime.GetMTime();}
+  virtual vtkMTimeType GetMTime() {return m_MTime.GetMTime();}
 
   /** return last update time */
   virtual unsigned long GetUpdateTime() {return m_UpdateTime.GetMTime();}

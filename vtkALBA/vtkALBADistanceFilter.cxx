@@ -21,9 +21,12 @@
 #include "vtkALBADistanceFilter.h"
 
 #include "assert.h"
+#include "vtkExecutive.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 
-vtkCxxRevisionMacro(vtkALBADistanceFilter, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkALBADistanceFilter);
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -46,13 +49,13 @@ vtkALBADistanceFilter::vtkALBADistanceFilter() {
   // caches
   this->UniformToRectGridIndex[0] = this->UniformToRectGridIndex[1] = this->UniformToRectGridIndex[2] = NULL;
   this->VoxelSizes[0] = this->VoxelSizes[1] = this->VoxelSizes[2] = NULL;
+
+	this->SetNumberOfInputPorts(2);
   }
 
 
 //----------------------------------------------------------------------------
 vtkALBADistanceFilter::~vtkALBADistanceFilter() {
-  this->SetSource((vtkDataSet *)NULL);
-
   if (this->InputTransform)
     this->InputTransform->Delete();
   if (this->InputMatrix)
@@ -65,22 +68,27 @@ vtkALBADistanceFilter::~vtkALBADistanceFilter() {
 void vtkALBADistanceFilter::SetSource(vtkDataSet *data)
 //----------------------------------------------------------------------------
 {
-  this->SetNthInput(1, (vtkDataObject*)data);
+  this->SetInputData(1, data);
 }
 
 //----------------------------------------------------------------------------
 vtkDataSet *vtkALBADistanceFilter::GetSource()
 //----------------------------------------------------------------------------
 {
-  if(this->GetNumberOfInputs() < 2)
-    return NULL;
-  return (vtkDataSet *)(this->Inputs[1]);
+	return (vtkDataSet *)(this->GetExecutive()->GetInputData(1,0));
 }
+
 //----------------------------------------------------------------------------
-unsigned long int vtkALBADistanceFilter::GetMTime() 
+vtkDataSet * vtkALBADistanceFilter::GetInput()
+{
+	return (vtkDataSet *)(this->GetExecutive()->GetInputData(0, 0));
+}
+
+//----------------------------------------------------------------------------
+vtkMTimeType vtkALBADistanceFilter::GetMTime()
 //----------------------------------------------------------------------------
 {
-  unsigned long int time = Superclass::GetMTime();
+	vtkMTimeType time = Superclass::GetMTime();
   if (this->GetSource() && this->GetSource()->GetMTime() > time)
     time = this->GetSource()->GetMTime();
   if (this->GetInput() && this->GetInput()->GetMTime() > time)
@@ -92,24 +100,13 @@ unsigned long int vtkALBADistanceFilter::GetMTime()
   return time;
 }
 
-//----------------------------------------------------------------------------
-void vtkALBADistanceFilter::ComputeInputUpdateExtents(vtkDataObject *output) {
-  vtkDataObject *source = this->GetSource();
-  if (source)
-    source->SetUpdateExtentToWholeExtent();
-  }
 
 //----------------------------------------------------------------------------
-void vtkALBADistanceFilter::ExecuteInformation() {
-  }
-
-
-//----------------------------------------------------------------------------
-void vtkALBADistanceFilter::ExecuteData(vtkDataObject *outputObject) {
+void vtkALBADistanceFilter::RequestData(vtkInformation* request, vtkPointSet *output)
+{
   vtkImageData       *imageData = vtkImageData::SafeDownCast(this->GetSource());
   vtkRectilinearGrid *gridData  = vtkRectilinearGrid::SafeDownCast(this->GetSource());
   vtkPointSet   *input  = vtkPointSet::SafeDownCast(this->GetInput());
-  vtkPointSet   *output = vtkPointSet::SafeDownCast(outputObject);
 
   if (input == NULL || output == NULL || imageData == NULL && gridData == NULL) {
     vtkErrorMacro(<< "Input or output is incorrect");
@@ -189,7 +186,7 @@ void vtkALBADistanceFilter::ExecuteData(vtkDataObject *outputObject) {
 				case VTK_INT:						 distance = this->TraceRay(point, normal, (const int*)DataPointer); break;
 				case VTK_UNSIGNED_INT:   distance = this->TraceRay(point, normal, (const unsigned int*)DataPointer); break;
 			}
-      if (scalars)
+			if (scalars)
         scalars->SetTuple1(pi, distance);
       else
         vectors->SetTuple3(pi, distance * normal[0], distance * normal[1], distance * normal[2]);
@@ -231,8 +228,31 @@ void vtkALBADistanceFilter::ExecuteData(vtkDataObject *outputObject) {
   }
 
 
+
+//----------------------------------------------------------------------------
+int vtkALBADistanceFilter::RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+	// get the info objects
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPointSet *output = vtkPointSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+	if (output)
+	{
+		this->PrepareVolume();
+
+		if (output)
+			this->RequestData(request, output);
+
+		output->Modified();
+	}
+	return 1;
+}
+
 //--------------------------------------------------------------------------------------
-template<typename DataType> double vtkALBADistanceFilter::TraceRay(const double origin[3], const double ray[3], const DataType *dataPointer) {
+template<typename DataType> double vtkALBADistanceFilter::TraceRay(const double origin[3], const double ray[3], const DataType *dataPointer) 
+{
   // find intersection between volume and ray
   // this code can be removed if out-of-bounds points are ignored (tmin is always 0)
   static const double maxD = 1.e20f;
@@ -281,11 +301,9 @@ template<typename DataType> double vtkALBADistanceFilter::TraceRay(const double 
   
   //---------------- actual traverse
   const DataType Threshold = (DataType)this->Threshold;
-  //modified by STEFY 25-6-2004(begin)
-  //double distance = 0; // traversed distance
-  // inizializing the distance with a negative value, so to have also negative distances (compenetration)
-  double distance = -(this->MaxDistance + 1);
-  //modified by STEFY 25-6-2004(end)
+  // initializing the distance with a negative value, so to have also negative distances (compenetration)
+  double distance = -(this->MaxDistance + 1); // traversed distance
+
   for ( ; (distance < this->MaxDistance) && *dataPointer < Threshold; ) {
     const int ii = (l[0] <= l[1] && l[0] <= l[2]) ? 0 : ((l[1] <= l[2]) ? 1 : 2);
     distance = l[ii];
@@ -307,9 +325,8 @@ template<typename DataType> double vtkALBADistanceFilter::TraceRay(const double 
 
 
 //------------------------------------------------------------------------
-template<typename DataType> double vtkALBADistanceFilter::FindDensity(const double point[3], const DataType *dataPointer) {
-  vtkRectilinearGrid *gridData  = vtkRectilinearGrid::SafeDownCast(this->GetSource());
-
+template<typename DataType> double vtkALBADistanceFilter::FindDensity(const double point[3], const DataType *dataPointer) 
+{
   double density = 0.f, xyz[3], dxyz[3];
   int ixyz[3];
   // convert point to index
@@ -340,7 +357,8 @@ template<typename DataType> double vtkALBADistanceFilter::FindDensity(const doub
   }
 
 //--------------------------------------------------------------
-void vtkALBADistanceFilter::PrepareVolume() {
+void vtkALBADistanceFilter::PrepareVolume()
+{
   if (this->GetSource()->GetMTime() < this->BuildTime && this->VoxelSizes[0] != NULL)
     return; // caches are up-to-date
   vtkImageData       *imageData = vtkImageData::SafeDownCast(this->GetSource());

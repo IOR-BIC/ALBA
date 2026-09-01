@@ -35,7 +35,6 @@
 #include "itkSubtractImageFilter.h"
 #include "itkImageToVTKImageFilter.h"
 
-vtkCxxRevisionMacro(vtkALBABinaryImageFloodFill, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkALBABinaryImageFloodFill);
 
 
@@ -63,13 +62,18 @@ vtkALBABinaryImageFloodFill::~vtkALBABinaryImageFloodFill()
 }
 
 //------------------------------------------------------------------------------
-void vtkALBABinaryImageFloodFill::Execute()
+int vtkALBABinaryImageFloodFill::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------------
 {
-  // get input
-  vtkImageData *input = (vtkImageData*)this->GetInput();
-  input->Update();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
+	// Initialize some frequently used values.
+	vtkImageData  *input = vtkImageData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  
   // Get the image dimensions based on input
   int dims[3];
   input->GetDimensions(dims);
@@ -91,7 +95,7 @@ void vtkALBABinaryImageFloodFill::Execute()
   {
     case 0:
       {
-        return;
+        return 1;
       } break;
     case 1:
       {
@@ -108,12 +112,11 @@ void vtkALBABinaryImageFloodFill::Execute()
   }
   
   // prepare output
-  vtkImageData *output = (vtkImageData *)this->GetOutput();
   output->DeepCopy(intermediate_output);
-  output->UpdateData();
-  output->Update();
-  this->SetOutput((vtkStructuredPoints *)output);
-  intermediate_output->Delete();
+
+	intermediate_output->Delete();
+	
+	return 1;
 }
 //------------------------------------------------------------------------------
 template <unsigned int ImageDimension>
@@ -136,7 +139,7 @@ vtkImageData *vtkALBABinaryImageFloodFill::FloodFill(vtkImageData *input)
   // must cast the image before pass it to the itk pipeline
   vtkALBASmartPointer<vtkImageCast> caster;
   caster->SetOutputScalarTypeToUnsignedChar();
-  caster->SetInput(input);
+  caster->SetInputData(input);
   caster->Update();
 
   // Convert vtk image to itk
@@ -184,7 +187,6 @@ vtkImageData *vtkALBABinaryImageFloodFill::FloodFill(vtkImageData *input)
   itk2Vtk->Update();
 
   vtkImageData *output = vtkImageData::New();
-  output->CopyInformation(input);
   output->CopyStructure(input);
   output->DeepCopy(itk2Vtk->GetOutput());
 
@@ -226,7 +228,6 @@ void vtkALBABinaryImageFloodFill::ComputeItkSeed()
 {
   // get input
   vtkImageData *input = (vtkImageData*)this->GetInput();
-  input->Update();
 
   // Get the image dimensions based on input
   int dims[3];

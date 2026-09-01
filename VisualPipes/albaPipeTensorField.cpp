@@ -27,6 +27,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 
 #include "albaDbg.h"
 
@@ -79,7 +80,6 @@ void albaPipeTensorField::Create(albaSceneNode *n)
 //------------------------------------------------------------------------
 {
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
-  ds->Update(); //force its update
 }
 
 //------------------------------------------------------------------------

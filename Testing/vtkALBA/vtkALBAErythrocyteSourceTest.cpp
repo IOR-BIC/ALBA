@@ -45,14 +45,13 @@ void vtkALBAErythrocyteSourceTest::TestExecuteData()
 {
   vtkALBAErythrocyteSource *source = vtkALBAErythrocyteSource::New();
 
-  //source->ExecuteData(cube);
   source->Update();
   vtkALBASmartPointer<vtkPolyData> poly = source->GetOutput();
   CPPUNIT_ASSERT(poly != NULL);
 
   double bounds[6];
-  poly->GetBounds(bounds);
-  CPPUNIT_ASSERT((bounds[0] - -0.19) < 0.001 && (bounds[1] - 0.19) < 0.001 && (bounds[2] - -0.19) < 0.001 && (bounds[3] - 0.19) < 0.001 \
+  poly->GetCellsBounds(bounds);
+	CPPUNIT_ASSERT((bounds[0] - -0.19) < 0.001 && (bounds[1] - 0.19) < 0.001 && (bounds[2] - -0.19) < 0.001 && (bounds[3] - 0.19) < 0.001 \
     && (bounds[4] - 0.054) < 0.001 && (bounds[5] - 0.054) < 0.001);
 
   vtkDEL(source);

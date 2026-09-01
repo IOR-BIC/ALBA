@@ -31,6 +31,7 @@
 #include "vtkStructuredPointsReader.h"
 #include "vtkStructuredPointsWriter.h"
 #include "vtkImageData.h"
+#include "vtkStructuredPoints.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
 
@@ -70,13 +71,13 @@ void vtkALBARayCastCleanerTest::TestFilter()
 
   //creating filter
   vtkALBASmartPointer<vtkALBARayCastCleaner> filter;
-  filter->SetInput((vtkImageData *)r->GetOutput());
+  filter->SetInputConnection(r->GetOutputPort());
   filter->SetModalityToCT();
   filter->Update();
   
   //getting output
-  oldOutput= (vtkImageData *)r2->GetOutput();
-  newOutput= (vtkImageData *)filter->GetOutput();
+  oldOutput= vtkImageData::SafeDownCast(r2->GetOutput());
+  newOutput=vtkImageData::SafeDownCast(filter->GetOutput());
   
   //base tests
   CPPUNIT_ASSERT( (oldOutput!= NULL) && (newOutput != NULL));
@@ -102,18 +103,6 @@ void vtkALBARayCastCleanerTest::TestFilter()
   CPPUNIT_ASSERT(equalScalars);
 
 
-  /* 
-  //Used to generate initial test file 
-  
-  vtkALBASmartPointer<vtkStructuredPointsWriter> w;
-  albaString outFilename=ALBA_DATA_ROOT;
-  outFilename<<"/Test_vtkALBARayCastCleaner/outputVolume.vtk";
-  w->SetFileName(outFilename.GetCStr());
-  w->SetFileTypeToBinary();
-  w->SetInput(filter->GetOutput());
-  w->Update();
-  */
-  
 }
 
 
@@ -140,13 +129,13 @@ void vtkALBARayCastCleanerTest::TestFilterMR()
   
   //creating filter
   vtkALBASmartPointer<vtkALBARayCastCleaner> filter;
-  filter->SetInput((vtkImageData *)r->GetOutput());
+  filter->SetInputConnection(r->GetOutputPort());
   filter->SetModalityToMR();
   filter->Update();
   
   //getting output
-  oldOutput= (vtkImageData *)r2->GetOutput();
-  newOutput= (vtkImageData *)filter->GetOutput();
+  oldOutput=r2->GetOutput();
+  newOutput=vtkImageData::SafeDownCast(filter->GetOutput());
   
   //base tests
   CPPUNIT_ASSERT( (oldOutput!= NULL) && (newOutput != NULL));
@@ -170,18 +159,6 @@ void vtkALBARayCastCleanerTest::TestFilterMR()
   }
   
   CPPUNIT_ASSERT(equalScalars);
-     
-  //Used to generate initial test file 
-  /*
-  vtkALBASmartPointer<vtkStructuredPointsWriter> w;
-  albaString outFilename=ALBA_DATA_ROOT;
-  outFilename<<"/Test_vtkALBARayCastCleaner/outputVolumeMR.vtk";
-  w->SetFileName(outFilename.GetCStr());
-  w->SetFileTypeToBinary();
-  w->SetInput(filter->GetOutput());
-  w->Update();
-  */
-  
 }
 
 //-------------------------------------------------------------------------

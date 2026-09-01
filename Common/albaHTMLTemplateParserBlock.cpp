@@ -182,11 +182,11 @@ void albaHTMLTemplateParserBlock::AddImageVar(wxString name, vtkImageData *image
 	vtkNEW(flipFilter);
 	if (flipAxis >= 0 && flipAxis < 3)
 		flipFilter->SetFilteredAxis(flipAxis); // flip 0=x 1=y 2=z axis
-	flipFilter->SetInput(imageData);
+	flipFilter->SetInputData(imageData);
 	flipFilter->Update();
 
 	// Save image
-	imageJPEGWriter->SetInput(flipFilter->GetOutput());
+	imageJPEGWriter->SetInputConnection(flipFilter->GetOutputPort());
 	imageJPEGWriter->SetFileName(imagePath);
 	imageJPEGWriter->Write();
 
@@ -247,7 +247,7 @@ void albaHTMLTemplateParserBlock::PushImageVar(wxString name, vtkImageData *imag
 	vtkNEW(imageJPEGWriter);
 
 	// Save image
-	imageJPEGWriter->SetInput(imageData);
+	imageJPEGWriter->SetInputData(imageData);
 	imageJPEGWriter->SetFileName(imagePath);
 	imageJPEGWriter->Write();
 

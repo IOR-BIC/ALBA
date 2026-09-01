@@ -207,7 +207,6 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 				vtkDataSet *data = vme->GetOutput()->GetVTKData();
 				if (data == NULL)
 					return;
-				data->Update();
 				//Get center of Volume to can the reset
 				data->GetCenter(sliceCenterVolumeReset);
 
@@ -714,7 +713,6 @@ void albaViewArbitrarySlice::VolumeWindowing(albaVME *volume)
 {
 	double sr[2];
 	vtkDataSet *data = volume->GetOutput()->GetVTKData();
-	data->Update();
 	data->GetScalarRange(sr);
 
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();

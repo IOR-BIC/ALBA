@@ -35,6 +35,8 @@
 #include "albaVMEVolumeGray.h"
 #include "albaVMEGenericAbstract.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkStructuredPoints.h"
+#include "vtkRectilinearGrid.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -63,12 +65,11 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   preader->SetFileName(filename);
   preader->Update();
 
-  vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+  vtkRectilinearGrid *data = preader->GetOutput();
 
   albaSmartPointer<albaVMEVolumeGray> Input;
   Input->SetDataByDetaching(data,0);
   Input->Update();
-  Input->GetOutput()->GetVTKData()->Update();
 
   //clean on, triangulate on
   albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();
@@ -82,7 +83,7 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   albaVMESurface *output = albaVMESurface::SafeDownCast(extract->GetOutput());
   albaString number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("7018") == 0;
+  result = number.Compare("10336") == 0;
 
   TEST_RESULT;
   albaDEL(output);
@@ -101,7 +102,7 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   output = albaVMESurface::SafeDownCast(extract1->GetOutput());
   number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("7018") == 0;
+  result = number.Compare("10336") == 0;
 
   TEST_RESULT;
   albaDEL(output);
@@ -121,7 +122,7 @@ void albaOpExtractIsosurfaceTest::TestExtractRG()
   output = albaVMESurface::SafeDownCast(extract2->GetOutput());
   number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("7018") == 0;
+  result = number.Compare("10336") == 0;
 
   TEST_RESULT;
   cppDEL(extract2);
@@ -139,12 +140,11 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   preader->SetFileName(filename);
   preader->Update();
 
-  vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+  vtkImageData *data = preader->GetOutput();
 
   albaSmartPointer<albaVMEVolumeGray> Input;
   Input->SetDataByDetaching(data,0);
   Input->Update();
-  Input->GetOutput()->GetVTKData()->Update();
 
   //clean on, triangulate on
   albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();
@@ -201,7 +201,7 @@ void albaOpExtractIsosurfaceTest::TestExtractSP()
   output = albaVMESurface::SafeDownCast(extract2->GetOutput());
   number = output->GetSurfaceOutput()->GetNumberOfTriangles();
 
-  result = number.Compare("656") == 0;
+  result = number.Compare("672") == 0;
 
   TEST_RESULT;
   cppDEL(extract2);
@@ -218,12 +218,11 @@ void albaOpExtractIsosurfaceTest::TestExtractConnectivity()
 	preader->SetFileName(filename);
 	preader->Update();
 
-	vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+	vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutput());
 
 	albaSmartPointer<albaVMEVolumeGray> Input;
 	Input->SetDataByDetaching(data, 0);
 	Input->Update();
-	Input->GetOutput()->GetVTKData()->Update();
 
 	//clean on, triangulate on
 	albaOpExtractIsosurface *extract = new albaOpExtractIsosurface();

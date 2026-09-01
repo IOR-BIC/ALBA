@@ -54,7 +54,7 @@ class ALBA_EXPORT albaICPUtility : public vtkObject
 public:
   static albaICPUtility *New();
 
-  vtkTypeRevisionMacro(albaICPUtility,vtkObject);
+  vtkTypeMacro(albaICPUtility,vtkObject);
 
   struct RegResult{
 		vnl_matrix_fixed<double,3,3> R;
@@ -95,9 +95,9 @@ public:
 
   inline RegResult StandardRegistration( vnl_matrix<double>& MS, vnl_matrix<double>& DS, float Convergence);
 
-  wxString RotationFixedFile;
-  wxString RotationFixedIndexFile;
-  wxString KnownMinLocalPositionFile;
+  std::string RotationFixedFile;
+	std::string RotationFixedIndexFile;
+	std::string KnownMinLocalPositionFile;
   bool KnownMinLocalFlag;
   bool RotationFixedFlag;
 
@@ -106,8 +106,7 @@ protected:
   ~albaICPUtility() {};
 };
 
-vtkCxxRevisionMacro(albaICPUtility, "$Revision: 1.4.2.3 $");
-  vtkStandardNewMacro(albaICPUtility);
+vtkStandardNewMacro(albaICPUtility);
 //----------------------------------------------------------------------------
 inline vnl_matrix<double> albaICPUtility::PolyData2VnlFilter(vtkPolyData* Shape)
 //----------------------------------------------------------------------------
@@ -722,7 +721,7 @@ inline void albaICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const 
 	const int DS_temp_cols=DS_temp.columns();
 
 	vnl_vector<int> index;
-	vcl_ifstream ml_rot_fixed(this->RotationFixedIndexFile.ToAscii(), std::ios::in);//Changed from "Rot_fixed_index.txt"
+	vcl_ifstream ml_rot_fixed(this->RotationFixedIndexFile, std::ios::in);//Changed from "Rot_fixed_index.txt"
 	index.read_ascii(ml_rot_fixed);
 	//vcl_cout << "There are  " << index.size() << "  to be tested\n";
 
@@ -813,7 +812,7 @@ inline albaICPUtility::RegResult albaICPUtility::ICP_vtkPointLocator(vnl_matrix<
 	vnl_matrix<double> Min;
 	vnl_matrix<double> DS_R(DS.rows(),DS.columns());//3xn
 	
-	vcl_ifstream ml_rot_fixed(this->RotationFixedFile.ToAscii(), std::ios::in); //Changed from Rotation_fixed.txt
+	vcl_ifstream ml_rot_fixed(this->RotationFixedFile, std::ios::in); //Changed from Rotation_fixed.txt
 	if(ml_rot_fixed.is_open() == 0) 
 	{
 		//vcl_cout << "File rotazioni RAR2 inesistente: impossibile proseguire" <<'\n';

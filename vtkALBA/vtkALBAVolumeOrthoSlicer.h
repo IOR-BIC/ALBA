@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkALBAProjectRG_h
 #define __vtkALBAProjectRG_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 #include "albaConfigure.h"
 
 #define ORTHOSLICER_X_SLICE 0
@@ -61,11 +61,11 @@ Class Name: vtkALBAVolumeOrthoSlicer.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class ALBA_EXPORT vtkALBAVolumeOrthoSlicer : public vtkDataSetToDataSetFilter
+class ALBA_EXPORT vtkALBAVolumeOrthoSlicer : public vtkDataSetAlgorithm
 {
 public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBAVolumeOrthoSlicer, vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkALBAVolumeOrthoSlicer, vtkDataSetAlgorithm);
   
   /** Static Function for object instantiation */
   static vtkALBAVolumeOrthoSlicer *New();
@@ -113,16 +113,20 @@ protected:
   void operator=(const vtkALBAVolumeOrthoSlicer&);
 
   /** Update dimensions and whole extents */
-  void ExecuteInformation();
+	int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  
   /** Execute the projection and fill output scalars */
-  void Execute();
+	int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
+	/** Set Output Type to vtkImageData */
+	int FillOutputPortInformation(int port, vtkInformation* info);
 
 	template<typename DataType>
 	void SliceScalars(int * inputDims, DataType * inputScalars, DataType * slicedScalars);
 
-	void GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
+	void GenerateOutputFromID(vtkInformation *request, vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars);
 
-	void GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
+	void GenerateOutputFromRG(vtkInformation *request, vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars);
 		
 	int  SclicingMode;
 	double Origin[3];

@@ -55,12 +55,12 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkPlaneSource.h"
+#include "vtkALBATicksGenerator.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeOrthoSlice);
 
 #include "albaMemDbg.h"
-#include "vtkDataSetToDataSetFilter.h"
 
 //----------------------------------------------------------------------------
 albaPipeVolumeOrthoSlice::albaPipeVolumeOrthoSlice():albaPipeSlice()
@@ -78,7 +78,7 @@ albaPipeVolumeOrthoSlice::albaPipeVolumeOrthoSlice():albaPipeSlice()
   m_ShowVolumeBox               = false;
 	m_ShowBounds									= false;
   
-  m_AssemblyUsed = NULL;
+	m_AssemblyUsed = NULL;
   m_ColorLUT  = NULL;
   m_CustomColorLUT = NULL;
 
@@ -89,6 +89,7 @@ albaPipeVolumeOrthoSlice::albaPipeVolumeOrthoSlice():albaPipeSlice()
 	m_Actor = NULL;
 
 	m_TickActor = NULL;
+	m_TicksGenerator = NULL;
 
   m_SliceDirection  = SLICE_Z;
   m_SliceOpacity  = 1.0;
@@ -135,7 +136,6 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
   vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   double b[6];
   m_Vme->GetOutput()->Update();
-  data->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
@@ -159,10 +159,10 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
 	CreateTICKs();
 
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);
+	corner->SetInputConnection(m_VolumeOutput->GetVTKOutputPort());
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
 	vtkNEW(m_VolumeBoxActor);
 	m_VolumeBoxActor->SetMapper(corner_mapper);
@@ -182,113 +182,28 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
 		vtkNEW(m_Box);
 		m_Box->SetBounds(bounds);
 		vtkNEW(m_Mapper);
-		m_Mapper->SetInput(m_Box->GetOutput());
+		m_Mapper->SetInputConnection(m_Box->GetOutputPort());
 		vtkNEW(m_Actor);
 		m_Actor->SetMapper(m_Mapper);
 		m_AssemblyUsed->AddPart(m_Actor);
 	}
-
-	// if the actor is in the background renderer
-	// create something invisible in the front renderer so that ResetCamera will work
-  m_GhostActor = NULL;
-  if(m_AssemblyBack != NULL)
-	{
-		int mapperNum = (m_SliceDirection < 3) ? m_SliceDirection : 0;
-		vtkNEW(m_GhostActor);
-		m_GhostActor->SetMapper(m_SliceMapper[mapperNum]);
-		m_GhostActor->PickableOff();
-		m_GhostActor->GetProperty()->SetOpacity(0);
-		m_GhostActor->GetProperty()->SetRepresentationToPoints();
-		m_GhostActor->GetProperty()->SetInterpolationToFlat();
-		m_AssemblyFront->AddPart(m_GhostActor);
-  }
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::CreateTICKs()
 {
-	//---- TICKs creation --------------------------
-	vtkPolyData  *CTLinesPD      = vtkPolyData::New();	
-	vtkPoints    *CTLinesPoints  = vtkPoints::New();	
-	vtkCellArray *CTCells        = vtkCellArray::New();
-	vtkIdType points_id[2];
-	int	counter = 0;
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
-	vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-	vtk_data->Update();
+	// ---- TICKs creation with filter --------------------------
+	vtkNEW(m_TicksGenerator);
+	m_TicksGenerator->SetInputConnection(port);
+	m_TicksGenerator->Update();
 
-	double bounds[6];
-	vtk_data->GetBounds(bounds);
-
-	double xmin, xmax, ymin, ymax, zmin, zmax;
-	xmin = bounds[0];
-	xmax = bounds[1];
-	ymin = bounds[2];
-	ymax = bounds[3];
-	zmin = bounds[4];
-	zmax = bounds[5];
-
-	vtkRectilinearGrid *rg_data = vtkRectilinearGrid::SafeDownCast(vtk_data);
-	if (rg_data)
-	{
-		vtkDoubleArray* z_fa = vtkDoubleArray::SafeDownCast(rg_data->GetZCoordinates());
-		if(z_fa)
-		{
-			for (int i = 0; i < z_fa->GetNumberOfTuples(); i++)
-			{
-				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa->GetValue(i));
-				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa->GetValue(i));
-				points_id[0] = counter;
-				points_id[1] = counter+1;
-				counter+=2;
-				CTCells->InsertNextCell(2 , points_id);
-			}
-		}
-		else
-		{
-			vtkFloatArray* z_fa_f = vtkFloatArray::SafeDownCast(rg_data->GetZCoordinates());
-			for (int i = 0; i < z_fa_f->GetNumberOfTuples(); i++)
-			{
-				CTLinesPoints->InsertNextPoint(xmax, ymax, z_fa_f->GetValue(i));
-				CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30, ymax+(ymax-ymin)/30 ,z_fa_f->GetValue(i));
-				points_id[0] = counter;
-				points_id[1] = counter+1;
-				counter+=2;
-				CTCells->InsertNextCell(2 , points_id);
-			}
-		}
-	}
-	vtkImageData *sp_data = vtkImageData::SafeDownCast(vtk_data);
-	if (sp_data)
-	{
-		int dim[3];
-		double origin[3];
-		double spacing[3];
-		sp_data->GetDimensions(dim);
-		sp_data->GetOrigin(origin);
-		sp_data->GetSpacing(spacing);
-
-		for (int i=0; i < dim[2]; i++)
-		{
-			float z_i = origin[2] + i*spacing[2];	//?
-			CTLinesPoints->InsertNextPoint(xmax, ymax, z_i);
-			CTLinesPoints->InsertNextPoint(xmax+(xmax-xmin)/30,ymax+(ymax-ymin)/30,z_i);
-
-			points_id[0] = counter;
-			points_id[1] = counter+1;
-			counter+=2;
-			CTCells->InsertNextCell(2 , points_id);
-		}	
-	}
-	CTLinesPD->SetPoints(CTLinesPoints);
-	CTLinesPD->SetLines(CTCells); 
-	CTLinesPD->Modified();	  
-
-	//Add tick to scene
+	// Add tick to scene
 	vtkPolyDataMapper *TickMapper = vtkPolyDataMapper::New();
-	TickMapper->SetInput(CTLinesPD);
+	TickMapper->SetInputConnection(m_TicksGenerator->GetOutputPort());
 
-	vtkProperty	*TickProperty = vtkProperty::New();
-	TickProperty->SetColor(1,0,0);
+	vtkProperty *TickProperty = vtkProperty::New();
+	TickProperty->SetColor(1, 0, 0);
 	TickProperty->SetAmbient(1);
 	TickProperty->SetRepresentationToWireframe();
 	TickProperty->SetInterpolationToFlat();
@@ -301,13 +216,8 @@ void albaPipeVolumeOrthoSlice::CreateTICKs()
 
 	m_AssemblyUsed->AddPart(m_TickActor);
 
-	vtkDEL(CTLinesPoints);
-	vtkDEL(CTCells);
-	vtkDEL(CTLinesPD);
-
 	vtkDEL(TickMapper);
 	vtkDEL(TickProperty);
-
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::CreateSlice()
@@ -317,21 +227,21 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 		{
 			double bounds[6];
 			vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
-			vtk_data->Update();
+			vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
 			vtkNEW(m_Slicer[i]);
 			m_Slicer[i]->SetSclicingMode(i);
 			m_Slicer[i]->SetPlaneOrigin(m_Origin);
-			m_Slicer[i]->SetInput(vtk_data);
-
+			m_Slicer[i]->SetInputConnection(port);
+	
 
 			vtkNEW(m_Texture[i]);
 			m_Texture[i]->RepeatOff();
 			m_Texture[i]->SetInterpolate(m_Interpolate);
 			m_Texture[i]->SetQualityTo32Bit();
-			m_Texture[i]->SetInput((vtkImageData*)m_Slicer[i]->GetOutput());
+			m_Texture[i]->SetColorModeToMapScalars();
+			m_Texture[i]->SetInputConnection(m_Slicer[i]->GetOutputPort());
 			m_Texture[i]->SetLookupTable(m_ColorLUT);
-			m_Texture[i]->MapColorScalarsThroughLookupTableOn();
 
 			vtkNEW(m_SlicePlane[i]);
 			vtk_data->GetBounds(bounds);
@@ -365,8 +275,8 @@ void albaPipeVolumeOrthoSlice::CreateSlice()
 			}
 
 			vtkNEW(m_SliceMapper[i]);
-			m_SliceMapper[i]->SetInput(m_SlicePlane[i]->GetOutput());
-			m_SliceMapper[i]->ScalarVisibilityOff();
+			m_SliceMapper[i]->SetInputConnection(m_SlicePlane[i]->GetOutputPort());
+			m_SliceMapper[i]->ScalarVisibilityOn();
 
 			vtkNEW(m_SliceActor[i]);
 			m_SliceActor[i]->SetMapper(m_SliceMapper[i]);
@@ -393,7 +303,6 @@ void albaPipeVolumeOrthoSlice::DeleteSlice()
 			vtkDEL(m_SlicePlane[i]);
 			vtkDEL(m_SliceActor[i]);
 		}
-
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::UpdatePlaneOrigin(int direction)
@@ -428,10 +337,7 @@ albaPipeVolumeOrthoSlice::~albaPipeVolumeOrthoSlice()
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
 	vtkDEL(m_TickActor);
-
-  if(m_GhostActor) 
-    m_AssemblyFront->RemovePart(m_GhostActor);
-  vtkDEL(m_GhostActor);
+	vtkDEL(m_TicksGenerator);
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::SetLutRange(double low, double high)

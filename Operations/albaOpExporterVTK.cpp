@@ -61,6 +61,7 @@ albaOp(label)
 
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
+	m_LegacyMode = 0;
 
 	m_ForceUnsignedShortScalarOutputForStructuredPoints = false;
 }
@@ -90,6 +91,7 @@ enum VTK_EXPORTER_ID
 {
   ID_VTK_BINARY_FILE = MINID,
 	ID_ABS_MATRIX,
+	ID_LEGACY_MODE,
   ID_CHOOSE_FILENAME,
   ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS,
 };
@@ -109,6 +111,9 @@ void albaOpExporterVTK::OpRun()
 	m_Gui->FileSave(ID_CHOOSE_FILENAME, _("VTK file"), &m_File, wildc);
 /*	m_Gui->Label("File type", true);*/
 	m_Gui->Bool(ID_VTK_BINARY_FILE, "Binary File type", &m_Binary, 1);
+
+	m_Gui->Bool(ID_LEGACY_MODE, "VTK File Version 4.2", &m_LegacyMode, 1);
+
 /*	m_Gui->Label("Absolute matrix", true);*/
 	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
 
@@ -152,6 +157,7 @@ void albaOpExporterVTK::OnEvent(albaEventBase *alba_event)
         OpStop(OP_RUN_CANCEL);
       break;
 			case ID_ABS_MATRIX:
+			case ID_LEGACY_MODE:
 				break;
       default:
         albaEventMacro(*e);
@@ -198,7 +204,7 @@ void albaOpExporterVTK::SaveVTKData()
   
   if (m_ForceUnsignedShortScalarOutputForStructuredPoints)
   {    
-    imageCast->SetInput(vtkImageData::SafeDownCast(inputData));
+    imageCast->SetInputData(vtkImageData::SafeDownCast(inputData));
     imageCast->SetOutputScalarTypeToUnsignedShort();
     imageCast->Update();
     writerInput = imageCast->GetOutput();
@@ -218,23 +224,23 @@ void albaOpExporterVTK::SaveVTKData()
 		if(m_Input->IsA("albaVMEMesh"))
 		{
 			vtkALBASmartPointer<vtkTransformFilter> v_tpdf;
-			v_tpdf->SetInput((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetInputData((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
 			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
-			writer->SetInput(v_tpdf->GetOutput());
+			writer->SetInputConnection(v_tpdf->GetOutputPort());
 		}
 		else
 		{
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-			v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetInputData((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
 			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
-			writer->SetInput(v_tpdf->GetOutput());
+			writer->SetInputConnection(v_tpdf->GetOutputPort());
 		}
   }
   else
   {
-    writer->SetInput(writerInput);
+    writer->SetInputData(writerInput);
   }
 
   if (this->m_Binary)
@@ -242,6 +248,11 @@ void albaOpExporterVTK::SaveVTKData()
   else
     writer->SetFileTypeToASCII();
 
+	if (m_LegacyMode)
+	{
+		writer->SetFileVersion(vtkDataWriter::VTK_LEGACY_READER_VERSION_4_2);
+		writer->WriteArrayMetaDataOff();
+	}
   // workaround code:  this is not working so I'm setting a dummy 50/100 progress value 
   // albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR, writer));
   long dummyProgressValue = 50;

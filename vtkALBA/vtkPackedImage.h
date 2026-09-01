@@ -35,7 +35,7 @@ public:
   /** construct the object*/
   static vtkPackedImage *New();
   /** RTTI macro */
-  vtkTypeRevisionMacro(vtkPackedImage, vtkUnsignedCharArray);
+  vtkTypeMacro(vtkPackedImage, vtkUnsignedCharArray);
 
   /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);

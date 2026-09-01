@@ -216,7 +216,6 @@ void albaOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int in
 
 	albaVMEComputeWrapping *vmeWrappedMeter =  albaVMEComputeWrapping::SafeDownCast(m_CurrentVme);
 	vmeWrappedMeter->GetOutput()->GetVTKData()->Modified();
-	vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
 	vmeWrappedMeter->Modified();
 	vmeWrappedMeter->Update();
 	int size;
@@ -480,7 +479,7 @@ void albaOpExporterWrappedMeter::Test()
 
 
 	wrappedMeter->ReparentTo(cloud);
-	wrappedMeter->GetOutput()->GetVTKData()->Update();
+
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 

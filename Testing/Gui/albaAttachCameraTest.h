@@ -59,10 +59,9 @@ private:
 
   void RenderVMESurface( albaVMESurface *vme );
   void CreateTestData();
-
+   
   albaVMESurface *m_TestSurface;
   albaVMERoot *m_Root;
-
 };
 
 #endif

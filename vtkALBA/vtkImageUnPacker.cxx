@@ -14,8 +14,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageUnPacker.h"
 #include "vtkImageData.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkImageUnPacker, "$Revision: 1.1.1.1.8.1 $");
 vtkStandardNewMacro(vtkImageUnPacker);
 
 //----------------------------------------------------------------------------
@@ -29,6 +31,7 @@ vtkImageUnPacker::vtkImageUnPacker()
 	SetDataScalarType(VTK_UNSIGNED_CHAR);
 	SetNumberOfScalarComponents(1);
 	UnPackFromFileOff();
+	SetNumberOfInputPorts(0);
 }
 
 //----------------------------------------------------------------------------
@@ -43,7 +46,7 @@ vtkImageUnPacker::~vtkImageUnPacker()
 void vtkImageUnPacker::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 {
-  vtkImageSource::PrintSelf(os,indent);
+  vtkImageAlgorithm::PrintSelf(os,indent);
 
   os << indent << "FileName: " <<
     (this->FileName ? this->FileName : "(none)") << "\n";
@@ -51,29 +54,29 @@ void vtkImageUnPacker::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 // This method returns the largest data that can be generated.
-void vtkImageUnPacker::ExecuteInformation()
+int vtkImageUnPacker::RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //----------------------------------------------------------------------------
 {
-	// Here information on the image are read and set in the Output cache.
+	 vtkInformation* outInfo = outputVector->GetInformationObject(0);
+	 vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+	
+	 // Here information on the image are read and set in the Output cache.
 	
 	if (ReadImageInformation(this->GetInput()))
 	{
 		vtkGenericWarningMacro("Problems extracting the image information. ");
 	}
 
-	GetOutput()->SetWholeExtent(GetDataExtent());
-	GetOutput()->SetUpdateExtent(GetDataExtent());
-	GetOutput()->SetScalarType(GetDataScalarType());
-	GetOutput()->SetNumberOfScalarComponents(GetNumberOfScalarComponents());
-}
+	outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), GetDataExtent(), 6);
+	outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), GetDataExtent(), 6);
+	
+	output->SetExtent(GetDataExtent());
+	output->AllocateScalars(GetDataScalarType(),GetNumberOfScalarComponents());
 
-//----------------------------------------------------------------------------
-// This function reads an image from a stream.
-void vtkImageUnPacker::Execute(vtkImageData *data)
-//----------------------------------------------------------------------------
-{
-	if (VtkImageUnPackerUpdate(this->Input,data))
+	if (VtkImageUnPackerUpdate(this->Input,output))
 	{
 		vtkErrorMacro("Cannot Unpack Image!");
 	}
+
+	return 1;
 }

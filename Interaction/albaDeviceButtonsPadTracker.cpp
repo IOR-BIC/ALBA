@@ -235,7 +235,7 @@ void albaDeviceButtonsPadTracker::SetLastPoseMatrix(const albaMatrix &matrix)
   // I had to add a test on elapsed time since it seems sometimes
   // an event gets lost! :-(((
   m_LastPoseMutex.Lock(); 
-  albaTimeStamp elapsed_time = (vtkTimerLog::GetCurrentTime()-m_LastMoveTime);
+  albaTimeStamp elapsed_time = (vtkTimerLog::GetUniversalTime()-m_LastMoveTime);
 
   // This is a very tricky thing: remove a move event after a give timeout
   // The only problem is if some other thread is pushing an event while we 
@@ -279,7 +279,7 @@ void albaDeviceButtonsPadTracker::SetLastPoseMatrix(const albaMatrix &matrix)
 
     // update current matrix
     *m_LastPoseMatrix=matrix;
-    m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime()); // set the time stamp to the current time
+    m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetUniversalTime()); // set the time stamp to the current time
 
     albaEventInteraction move_event(this,GetTracker3DMoveId(),m_LastPoseMatrix);    
 

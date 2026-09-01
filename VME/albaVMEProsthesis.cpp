@@ -212,14 +212,14 @@ void albaVMEProsthesis::AddComponentGroup(albaProDBCompGroup *componentGroup)
 		vtkPolyData * compVTKData = currentComp->GetVTKData();
 		if (compVTKData)
 		{
-			compTraFilter->SetInput(compVTKData);
+			compTraFilter->SetInputData(compVTKData);
 			compVTKData->UnRegister(NULL);
 		}
 	}
 	compTra->Update();
 
 	compTraFilter->SetTransform(compTra);
-	m_AppendPolydata->AddInput(compTraFilter->GetOutput());
+	m_AppendPolydata->AddInputConnection(compTraFilter->GetOutputPort());
 
 	CreateComponentGui(currGroup, componentGroup);
 }
@@ -261,7 +261,7 @@ void albaVMEProsthesis::ClearComponentGroups()
 {
 	for (int i = 0; i < m_TransformFilters.size(); i++)
 	{
-		m_AppendPolydata->RemoveInput(m_TransformFilters[i]->GetOutput());
+		m_AppendPolydata->RemoveInputConnection(0, m_TransformFilters[i]->GetOutputPort());
 		vtkDEL(m_TransformFilters[i]);
 		vtkDEL(m_Transforms[i]);
 		//m_ContentGui->Remove(m_ComponentGui[i]);
@@ -299,7 +299,7 @@ void albaVMEProsthesis::SelectComponent(int compGroup, int compId)
 	{
 		//update current VTK data 
 		albaProDBComponent * currentComp = components->at(compId);
-		m_TransformFilters[compGroup]->SetInput(currentComp->GetVTKData());
+		m_TransformFilters[compGroup]->SetInputData(currentComp->GetVTKData());
 
 
 		//update current following transforms
@@ -329,9 +329,9 @@ void albaVMEProsthesis::SelectComponent(int compGroup, int compId)
 void albaVMEProsthesis::ShowComponent(int compGroup, bool show)
 {
 	if (show)
-		m_AppendPolydata->AddInput(m_TransformFilters[compGroup]->GetOutput());
+		m_AppendPolydata->AddInputConnection(m_TransformFilters[compGroup]->GetOutputPort());
 	else
-		m_AppendPolydata->RemoveInput(m_TransformFilters[compGroup]->GetOutput());
+		m_AppendPolydata->RemoveInputConnection(0, m_TransformFilters[compGroup]->GetOutputPort());
 	m_AppendPolydata->Update();
 	GetOutput()->Update();
 	

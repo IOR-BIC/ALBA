@@ -22,14 +22,7 @@ ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
 
-SET(PROJECT_LIBS
-  albaBase
-  albaCore
-  albaVME
-  vtkCommon
-  vtkRendering
-  vtkGraphics
-)
+SET(PROJECT_LIBS albaBase albaCore albaVME ${VTK_LIBRARIES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
 

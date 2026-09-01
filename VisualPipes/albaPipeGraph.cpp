@@ -109,9 +109,10 @@ albaPipeGraph::~albaPipeGraph()
   m_CheckedVector.clear();
 
   vtkDEL(m_TimeArray);
-  m_PlotActor->RemoveAllInputs();
-  m_PlotTimeLineActor->RemoveAllInputs();
+  m_PlotActor->RemoveAllDataSetInputConnections();
+  m_PlotTimeLineActor->RemoveAllDataSetInputConnections();
   vtkDEL(m_PlotActor);
+  
   vtkDEL(m_PlotTimeLineActor);
   }
 //----------------------------------------------------------------------------
@@ -165,7 +166,7 @@ void albaPipeGraph::Create(albaSceneNode *n)
   m_PlotTimeLineActor->SetAxisLabelTextProperty(tProp);
   m_PlotTimeLineActor->SetTitleTextProperty(tProp);	
 
-  m_LegendBoxTimeLine_Actor = m_PlotTimeLineActor->GetLegendBoxActor();
+  m_LegendBoxTimeLine_Actor = m_PlotTimeLineActor->GetLegendActor();
   m_PlotTimeLineActor->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
   m_PlotTimeLineActor->SetLegendPosition2(0.35, 0.25);
   m_PlotTimeLineActor->SetPosition(0.01,0.01);
@@ -197,7 +198,7 @@ void albaPipeGraph::Create(albaSceneNode *n)
   m_PlotActor->SetAxisLabelTextProperty(tProp);
   m_PlotActor->SetTitleTextProperty(tProp);	
 
-  m_LegendBox_Actor = m_PlotActor->GetLegendBoxActor();
+  m_LegendBox_Actor = m_PlotActor->GetLegendActor();
   m_PlotActor->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
   m_PlotActor->SetLegendPosition2(0.35, 0.25);
   m_PlotActor->SetPosition(0.01,0.01);
@@ -274,16 +275,16 @@ void albaPipeGraph::UpdateGraph()
 {
   double scalarData = 0;
   int counter_array = 0;
-  vtkDoubleArray* scalar;
+  vtkDoubleArray *scalar;
   vnl_vector<double> row;
 
-  for (int i = 0; i < m_VtkData.size(); i++)
+  for(int i=0;i<m_VtkData.size();i++)
   {
     vtkDEL(m_VtkData[i]);
   }
   m_VtkData.clear();
 
-  for (int i = 0; i < m_ScalarArray.size(); i++)
+  for(int i=0;i<m_ScalarArray.size();i++)
   {
     vtkDEL(m_ScalarArray[i]);
   }
@@ -294,40 +295,52 @@ void albaPipeGraph::UpdateGraph()
 
   m_EmgPlot = albaVMEAnalog::SafeDownCast(m_Vme);
 
-  vtkALBASmartPointer<vtkDoubleArray> newTimeArray;
-  vtkALBASmartPointer<vtkDoubleArray> fakeTimeArray;
+   vtkALBASmartPointer<vtkDoubleArray> newTimeArray;
+   vtkALBASmartPointer<vtkDoubleArray> fakeTimeArray;
 
-  //cycle to get a fake scalar value
-  for (int c = 0; c < m_NumberOfSignals; c++)
-  {
-    if (m_CheckedVector.at(c)) //fill the vector with vtkDoubleArray of signals checked
-    {
-      scalar = vtkDoubleArray::New();
-      row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c + 1); //skip first row with time information
+   //cycle to get a fake scalar value
+   for (int c = 0; c < m_NumberOfSignals ; c++)
+   {
+     if (m_CheckedVector.at(c)) //fill the vector with vtkDoubleArray of signals checked
+     {
+       scalar = vtkDoubleArray::New();
+       row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
 
-      if (m_FitPlot)
-      {
-        for (int t = 0; t < m_TimeStamp; t++)
-        {
-          scalarData = row.get(t);
-          break;
-        }
-      }
-      scalar->Delete();
-    }
-  }
+       if (m_FitPlot)
+       {
+         for (int t = 0; t < m_TimeStamp; t++) 
+         { 
+           scalarData = row.get(t);
+           break;
+         }
+       }
+       scalar->Delete();
+     }
+   }
 
-  for (int c = 0; c < m_NumberOfSignals; c++)
+  for (int c = 0; c < m_NumberOfSignals ; c++)
   {
     if (m_CheckedVector.at(c)) //fill the vector with vtkDoubleArray of signals checked
     {
       int counter = 0;
       scalar = vtkDoubleArray::New();
-      row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c + 1); //skip first row with time information
-
+      row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
+      
       if (m_FitPlot)
-      {
-        for (int t = 0; t < m_TimeStamp; t++)
+       {
+        for (int t = 0; t < m_TimeStamp; t++) 
+        { 
+          newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
+          scalarData = row.get(t);
+          scalar->InsertValue(counter, scalarData);
+          counter++;
+        }
+     }
+     else //if not Autofit plot, get values inside m_TimeManualRange
+     {
+      for (int t = 0; t < m_TimeStamp; t++) 
+      { 
+        if (m_TimesManualRange[0] <= m_TimeArray->GetValue(t) && m_TimeArray->GetValue(t) <= m_TimesManualRange[1])
         {
           newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
           scalarData = row.get(t);
@@ -335,43 +348,16 @@ void albaPipeGraph::UpdateGraph()
           counter++;
         }
       }
-      else //if not Autofit plot, get values inside m_TimeManualRange
-      {
-        for (int t = 0; t < m_TimeStamp; t++)
-        {
-          if (m_TimesManualRange[0] <= m_TimeArray->GetValue(t) && m_TimeArray->GetValue(t) <= m_TimesManualRange[1])
-          {
-            newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
-            scalarData = row.get(t);
-            scalar->InsertValue(counter, scalarData);
-            counter++;
-          }
-        }
-      }
-
+     }
+      
       m_ScalarArray.push_back(scalar);
-      vtkRectilinearGrid* rect_grid;
+      vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
       rect_grid->SetDimensions(newTimeArray->GetNumberOfTuples(), 1, 1);
-      rect_grid->SetXCoordinates(newTimeArray);
-      rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c));
+      rect_grid->SetXCoordinates(newTimeArray); 
+      rect_grid->GetPointData()->SetScalars(scalar);
       m_VtkData.push_back(rect_grid);
-      m_PlotActor->AddInput(m_VtkData.at(c));
-    }
-    else
-    {
-      scalar = vtkDoubleArray::New();
-      fakeTimeArray->Resize(0);
-      scalar->InsertValue(0, scalarData);  //now scalarData is a fake value, already present in the plot
-      m_ScalarArray.push_back(scalar);
-
-      vtkRectilinearGrid* rect_grid;
-      rect_grid = vtkRectilinearGrid::New();
-      rect_grid->SetDimensions(fakeTimeArray->GetNumberOfTuples(), 1, 1);
-      rect_grid->SetXCoordinates(fakeTimeArray);
-      rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c));
-      m_VtkData.push_back(rect_grid);
-      m_PlotActor->AddInput(m_VtkData.at(c));
+      m_PlotActor->AddDataSetInput(rect_grid);
     }
   }
 
@@ -386,10 +372,10 @@ void albaPipeGraph::UpdateGraph()
     double dataRange[2];
     m_ScalarArray.at(i)->GetRange(dataRange);
 
-    if (dataRange[0] < minY)
+    if(dataRange[0] < minY)
       minY = dataRange[0];
 
-    if (dataRange[1] > maxY)
+    if(dataRange[1] > maxY)
       maxY = dataRange[1];
   }
 
@@ -404,29 +390,29 @@ void albaPipeGraph::UpdateGraph()
     m_PlotTimeLineActor->SetPlotRange(m_TimesRange[0], m_DataManualRange[0], m_TimesRange[1], m_DataManualRange[1]);
   }
 
-  m_PlotActor->SetNumberOfXLabels(m_TimesRange[1] - m_TimesRange[0]);
+  m_PlotActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
   m_PlotActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
 
-  m_PlotTimeLineActor->SetNumberOfXLabels(m_TimesRange[1] - m_TimesRange[0]);
+  m_PlotTimeLineActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
   m_PlotTimeLineActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
 
-  vtkDoubleArray* lineArray;
+  vtkDoubleArray *lineArray;
   vtkNEW(lineArray);
   lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
   lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
 
-  vtkDoubleArray* scalarArrayLine;
+  vtkDoubleArray *scalarArrayLine;
   vtkNEW(scalarArrayLine);
   double scalarRange[2];
-  if (m_FitPlot)
+  if(m_FitPlot)
   {
-    scalarRange[0] = minY + abs(minY * 0.1);
-    scalarRange[1] = maxY - abs(maxY * 0.1);
+    scalarRange[0]=minY+abs(minY*0.1);
+    scalarRange[1]=maxY-abs(maxY*0.1);
   }
   else
   {
-    scalarRange[0] = m_DataManualRange[0] + abs(m_DataManualRange[0] * 0.1);
-    scalarRange[1] = m_DataManualRange[1] - abs(m_DataManualRange[1] * 0.1);
+    scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
+    scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
   }
   scalarArrayLine->InsertNextTuple1(scalarRange[0]);
   scalarArrayLine->InsertNextTuple1(scalarRange[1]);
@@ -434,18 +420,17 @@ void albaPipeGraph::UpdateGraph()
   vtkNEW(m_TimeLine);
   m_TimeLine->SetDimensions(2, 1, 1);
   m_TimeLine->SetXCoordinates(lineArray);
-  m_TimeLine->GetPointData()->SetScalars(scalarArrayLine);
-  m_TimeLine->Update();
+  m_TimeLine->GetPointData()->SetScalars(scalarArrayLine); 
 
   vtkDEL(lineArray);
   vtkDEL(scalarArrayLine);
 
   m_VtkData.push_back(m_TimeLine);
-  m_PlotTimeLineActor->AddInput((vtkDataSet*)m_TimeLine);
+  m_PlotTimeLineActor->AddDataSetInput(m_TimeLine);
 
   m_RenFront->AddActor2D(m_PlotActor);
   //m_RenFront->AddActor2D(m_PlotTimeLineActor);
-
+   
 }
 //----------------------------------------------------------------------------
 void albaPipeGraph::CreateLegend()
@@ -454,13 +439,13 @@ void albaPipeGraph::CreateLegend()
   int counter_legend = 0;
   albaString name; 
   albaTagItem *tag_Signals = m_Vme->GetTagArray()->GetTag("SIGNALS_COLOR");
-  m_PlotActor->RemoveAllInputs();
+  m_PlotActor->RemoveAllDataSetInputConnections();
   for (int c = 0; c < m_NumberOfSignals ; c++)
   {
     int idx = c*3;
     if (m_CheckBox->IsItemChecked(c))
     { 
-      m_PlotActor->AddInput(m_VtkData.at(c));
+      m_PlotActor->AddDataSetInput(m_VtkData.at(c));
       m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
       name = m_CheckBox->GetItemLabel(c);
       m_LegendBox_Actor->SetEntryString(counter_legend, name.GetCStr());
@@ -473,9 +458,9 @@ void albaPipeGraph::CreateLegend()
     }
   }
 
-  m_PlotTimeLineActor->RemoveAllInputs();
+  m_PlotTimeLineActor->RemoveAllDataSetInputConnections();
 
-  m_PlotTimeLineActor->AddInput(m_VtkData.at(m_VtkData.size()-1));
+  m_PlotTimeLineActor->AddDataSetInput(m_VtkData.at(m_VtkData.size()-1));
 
 }
 //----------------------------------------------------------------------------
@@ -595,7 +580,7 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
           albaErrorMessage("Invalid plot range!");
           return;
         }
-        m_PlotActor->RemoveAllInputs();
+        m_PlotActor->RemoveAllDataSetInputConnections();
         UpdateGraph();
         CreateLegend();
         GetLogicManager()->CameraUpdate();
@@ -605,7 +590,7 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
       {
         m_Gui->Enable(ID_RANGE_X, !m_FitPlot);
         m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
-        m_PlotActor->RemoveAllInputs();
+        m_PlotActor->RemoveAllDataSetInputConnections();
         UpdateGraph();
         CreateLegend();
 				GetLogicManager()->CameraUpdate();
@@ -617,7 +602,7 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
         m_ColorRGB[1] = m_SignalColor.Green()/255.0;
         m_ColorRGB[2] = m_SignalColor.Blue()/255.0;
         ChangeSignalColor();
-        m_PlotActor->RemoveAllInputs();
+        m_PlotActor->RemoveAllDataSetInputConnections();
         UpdateGraph();
         CreateLegend();
 				GetLogicManager()->CameraUpdate();
@@ -625,7 +610,7 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
       break;
     case ID_DRAW:
       {
-        m_PlotActor->RemoveAllInputs();
+        m_PlotActor->RemoveAllDataSetInputConnections();
         UpdateGraph();
         CreateLegend();
 				GetLogicManager()->CameraUpdate();
@@ -736,7 +721,6 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
     m_TimeLine->SetDimensions(2, 1, 1);
     m_TimeLine->SetXCoordinates(lineArray);
     m_TimeLine->GetPointData()->SetScalars(scalarArrayLine); 
-    m_TimeLine->Update();
 
     vtkDEL(lineArray);
     vtkDEL(scalarArrayLine);
@@ -744,7 +728,7 @@ void albaPipeGraph::OnEvent(albaEventBase *alba_event)
     m_VtkData.pop_back();
     m_VtkData.push_back(m_TimeLine);
 
-    m_PlotTimeLineActor->AddInput((vtkDataSet*)m_TimeLine);
+    m_PlotTimeLineActor->AddDataSetInput((vtkDataSet*)m_TimeLine);
     m_RenFront->AddActor2D(m_PlotTimeLineActor);
     
     CreateLegend();

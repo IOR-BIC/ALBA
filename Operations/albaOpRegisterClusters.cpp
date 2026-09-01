@@ -809,7 +809,6 @@ void albaOpRegisterClusters::OpUndo()
 				points->InsertNextPoint(coords);
 			}
 			data->SetPoints(points);
-			data->Update();
 						
 			matrix->Identity();
 			m_Registered->SetPose(*matrix,cTime);
@@ -834,7 +833,6 @@ void albaOpRegisterClusters::OpUndo()
 			points->InsertNextPoint(coords);
 		}
 		data->SetPoints(points);
-		data->Update();
 		
 		matrix->Identity();
 		m_Registered->SetMatrix(*matrix);

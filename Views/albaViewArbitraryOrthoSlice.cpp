@@ -384,7 +384,9 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoTranslate(vtkMatrix4x4 *matrix, in
 	m_SlicingOrigin[1] += translation[1];
 	m_SlicingOrigin[2] += translation[2];
 	
-	SetSlices();
+	//It's not necessary to update the slice of the plane on which the gizmo moves. 
+	//Even if the origin or rotation changes, the slice on that plane remains the same.
+	SetSlices(planeSkip);
 }
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip)
@@ -397,10 +399,12 @@ void albaViewArbitraryOrthoSlice::OnEventGizmoRotate(vtkMatrix4x4 *matrix, int p
 
 	UpdateConesPosition();
 
-	SetSlices();
+	//It's not necessary to update the slice of the plane on which the gizmo moves. 
+	//Even if the origin or rotation changes, the slice on that plane remains the same.
+	SetSlices(planeSkip);
 }
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::SetSlices()
+void albaViewArbitraryOrthoSlice::SetSlices(int skipPlane)
 {
 	albaPipeVolumeArbOrthoSlice *pipeOrthoSlice = albaPipeVolumeArbOrthoSlice::SafeDownCast(m_ChildViewList[PERSPECTIVE_VIEW]->GetNodePipe(m_InputVolume));
 
@@ -411,6 +415,9 @@ void albaViewArbitraryOrthoSlice::SetSlices()
 		
 	for (int i = X; i <= Z; i++)
 	{
+		if(i==skipPlane)
+			continue;
+
 		m_SlicingOriginGUI[i] = m_SlicingOrigin[i];
 
 		double normal[4];
@@ -792,7 +799,6 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 {
 	double sr[2];
 	vtkDataSet *data = volume->GetOutput()->GetVTKData();
-	data->Update();
 	data->GetScalarRange(sr);
 
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();
@@ -831,7 +837,6 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 
 	EnableWidgets(true);
 
-	volumeVTKData->Update();
 	volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
 	volumeVTKData->GetScalarRange(sr);
 	
@@ -854,7 +859,7 @@ void albaViewArbitraryOrthoSlice::ShowVolume( albaVME * vme, bool show )
 
 	vtkTransformPolyDataFilter *localToABSTPDF;
 	vtkNEW(localToABSTPDF);
-	localToABSTPDF->SetInput(sliceCenterLocalCoordsPolydata);
+	localToABSTPDF->SetInputData(sliceCenterLocalCoordsPolydata);
 	localToABSTPDF->SetTransform(sliceCenterLocalCoordsToABSCoordsTransform);
 	localToABSTPDF->Update();
 	localToABSTPDF->GetOutput()->GetCenter(m_SlicingOrigin);
@@ -1195,7 +1200,7 @@ void albaViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActors()
 		coord->SetValue(size[0] - 1, size[1] - 1, 0);
 
 		vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
-		pdmd->SetInput(ss->GetOutput());
+		pdmd->SetInputConnection(ss->GetOutputPort());
 		pdmd->SetTransformCoordinate(coord);
 
 		vtkProperty2D *pd = vtkProperty2D::New();

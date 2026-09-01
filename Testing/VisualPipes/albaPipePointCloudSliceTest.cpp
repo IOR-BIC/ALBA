@@ -111,7 +111,6 @@ void albaPipePointCloudSliceTest::TestPointCloudPipeCreation()
 
   albaSmartPointer<albaVMEPointCloud> pointCloud;
   pointCloud->SetData(pointCloudData, 0.0);
-  pointCloud->GetOutput()->GetVTKData()->Update();
   pointCloud->GetOutput()->Update();
   pointCloud->GetMaterial();
   pointCloud->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
@@ -143,7 +142,6 @@ void albaPipePointCloudSliceTest::TestPointCloudPipeExecution()
 
   albaSmartPointer<albaVMEPointCloud> pointCloud;
   pointCloud->SetData(pointCloudData, 0.0);
-  pointCloud->GetOutput()->GetVTKData()->Update();
   pointCloud->GetOutput()->Update();
   pointCloud->GetMaterial();
   pointCloud->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
@@ -210,7 +208,6 @@ void albaPipePointCloudSliceTest::TestSetGetThickness()
 
   albaSmartPointer<albaVMEPointCloud> pointCloud;
   pointCloud->SetData(pointCloudData, 0.0);
-  pointCloud->GetOutput()->GetVTKData()->Update();
   pointCloud->GetOutput()->Update();
   pointCloud->Update();
 

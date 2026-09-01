@@ -247,7 +247,6 @@ void albaViewRXCT::VmeShow(albaVME *vme, bool show)
 
 			// get the VTK volume
 			vtkDataSet *data = vme->GetOutput()->GetVTKData();
-			data->Update();
 			data->GetCenter(center);
 			data->GetScalarRange(sr);
 		

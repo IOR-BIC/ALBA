@@ -115,7 +115,7 @@ public:
   /**  Construct a vtkALBADOFMatrix */
   static vtkALBADOFMatrix *New();
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBADOFMatrix,vtkObject);
+  vtkTypeMacro(vtkALBADOFMatrix,vtkObject);
   /** Print Object Information */
   void PrintSelf(ostream& os, vtkIndent indent);
   

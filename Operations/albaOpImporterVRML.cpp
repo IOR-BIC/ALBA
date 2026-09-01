@@ -222,6 +222,7 @@ int  albaOpImporterVRML::ImportFile()
   for (int i = 0; i < num_actors; i++)
   {
     vtkActor *actor = ac->GetNextActor();
+		actor->GetMapper()->Update();
     matrix.DeepCopy(actor->GetMatrix());
 
     if (actor->GetMapper() != NULL && actor->GetMapper()->GetInput() != NULL)
@@ -234,7 +235,6 @@ int  albaOpImporterVRML::ImportFile()
       albaSmartPointer<albaVMESurface> surface;
       surface->SetName(name.ToAscii());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();
-      data->Update();
       if(data->GetNumberOfPolys() != 0)
       {
         surface->SetData(data,t);

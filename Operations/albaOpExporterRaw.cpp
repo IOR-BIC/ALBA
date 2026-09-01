@@ -151,7 +151,7 @@ void albaOpExporterRAW::SaveVolume()
 		int zdim = dim[2];
 			
 		vtkImageWriter *exporter = vtkImageWriter::New();
-		exporter->SetInput(ImageData);
+		exporter->SetInputData(ImageData);
 
 		wxString prefix;
 
@@ -260,12 +260,11 @@ void albaOpExporterRAW::SaveVolume()
 			double spacing_z = 1;
 
 			StructuredPoints->SetSpacing(spacing_x, spacing_y, spacing_z);
-			StructuredPoints->SetScalarTypeToShort();
-			StructuredPoints->Update();
+			StructuredPoints->AllocateScalars(VTK_SHORT,1);
 
 			vtkImageWriter *exporter = vtkImageWriter::New();
 				
-			exporter->SetInput(StructuredPoints);
+			exporter->SetInputData(StructuredPoints);
 
 			vtkRectilinearGrid *RectilinearGrid = (vtkRectilinearGrid *)(volume->GetOutput()->GetVTKData());
 			vtkDoubleArray *z_coords = ((vtkDoubleArray *)RectilinearGrid->GetZCoordinates());
@@ -317,7 +316,6 @@ void albaOpExporterRAW::SaveVolume()
 				short_scalars->SetValue(k, double_scalars->GetValue(k));
 					
 			StructuredPoints->GetPointData()->SetScalars(short_scalars);		
-			StructuredPoints->Update();
 			exporter->Modified();								
 						
 			int a[3];
@@ -350,11 +348,10 @@ void albaOpExporterRAW::SaveVolume()
 			double spacing_y = (ymax-ymin)/ydim;
 								
 			StructuredPoints->SetSpacing(spacing_x, spacing_y, 0);
-			StructuredPoints->SetScalarTypeToShort();
-			StructuredPoints->Update();
+			StructuredPoints->AllocateScalars(VTK_SHORT,1);
 
 			vtkImageWriter *exporter = vtkImageWriter::New();
-			exporter->SetInput(StructuredPoints);
+			exporter->SetInputData(StructuredPoints);
 
 			vtkRectilinearGrid *RectilinearGrid = (vtkRectilinearGrid *)(volume->GetOutput()->GetVTKData());
 			vtkDoubleArray *z_coords = ((vtkDoubleArray *)RectilinearGrid->GetZCoordinates());
@@ -419,7 +416,6 @@ void albaOpExporterRAW::SaveVolume()
 						
 				StructuredPoints->GetPointData()->SetScalars(short_scalars);
 								
-				StructuredPoints->Update();
 				exporter->Modified();								
 								
 				wxString filename = albaString::Format("%s%s_%dx%d_%04d.raw",path.ToAscii(),name.ToAscii(),xdim,ydim,i);							

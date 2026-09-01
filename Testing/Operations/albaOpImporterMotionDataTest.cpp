@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaopImporterMotionDataTest.h"
+#include "albaOpImporterMotionDataTest.h"
 #include "albaOpImporterMotionData.h"
 #include "albaVMERawMotionData.h"
 #include "albaVMELandmarkCloud.h"

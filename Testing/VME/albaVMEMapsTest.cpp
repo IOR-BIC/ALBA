@@ -116,6 +116,7 @@ void albaVMEMapsTest::CreateVMEMaps()
 
   sphere->SetCenter(0,0,0);
   sphere->SetRadius(10);
+	sphere->Update();
   polydata = sphere->GetOutput();
 
   m_SurfaceToMap->SetData(polydata, 0.0);

@@ -87,7 +87,6 @@ void albaPipeBoxTest::TestPipe3DExecution()
   albaVMESurface *surfaceParent;
   albaNEW(surfaceParent);
   surfaceParent->SetData(importer->GetOutput(),0.0);
-  surfaceParent->GetOutput()->GetVTKData()->Update();
   surfaceParent->GetOutput()->Update();
   surfaceParent->Update();
 
@@ -99,7 +98,6 @@ void albaPipeBoxTest::TestPipe3DExecution()
   albaVMESurface *surfaceChild;
   albaNEW(surfaceChild);
   surfaceChild->SetData(importer->GetOutput(),0.0);
-  surfaceChild->GetOutput()->GetVTKData()->Update();
   surfaceChild->GetOutput()->Update();
   surfaceChild->Update();
 
@@ -161,7 +159,6 @@ void albaPipeBoxTest::TestPipe3DSubtreeExecution()
   albaVMESurface *surfaceParent;
   albaNEW(surfaceParent);
   surfaceParent->SetData(importer->GetOutput(),0.0);
-  surfaceParent->GetOutput()->GetVTKData()->Update();
   surfaceParent->GetOutput()->Update();
   surfaceParent->Update();
 
@@ -173,7 +170,6 @@ void albaPipeBoxTest::TestPipe3DSubtreeExecution()
   albaVMESurface *surfaceChild;
   albaNEW(surfaceChild);
   surfaceChild->SetData(importer->GetOutput(),0.0);
-  surfaceChild->GetOutput()->GetVTKData()->Update();
   surfaceChild->GetOutput()->Update();
   surfaceChild->Update();
 
@@ -234,7 +230,6 @@ void albaPipeBoxTest::TestPipe4DExecution()
   albaVMESurface *surfaceParent;
   albaNEW(surfaceParent);
   surfaceParent->SetData(importer->GetOutput(),0.0);
-  surfaceParent->GetOutput()->GetVTKData()->Update();
   surfaceParent->GetOutput()->Update();
   surfaceParent->Update();
 
@@ -299,7 +294,6 @@ void albaPipeBoxTest::TestPipe4DSubtreeExecution()
   albaVMESurface *surfaceParent;
   albaNEW(surfaceParent);
   surfaceParent->SetData(importer->GetOutput(),0.0);
-  surfaceParent->GetOutput()->GetVTKData()->Update();
   surfaceParent->GetOutput()->Update();
   surfaceParent->Update();
 
@@ -318,7 +312,6 @@ void albaPipeBoxTest::TestPipe4DSubtreeExecution()
   albaVMESurface *surfaceChild;
   albaNEW(surfaceChild);
   surfaceChild->SetData(importer->GetOutput(),0.0);
-  surfaceChild->GetOutput()->GetVTKData()->Update();
   surfaceChild->GetOutput()->Update();
   surfaceChild->Update();
 

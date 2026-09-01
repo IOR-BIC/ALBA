@@ -58,7 +58,7 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
 {
  public:
   /** RTTI macro */
-  vtkTypeRevisionMacro(vtkALBAHistogram, vtkActor2D);
+  vtkTypeMacro(vtkALBAHistogram, vtkActor2D);
   /** Print Object Information*/
   void PrintSelf(ostream& os, vtkIndent indent);
   /** Function that create an instance of the object*/
@@ -133,8 +133,11 @@ class ALBA_EXPORT vtkALBAHistogram : public vtkActor2D
 	/** Set/Get the number of bins.*/
 	vtkGetMacro(Component, int);
 
-  /** Update the position of the gizmos */
-  void UpdateLines(double range[2]);
+	/** Update the position of the gizmos */
+	void UpdateLines(double range[2]);
+
+	/** Update the position of the gizmos */
+	void UpdateLines(double low, double hi);
 
   /** retrieve histogram value (count) from x*/
   long int GetHistogramValue(int x, int y);

@@ -116,7 +116,6 @@ void albaOpImporterAbaqusFileTest::ImportInputFile(albaString fileName, int numP
 
   importedMesh->GetUnstructuredGridOutput()->Update();
   vtkUnstructuredGrid *inputUGrid = importedMesh->GetUnstructuredGridOutput()->GetUnstructuredGridData();
-  inputUGrid->Update();
 
   // Nodes
   vtkIntArray *nodesIDArray = importedMesh->GetNodesIDArray();

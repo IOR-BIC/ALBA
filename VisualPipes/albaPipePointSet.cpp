@@ -61,17 +61,13 @@ void albaPipePointSet::Create(albaSceneNode *n)
   albaVMEOutputPointSet *pointset_output = albaVMEOutputPointSet::SafeDownCast(m_Vme->GetOutput());
   assert(pointset_output);
   pointset_output->Update();
-  vtkPolyData *data = pointset_output->GetPointSetData();
-  assert(data);
+  vtkAlgorithmOutput *port = pointset_output->GetVTKOutputPort();
+  assert(port);
 
   m_PointSetMapper = vtkPolyDataMapper::New();
-	m_PointSetMapper->SetInput(data);
+	m_PointSetMapper->SetInputConnection(port);
 	m_PointSetMapper->ScalarVisibilityOff();
-  if(m_Vme->IsAnimated())				
-    m_PointSetMapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-  else
-    m_PointSetMapper->ImmediateModeRenderingOff();
-
+  
   m_PointSetActor = vtkActor::New();
 	m_PointSetActor->SetProperty(pointset_output->GetMaterial()->m_Prop);
 	m_PointSetActor->GetProperty()->SetInterpolationToGouraud();
@@ -79,12 +75,12 @@ void albaPipePointSet::Create(albaSceneNode *n)
 
   m_AssemblyFront->AddPart(m_PointSetActor);
 
-  // selection hilight
+  // selection highlight
 	m_OutlineFilter = vtkOutlineCornerFilter::New();
-	m_OutlineFilter->SetInput(data);
+	m_OutlineFilter->SetInputConnection(port);
 
 	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
+	m_OutlineMapper->SetInputConnection(m_OutlineFilter->GetOutputPort());
 
 	m_OutlineProperty = vtkProperty::New();
 	m_OutlineProperty->SetColor(1,1,1);

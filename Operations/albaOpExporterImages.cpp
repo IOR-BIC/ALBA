@@ -91,8 +91,7 @@ void albaOpExporterImages::OpRun()
 
 		const wxString fileFormats[] = { "BMP", "JPEG", "PNG", "TIFF"};
 
-		//Tiff export does not work well in VTK 4.4, so it is disabled for now, set numchoises to 4 to re-enable it
-		m_Gui->Radio(ID_SINGLE_FILE, "file format", &m_FileFormat, 3, fileFormats);
+		m_Gui->Radio(ID_SINGLE_FILE, "file format", &m_FileFormat, 4, fileFormats);
 
     m_Gui->Label("");
     m_Gui->OkCancel(); 
@@ -149,7 +148,7 @@ void albaOpExporterImages::SaveImages()
       if (!wxFileName::Mkdir(finalDirName, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL))
       {
         albaErrorMessage("Failed to create subdirectory: %s", finalDirName.ToAscii());
-				return; // Exit if directory creation fails
+        return; // Exit if directory creation fails
       }
 
       m_DirName = finalDirName;
@@ -179,7 +178,6 @@ void albaOpExporterImages::SaveImages()
   double spacing_x, spacing_y;
   if (rg)
   {
-    rg->Update();
     rg->GetDimensions(dim);
     xdim = dim[0];
     ydim = dim[1];
@@ -193,15 +191,13 @@ void albaOpExporterImages::SaveImages()
     spacing_y = (ymax - ymin) / ydim;
 
     imageDataRg->SetSpacing(spacing_x, spacing_y, 1);
-    imageDataRg->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
+    imageDataRg->AllocateScalars(rg->GetPointData()->GetScalars()->GetDataType(), rg->GetPointData()->GetScalars()->GetNumberOfComponents());
     imageDataRg->GetPointData()->SetScalars(rg->GetPointData()->GetScalars());
-    imageDataRg->Update();
 
     imageData = imageDataRg;
   }
   else
   {
-    imageData->Update();
     imageData->GetDimensions(dim);
     xdim = dim[0];
     ydim = dim[1];
@@ -215,7 +211,7 @@ void albaOpExporterImages::SaveImages()
   imageData->GetScalarRange(m_ScalarRange);
 
   vtkALBASmartPointer<vtkImageData> imageSlice;
-  imageSlice->SetScalarTypeToUnsignedChar();
+  imageSlice->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
   imageSlice->SetDimensions(xdim, ydim, 1);
   imageSlice->SetSpacing(spacing_x, spacing_y, 1);
 
@@ -236,23 +232,22 @@ void albaOpExporterImages::SaveImages()
   {
     vtkALBASmartPointer<vtkImageShiftScale> pImageCast;
 
-    imageData->Update(); //important
     pImageCast->SetShift(-m_ScalarRange[0]);
     pImageCast->SetScale(255 / (m_ScalarRange[1] - m_ScalarRange[0]));
     pImageCast->SetOutputScalarTypeToUnsignedChar();
 
     pImageCast->ClampOverflowOn();
-    pImageCast->SetInput(imageData);
+    pImageCast->SetInputData(imageData);
 
-    imageFlip->SetInput(pImageCast->GetOutput());
+    imageFlip->SetInputConnection(pImageCast->GetOutputPort());
 
   }  //resampling   
   else
   {
-    imageFlip->SetInput(imageData);
+    imageFlip->SetInputData(imageData);
   }
 
-	vtkImageWriter *exporter;
+  vtkImageWriter *exporter;
 
   switch (m_FileFormat)
   {
@@ -277,9 +272,8 @@ void albaOpExporterImages::SaveImages()
     exporter->SetFilePattern("%s_%04d.bmp");
     break;
   }
-  
 
-  exporter->SetInput(imageFlip->GetOutput());
+  exporter->SetInputConnection(imageFlip->GetOutputPort());
   exporter->SetFileDimensionality(2); // the writer will create a number of 2D images
   exporter->SetFilePrefix((char *)prefix.GetCStr());
 

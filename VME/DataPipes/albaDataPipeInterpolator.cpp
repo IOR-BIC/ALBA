@@ -68,16 +68,16 @@ void albaDataPipeInterpolator::SetTimeStamp(albaTimeStamp time)
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration also modifications to the Input Array
-unsigned long albaDataPipeInterpolator::GetMTime()
+vtkMTimeType albaDataPipeInterpolator::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mtime = Superclass::GetMTime();
+	vtkMTimeType mtime = Superclass::GetMTime();
   
   albaVMEGenericAbstract *vme = (albaVMEGenericAbstract *)m_VME;
 
   if (vme && vme->GetDataVector())
   {
-    unsigned long arrayMTime = vme->GetDataVector()->GetMTime();
+		vtkMTimeType arrayMTime = vme->GetDataVector()->GetMTime();
     if (arrayMTime > mtime)
     {
       return arrayMTime;

@@ -135,8 +135,7 @@ protected:
 
 	albaTransform*     m_CopyTransform; ///< pose matrix for the slicer plane
   albaTransform*     m_Transform; ///< pose matrix for the slicer plane
-  vtkALBAVolumeSlicer*  m_PSlicer;  ///< slicer object used to extract the cut contour
-  vtkALBAVolumeSlicer*  m_ISlicer;  ///< slicer object used to compute the slice image
+  vtkALBAVolumeSlicer*  m_ArbSlicer;  ///< slicer object used to extract the cut contour
 
   vtkTransformPolyDataFilter *m_BackTransform;
   //vtkTransformPolyDataFilter *m_BackTransformParent;

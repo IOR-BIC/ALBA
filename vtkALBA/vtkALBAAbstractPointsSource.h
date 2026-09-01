@@ -23,14 +23,13 @@
 #ifndef __vtkALBAAbstractPointsSource_h
 #define __vtkALBAAbstractPointsSource_h
 
-#include "vtkPolyDataSource.h"
-#include "albaConfigure.h"
+#include "vtkPolyDataAlgorithm.h"
 
 class vtkPoints;
 class vtkCellArray;
 class vtkPolyData;
 
-class ALBA_EXPORT vtkALBAAbstractPointsSource : public vtkPolyDataSource 
+class vtkALBAAbstractPointsSource : public vtkPolyDataAlgorithm
 {
 public:
     
@@ -52,8 +51,7 @@ protected:
   vtkALBAAbstractPointsSource();
   ~vtkALBAAbstractPointsSource();
 
-  void Execute();
-  void ExecuteInformation();
+	/*virtual*/int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   vtkIdType NumberOfPoints;
 	vtkPoints *points;
@@ -66,3 +64,4 @@ private:
 };
 
 #endif
+

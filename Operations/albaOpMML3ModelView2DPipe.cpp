@@ -69,7 +69,6 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // Calculate scalar lut
   //----------------------------------------------------------------------------
   double r[2] ;
-  volume->Update() ;
   volume->GetScalarRange(r) ;
   m_LutWindow = (r[1]-r[0]);
   m_LutLevel = (r[1]+r[0]) / 2.0 ;
@@ -122,11 +121,11 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_MuscleTransform->Identity() ;
 
   m_MuscleTransformFilter = vtkTransformPolyDataFilter::New() ;
-  m_MuscleTransformFilter->SetInput(muscle) ;
+  m_MuscleTransformFilter->SetInputData(muscle) ;
   m_MuscleTransformFilter->SetTransform(m_MuscleTransform) ;
 
   m_MuscleMapper = vtkPolyDataMapper::New() ;
-  m_MuscleMapper->SetInput(m_MuscleTransformFilter->GetOutput()) ;
+  m_MuscleMapper->SetInputConnection(m_MuscleTransformFilter->GetOutputPort()) ;
 
   m_MuscleActor = vtkActor::New() ;
   m_MuscleActor->SetMapper(m_MuscleMapper) ;
@@ -174,7 +173,7 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_SliceTransformScale->Identity() ;
 
   m_SliceTransformScaleFilter = vtkTransformPolyDataFilter::New() ;
-  m_SliceTransformScaleFilter->SetInput(m_SliceSource->GetOutput()) ;
+  m_SliceTransformScaleFilter->SetInputConnection(m_SliceSource->GetOutputPort()) ;
   m_SliceTransformScaleFilter->SetTransform(m_SliceTransformScale) ;
 
   m_SliceTransform = new (vtkTransform*[m_NumberOfSlices]) ;
@@ -190,22 +189,22 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
     m_SliceTransform[i]->Identity() ;
 
     m_SliceTransformFilter[i] = vtkTransformPolyDataFilter::New() ;
-    m_SliceTransformFilter[i]->SetInput(m_SliceTransformScaleFilter->GetOutput()) ;
+    m_SliceTransformFilter[i]->SetInputConnection(m_SliceTransformScaleFilter->GetOutputPort()) ;
     m_SliceTransformFilter[i]->SetTransform(m_SliceTransform[i]) ;
 
     m_SliceProbeFilter[i] = vtkProbeFilter::New() ;
-    m_SliceProbeFilter[i]->SetSource(volume) ; // input volume
-    m_SliceProbeFilter[i]->SetInput(m_SliceTransformFilter[i]->GetOutput()) ;
+    m_SliceProbeFilter[i]->SetSourceData(volume) ; // input volume
+    m_SliceProbeFilter[i]->SetInputConnection(m_SliceTransformFilter[i]->GetOutputPort()) ;
 
     m_SliceInvTransform[i] = vtkTransform::New() ; // inverse transform back to slice coords
     m_SliceInvTransform[i]->Identity() ;
 
     m_SliceInvTransformFilter[i] = vtkTransformPolyDataFilter::New() ;
-    m_SliceInvTransformFilter[i]->SetInput((vtkPolyData*)(m_SliceProbeFilter[i]->GetOutput())) ;
+    m_SliceInvTransformFilter[i]->SetInputConnection(m_SliceProbeFilter[i]->GetOutputPort()) ;
     m_SliceInvTransformFilter[i]->SetTransform(m_SliceInvTransform[i]) ;
 
     m_SliceMapper[i] = vtkPolyDataMapper::New() ;
-    m_SliceMapper[i]->SetInput(m_SliceInvTransformFilter[i]->GetOutput()) ;
+    m_SliceMapper[i]->SetInputConnection(m_SliceInvTransformFilter[i]->GetOutputPort()) ;
     m_SliceMapper[i]->SetLookupTable(m_Lut);
     m_SliceMapper[i]->UseLookupTableScalarRangeOn();
     m_SliceMapper[i]->SetColorModeToMapScalars();
@@ -241,12 +240,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // east contour axis
   m_ContourPosXAxisLineSource = vtkLineSource::New();
   m_ContourPosXAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_ContourPosXAxisTransformPDFilter->SetInput(m_ContourPosXAxisLineSource->GetOutput()) ;
+  m_ContourPosXAxisTransformPDFilter->SetInputConnection(m_ContourPosXAxisLineSource->GetOutputPort()) ;
   m_ContourPosXAxisTransformPDFilter->SetTransform(m_ContourAxesTransform) ;
   m_ContourPosXAxisTubeFilter = vtkTubeFilter::New();
-  m_ContourPosXAxisTubeFilter->SetInput(m_ContourPosXAxisTransformPDFilter->GetOutput());
+  m_ContourPosXAxisTubeFilter->SetInputConnection(m_ContourPosXAxisTransformPDFilter->GetOutputPort());
   m_ContourPosXAxisMapper = vtkPolyDataMapper::New();
-  m_ContourPosXAxisMapper->SetInput(m_ContourPosXAxisTubeFilter->GetOutput());
+  m_ContourPosXAxisMapper->SetInputConnection(m_ContourPosXAxisTubeFilter->GetOutputPort());
   m_ContourPosXAxisActor = vtkActor::New();
   m_ContourPosXAxisActor->SetMapper(m_ContourPosXAxisMapper);
   m_ContourPosXAxisActor->SetVisibility(m_ContourAxesOn) ;
@@ -255,12 +254,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // north contour axis
   m_ContourPosYAxisLineSource = vtkLineSource::New();
   m_ContourPosYAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_ContourPosYAxisTransformPDFilter->SetInput(m_ContourPosYAxisLineSource->GetOutput()) ;
+  m_ContourPosYAxisTransformPDFilter->SetInputConnection(m_ContourPosYAxisLineSource->GetOutputPort()) ;
   m_ContourPosYAxisTransformPDFilter->SetTransform(m_ContourAxesTransform) ;
   m_ContourPosYAxisTubeFilter = vtkTubeFilter::New();
-  m_ContourPosYAxisTubeFilter->SetInput(m_ContourPosYAxisTransformPDFilter->GetOutput());
+  m_ContourPosYAxisTubeFilter->SetInputConnection(m_ContourPosYAxisTransformPDFilter->GetOutputPort());
   m_ContourPosYAxisMapper = vtkPolyDataMapper::New();
-  m_ContourPosYAxisMapper->SetInput(m_ContourPosYAxisTubeFilter->GetOutput());
+  m_ContourPosYAxisMapper->SetInputConnection(m_ContourPosYAxisTubeFilter->GetOutputPort());
   m_ContourPosYAxisActor = vtkActor::New();
   m_ContourPosYAxisActor->SetMapper(m_ContourPosYAxisMapper);
   m_ContourPosYAxisActor->SetVisibility(m_ContourAxesOn) ;
@@ -269,12 +268,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // west contour axis
   m_ContourNegXAxisLineSource = vtkLineSource::New();
   m_ContourNegXAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_ContourNegXAxisTransformPDFilter->SetInput(m_ContourNegXAxisLineSource->GetOutput()) ;
+  m_ContourNegXAxisTransformPDFilter->SetInputConnection(m_ContourNegXAxisLineSource->GetOutputPort()) ;
   m_ContourNegXAxisTransformPDFilter->SetTransform(m_ContourAxesTransform) ;
   m_ContourNegXAxisTubeFilter = vtkTubeFilter::New();
-  m_ContourNegXAxisTubeFilter->SetInput(m_ContourNegXAxisTransformPDFilter->GetOutput());
+  m_ContourNegXAxisTubeFilter->SetInputConnection(m_ContourNegXAxisTransformPDFilter->GetOutputPort());
   m_ContourNegXAxisMapper = vtkPolyDataMapper::New();
-  m_ContourNegXAxisMapper->SetInput(m_ContourNegXAxisTubeFilter->GetOutput());
+  m_ContourNegXAxisMapper->SetInputConnection(m_ContourNegXAxisTubeFilter->GetOutputPort());
   m_ContourNegXAxisActor = vtkActor::New();
   m_ContourNegXAxisActor->SetMapper(m_ContourNegXAxisMapper);
   m_ContourNegXAxisActor->SetVisibility(m_ContourAxesOn) ;
@@ -283,12 +282,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // south contour axis
   m_ContourNegYAxisLineSource = vtkLineSource::New();
   m_ContourNegYAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_ContourNegYAxisTransformPDFilter->SetInput(m_ContourNegYAxisLineSource->GetOutput()) ;
+  m_ContourNegYAxisTransformPDFilter->SetInputConnection(m_ContourNegYAxisLineSource->GetOutputPort()) ;
   m_ContourNegYAxisTransformPDFilter->SetTransform(m_ContourAxesTransform) ;
   m_ContourNegYAxisTubeFilter = vtkTubeFilter::New();
-  m_ContourNegYAxisTubeFilter->SetInput(m_ContourNegYAxisTransformPDFilter->GetOutput());
+  m_ContourNegYAxisTubeFilter->SetInputConnection(m_ContourNegYAxisTransformPDFilter->GetOutputPort());
   m_ContourNegYAxisMapper = vtkPolyDataMapper::New();
-  m_ContourNegYAxisMapper->SetInput(m_ContourNegYAxisTubeFilter->GetOutput());
+  m_ContourNegYAxisMapper->SetInputConnection(m_ContourNegYAxisTubeFilter->GetOutputPort());
   m_ContourNegYAxisActor = vtkActor::New();
   m_ContourNegYAxisActor->SetMapper(m_ContourNegYAxisMapper);
   m_ContourNegYAxisActor->SetVisibility(m_ContourAxesOn) ;
@@ -322,12 +321,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // east global axis
   m_GlobalPosXAxisLineSource = vtkLineSource::New();
   m_GlobalPosXAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_GlobalPosXAxisTransformPDFilter->SetInput(m_GlobalPosXAxisLineSource->GetOutput()) ;
+  m_GlobalPosXAxisTransformPDFilter->SetInputConnection(m_GlobalPosXAxisLineSource->GetOutputPort()) ;
   m_GlobalPosXAxisTransformPDFilter->SetTransform(m_GlobalAxesTransform) ;
   m_GlobalPosXAxisTubeFilter = vtkTubeFilter::New();
-  m_GlobalPosXAxisTubeFilter->SetInput(m_GlobalPosXAxisTransformPDFilter->GetOutput());
+  m_GlobalPosXAxisTubeFilter->SetInputConnection(m_GlobalPosXAxisTransformPDFilter->GetOutputPort());
   m_GlobalPosXAxisMapper = vtkPolyDataMapper::New();
-  m_GlobalPosXAxisMapper->SetInput(m_GlobalPosXAxisTubeFilter->GetOutput());
+  m_GlobalPosXAxisMapper->SetInputConnection(m_GlobalPosXAxisTubeFilter->GetOutputPort());
   m_GlobalPosXAxisActor = vtkActor::New();
   m_GlobalPosXAxisActor->SetMapper(m_GlobalPosXAxisMapper);
   m_GlobalPosXAxisActor->SetVisibility(m_GlobalAxesOn) ;
@@ -336,12 +335,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // north global axis
   m_GlobalPosYAxisLineSource = vtkLineSource::New();
   m_GlobalPosYAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_GlobalPosYAxisTransformPDFilter->SetInput(m_GlobalPosYAxisLineSource->GetOutput()) ;
+  m_GlobalPosYAxisTransformPDFilter->SetInputConnection(m_GlobalPosYAxisLineSource->GetOutputPort()) ;
   m_GlobalPosYAxisTransformPDFilter->SetTransform(m_GlobalAxesTransform) ;
   m_GlobalPosYAxisTubeFilter = vtkTubeFilter::New();
-  m_GlobalPosYAxisTubeFilter->SetInput(m_GlobalPosYAxisTransformPDFilter->GetOutput());
+  m_GlobalPosYAxisTubeFilter->SetInputConnection(m_GlobalPosYAxisTransformPDFilter->GetOutputPort());
   m_GlobalPosYAxisMapper = vtkPolyDataMapper::New();
-  m_GlobalPosYAxisMapper->SetInput(m_GlobalPosYAxisTubeFilter->GetOutput());
+  m_GlobalPosYAxisMapper->SetInputConnection(m_GlobalPosYAxisTubeFilter->GetOutputPort());
   m_GlobalPosYAxisActor = vtkActor::New();
   m_GlobalPosYAxisActor->SetMapper(m_GlobalPosYAxisMapper);
   m_GlobalPosYAxisActor->SetVisibility(m_GlobalAxesOn) ;
@@ -350,12 +349,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // west global axis
   m_GlobalNegXAxisLineSource = vtkLineSource::New();
   m_GlobalNegXAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_GlobalNegXAxisTransformPDFilter->SetInput(m_GlobalNegXAxisLineSource->GetOutput()) ;
+  m_GlobalNegXAxisTransformPDFilter->SetInputConnection(m_GlobalNegXAxisLineSource->GetOutputPort()) ;
   m_GlobalNegXAxisTransformPDFilter->SetTransform(m_GlobalAxesTransform) ;
   m_GlobalNegXAxisTubeFilter = vtkTubeFilter::New();
-  m_GlobalNegXAxisTubeFilter->SetInput(m_GlobalNegXAxisTransformPDFilter->GetOutput());
+  m_GlobalNegXAxisTubeFilter->SetInputConnection(m_GlobalNegXAxisTransformPDFilter->GetOutputPort());
   m_GlobalNegXAxisMapper = vtkPolyDataMapper::New();
-  m_GlobalNegXAxisMapper->SetInput(m_GlobalNegXAxisTubeFilter->GetOutput());
+  m_GlobalNegXAxisMapper->SetInputConnection(m_GlobalNegXAxisTubeFilter->GetOutputPort());
   m_GlobalNegXAxisActor = vtkActor::New();
   m_GlobalNegXAxisActor->SetMapper(m_GlobalNegXAxisMapper);
   m_GlobalNegXAxisActor->SetVisibility(m_GlobalAxesOn) ;
@@ -364,12 +363,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // south global axis
   m_GlobalNegYAxisLineSource = vtkLineSource::New();
   m_GlobalNegYAxisTransformPDFilter = vtkTransformPolyDataFilter::New() ;
-  m_GlobalNegYAxisTransformPDFilter->SetInput(m_GlobalNegYAxisLineSource->GetOutput()) ;
+  m_GlobalNegYAxisTransformPDFilter->SetInputConnection(m_GlobalNegYAxisLineSource->GetOutputPort()) ;
   m_GlobalNegYAxisTransformPDFilter->SetTransform(m_GlobalAxesTransform) ;
   m_GlobalNegYAxisTubeFilter = vtkTubeFilter::New();
-  m_GlobalNegYAxisTubeFilter->SetInput(m_GlobalNegYAxisTransformPDFilter->GetOutput());
+  m_GlobalNegYAxisTubeFilter->SetInputConnection(m_GlobalNegYAxisTransformPDFilter->GetOutputPort());
   m_GlobalNegYAxisMapper = vtkPolyDataMapper::New();
-  m_GlobalNegYAxisMapper->SetInput(m_GlobalNegYAxisTubeFilter->GetOutput());
+  m_GlobalNegYAxisMapper->SetInputConnection(m_GlobalNegYAxisTubeFilter->GetOutputPort());
   m_GlobalNegYAxisActor = vtkActor::New();
   m_GlobalNegYAxisActor->SetMapper(m_GlobalNegYAxisMapper);
   m_GlobalNegYAxisActor->SetVisibility(m_GlobalAxesOn) ;
@@ -421,13 +420,13 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
 
   m_ContourCutter = vtkCutter::New();
   m_ContourCutter->SetCutFunction(m_ContourPlane);
-  m_ContourCutter->SetInput(muscle);
+  m_ContourCutter->SetInputData(muscle);
 
   m_ContourTransform = vtkTransform::New() ;
   m_ContourTransform->Identity() ;
 
   m_ContourTransformFilter = vtkTransformPolyDataFilter::New() ;
-  m_ContourTransformFilter->SetInput(m_ContourCutter->GetOutput()) ;
+  m_ContourTransformFilter->SetInputConnection(m_ContourCutter->GetOutputPort()) ;
   m_ContourTransformFilter->SetTransform(m_ContourTransform) ;
 
 
@@ -496,12 +495,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   //----------------------------------------------------------------------------
 
   m_NEContourClipFilterN = vtkClipPolyData::New();
-  m_NEContourClipFilterN->SetInput(m_ContourTransformFilter->GetOutput()); // first cut plane
+  m_NEContourClipFilterN->SetInputConnection(m_ContourTransformFilter->GetOutputPort()); // first cut plane
   m_NEContourClipFilterN->SetClipFunction(m_CuttingPlaneN);
   m_NEContourClipFilterN->GlobalWarningDisplayOff();
 
   m_NEContourClipFilterE = vtkClipPolyData::New();
-  m_NEContourClipFilterE->SetInput(m_NEContourClipFilterN->GetOutput()); // second cut plane
+  m_NEContourClipFilterE->SetInputConnection(m_NEContourClipFilterN->GetOutputPort()); // second cut plane
   m_NEContourClipFilterE->SetClipFunction(m_CuttingPlaneE);
   m_NEContourClipFilterE->GlobalWarningDisplayOff();
 
@@ -509,16 +508,16 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_NEContourTransform->Identity() ;
 
   m_NEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_NEContourTransformPolyDataFilter->SetInput(m_NEContourClipFilterE->GetOutput());
+  m_NEContourTransformPolyDataFilter->SetInputConnection(m_NEContourClipFilterE->GetOutputPort());
   m_NEContourTransformPolyDataFilter->SetTransform(m_NEContourTransform) ;
 
   m_NEContourTubeFilter =  vtkTubeFilter::New();
-  m_NEContourTubeFilter->SetInput(m_NEContourTransformPolyDataFilter->GetOutput());
+  m_NEContourTubeFilter->SetInputConnection(m_NEContourTransformPolyDataFilter->GetOutputPort());
   m_NEContourTubeFilter->SetRadius(m_TubeSize);
   m_NEContourTubeFilter->SetNumberOfSides(12);
 
   m_NEContourMapper = vtkPolyDataMapper::New();
-  m_NEContourMapper->SetInput(m_NEContourTubeFilter->GetOutput());
+  m_NEContourMapper->SetInputConnection(m_NEContourTubeFilter->GetOutputPort());
 
   m_NEContourActor = vtkActor::New();
   m_NEContourActor->SetMapper(m_NEContourMapper);
@@ -533,12 +532,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // north-west contour visual pipe
   //----------------------------------------------------------------------------
   m_NWContourClipFilterN = vtkClipPolyData::New();
-  m_NWContourClipFilterN->SetInput(m_ContourTransformFilter->GetOutput());
+  m_NWContourClipFilterN->SetInputConnection(m_ContourTransformFilter->GetOutputPort());
   m_NWContourClipFilterN->SetClipFunction(m_CuttingPlaneN);
   m_NWContourClipFilterN->GlobalWarningDisplayOff();
 
   m_NWContourClipFilterW = vtkClipPolyData::New();
-  m_NWContourClipFilterW->SetInput(m_NWContourClipFilterN->GetOutput());
+  m_NWContourClipFilterW->SetInputConnection(m_NWContourClipFilterN->GetOutputPort());
   m_NWContourClipFilterW->SetClipFunction(m_CuttingPlaneW);
   m_NWContourClipFilterW->GlobalWarningDisplayOff();
 
@@ -546,16 +545,16 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_NWContourTransform->Identity() ;
 
   m_NWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_NWContourTransformPolyDataFilter->SetInput(m_NWContourClipFilterW->GetOutput());
+  m_NWContourTransformPolyDataFilter->SetInputConnection(m_NWContourClipFilterW->GetOutputPort());
   m_NWContourTransformPolyDataFilter->SetTransform(m_NWContourTransform) ;
 
   m_NWContourTubeFilter =  vtkTubeFilter::New();
-  m_NWContourTubeFilter->SetInput(m_NWContourTransformPolyDataFilter->GetOutput());
+  m_NWContourTubeFilter->SetInputConnection(m_NWContourTransformPolyDataFilter->GetOutputPort());
   m_NWContourTubeFilter->SetRadius(m_TubeSize);
   m_NWContourTubeFilter->SetNumberOfSides(12);
 
   m_NWContourMapper = vtkPolyDataMapper::New();
-  m_NWContourMapper->SetInput(m_NWContourTubeFilter->GetOutput());
+  m_NWContourMapper->SetInputConnection(m_NWContourTubeFilter->GetOutputPort());
 
   m_NWContourActor = vtkActor::New();
   m_NWContourActor->SetMapper(m_NWContourMapper);
@@ -569,12 +568,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // south-east contour visual pipe
   //----------------------------------------------------------------------------
   m_SEContourClipFilterS = vtkClipPolyData::New();
-  m_SEContourClipFilterS->SetInput(m_ContourTransformFilter->GetOutput());
+  m_SEContourClipFilterS->SetInputConnection(m_ContourTransformFilter->GetOutputPort());
   m_SEContourClipFilterS->SetClipFunction(m_CuttingPlaneS);
   m_SEContourClipFilterS->GlobalWarningDisplayOff();
 
   m_SEContourClipFilterE = vtkClipPolyData::New();
-  m_SEContourClipFilterE->SetInput(m_SEContourClipFilterS->GetOutput());
+  m_SEContourClipFilterE->SetInputConnection(m_SEContourClipFilterS->GetOutputPort());
   m_SEContourClipFilterE->SetClipFunction(m_CuttingPlaneE);
   m_SEContourClipFilterE->GlobalWarningDisplayOff();
 
@@ -582,16 +581,16 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_SEContourTransform->Identity() ;
 
   m_SEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_SEContourTransformPolyDataFilter->SetInput(m_SEContourClipFilterE->GetOutput());
+  m_SEContourTransformPolyDataFilter->SetInputConnection(m_SEContourClipFilterE->GetOutputPort());
   m_SEContourTransformPolyDataFilter->SetTransform(m_SEContourTransform) ;
 
   m_SEContourTubeFilter =  vtkTubeFilter::New();
-  m_SEContourTubeFilter->SetInput(m_SEContourTransformPolyDataFilter->GetOutput());
+  m_SEContourTubeFilter->SetInputConnection(m_SEContourTransformPolyDataFilter->GetOutputPort());
   m_SEContourTubeFilter->SetRadius(m_TubeSize);
   m_SEContourTubeFilter->SetNumberOfSides(12);
 
   m_SEContourMapper = vtkPolyDataMapper::New();
-  m_SEContourMapper->SetInput(m_SEContourTubeFilter->GetOutput());
+  m_SEContourMapper->SetInputConnection(m_SEContourTubeFilter->GetOutputPort());
 
   m_SEContourActor = vtkActor::New();
   m_SEContourActor->SetMapper(m_SEContourMapper);
@@ -605,12 +604,12 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // south-west contour visual pipe
   //----------------------------------------------------------------------------
   m_SWContourClipFilterS = vtkClipPolyData::New();
-  m_SWContourClipFilterS->SetInput(m_ContourTransformFilter->GetOutput());
+  m_SWContourClipFilterS->SetInputConnection(m_ContourTransformFilter->GetOutputPort());
   m_SWContourClipFilterS->SetClipFunction(m_CuttingPlaneS);
   m_SWContourClipFilterS->GlobalWarningDisplayOff();
 
   m_SWContourClipFilterW = vtkClipPolyData::New();
-  m_SWContourClipFilterW->SetInput(m_SWContourClipFilterS->GetOutput());
+  m_SWContourClipFilterW->SetInputConnection(m_SWContourClipFilterS->GetOutputPort());
   m_SWContourClipFilterW->SetClipFunction(m_CuttingPlaneW);
   m_SWContourClipFilterW->GlobalWarningDisplayOff();
 
@@ -618,16 +617,16 @@ m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_SWContourTransform->Identity() ;
 
   m_SWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_SWContourTransformPolyDataFilter->SetInput(m_SWContourClipFilterW->GetOutput());
+  m_SWContourTransformPolyDataFilter->SetInputConnection(m_SWContourClipFilterW->GetOutputPort());
   m_SWContourTransformPolyDataFilter->SetTransform(m_SWContourTransform) ;
 
   m_SWContourTubeFilter =  vtkTubeFilter::New();
-  m_SWContourTubeFilter->SetInput(m_SWContourTransformPolyDataFilter->GetOutput());
+  m_SWContourTubeFilter->SetInputConnection(m_SWContourTransformPolyDataFilter->GetOutputPort());
   m_SWContourTubeFilter->SetRadius(m_TubeSize);
   m_SWContourTubeFilter->SetNumberOfSides(12);
 
   m_SWContourMapper = vtkPolyDataMapper::New();
-  m_SWContourMapper->SetInput(m_SWContourTubeFilter->GetOutput());
+  m_SWContourMapper->SetInputConnection(m_SWContourTubeFilter->GetOutputPort());
 
   m_SWContourActor = vtkActor::New();
   m_SWContourActor->SetMapper(m_SWContourMapper);
@@ -1199,7 +1198,6 @@ void albaOpMML3ModelView2DPipe::SetGlobalAxesTransform(vtkTransform *transform)
 void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsNE(double *bounds) 
 //------------------------------------------------------------------------------
 {
-  m_NEContourClipFilterE->GetOutput()->Update() ;
   m_NEContourClipFilterE->GetOutput()->GetBounds(bounds) ;
 }
 
@@ -1210,7 +1208,6 @@ void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsNE(double *bounds)
 void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsNW(double *bounds) 
 //------------------------------------------------------------------------------
 {
-  m_NWContourClipFilterW->GetOutput()->Update() ;
   m_NWContourClipFilterW->GetOutput()->GetBounds(bounds) ;
 }
 
@@ -1220,7 +1217,6 @@ void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsNW(double *bounds)
 void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsSE(double *bounds) 
 //------------------------------------------------------------------------------
 {
-  m_SEContourClipFilterE->GetOutput()->Update() ;
   m_SEContourClipFilterE->GetOutput()->GetBounds(bounds) ;
 }
 
@@ -1231,7 +1227,6 @@ void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsSE(double *bounds)
 void albaOpMML3ModelView2DPipe::GetOriginalSegmentBoundsSW(double *bounds) 
 //------------------------------------------------------------------------------
 {
-  m_SWContourClipFilterW->GetOutput()->Update() ;
   m_SWContourClipFilterW->GetOutput()->GetBounds(bounds) ;
 }
 
@@ -1297,16 +1292,9 @@ void albaOpMML3ModelView2DPipe::GetCurrentContourBounds(double *bounds)
 {
   double bNE[6], bSE[6], bSW[6], bNW[6] ;
 
-  m_NEContourTransformPolyDataFilter->GetOutput()->Update() ;
   m_NEContourTransformPolyDataFilter->GetOutput()->GetBounds(bNE) ;
-
-  m_NWContourTransformPolyDataFilter->GetOutput()->Update() ;
   m_NWContourTransformPolyDataFilter->GetOutput()->GetBounds(bNW) ;
-
-  m_SEContourTransformPolyDataFilter->GetOutput()->Update() ;
   m_SEContourTransformPolyDataFilter->GetOutput()->GetBounds(bSE) ;
-
-  m_SWContourTransformPolyDataFilter->GetOutput()->Update() ;
   m_SWContourTransformPolyDataFilter->GetOutput()->GetBounds(bSW) ;
 
   bounds[0] = std::min(bNE[0], bSE[0]) ;
@@ -1416,7 +1404,6 @@ void albaOpMML3ModelView2DPipe::SetSWContourTransform(vtkTransform *transform)
 void albaOpMML3ModelView2DPipe::CalculateRobustCenterOfContour(double *pos) const
 //------------------------------------------------------------------------------
 {
-  m_ContourTransformFilter->GetOutput()->Update() ;
   vtkPoints *contourPoints = m_ContourTransformFilter->GetOutput()->GetPoints() ;
 
   int numPts = contourPoints->GetNumberOfPoints() ;

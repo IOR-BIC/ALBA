@@ -70,10 +70,10 @@ public:
   void ZIPSave(albaString file = "");
   
 	/** Save the msf tree. */
-  int MSFSave();
+  int MSFSave(int legacy_mode=false);
   
 	/** Save the msf tree with different filename. */
-  int MSFSaveAs();
+  int MSFSaveAs(int legacy_mode=false);
 
 	/** Return true if the tree has been modifyed. */
   bool MSFIsModified() {return m_Modified;};

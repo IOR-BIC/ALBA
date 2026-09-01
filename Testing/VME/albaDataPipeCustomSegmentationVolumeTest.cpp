@@ -49,7 +49,6 @@ void albaDataPipeCustomSegmentationVolumeTest::BeforeTest()
   // Volume with 11 slices and scalar range between 0 and 9
   albaNEW(m_VolumeSP);
   m_VolumeSP->SetData((vtkImageData*)readerSP->GetOutput(),0.0);
-  m_VolumeSP->GetOutput()->GetVTKData()->Update();
   m_VolumeSP->GetOutput()->Update();
   m_VolumeSP->Update();
   vtkDEL(readerSP);
@@ -62,7 +61,6 @@ void albaDataPipeCustomSegmentationVolumeTest::BeforeTest()
   // Rectilinear Grid  10x10x10 values between 1 and 10
   albaNEW(m_VolumeRG);
   m_VolumeRG->SetData((vtkRectilinearGrid*)readerRG->GetOutput(),0.0);
-  m_VolumeRG->GetOutput()->GetVTKData()->Update();
   m_VolumeRG->GetOutput()->Update();
   m_VolumeRG->Update();
   vtkDEL(readerRG);

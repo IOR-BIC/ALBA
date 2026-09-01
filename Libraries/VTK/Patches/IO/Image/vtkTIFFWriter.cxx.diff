@@ -1,0 +1,78 @@
+62a63,117
+> 
+> 
+>   // Fill in image information.
+>   this->GetInputExecutive(0, 0)->UpdateInformation();
+>   int* wExtent;
+>   this->FilesDeleted = 0;
+>   this->UpdateProgress(0.0);
+> 
+> 
+>   wExtent = vtkStreamingDemandDrivenPipeline::GetWholeExtent(this->GetInputInformation(0, 0));
+>   if (this->FileDimensionality == 3)
+>   {
+>     DeterminateFileName(internalFileNameSize);
+>     this->WriteFileHeader(nullptr, this->GetInput(), wExtent);
+>     this->WriteFile(nullptr, this->GetInput(), wExtent, nullptr);
+>     if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
+>     {
+>       this->DeleteFiles();
+>     }
+>     else
+>     {
+>       this->WriteFileTrailer(nullptr, nullptr);
+>     }
+>   }
+>   else
+>   {
+>     int uExt[6];
+>     memcpy(uExt, wExtent, 4 * sizeof(int));
+> 
+>     for (this->FileNumber = wExtent[4]; this->FileNumber <= wExtent[5]; ++this->FileNumber)
+>     {
+>       uExt[4] = uExt[5] = this->FileNumber;
+>       DeterminateFileName(internalFileNameSize);
+>       this->WriteFileHeader(nullptr, this->GetInput(), uExt);
+>       this->WriteFile(nullptr, this->GetInput(), uExt, nullptr);
+>       if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
+>       {
+>         this->DeleteFiles();
+>       }
+>       else
+>       {
+>         this->WriteFileTrailer(nullptr, nullptr);
+>       }
+>     }
+>   }
+> 
+>   delete[] this->InternalFileName;
+>   this->InternalFileName = nullptr;
+> }
+> 
+> 
+> //----------------------------------------------------------------------------
+> void vtkTIFFWriter::DeterminateFileName(int internalFileNameSize)
+> {
+> 
+89,109d143
+< 
+<   // Fill in image information.
+<   this->GetInputExecutive(0, 0)->UpdateInformation();
+<   int* wExtent;
+<   wExtent = vtkStreamingDemandDrivenPipeline::GetWholeExtent(this->GetInputInformation(0, 0));
+<   this->FilesDeleted = 0;
+<   this->UpdateProgress(0.0);
+< 
+<   this->WriteFileHeader(nullptr, this->GetInput(), wExtent);
+<   this->WriteFile(nullptr, this->GetInput(), wExtent, nullptr);
+<   if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
+<   {
+<     this->DeleteFiles();
+<   }
+<   else
+<   {
+<     this->WriteFileTrailer(nullptr, nullptr);
+<   }
+< 
+<   delete[] this->InternalFileName;
+<   this->InternalFileName = nullptr;

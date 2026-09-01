@@ -43,7 +43,7 @@ public:
   virtual void Modified();
 
   /** return modification time */
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
 protected:
   albaMTime          m_MTime;        ///< Last modification time

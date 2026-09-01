@@ -73,6 +73,7 @@ void vtkALBAHistogramTest::TestHistogramPointRepresentation()
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
   reader->SetFileName(fname.str().c_str());
+	reader->Update();
 
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
@@ -99,6 +100,7 @@ void vtkALBAHistogramTest::TestHistogramLineRepresentation()
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
   reader->SetFileName(fname.str().c_str());
+	reader->Update();
 
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
@@ -125,6 +127,7 @@ void vtkALBAHistogramTest::TestHistogramBarRepresentation()
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
   reader->SetFileName(fname.str().c_str());
+	reader->Update();
 
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
@@ -151,6 +154,7 @@ void vtkALBAHistogramTest::TestHistogramLogaritmicProperties()
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
   reader->SetFileName(fname.str().c_str());
+	reader->Update();
 
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
@@ -180,6 +184,7 @@ void vtkALBAHistogramTest::TestHistogramScaleFactorColorProperties()
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
   reader->SetFileName(fname.str().c_str());
+	reader->Update();
 
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
@@ -211,6 +216,7 @@ void vtkALBAHistogramTest::TestHistogramGetAttributesAndUpdateLines()
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
   reader->SetFileName(fname.str().c_str());
+	reader->Update();
 
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
@@ -222,8 +228,7 @@ void vtkALBAHistogramTest::TestHistogramGetAttributesAndUpdateLines()
   actor->LabelVisibilityOn();
   actor->SetLabel("TEST ATTRIBUTES AND UPDATE LINES");
 
-	double sr[2] = { 50,80 };
-  actor->UpdateLines(sr);
+  actor->UpdateLines(50,80);
   actor->ShowLinesOn();
 
   RenderData(actor, "TestHistogramGetAttributesAndUpdateLines");
@@ -246,6 +251,6 @@ void vtkALBAHistogramTest::TestPrintSelf()
 {
   vtkALBAHistogram *actor;
   actor = vtkALBAHistogram::New();
-  actor->PrintSelf(std::cout, 3);
+  actor->PrintSelf(std::cout, vtkIndent(3));
   actor->Delete();
 }

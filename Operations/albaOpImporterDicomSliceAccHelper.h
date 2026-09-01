@@ -15,7 +15,6 @@ PURPOSE. See the above copyright notice for more information.
 
 
 #include "albaConfigure.h"
-#include <vtkRectilinearGridSource.h>
 #include "vtkRectilinearGrid.h"
 #include <vtkImageData.h>
 

@@ -24,11 +24,13 @@
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-#include "vtkDataSetToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <sysinfoapi.h>
+#include <memoryapi.h>
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -42,17 +44,18 @@ class name: vtkALBAPoissonSurfaceReconstruction
 This class implement Poisson Surface Reconstruction method.
 A paper can be viewed here: research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf
 */
-class ALBA_EXPORT vtkALBAPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
+class ALBA_EXPORT vtkALBAPoissonSurfaceReconstruction : public vtkPolyDataAlgorithm
 {
 public:
-   /** RTTI macro */
-  vtkTypeRevisionMacro(vtkALBAPoissonSurfaceReconstruction,vtkDataSetToPolyDataFilter);
-
 	/** create instance of the object */
 	static vtkALBAPoissonSurfaceReconstruction *New();
-
+  /** RTTI macro */
+  vtkTypeMacro(vtkALBAPoissonSurfaceReconstruction,vtkPolyDataAlgorithm);
   /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);
+
+	/** Set Input port information to accept the right type */
+	int FillInputPortInformation(int, vtkInformation *info);
 
   // Description:
   // This error function allows our ported code to report error messages neatly.
@@ -67,12 +70,13 @@ protected:
 
   // Description:
   // the main function that does the work
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   /** computation of extents and update values*/
-  void ComputeInputUpdateExtents(vtkDataObject *output);
+	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
+
   /** only check if input is not null */
-  void ExecuteInformation(); 
+  int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector); 
   
 private:
   /** copy constructor not implemented */
@@ -1433,10 +1437,7 @@ Represent a square in a marching square algorithms
 */
 class ALBA_EXPORT Square{
 public:
-	const static int CORNERS = 4;
-	const static int EDGES = 4;
-	const static int NEIGHBORS = 4;
-
+	const static int CORNERS=4,EDGES=4,NEIGHBORS=4;
   /** return corner index */
 	static int  CornerIndex			(const int& x,const int& y);
   /**  calculate corner with 0,1 notation */
@@ -1460,9 +1461,7 @@ Represent a cube in a marching cube algorithms
 */
 class ALBA_EXPORT Cube{
 public:
-	const static int CORNERS = 8;
-	const static int EDGES = 12;
-	const static int NEIGHBORS = 6;
+	const static int CORNERS=8,EDGES=12,NEIGHBORS=6;
 
   /** retrieve corner index */
 	static int  CornerIndex			(const int& x,const int& y,const int& z);
@@ -3046,7 +3045,4 @@ public:
 	/** get marching cubes triangles */
 	void GetMCIsoTriangles(const Real& isoValue,const int& subdivideDepth,CoredMeshData* mesh,const int& fullDepthIso=0,const int& nonLinearFit=1);
 };
-
-
-
 #endif

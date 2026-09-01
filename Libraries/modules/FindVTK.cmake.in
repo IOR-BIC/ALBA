@@ -16,7 +16,7 @@
 
 #MESSAGE ("FindVTK: SOF")
 # try to setup legacy search path for VTK
-FIND_PATH(VTK_DIR UseVTK.cmake "${MFL_BINARY_DIR}/VTK/Build")
+SET(VTK_DIR "${MFL_BINARY_DIR}/VTK/Build")
 
 #INCLUDE ("${CMAKE_ROOT}/Modules/FindVTK.cmake")
 find_package(VTK)

@@ -159,9 +159,6 @@ void albaViewSlicer::VmeShow(albaVME *vme, bool show)
 		if(vme->GetOutput()->IsA("albaVMEOutputVolume"))
 		{
 			m_CurrentVolume = vme;
-
-			// data update
-      vme->GetOutput()->GetVTKData()->Update();
 		}
 		else if(vme->IsA("albaVMESurface") || vme->IsA("albaVMESurfaceParametric"))
 		{

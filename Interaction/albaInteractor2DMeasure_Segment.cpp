@@ -65,7 +65,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 	double point1[3];
 	double point2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSource();
+	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
 	lineSource->GetPoint1(point1);
 	lineSource->GetPoint2(point2);
 

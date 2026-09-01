@@ -68,12 +68,10 @@ void albaOpImporterVRMLTest::Test()
 	double bounds[6];
 	Cone->GetOutput()->GetBounds(bounds);
 	CPPUNIT_ASSERT(bounds[0]==-2 && bounds[1]==2 && bounds[2]==-2 && bounds[3]==2 && bounds[4]==-2 && bounds[5]==2);
-	Cone->GetOutput()->GetVTKData()->Update();
 	CPPUNIT_ASSERT(Cone->GetMaterial()->m_Diffuse[0]==0.0 && Cone->GetMaterial()->m_Diffuse[1]==0.0 && Cone->GetMaterial()->m_Diffuse[2]==1.0);
 
 	Cube->GetOutput()->GetBounds(bounds);
 	CPPUNIT_ASSERT(bounds[0]==-1 && bounds[1]==1 && bounds[2]==-1 && bounds[3]==1 && bounds[4]==-1 && bounds[5]==1);
-	Cube->GetOutput()->GetVTKData()->Update();
 	CPPUNIT_ASSERT(Cube->GetOutput()->GetVTKData()->GetNumberOfCells()==6);
 	CPPUNIT_ASSERT(Cube->GetMaterial()->m_Diffuse[0]==0.0 && Cube->GetMaterial()->m_Diffuse[1]==1.0 && Cube->GetMaterial()->m_Diffuse[2]==0.0);
 

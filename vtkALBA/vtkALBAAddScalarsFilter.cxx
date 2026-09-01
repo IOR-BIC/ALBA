@@ -19,11 +19,12 @@ University of Bedfordshire
 #include "vtkCellData.h"
 #include "vtkIdList.h"
 #include "assert.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 
 
 
-vtkCxxRevisionMacro(vtkALBAAddScalarsFilter, "$Revision: 1.61 $");
 vtkStandardNewMacro(vtkALBAAddScalarsFilter);
 
 
@@ -132,8 +133,7 @@ void vtkALBAAddScalarsFilter::SetColorOfCell(int cellId, double r, double g, dou
     m_UserColors.push_back(newcol) ;
   }
   else{
-    m_Input = this->GetInput() ;
-    m_Input->Update() ;
+    m_Input = vtkPolyData::SafeDownCast(this->GetInput());
     vtkIdList* idlist = vtkIdList::New() ;
     m_Input->GetCellPoints(cellId, idlist) ;
     for (int j = 0 ;  j < idlist->GetNumberOfIds() ;  j++){
@@ -218,15 +218,21 @@ void vtkALBAAddScalarsFilter::SetName(char* name)
 
 
 //------------------------------------------------------------------------------
-// Execute method
-//------------------------------------------------------------------------------
-void vtkALBAAddScalarsFilter::Execute()
+int vtkALBAAddScalarsFilter::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkDebugMacro(<< "Executing vtkALBAAddScalarsFilter") ;
 
   // pointers to input and output
-  m_Input = this->GetInput() ;
-  m_Output = this->GetOutput() ;
+  m_Input = input ;
+  m_Output = output;
 
   m_Output->DeepCopy(m_Input) ;
 
@@ -249,7 +255,7 @@ void vtkALBAAddScalarsFilter::Execute()
   else{
     // error: unknown mode
     scalars->Delete() ;
-    return ;
+    return 1;
   }
 
 
@@ -279,14 +285,12 @@ void vtkALBAAddScalarsFilter::Execute()
   else{
     // error: unknown mode
     scalars->Delete() ;
-    return ;
+    return 1;
   }
 
 
   // clean up and exit
   scalars->Delete() ;
+
+	return 1;
 }
-
-
-
-

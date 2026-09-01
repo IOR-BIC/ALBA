@@ -43,6 +43,7 @@ class vtkOutlineSource;
 class albaLODActor;
 class albaVMEOutputVolume;
 class vtkPlaneSource;
+class vtkALBATicksGenerator;
 
 
 /** 
@@ -192,8 +193,8 @@ protected:
 	
   vtkActor               *m_VolumeBoxActor;
 	vtkActor							 *m_TickActor;
+	vtkALBATicksGenerator *m_TicksGenerator;
 
-  vtkActor               *m_GhostActor;
 
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;

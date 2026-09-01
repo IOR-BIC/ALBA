@@ -18,7 +18,7 @@
 #ifndef __vtkALBAExtrudeToCircle_h
 #define __vtkALBAExtrudeToCircle_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "vtkPolyData.h"
 #include "vtkMatrix4x4.h"
 #include "albaConfigure.h"
@@ -30,13 +30,13 @@
 /// Extrusion filter based on vtkLinearExtrusionFilter. \n
 /// This creates an extrusion terminating in a circle.
 //------------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBAExtrudeToCircle : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAExtrudeToCircle : public vtkPolyDataAlgorithm
 {
 public:
   //----------------------------------------------------------------------------
   // Public methods
   //----------------------------------------------------------------------------
-  vtkTypeRevisionMacro(vtkALBAExtrudeToCircle, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAExtrudeToCircle, vtkPolyDataAlgorithm);
   static vtkALBAExtrudeToCircle *New();                  ///< New() method
   void PrintSelf(ostream& os, vtkIndent indent) const ; ///< print self
 
@@ -74,7 +74,8 @@ protected:
   vtkALBAExtrudeToCircle() ;   ///< constructor
   ~vtkALBAExtrudeToCircle() ;  ///< deconstructor
 
-  void Execute();       ///< execute method
+	/** Execute method */
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   void Initialize() ;   ///< initialize filter (clear old data out for clean start)
 

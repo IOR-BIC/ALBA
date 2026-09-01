@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkALBADOFMatrix, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkALBADOFMatrix);
 
 //----------------------------------------------------------------------------

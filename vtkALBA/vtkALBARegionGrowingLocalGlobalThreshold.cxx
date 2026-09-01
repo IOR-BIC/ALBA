@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #define APLHA 1.0
 
-vtkCxxRevisionMacro(vtkALBARegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkALBARegionGrowingLocalGlobalThreshold);
 
 //----------------------------------------------------------------------------
@@ -77,7 +76,6 @@ void vtkALBARegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int inde
   }
 
   vtkImageData *inputIM = Input;
-  inputIM->Update();
 
   int dims[3],dimsBordered[3];
   inputIM->GetDimensions(dims);
@@ -222,7 +220,6 @@ void vtkALBARegionGrowingLocalGlobalThreshold::BorderCreate(vtkImageData *imToAp
 //----------------------------------------------------------------------------
 {
   vtkImageData *inputIM = Input;
-  inputIM->Update();
 
   int scalarsType = inputIM->GetScalarType();
   vtkDataArray *scalars = inputIM->GetPointData()->GetScalars();
@@ -249,7 +246,6 @@ void vtkALBARegionGrowingLocalGlobalThreshold::BorderCreate(vtkImageData *imToAp
 
   imWithBorder->SetDimensions(dimsBordered);
   imWithBorder->SetSpacing(spacing);
-  imWithBorder->Update();
 
   vtkDataArray *scalarsBordered = NULL;
   switch(scalarsType)
@@ -327,13 +323,10 @@ void vtkALBARegionGrowingLocalGlobalThreshold::BorderCreate(vtkImageData *imToAp
     }
   }
 
-
   scalarsBordered->SetName("Scalars");
 
   imWithBorder->GetPointData()->AddArray(scalarsBordered);
   imWithBorder->GetPointData()->SetActiveScalars("Scalars");
-
-  imWithBorder->Update();
 
   scalarsBordered->Delete();
 }
@@ -342,49 +335,42 @@ void vtkALBARegionGrowingLocalGlobalThreshold::Update()
 //----------------------------------------------------------------------------
 {
   vtkImageData *inputIM = Input;
-  inputIM->Update();
-
   Output->CopyStructure(Input);
-  Output->Update();
+
 
   if (inputIM->GetPointData()->GetScalars())
   {
     vtkDataArray *scalarsOutput = NULL;
     switch(OutputScalarType)
     {
+		Output->AllocateScalars(OutputScalarType,inputIM->GetNumberOfPoints());
     case VTK_DOUBLE:
       {
-        Output->SetScalarTypeToDouble();
         scalarsOutput = vtkDoubleArray::New();
       }
       break;
     case VTK_FLOAT:
       {
-        Output->SetScalarTypeToFloat();
         scalarsOutput = vtkFloatArray::New();
       }
       break;
     case VTK_UNSIGNED_SHORT:
       {
-        Output->SetScalarTypeToUnsignedShort();
         scalarsOutput = vtkUnsignedShortArray::New();
       }
       break;
     case VTK_SHORT:
       {
-        Output->SetScalarTypeToShort();
         scalarsOutput = vtkShortArray::New();
       }
       break;
     case VTK_CHAR:
       {
-        Output->SetScalarTypeToChar();
         scalarsOutput = vtkCharArray::New();
       }
       break;
     case VTK_UNSIGNED_CHAR:
       {
-        Output->SetScalarTypeToUnsignedChar();
         scalarsOutput = vtkUnsignedCharArray::New();
       }
       break;
@@ -397,16 +383,8 @@ void vtkALBARegionGrowingLocalGlobalThreshold::Update()
 
     BorderCreate(imBordered);
     
-    double progress = 0;
     for (int i=0;i<inputIM->GetPointData()->GetScalars()->GetNumberOfTuples();i++)//For each scalar
     {
-      double newProgress = (double)i/inputIM->GetPointData()->GetScalars()->GetNumberOfTuples();
-      if (newProgress > progress + 0.01)
-      {
-      	this->UpdateProgress(newProgress);
-        progress = newProgress;
-      }
-
       double scalarValue = inputIM->GetPointData()->GetScalars()->GetTuple1(i);
 
       if (scalarValue > LowerThreshold && scalarValue < UpperThreshold)
@@ -456,7 +434,6 @@ void vtkALBARegionGrowingLocalGlobalThreshold::Update()
 
     Output->GetPointData()->SetScalars(scalarsOutput);
     Output->GetPointData()->GetScalars()->Modified();
-    Output->Update();
 
     imBordered->Delete();
     scalarsOutput->Delete();

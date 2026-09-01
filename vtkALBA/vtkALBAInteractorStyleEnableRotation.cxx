@@ -14,7 +14,6 @@ University of Bedfordshire
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkALBAInteractorStyleEnableRotation, "$Revision: 1.61 $");
 vtkStandardNewMacro(vtkALBAInteractorStyleEnableRotation);
 
 

@@ -18,7 +18,7 @@
 #define __vtkALBAImageFillHolesRemoveIslands_H__
 
 #include "albaConfigure.h"
-#include "vtkStructuredPointsToStructuredPointsFilter.h"
+#include "vtkALBAStructuredPointsAlgorithm.h"
 
 class vtkImageData;
 class vtkImageData;
@@ -31,7 +31,7 @@ vtkALBAImageFillHolesRemoveIslands is a vtkStructuredPointsToStructuredPointsFil
 that must be a binary image represented by a vtkUCharArray with values of 0 or 255 only.
 */
 //---------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBAImageFillHolesRemoveIslands : public vtkStructuredPointsToStructuredPointsFilter
+class ALBA_EXPORT vtkALBAImageFillHolesRemoveIslands : public vtkALBAStructuredPointsAlgorithm
 //---------------------------------------------------------------------------
 {
 public:
@@ -44,7 +44,7 @@ public:
   };
 
   /** Add collect revision method */
-  vtkTypeRevisionMacro(vtkALBAImageFillHolesRemoveIslands,vtkStructuredPointsToStructuredPointsFilter);
+  vtkTypeMacro(vtkALBAImageFillHolesRemoveIslands,vtkALBAStructuredPointsAlgorithm);
 
   /** Dynamic ctor */
   static vtkALBAImageFillHolesRemoveIslands *New();
@@ -76,7 +76,7 @@ public:
 protected:
 
   /** Execute this filter */
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   int Algorithm;                            //> fill holes or remove islands
   unsigned int EdgeSize;                    //> maximum holes/islands size

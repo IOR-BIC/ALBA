@@ -230,21 +230,18 @@ void albaVMEMeterTest::GetAngleTest()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
   vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND2;
   albaNEW(vmeParametricSurfaceEND2);	
   vmeParametricSurfaceEND2->ReparentTo(root);
-  vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
@@ -271,7 +268,6 @@ void albaVMEMeterTest::GetAngleTest()
   meter->SetMeterMode(albaVMEMeter::LINE_ANGLE);
   meter->Modified();
   meter->Update();
-  meter->GetOutput()->GetVTKData()->Update();
 
   meter->GetOutput()->Update();
   double angle = meter->GetAngle();
@@ -306,19 +302,16 @@ void albaVMEMeterTest::GetDistanceTest()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
 	vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND2;
   albaNEW(vmeParametricSurfaceEND2);	
   vmeParametricSurfaceEND2->ReparentTo(root);
-  vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
@@ -332,7 +325,6 @@ void albaVMEMeterTest::GetDistanceTest()
   matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
 	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
-	
   albaVMEMeter *meter;
   albaNEW(meter);
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
@@ -341,8 +333,6 @@ void albaVMEMeterTest::GetDistanceTest()
   meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
-
-  meter->GetOutput()->GetVTKData()->Update();
 
   meter->GetOutput()->Update();
 
@@ -379,21 +369,18 @@ void albaVMEMeterTest::GetEndPoint2CoordinateTest()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
   vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND2;
   albaNEW(vmeParametricSurfaceEND2);	
   vmeParametricSurfaceEND2->ReparentTo(root);
-  vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
@@ -416,8 +403,6 @@ void albaVMEMeterTest::GetEndPoint2CoordinateTest()
   meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
-
-  meter->GetOutput()->GetVTKData()->Update();
   meter->GetOutput()->Update();
 
   double *outPos;
@@ -452,14 +437,12 @@ void albaVMEMeterTest::GetEndPointCoordinateTest()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
   vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
@@ -481,7 +464,6 @@ void albaVMEMeterTest::GetEndPointCoordinateTest()
   meter->Modified();
   meter->Update();
 
-  meter->GetOutput()->GetVTKData()->Update();
   meter->GetOutput()->Update();
 
   double *outPos;
@@ -543,21 +525,18 @@ void albaVMEMeterTest::GetPolylineOutputTest()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
   vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND2;
   albaNEW(vmeParametricSurfaceEND2);	
   vmeParametricSurfaceEND2->ReparentTo(root);
-  vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
@@ -580,8 +559,6 @@ void albaVMEMeterTest::GetPolylineOutputTest()
   meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
-
-  meter->GetOutput()->GetVTKData()->Update();
 
   meter->GetOutput()->Update();
 
@@ -839,14 +816,12 @@ void albaVMEMeterTest::GetStartPointCoordinateTest()
   albaVMESurfaceParametric *vmeParametricSurfaceSTART;
   albaNEW(vmeParametricSurfaceSTART);
   vmeParametricSurfaceSTART->ReparentTo(root);
-  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   albaVMESurfaceParametric *vmeParametricSurfaceEND1;
   albaNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
-  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
   vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
@@ -869,7 +844,6 @@ void albaVMEMeterTest::GetStartPointCoordinateTest()
   meter->Modified();
   meter->Update();
 
-  meter->GetOutput()->GetVTKData()->Update();
   meter->GetOutput()->Update();
 
   double *outPos;

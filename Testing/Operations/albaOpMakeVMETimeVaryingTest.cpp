@@ -106,7 +106,6 @@ void albaOpMakeVMETimevaryingTest::TestOpExecute()
     imageData[i]->SetDimensions(i+1, i+1, 1);
     imageData[i]->SetOrigin(0, 0, 0);
     imageData[i]->SetSpacing(1,1,1);
-    imageData[i]->Update();
 
     albaNEW(images[i]);
 
