@@ -16,22 +16,22 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
 # this is to build BTK inside the ALBA tree
-IF (EXISTS "${BTK_SOURCE_DIR}/Sources")   
-  SET (BTK_SOURCE_PATH "${BTK_SOURCE_DIR}/Sources")
-ENDIF (EXISTS "${BTK_SOURCE_DIR}/Sources")
+IF (EXISTS "${BTK_SOURCE_DIR}/Src")   
+  SET (BTK_SOURCE_PATH "${BTK_SOURCE_DIR}/Src")
+ENDIF (EXISTS "${BTK_SOURCE_DIR}/Src")
 
 #look if there is a package for BTK
 IF (EXISTS "${BTK_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "BTK: Found BTK packages")
-  # here we should unpack into "${BTK_BINARY_DIR}/Sources"
+  # here we should unpack into "${BTK_BINARY_DIR}/Src"
   SET (BTK_PACKAGE_PATH "${BTK_SOURCE_DIR}/Packages")
   SET (BTK_PATCH_PATH "${BTK_SOURCE_DIR}/Patches")
   SET (BTK_Extension_PACKAGE_PATH "${BTK_SOURCE_DIR}/Packages")
   ##The macro must run only one time
-  SET (BTK_SOURCE_PATH "${BTK_BINARY_DIR}/Sources/BTK")
+  SET (BTK_SOURCE_PATH "${BTK_BINARY_DIR}/Src/BTK")
   SET (BTK_PATCH_PATH "${BTK_SOURCE_DIR}/Patches")
   IF (NOT EXISTS "${BTK_SOURCE_PATH}")
-	  FIND_AND_UNPACK_PACKAGE (BTK ${BTK_PACKAGE_PATH} "${BTK_BINARY_DIR}/Sources" ${BTK_SOURCE_PATH})
+	  FIND_AND_UNPACK_PACKAGE (BTK ${BTK_PACKAGE_PATH} "${BTK_BINARY_DIR}/Src" ${BTK_SOURCE_PATH})
 	  FIND_AND_APPLAY_PATCHES (BTK ${BTK_PATCH_PATH} "${BTK_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${BTK_SOURCE_PATH}")
 ENDIF (EXISTS "${BTK_SOURCE_DIR}/Packages")

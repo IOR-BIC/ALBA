@@ -20,16 +20,16 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 #
 OPTION(VTK_USE_ANSI_STDLIB "Use the ANSI iostream stdlib library. This must be On to allow ITK<->VTK interfacing." OFF)
 # this is to build VTK inside the ALBA tree
-IF (EXISTS "${VTK_SOURCE_DIR}/Sources")   
-  SET (VTK_SOURCE_PATH "${VTK_SOURCE_DIR}/Sources")
-ENDIF (EXISTS "${VTK_SOURCE_DIR}/Sources")
+IF (EXISTS "${VTK_SOURCE_DIR}/Src")   
+  SET (VTK_SOURCE_PATH "${VTK_SOURCE_DIR}/Src")
+ENDIF (EXISTS "${VTK_SOURCE_DIR}/Src")
 
 #look if there is a package for VTK
 IF (EXISTS "${VTK_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "VTK: Found VTK packages")
-  # here we should unpack into "${VTK_BINARY_DIR}/Sources"
+  # here we should unpack into "${VTK_BINARY_DIR}/Src"
   SET (VTK_PACKAGE_PATH "${VTK_SOURCE_DIR}/Packages")
-  SET (VTK_UNPACK_PATH "${VTK_BINARY_DIR}/Sources")
+  SET (VTK_UNPACK_PATH "${VTK_BINARY_DIR}/Src")
   SET (VTK_PATCH_PATH "${VTK_SOURCE_DIR}/Patches")
   SET (VTK_SOURCE_PATH "${VTK_UNPACK_PATH}/VTK") # where sources are 
   

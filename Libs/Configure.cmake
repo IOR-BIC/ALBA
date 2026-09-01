@@ -79,7 +79,7 @@ ENDIF (ALBA_USE_ITK)
 IF (ALBA_USE_WX)
  SET(wxBUILD_SHARED FALSE)
 
- ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/Libraries/wxWidgets)
+ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/Libs/wxWidgets)
  
  SET(wxWidgets_USE_STATIC TRUE)
  find_package(wxWidgets REQUIRED COMPONENTS net core base html)

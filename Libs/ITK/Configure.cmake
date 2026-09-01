@@ -18,17 +18,17 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 # This option is for using ANSI stream within ITK library
 #
 # this is to build ITK inside the ALBA tree
-IF (EXISTS "${ITK_SOURCE_DIR}/Sources")   
-  SET (ITK_SOURCE_PATH "${ITK_SOURCE_DIR}/Sources")
-ENDIF (EXISTS "${ITK_SOURCE_DIR}/Sources")
+IF (EXISTS "${ITK_SOURCE_DIR}/Src")   
+  SET (ITK_SOURCE_PATH "${ITK_SOURCE_DIR}/Src")
+ENDIF (EXISTS "${ITK_SOURCE_DIR}/Src")
 
 
 #look if there is a package for ITK
 IF (EXISTS "${ITK_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "ITK: Found ITK packages")
-  # here we should unpack into "${ITK_BINARY_DIR}/Sources"
+  # here we should unpack into "${ITK_BINARY_DIR}/Src"
   SET (ITK_PACKAGE_PATH "${ITK_SOURCE_DIR}/Packages")
-  SET (ITK_UNPACK_PATH "${ITK_BINARY_DIR}/Sources")
+  SET (ITK_UNPACK_PATH "${ITK_BINARY_DIR}/Src")
   SET (ITK_PATCH_PATH "${ITK_SOURCE_DIR}/Patches")
   SET (ITK_SOURCE_PATH "${ITK_UNPACK_PATH}/InsightToolkit-3.0.1") # where sources are 
 

@@ -1,5 +1,5 @@
 # Load CppUnit stuff
-INCLUDE(${ALBA_SOURCE_DIR}/Libraries/modules/FindCppUnit.cmake)
+INCLUDE(${ALBA_SOURCE_DIR}/Libs/modules/FindCppUnit.cmake)
 IF (CPPUNIT_RELEASE_FOUND OR CPPUNIT_DEBUG_FOUND)
   #MESSAGE("Found Cppunit library")
   INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

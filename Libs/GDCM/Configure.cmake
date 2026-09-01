@@ -16,21 +16,21 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
 # this is to build GDCM inside the ALBA tree
-IF (EXISTS "${GDCM_SOURCE_DIR}/Sources")   
-  SET (GDCM_SOURCE_PATH "${GDCM_SOURCE_DIR}/Sources")
-ENDIF (EXISTS "${GDCM_SOURCE_DIR}/Sources")
+IF (EXISTS "${GDCM_SOURCE_DIR}/Src")   
+  SET (GDCM_SOURCE_PATH "${GDCM_SOURCE_DIR}/Src")
+ENDIF (EXISTS "${GDCM_SOURCE_DIR}/Src")
 
 #look if there is a package for GDCM
 IF (EXISTS "${GDCM_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "GDCM: Found GDCM packages")
-  # here we should unpack into "${GDCM_BINARY_DIR}/Sources"
+  # here we should unpack into "${GDCM_BINARY_DIR}/Src"
   SET (GDCM_PACKAGE_PATH "${GDCM_SOURCE_DIR}/Packages")
   SET (GDCM_PATCH_PATH "${GDCM_SOURCE_DIR}/Patches")
   SET (GDCM_Extension_PACKAGE_PATH "${GDCM_SOURCE_DIR}/Packages")
   ##The macro must run only one time
-  SET (GDCM_SOURCE_PATH "${GDCM_BINARY_DIR}/Sources/gdcm-2.8.5")
+  SET (GDCM_SOURCE_PATH "${GDCM_BINARY_DIR}/Src/gdcm-2.8.5")
   IF (NOT EXISTS "${GDCM_SOURCE_PATH}")
-	  FIND_AND_UNPACK_PACKAGE (gdcm-2.8.5 ${GDCM_PACKAGE_PATH} "${GDCM_BINARY_DIR}/Sources" ${GDCM_SOURCE_PATH})
+	  FIND_AND_UNPACK_PACKAGE (gdcm-2.8.5 ${GDCM_PACKAGE_PATH} "${GDCM_BINARY_DIR}/Src" ${GDCM_SOURCE_PATH})
 	  FIND_AND_APPLAY_PATCHES(gdcm-2.8.5 ${GDCM_PATCH_PATH} "${GDCM_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${GDCM_SOURCE_PATH}")
 ENDIF (EXISTS "${GDCM_SOURCE_DIR}/Packages")

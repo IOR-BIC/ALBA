@@ -16,20 +16,20 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
 # this is to build XercesC inside the ALBA tree
-IF (EXISTS "${XercesC_SOURCE_DIR}/Sources")   
-  SET (XercesC_SOURCE_PATH "${XercesC_SOURCE_DIR}/Sources")
-ENDIF (EXISTS "${XercesC_SOURCE_DIR}/Sources")
+IF (EXISTS "${XercesC_SOURCE_DIR}/Src")   
+  SET (XercesC_SOURCE_PATH "${XercesC_SOURCE_DIR}/Src")
+ENDIF (EXISTS "${XercesC_SOURCE_DIR}/Src")
 
 #look if there is a package for XercesC
 IF (EXISTS "${XercesC_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "XercesC: Found XercesC packages")
-  # here we should unpack into "${XercesC_BINARY_DIR}/Sources"
+  # here we should unpack into "${XercesC_BINARY_DIR}/Src"
   SET (XercesC_PACKAGE_PATH "${XercesC_SOURCE_DIR}/Packages")
   ##The macro must run only one time
-  SET (XercesC_SOURCE_PATH "${XercesC_BINARY_DIR}/Sources/XercesC")
+  SET (XercesC_SOURCE_PATH "${XercesC_BINARY_DIR}/Src/XercesC")
   SET (XercesC_PATCH_PATH "${XercesC_SOURCE_DIR}/Patches")
   IF (NOT EXISTS "${XercesC_SOURCE_PATH}")
-  	FIND_AND_UNPACK_PACKAGE (XercesC ${XercesC_PACKAGE_PATH} "${XercesC_BINARY_DIR}/Sources" ${XercesC_SOURCE_PATH})
+  	FIND_AND_UNPACK_PACKAGE (XercesC ${XercesC_PACKAGE_PATH} "${XercesC_BINARY_DIR}/Src" ${XercesC_SOURCE_PATH})
   	FIND_AND_APPLAY_PATCHES (XercesC ${XercesC_PATCH_PATH} "${XercesC_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${XercesC_SOURCE_PATH}")
 ENDIF (EXISTS "${XercesC_SOURCE_DIR}/Packages")

@@ -11,24 +11,20 @@ MESSAGE(STATUS "Configuring wxWidgets")
 
 INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
- SET(WXWIN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/Libraries/wxWidgets)
- SET(WXWIN_BINARY_DIR ${PROJECT_BINARY_DIR}/Libraries/wxWidgets)
-# SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Libraries/wxWidgets/bin/ CACHE INTERNAL
-#     "Single output directory for building all libraries.")
-# SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Libraries/wxWidgets/bin/ CACHE INTERNAL 
-#     "Single output directory for building all executables.")
+ SET(WXWIN_SOURCE_DIR ${PROJECT_SOURCE_DIR}/Libs/wxWidgets)
+ SET(WXWIN_BINARY_DIR ${PROJECT_BINARY_DIR}/Libs/wxWidgets)
 	
 #This option is to build WXWIN inside the APP tree
- IF (EXISTS "${WXWIN_SOURCE_DIR}/Sources")   
-  SET (WXWIN_SOURCE_PATH "${WXWIN_SOURCE_DIR}/Sources")
- ENDIF (EXISTS "${WXWIN_SOURCE_DIR}/Sources")
+ IF (EXISTS "${WXWIN_SOURCE_DIR}/Src")   
+  SET (WXWIN_SOURCE_PATH "${WXWIN_SOURCE_DIR}/Src")
+ ENDIF (EXISTS "${WXWIN_SOURCE_DIR}/Src")
 
  # Look if there is a package for WXWIN
  IF (EXISTS "${WXWIN_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "WXWIN: Found wxWidgets Packages")
 
   SET (WXWIN_PACKAGE_PATH "${WXWIN_SOURCE_DIR}/Packages")
-  SET (WXWIN_UNPACK_PATH "${WXWIN_BINARY_DIR}/Sources")
+  SET (WXWIN_UNPACK_PATH "${WXWIN_BINARY_DIR}/Src")
   SET (WXWIN_PATCH_PATH "${WXWIN_SOURCE_DIR}/Patches")
   SET (WXWIN_SOURCE_PATH "${WXWIN_UNPACK_PATH}")
 
@@ -57,7 +53,8 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
     FILE(MAKE_DIRECTORY "${WXWIN_BINARY_PATH}")
 	
 	
-	set(wxWidgets_ROOT_DIR "${PROJECT_BINARY_DIR}/wxWidgets" CACHE PATH "wxWidgets base/installation directory")
+	set(wxWidgets_ROOT_DIR "${PROJECT_BINARY_DIR}/wxWidgets" CACHE PATH "wxWidgets base/installation directory" FORCE)
+	MESSAGE(STATUS "wxWidgets_ROOT_DIR: ${wxWidgets_ROOT_DIR}")
 	
 	# Run configuration of WXWIN library
     MESSAGE(STATUS "WXWIN: Configuring external wxWidgets project")

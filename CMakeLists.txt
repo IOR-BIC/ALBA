@@ -161,10 +161,10 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the ALBA tree.
 #-----------------------------------------------------------------------------
-ALBA_SUBPROJECT(MFL Libraries)
+ALBA_SUBPROJECT(MFL Libs)
 
 IF (MFL_CONFIG_FOUND)
-  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${ALBA_BINARY_DIR}/Libraries") 
+  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${ALBA_BINARY_DIR}/Libs") 
   IF (USE_MFL_FILE)
     DBG_MESSAGE("ALBA: MFL Configured")
     SET (ALBA_CAN_BUILD 1)
@@ -195,7 +195,7 @@ IF (ALBA_CAN_BUILD)
               "${ALBA_SOURCE_DIR}/Core" "${ALBA_SOURCE_DIR}/Service" "${ALBA_SOURCE_DIR}/Gui" "${ALBA_SOURCE_DIR}/IO" "${ALBA_SOURCE_DIR}/Operations" "${ALBA_SOURCE_DIR}/VME" "${ALBA_SOURCE_DIR}/VisualPipes" "${ALBA_SOURCE_DIR}/Views"
               "${ALBA_SOURCE_DIR}/VME/DataPipes" "${ALBA_SOURCE_DIR}/vtkALBA" "${ALBA_BINARY_DIR}/vtkALBA"  "${ALBA_SOURCE_DIR}/GPUAPI" 
               "${ALBA_SOURCE_DIR}/GPUAPI/GLEW" "${ALBA_SOURCE_DIR}/GPUAPI/FBO")
-  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/albaDLL" "${ALBA_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
+  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/albaDLL" "${ALBA_BINARY_DIR}/Libs/ITK/Src/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
 	
 	if(BUILD_TESTING)
 	  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/Testing" )
