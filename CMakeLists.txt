@@ -289,20 +289,8 @@ ENDIF(WIN32)
     ENDIF(NOT tmp_manifest)
 	ENDIF(WIN32)
 
-  # Export Build settings and library dependences
-  #INCLUDE(CMakeExportBuildSettings)
   
-  #CMAKE_EXPORT_BUILD_SETTINGS(
-  #${ALBA_BINARY_DIR}/ALBABuildSettings.cmake
-  #)
-  
-
-  
-  #EXPORT_LIBRARY_DEPENDENCIES(
-  #${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
-  #)
-
-  CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
+ CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
   
   #### Include directory for binary distribution of ALBA
   SET(ALBA_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})
