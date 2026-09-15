@@ -80,12 +80,7 @@ SET(vtkALBA_SRCS
   vtkALBAPolyDataDeformation.cpp  						vtkALBAPolyDataDeformation.h
   vtkALBAPolyDataDeformation_M1.cpp  					vtkALBAPolyDataDeformation_M1.h
   vtkALBAPolyDataDeformation_M2.cpp  					vtkALBAPolyDataDeformation_M2.h  
-  ###############################################
-      
-  vtkALBAErythrocyteSource.cpp  							vtkALBAErythrocyteSource.h  
-  vtkALBAImageFillHolesRemoveIslands.cxx  				vtkALBAImageFillHolesRemoveIslands.h  
-  vtkALBABinaryImageFloodFill.cxx  						vtkALBABinaryImageFloodFill.h
-  
+   
   ##vtkbioeng####################################
   vtkALBACollisionDetectionFilter.cxx  					vtkALBACollisionDetectionFilter.h  
   vtkALBARayCastCleaner.cpp  							vtkALBARayCastCleaner.h  

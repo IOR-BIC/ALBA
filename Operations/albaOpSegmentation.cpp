@@ -85,8 +85,6 @@
 #include "vtkImageCast.h"
 #include "vtkImageClip.h"
 #include "vtkLookupTable.h"
-#include "vtkALBABinaryImageFloodFill.h"
-#include "vtkALBAImageFillHolesRemoveIslands.h"
 #include "vtkALBAVolumeOrthoSlicer.h"
 #include "vtkALBAVolumeToClosedSmoothSurface.h"
 #include "vtkMath.h"
@@ -193,13 +191,8 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_ManualBrushShapeRadioBox = NULL;
   m_BrushShape = CIRCLE_BRUSH_SHAPE;
   m_BrushSize = 1;
-  m_ManualRefinementRegionsSize = 1;
 
   m_BrushSizeSlider = NULL;
-
-  m_ManualRefinementComboBox = NULL;
-  m_ManualRefinementRegionSizeText = NULL;
-
   m_SegmentationPicker = NULL;
 	 
   m_EditPER = NULL;
@@ -232,8 +225,6 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
 
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
-
-  m_RemovePeninsulaRegions = false;
 
   m_ManualSegmentationTools  = DRAW_EDIT;
   m_ManualBucketActions = 0;
@@ -353,9 +344,6 @@ void albaOpSegmentation::OpStop(int result)
       albaDEL(m_SegmentationVolume);
     }
   }
-
-  ResetRefinementUndoList();
-  ResetRefinementRedoList();
 
 	// Restore old EventFilterFunc
 	((albaLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(m_OldEventFunc);
@@ -1028,48 +1016,6 @@ void albaOpSegmentation::CreateEditSegmentationGui()
 	EnableSizerContent(m_FillEditingSizer, false);
 	EnableSizerContent(m_BrushEditingSizer, true);
 
-	//////////////////////////////////////////////////////////////////////////
-	// Action: remove islands OR fill holes.
-	/*
-	m_RefinementSegmentationAction = ID_REFINEMENT_ISLANDS_REMOVE;
-	wxString operations[2];
-	operations[ID_REFINEMENT_ISLANDS_REMOVE] = wxString("Remove Islands");
-	operations[ID_REFINEMENT_HOLES_FILL] = wxString("Fill Holes");
-
-	currentGui->Combo(ID_REFINEMENT_ACTION, "Action", &m_RefinementSegmentationAction, 2, operations);
-
-	// Size of islands/holes to be taken into consideration
-	m_RefinementRegionsSize = 1;
-	//currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, albaString("Size"), &m_RefinementRegionsSize, 0, MAXINT, albaString("Max size of islands/holes to be taken into consideration"));
-
-	int stepsNumber = 10;
-	w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
-
-	wxStaticText *sizeText = new wxStaticText(currentGui, w_id, "Size: ");
-
-	wxTextCtrl *refinementRegionSizeText = new wxTextCtrl(currentGui, w_id, "", wxDefaultPosition, wxSize(36, 18), wxSUNKEN_BORDER, wxDefaultValidator, "Size:");
-	wxSlider *sli = new wxSlider(currentGui, w_id, 1, 1, stepsNumber, wxDefaultPosition, wxSize(120, 18));
-
-	refinementRegionSizeText->SetValidator(albaGUIValidator(currentGui, w_id, refinementRegionSizeText, &m_RefinementRegionsSize, sli, 1, stepsNumber)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
-	sli->SetValidator(albaGUIValidator(currentGui, w_id, sli, &m_RefinementRegionsSize, refinementRegionSizeText));
-
-	wxBoxSizer *regionSizeSizer = new wxBoxSizer(wxHORIZONTAL);
-	regionSizeSizer->Add(sizeText, 0);
-	regionSizeSizer->Add(refinementRegionSizeText, 0);
-	regionSizeSizer->Add(sli, 0);
-
-	currentGui->Add(regionSizeSizer);
-
-	// Switch on/off the "apply on every slice" option
-	m_RefinementEverySlice = 0;
-	currentGui->Bool(ID_REFINEMENT_EVERY_SLICE, albaString("Global"), &m_RefinementEverySlice, 0, albaString("Apply refinement procedure on every slice"));
-
-	m_RefinementIterative = 0;
-	currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, albaString("Apply to peninsula regions"), &m_RemovePeninsulaRegions, 1, albaString("Apply refinement on peninsula regions"));
-	currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
-	currentGui->Button(ID_REFINEMENT_APPLY, albaString("Apply"), "");
-	currentGui->Divider(1);
-	*/
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION] = currentGui;
 }
 
@@ -1230,125 +1176,6 @@ void albaOpSegmentation::UpdateThresholdRealTimePreview()
 	m_View->CameraUpdate();
 }
 
-//----------------------------------------------------------------------------
-bool albaOpSegmentation::ApplyRefinementFilter2(vtkImageData *inputImage, vtkImageData *outputImage)
-{
-  vtkALBAImageFillHolesRemoveIslands *filter = vtkALBAImageFillHolesRemoveIslands::New();
-  filter->SetInputData(inputImage);
-  filter->SetEdgeSize(m_RefinementRegionsSize);
-  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == true);
-  if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
-  {
-    filter->SetAlgorithmToFillHoles();
-  }
-  else if(m_RefinementSegmentationAction == ID_REFINEMENT_ISLANDS_REMOVE)
-  {
-    filter->SetAlgorithmToRemoveIslands();
-  }
-  filter->Update();
-  outputImage->DeepCopy((vtkImageData*)filter->GetOutput());
-  filter->Delete();
-  return true;
-}
-//----------------------------------------------------------------------------
-bool albaOpSegmentation::ApplyRefinementFilter(vtkImageData *inputImage, vtkImageData *outputImage)
-{
-  typedef itk::VotingBinaryHoleFillingImageFilter<UCharImage, UCharImage> ITKVotingHoleFillingFilter;
-  ITKVotingHoleFillingFilter::Pointer holeFillingFilter = ITKVotingHoleFillingFilter::New();
-
-  typedef itk::VotingBinaryIterativeHoleFillingImageFilter<UCharImage> ITKVotingIterativeHoleFillingFilter;
-  ITKVotingIterativeHoleFillingFilter::Pointer iterativeHoleFillingFilter = ITKVotingIterativeHoleFillingFilter::New();
-
-  vtkALBASmartPointer<vtkImageData> refinedImage;
-
-
-  vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
-  vtkImageToFloat->SetOutputScalarTypeToUnsignedChar();
-  vtkImageToFloat->SetInputData(inputImage);
-  vtkImageToFloat->Modified();
-  vtkImageToFloat->Update();
-  //////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////////////
-  //ITK pipeline to fill holes
-  //////////////////////////////////////////////////////////////////////////
-  typedef itk::VTKImageToImageFilter< UCharImage > ConvertervtkTOitk;
-  ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-  vtkTOitk->SetInput( vtkImageToFloat->GetOutput() );
-  vtkTOitk->Update();
-
-  RealImage::SizeType indexRadius;
-  indexRadius[0] = m_RefinementRegionsSize; // radius along x
-  indexRadius[1] = m_RefinementRegionsSize; // radius along y
-  indexRadius[2] = m_RefinementRegionsSize; // radius along z
-
-  bool iterative = m_RefinementIterative && m_RefinementSegmentationAction==ID_REFINEMENT_ISLANDS_REMOVE;
-
-  unsigned char scalarValue = 255;
-
-  if(iterative)
-  {
-    iterativeHoleFillingFilter->SetInput( ((UCharImage*)vtkTOitk->GetOutput()) );
-    iterativeHoleFillingFilter->SetRadius( indexRadius );
-    if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
-    {
-      iterativeHoleFillingFilter->SetBackgroundValue( 0 );
-      iterativeHoleFillingFilter->SetForegroundValue( scalarValue );
-    }
-    else
-    {
-      iterativeHoleFillingFilter->SetBackgroundValue( scalarValue );
-      iterativeHoleFillingFilter->SetForegroundValue( 0 );
-    }
-
-  }
-  else
-  {
-    holeFillingFilter->SetInput( ((UCharImage*)vtkTOitk->GetOutput()) );
-    holeFillingFilter->SetRadius( indexRadius );
-    holeFillingFilter->SetMajorityThreshold( m_MajorityThreshold ); 
-
-    if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
-    {
-      holeFillingFilter->SetBackgroundValue( 0 );
-      holeFillingFilter->SetForegroundValue( scalarValue );
-    }
-    else
-    {
-      holeFillingFilter->SetBackgroundValue( scalarValue );
-      holeFillingFilter->SetForegroundValue( 0 );
-    }
-  }
-
-  try
-  {
-    if(iterative)
-      iterativeHoleFillingFilter->Update();
-    else
-      holeFillingFilter->Update();
-  }
-  catch ( itk::ExceptionObject &err )
-  {
-    std::cout << "ExceptionObject caught !" << std::endl; 
-    std::cout << err << std::endl; 
-  }
-
-  typedef itk::ImageToVTKImageFilter< UCharImage > ConverteritkTOvtk;
-  ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-  if(iterative)
-    itkTOvtk->SetInput( iterativeHoleFillingFilter->GetOutput() ); 
-  else
-    itkTOvtk->SetInput( holeFillingFilter->GetOutput() );
-  itkTOvtk->Update();
-  //////////////////////////////////////////////////////////////////////////
-
-  refinedImage = ((vtkImageData*)itkTOvtk->GetOutput());
-
-  outputImage->DeepCopy(refinedImage);
-	
-  return true;
-}
-//----------------------------------------------------------------------------
 
 // EVENTS ////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -1360,8 +1187,6 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			OnInitEvent(e);
 		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
 			OnEditSegmentationEvent(e);
-		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
-			OnRefinementSegmentationEvent(e);
 		//SWITCH
 		else switch (e->GetId())
 		{
@@ -2222,101 +2047,7 @@ void albaOpSegmentation::OnUndoRedo(bool undo)
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_UndoList.size() > 0);
 	m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_MANUAL_REDO, m_RedoList.size() > 0);
 }
-//------------------------------------------------------------------------
-void albaOpSegmentation::OnRefinementSegmentationEvent(albaEvent *e)
-{
-	switch (e->GetId())
-	{
-	case ID_REFINEMENT_ACTION:
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_ITERATIVE, m_RefinementSegmentationAction == ID_REFINEMENT_ISLANDS_REMOVE);
-	break;
-	case ID_REFINEMENT_UNDO:
-	{
-		int numOfChanges = m_RefinementUndoList.size();
-		if (numOfChanges)
-		{
-			vtkDataSet *dataSet = m_SegmentationVolume->GetOutput()->GetVTKData();
 
-			vtkUnsignedCharArray *redoScalars = vtkUnsignedCharArray::New();
-			redoScalars->DeepCopy(dataSet->GetPointData()->GetScalars());
-			redoScalars->SetName("SCALARS");
-			m_RefinementRedoList.push_back(redoScalars);
-
-			vtkDataArray *undoScalars = m_RefinementUndoList[numOfChanges - 1];
-
-			dataSet->GetPointData()->SetScalars(undoScalars);
-
-			vtkALBASmartPointer<vtkImageData> newDataSet;
-			newDataSet->DeepCopy(dataSet);
-
-			m_SegmentationVolume->SetData(newDataSet, m_Volume->GetTimeStamp());
-
-			vtkDEL(m_RefinementUndoList[numOfChanges - 1]);
-			m_RefinementUndoList.pop_back();
-
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size() > 0);
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size() > 0);
-
-			UpdateSlice();
-		}
-		break;
-	}
-	case ID_REFINEMENT_REDO:
-	{
-		int numOfChanges = m_RefinementRedoList.size();
-		if (numOfChanges)
-		{
-			vtkDataSet *dataSet = m_SegmentationVolume->GetOutput()->GetVTKData();
-
-			vtkUnsignedCharArray *undoScalars = vtkUnsignedCharArray::New();
-			undoScalars->DeepCopy(dataSet->GetPointData()->GetScalars());
-			undoScalars->SetName("SCALARS");
-			m_RefinementUndoList.push_back(undoScalars);
-
-			vtkDataArray *redoScalars = m_RefinementRedoList[numOfChanges - 1];
-
-			dataSet->GetPointData()->SetScalars(redoScalars);
-
-			vtkALBASmartPointer<vtkImageData> newDataSet;
-			newDataSet->DeepCopy(dataSet);
-
-			m_SegmentationVolume->SetData(newDataSet, m_Volume->GetTimeStamp());
-
-			vtkDEL(m_RefinementRedoList[numOfChanges - 1]);
-			m_RefinementRedoList.pop_back();
-
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size() > 0);
-			m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size() > 0);
-
-			UpdateSlice();
-		}
-		break;
-	}
-	case ID_REFINEMENT_APPLY:
-	{
-		vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::New();
-		scalars->DeepCopy(m_SegmentationVolume->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
-		scalars->SetName("SCALARS");
-
-		m_RefinementUndoList.push_back(scalars);
-
-		if (!Refinement())
-		{
-			break;
-		}
-
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size() > 0);
-		m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size() > 0);
-
-		UpdateSlice();
-		m_View->CameraUpdate();
-	}
-	break;
-	default:
-		albaEventMacro(*e);
-	}
-
-}
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnEditStepExit()
 {
@@ -2339,19 +2070,7 @@ void albaOpSegmentation::OnEditStepExit()
    
   m_SnippetsLabel->SetLabel( _(""));
 }
-//----------------------------------------------------------------------------
-void albaOpSegmentation::OnRefinementStep()
-{
-  //gui stuff
-  m_Dialog->Update();
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
-  m_SegmentationOperationsGui[EDIT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, true);
-  m_GuiDialog->Enable(ID_BUTTON_EDIT,false);
 
-	//logic stuff
-  UpdateSlice();
-}
 
 // DRAW //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
@@ -2510,129 +2229,6 @@ void albaOpSegmentation::RestoreSliceBackup()
 		scalars->Modified();
 	}
 }
-//----------------------------------------------------------------------------
-bool albaOpSegmentation::Refinement()
-{
-	wxBusyCursor wait_cursor;
-	albaGUIBusyInfo wait(_("Wait! The algorithm could take long time!"),m_TestMode);
-
-	vtkDataSet *inputDataSet = vtkDataSet::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_SegmentationVolume)->GetOutput()->GetVTKData());
-
-	if (inputDataSet)
-	{
-		long progress = 0;
-		m_ProgressBar->SetValue(progress);
-		m_ProgressBar->Show(true);
-		m_ProgressBar->Update();
-
-		vtkALBASmartPointer<vtkUnsignedCharArray> newScalars;
-		newScalars->SetName("SCALARS");
-		newScalars->SetNumberOfTuples(m_VolumeDims[0] * m_VolumeDims[1] * m_VolumeDims[2]);
-
-		double point[3];
-		inputDataSet->GetPoint(m_SliceIndex*m_VolumeDims[0] * m_VolumeDims[1], point);
-
-		vtkDataArray *inputScalars = inputDataSet->GetPointData()->GetScalars();
-		vtkALBASmartPointer<vtkUnsignedCharArray> scalars;
-		scalars->SetName("SCALARS");
-		scalars->SetNumberOfTuples(m_VolumeDims[0] * m_VolumeDims[1]);
-
-		if (m_RefinementEverySlice)
-		{
-			for (int i = 0; i < m_VolumeDims[2]; i++)
-			{
-				progress = (i * 100 / m_VolumeDims[2]);
-				m_ProgressBar->SetValue(progress);
-				m_ProgressBar->Update();
-
-				for (int k = 0; k < (m_VolumeDims[0] * m_VolumeDims[1]); k++)
-				{
-					unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]));
-					scalars->SetTuple1(k, value);
-				}
-
-				vtkALBASmartPointer<vtkImageData> im;
-				im->SetDimensions(m_VolumeDims[0], m_VolumeDims[1], 1);
-				im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
-				im->GetPointData()->AddArray(scalars);
-				im->GetPointData()->SetActiveScalars("SCALARS");
-
-				vtkALBASmartPointer<vtkImageData> filteredImage;
-				if (ApplyRefinementFilter2(im, filteredImage) && filteredImage)
-				{
-					vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
-
-					for (int k = 0; k < filteredImage->GetNumberOfPoints(); k++)
-					{
-						unsigned char value = binaryScalars->GetTuple1(k);
-						newScalars->SetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]), value);
-					}
-				}
-			}
-
-		}
-		else
-		{
-			for (int i = 0; i < m_VolumeDims[2]; i++)
-			{
-				if (i != m_SliceIndex - 1)
-					//if(i != zID)
-				{
-					for (int k = 0; k < (m_VolumeDims[0] * m_VolumeDims[1]); k++)
-					{
-						unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]));
-						newScalars->SetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]), value);
-					}
-				}
-				else
-				{
-					for (int k = 0; k < (m_VolumeDims[0] * m_VolumeDims[1]); k++)
-					{
-						unsigned char value = inputScalars->GetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]));
-						scalars->SetTuple1(k, value);
-					}
-
-					vtkALBASmartPointer<vtkImageData> im;
-					im->SetDimensions(m_VolumeDims[0], m_VolumeDims[1], 1);
-					im->SetSpacing(m_VolumeSpacing[0], m_VolumeSpacing[1], 0.0);
-					im->GetPointData()->AddArray(scalars);
-					im->GetPointData()->SetActiveScalars("SCALARS");
-
-					vtkALBASmartPointer<vtkImageData> filteredImage;
-					if (ApplyRefinementFilter2(im, filteredImage) && filteredImage)
-					{
-						vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
-
-						for (int k = 0; k < filteredImage->GetNumberOfPoints(); k++)
-						{
-							unsigned char value = binaryScalars->GetTuple1(k);
-							newScalars->SetTuple1(k + i*(m_VolumeDims[0] * m_VolumeDims[1]), value);
-						}
-					}
-				}
-			}
-		}
-
-		vtkALBASmartPointer<vtkImageData> newSP;
-		newSP->CopyStructure(vtkImageData::SafeDownCast(inputDataSet));
-		newSP->GetPointData()->AddArray(newScalars);
-		newSP->GetPointData()->SetActiveScalars("SCALARS");
-
-		m_SegmentationVolume->SetData(newSP, m_Volume->GetTimeStamp());
-		vtkImageData *spVME = vtkImageData::SafeDownCast(m_SegmentationVolume->GetOutput()->GetVTKData());
-
-		m_SegmentationVolume->Update();
-
-		m_ProgressBar->SetValue(100);
-		m_ProgressBar->Show(false);
-		m_ProgressBar->Update();
-
-		UpdateSlice();
-	}
-
-	return true;
-}
-
 // GET SET ///////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
@@ -2718,7 +2314,6 @@ void albaOpSegmentation::SetThresholdByRange()
 // RESET /////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
 void albaOpSegmentation::ClearManualRedoList()
-//----------------------------------------------------------------------------
 {
   for (int i=0;i<m_RedoList.size();i++)
     vtkDEL(m_RedoList[i].m_Scalars);
@@ -2734,20 +2329,7 @@ void albaOpSegmentation::ClearManualUndoList()
     vtkDEL(m_UndoList[i].m_Scalars);
   m_UndoList.clear();
 }
-//----------------------------------------------------------------------------
-void albaOpSegmentation::ResetRefinementRedoList()
-{
-  for (int i=0;i<m_RefinementRedoList.size();i++)
-    vtkDEL(m_RefinementRedoList[i]);
-  m_RefinementRedoList.clear();
-}
-//----------------------------------------------------------------------------
-void albaOpSegmentation::ResetRefinementUndoList()
-{
-  for (int i=0;i<m_RefinementUndoList.size();i++)
-    vtkDEL(m_RefinementUndoList[i]);
-  m_RefinementUndoList.clear();
-}
+
 
 //----------------------------------------------------------------------------
 int albaOpSegmentation::OpSegmentationEventFilter(wxEvent& event)

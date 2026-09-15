@@ -83,7 +83,6 @@ This operation accept a volume as input and produces a surface as output of segm
 User can select:
 - manual segmentation
 - automatic segmentation
-- segmentation refinement
 or he can load a previous segmentation.
 */
 class ALBA_EXPORT albaOpSegmentation: public albaOp
@@ -129,7 +128,6 @@ public:
 		ID_MANUAL_AUTOFILL_ON_RELASE,
     ID_MANUAL_BUCKET_ACTION,
     ID_MANUAL_BUCKET_GLOBAL,
-    ID_MANUAL_REFINEMENT_REGIONS_SIZE,
     ID_MANUAL_CANCEL,
 		ID_MANUAL_COPY_FROM_LAST_SLICE,
     ID_MANUAL_UNDO, 
@@ -147,14 +145,7 @@ public:
     ID_REMOVE_RANGE,
     ID_RANGE_SELECTION,
     ID_INIT_MODALITY,
-    ID_REFINEMENT_ACTION,
-    ID_REFINEMENT_EVERY_SLICE,
-    ID_REFINEMENT_ITERATIVE,
-    ID_REFINEMENT_APPLY,
-    ID_REFINEMENT_UNDO,
-    ID_REFINEMENT_REDO,
     ID_ENABLE_TRILINEAR_INTERPOLATION,
-    ID_REFINEMENT_REMOVE_PENINSULA_REGIONS,
 		ID_TRIPLE_PASS,
     MINID,
   };
@@ -166,11 +157,6 @@ public:
     NUMBER_OF_PHASES,
   };
 		
-  enum REFINEMENT_SEGMENTATION_IDS
-  {
-    ID_REFINEMENT_ISLANDS_REMOVE = 0,
-    ID_REFINEMENT_HOLES_FILL,
-  };
 
   /** constructor. */
   albaOpSegmentation(const wxString &label = "Segmentation", int disableInit=false);
@@ -265,9 +251,6 @@ protected:
   /** Update slice widgets and labels. Set current slice position. */
   void UpdateSlice();
 
-  /** Used to remove islands or fill holes in a binary volume*/
-  bool Refinement();
-
   /** Receive events from Automatic segmentation gui */
   void OnInitEvent(albaEvent *e);
 
@@ -283,19 +266,13 @@ protected:
 	void CopyFromLastSlice();
 
 	void OnUndoRedo(bool undo);
-	
-  /** Receive events from Refinement segmentation gui */
-  void OnRefinementSegmentationEvent(albaEvent *e);
-  
+	  
   /** Receive events from Load segmentation gui */
   void OnLoadSegmentation();
 
   /** De initialize Initialize Manual step */
   void OnEditStepExit();
 
-  /** Initialize Refinement step */
-  void OnRefinementStep();
-	
   /** Perform the initializations when the user press next button */
   void OnEditStep();
 
@@ -387,9 +364,6 @@ protected:
 	int m_FillThesholdPerc;                     //<Brush size
 	
 	
-  int m_ManualRefinementRegionsSize;            //<Refinement region size
-  wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
-  wxTextCtrl *m_ManualRefinementRegionSizeText; //<Refinement size text - GUI
   std::vector<UndoRedoState> m_UndoList;  //< Undo stack
   std::vector<UndoRedoState> m_RedoList;  // Redo stack
   albaInteractorPERBrushFeedback *m_EditPER;   //<Dynamic event router
@@ -454,38 +428,13 @@ protected:
   albaInteractorPERScalarInformation *m_InitPER; //<Interactor for scalar value visualization on mouse move
   //////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////
-  //Segmentation Refinement stuff
-  /** Reset refinement undo list */
-  void ResetRefinementUndoList();
-
-	/** Reset refinement redo list */
-  void ResetRefinementRedoList();
-
-  /** Apply refinement algorithm implemented with ITK (not used) */
-  bool ApplyRefinementFilter(vtkImageData *inputImage, vtkImageData *outputImage);
-
-  /** Apply refinement algorithm implemented with vtk only */
-  bool ApplyRefinementFilter2(vtkImageData *inputImage, vtkImageData *outputImage);
-
   /** Update slice visualization on manual step */
   void OnUpdateSlice();
-
-  int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands
-  int m_RefinementRegionsSize;              //<Size for region recognition
-  int m_RefinementMajorityThreshold;        //<Used in itk algorithm (not yet exposed and used)
-  int m_RefinementEverySlice;               //<Determine if refinement performed on every slice
-  int m_RefinementIterative;                //<Iterative refinement (not yet used)
-
-  std::vector<vtkUnsignedCharArray *> m_RefinementUndoList; //<Refinement undo list
-  std::vector<vtkUnsignedCharArray *> m_RefinementRedoList; //<Refinement redo list
 
   int m_MajorityThreshold;                   //<Used in itk algorithm (not yet exposed and used)
 
   int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
-
-  int m_RemovePeninsulaRegions; //<Determine if refinement filter removes penisula regions or not
 
 	int m_SwitchTO;        //<Plane to switch to
  
