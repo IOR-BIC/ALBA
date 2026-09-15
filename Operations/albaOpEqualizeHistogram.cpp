@@ -283,7 +283,6 @@ void albaOpEqualizeHistogram::Algorithm()
   radius[0] = m_Radius[0];
   radius[1] = m_Radius[1];
   radius[2] = m_Radius[2];
-  radius.Fill(0);
   histeqFilter->SetRadius(radius);   
   histeqFilter->SetAlpha(m_Alpha);
   histeqFilter->SetBeta(m_Beta); 
