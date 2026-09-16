@@ -71,12 +71,6 @@
 #include "mmaVolumeMaterial.h"
 #include "albaGUIMDIChild.h"
 
-#include "itkImage.h"
-#include "itkImageToVTKImageFilter.h"
-#include "itkVTKImageToImageFilter.h"
-#include "itkVotingBinaryHoleFillingImageFilter.h"
-#include "itkVotingBinaryIterativeHoleFillingImageFilter.h"
-
 #include "vtkActor.h"
 #include "vtkActor2D.h"
 #include "vtkCamera.h"
@@ -126,9 +120,6 @@ enum EDIT_MODALITY_TYPE
 	CONNECTIVITY_3D,
 	SWITCH_PLANE,
 };
-
-typedef  itk::Image< float, 3> RealImage;
-typedef  itk::Image< unsigned char, 3> UCharImage;
 
 static int glo_CurrVolDims[3] = {0,0,0};          //<Used to load only volume with the specified dimensions
 static double glo_CurrVolSpacing[3] = {0,0,0};          //<Used to load only volume with the specified spacing
@@ -213,9 +204,6 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_InitModality = GLOBAL_INIT;
 
   //////////////////////////////////////////////////////////////////////////
-  //Refinement initializations
-  m_MajorityThreshold = 9;
-
 	m_BrushFillErase = 0;
 	m_AutofillOnRelease = true;
 

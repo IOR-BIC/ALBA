@@ -431,8 +431,6 @@ protected:
   /** Update slice visualization on manual step */
   void OnUpdateSlice();
 
-  int m_MajorityThreshold;                   //<Used in itk algorithm (not yet exposed and used)
-
   int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 

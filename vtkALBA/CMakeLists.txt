@@ -51,7 +51,6 @@ SET(vtkALBA_SRCS
   vtkALBAExtrudeToCircle.cxx  							vtkALBAExtrudeToCircle.h
   vtkALBAFillingHole.cxx  								vtkALBAFillingHole.h
   vtkALBAFixTopology.cxx  								vtkALBAFixTopology.h
-  vtkALBAImageUnsharpFilter.cxx  						vtkALBAImageUnsharpFilter.h
   vtkALBAMatrixVectorMath.h  							vtkALBAMatrixVectorMath.cxx
   vtkALBAPoissonSurfaceReconstruction.cxx  				vtkALBAPoissonSurfaceReconstruction.h
   vtkALBAPolyDataMirror.cxx  							vtkALBAPolyDataMirror.h

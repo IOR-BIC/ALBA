@@ -148,9 +148,7 @@ IF (ALBA_USE_VTK)
 	albaOpMakeVMETimevarying.cpp  albaOpMakeVMETimevarying.h
 	albaOpSegmentationRegionGrowingConnectedThreshold.cpp  albaOpSegmentationRegionGrowingConnectedThreshold.h
 	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
-	  
-	albaOpEqualizeHistogram.cpp  albaOpEqualizeHistogram.h
-	  
+	  	  
 	albaOpExporterAnalogWS.cpp		albaOpExporterAnalogWS.h
 	albaOpExporterGRFWS.cpp		albaOpExporterGRFWS.h
 	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h

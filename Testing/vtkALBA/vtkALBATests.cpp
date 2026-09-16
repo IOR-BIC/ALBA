@@ -52,7 +52,6 @@
 #include "vtkPackedImageTest.h"
 #include "vtkXRayVolumeMapperTest.h"
 #include "vtkALBADataArrayDescriptorTest.h"
-#include "vtkALBAErythrocyteSourceTest.h"
 #include "vtkALBAMeshCutterTest.h"
 #include "vtkALBAFillingHoleTest.h"
 #include "vtkALBAFixTopologyTest.h"
@@ -95,7 +94,6 @@
 #include "CSkeletonVertexM1Test.h"
 #include "CSkeletonVertexM2Test.h"
 #include "vtkALBACollisionDetectionFilterTest.h"
-#include "vtkALBAImageFillHolesRemoveIslandsTest.h"
 #include "vtkALBARayCastCleanerTest.h"
 #include "vtkALBALineStripSourceTest.h"
 #include "vtkALBATubeFilterTest.h"
@@ -179,7 +177,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkPackedImageTest::suite()); 
 	runner.addTest(vtkXRayVolumeMapperTest::suite());
 	runner.addTest(vtkALBADataArrayDescriptorTest::suite());
-	runner.addTest(vtkALBAErythrocyteSourceTest::suite());
 	runner.addTest(vtkALBAMeshCutterTest::suite());
 	runner.addTest(vtkALBAFillingHoleTest::suite());
 	runner.addTest(vtkALBAFixTopologyTest::suite());
@@ -222,7 +219,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(CSkeletonVertexM1Test::suite());
 	runner.addTest(CSkeletonVertexM2Test::suite());
 	runner.addTest(vtkALBACollisionDetectionFilterTest::suite());
-	runner.addTest(vtkALBAImageFillHolesRemoveIslandsTest::suite());
 	runner.addTest(vtkALBARayCastCleanerTest::suite());
 	runner.addTest(vtkALBALineStripSourceTest::suite());
 	runner.addTest(vtkALBATubeFilterTest::suite());

@@ -51,7 +51,6 @@
 #include "albaOpDecomposeTimeVarVMETest.h"
 #include "albaOpEditMetadataTest.h"
 #include "albaOpEditNormalsTest.h"
-#include "albaOpEqualizeHistogramTest.h"
 #include "albaOpExporterAbaqusFileTest.h"
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnsysCDBFileTest.h"
@@ -295,7 +294,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterDicomTest::suite());
 	runner.addTest(albaItkRawMotionImporterUtilityTest::suite());
 	runner.addTest(albaOpMakeVMETimevaryingTest::suite());
-	runner.addTest(albaOpEqualizeHistogramTest::suite());
 	runner.addTest(albaOpCreateWrappedMeterTest::suite());
 	runner.addTest(albaOpFlipNormalsTest::suite());
 	runner.addTest(albaOpSmoothSurfaceCellsTest::suite());

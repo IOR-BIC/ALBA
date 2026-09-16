@@ -188,7 +188,6 @@
 #include "albaOpExtractIsosurface.h"
 #include "albaOpExtractImageFromArbitraryView.h"
 #include "albaOpExtrusionHoles.h"
-#include "albaOpEqualizeHistogram.h"
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
 #include "albaOpFilterVolume.h"
@@ -2116,7 +2115,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpFillHoles(), _("Modify"));
 	Plug(new albaOpMeshDeformation(), _("Modify"));
 	Plug(new albaOpMakeVMETimevarying(), _("Modify"));
-	Plug(new albaOpEqualizeHistogram(), _("Modify"));
 	Plug(new albaOpSmoothSurfaceCells(), _("Modify"));
 	Plug(new albaOpTransformAtoB(), "Modify");
 

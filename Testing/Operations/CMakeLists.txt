@@ -98,7 +98,6 @@ SET(PROJECT_SRCS
 	albaOpImporterDicomTest.h albaOpImporterDicomTest.cpp
 	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
 	albaOpMakeVMETimevaryingTest.h albaOpMakeVMETimevaryingTest.cpp
-	albaOpEqualizeHistogramTest.h albaOpEqualizeHistogramTest.cpp
 	albaOpCreateWrappedMeterTest.h albaOpCreateWrappedMeterTest.cpp
 	albaOpFlipNormalsTest.h albaOpFlipNormalsTest.cpp
 	albaOpSmoothSurfaceCellsTest.h albaOpSmoothSurfaceCellsTest.cpp
