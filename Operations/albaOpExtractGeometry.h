@@ -49,8 +49,9 @@ public:
     ID_RESAMPLE_VOLUME_SPACING,
     ID_RESAMPLE_OK,
     ID_VOLUME_SMOOTHING,
-    ID_VOLUME_SMOOTHING_REPETITIONS,
     ID_EXTRACT_GEOMETRY,
+    ID_VOLUME_SMOOTHING_RADIUSFACTOR,
+    ID_VOLUME_SMOOTHING_STANDARDDEVIATION,
     ID_SURFACE_OPTIMIZATION,
     ID_CONNECTIVITY, 
     ID_CLEAN_SURFACE,
@@ -133,7 +134,8 @@ protected:
   int m_DecimateReductionRate;
   int m_DecimatePreserveTopology;
   int m_SmoothSurfaceIterationsNumber;
-  int m_VolumeSmoothingRepetitions;
+	double m_VolumeSmoothingStandardDeviation;
+	double m_VolumeSmoothingRadiusFactor;
   double m_SurfaceContourValue;
   
   albaVMEVolumeGray *m_VolumeInput;
