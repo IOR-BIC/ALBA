@@ -22,11 +22,13 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaDefines.h"
+
 #include "albaOpSegmentationRegionGrowingConnectedThreshold.h"
+#include "albaOpVolumeResample.h"
 #include "albaGUIBusyInfo.h"
 
 #include "albaGUI.h"
-#include "albaVME.h"
 #include "albaVME.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
@@ -35,23 +37,20 @@
 
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
-#include "vtkImageCast.h"
 #include "vtkPoints.h"
 #include "vtkSphereSource.h"
-#include "itkVTKImageToImageFilter.h"
-#include "itkImage.h"
-#include "itkImageToVTKImageFilter.h"
-#include "itkConnectedThresholdImageFilter.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkImageToStructuredPoints.h"
-#include "albaOpVolumeResample.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkALBAVolumeToClosedSmoothSurface.h"
+#include "vtkImageConnectivityFilter.h"
+#include "vtkPolyData.h"
 
+#include <queue>
+#include <vector>
 
-#define ITK_IMAGE_DIMENSION 3
+#define IMAGE_DIMENSION 3
 #define SPACING_PERCENTAGE_BOUNDS 0.1
-typedef  itk::Image< float, ITK_IMAGE_DIMENSION> RealImage;
 using namespace std;
 
 //----------------------------------------------------------------------------
@@ -70,17 +69,13 @@ albaOpSegmentationRegionGrowingConnectedThreshold::albaOpSegmentationRegionGrowi
   m_Upper = 0;
   m_Replace = 255;
 
-  m_ImageDim = ITK_IMAGE_DIMENSION;
+  m_ImageDim = IMAGE_DIMENSION;
 
   m_Seed = new int[m_ImageDim];
   for (int i=0;i<m_ImageDim;i++)
   {
     m_Seed[i]=0;
   }
-  m_NumIter = 5;// this is used in smoothing
-  m_TimeStep = 0.0125;// this is used in smoothing
-  m_Conductance = 1.0; // this is used in smoothing
-  m_UseSpacing = true;// this is used in smoothing
 
   m_Picker = NULL;
   m_OldBehavior = NULL;
@@ -178,13 +173,6 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::CreateGui()
   m_Gui->Label(_("Voxel value:"),&m_SeedScalarValue, true, false, false, 0.45);
   m_Gui->VectorN(ID_SEED,_("Seed"),m_Seed,m_ImageDim,MININT,MAXINT,"Seed point to start growing, in image coordinates");
 
-//   m_Gui->Label(_("Anisotropic curvature diffusion parameters"));
-//   m_Gui->Integer(ID_ITERATIONS,_("iterations"),&m_NumIter,0,MAXINT,_("number of iterations. Default [5]"));
-//   m_Gui->Float(ID_TIME_STEP,_("time step"),&m_TimeStep,0,MAXFLOAT,0,-1,_("time step. Default [0.0125]"));
-//   m_Gui->Float(ID_CONDUCTANCE,_("conductance"),&m_Conductance,MINFLOAT,MAXFLOAT,0,-1,_("conductance. Default [1.0]"));
-//   m_Gui->Bool(ID_USE_SPACING,_("use spacing"),&m_UseSpacing,1,_("do NOT use image spacing when computing filter"));
-
-//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
@@ -235,109 +223,113 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
   }
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()   
+void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor *wait=NULL;
-	albaGUIBusyInfo busy("Please wait", m_TestMode);
+  wxBusyCursor *wait = NULL;
+  albaGUIBusyInfo busy("Please wait", m_TestMode);
 
-	if (!m_TestMode)
+  if (!m_TestMode)
     wait = new wxBusyCursor;
 
-  //in test mode resample is not created before algorithm call
-  if (m_TestMode) CreateResample();
+  // In test mode resampling is performed here because it is not created before
+  // calling the algorithm.
+  if (m_TestMode)
+    CreateResample();
 
- typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
-  ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
+  vtkImageData *inputImage = vtkImageData::SafeDownCast(m_ResampleInput->GetOutput()->GetVTKData());
 
-  vtkImageData *im = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
-  
-  vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
-  vtkImageToFloat->SetOutputScalarTypeToFloat ();
-  vtkImageToFloat->SetInputData(im);
-  vtkImageToFloat->Modified();
-  vtkImageToFloat->Update();
-
-  typedef itk::VTKImageToImageFilter< RealImage > ConvertervtkTOitk;
-  ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-	vtkTOitk->SetInput( vtkImageToFloat->GetOutput() );
-	vtkTOitk->Update();
-
-  connectedThreshold->SetLower(m_Lower);
-  connectedThreshold->SetUpper(m_Upper);
-  connectedThreshold->SetReplaceValue(m_Replace);
-
-  RealImage::IndexType seed;
-  for (int i=0;i<m_ImageDim;i++)
+  if (inputImage == NULL)
   {
-    seed[i]=m_Seed[i];
-  }
-  connectedThreshold->AddSeed(seed);
-  //ConnectedThresholdParams->seed = seedGeo;
-
-  //ConnectedThresholdParams->numberOfIterations = m_NumIter;
-  //ConnectedThresholdParams->timeStep = m_TimeStep;
-  //ConnectedThresholdParams->conductance = m_Conductance;
-
-  if (m_UseSpacing == true)
-  {
-    //ConnectedThresholdParams->useImageSpacing = true;
-  } 
-  else
-  {
-    //ConnectedThresholdParams->useImageSpacing = false;
+    cppDEL(wait);
+    return;
   }
 
-  //connectedThreshold->SetParameters( static_cast<evoConnectedThresholdParameters::ConstPointer> (ConnectedThresholdParams) );
+  // Convert the seed from image coordinates to a physical point. The
+  // connectivity filter receives seed points in the physical coordinate system.
+  int extent[6];
+  inputImage->GetExtent(extent);
 
-  connectedThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
+  vtkIdType sizeX = extent[1] - extent[0] + 1;
+  vtkIdType sizeY = extent[3] - extent[2] + 1;
+  vtkIdType sizeZ = extent[5] - extent[4] + 1;
 
-  try
+  if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0)
   {
-    connectedThreshold->Update();
-  }
-  catch ( itk::ExceptionObject &err )
-  {
-    std::cout << "ExceptionObject caught !" << std::endl; 
-    std::cout << err << std::endl; 
+    cppDEL(wait);
+    return;
   }
 
-  typedef itk::ImageToVTKImageFilter< RealImage > ConverteritkTOvtk;
-  ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-  itkTOvtk->SetInput( connectedThreshold->GetOutput() );
-  itkTOvtk->Update();
+  vtkIdType seedX = extent[0] + m_Seed[0];
+  vtkIdType seedY = extent[2] + m_Seed[1];
+  vtkIdType seedZ = extent[4] + m_Seed[2];
+
+  if (seedX < extent[0] || seedX > extent[1] || seedY < extent[2] || seedY > extent[3] || seedZ < extent[4] || seedZ > extent[5])
+  {
+    cppDEL(wait);
+    return;
+  }
+
+  vtkIdType xySize = sizeX * sizeY;
+  vtkIdType seedId = (seedZ - extent[4]) * xySize + (seedY - extent[2]) * sizeX + (seedX - extent[0]);
+
+  double seedPoint[3];
+  inputImage->GetPoint(seedId, seedPoint);
+
+  // vtkImageConnectivityFilter uses 6-connectivity for three-dimensional
+  // images. Only voxels whose scalar value is inside the inclusive range are
+  // considered part of the connected region.
+  vtkALBASmartPointer<vtkPoints> seedPoints;
+  seedPoints->InsertNextPoint(seedPoint);
+
+  vtkALBASmartPointer<vtkPolyData> seedData;
+  seedData->SetPoints(seedPoints);
+
+  vtkALBASmartPointer<vtkImageConnectivityFilter> connectedFilter;
+  connectedFilter->SetInputData(inputImage);
+  connectedFilter->SetSeedData(seedData);
+  connectedFilter->SetScalarRange(m_Lower, m_Upper);
+  connectedFilter->SetExtractionModeToSeededRegions();
+  connectedFilter->SetLabelModeToConstantValue();
+  connectedFilter->SetLabelConstantValue(m_Replace);
+  connectedFilter->SetLabelScalarTypeToInt();
+  connectedFilter->Update();
+
+  // The filter output is a label image. Voxels outside the connected region
+  // contain the background value zero, while the selected region contains
+  // m_Replace.
+  vtkImageData *image = connectedFilter->GetOutput();
 
   albaNEW(m_VolumeOut);
   m_VolumeOut->SetName("Connected Threshold");
 
-  vtkImageData *image = ((vtkImageData*)itkTOvtk->GetOutput());
+  vtkALBASmartPointer<vtkImageToStructuredPoints> imageToStructuredPoints;
+  imageToStructuredPoints->SetInputData(image);
+  imageToStructuredPoints->Update();
 
-  vtkALBASmartPointer<vtkImageToStructuredPoints> image_to_sp;
-  image_to_sp->SetInputData(image);
-  image_to_sp->Update();
-  m_VolumeOut->SetData((vtkImageData*)image_to_sp->GetOutput(),m_ResampleInput->GetTimeStamp());
+  m_VolumeOut->SetData(imageToStructuredPoints->GetOutput(), m_ResampleInput->GetTimeStamp());
 
-  albaTagItem tag_Nature;
-  tag_Nature.SetName("VME_NATURE");
-  tag_Nature.SetValue("SYNTHETIC");
-
-  m_VolumeOut->GetTagArray()->SetTag(tag_Nature);
+  albaTagItem tagNature;
+  tagNature.SetName("VME_NATURE");
+  tagNature.SetValue("SYNTHETIC");
+  m_VolumeOut->GetTagArray()->SetTag(tagNature);
 
   m_VolumeOut->Update();
+  m_VolumeOut->GetTagArray()->SetTag(albaTagItem("VOLUME_TYPE", "BINARY"));
 
-  m_VolumeOut->GetTagArray()->SetTag(albaTagItem("VOLUME_TYPE","BINARY"));
-
-  
+  // Generate a surface halfway between the background value and the selected
+  // region value.
   vtkALBASmartPointer<vtkALBAVolumeToClosedSmoothSurface> volToSurface;
   volToSurface->SetInputData(m_VolumeOut->GetOutput()->GetVTKData());
-  volToSurface->SetContourValue(127.5);
+  volToSurface->SetContourValue(m_Replace / 2.0);
   volToSurface->Update();
-  vtkPolyData *surface=volToSurface->GetOutput();
+
+  vtkPolyData *surface = volToSurface->GetOutput();
 
   //Generating Surface VME
   albaNEW(m_SurfaceOut);
   m_SurfaceOut->SetName("Connected Threshold Surface");
-  m_SurfaceOut->SetData(surface,albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetTimeStamp());
+  m_SurfaceOut->SetData(surface, m_ResampleInput->GetTimeStamp());
   m_SurfaceOut->ReparentTo(m_ResampleInput);
   m_SurfaceOut->Modified();
   m_SurfaceOut->Update();
@@ -348,9 +340,9 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   //                          |-Binary volume
   m_VolumeOut->ReparentTo(m_SurfaceOut);
 
-  m_Output=m_SurfaceOut;
+  m_Output = m_SurfaceOut;
 
-	cppDEL(wait);
+  cppDEL(wait);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *alba_event)
