@@ -62,7 +62,6 @@
 #include "albaVME.h"
 #include "albaVMEImage.h"
 #include "albaVMEItemVTK.h"
-#include "albaVMESegmentationVolume.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolumeGray.h"
 

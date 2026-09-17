@@ -18,7 +18,6 @@
 #include "albaOp.h"
 #include "albaOpSegmentationHelper.h"
 #include "albaVME.h"
-#include "albaVMESegmentationVolume.h"
 
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
@@ -182,9 +181,6 @@ public:
 
   /** Makes the undo for the operation. */
   virtual void OpUndo();
-
-  /** Return true if node is of type albaVMESegmentationVolume. */
-  static bool SegmentationVolumeAccept(albaVME* node) {return(node != NULL  && node->IsALBAType(albaVMESegmentationVolume));};
 
 	/** Return true if node is of type albaVMEVolume. */
 	static bool SegmentedVolumeAccept(albaVME* node);

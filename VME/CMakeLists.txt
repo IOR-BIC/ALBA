@@ -10,37 +10,33 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
   albaDataVector.cpp  albaDataVector.h
   albaMatrixInterpolator.cpp  				albaMatrixInterpolator.h
-  albaMatrixVector.cpp  						albaMatrixVector.h
+  albaMatrixVector.cpp  					albaMatrixVector.h
   albaPipeFactoryVME.cpp  					albaPipeFactoryVME.h
-  albaScalarVector.cpp  						albaScalarVector.h
+  albaScalarVector.cpp  					albaScalarVector.h
   albaVMEExternalData.cpp  					albaVMEExternalData.h
   albaVMEFactory.cpp  						albaVMEFactory.h
   albaVMEGenericAbstract.cpp  				albaVMEGenericAbstract.h
-  albaVMEGroup.cpp  							albaVMEGroup.h
+  albaVMEGroup.cpp  						albaVMEGroup.h
   albaVMEItem.cpp  							albaVMEItem.h
   albaVMEInfoText.cpp  						albaVMEInfoText.h
   albaMSFImporter.cpp  						albaMSFImporter.h
   albaVMEOutputScalar.cpp  					albaVMEOutputScalar.h
   albaVMEScalar.cpp  						albaVMEScalar.h
   ###############
-  albaVMELabeledVolume.cpp  					albaVMELabeledVolume.h
+  albaVMELabeledVolume.cpp  				albaVMELabeledVolume.h
 
- #albaPolylineGraph.cpp  					albaPolylineGraph.h
   albaVMEPolylineGraph.cpp  					albaVMEPolylineGraph.h
   albaVMEPolylineEditor.cpp  				albaVMEPolylineEditor.h
   albaVMEOutputPolylineEditor.cpp  			albaVMEOutputPolylineEditor.h
   albaVMEMaps.cpp  							albaVMEMaps.h  
   albaVMEWrappedMeter.cpp  					albaVMEWrappedMeter.h
   albaVMEOutputWrappedMeter.cpp  			albaVMEOutputWrappedMeter.h
-  albaVMESurfaceEditor.cpp  					albaVMESurfaceEditor.h
+  albaVMESurfaceEditor.cpp  				albaVMESurfaceEditor.h
   albaVMEOutputSurfaceEditor.cpp  			albaVMEOutputSurfaceEditor.h  
   albaVMEComputeWrapping.cpp  				albaVMEComputeWrapping.h
-  albaVMEOutputComputeWrapping.cpp  			albaVMEOutputComputeWrapping.h   
-  albaVMESegmentationVolume.cpp  			albaVMESegmentationVolume.h
-  albaAttributeSegmentationVolume.cpp  		albaAttributeSegmentationVolume.h
-	albaDataPipeCustomSegmentationVolume.cpp  	albaDataPipeCustomSegmentationVolume.h
-	albaVMEPointCloud.cpp 					albaVMEPointCloud.h
-	albaVMEProsthesis.cpp albaVMEProsthesis.h
+  albaVMEOutputComputeWrapping.cpp  		albaVMEOutputComputeWrapping.h   
+  albaVMEPointCloud.cpp 					albaVMEPointCloud.h
+  albaVMEProsthesis.cpp                 	albaVMEProsthesis.h
 )
 
 IF (ALBA_USE_CRYPTO)

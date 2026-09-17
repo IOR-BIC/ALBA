@@ -72,8 +72,6 @@
 
 #include "albaVMESurfaceEditor.h"
 #include "albaVMELabeledVolume.h"
-#include "albaVMESegmentationVolume.h"
-#include "albaAttributeSegmentationVolume.h"
 
 #ifdef ALBA_USE_ITK
 #include "albaVMERawMotionData.h"
@@ -161,17 +159,12 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMESlicer,"Slicer");
   albaPlugVMEMacro(albaVMEVector,"Vector");
 
-
-  //albaPlugObjectMacro(mmaObject,"Object attributes");
-  albaPlugObjectMacro(albaAttributeSegmentationVolume,"Segmentation Volume attributes");
-
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
   albaPlugVMEMacro(albaVMEPolylineGraph,"Polyline Graph");
   albaPlugVMEMacro(albaVMEPolylineEditor,"Polyline Editor");
   albaPlugVMEMacro(albaVMESurfaceEditor,"Surface Editor");
   albaPlugVMEMacro(albaVMELabeledVolume,"Labeled Volume");
   albaPlugVMEMacro(albaVMEMaps, "VME representing density-distace surface scalars");
-  albaPlugVMEMacro(albaVMESegmentationVolume, "Segmented Volume");
 
 #ifdef ALBA_USE_ITK
   albaPlugVMEMacro(albaVMERawMotionData,"Raw Motion Data");

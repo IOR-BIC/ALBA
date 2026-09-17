@@ -22,9 +22,7 @@
 #include "albaVMETests.h"
 
 #include "CustomDataPipeTest.h"
-#include "albaAttributeSegmentationVolumeTest.h"
 #include "albaCryptTest.h"
-#include "albaDataPipeCustomSegmentationVolumeTest.h"
 #include "albaDataVectorTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaMSFImporterTest.h"
@@ -80,7 +78,6 @@
 #include "albaVMERefSysTest.h"
 #include "albaVMEScalarMatrixTest.h"
 #include "albaVMEScalarTest.h"
-#include "albaVMESegmentationVolumeTest.h"
 #include "albaVMESlicerTest.h"
 #include "albaVMESurfaceEditorTest.h"
 #include "albaVMESurfaceParametricTest.h"
@@ -193,13 +190,10 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEMapsTest::suite());
 	runner.addTest(albaVMEOutputWrappedMeterTest::suite());
 	runner.addTest(albaVMEPolylineGraphTest::suite());
-	runner.addTest(albaVMESegmentationVolumeTest::suite());
-	runner.addTest(albaAttributeSegmentationVolumeTest::suite());
 	runner.addTest(albaVMEOutputComputeWrappingTest::suite());
 	runner.addTest(albaPolylineGraphVertexTest::suite());
 	runner.addTest(albaPolylineGraphEdgeTest::suite());
 	runner.addTest(albaPolylineGraphBranchTest::suite());
-	runner.addTest(albaDataPipeCustomSegmentationVolumeTest::suite());
 	runner.addTest(VMEGenericPoseTest::suite());
 	runner.addTest(VMEGenericBoundsTest::suite());
 	/**/
