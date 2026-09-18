@@ -40,12 +40,8 @@
 #include "albaVMEProber.h"
 #include "albaVMERefSys.h"
 #include "albaVMERoot.h"
-
-#ifdef ALBA_USE_ITK
-  #include "albaVMEScalarMatrix.h"
-  #include "albaVMEItemScalarMatrix.h"
-#endif
-
+#include "albaVMEScalarMatrix.h"
+#include "albaVMEItemScalarMatrix.h"
 #include "albaVMEScalar.h"
 #include "albaVMESlicer.h"
 #include "albaVMESurface.h"
@@ -63,21 +59,14 @@
 #include "mmaMeter.h"
 #include "albaTagArray.h"
 #include "albaVMEItemVTK.h"
-
-
 #include "albaVMEWrappedMeter.h"
 #include "albaVMEPolylineGraph.h"
 #include "albaVMEPolylineEditor.h"
 #include "albaVMEMaps.h"
-
 #include "albaVMESurfaceEditor.h"
 #include "albaVMELabeledVolume.h"
-
-#ifdef ALBA_USE_ITK
 #include "albaVMERawMotionData.h"
 #include "albaVMEAnalog.h"
-#endif
-
 
 #include "albaIndent.h"
 #include <string>
@@ -122,15 +111,12 @@ albaVMEFactory::albaVMEFactory()
   //
   albaPlugObjectMacro(albaTagArray,"a basic kind of attribute used to store key-value pairs");
   albaPlugObjectMacro(albaVMEItemVTK,"a VME item storing VTK datasets");
-#ifdef ALBA_USE_ITK
   albaPlugObjectMacro(albaVMEItemScalarMatrix,"a VME item storing matrix scalar data through vnl matrix");
-#endif
   albaPlugObjectMacro(mmaMeter,"Meter attributes");
   albaPlugObjectMacro(mmaMaterial,"Material attributes");
   albaPlugObjectMacro(mmaVolumeMaterial,"Volume material attributes");
   albaPlugObjectMacro(mmaApplicationLayout,"Applycation layout attributes");
   albaPlugObjectMacro(albaAttributeTraceability,"Trial event attributes");
-  
   albaPlugVMEMacro(albaVMERoot,"Root");
   albaPlugVMEMacro(albaVMEExternalData,"External data.");
   albaPlugVMEMacro(albaVMEGroup,"Group");
@@ -149,28 +135,20 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMELandmark,"Landmark");
   albaPlugVMEMacro(albaVMELandmarkCloud,"Landmark Cloud");
   albaPlugVMEMacro(albaVMEProber,"Prober");
-  //albaPlugVMEMacro(albaVMEGizmo,"VME representing a tool");
   albaPlugVMEMacro(albaVMEPointSet,"Point set");
   albaPlugVMEMacro(albaVMERefSys,"Reference System");
   albaPlugVMEMacro(albaVMEScalar,"Scalar");
-#ifdef ALBA_USE_ITK
   albaPlugVMEMacro(albaVMEScalarMatrix,"Scalar Matrix");
-#endif
   albaPlugVMEMacro(albaVMESlicer,"Slicer");
   albaPlugVMEMacro(albaVMEVector,"Vector");
-
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
   albaPlugVMEMacro(albaVMEPolylineGraph,"Polyline Graph");
   albaPlugVMEMacro(albaVMEPolylineEditor,"Polyline Editor");
   albaPlugVMEMacro(albaVMESurfaceEditor,"Surface Editor");
   albaPlugVMEMacro(albaVMELabeledVolume,"Labeled Volume");
   albaPlugVMEMacro(albaVMEMaps, "VME representing density-distace surface scalars");
-
-#ifdef ALBA_USE_ITK
   albaPlugVMEMacro(albaVMERawMotionData,"Raw Motion Data");
   albaPlugVMEMacro(albaVMEAnalog,"EMG scalar data");
-#endif
-
 }
 
 //------------------------------------------------------------------------------
