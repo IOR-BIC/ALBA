@@ -1,0 +1,4 @@
+92a93,95
+>   /** Set the orientation matrix of the image */
+>   virtual void SetOrientationMatrix(const double matrix[3][3]);
+> 

@@ -1,0 +1,7 @@
+348a349,354
+> //----------------------------------------------------------------------------
+> void vtkMetaImageReader::GetOrientationMatrix(double matrix[3][3]) 
+> {
+>   this->MetaImagePtr->Orientation((double *)matrix);
+> }
+> 
