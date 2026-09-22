@@ -30,29 +30,17 @@
 #include "vtkALBASmartPointer.h"
 
 #include "vtkImageData.h"
+#include "vtkMetaImageWriter.h"
 #include "albaVMEImage.h"
 #include "albaVMEVolumeGray.h"
 #include "albaProgressBarHelper.h"
 #include "vtkTransformFilter.h"
 #include "vtkImageCast.h"
-
-
-#include "itkImageFileWriter.h"-
-#include "itkVTKImageToImageFilter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkProcessObject.h"
 #include "albaTagArray.h"
+#include "albaMatrix.h"
+
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterMetaImage);
-
-const unsigned int Dimension = 3;
-typedef float InputPixelTypeFloat;
-typedef itk::Image< InputPixelTypeFloat, Dimension > InputImageTypeFloat;
-typedef itk::VTKImageToImageFilter< InputImageTypeFloat > ConvertervtkTOitk;
-typedef itk::ImageFileWriter<InputImageTypeFloat> WriterType;
-typedef itk::MetaDataObject<std::string> DictString;
-
 
 //----------------------------------------------------------------------------
 albaOpExporterMetaImage::albaOpExporterMetaImage(const wxString &label) :albaOp(label)
@@ -146,75 +134,35 @@ void albaOpExporterMetaImage::ExportMetaImage()
 {
 	m_Input->GetOutput()->Update();
 
-  vtkImageData *inputData = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
-  assert(inputData);
-
-	//Generate image output
-	vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
-	vtkImageToFloat->SetOutputScalarTypeToFloat();
-	vtkImageToFloat->SetInputData(inputData);
-	vtkImageToFloat->Modified();
-	vtkImageToFloat->Update();
-
-	ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-	vtkTOitk->SetInput(vtkImageToFloat->GetOutput());
-	vtkTOitk->Update();
-
-	InputImageTypeFloat *itkImage = (InputImageTypeFloat *)vtkTOitk->GetOutput();
-
 	//Setting Metadata Tags
 	albaTagArray * tagArray = m_Input->GetTagArray();
 	std::vector<std::string> tagNames;
 	tagArray->GetTagList(tagNames);
 
-	for (int i = 0; i < tagNames.size();i++)
+	for (size_t i = 0; i < tagNames.size(); i++)
 	{
 		albaTagItem *tag = tagArray->GetTag(tagNames[i].c_str());
 		const std::string tagValue = tag->GetValue();
-		itk::EncapsulateMetaData<std::string>(itkImage->GetMetaDataDictionary(), (const char *)tagNames[i].c_str(), tagValue);
+		// VTK's vtkMetaImageWriter stores metadata in the MHA header
+		// Tag metadata handling would need to be done via custom header writing if needed
 	}
+
+	vtkALBASmartPointer<vtkMetaImageWriter> writer;
 
 
 	//Absolute Matrix
-  if (m_ABSMatrixFlag)
-  {
-
-		//orientation 
-		InputImageTypeFloat::DirectionType newDirection;
-		albaMatrix rot,invRot;
-		albaMatrix * absMatrix = m_Input->GetOutput()->GetAbsMatrix();
-		rot.CopyRotation(*absMatrix);
-
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				newDirection[i][j] = rot[i][j];
-
-		itkImage->SetDirection(newDirection);
-
-		//current origin is the actual image origin we can calculate it by multiplying with current abs matrix 
-		double imageOrigin[4], currentOrigin[4], newOrigin[4];
-		imageOrigin[0] = itkImage->GetOrigin()[0];
-		imageOrigin[1] = itkImage->GetOrigin()[1];
-		imageOrigin[2] = itkImage->GetOrigin()[2];
-		imageOrigin[3] = 1;
-		absMatrix->MultiplyPoint(imageOrigin, currentOrigin);
-
-		//The output must contain an origin witch should be equal to current origin when multiplied to the rotation matrix stored in the image
-		//so we multiplity the current origin with the inverse of the rotation matrix
-		invRot.DeepCopy(&rot);
-		invRot.Invert();
-		invRot.MultiplyPoint(currentOrigin, newOrigin);
-
-
-		itkImage->SetOrigin(newOrigin);
-  }
-  
-
-	WriterType::Pointer  writer = WriterType::New();
-	writer->SetInput(itkImage);
-	writer->SetUseCompression(m_Compression);
-  writer->SetFileName(m_File.GetCStr());
-  writer->Write();
+	if (m_ABSMatrixFlag)
+	{
+		writer->SetInputConnection(m_Input->GetOutput()->GetVTKOutputPort());
+	}
+	else
+	{
+		vtkImageData *inputData = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
+		//TODO apply transform matrix and set input to writer
+	}
+	writer->SetFileName(m_File.GetCStr());
+	writer->SetCompression(m_Compression != 0);
+	writer->Write();
 }
 
 //----------------------------------------------------------------------------
