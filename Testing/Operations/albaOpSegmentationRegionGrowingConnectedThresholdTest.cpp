@@ -44,25 +44,21 @@
 
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestFixture()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestStaticAllocation()
-//----------------------------------------------------------------------------
 {
   albaOpSegmentationRegionGrowingConnectedThreshold op;
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
 {
   albaOpSegmentationRegionGrowingConnectedThreshold *op = new albaOpSegmentationRegionGrowingConnectedThreshold();
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAccept()
-//----------------------------------------------------------------------------
 {
 
   albaOpSegmentationRegionGrowingConnectedThreshold *op = new albaOpSegmentationRegionGrowingConnectedThreshold();
@@ -70,27 +66,26 @@ void albaOpSegmentationRegionGrowingConnectedThresholdTest::TestAccept()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentationRegionGrowingConnectedThresholdTest::CompareImageData(vtkImageData *imITK,vtkImageData *imOP)
-//----------------------------------------------------------------------------
+void albaOpSegmentationRegionGrowingConnectedThresholdTest::CompareImageData(vtkImageData *imFile,vtkImageData *imOP)
 {
-  CPPUNIT_ASSERT( imITK->GetNumberOfPoints() == imOP->GetNumberOfPoints() );
-  CPPUNIT_ASSERT( imITK->GetNumberOfCells() == imOP->GetNumberOfCells() );
+  CPPUNIT_ASSERT( imFile->GetNumberOfPoints() == imOP->GetNumberOfPoints() );
+  CPPUNIT_ASSERT( imFile->GetNumberOfCells() == imOP->GetNumberOfCells() );
 
 	bool sameTuple=true;
 
-  if ( imITK->GetPointData()->GetScalars() != NULL && imOP->GetPointData()->GetScalars() != NULL )
+  if ( imFile->GetPointData()->GetScalars() != NULL && imOP->GetPointData()->GetScalars() != NULL )
   {
-    for (int i=0;i<imITK->GetNumberOfPoints();i++)
+    for (int i=0;i<imFile->GetNumberOfPoints();i++)
     {
-      if( imITK->GetPointData()->GetScalars()->GetTuple1(i) != imOP->GetPointData()->GetScalars()->GetTuple1(i) )
+      if( imFile->GetPointData()->GetScalars()->GetTuple1(i) != imOP->GetPointData()->GetScalars()->GetTuple1(i) )
 				sameTuple=false;
     }
   }
-  else if ( imITK->GetCellData()->GetScalars() != NULL && imOP->GetCellData()->GetScalars() != NULL )
+  else if ( imFile->GetCellData()->GetScalars() != NULL && imOP->GetCellData()->GetScalars() != NULL )
   {
-    for (int i=0;i<imITK->GetNumberOfCells();i++)
+    for (int i=0;i<imFile->GetNumberOfCells();i++)
     {
-      if (imITK->GetCellData()->GetScalars()->GetTuple1(i) != imOP->GetCellData()->GetScalars()->GetTuple1(i) )
+      if (imFile->GetCellData()->GetScalars()->GetTuple1(i) != imOP->GetCellData()->GetScalars()->GetTuple1(i) )
 				sameTuple=false;
     }
   }
