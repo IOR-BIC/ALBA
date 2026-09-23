@@ -26,6 +26,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaVME;
+class vtkMetaImageWriter;
 
 //----------------------------------------------------------------------------
 // albaOpExporterMetaImage :
@@ -34,7 +35,7 @@ class albaVME;
 class ALBA_EXPORT albaOpExporterMetaImage: public albaOp
 {
 public:
-  albaOpExporterMetaImage(const wxString &label = "VTKExporter");
+  albaOpExporterMetaImage(const wxString &label = "Exporter ITK MetaImage");
  ~albaOpExporterMetaImage(); 
   
   albaTypeMacro(albaOpExporterMetaImage, albaOp);

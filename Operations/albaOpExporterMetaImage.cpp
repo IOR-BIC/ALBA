@@ -38,6 +38,7 @@
 #include "vtkImageCast.h"
 #include "albaTagArray.h"
 #include "albaMatrix.h"
+#include "vtkmetaio/metaImage.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterMetaImage);
@@ -62,6 +63,8 @@ bool albaOpExporterMetaImage::InternalAccept(albaVME *node)
 { 
   return ((node->IsALBAType(albaVMEVolumeGray) && vtkImageData::SafeDownCast(node->GetOutput()->GetVTKData())) || node->IsALBAType(albaVMEImage));
 }
+
+
 albaOp* albaOpExporterMetaImage::Copy()   
 {
   albaOpExporterMetaImage *cp = new albaOpExporterMetaImage(m_Label);
@@ -157,9 +160,32 @@ void albaOpExporterMetaImage::ExportMetaImage()
 	}
 	else
 	{
-		vtkImageData *inputData = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
-		//TODO apply transform matrix and set input to writer
+		vtkALBASmartPointer<vtkImageData> inputData;
+		inputData->DeepCopy(vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData()));
+
+		albaMatrix *absMatrix = m_Input->GetOutput()->GetAbsMatrix();
+		double origin[3];
+
+		inputData->GetOrigin(origin);
+		absMatrix->MultiplyPoint(origin, origin);
+		inputData->SetOrigin(origin);
+
+		albaMatrix rotationMatrix;
+		albaMatrix::CopyRotation(*absMatrix, rotationMatrix);
+
+		double orientation[3][3];
+		for(int i = 0; i < 3; i++)
+		{
+			for(int j = 0; j < 3; j++)
+			{
+				orientation[i][j] = rotationMatrix.GetElement(i, j);
+			}
+		}
+
+		writer->SetOrientationMatrix(orientation);
+		writer->SetInputData(inputData);
 	}
+
 	writer->SetFileName(m_File.GetCStr());
 	writer->SetCompression(m_Compression != 0);
 	writer->Write();
