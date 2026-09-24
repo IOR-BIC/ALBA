@@ -1,7 +1,18 @@
-69a70,75
+69a70,86
 > //----------------------------------------------------------------------------
 > void vtkMetaImageWriter::SetOrientationMatrix(const double matrix[3][3]) 
 > {
->   this->MetaImagePtr->Orientation((const double *)matrix);
+>   int nDims = this->MetaImagePtr->NDims();
+>   if (nDims > 3) 
+>   {
+>   	nDims = 3;
+>   }
+>   for (int i = 0; i < nDims; i++)
+>   {
+>     for (int j = 0; j < nDims; j++)
+>     {
+>       this->MetaImagePtr->Orientation(i, j, matrix[i][j]);
+>     }
+>   }
 > }
 > 
