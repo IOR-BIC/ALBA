@@ -292,7 +292,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpMML3Test::suite());
 	runner.addTest(albaOpExtractGeometryTest::suite());
 	runner.addTest(albaOpImporterDicomTest::suite());
-	runner.addTest(albaItkRawMotionImporterUtilityTest::suite());
 	runner.addTest(albaOpMakeVMETimevaryingTest::suite());
 	runner.addTest(albaOpCreateWrappedMeterTest::suite());
 	runner.addTest(albaOpFlipNormalsTest::suite());

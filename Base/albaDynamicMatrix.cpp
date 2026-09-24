@@ -121,13 +121,13 @@ void albaDynamicMatrix::AddRow(const std::vector<double> &values)
 }
 
 //----------------------------------------------------------------------------
-int albaDynamicMatrix::GetNumberOfRows() const
+int albaDynamicMatrix::GetRowsNum() const
 {
   return m_Rows;
 }
 
 //----------------------------------------------------------------------------
-int albaDynamicMatrix::GetNumberOfColumns() const
+int albaDynamicMatrix::GetColNum() const
 {
   return m_Columns;
 }
@@ -208,11 +208,11 @@ void albaDynamicMatrix::AddRow(double *values)
 }
 
 //----------------------------------------------------------------------------
-int albaDynamicMatrix::ReadFromFile(char *filename)
+int albaDynamicMatrix::ReadFromFile(albaString filename)
 {
   Resize(0, 0);
 
-  if (ReadInit(albaString(filename), true, false, "", NULL) == ALBA_ERROR)
+  if (ReadInit(filename, true, false, "", NULL) == ALBA_ERROR)
   {
     albaLogMessage("Cannot Open: %s", filename);
     ReadFinalize();

@@ -81,12 +81,12 @@ public:
   /**
     Returns the number of rows.
   */
-  int GetNumberOfRows() const;
+  int GetRowsNum() const;
 
   /**
     Returns the number of columns.
   */
-  int GetNumberOfColumns() const;
+  int GetColNum() const;
 
   /**
     Returns true if the matrix has no usable elements.
@@ -121,7 +121,7 @@ public:
     Reads matrix data from a text file.
     Returns ALBA_OK on success, ALBA_ERROR on failure.
   */
-	int ReadFromFile(char *filename);
+	int ReadFromFile(albaString filename);
 
 private:
   inline int GetIndex(int row, int column)  { return row * m_Columns + column; }
