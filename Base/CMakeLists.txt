@@ -47,6 +47,7 @@ vtkALBASmartPointer.h
 vtkALBAToLinearTransform.h
 albaZipUtility.cpp		albaZipUtility.h
 albaQuaternion.cpp	    albaQuaternion.h
+albaDynamicMatrix.cpp	albaDynamicMatrix.h
 )
 
 IF (ALBA_USE_VTK)
