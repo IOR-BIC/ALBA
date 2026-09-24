@@ -198,7 +198,6 @@ ENDIF(ALBA_USE_BTK)
 
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
-    albaASCIIImporterUtility.cpp			albaASCIIImporterUtility.h
     albaOpImporterASCII.cpp				albaOpImporterASCII.h
     albaVMEDataSetAttributesImporter.cpp	albaVMEDataSetAttributesImporter.h
     albaVMEMeshAnsysTextImporter.cpp		albaVMEMeshAnsysTextImporter.h

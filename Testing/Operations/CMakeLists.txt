@@ -46,7 +46,6 @@ SET(PROJECT_SRCS
 	albaOpValidateTreeTest.h albaOpValidateTreeTest.cpp
 	albaOpGarbageCollectMSFDirTest.h albaOpGarbageCollectMSFDirTest.cpp
 	albaOpScalarToSurfaceTest.h albaOpScalarToSurfaceTest.cpp
-	albaASCIIImporterUtilityTest.h albaASCIIImporterUtilityTest.cpp
 	albaOpEditMetadataTest.h albaOpEditMetadataTest.cpp
 	albaOpFilterVolumeTest.h albaOpFilterVolumeTest.cpp
 	albaOpTransformOldTest.h albaOpTransformOldTest.cpp

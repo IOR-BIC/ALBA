@@ -21,7 +21,6 @@
 
 #include "albaOperationsTests.h"
 
-#include "albaASCIIImporterUtilityTest.h"
 #include "albaDicomClassesTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaGeometryEditorPolylineGraphTest.h"
@@ -243,7 +242,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpValidateTreeTest::suite());
 	runner.addTest(albaOpGarbageCollectMSFDirTest::suite());
 	runner.addTest(albaOpScalarToSurfaceTest::suite());
-	runner.addTest(albaASCIIImporterUtilityTest::suite());
 	runner.addTest(albaOpEditMetadataTest::suite());
 	runner.addTest(albaOpFilterVolumeTest::suite());
 	runner.addTest(albaOpTransformOldTest::suite());

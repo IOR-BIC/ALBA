@@ -263,3 +263,50 @@ int albaDynamicMatrix::ReadFromFile(albaString filename)
 
 	return ALBA_OK;
 }
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::ExtractRow(int rowNum, std::vector<double> &row)
+{
+	if (rowNum < 0 || rowNum >= m_Rows)
+		throw std::out_of_range("albaDynamicMatrix: row index out of range");
+
+	row.assign(m_Data.begin() + rowNum * m_Columns, m_Data.begin() + (rowNum + 1) * m_Columns);
+}
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::ExtractRow(int rowNum, double *row)
+{
+	if (rowNum < 0 || rowNum >= m_Rows)
+		throw std::out_of_range("albaDynamicMatrix: row index out of range");
+
+	if (row == NULL)
+		throw std::invalid_argument("albaDynamicMatrix: invalid row data");
+
+	for (int column = 0; column < m_Columns; ++column)
+		row[column] = m_Data[rowNum * m_Columns + column];
+}
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::ExtractColumn(int colNum, std::vector<double> &col)
+{
+	if (colNum < 0 || colNum >= m_Columns)
+		throw std::out_of_range("albaDynamicMatrix: column index out of range");
+
+	col.resize(m_Rows);
+
+	for (int row = 0; row < m_Rows; ++row)
+		col[row] = m_Data[row * m_Columns + colNum];
+}
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::ExtractColumn(int colNum, double *col)
+{
+	if (colNum < 0 || colNum >= m_Columns)
+		throw std::out_of_range("albaDynamicMatrix: column index out of range");
+
+	if (col == NULL)
+		throw std::invalid_argument("albaDynamicMatrix: invalid column data");
+
+	for (int row = 0; row < m_Rows; ++row)
+		col[row] = m_Data[row * m_Columns + colNum];
+}

@@ -38,90 +38,74 @@ public:
   albaDynamicMatrix(const albaDynamicMatrix &matrix);
   albaDynamicMatrix &operator=(const albaDynamicMatrix &matrix);
 
-  /**
-    Resizes the matrix and preserves the existing values when possible.
-    New elements are initialized to zero.
-  */
+  /** Resizes the matrix and preserves the existing values when possible.
+    New elements are initialized to zero. */
   void Resize(int rows, int columns);
 
-  /**
-    Resizes the matrix and initializes all elements with value.
-  */
+  /** Resizes the matrix and initializes all elements with value. */
   void Resize(int rows, int columns, double value);
 
-  /**
-    Sets all matrix elements to value.
-  */
+  /** Sets all matrix elements to value. */
   void Fill(double value);
 
-  /**
-    Appends a row initialized with zeroes.
-  */
+  /** Appends a row initialized with zeroes. */
   void AddRow();
 
-  /**
-    Appends a row initialized with value.
-  */
+  /** Appends a row initialized with value. */
   void AddRow(double value);
 
-  /**
-    Appends a row containing the specified values.
+  /** Appends a row containing the specified values.
     If the matrix has no columns, the number of columns is set
-    to values.size().
-  */
+    to values.size(). */
   void AddRow(const std::vector<double> &values);
   
-  /**
-    Appends a row containing the specified values.
+  /** Appends a row containing the specified values.
     If the matrix has no columns, the number of columns is set
-    to the number of elements in values.
-  */
+    to the number of elements in values. */
   void AddRow(double *values);
 
-  /**
-    Returns the number of rows.
-  */
+  /** Returns the number of rows.*/
   int GetRowsNum() const;
 
-  /**
-    Returns the number of columns.
-  */
+  /** Returns the number of columns. */
   int GetColNum() const;
 
-  /**
-    Returns true if the matrix has no usable elements.
-  */
+  /** Returns true if the matrix has no usable elements. */
   bool IsEmpty() const;
 
-  /**
-    Returns a reference to the specified element.
-    Throws std::out_of_range if the index is invalid.
-  */
+  /**Returns a reference to the specified element.
+    Throws std::out_of_range if the index is invalid. */
   double &At(int row, int column);
   const double &At(int row, int column) const;
 
-  /**
-    Provides access to the specified element.
-    Throws std::out_of_range if the index is invalid.
-  */
+  /** Provides access to the specified element.
+    Throws std::out_of_range if the index is invalid. */
   double &operator()(int row, int column);
   const double &operator()(int row, int column) const;
 
-  /**
-    Returns a pointer to the contiguous matrix data.
-    Returns NULL if the matrix has no stored elements.
-  */
+  /** Returns a pointer to the contiguous matrix data.
+    Returns NULL if the matrix has no stored elements. */
   double *GetData();
   const double *GetData() const;
 
   bool operator==(const albaDynamicMatrix &matrix) const;
   bool operator!=(const albaDynamicMatrix &matrix) const;
 
-  /**
-    Reads matrix data from a text file.
-    Returns ALBA_OK on success, ALBA_ERROR on failure.
-  */
+  /** Reads matrix data from a text file.
+    Returns ALBA_OK on success, ALBA_ERROR on failure. */
 	int ReadFromFile(albaString filename);
+
+  /** Fills the given vector with the values in specified row.*/
+  void ExtractRow(int rowNum, std::vector<double> &row);
+
+	/** Fills the given array with the values in specified row.*/
+  void ExtractRow(int rowNum, double *row);
+
+	/** Fills the given array with the values in specified column.*/ 
+  void ExtractColumn(int colNum, std::vector<double> &col);
+
+	/** Fills the given array with the values in specified column.*/ 
+  void ExtractColumn(int colNum, double *col);
 
 private:
   inline int GetIndex(int row, int column)  { return row * m_Columns + column; }
