@@ -31,7 +31,6 @@
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 #include "vtkVectorText.h"
-#include "vcl_cassert.h"
 #include "vtkPolyDataReader.h"
 #include "vtkDirectory.h"
 #include "vtkTransformPolydataFilter.h"

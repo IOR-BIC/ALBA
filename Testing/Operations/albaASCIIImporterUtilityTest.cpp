@@ -27,8 +27,6 @@
 #include "albaASCIIImporterUtilityTest.h"
 #include "albaASCIIImporterUtility.h"
 #include "albaString.h"
-#include <vcl_fstream.h>
-#include <vnl/vnl_vector.h>
 
 #include <iostream>
 

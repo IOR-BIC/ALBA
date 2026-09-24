@@ -30,7 +30,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkMath.h"
 
-//#include "vcl_fstream.h"
 #include <iostream>
 
 #include "albaICPUtility.h"
