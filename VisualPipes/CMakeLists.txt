@@ -49,14 +49,8 @@ SET(PROJECT_SRCS
   albaPipeVolumeArbOrthoSlice.cpp			albaPipeVolumeArbOrthoSlice.h
   albaPipePointCloud.cpp					albaPipePointCloud.h
   albaPipePointCloudSlice.cpp					albaPipePointCloudSlice.h
-)
-
-
-IF (ALBA_USE_ITK)
-SET(PROJECT_SRCS  ${PROJECT_SRCS}
   albaPipeScalarMatrix.cpp  					albaPipeScalarMatrix.h
   )
-ENDIF (ALBA_USE_ITK)
 
 IF (ALBA_USE_VTK)
   SET(PROJECT_SRCS
@@ -92,7 +86,3 @@ ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
 IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
 ENDIF (ALBA_USE_VTK)
-
-IF (ALBA_USE_ITK)
-  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_ITK_LIBRARY)
-ENDIF (ALBA_USE_ITK)

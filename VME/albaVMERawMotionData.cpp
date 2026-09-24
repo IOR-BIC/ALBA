@@ -158,7 +158,6 @@ int albaVMERawMotionData::Read()
 		}//if vdict is open
 		else
 		{
-		  //vcl_cout << "File does not exist!\n";
 		  return 1;
 		}
 

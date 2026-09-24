@@ -35,7 +35,6 @@
 //--------------------------------------------------------------------------
 #cmakedefine ALBA_USE_VTK
 #cmakedefine ALBA_USE_WX
-#cmakedefine ALBA_USE_ITK
 #cmakedefine ALBA_USE_CRYPTO
 #cmakedefine ALBA_USE_CURL
 #cmakedefine ALBA_USE_WXMOZILLA

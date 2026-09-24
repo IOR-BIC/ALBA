@@ -50,10 +50,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 
-// vcl includes
-
-#include <vcl_map.h>
-#include <vcl_vector.h>
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterAnsysInputFile);
@@ -224,7 +220,7 @@ int albaOpExporterAnsysInputFile::WriteNodesFile(FILE *file )
     pointsToBeExported = inputUGrid->GetPoints();
   }
 
-  // read all the pointsToBeExported in memory (vnl_matrix)
+  // read all the pointsToBeExported in memory 
 
   double pointCoordinates[3] = {-9999, -9999, -9999};
 

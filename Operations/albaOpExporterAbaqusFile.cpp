@@ -51,12 +51,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 
-// vcl includes
-#include <vcl_string.h>
-#include <vcl_fstream.h>
-#include <vcl_sstream.h>
-#include <vcl_map.h>
-#include <vcl_vector.h>
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterAbaqusFile);

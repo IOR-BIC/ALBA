@@ -14,14 +14,9 @@ SET(PROJECT_SRCS
   albaDataPipeInterpolatorVTK.h
   vtkALBADataPipe.cpp
   vtkALBADataPipe.h
-)
-
-IF (ALBA_USE_ITK)
-SET(PROJECT_SRCS  ${PROJECT_SRCS}
   albaDataPipeInterpolatorScalarMatrix.cpp
   albaDataPipeInterpolatorScalarMatrix.h
   )
-ENDIF (ALBA_USE_ITK)
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS albaCore vtkALBA)
