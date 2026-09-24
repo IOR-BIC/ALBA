@@ -1,7 +1,24 @@
+/*=========================================================================
+
+Program: ALBA
+Module:  albaDynamicMatrix.h
+Authors: Gianluigi Crimi
+
+Copyright (c) BIC
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #ifndef __albaDynamicMatrix_h
 #define __albaDynamicMatrix_h
 
 #include "albaDefines.h"
+#include "albaTextFileReaderHelper.h"
 
 #include <cstddef>
 #include <vector>
@@ -9,7 +26,7 @@
 /**
   albaDynamicMatrix - Dynamic rectangular matrix of double values.
 */
-class ALBA_EXPORT albaDynamicMatrix
+class ALBA_EXPORT albaDynamicMatrix : public albaTextFileReaderHelper
 {
 public:
   albaDynamicMatrix();
@@ -53,6 +70,13 @@ public:
     to values.size().
   */
   void AddRow(const std::vector<double> &values);
+  
+  /**
+    Appends a row containing the specified values.
+    If the matrix has no columns, the number of columns is set
+    to the number of elements in values.
+  */
+  void AddRow(double *values);
 
   /**
     Returns the number of rows.
@@ -92,6 +116,12 @@ public:
 
   bool operator==(const albaDynamicMatrix &matrix) const;
   bool operator!=(const albaDynamicMatrix &matrix) const;
+
+  /**
+    Reads matrix data from a text file.
+    Returns ALBA_OK on success, ALBA_ERROR on failure.
+  */
+	int ReadFromFile(char *filename);
 
 private:
   inline int GetIndex(int row, int column)  { return row * m_Columns + column; }

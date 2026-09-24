@@ -1,3 +1,18 @@
+/*=========================================================================
+
+Program: ALBA
+Module:  albaDynamicMatrix.h
+Authors: Gianluigi Crimi
+
+Copyright (c) BIC
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 #include "albaDefines.h"
 
 #include "albaDynamicMatrix.h"
@@ -180,4 +195,71 @@ void albaDynamicMatrix::CheckIndex(int row, int column) const
 {
   if (row >= m_Rows || column >= m_Columns)
     throw std::out_of_range("albaDynamicMatrix: index out of range");
+}
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::AddRow(double *values)
+{
+	if (values == NULL)
+		throw std::invalid_argument("albaDynamicMatrix: invalid row data");
+
+	m_Data.insert(m_Data.end(), values, values + m_Columns);
+	++m_Rows;
+}
+
+//----------------------------------------------------------------------------
+int albaDynamicMatrix::ReadFromFile(char *filename)
+{
+  Resize(0, 0);
+
+  if (ReadInit(albaString(filename), true, false, "", NULL) == ALBA_ERROR)
+  {
+    albaLogMessage("Cannot Open: %s", filename);
+    ReadFinalize();
+    return ALBA_ERROR;
+  }
+	bool headerReaded = false;
+  int lineLenght;
+	unsigned int charsReaded = 0, totCharReaded = 0;
+  float tmpValue;
+
+	// Skip header lines
+  while (!headerReaded && (lineLenght = GetLine(true)) != 0)
+  {
+		// if I can read a float value from the line, then I have skipped the header
+    if (sscanf(m_Line,"%f%n",&tmpValue,&charsReaded) == 1)
+    {
+      headerReaded = true;
+			m_Columns = 1;
+      while (sscanf(m_Line + totCharReaded, "%f%n", &tmpValue, &charsReaded) == 1)
+      {
+        totCharReaded += charsReaded;
+        ++m_Columns;
+			}
+    }
+  }
+
+	double *rowData = new double[m_Columns];
+
+  while ((lineLenght = GetLine(true)) != 0)
+  {
+    totCharReaded = 0;
+    for (int i = 0; i < m_Columns; ++i)
+    {
+      if (sscanf(m_Line + totCharReaded, "%lf%n", &rowData[i], &charsReaded) != 1)
+      {
+        albaLogMessage("Wrong Column number on line %d", m_CurrentLine);
+        delete[] rowData;
+        ReadFinalize();
+        return ALBA_ERROR;
+      }
+      totCharReaded += charsReaded;
+    }
+    AddRow(rowData);
+  }
+  
+  delete[] rowData;
+  ReadFinalize();
+
+	return ALBA_OK;
 }
