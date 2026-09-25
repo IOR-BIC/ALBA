@@ -97,8 +97,6 @@ SET(vtkALBA_SRCS
   
   vtkALBAConnectedRegionsContourTriangulator.cxx			vtkALBAConnectedRegionsContourTriangulator.h
   vtkALBATicksGenerator.cpp									vtkALBATicksGenerator.h
-  albaClassicICPRegistration.cxx  						albaClassicICPRegistration.h
-  albaICPUtility.h
 )
 
 
