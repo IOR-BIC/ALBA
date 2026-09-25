@@ -210,18 +210,17 @@ int albaDynamicMatrix::ReadFromFile(albaString filename)
     return ALBA_ERROR;
   }
 	bool headerReaded = false;
-  int lineLenght;
 	unsigned int charsReaded = 0, totCharReaded = 0;
   float tmpValue;
 
 	// Skip header lines
-  while (!headerReaded && (lineLenght = GetLine(true)) != 0)
+  while (!headerReaded && GetLine(false,true) != 0)
   {
 		// if I can read a float value from the line, then I have skipped the header
     if (sscanf(m_Line,"%f%n",&tmpValue,&charsReaded) == 1)
     {
       headerReaded = true;
-			m_Columns = 1;
+			m_Columns = 0;
       while (sscanf(m_Line + totCharReaded, "%f%n", &tmpValue, &charsReaded) == 1)
       {
         totCharReaded += charsReaded;
@@ -232,7 +231,7 @@ int albaDynamicMatrix::ReadFromFile(albaString filename)
 
 	double *rowData = new double[m_Columns];
 
-  while ((lineLenght = GetLine(true)) != 0)
+  do
   {
     totCharReaded = 0;
     for (int i = 0; i < m_Columns; ++i)
@@ -247,7 +246,7 @@ int albaDynamicMatrix::ReadFromFile(albaString filename)
       totCharReaded += charsReaded;
     }
     AddRow(rowData);
-  }
+  } while (GetLine(false, true) != 0);
   
   delete[] rowData;
   ReadFinalize();
