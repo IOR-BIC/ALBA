@@ -279,9 +279,6 @@ int albaDynamicMatrix::ReadFromStream(std::istream &stream)
 			continue;
 		}
 
-		if (!lineStream.eof())
-			return ALBA_ERROR;
-
 		if (!dataStarted)
 		{
 			m_Columns = values.size();
@@ -418,8 +415,7 @@ std::ostream &operator<<(std::ostream &stream, const albaDynamicMatrix &matrix)
       stream << matrix(row, column);
     }
 
-    if (row + 1 < matrix.GetRowsNum())
-      stream << '\n';
+    stream << '\n';
   }
 
   return stream;
