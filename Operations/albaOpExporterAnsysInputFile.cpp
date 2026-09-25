@@ -279,7 +279,7 @@ int albaOpExporterAnsysInputFile::WriteMaterialsFile(FILE *file)
     int numberOfMaterialProperties = materialData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
 
     // gather material properties array names
-    vcl_vector<wxString> materialProperties;
+    std::vector<wxString> materialProperties;
     for (int arrayID = 0; arrayID < materialData->GetNumberOfArrays(); arrayID++)
     {
       wxString arrayName = materialData->GetArray(arrayID)->GetName();
