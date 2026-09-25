@@ -95,7 +95,6 @@ SET(PROJECT_SRCS
 	albaOpMML3Test.h albaOpMML3Test.cpp
 	albaOpExtractGeometryTest.h albaOpExtractGeometryTest.cpp
 	albaOpImporterDicomTest.h albaOpImporterDicomTest.cpp
-	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
 	albaOpMakeVMETimevaryingTest.h albaOpMakeVMETimevaryingTest.cpp
 	albaOpCreateWrappedMeterTest.h albaOpCreateWrappedMeterTest.cpp
 	albaOpFlipNormalsTest.h albaOpFlipNormalsTest.cpp

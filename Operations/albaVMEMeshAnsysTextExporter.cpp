@@ -38,10 +38,8 @@
 #include "albaVMEMesh.h"
 #include "albaTagArray.h"
 
-
-// vcl includes
-#include <vcl_fstream.h>
-#include <vcl_map.h>
+#include <fstream>
+#include <map>
 
 //----------------------------------------------------------------------------
 albaVMEMeshAnsysTextExporter::albaVMEMeshAnsysTextExporter()
@@ -153,8 +151,7 @@ int albaVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
     pointsToBeExported = inputUGrid->GetPoints();
   }
   
-  // read all the pointsToBeExported in memory (vnl_matrix)
-  
+  // read all the pointsToBeExported in memory  
   int pointIDColumn = 0;
 
   double pointCoordinates[3] = {-9999, -9999, -9999};
@@ -202,7 +199,7 @@ int albaVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
   //  offset                  |                     pointsToBeExported ID
   //  1   3   3   3   0   1      5     2     4     3    11    10    14    13    9    12
 
-  // read all the elements with their attribute data in memory (vnl_matrix)
+  // read all the elements with their attribute data in memory
 
   // get the ELEMENT_ID array
   vtkIntArray *elementIdArray = albaVMEMesh::GetElementsIDArray(inputUGrid);
@@ -249,7 +246,7 @@ int albaVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
   }
 
   // create vtkPointIdAnsysPointId map
-  vcl_map<int, int> vtkPointIdAnsysPointsIdMap;
+  std::map<int, int> vtkPointIdAnsysPointsIdMap;
   int nodesIdNumber = nodesIDArray->GetNumberOfTuples();
   
   assert(nodesIdNumber == inputUGrid->GetNumberOfPoints());
@@ -363,7 +360,7 @@ void albaVMEMeshAnsysTextExporter::WriteMaterialsFile(vtkUnstructuredGrid *input
 		return;
 	}
 
-	vcl_ofstream outputf;
+	std::ofstream outputf;
 	outputf.open(outputFileName);
 	
 	// get the number of materials

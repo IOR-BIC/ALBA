@@ -45,11 +45,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <vtkPolyData.h>
 #include "albaProgressBarHelper.h"
 
-//#include "C3D_Reader.h"
-
-#include <vcl_fstream.h>
-#include <vcl_string.h>
-#include <vnl\vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 #include <iostream>
 #include <fstream>
@@ -214,8 +210,8 @@ int albaOpImporterC3D::OpenC3D(const albaString &fullFileName)
 //----------------------------------------------------------------------------
 bool albaOpImporterC3D::LoadDictionary()
 {
-	vcl_string landmarkName, segmentName;
-	vcl_ifstream dictionaryInputStream(m_DictionaryFileName, std::ios::in);
+	std::string landmarkName, segmentName;
+	std::ifstream dictionaryInputStream(m_DictionaryFileName, std::ios::in);
 
 	if (dictionaryInputStream.is_open() == 0)
 		return false;
@@ -574,8 +570,8 @@ void albaOpImporterC3D::ImportAnalog(albaOpImporterC3D::_InternalC3DData &intDat
 	analogVmeName.Append("_ANALOG");
 	intData.m_VmeAnalog->SetName(analogVmeName);
 
-	vnl_matrix<double> analogMatrix;
-	analogMatrix.set_size(intData.m_NumChannels + 1, intData.m_NumSamples); //set dimensions
+	albaDynamicMatrix analogMatrix;
+	analogMatrix.Resize(intData.m_NumChannels + 1, intData.m_NumSamples); //set dimensions
 
 	std::vector<albaString> channelsNameList; //string array for channel name
 
@@ -584,7 +580,7 @@ void albaOpImporterC3D::ImportAnalog(albaOpImporterC3D::_InternalC3DData &intDat
 	{
 		albaTimeStamp currentTime = currentSample * intData.m_AnalogSamplePeriod;
 
-		analogMatrix.put(0, currentSample, currentTime); //fill first row with timeframe, every column is a time
+		analogMatrix.Set(0, currentSample, currentTime); //fill first row with timeframe, every column is a time
 
 																										 //For every channel
 		for (int currentChannel = 0; currentChannel < intData.m_NumChannels; currentChannel++)
@@ -596,7 +592,7 @@ void albaOpImporterC3D::ImportAnalog(albaOpImporterC3D::_InternalC3DData &intDat
 
 			if (currentSample == 0) channelsNameList.push_back(intData.m_ChannelName);
 
-			analogMatrix.put(currentChannel + 1, currentSample, intData.m_AnalogValue); //fill following rows with values, every channel is a row
+			analogMatrix.Set(currentChannel + 1, currentSample, intData.m_AnalogValue); //fill following rows with values, every channel is a row
 		}
 
 		progessHelper.UpdateProgressBar((currentSample + 1) * 100 / (intData.m_NumSamples));

@@ -25,7 +25,6 @@
 
 #include "albaVMEAnalog.h"
 
-#include <vnl/vnl_vector.h>
 #include "albaGUI.h"
 #include "albaVMEOutputScalarMatrix.h"
 
@@ -67,7 +66,7 @@ void albaVMEAnalog::Print(std::ostream& os, const int tabs)
 bool albaVMEAnalog::IsAnimated()
 //-------------------------------------------------------------------------
 {
-  vnl_vector<double> timeVector = this->GetScalarOutput()->GetScalarData().get_row(0);
+  std::vector<double> timeVector = this->GetScalarOutput()->GetScalarData().GetRow(0);
   return (timeVector.size() > 0);  
 }
 
@@ -75,7 +74,7 @@ bool albaVMEAnalog::IsAnimated()
 void albaVMEAnalog::GetTimeBounds(albaTimeStamp tbounds[2]) 
 //-------------------------------------------------------------------------
 {
-  vnl_vector<double> timeVector = this->GetScalarOutput()->GetScalarData().get_row(0);
+  std::vector<double> timeVector = this->GetScalarOutput()->GetScalarData().GetRow(0);
 	int timeVectSize = timeVector.size();
 	if (timeVectSize > 0)
 	{
@@ -93,10 +92,10 @@ void albaVMEAnalog::GetLocalTimeStamps(std::vector<albaTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   kframes.clear();
-  vnl_vector<double> timeVector = this->GetScalarOutput()->GetScalarData().get_row(0);
+  std::vector<double> timeVector = this->GetScalarOutput()->GetScalarData().GetRow(0);
   for (int n = 0; n < timeVector.size(); n++)
   {
-    kframes.push_back(timeVector.get(n));
+    kframes.push_back(timeVector[n]);
   }
 }
 //-------------------------------------------------------------------------

@@ -150,8 +150,8 @@ void albaOpImporterAnalogWS::Read()
     rowNumber++;
   } while (!inputFile.Eof());
 
-  vnl_matrix<double> emgMatrix;
-  emgMatrix.set_size(rowNumber , num_tk);
+  albaDynamicMatrix emgMatrix;
+  emgMatrix.Resize(rowNumber , num_tk);
 
   wxFileInputStream inputFile1( m_File );
   wxTextInputStream text1( inputFile1 );
@@ -169,7 +169,7 @@ void albaOpImporterAnalogWS::Read()
     space = line.Find(' ');
     frame = line.SubString(0,space - 1);
     emg_time = atof(frame)/freq_val; 
-    emgMatrix.put(n,i, emg_time); //Add scalar value to the vnl_matrix
+		emgMatrix.Set(n, i, emg_time); //Add scalar value to the dynamic matrix
 
     wxStringTokenizer tkz(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
     tkz.GetNextToken(); //To skip the time value
@@ -180,7 +180,7 @@ void albaOpImporterAnalogWS::Read()
       scalar = tkz.GetNextToken();
       val_scalar = atof(scalar);
     
-      emgMatrix.put(n,i,val_scalar); //Add scalar value to the vnl_matrix 
+      emgMatrix.put(n,i,val_scalar); //Add scalar value to the dynamic matrix
     }
     line = text1.ReadLine();
     line.Replace(","," ");
@@ -188,7 +188,7 @@ void albaOpImporterAnalogWS::Read()
     
   } 
 
-  vnl_matrix<double> emgMatrixTranspose = emgMatrix.transpose();
+  albaDynamicMatrix emgMatrixTranspose = emgMatrix.Transpose();
 
   m_EmgScalar->SetData(emgMatrixTranspose, 0);
 

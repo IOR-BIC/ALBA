@@ -59,8 +59,7 @@ albaCxxTypeMacro(albaVMEScalarMatrixTestClass)
 void albaDataPipeInterpolatorScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  m_DataMatrix.set_size(10,20);
-  m_DataMatrix.fill(1.0);
+  m_DataMatrix.Resize(10,20,1.0);
 }
 
 //----------------------------------------------------------------------------
@@ -124,10 +123,10 @@ void albaDataPipeInterpolatorScalarMatrixTest::TestGetScalarData()
   smi->SetVME(matrixTest);
   smi->Update();
 
-  int numberOfRows = m_DataMatrix.rows();
-  int numberOfCols = m_DataMatrix.columns();
-  int checkNumberOfRows = smi->GetScalarData().rows();
-  int checkNumberOfCols = smi->GetScalarData().columns();
+  int numberOfRows = m_DataMatrix.GetRowsNum();
+  int numberOfCols = m_DataMatrix.GetColsNum();
+  int checkNumberOfRows = smi->GetScalarData().GetRowsNum();
+  int checkNumberOfCols = smi->GetScalarData().GetColsNum();
   
   m_Result =  numberOfRows == checkNumberOfRows && 
               numberOfCols == checkNumberOfCols;
@@ -155,8 +154,8 @@ void albaDataPipeInterpolatorScalarMatrixTest::TestGetCurrentItem()
 {
   albaSmartPointer<albaVMEScalarMatrixTestClass> matrixTest;
   
-  int numberOfRows = m_DataMatrix.rows();
-  int numberOfCols = m_DataMatrix.columns();
+  int numberOfRows = m_DataMatrix.GetRowsNum();
+  int numberOfCols = m_DataMatrix.GetColsNum();
   
   matrixTest->SetData(m_DataMatrix, 0.0);
   matrixTest->Update();
@@ -168,8 +167,8 @@ void albaDataPipeInterpolatorScalarMatrixTest::TestGetCurrentItem()
   albaVMEItem *currentItem;
   currentItem = smi->GetCurrentItem();
   
-  int checkNumberOfRows = albaVMEItemScalarMatrix::SafeDownCast(currentItem)->GetData().rows();
-  int checkNumberOfCols = albaVMEItemScalarMatrix::SafeDownCast(currentItem)->GetData().columns();
+  int checkNumberOfRows = albaVMEItemScalarMatrix::SafeDownCast(currentItem)->GetData().GetRowsNum();
+  int checkNumberOfCols = albaVMEItemScalarMatrix::SafeDownCast(currentItem)->GetData().GetColsNum();
 
   m_Result = currentItem != NULL && 
              currentItem->IsA("albaVMEItemScalarMatrix") && 
@@ -184,7 +183,7 @@ void albaDataPipeInterpolatorScalarMatrixTest::TestGetCurrentItem()
   {
     for(;j< numberOfCols; j++)
     {
-      if(m_DataMatrix.get(i,j) != albaVMEItemScalarMatrix::SafeDownCast(currentItem)->GetData().get(i,j))
+      if(m_DataMatrix(i,j) != albaVMEItemScalarMatrix::SafeDownCast(currentItem)->GetData()(i,j))
       {
         m_Result = false;
       }

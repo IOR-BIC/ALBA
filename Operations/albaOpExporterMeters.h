@@ -25,11 +25,10 @@
 #include <fstream>
 #include <map>
 
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
 //----------------------------------------------------------------------------
@@ -125,7 +124,7 @@ protected:
 
   albaVME            *m_CurrentVme;
   std::vector<albaVME *> m_Meters;
-  std::vector< vnl_matrix<double> > m_MetersCoordinatesList;
+  std::vector<albaDynamicMatrix> m_MetersCoordinatesList;
 
   int m_SubTreeExportMeter;
 };

@@ -85,19 +85,15 @@ void albaPipeGraphTest::TestPipeExecution()
 {
   ////// Create VME ////////////////////
   albaVMEAnalog *analog = NULL;
-  vnl_matrix<double> emgMatrix;
+  albaDynamicMatrix emgMatrix;
   int rows = 30;
   int nTimeStamps = 500;
-  emgMatrix.set_size(rows , nTimeStamps);
+  emgMatrix.Resize(rows , nTimeStamps);
    
   int count = 0;
   for (int i = 0; i < rows; i++)
-  {
     for (int j = 0; j < nTimeStamps; j++)
-    {
-      emgMatrix.put(i, j, count++);  //timeStamp is the first line-> 0 1 2
-    }
-  }
+      emgMatrix.Set(i, j, count++);  //timeStamp is the first line-> 0 1 2
 
   albaNEW(analog);
   analog->SetData(emgMatrix,0);

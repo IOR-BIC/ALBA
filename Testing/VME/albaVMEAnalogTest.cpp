@@ -28,7 +28,7 @@
 #include <iostream>
 
 #include "albaVMEAnalog.h"
-#include <vnl\vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
@@ -55,10 +55,10 @@ void albaVMEAnalogTest::TestGetLocalTimeBounds()
 //---------------------------------------------------------
 {
   albaVMEAnalog *analog = NULL;
-	vnl_matrix<double> emgMatrix;
+	albaDynamicMatrix emgMatrix;
   int rows = 5;
   int nTimeStamps = 3;
-  emgMatrix.set_size(rows-1 , nTimeStamps);
+  emgMatrix.Resize(rows-1 , nTimeStamps);
 
   int i=0;
   int j=0;
@@ -67,7 +67,7 @@ void albaVMEAnalogTest::TestGetLocalTimeBounds()
   {
     for(;j<nTimeStamps;j++)
     {
-      emgMatrix.put(i,j,count++);  //timeStamp is the first line-> 0 1 2
+      emgMatrix.Set(i,j,count++);  //timeStamp is the first line-> 0 1 2
     }
   }
 
@@ -88,10 +88,10 @@ void albaVMEAnalogTest::TestIsAnimated()
 //---------------------------------------------------------
 {
   albaVMEAnalog *analog = NULL;
-  vnl_matrix<double> emgMatrix;
+  albaDynamicMatrix emgMatrix;
   int rows = 5;
   int nTimeStamps = 3;
-  emgMatrix.set_size(rows-1 , nTimeStamps);
+  emgMatrix.Resize(rows-1 , nTimeStamps);
 
   int i=0;
   int j=0;
@@ -100,7 +100,7 @@ void albaVMEAnalogTest::TestIsAnimated()
   {
     for(;j<nTimeStamps;j++)
     {
-      emgMatrix.put(i,j,count++);  //timeStamp is the first line-> 0 1 2
+      emgMatrix.Set(i,j,count++);  //timeStamp is the first line-> 0 1 2
     }
   }
 
@@ -122,10 +122,10 @@ void albaVMEAnalogTest::TestGetTimeBounds()
 {
   //actually this method invokes TestGetLocalTimeBounds, so it determines the same results
   albaVMEAnalog *analog = NULL;
-  vnl_matrix<double> emgMatrix;
+  albaDynamicMatrix emgMatrix;
   int rows = 5;
   int nTimeStamps = 3;
-  emgMatrix.set_size(rows-1 , nTimeStamps);
+  emgMatrix.Resize(rows-1 , nTimeStamps);
 
   int i=0;
   int j=0;
@@ -134,7 +134,7 @@ void albaVMEAnalogTest::TestGetTimeBounds()
   {
     for(;j<nTimeStamps;j++)
     {
-      emgMatrix.put(i,j,count++);  //timeStamp is the first line-> 0 1 2
+      emgMatrix.Set(i,j,count++);  //timeStamp is the first line-> 0 1 2
     }
   }
 
@@ -156,10 +156,10 @@ void albaVMEAnalogTest::TestGetLocalTimeStamps()
 {
   //actually this method invokes TestGetLocalTimeBounds, so it determines the same results
   albaVMEAnalog *analog = NULL;
-  vnl_matrix<double> emgMatrix;
+  albaDynamicMatrix emgMatrix;
   int rows = 5;
   int nTimeStamps = 3;
-  emgMatrix.set_size(rows-1 , nTimeStamps);
+  emgMatrix.Resize(rows-1 , nTimeStamps);
 
   int i=0;
   int j=0;
@@ -168,7 +168,7 @@ void albaVMEAnalogTest::TestGetLocalTimeStamps()
   {
     for(;j<nTimeStamps;j++)
     {
-      emgMatrix.put(i,j,count++);  //timeStamp is the first line-> 0 1 2
+      emgMatrix.Set(i,j,count++);  //timeStamp is the first line-> 0 1 2
     }
   }
 

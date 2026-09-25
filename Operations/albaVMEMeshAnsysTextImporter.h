@@ -19,13 +19,12 @@
 
 #include "vtkUnstructuredGrid.h"
 #include "albaVMEMesh.h"
+#include "albaDynamicMatrix.h"
 #include <map>
 #include <fstream>
-#include "vnl/vnl_matrix.h"
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
 /**
@@ -174,9 +173,8 @@ protected:
   
   /** 
   utility functions */
-  int ReadMatrix(vnl_matrix<double> &M, const char *fname);
   void FEMDataToCellData(vtkUnstructuredGrid *input, vtkUnstructuredGrid *output );
-  void AddIntArrayToUnstructuredGridCellData(vtkUnstructuredGrid *grid, vnl_matrix<double> &elementsFileMatrix, int column, albaString outputArrayName, bool activeScalar = false);
+  void AddIntArrayToUnstructuredGridCellData(vtkUnstructuredGrid *grid, albaDynamicMatrix &elementsFileMatrix, int column, albaString outputArrayName, bool activeScalar = false);
 
 
 };

@@ -48,9 +48,8 @@ void albaVMEOutputScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
 	m_Result = false;
-  in_data.set_size(10,20);
-  in_data.fill(1.0);
-  in_data[5][10] = 0.0;
+  m_InData.Resize(10,20,1.0);
+  m_InData(5,10) = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -65,12 +64,12 @@ void albaVMEOutputScalarMatrixTest::TestGetScalarData()
 //----------------------------------------------------------------------------
 {
 	albaSmartPointer<albaVMEScalarMatrix> scalarMatrix;
-	scalarMatrix->SetData(in_data,0.0);
+	scalarMatrix->SetData(m_InData,0.0);
 
-  m_Result = in_data.rows() == scalarMatrix->GetScalarOutput()->GetScalarData().rows() &&
-             in_data.cols() == scalarMatrix->GetScalarOutput()->GetScalarData().cols() &&
-             scalarMatrix->GetScalarOutput()->GetScalarData().get(5,10) == 0.0 && 
-             scalarMatrix->GetScalarOutput()->GetScalarData().get(0,0) == 1.0;
+  m_Result = m_InData.GetRowsNum() == scalarMatrix->GetScalarOutput()->GetScalarData().GetRowsNum() &&
+             m_InData.GetColsNum() == scalarMatrix->GetScalarOutput()->GetScalarData().GetColsNum() &&
+             scalarMatrix->GetScalarOutput()->GetScalarData()(5,10) == 0.0 && 
+             scalarMatrix->GetScalarOutput()->GetScalarData()(0,0) == 1.0;
   
   TEST_RESULT;
 }
@@ -80,7 +79,7 @@ void albaVMEOutputScalarMatrixTest::TestGetVTKData_UpdateVTKRepresentation()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEScalarMatrix> scalarMatrix;
-  scalarMatrix->SetData(in_data,0.0);
+  scalarMatrix->SetData(m_InData,0.0);
   scalarMatrix->SetScalarIdForZCoordinate(0); //represent the line that output will retrieve
   scalarMatrix->GetScalarOutput()->Update();
 
@@ -103,7 +102,7 @@ void albaVMEOutputScalarMatrixTest::TestGetVTKData_UpdateVTKRepresentation()
   }
 
   vtkCellArray *lines0 = polyData0->GetLines();
-  m_Result = lines0->GetNumberOfCells() == in_data.cols()-1; 
+  m_Result = lines0->GetNumberOfCells() == m_InData.GetColsNum()-1; 
   TEST_RESULT;
   
 
@@ -130,7 +129,7 @@ void albaVMEOutputScalarMatrixTest::TestGetVTKData_UpdateVTKRepresentation()
   }
 
   vtkCellArray *lines5 = polyData5->GetLines();
-  m_Result = lines5->GetNumberOfCells() == in_data.cols()-1;
+  m_Result = lines5->GetNumberOfCells() == m_InData.GetColsNum()-1;
 
   TEST_RESULT;
   
@@ -141,7 +140,7 @@ void albaVMEOutputScalarMatrixTest::TestUpdate_GetNumberOfRows_GetNumberOfCols()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEScalarMatrix> scalarMatrix;
-  scalarMatrix->SetData(in_data,0.0);
+  scalarMatrix->SetData(m_InData,0.0);
 	scalarMatrix->GetScalarOutput()->Update();
 	
 	m_Result = albaString("10").Equals(scalarMatrix->GetScalarOutput()->GetNumberOfRows());

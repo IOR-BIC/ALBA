@@ -301,22 +301,22 @@ void albaOpExporterMeters::ExportClassicMeterCoordinates(int index, int indexTim
 
   if(indexTime == 0) // create coordinate Matrix
   {
-    vnl_matrix<double> M;
-    M.set_size(6, m_Times.size());
+    albaDynamicMatrix M;
+    M.Resize(6, m_Times.size());
     m_MetersCoordinatesList.push_back(M);
   }
 
   //origin
   double *value = vmeMeter->GetStartPointCoordinate();
-  m_MetersCoordinatesList[index].put(0,indexTime,value[0]);
-  m_MetersCoordinatesList[index].put(1,indexTime,value[1]);
-  m_MetersCoordinatesList[index].put(2,indexTime,value[2]);
+  m_MetersCoordinatesList[index].Set(0,indexTime,value[0]);
+  m_MetersCoordinatesList[index].Set(1,indexTime,value[1]);
+  m_MetersCoordinatesList[index].Set(2,indexTime,value[2]);
 
   //end point
   value = vmeMeter->GetEndPointCoordinate();
-  m_MetersCoordinatesList[index].put(3,indexTime,value[0]);
-  m_MetersCoordinatesList[index].put(4,indexTime,value[1]);
-  m_MetersCoordinatesList[index].put(5,indexTime,value[2]);
+  m_MetersCoordinatesList[index].Set(3,indexTime,value[0]);
+  m_MetersCoordinatesList[index].Set(4,indexTime,value[1]);
+  m_MetersCoordinatesList[index].Set(5,indexTime,value[2]);
 
 }
 //----------------------------------------------------------------------------
@@ -335,15 +335,15 @@ void albaOpExporterMeters::ExportWrappedMeterCoordinates(int index, int indexTim
 
   if(indexTime == 0)
   {
-    vnl_matrix<double> M;
+    albaDynamicMatrix M;
     if(wrappedModality == albaVMEWrappedMeter::AUTOMATED_WRAP)
     {
-      M.set_size(12, m_Times.size());
+      M.Resize(12, m_Times.size());
     }
     else
     {
       int numberOfRows = 6 + 3*albaVMEWrappedMeter::SafeDownCast(m_CurrentVme)->GetNumberMiddlePoints();
-      M.set_size(numberOfRows, m_Times.size());
+      M.Resize(numberOfRows, m_Times.size());
     }
     m_MetersCoordinatesList.push_back(M);
   }
@@ -353,48 +353,48 @@ void albaOpExporterMeters::ExportWrappedMeterCoordinates(int index, int indexTim
   {
     //origin
     double *value = vmeWrappedMeter->GetStartPointCoordinate();
-    m_MetersCoordinatesList[index].put(0,indexTime,value[0]);
-    m_MetersCoordinatesList[index].put(1,indexTime,value[1]);
-    m_MetersCoordinatesList[index].put(2,indexTime,value[2]);
+    m_MetersCoordinatesList[index].Set(0,indexTime,value[0]);
+    m_MetersCoordinatesList[index].Set(1,indexTime,value[1]);
+    m_MetersCoordinatesList[index].Set(2,indexTime,value[2]);
     //insertion1
     value = vmeWrappedMeter->GetWrappedGeometryTangent1();
-    m_MetersCoordinatesList[index].put(3,indexTime,value[0]);
-    m_MetersCoordinatesList[index].put(4,indexTime,value[1]);
-    m_MetersCoordinatesList[index].put(5,indexTime,value[2]);
+    m_MetersCoordinatesList[index].Set(3,indexTime,value[0]);
+    m_MetersCoordinatesList[index].Set(4,indexTime,value[1]);
+    m_MetersCoordinatesList[index].Set(5,indexTime,value[2]);
     //insertion 2
     value = vmeWrappedMeter->GetWrappedGeometryTangent2();
-    m_MetersCoordinatesList[index].put(6,indexTime,value[0]);
-    m_MetersCoordinatesList[index].put(7,indexTime,value[1]);
-    m_MetersCoordinatesList[index].put(8,indexTime,value[2]);
+    m_MetersCoordinatesList[index].Set(6,indexTime,value[0]);
+    m_MetersCoordinatesList[index].Set(7,indexTime,value[1]);
+    m_MetersCoordinatesList[index].Set(8,indexTime,value[2]);
     //end point
     value = vmeWrappedMeter->GetEndPointCoordinate();
-    m_MetersCoordinatesList[index].put(9,indexTime,value[0]);
-    m_MetersCoordinatesList[index].put(10,indexTime,value[1]);
-    m_MetersCoordinatesList[index].put(11,indexTime,value[2]);
+    m_MetersCoordinatesList[index].Set(9,indexTime,value[0]);
+    m_MetersCoordinatesList[index].Set(10,indexTime,value[1]);
+    m_MetersCoordinatesList[index].Set(11,indexTime,value[2]);
   }
   else // wrappedModality == albaVMEWrappedMeter::MANUAL_WRAP
   {
     //origin
     double *value = vmeWrappedMeter->GetStartPointCoordinate();
-    m_MetersCoordinatesList[index].put(0,indexTime,value[0]);
-    m_MetersCoordinatesList[index].put(1,indexTime,value[1]);
-    m_MetersCoordinatesList[index].put(2,indexTime,value[2]);
+    m_MetersCoordinatesList[index].Set(0,indexTime,value[0]);
+    m_MetersCoordinatesList[index].Set(1,indexTime,value[1]);
+    m_MetersCoordinatesList[index].Set(2,indexTime,value[2]);
 
     //middle points
     int numberOfMiddlePoints = vmeWrappedMeter->GetNumberMiddlePoints();
     for(int k=0; k<numberOfMiddlePoints ;k++)
     {
       value = vmeWrappedMeter->GetMiddlePointCoordinate(k);
-      m_MetersCoordinatesList[index].put(3*(k+1),indexTime,value[0]);
-      m_MetersCoordinatesList[index].put(3*(k+1)+1,indexTime,value[1]);
-      m_MetersCoordinatesList[index].put(3*(k+1)+2,indexTime,value[2]);
+      m_MetersCoordinatesList[index].Set(3*(k+1),indexTime,value[0]);
+      m_MetersCoordinatesList[index].Set(3*(k+1)+1,indexTime,value[1]);
+      m_MetersCoordinatesList[index].Set(3*(k+1)+2,indexTime,value[2]);
     }
 
     //end point
     value = vmeWrappedMeter->GetEndPointCoordinate();
-    m_MetersCoordinatesList[index].put(3*(numberOfMiddlePoints+1),indexTime,value[0]);
-    m_MetersCoordinatesList[index].put(3*(numberOfMiddlePoints+1)+1,indexTime,value[1]);
-    m_MetersCoordinatesList[index].put(3*(numberOfMiddlePoints+1)+2,indexTime,value[2]);
+    m_MetersCoordinatesList[index].Set(3*(numberOfMiddlePoints+1),indexTime,value[0]);
+    m_MetersCoordinatesList[index].Set(3*(numberOfMiddlePoints+1)+1,indexTime,value[1]);
+    m_MetersCoordinatesList[index].Set(3*(numberOfMiddlePoints+1)+2,indexTime,value[2]);
 
   }
 }
@@ -421,8 +421,8 @@ void albaOpExporterMeters::WriteOnFile()
 void albaOpExporterMeters::WriteCoordinatesOnFile(int index)
 //----------------------------------------------------------------------------
 {
-  unsigned int rows = m_MetersCoordinatesList[index].rows();
-  unsigned int columns = m_MetersCoordinatesList[index].columns();
+  unsigned int rows = m_MetersCoordinatesList[index].GetRowsNum();
+  unsigned int columns = m_MetersCoordinatesList[index].GetColNum();
   for(int i=0; i< rows; i++)
   {
     if(i%3 == 0 || i == 0)
@@ -444,7 +444,7 @@ void albaOpExporterMeters::WriteCoordinatesOnFile(int index)
 
     for(int j=0; j< columns; j++)
     {
-      double value =  m_MetersCoordinatesList[index].get(i,j);
+      double value =  m_MetersCoordinatesList[index](i,j);
       m_OutputFile << std::fixed << std::setprecision(3) << std::setw(8) << value << "\t";
     }
     m_OutputFile << std::endl;

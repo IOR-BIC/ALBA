@@ -173,7 +173,7 @@ int albaVMERawMotionData::Read()
 		dlc->SetRadius(15);
     		
 	  //Create (M.GetNumberOfColumns() / 3) landmarks
-		for (int j = 0; j < M.GetColNum(); j += 3)
+		for (int j = 0; j < M.GetColsNum(); j += 3)
 		{
       albaString lm_name;
 			lm_name ="lm_";

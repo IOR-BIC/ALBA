@@ -282,7 +282,7 @@ int albaOpExporterAbaqusFile::WriteNodesFile(FILE *file)
     pointsToBeExported = inputUGrid->GetPoints();
   }
 
-  // read all the pointsToBeExported in memory (vnl_matrix)
+  // read all the pointsToBeExported in memory
 
   int pointIDColumn = 0;
   double pointCoordinates[3] = {-9999, -9999, -9999};
@@ -328,7 +328,7 @@ int albaOpExporterAbaqusFile::WriteElementsFile(FILE *file)
   // create elements matrix 
   int rowsNumber = inputUGrid->GetNumberOfCells();
 
-  // read all the elements with their attribute data in memory (vnl_matrix)
+  // read all the elements with their attribute data in memory 
 
   // get the ELEMENT_ID array
   vtkIntArray *elementIdArray = input->GetElementsIDArray();

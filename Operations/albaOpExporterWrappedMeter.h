@@ -19,13 +19,12 @@
 
 #include "albaDefines.h"
 #include "albaOp.h"
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 #include "albaVMEIterator.h"
 #include <fstream>
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
 //----------------------------------------------------------------------------
@@ -50,7 +49,7 @@ public:
   ~albaOpExporterWrappedMeter(); 
 
   std::vector<albaVME *> m_Meters;
-  std::vector< vnl_matrix<double> > m_MetersCoordinatesList ;
+  std::vector< albaDynamicMatrix > m_MetersCoordinatesList ;
   albaTimeStamp       m_CurrentTime;
   std::vector<albaTimeStamp> m_Times ;
   albaVME            *m_CurrentVme ;
