@@ -138,7 +138,7 @@ void albaDataPipeInterpolatorScalarMatrixTest::TestGetScalarData()
   {
     for(;j< numberOfCols; j++)
     {
-      if(m_DataMatrix.get(i,j) != smi->GetScalarData().get(i,j))
+      if(m_DataMatrix(i,j) != smi->GetScalarData()(i,j))
       {
         m_Result = false;
       }

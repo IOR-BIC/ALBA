@@ -180,7 +180,7 @@ void albaOpImporterAnalogWS::Read()
       scalar = tkz.GetNextToken();
       val_scalar = atof(scalar);
     
-      emgMatrix.put(n,i,val_scalar); //Add scalar value to the dynamic matrix
+      emgMatrix.Set(n,i,val_scalar); //Add scalar value to the dynamic matrix
     }
     line = text1.ReadLine();
     line.Replace(","," ");

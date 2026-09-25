@@ -422,7 +422,7 @@ void albaOpExporterMeters::WriteCoordinatesOnFile(int index)
 //----------------------------------------------------------------------------
 {
   unsigned int rows = m_MetersCoordinatesList[index].GetRowsNum();
-  unsigned int columns = m_MetersCoordinatesList[index].GetColNum();
+  unsigned int columns = m_MetersCoordinatesList[index].GetColsNum();
   for(int i=0; i< rows; i++)
   {
     if(i%3 == 0 || i == 0)

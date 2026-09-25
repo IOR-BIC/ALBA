@@ -133,9 +133,9 @@ void albaOpExporterAnalogWS::Write()
     for (int i=0;i<emgMatrix.GetColsNum();i++)
     {
       // Add time
-      double time = emgMatrix.get(0,i);
+      double time = emgMatrix(0,i);
       f_Out << time << ",";
-      for (int j=1;j<emgMatrix.rows()-1;j++)
+      for (int j=1;j<emgMatrix.GetRowsNum()-1;j++)
       {
         // Add all values but last one
         f_Out << emgMatrix(j,i) << ",";
