@@ -47,6 +47,7 @@
 #include "albaVect3dTest.h"
 #include "albaEventTest.h"
 #include "multiThreaderTest.h"
+#include "albaDynamicMatrixTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -87,7 +88,6 @@ int	main( int argc, char* argv[] )
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
-
 	runner.addTest(albaStringTest::suite());
 	runner.addTest(albaTransformTest::suite());
 	runner.addTest(albaTransformFrameTest::suite());
@@ -114,7 +114,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVect3dTest::suite());
 	runner.addTest(albaEventTest::suite());
 	runner.addTest(multiThreaderTest::suite());
-
+	runner.addTest(albaDynamicMatrixTest::suite());
 
 	runner.run( controller );
 
