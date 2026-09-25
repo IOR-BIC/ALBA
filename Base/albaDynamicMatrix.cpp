@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <algorithm>
 #include <stdexcept>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 albaDynamicMatrix::albaDynamicMatrix(): m_Rows(0), m_Columns(0)
@@ -120,22 +121,12 @@ void albaDynamicMatrix::AddRow(const std::vector<double> &values)
   ++m_Rows;
 }
 
-//----------------------------------------------------------------------------
-int albaDynamicMatrix::GetRowsNum() const
-{
-  return m_Rows;
-}
 
 //----------------------------------------------------------------------------
-int albaDynamicMatrix::GetColNum() const
+void albaDynamicMatrix::Set(int row, int column, double value)
 {
-  return m_Columns;
-}
-
-//----------------------------------------------------------------------------
-bool albaDynamicMatrix::IsEmpty() const
-{
-  return m_Rows == 0 || m_Columns == 0;
+  CheckIndex(row, column);
+	m_Data[GetIndex(row, column)] = value;
 }
 
 //----------------------------------------------------------------------------
@@ -265,6 +256,48 @@ int albaDynamicMatrix::ReadFromFile(albaString filename)
 }
 
 //----------------------------------------------------------------------------
+int albaDynamicMatrix::ReadFromStream(std::istream &stream)
+{
+	Resize(0, 0);
+
+	std::string line;
+	bool dataStarted = false;
+
+	while (std::getline(stream, line))
+	{
+		std::istringstream lineStream(line);
+		std::vector<double> values;
+		double value;
+
+		while (lineStream >> value)
+			values.push_back(value);
+
+		if (values.empty())
+		{
+			if (dataStarted && !lineStream.eof())
+				return ALBA_ERROR;
+
+			continue;
+		}
+
+		if (!lineStream.eof())
+			return ALBA_ERROR;
+
+		if (!dataStarted)
+		{
+			m_Columns = values.size();
+			dataStarted = true;
+		}
+		else if (values.size() != m_Columns)
+			return ALBA_ERROR;
+
+		AddRow(values);
+	}
+
+	return stream.bad() ? ALBA_ERROR : ALBA_OK;
+}
+
+//----------------------------------------------------------------------------
 void albaDynamicMatrix::ExtractRow(int rowNum, std::vector<double> &row)
 {
 	if (rowNum < 0 || rowNum >= m_Rows)
@@ -284,6 +317,43 @@ void albaDynamicMatrix::ExtractRow(int rowNum, double *row)
 
 	for (int column = 0; column < m_Columns; ++column)
 		row[column] = m_Data[rowNum * m_Columns + column];
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> albaDynamicMatrix::GetRow(int rowNum) const
+{
+	if (rowNum < 0 || rowNum >= m_Rows)
+		throw std::out_of_range("Row index out of range");
+
+	std::vector<double> row(m_Columns);
+	for (int column = 0; column < m_Columns; ++column)
+		row[column] = m_Data[GetIndex(rowNum, column)];
+
+	return row;
+}
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::SetRow(int rowNum, const std::vector<double> &row)
+{
+  if (rowNum < 0 || rowNum >= m_Rows)
+    throw std::out_of_range("albaDynamicMatrix: row index out of range");
+
+  if (row.size() != m_Columns)
+    throw std::invalid_argument("albaDynamicMatrix: invalid row size");
+
+  std::copy(row.begin(), row.end(), m_Data.begin() + rowNum * m_Columns);
+}
+
+//----------------------------------------------------------------------------
+void albaDynamicMatrix::SetRow(int rowNum, double *row)
+{
+  if (rowNum < 0 || rowNum >= m_Rows)
+    throw std::out_of_range("albaDynamicMatrix: row index out of range");
+
+  if (row == NULL)
+    throw std::invalid_argument("albaDynamicMatrix: invalid row data");
+
+  std::copy(row, row + m_Columns, m_Data.begin() + rowNum * m_Columns);
 }
 
 //----------------------------------------------------------------------------
@@ -309,4 +379,67 @@ void albaDynamicMatrix::ExtractColumn(int colNum, double *col)
 
 	for (int row = 0; row < m_Rows; ++row)
 		col[row] = m_Data[row * m_Columns + colNum];
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> albaDynamicMatrix::GetColumn(int colNum) const
+{
+	if (colNum < 0 || colNum >= m_Columns)
+		throw std::out_of_range("Column index out of range");
+
+	std::vector<double> column(m_Rows);
+	for (int row = 0; row < m_Rows; ++row)
+		column[row] = m_Data[GetIndex(row, colNum)];
+
+	return column;
+}
+
+//----------------------------------------------------------------------------
+albaDynamicMatrix albaDynamicMatrix::Transpose()
+{
+	albaDynamicMatrix transposed(m_Columns, m_Rows);
+
+	for (int row = 0; row < m_Rows; ++row)
+		for (int column = 0; column < m_Columns; ++column)
+			transposed(column, row) = m_Data[row * m_Columns + column];
+
+	return transposed;
+}
+
+//----------------------------------------------------------------------------
+std::ostream &operator<<(std::ostream &stream, const albaDynamicMatrix &matrix)
+{
+  for (int row = 0; row < matrix.GetRowsNum(); ++row)
+  {
+    for (int column = 0; column < matrix.GetColsNum(); ++column)
+    {
+      if (column > 0)
+        stream << ' ';
+
+      stream << matrix(row, column);
+    }
+
+    if (row + 1 < matrix.GetRowsNum())
+      stream << '\n';
+  }
+
+  return stream;
+}
+
+//----------------------------------------------------------------------------
+double albaDynamicMatrix::MinValue() const
+{
+	if (m_Data.empty())
+		throw std::runtime_error("albaDynamicMatrix: cannot find minimum value of an empty matrix");
+
+	return *std::min_element(m_Data.begin(), m_Data.end());
+}
+
+//----------------------------------------------------------------------------
+double albaDynamicMatrix::MaxValue() const
+{
+	if (m_Data.empty())
+		throw std::runtime_error("albaDynamicMatrix: cannot find maximum value of an empty matrix");
+
+	return *std::max_element(m_Data.begin(), m_Data.end());
 }
