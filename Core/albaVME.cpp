@@ -760,24 +760,6 @@ void albaVME::OnEvent(albaEventBase *alba_event)
         InternalUpdate();   // self process the event
         InvokeEvent(alba_event); // forward event to observers
       break;
-      case VME_MATRIX_UPDATE:
-			{
-				albaEventBase absEvent(this, VME_ABSMATRIX_UPDATE);
-				if (alba_event->GetSender() == m_AbsMatrixPipe)
-				{
-					InvokeEvent(&absEvent);
-				}
-				else
-        {
-					InvokeEvent(alba_event); // forward event to observers
-        }
-
-				for (int i = 0; i < this->GetNumberOfChildren(); i++)
-				{
-					GetChild(i)->InvokeEvent(&absEvent);
-				}
-			}
-      break;
       default:
 				NodeOnEvent(alba_event);
     }

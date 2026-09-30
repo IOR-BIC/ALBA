@@ -148,11 +148,6 @@ void albaAbsMatrixPipe::InternalUpdate()
   *m_Matrix = m_Transform->GetMatrix();
 
   m_Matrix->SetTimeStamp(GetTimeStamp());
-
-  if (m_UpdateMatrixObserverFlag)
-  {
-    if (m_VME) m_VME->OnEvent(&albaEventBase(this,VME_MATRIX_UPDATE,m_Matrix));
-  }
    
   if (input&&GetTimeStamp()!=old_vme_time)
   {

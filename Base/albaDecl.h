@@ -404,7 +404,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	VME_TIME_SET,           ///< used either to set or to advise of time changes
 	VME_MATRIX_CHANGED,     ///< issued when the matrix in the output has changed (e.g. when matrix pipe is changed at runtime)
 	VME_MATRIX_PREUPDATE,  ///< issued by albaMatrixPipe before updating the matrix 
-	VME_MATRIX_UPDATE,      ///< issued when pose matrix is updated
 	VME_ABSMATRIX_UPDATE,   ///< issued when absolute pose matrix is updated
 	VME_OUTPUT_DATA_PREUPDATE, ///< issued by albaDataPipe before the output data is actually updated
 	VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated

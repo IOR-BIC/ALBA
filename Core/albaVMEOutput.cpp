@@ -341,16 +341,12 @@ void albaVMEOutput::GetMatrix(albaMatrix &matrix,albaTimeStamp t) const
     }
     else
     {
-      // disable rising of update event since this is
-      // only a temporary change to the matrix
-      bool old_flag=mpipe->GetUpdateMatrixObserverFlag();
-      mpipe->UpdateMatrixObserverOff();
+			//set the time stamp to the one requested and get the matrix
       mpipe->SetTimeStamp(t);
       matrix=mpipe->GetMatrix();
 
       // restore right time
       mpipe->SetTimeStamp(m_VME->GetTimeStamp());
-      mpipe->SetUpdateMatrixObserverFlag(old_flag);
     }
   }
   else
@@ -409,16 +405,12 @@ void albaVMEOutput::GetAbsMatrix(albaMatrix &matrix,albaTimeStamp t) const
   else
   {
     albaAbsMatrixPipe *abspipe=m_VME->GetAbsMatrixPipe();
-    // disable rising of update event since this is
-    // only a temporary change to the matrix
-    bool old_flag=abspipe->GetUpdateMatrixObserverFlag();
-    abspipe->UpdateMatrixObserverOff();
+		//set the time stamp to the one requested and get the matrix
     abspipe->SetTimeStamp(t);
     matrix=abspipe->GetMatrix();
     
     // restore right time
     abspipe->SetTimeStamp(m_VME->GetTimeStamp());
-    abspipe->SetUpdateMatrixObserverFlag(old_flag);
   }
 }
 
