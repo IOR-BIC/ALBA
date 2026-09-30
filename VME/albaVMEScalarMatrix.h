@@ -19,11 +19,10 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaVMEGenericAbstract.h"
-#include "vnl/vnl_matrix.h"
+#include "albaDynamicMatrix.h"
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
 //----------------------------------------------------------------------------
@@ -69,7 +68,7 @@ public:
   This function automatically creates a VMEItem for the data to be stored.
   Return ALBA_OK if succeeded, ALBA_ERROR if they kind of data is not accepted by
   this type of VME. */
-  virtual int SetData(vnl_matrix<double> &data, albaTimeStamp t);
+  virtual int SetData(albaDynamicMatrix &data, albaTimeStamp t);
 
   /** Set the time for this VME.
   It updates also the vtk representation for the scalar data.*/

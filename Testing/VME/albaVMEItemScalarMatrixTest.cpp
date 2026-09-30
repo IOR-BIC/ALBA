@@ -83,10 +83,9 @@ void albaVMEItemScalarMatrixTest::TestSetData()
 {
   albaVMEItemScalarMatrix *item;
   albaNEW(item);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
-  data.set_size(3,3);
-  data.fill((double)1.64);
+  data.Resize(3,3,1.64);
 
   item->SetData(data);
   CPPUNIT_ASSERT(data == item->GetData());
@@ -101,14 +100,12 @@ void albaVMEItemScalarMatrixTest::TestEquals()
   albaVMEItemScalarMatrix *item2;
   albaNEW(item1);
   albaNEW(item2);
-  vnl_matrix<double> data1;
-  vnl_matrix<double> data2;
+  albaDynamicMatrix data1;
+  albaDynamicMatrix data2;
 
   //Different data but the same data type: Equals should return true
-  data1.set_size(3,3);
-  data1.fill((double)4.94);
-  data2.set_size(3,3);
-  data2.fill((double)1.32);
+  data1.Resize(3,3,4.94);
+  data2.Resize(3,3,1.32);
 
   item1->SetData(data1);
   item2->SetData(data2);
@@ -142,11 +139,10 @@ void albaVMEItemScalarMatrixTest::TestIsDataPresent()
 {
   albaVMEItemScalarMatrix *item;
   albaNEW(item);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
-  data.set_size(3,3);
-  data.fill((double)3.28);
-
+  data.Resize(3, 3, 3.28);
+  
   CPPUNIT_ASSERT(!item->IsDataPresent());
 
   item->SetData(data);
@@ -179,10 +175,9 @@ void albaVMEItemScalarMatrixTest::TestDeepCopy()
   albaVMEItemScalarMatrix *item2;
   albaNEW(item1);
   albaNEW(item2);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
-  data.set_size(3,3);
-  data.fill((double)3.28);
+  data.Resize(3,3,3.28);
 
   item1->SetData(data);
 
@@ -201,9 +196,9 @@ void albaVMEItemScalarMatrixTest::TestShallowCopy()
   albaVMEItemScalarMatrix *item2;
   albaNEW(item1);
   albaNEW(item2);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
-  data.fill((double)3.28);
+  data.Resize(1,1,3.28);
 
   item1->SetData(data);
 
@@ -220,7 +215,7 @@ void albaVMEItemScalarMatrixTest::TestReadData()
 {
   albaVMEItemScalarMatrix *item;
   albaNEW(item);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
   albaString filename = ALBA_DATA_ROOT;
   filename << "/ItemScalarMatrix/matrix.sca";
@@ -232,26 +227,15 @@ void albaVMEItemScalarMatrixTest::TestReadData()
   0.52 3.75 3.33
   */
 
-  item->SetDataType("vnl_matrix");
+  item->SetDataType("albaDynamicMatrix");
   item->ReadData(filename);
 
   CPPUNIT_ASSERT(item->IsDataPresent());
 
-  data.set_size(3,3);
-  //row 1
-  data.put(0,0,3.28);//col 1
-  data.put(0,1,16.4);//col 2
-  data.put(0,2,4.94);//col 3
-
-  //row 2
-  data.put(1,0,3.39);//col 1
-  data.put(1,1,7.41);//col 2
-  data.put(1,2,4.84);//col 3
-
-  //row 3
-  data.put(2,0,0.52);//col 1
-  data.put(2,1,3.75);//col 2
-  data.put(2,2,3.33);//col 3
+  data.Resize(3,3);
+  data.SetRow(0,std::vector<double>{3.28,16.4,4.94});
+  data.SetRow(1,std::vector<double>{3.39,7.41,4.84});
+  data.SetRow(2,std::vector<double>{0.52,3.75,3.33});
 
   CPPUNIT_ASSERT(item->GetData() == data);  
 
@@ -263,14 +247,13 @@ void albaVMEItemScalarMatrixTest::TestInternalStoreData()
 {
   albaVMEItemScalarMatrix *itemw;
   albaNEW(itemw);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
   DummyObserver *observer = new DummyObserver();
 
   itemw->SetListener(observer);
 
-  data.set_size(3,3);
-  data.fill((double)5.21);
+  data.Resize(3,3,5.21);
 
   itemw->SetData(data);
 
@@ -282,7 +265,7 @@ void albaVMEItemScalarMatrixTest::TestInternalStoreData()
   albaVMEItemScalarMatrix *itemr;
   albaNEW(itemr);
 
-  itemr->SetDataType("vnl_matrix");
+  itemr->SetDataType("albaDynamicMatrix");
   itemr->ReadData(filename);
 
   CPPUNIT_ASSERT(itemr->GetData() == itemw->GetData());
@@ -297,14 +280,13 @@ void albaVMEItemScalarMatrixTest::TestStoreToArchive()
 {
   albaVMEItemScalarMatrix *itemw;
   albaNEW(itemw);
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
   DummyObserver *observer = new DummyObserver();
 
   itemw->SetListener(observer);
 
-  data.set_size(3,3);
-  data.fill((double)5.21);
+  data.Resize(3,3,5.21);
 
   itemw->SetData(data);
 
@@ -344,7 +326,7 @@ void albaVMEItemScalarMatrixTest::TestStoreToArchive()
   albaNEW(itemr);
 
   itemr->SetURL("item.sca");
-  itemr->SetDataType("vnl_matrix");
+  itemr->SetDataType("albaDynamicMatrix");
   itemr->SetIOModeToMemory();
   itemr->ReadData(filenamez);
 

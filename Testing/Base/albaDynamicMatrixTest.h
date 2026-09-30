@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaItkRawMotionImporterUtilityTest
- Authors: Daniele Giunchi
+ Module: albaDynamicMatrixTest
+ Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -14,26 +14,26 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_albaItkRawMotionImporterUtilityTest_H
-#define CPP_UNIT_albaItkRawMotionImporterUtilityTest_H
+#ifndef CPP_UNIT_albaDynamicMatrixTest_H
+#define CPP_UNIT_albaDynamicMatrixTest_H
 
 #include "albaTest.h"
 
-class albaItkRawMotionImporterUtilityTest : public albaTest
+class albaDynamicMatrixTest : public albaTest
 {
 public: 
 
-  CPPUNIT_TEST_SUITE( albaItkRawMotionImporterUtilityTest );
+  CPPUNIT_TEST_SUITE( albaDynamicMatrixTest );
   CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestReadMatrix );
+	//CPPUNIT_TEST(TestReadMatrix);
+	CPPUNIT_TEST(TestBigFileRead);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
   void TestDynamicAllocation();
   void TestReadMatrix();
-
-  bool m_Result;
+	void TestBigFileRead();
 };
 
 #endif

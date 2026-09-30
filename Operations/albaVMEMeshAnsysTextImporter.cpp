@@ -41,16 +41,6 @@
 #include "albaGui.h"
 #include "albaGUIDialog.h"
 
-
-// vcl includes
-#include <vcl_string.h>
-#include <vcl_fstream.h>
-#include <vcl_sstream.h>
-#include <vcl_map.h>
-#include <vcl_vector.h>
-#include <vcl_algorithm.h>
-
-
 //----------------------------------------------------------------------------
 // constants
 
@@ -140,9 +130,9 @@ int albaVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   int z_col = x_col + 2;
 
   
-  vnl_matrix<double> M;
+  albaDynamicMatrix M;
 
-  if (ReadMatrix(M,this->m_NodesFileName))
+  if (M.ReadFromFile(this->m_NodesFileName)==ALBA_ERROR)
   {
     albaErrorMacro("Wrong Node file! File:" << m_NodesFileName << endl);
 	  return -1;
@@ -151,9 +141,9 @@ int albaVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   // create points structure
 
   vtkPoints* points = vtkPoints::New();
-  points->SetNumberOfPoints(M.rows());
+  points->SetNumberOfPoints(M.GetRowsNum());
 
-  for (int i = 0; i < M.rows(); i++)    
+  for (int i = 0; i < M.GetRowsNum(); i++)    
     {
       double xCoord = M(i, x_col);
       double yCoord = M(i, y_col);
@@ -168,7 +158,7 @@ int albaVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
 
 
   // create a map with id_val <-> node_id association
-  for (int i = 0; i < M.rows(); i++)
+  for (int i = 0; i < M.GetRowsNum(); i++)
   {
     m_NodeIdNodeNumberMap[M(i, node_id_col)] = i;  
   }
@@ -189,9 +179,9 @@ int albaVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   */
   vtkIntArray *node_id_array = vtkIntArray::New();
   node_id_array->SetName("Id");
-  node_id_array->SetNumberOfTuples(M.rows());
+  node_id_array->SetNumberOfTuples(M.GetRowsNum());
 
-  for (int i = 0; i < M.rows(); i++)
+  for (int i = 0; i < M.GetRowsNum(); i++)
   {
     // fill the MaterialsArray
     node_id_array->SetValue(i, M(i, node_id_col));
@@ -205,14 +195,14 @@ int albaVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   return 0;
 }
 
-void albaVMEMeshAnsysTextImporter::AddIntArrayToUnstructuredGridCellData( vtkUnstructuredGrid *grid, vnl_matrix<double> &elementsFileMatrix, int column, albaString outputArrayName , bool activeScalar)
+void albaVMEMeshAnsysTextImporter::AddIntArrayToUnstructuredGridCellData( vtkUnstructuredGrid *grid, albaDynamicMatrix &elementsFileMatrix, int column, albaString outputArrayName , bool activeScalar)
 {
   // store info about cell_id <-> material_id association
   vtkIntArray *array = vtkIntArray::New();
   array->SetName(outputArrayName.GetCStr());
-  array->SetNumberOfTuples(elementsFileMatrix.rows());
+  array->SetNumberOfTuples(elementsFileMatrix.GetRowsNum());
 
-  for (int i = 0; i < elementsFileMatrix.rows(); i++)
+  for (int i = 0; i < elementsFileMatrix.GetRowsNum(); i++)
   {
     // fill the array
     array->SetValue(i, elementsFileMatrix(i, column));
@@ -239,7 +229,7 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
     return -1;
   }
   
-  vnl_matrix<double> ElementsFileMatrix;
+  albaDynamicMatrix ElementsFileMatrix;
 
 
   int cell_id_col = 0;
@@ -282,7 +272,7 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   // id list for connectivity
   vtkIdList *id_list = vtkIdList::New();
 
-  if (ReadMatrix(ElementsFileMatrix,this->m_ElementsFileName))
+  if (ElementsFileMatrix.ReadFromFile(this->m_ElementsFileName)==ALBA_ERROR)
   {
     albaErrorMacro("Wrong Elements file! File:" << m_ElementsFileName << endl);
 	  return -1;
@@ -290,14 +280,14 @@ int albaVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
   id_list->SetNumberOfIds(m_NodesPerElement);
     
-  grid->Allocate(ElementsFileMatrix.rows(),1);
+  grid->Allocate(ElementsFileMatrix.GetRowsNum(),1);
 
 
   // create the connectivity list for each cell from each row
-  for (int i = 0; i < ElementsFileMatrix.rows(); i++)
+  for (int i = 0; i < ElementsFileMatrix.GetRowsNum(); i++)
   {
       int id_index = 0;
-      for (int j = m_FirstConnectivityColumn; j < ElementsFileMatrix.columns(); j++ )
+      for (int j = m_FirstConnectivityColumn; j < ElementsFileMatrix.GetColsNum(); j++ )
       {
         /*
         // store info about node_id <-> node_index association 
@@ -356,17 +346,17 @@ int albaVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, 
 		return -1;
 	}
 
-	vnl_matrix<double> matMtr;
+	albaDynamicMatrix matMtr;
 
-	if (ReadMatrix(matMtr, matfilename))
+	if (matMtr.ReadFromFile(matfilename)==ALBA_ERROR)
 	{
 		albaErrorMacro("Wrong Materials file!\nCannot read matrix, File:" << matfilename << endl);
 		return -1;
 	}
 
 
-	int nCols = matMtr.cols();
-	int nRows = matMtr.rows();
+	int nCols = matMtr.GetColsNum();
+	int nRows = matMtr.GetRowsNum();
 
 	if (nCols != 4)
 	{
@@ -405,7 +395,7 @@ int albaVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, 
 		for (int j = 0; j < nRows; j++)
 		{
 			// fill ith data array with jth value 
-			darr->SetTuple1(j, matMtr[j][i]);
+			darr->SetTuple1(j, matMtr(j, i));
 		}
 
 		double *range = darr->GetRange();
@@ -427,10 +417,10 @@ int albaVMEMeshAnsysTextImporter::GetElementType()
 //----------------------------------------------------------------------------
 {
   // read the first line of the connectivity file    
-  vcl_ifstream connectivityStream;
+  std::ifstream connectivityStream;
   connectivityStream.open(m_ElementsFileName, ios::out);
 
-  vcl_vector<int> connectivityVector;
+  std::vector<int> connectivityVector;
 
   if (connectivityStream.is_open())
   {
@@ -442,7 +432,7 @@ int albaVMEMeshAnsysTextImporter::GetElementType()
     connectivityStream.getline(buf, CHAR_BUF_SIZE, '\n');
     
     // associate an istringstream with full line
-    vcl_istringstream connectivityStrStream(buf);
+    std::istringstream connectivityStrStream(buf);
 
     // fill the connectivityVector
     while (connectivityStrStream >> tmpInt) 
@@ -518,29 +508,6 @@ int albaVMEMeshAnsysTextImporter::GetElementType()
 }
 
 //----------------------------------------------------------------------------
-int albaVMEMeshAnsysTextImporter::ReadMatrix(vnl_matrix<double> &M, const char *fname)
-{
-  vcl_ifstream matrix_stream(fname, std::ios::in);
-
-  if(matrix_stream.is_open() != 0)
-  {	
-    if(M.read_ascii(matrix_stream))
-			return 0;
-		else
-		{
-			matrix_stream.clear();
-			matrix_stream.seekg(0, ios::beg);
-			char buffer[1024];
-			matrix_stream.getline(buffer,1024);
-			if (M.read_ascii(matrix_stream))
-				return 0;
-		}
-  }
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 void albaVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input, vtkUnstructuredGrid *output  )
 //----------------------------------------------------------------------------
 {
@@ -593,7 +560,7 @@ void albaVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input
   int materialsNumber = materialIDArrayFD->GetNumberOfTuples();
 
   // create a vector for searching material ID:
-  vcl_map<int, int> materialIdMaterialColumnMap;
+  std::map<int, int> materialIdMaterialColumnMap;
   for (int i = 0; i < materialsNumber; i++)
   {
     int materialID = (int)(materialIDArrayFD->GetValue(i));

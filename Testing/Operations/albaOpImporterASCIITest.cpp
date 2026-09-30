@@ -85,7 +85,7 @@ void albaOpImporterASCIITest::TestImportSingleASCIIFile()
 
   albaVMEScalarMatrix *matrix;
   albaNEW(matrix);
-  vnl_matrix<double> m;
+  albaDynamicMatrix m;
 
   /* Create a Matrix equals to the one stored in the ASCII file;
   1.0 2.0 3.0
@@ -93,17 +93,10 @@ void albaOpImporterASCIITest::TestImportSingleASCIIFile()
   7.0 8.0 9.0
   */
 
-  m.set_size(3,3);
-  m.put(0,0,1.0);
-  m.put(0,1,2.0);
-  m.put(0,2,3.0);
-  m.put(1,0,4.0);
-  m.put(1,1,5.0);
-  m.put(1,2,6.0);
-  m.put(2,0,7.0);
-  m.put(2,1,8.0);
-  m.put(2,2,9.0);
-
+  m.Resize(3,3);
+  m.SetRow(0,std::vector<double>{1.0, 2.0, 3.0});
+  m.SetRow(1,std::vector<double>{4.0, 5.0, 6.0});
+  m.SetRow(2,std::vector<double>{7.0, 8.0, 9.0});
   matrix->SetData(m,0);
 
   filename<<"/Test_ImporterASCII/matrix_01.txt";
@@ -137,7 +130,7 @@ void albaOpImporterASCIITest::TestImportMultipleASCIIFiles()
 
   albaVMEScalarMatrix *matrix;
   albaNEW(matrix);
-  vnl_matrix<double> m;
+  albaDynamicMatrix m;
 
   /* Create a Matrix equals to the one stored in the ASCII file;
   1.0 2.0 3.0
@@ -145,17 +138,10 @@ void albaOpImporterASCIITest::TestImportMultipleASCIIFiles()
   7.0 8.0 9.0
   */
 
-  m.set_size(3,3);
-  m.put(0,0,1.0);
-  m.put(0,1,2.0);
-  m.put(0,2,3.0);
-  m.put(1,0,4.0);
-  m.put(1,1,5.0);
-  m.put(1,2,6.0);
-  m.put(2,0,7.0);
-  m.put(2,1,8.0);
-  m.put(2,2,9.0);
-
+  m.Resize(3,3);
+  m.SetRow(0,std::vector<double>{1.0, 2.0, 3.0});
+  m.SetRow(1,std::vector<double>{4.0, 5.0, 6.0});
+  m.SetRow(2,std::vector<double>{7.0, 8.0, 9.0});
   matrix->SetData(m,0);
 
   /* Create a Matrix equals to the one stored in the ASCII file;
@@ -164,17 +150,10 @@ void albaOpImporterASCIITest::TestImportMultipleASCIIFiles()
   7.0 8.0 9.0
   */
 
-  m.set_size(3,3);
-  m.put(0,0,10.0);
-  m.put(0,1,11.0);
-  m.put(0,2,12.0);
-  m.put(1,0,13.0);
-  m.put(1,1,14.0);
-  m.put(1,2,15.0);
-  m.put(2,0,16.0);
-  m.put(2,1,17.0);
-  m.put(2,2,18.0);
-
+  m.Resize(3,3);
+  m.SetRow(0,std::vector<double>{10.0, 11.0, 12.0});
+  m.SetRow(1,std::vector<double>{13.0, 14.0, 15.0});
+  m.SetRow(2,std::vector<double>{16.0, 17.0, 18.0});
   matrix->SetData(m,1);
 
   filename<<"/Test_ImporterASCII/matrix_01.txt";

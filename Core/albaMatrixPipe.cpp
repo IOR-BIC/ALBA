@@ -40,7 +40,6 @@ albaCxxTypeMacro(albaMatrixPipe)
 albaMatrixPipe::albaMatrixPipe()
 //------------------------------------------------------------------------------
 {
-  m_UpdateMatrixObserverFlag=1;
   m_Updating=0; // this should be used to avoid updating loops
   m_VME=NULL;
 }
@@ -139,7 +138,6 @@ vtkMTimeType albaMatrixPipe::GetMTime()
 void albaMatrixPipe::InternalUpdate()
 //----------------------------------------------------------------------------
 {
-  if (m_VME) m_VME->OnEvent(&albaEventBase(this,VME_MATRIX_UPDATE));
 }
 
 //----------------------------------------------------------------------------

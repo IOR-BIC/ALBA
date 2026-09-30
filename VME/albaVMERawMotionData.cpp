@@ -31,9 +31,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
 
-#include "albaItkRawMotionImporterUtility.h"
 #include <iostream>
 #include <string>
+#include "albaDynamicMatrix.h"
 
 
 //----------------------------------------------------------------------------
@@ -83,12 +83,9 @@ void albaVMERawMotionData::SetFileName(const char *name)
 int albaVMERawMotionData::Read()
 //----------------------------------------------------------------------------
 {
-		
-  albaItkRawMotionImporterUtility utils;
+	albaDynamicMatrix M;
 
-  vnl_matrix<double> M;
-
-  if (utils.ReadMatrix(M,this->m_FileName))
+  if (M.ReadFromFile(this->m_FileName)==ALBA_ERROR)
   {
     albaErrorMacro("File does not exist!");
 	  return 1;
@@ -141,7 +138,7 @@ int albaVMERawMotionData::Read()
 						
 				currentDlc->AppendLandmark(v_lmname.c_str());
 
-				for (int i = 0; i < M.rows(); i++)
+				for (int i = 0; i < M.GetRowsNum(); i++)
 				{ 
 				  currentDlc->SetLandmark(v_lmname.c_str(), M(i, v_current_col), M(i, v_current_col + 1), M(i, v_current_col + 2), i);
 						
@@ -158,7 +155,6 @@ int albaVMERawMotionData::Read()
 		}//if vdict is open
 		else
 		{
-		  //vcl_cout << "File does not exist!\n";
 		  return 1;
 		}
 
@@ -176,8 +172,8 @@ int albaVMERawMotionData::Read()
     dlc->SetName("dummy segment");
 		dlc->SetRadius(15);
     		
-	  //Create (M.columns() / 3) landmarks
-		for (int j = 0; j < M.columns(); j += 3)
+	  //Create (M.GetNumberOfColumns() / 3) landmarks
+		for (int j = 0; j < M.GetColsNum(); j += 3)
 		{
       albaString lm_name;
 			lm_name ="lm_";
@@ -186,7 +182,7 @@ int albaVMERawMotionData::Read()
 			dlc->AppendLandmark(lm_name);
 			current_lm++;
 
-			for (int i = 0; i < M.rows(); i++)
+			for (int i = 0; i < M.GetRowsNum(); i++)
 			{ 
 				dlc->SetLandmark(lm_name,
 				M(i, j),						

@@ -577,7 +577,6 @@ wxString  albaIdString(int id)
      case VME_TIME_SET:             s="VME_TIME_SET"; break;
      case VME_MATRIX_CHANGED:       s="VME_MATRIX_CHANGED"; break;
      case VME_MATRIX_PREUPDATE:     s="VME_MATRIX_PREUPDATE"; break;
-     case VME_MATRIX_UPDATE:        s="VME_MATRIX_UPDATE"; break;
      case VME_ABSMATRIX_UPDATE:     s="VME_ABSMATRIX_UPDATE"; break;
      case VME_OUTPUT_DATA_PREUPDATE:s="VME_OUTPUT_DATA_PREUPDATE"; break;
      case VME_OUTPUT_DATA_UPDATE:   s="VME_OUTPUT_DATA_UPDATE"; break;

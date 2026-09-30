@@ -26,7 +26,6 @@
 #include "albaTagItem.h"
 #include "vtkCell.h"
 #include "vtkPolyData.h"
-#include "vnl/vnl_vector.h"
 
 using namespace std;
 

@@ -32,7 +32,7 @@
 #include <fstream>
 #include <iostream>
 
-#include <vnl\vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 #include "albaProgressBarHelper.h"
 
 using namespace std;
@@ -129,30 +129,30 @@ void albaOpExporterAnalogWS::Write()
     f_Out << "\n";
 
     //Add times and values; time is always the first row
-    vnl_matrix<double> emgMatrix = m_Analog->GetScalarOutput()->GetScalarData();
-    for (int i=0;i<emgMatrix.columns();i++)
+    albaDynamicMatrix emgMatrix = m_Analog->GetScalarOutput()->GetScalarData();
+    for (int i=0;i<emgMatrix.GetColsNum();i++)
     {
       // Add time
-      double time = emgMatrix.get(0,i);
+      double time = emgMatrix(0,i);
       f_Out << time << ",";
-      for (int j=1;j<emgMatrix.rows()-1;j++)
+      for (int j=1;j<emgMatrix.GetRowsNum()-1;j++)
       {
         // Add all values but last one
-        f_Out << emgMatrix.get(j,i) << ",";
+        f_Out << emgMatrix(j,i) << ",";
       }
-      if (emgMatrix.rows()>0)
+      if (emgMatrix.GetRowsNum()>0)
       {
         // Add last one
-        if (i==emgMatrix.columns()-1)
+        if (i==emgMatrix.GetColsNum()-1)
         {
-          f_Out << emgMatrix.get(emgMatrix.rows()-1,i);
+          f_Out << emgMatrix(emgMatrix.GetRowsNum()-1,i);
         }
         else
         {
-          f_Out << emgMatrix.get(emgMatrix.rows()-1,i) << "\n";
+          f_Out << emgMatrix(emgMatrix.GetRowsNum()-1,i) << "\n";
         }
       }
-			progressHelper.UpdateProgressBar(((double) i)/((double) emgMatrix.columns())*100.);
+			progressHelper.UpdateProgressBar(((double) i)/((double) emgMatrix.GetColsNum())*100.);
     }
     
     f_Out.close();

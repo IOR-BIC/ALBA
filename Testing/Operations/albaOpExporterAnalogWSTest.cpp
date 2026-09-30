@@ -24,8 +24,7 @@
 
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnalogWS.h"
-
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
@@ -79,12 +78,12 @@ void albaOpExporterAnalogWSTest::TestWrite()
 		v_third_channel[i] = (i + 1) * 3;
   }
 
-   vnl_matrix<double> emgScalar;
-   emgScalar.set_size(4,10);
-  emgScalar.set_row(0,v_time);
-  emgScalar.set_row(1,v_first_channel);
-  emgScalar.set_row(2,v_second_channel);
-  emgScalar.set_row(3,v_third_channel);
+  albaDynamicMatrix emgScalar;
+  emgScalar.Resize(4,10);
+  emgScalar.SetRow(0,v_time);
+  emgScalar.SetRow(1,v_first_channel);
+  emgScalar.SetRow(2,v_second_channel);
+  emgScalar.SetRow(3,v_third_channel);
   
   albaVMEAnalog* analog_test;
   albaNEW(analog_test);

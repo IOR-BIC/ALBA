@@ -20,10 +20,8 @@ albaStorage
 albaVME
 albaView
 albaVisualPipe
-itkALBA
 vtkALBA
 alba
 <--ExternalInherit-->
 vtk
-itk
 wx

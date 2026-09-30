@@ -114,7 +114,7 @@ albaVMEOutput *albaVMEScalarMatrix::GetOutput()
 }
 
 //-------------------------------------------------------------------------
-int albaVMEScalarMatrix::SetData(vnl_matrix<double> &data, albaTimeStamp t)
+int albaVMEScalarMatrix::SetData(albaDynamicMatrix &data, albaTimeStamp t)
 //-------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEItemScalarMatrix> item;
@@ -276,16 +276,16 @@ int albaVMEScalarMatrix::GetScalarIdForXCoordinate()
 //-------------------------------------------------------------------------
 {
   albaVMEOutputScalarMatrix *output = GetScalarOutput();
-  vnl_matrix<double> data = output->GetScalarData();
-  if (!data.empty())
+  albaDynamicMatrix data = output->GetScalarData();
+  if (!data.IsEmpty())
   {
     if (m_ScalarArrayOrientationInMatrix == COLUMNS)
     {
-      m_XID = m_XID > data.columns() ? data.columns() : m_XID;
+      m_XID = m_XID > data.GetColsNum() ? data.GetColsNum() : m_XID;
     }
     else
     {
-      m_XID = m_XID > data.rows() ? data.rows() : m_XID;
+      m_XID = m_XID > data.GetRowsNum() ? data.GetRowsNum() : m_XID;
     }
   }
   if (m_Gui)
@@ -329,16 +329,16 @@ int albaVMEScalarMatrix::GetScalarIdForYCoordinate()
 //-------------------------------------------------------------------------
 {
   albaVMEOutputScalarMatrix *output = GetScalarOutput();
-  vnl_matrix<double> data = output->GetScalarData();
-  if (!data.empty())
+  albaDynamicMatrix data = output->GetScalarData();
+  if (!data.IsEmpty())
   {
     if (m_ScalarArrayOrientationInMatrix == COLUMNS)
     {
-      m_YID = m_YID > data.columns() ? data.columns() : m_YID;
+      m_YID = m_YID > data.GetColsNum() ? data.GetColsNum() : m_YID;
     }
     else
     {
-      m_YID = m_YID > data.rows() ? data.rows() : m_YID;
+      m_YID = m_YID > data.GetRowsNum() ? data.GetRowsNum() : m_YID;
     }
   }
   if (m_Gui)
@@ -382,16 +382,16 @@ int albaVMEScalarMatrix::GetScalarIdForZCoordinate()
 //-------------------------------------------------------------------------
 {
   albaVMEOutputScalarMatrix *output = GetScalarOutput();
-  vnl_matrix<double> data = output->GetScalarData();
-  if (!data.empty())
+  albaDynamicMatrix data = output->GetScalarData();
+  if (!data.IsEmpty())
   {
     if (m_ScalarArrayOrientationInMatrix == COLUMNS)
     {
-      m_ZID = m_ZID > data.columns() ? data.columns() : m_ZID;
+      m_ZID = m_ZID > data.GetColsNum() ? data.GetColsNum() : m_ZID;
     }
     else
     {
-      m_ZID = m_ZID > data.rows() ? data.rows() : m_ZID;
+      m_ZID = m_ZID > data.GetRowsNum() ? data.GetRowsNum() : m_ZID;
     }
   }
   if (m_Gui)

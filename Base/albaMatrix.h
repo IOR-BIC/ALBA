@@ -129,8 +129,11 @@ public:
   static void Invert(const albaMatrix &in, albaMatrix &out) {albaMatrix::Invert(*in.GetElements(),*out.GetElements()); out.Modified();}
   /**
     Matrix Inversion (adapted from Richard Carling in "Graphics Gems," 
-    Academic Press, 1990). */
+    Academic Press, 1990). This method modifies the matrix*/
 	albaMatrix *Invert() { albaMatrix::Invert(*this, *this); return this; }
+  /** Return the inverse matrix without modifying the original */
+  albaMatrix GetInverse() { albaMatrix inv; albaMatrix::Invert(*this, inv); return inv; }
+
   /**
     Matrix Inversion, (adapted from Richard Carling in "Graphics Gems," 
     Academic Press, 1990). static version.*/

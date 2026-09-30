@@ -1,9 +1,0 @@
-442a443
-> #if !defined(_MSC_VER) || _MSC_VER < 1600
-443a445,446
-> #endif
-> 		
-1042a1046
-> #if !defined(_MSC_VER) || _MSC_VER < 1600
-1050a1055
-> #endif

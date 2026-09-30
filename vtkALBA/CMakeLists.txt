@@ -100,23 +100,13 @@ SET(vtkALBA_SRCS
 )
 
 
-IF (ALBA_USE_ITK)
-SET(vtkALBA_SRCS  ${vtkALBA_SRCS}
-  albaClassicICPRegistration.cxx  						albaClassicICPRegistration.h
-  albaICPUtility.h
-)
-ENDIF (ALBA_USE_ITK)
-
-
 #####PUT HERE FILES THAT DOES NOT NEEDS AN INSTANTIATOR
-SET(vtkALBA_FULL_SRCS
-	${vtkALBA_SRCS}
+SET(vtkALBA_FULL_SRCS ${vtkALBA_SRCS}
   vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
   vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
   albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
   vtkALBAIdType64.h
   )
-
 
 # List the kits from VTK that are needed by this project.
 SET(vtkALBA_LIBS ${VTK_LIBRARIES})

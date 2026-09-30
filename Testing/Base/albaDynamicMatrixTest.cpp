@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaItkRawMotionImporterUtilityTest
- Authors: Daniele Giunchi
+ Module: albaDynamicMatrixTest
+ Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -22,11 +22,10 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "itkRawMotionImporterUtilityTest.h"
-#include "albaItkRawMotionImporterUtility.h"
+#include "albaDynamicMatrixTest.h"
+#include "albaDynamicMatrix.h"
 #include "albaString.h"
 
-#include "vnl/vnl_matrix.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
@@ -37,59 +36,47 @@
 //3.0 3.1 3.2 3.3
 
 //----------------------------------------------------------------------------
-void albaItkRawMotionImporterUtilityTest::TestFixture()
+void albaDynamicMatrixTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //-----------------------------------------------------------
-void albaItkRawMotionImporterUtilityTest::TestDynamicAllocation() 
+void albaDynamicMatrixTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  albaItkRawMotionImporterUtility *rMIU=new albaItkRawMotionImporterUtility();
+  albaDynamicMatrix *rMIU=new albaDynamicMatrix();
   delete rMIU;
 }
 //-----------------------------------------------------------
-void albaItkRawMotionImporterUtilityTest::TestReadMatrix() 
+void albaDynamicMatrixTest::TestReadMatrix() 
 //-----------------------------------------------------------
 {
-  enum ID_RESULT
-  {
-    RES_OK = 0,
-    RES_ERROR = 1,
-  };
-
+ 
   albaString matrixFile = ALBA_DATA_ROOT;
   matrixFile << "/Matrix/TestMatrix001.txt";
-  vnl_matrix<double> mat;
-  albaItkRawMotionImporterUtility *rMIU=new albaItkRawMotionImporterUtility();
-  int res = rMIU->ReadMatrix(mat,matrixFile);
+  albaDynamicMatrix mat;
+  int res = mat.ReadFromFile(matrixFile);
 
-  m_Result = res == RES_OK;
-  TEST_RESULT;
+  CPPUNIT_ASSERT( res == ALBA_OK );
+  CPPUNIT_ASSERT( mat.GetColsNum() == 4 && mat.GetColsNum() == 4 );
+  
+  CPPUNIT_ASSERT(mat(0, 0) == 0.0 && mat(0, 1) == 0.1 && mat(0, 2) == 0.2 && mat(0, 3) == 0.3);
+  CPPUNIT_ASSERT(mat(1, 0) == 1.0 && mat(1, 1) == 1.1 && mat(1, 2) == 1.2 && mat(1, 3) == 1.3);
+  CPPUNIT_ASSERT(mat(2, 0) == 2.0 && mat(2, 1) == 2.1 && mat(2, 2) == 2.2 && mat(2, 3) == 2.3);
+  CPPUNIT_ASSERT(mat(3, 0) == 3.0 && mat(3, 1) == 3.1 && mat(3, 2) == 3.2 && mat(3, 3) == 3.3);
+  
+}
 
-  m_Result = mat.columns() == 4 && mat.rows() == 4;
-  TEST_RESULT;
+//----------------------------------------------------------------------------
+void albaDynamicMatrixTest::TestBigFileRead()
+{
+  albaDynamicMatrix matrix;
 
-  m_Result = mat.get(0,0) == 0.0 && 
-             mat.get(0,1) == 0.1 &&
-             mat.get(0,2) == 0.2 &&
-             mat.get(0,3) == 0.3 &&
+	albaString matrixFile = ALBA_DATA_ROOT;
+  matrixFile << "/RAW_MAL/Fprg3bsi.man";
 
-             mat.get(1,0) == 1.0 &&
-             mat.get(1,1) == 1.1 &&
-             mat.get(1,2) == 1.2 &&
-             mat.get(1,3) == 1.3 &&
+  int result=matrix.ReadFromFile(matrixFile);
 
-             mat.get(2,0) == 2.0 &&
-             mat.get(2,1) == 2.1 &&
-             mat.get(2,2) == 2.2 &&
-             mat.get(2,3) == 2.3 &&
+  CPPUNIT_ASSERT( result == ALBA_OK );
 
-             mat.get(3,0) == 3.0 &&
-             mat.get(3,1) == 3.1 &&
-             mat.get(3,2) == 3.2 &&
-             mat.get(3,3) == 3.3;
-  TEST_RESULT;
-
-  delete rMIU;
 }

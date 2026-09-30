@@ -7,7 +7,6 @@ PROJECT(albaCommon)
 # Set your list of sources here.
 SET(PROJECT_SRCS
 
-  albaItkRawMotionImporterUtility.cxx  					albaItkRawMotionImporterUtility.h  
   albaPolylineGraph.cpp  												albaPolylineGraph.h  
   albaCurvilinearAbscissaOnSkeletonHelper.cpp  	albaCurvilinearAbscissaOnSkeletonHelper.h  
   albaRelationalDatabaseAbstractConnector.cpp  	albaRelationalDatabaseAbstractConnector.h  

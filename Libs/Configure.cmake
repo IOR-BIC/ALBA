@@ -18,7 +18,6 @@ SET (MFL_TARGETS "")
 # options for configuring MFL libraries
 OPTION(COMPILE_LIBRARIES "Complie Libraries on build (you can disable this after first compilation to speedup build time)" ON)
 OPTION(ALBA_USE_VTK "Find and Link the VTK library." ON)
-OPTION(ALBA_USE_ITK "Find and Link the ITK library." ON)
 OPTION(ALBA_USE_WX "Find and Link the wxWidgets library." ON)
 OPTION(ALBA_USE_VCOLLIDE "Find and Link the VCOLLIDE library." OFF)
 OPTION(ALBA_USE_XercesC "Find and Link the XercesC library." ON)
@@ -59,19 +58,6 @@ IF (ALBA_USE_GDCM)
   MFL_SUBPROJECT(GDCM GDCM)
 ENDIF(ALBA_USE_GDCM)
 
-#
-# this is to build ITK inside the ALBA tree
-#
-IF (ALBA_USE_ITK)
-  MFL_SUBPROJECT(ITK ITK)
-ENDIF (ALBA_USE_ITK)
-
-#
-# this is to build VCOLLIDE inside the ALBA tree
-#
-#IF (ALBA_USE_VCOLLIDE)
-#MFL_SUBPROJECT(VCollide20 VCollide20)
-#ENDIF (ALBA_USE_VCOLLIDE)
 
 #
 # wxWindows Library

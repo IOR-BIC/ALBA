@@ -22,11 +22,10 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 #include "albaOp.h"
-#include <vnl\vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
 //----------------------------------------------------------------------------
@@ -75,7 +74,7 @@ protected:
 	bool InternalAccept(albaVME*node) { return true; };
 
   albaVMEAnalog *m_EmgScalar;
-  vnl_matrix<double> m_EmgMatrix;
+  albaDynamicMatrix m_EmgMatrix;
   wxString m_FileDir;
 	wxString m_File;
 };

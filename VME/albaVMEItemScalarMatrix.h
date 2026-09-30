@@ -22,9 +22,8 @@
 #include "albaStorable.h"
 #include "albaString.h"
 #include "albaMTime.h"
+#include "albaDynamicMatrix.h"
 
-#include <vnl/vnl_matrix.h>
-#include <vnl/vnl_matrix.txx>
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -36,10 +35,9 @@ class albaTagArray;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
-/** albaVMEItemScalarMatrix - store time-varying scalar information into a vnl_vector
+/** albaVMEItemScalarMatrix - store time-varying scalar information into a std::vector
   albaVMEItemScalarMatrix is an object that stores the single time stamped scalar array of a
   albaVME. This class associates a Time stamp and a Tagged list to an internally 
   stored scalar array. 
@@ -74,10 +72,10 @@ public:
 
   /** Return data scalar. (Supported only if ALBA is compiled
     with ITK support which include VNL library) */
-  virtual vnl_matrix<double> &GetData();
+  virtual albaDynamicMatrix &GetData();
 
   /** Set the scalar data */
-  virtual void SetData(vnl_matrix<double> &data);
+  virtual void SetData(albaDynamicMatrix &data);
 
   /** Compare two scalar items. Two scalar items are considered equivalent if they store
     the same type of data, have the same TimeStamp and equivalent TagArray.
@@ -91,7 +89,7 @@ public:
   /** Return true if scalar data is not empty. Currently this doesn't ensure data is the same on 
   the file. IsDataModified() can be used to know if data has been changed with respect
   to file.*/
-  virtual bool IsDataPresent() {return !m_Data.empty();}
+  virtual bool IsDataPresent() {return !m_Data.IsEmpty();}
   
   /** UpdateBounds for this data. GetBounds automatically call this function...*/
   virtual void UpdateBounds();
@@ -125,7 +123,7 @@ protected:
   /** Check that stored string is valid.*/
   virtual int CheckFile(const char *input_string, int input_len) {return ALBA_OK;};
 
-  /** Update the vnl reader to read from memory or file from disk (encrypted or not).*/
+  /** Update the reader to read from memory or file from disk (encrypted or not).*/
   int UpdateReader(albaString &filename);
 
   /** Restore data stored in this object. This function asks the storage
@@ -138,8 +136,8 @@ protected:
     into the URL. This method is called by Store().*/
   virtual int InternalStoreData(const char *url);
 
-  vnl_matrix<double>  m_Data;       ///< pointer to scalar data
-  albaString           m_DataString; 
+  albaDynamicMatrix   m_Data;       ///< pointer to scalar data
+  albaString          m_DataString; 
   int                 m_IOStatus;   ///< internally used to store the IO status
   double              m_ScalarBouns[2];
   

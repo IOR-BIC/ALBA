@@ -47,17 +47,12 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
 	ADD_DEFINITIONS(-DCRYPTOPP_DISABLE_ASM)
 ENDIF (ALBA_USE_CRYPTO)
 
-IF (ALBA_USE_ITK)
-SET(PROJECT_SRCS  ${PROJECT_SRCS}
+IF (ALBA_USE_VTK)
+  SET(PROJECT_SRCS  ${PROJECT_SRCS}
   albaVMEOutputScalarMatrix.cpp  			albaVMEOutputScalarMatrix.h
   albaVMEScalarMatrix.cpp  					albaVMEScalarMatrix.h
   albaVMEItemScalarMatrix.cpp  				albaVMEItemScalarMatrix.h
-  )
-ENDIF (ALBA_USE_ITK)
 
-IF (ALBA_USE_VTK)
-  SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
   albaVMEGeneric.cpp  						albaVMEGeneric.h
   albaVMEGizmo.cpp  							albaVMEGizmo.h
   albaVMEImage.cpp  							albaVMEImage.h
@@ -124,8 +119,4 @@ ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
 IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
 ENDIF (ALBA_USE_VTK)
-
-IF (ALBA_USE_ITK)
-  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_ITK_LIBRARY)
-ENDIF (ALBA_USE_ITK)
 

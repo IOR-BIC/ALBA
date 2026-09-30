@@ -67,18 +67,18 @@ void albaPipeScalarMatrixTest::TestPipeExecution()
   vtkTimerLog::SetLogging(0); // Must shutdown logging otherwise it will generate leaks
 
   // Create the scalar matrix
-  vnl_matrix<double> matrix;
-  matrix.set_size(10,10);
+  albaDynamicMatrix matrix;
+  matrix.Resize(10,10);
   for(int r = 0; r < 10; r++)
   {
     for(int c = 0; c < 10; c++)
     {
       if(r == 0)
-        matrix.put(r,c,c);
+        matrix.Set(r,c,c);
       else if(c == 0)
-        matrix.put(r,c,r);
+        matrix.Set(r,c,r);
       else
-        matrix.put(r,c,c + r);
+        matrix.Set(r,c,c + r);
     }
   }
 

@@ -460,7 +460,6 @@ IF (ALBA_USE_CRYPTO)
   )
 ENDIF (ALBA_USE_CRYPTO)
 
-IF (ALBA_USE_ITK)
   SET(VME_SRCS
     ${VME_SRCS}
     ../VME/albaPipeScalarMatrix.cpp
@@ -472,7 +471,6 @@ IF (ALBA_USE_ITK)
     ../VME/albaVMEItemScalarMatrix.cpp
     ../VME/albaVMEItemScalarMatrix.h
   )
-ENDIF (ALBA_USE_ITK)
 
 IF (ALBA_USE_VTK)
   SET(VME_SRCS

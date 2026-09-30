@@ -41,9 +41,8 @@ void albaVMEScalarMatrixTest::TestFixture()
 void albaVMEScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  in_data.set_size(10,20);
-  in_data.fill(1.0);
-
+  m_InData.Resize(10,20,1.0);
+  
   // initialized the VME factory
   albaVMEFactory::Initialize();
 }
@@ -53,7 +52,7 @@ void albaVMEScalarMatrixTest::TestVMEScalarFactory()
 //----------------------------------------------------------------------------
 {
   albaVMEScalarMatrix *scalar = albaVMEScalarMatrix::SafeDownCast(albaVMEFactory::CreateInstance("albaVMEScalarMatrix"));
-  scalar->SetData(in_data,0.0);
+  scalar->SetData(m_InData,0.0);
   scalar->Delete();
 }
 //----------------------------------------------------------------------------
@@ -83,14 +82,14 @@ void albaVMEScalarMatrixTest::TestVMEScalarData()
 //----------------------------------------------------------------------------
 {
   int r,c;
-  vnl_matrix<double> out_data;
+  albaDynamicMatrix out_data;
 
   albaVMEScalarMatrix *scalar = albaVMEScalarMatrix::SafeDownCast(albaVMEFactory::CreateInstance("albaVMEScalarMatrix"));
-  scalar->SetData(in_data,0.0);
+  scalar->SetData(m_InData,0.0);
   out_data = scalar->GetScalarOutput()->GetScalarData();
-  c = out_data.columns();
+  c = out_data.GetColsNum();
   CPPUNIT_ASSERT(c == 20);
-  r = out_data.rows();
+  r = out_data.GetRowsNum();
   CPPUNIT_ASSERT(r == 10);
 
   CPPUNIT_ASSERT(!scalar->IsAnimated());
@@ -102,7 +101,7 @@ void albaVMEScalarMatrixTest::TestVMEScalarMethods()
 //----------------------------------------------------------------------------
 {
   albaVMEScalarMatrix *scalar = albaVMEScalarMatrix::SafeDownCast(albaVMEFactory::CreateInstance("albaVMEScalarMatrix"));
-  scalar->SetData(in_data,0.0);
+  scalar->SetData(m_InData,0.0);
 
   //////////////////////////////////////////////////////////////////////////
   // Test default settings.
@@ -156,13 +155,12 @@ void albaVMEScalarMatrixTest::TestVMEScalarMethods()
 void albaVMEScalarMatrixTest::TestAnimatedVMEScalar()
 //----------------------------------------------------------------------------
 {
-  vnl_matrix<double> out_data;
-  vnl_matrix<double> in_data_t1;
-  in_data_t1.set_size(10,20);
-  in_data_t1.fill(5.0);
+  albaDynamicMatrix out_data;
+  albaDynamicMatrix in_data_t1;
+  in_data_t1.Resize(10,20,5.0);
 
   albaVMEScalarMatrix *scalar = albaVMEScalarMatrix::SafeDownCast(albaVMEFactory::CreateInstance("albaVMEScalarMatrix"));
-  scalar->SetData(in_data,0.0);
+  scalar->SetData(m_InData,0.0);
   scalar->SetData(in_data_t1,1.0);
 
   CPPUNIT_ASSERT(scalar->IsAnimated());
@@ -171,11 +169,11 @@ void albaVMEScalarMatrixTest::TestAnimatedVMEScalar()
   // Test scalar values at different timestamp.
   scalar->SetTimeStamp(0.0);
   out_data = scalar->GetScalarOutput()->GetScalarData();
-  CPPUNIT_ASSERT(albaEquals(out_data.get(0,0),1.0));
+  CPPUNIT_ASSERT(albaEquals(out_data(0,0),1.0));
 
   scalar->SetTimeStamp(1.0);
   out_data = scalar->GetScalarOutput()->GetScalarData();
-  CPPUNIT_ASSERT(albaEquals(out_data.get(0,0),5.0));
+  CPPUNIT_ASSERT(albaEquals(out_data(0,0),5.0));
   //////////////////////////////////////////////////////////////////////////
   
   scalar->Delete();

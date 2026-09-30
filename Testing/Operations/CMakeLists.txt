@@ -46,7 +46,6 @@ SET(PROJECT_SRCS
 	albaOpValidateTreeTest.h albaOpValidateTreeTest.cpp
 	albaOpGarbageCollectMSFDirTest.h albaOpGarbageCollectMSFDirTest.cpp
 	albaOpScalarToSurfaceTest.h albaOpScalarToSurfaceTest.cpp
-	albaASCIIImporterUtilityTest.h albaASCIIImporterUtilityTest.cpp
 	albaOpEditMetadataTest.h albaOpEditMetadataTest.cpp
 	albaOpFilterVolumeTest.h albaOpFilterVolumeTest.cpp
 	albaOpTransformOldTest.h albaOpTransformOldTest.cpp
@@ -96,7 +95,6 @@ SET(PROJECT_SRCS
 	albaOpMML3Test.h albaOpMML3Test.cpp
 	albaOpExtractGeometryTest.h albaOpExtractGeometryTest.cpp
 	albaOpImporterDicomTest.h albaOpImporterDicomTest.cpp
-	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
 	albaOpMakeVMETimevaryingTest.h albaOpMakeVMETimevaryingTest.cpp
 	albaOpCreateWrappedMeterTest.h albaOpCreateWrappedMeterTest.cpp
 	albaOpFlipNormalsTest.h albaOpFlipNormalsTest.cpp
