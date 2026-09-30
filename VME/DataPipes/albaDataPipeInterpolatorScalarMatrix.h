@@ -19,7 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaDataPipeInterpolator.h"
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -28,7 +28,6 @@ class albaVMEItemScalarMatrix;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
 #endif
 
 /**
@@ -62,8 +61,8 @@ public:
    /**  Get the output of the interpolator item*/
   albaVMEItemScalarMatrix *GetCurrentItem() {return (albaVMEItemScalarMatrix *)m_CurrentItem;}
 
-  /** return the vnl_matrix data generated as output to this data pipe */
-  virtual vnl_matrix<double> &GetScalarData();
+  /** return the albaDynamicMatrix data generated as output to this data pipe */
+  virtual albaDynamicMatrix &GetScalarData();
 
 protected:
   /** constructor */
@@ -77,7 +76,7 @@ protected:
   /** Execute possible procedural code: Empty function */
   virtual void Execute() {}
 
-  vnl_matrix<double> m_ScalarData;
+  albaDynamicMatrix m_ScalarData;
 
 private:
   /** copy constructor not implemented */

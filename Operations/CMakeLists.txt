@@ -148,9 +148,7 @@ IF (ALBA_USE_VTK)
 	albaOpMakeVMETimevarying.cpp  albaOpMakeVMETimevarying.h
 	albaOpSegmentationRegionGrowingConnectedThreshold.cpp  albaOpSegmentationRegionGrowingConnectedThreshold.h
 	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
-	  
-	albaOpEqualizeHistogram.cpp  albaOpEqualizeHistogram.h
-	  
+	  	  
 	albaOpExporterAnalogWS.cpp		albaOpExporterAnalogWS.h
 	albaOpExporterGRFWS.cpp		albaOpExporterGRFWS.h
 	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
@@ -198,10 +196,8 @@ IF(ALBA_USE_BTK)
 	 SET(PROJECT_SRCS ${PROJECT_SRCS} albaOpImporterC3D.cpp			albaOpImporterC3D.h)
 ENDIF(ALBA_USE_BTK)
 
-IF (ALBA_USE_ITK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
-    albaASCIIImporterUtility.cpp			albaASCIIImporterUtility.h
     albaOpImporterASCII.cpp				albaOpImporterASCII.h
     albaVMEDataSetAttributesImporter.cpp	albaVMEDataSetAttributesImporter.h
     albaVMEMeshAnsysTextImporter.cpp		albaVMEMeshAnsysTextImporter.h
@@ -226,7 +222,7 @@ IF (ALBA_USE_ITK)
 	albaOpFilterImage.cpp			albaOpFilterImage.h
 	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
   )
-ENDIF (ALBA_USE_ITK)
+
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "albaVME" "albaInteraction" ${wxWidgets_LIBRARIES})

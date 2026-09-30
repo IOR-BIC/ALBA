@@ -144,7 +144,6 @@ void albaViewRXCT::PackageView()
 		m_ViewsRX[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeProjected", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeProjected", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMESlicer", "albaVisualPipeSlicerSlice", MUTEX);
-		m_ViewsRX[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeProjected", MUTEX);
 		m_ViewsRX[v]->SetCanSpin(false);
 
 		PlugChildView(m_ViewsRX[v]);
@@ -164,7 +163,6 @@ void albaViewRXCT::PackageView()
 	vs->PlugVisualPipe("albaVMEMeter", "albaPipePolylineSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEWrappedMeter", "albaPipePolylineSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
-	vs->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice", MUTEX);
 	vs->SetCanSpin(false);
 
 	SetCanSpin(false);

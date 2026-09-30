@@ -22,9 +22,6 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include <vnl/vnl_vector.h>
-
-
 #include "albaPipeGraph.h"
 #include "albaDecl.h"
 #include "albaSceneNode.h"
@@ -126,10 +123,10 @@ void albaPipeGraph::Create(albaSceneNode *n)
   m_Vme->AddObserver(this);
 
   m_EmgPlot = albaVMEAnalog::SafeDownCast(m_Vme);
-  m_NumberOfSignals = m_EmgPlot->GetScalarOutput()->GetScalarData().rows()-1; //1 row is for time information
-  m_DataMin = m_EmgPlot->GetScalarOutput()->GetScalarData().min_value();
-  m_DataMax = m_EmgPlot->GetScalarOutput()->GetScalarData().max_value();
-  m_TimeStamp = m_EmgPlot->GetScalarOutput()->GetScalarData().columns();
+  m_NumberOfSignals = m_EmgPlot->GetScalarOutput()->GetScalarData().GetRowsNum()-1; //1 row is for time information
+  m_DataMin = m_EmgPlot->GetScalarOutput()->GetScalarData().MinValue();
+  m_DataMax = m_EmgPlot->GetScalarOutput()->GetScalarData().MaxValue();
+  m_TimeStamp = m_EmgPlot->GetScalarOutput()->GetScalarData().GetColsNum();
   m_DataManualRange[0] = m_DataMin; //Initialize max data range 
   m_DataManualRange[1] = m_DataMax;
 
@@ -137,11 +134,11 @@ void albaPipeGraph::Create(albaSceneNode *n)
   
   m_EmgPlot->Update();
   m_TimeArray = vtkDoubleArray::New();
-  vnl_vector<double> rowTime = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(0);
+  std::vector<double> rowTime = m_EmgPlot->GetScalarOutput()->GetScalarData().GetRow(0);
 
   for (int t = 0; t < m_TimeStamp; t++)
   {
-   timeData = rowTime.get(t);
+   timeData = rowTime[t];
    m_TimeArray->InsertValue(counter,timeData);
    counter++;
   } 
@@ -276,7 +273,7 @@ void albaPipeGraph::UpdateGraph()
   double scalarData = 0;
   int counter_array = 0;
   vtkDoubleArray *scalar;
-  vnl_vector<double> row;
+  std::vector<double> row;
 
   for(int i=0;i<m_VtkData.size();i++)
   {
@@ -304,13 +301,13 @@ void albaPipeGraph::UpdateGraph()
      if (m_CheckedVector.at(c)) //fill the vector with vtkDoubleArray of signals checked
      {
        scalar = vtkDoubleArray::New();
-       row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
+       row = m_EmgPlot->GetScalarOutput()->GetScalarData().GetRow(c+1); //skip first row with time information
 
        if (m_FitPlot)
        {
          for (int t = 0; t < m_TimeStamp; t++) 
          { 
-           scalarData = row.get(t);
+           scalarData = row[t];
            break;
          }
        }
@@ -324,14 +321,14 @@ void albaPipeGraph::UpdateGraph()
     {
       int counter = 0;
       scalar = vtkDoubleArray::New();
-      row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
+      row = m_EmgPlot->GetScalarOutput()->GetScalarData().GetRow(c+1); //skip first row with time information
       
       if (m_FitPlot)
        {
         for (int t = 0; t < m_TimeStamp; t++) 
         { 
           newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
-          scalarData = row.get(t);
+          scalarData = row[t];
           scalar->InsertValue(counter, scalarData);
           counter++;
         }
@@ -343,7 +340,7 @@ void albaPipeGraph::UpdateGraph()
         if (m_TimesManualRange[0] <= m_TimeArray->GetValue(t) && m_TimeArray->GetValue(t) <= m_TimesManualRange[1])
         {
           newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
-          scalarData = row.get(t);
+          scalarData = row[t];
           scalar->InsertValue(counter, scalarData);
           counter++;
         }

@@ -45,7 +45,6 @@ SET(PROJECT_SRCS
 	vtkPackedImageTest.h vtkPackedImageTest.cpp
 	vtkXRayVolumeMapperTest.h vtkXRayVolumeMapperTest.cpp
 	vtkALBADataArrayDescriptorTest.h vtkALBADataArrayDescriptorTest.cpp
-	vtkALBAErythrocyteSourceTest.h vtkALBAErythrocyteSourceTest.cpp
 	vtkALBAMeshCutterTest.h vtkALBAMeshCutterTest.cpp
 	vtkALBAFillingHoleTest.h vtkALBAFillingHoleTest.cpp
 	vtkALBAFixTopologyTest.h vtkALBAFixTopologyTest.cpp
@@ -88,7 +87,6 @@ SET(PROJECT_SRCS
 	CSkeletonVertexM1Test.h CSkeletonVertexM1Test.cpp
 	CSkeletonVertexM2Test.h CSkeletonVertexM2Test.cpp
 	vtkALBACollisionDetectionFilterTest.h vtkALBACollisionDetectionFilterTest.cpp
-	vtkALBAImageFillHolesRemoveIslandsTest.h vtkALBAImageFillHolesRemoveIslandsTest.cpp
 	vtkALBARayCastCleanerTest.h vtkALBARayCastCleanerTest.cpp
 	vtkALBALineStripSourceTest.h vtkALBALineStripSourceTest.cpp
 	vtkALBARGtoSPImageFilterTest.h vtkALBARGtoSPImageFilterTest.cpp

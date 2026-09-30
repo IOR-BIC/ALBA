@@ -1,0 +1,4 @@
+84a85,87
+>   /** Get the orientation matrix of the image */
+>   void GetOrientationMatrix(double matrix[3][3]);
+> 

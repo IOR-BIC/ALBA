@@ -19,8 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaVMEOutput.h"
-#include "vnl/vnl_matrix.h"
-
+#include "albaDynamicMatrix.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -31,8 +30,6 @@ class vtkPolyData;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
-EXPORT_VNL_MATRIX(ALBA_EXPORT, double);
-EXPORT_VNL_VECTOR(ALBA_EXPORT, double);
 #endif
 
 /** NULL output for VME node with a scalar output data.
@@ -50,7 +47,7 @@ public:
     Usually the output is a  "smart copy" of one of the vnl matrix in 
     the DataArray. An event is rised when the output data changes to allow attached classes to 
     update their input.*/
-  virtual vnl_matrix<double> &GetScalarData();
+  virtual albaDynamicMatrix &GetScalarData();
 
 #ifdef ALBA_USE_VTK
   /**

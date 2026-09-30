@@ -35,9 +35,7 @@
 #include "albaTagArray.h"
 
 #include <assert.h>
-
-#include <vcl_fstream.h>
-#include <vnl/vnl_vector.h>
+#include <fstream>
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEItemScalarMatrix)
@@ -55,7 +53,6 @@ albaVMEItemScalarMatrix::albaVMEItemScalarMatrix()
 albaVMEItemScalarMatrix::~albaVMEItemScalarMatrix()
 //-------------------------------------------------------------------------
 {
-  m_Data.clear();
 }
 
 //-------------------------------------------------------------------------
@@ -65,13 +62,13 @@ void albaVMEItemScalarMatrix::DeepCopy(albaVMEItem *a)
   albaVMEItemScalarMatrix *scalar_item = albaVMEItemScalarMatrix::SafeDownCast(a);
   assert(scalar_item);
   Superclass::DeepCopy(scalar_item);
-  if (!scalar_item->GetData().empty())
+  if (!scalar_item->GetData().IsEmpty())
   {
     m_Data = scalar_item->GetData();
   }
   else
   {
-    m_Data.clear();
+    m_Data.Reset();
   }
 }
 
@@ -95,31 +92,31 @@ bool albaVMEItemScalarMatrix::Equals(albaVMEItem *a)
   {
     albaVMEItemScalarMatrix *item = albaVMEItemScalarMatrix::SafeDownCast(a);
 
-    vnl_matrix<double> data1 = GetData();
-    vnl_matrix<double> data2 = item->GetData();
+    albaDynamicMatrix data1 = GetData();
+    albaDynamicMatrix data2 = item->GetData();
 
-    if (!data1.empty() && !data2.empty())
+    if (!data1.IsEmpty() && !data2.IsEmpty())
     {
       // We test for equivalence of data types.
-      unsigned elem1 = data1.size();
-      unsigned elem2 = data2.size();
+      unsigned elem1 = data1.GetSize();
+      unsigned elem2 = data2.GetSize();
 
       if (elem1 != elem2)
         return false;
       
-      unsigned col1 = data1.cols();
-      unsigned col2 = data2.cols();
-      unsigned row1 = data1.rows();
-      unsigned row2 = data2.rows();
+      unsigned col1 = data1.GetColsNum();
+      unsigned col2 = data2.GetColsNum();
+      unsigned row1 = data1.GetRowsNum();
+      unsigned row2 = data2.GetRowsNum();
 
       if (col1 != col2 || row1 != row2)
         return false;
 
       double range1[2],range2[2];
-      range1[0] = data1.min_value();
-      range1[1] = data1.max_value();
-      range2[0] = data2.min_value();
-      range2[1] = data2.max_value();
+      range1[0] = data1.MinValue();
+      range1[1] = data1.MaxValue();
+      range2[0] = data2.MinValue();
+      range2[1] = data2.MaxValue();
 
       if (range1[0] != range2[0] || range1[1] != range2[1])
         return false;
@@ -137,7 +134,7 @@ bool albaVMEItemScalarMatrix::Equals(albaVMEItem *a)
 }
 
 //-------------------------------------------------------------------------
-vnl_matrix<double> &albaVMEItemScalarMatrix::GetData()
+albaDynamicMatrix &albaVMEItemScalarMatrix::GetData()
 //-------------------------------------------------------------------------
 {
   UpdateData();
@@ -145,14 +142,14 @@ vnl_matrix<double> &albaVMEItemScalarMatrix::GetData()
 }
 
 //-------------------------------------------------------------------------
-void albaVMEItemScalarMatrix::SetData(vnl_matrix<double> &data)
+void albaVMEItemScalarMatrix::SetData(albaDynamicMatrix &data)
 //-------------------------------------------------------------------------
 {
   if (m_Data != data)
   {
-    if (!data.empty())
+    if (!data.IsEmpty())
     {
-      this->SetDataType("vnl_matrix");
+      this->SetDataType("albaDynamicMatrix");
 
       double bounds[6];
       bounds[0] = bounds[1] = bounds[2] = bounds[3] = bounds[4] = bounds[5] = 0.0;
@@ -165,8 +162,8 @@ void albaVMEItemScalarMatrix::SetData(vnl_matrix<double> &data)
     }
 
     m_Data = data;
-    m_ScalarBouns[0] = m_Data.min_value();
-    m_ScalarBouns[1] = m_Data.max_value();
+    m_ScalarBouns[0] = m_Data.MinValue();
+    m_ScalarBouns[1] = m_Data.MaxValue();
     m_UpdateTime.Modified();
 
     Modified();
@@ -181,7 +178,7 @@ void albaVMEItemScalarMatrix::SetData(vnl_matrix<double> &data)
 void albaVMEItemScalarMatrix::UpdateData()
 //-------------------------------------------------------------------------
 {
-  if (IsDataModified() && !m_Data.empty())
+  if (IsDataModified() && !m_Data.IsEmpty())
   {
     return;
   }
@@ -190,7 +187,7 @@ void albaVMEItemScalarMatrix::UpdateData()
   // otherwise make it be read from disk. Notice that when read
   // from this SetData() is called: Bounds are updated but we need 
   // to reset the DataModified flag.
-  if (m_Data.empty())
+  if (m_Data.IsEmpty())
   {
     if (RestoreData() == ALBA_OK)
     {
@@ -204,15 +201,15 @@ void albaVMEItemScalarMatrix::UpdateData()
 void albaVMEItemScalarMatrix::UpdateBounds()
 //-------------------------------------------------------------------------
 {
-  if (!m_Data.empty())
+  if (!m_Data.IsEmpty())
   {
     if (GetMTime()>m_Bounds.GetMTime() || !m_Bounds.IsValid())
     {
       double bounds[6];
       bounds[0] = bounds[1] = bounds[2] = bounds[3] = bounds[4] = bounds[5] = 0.0;
       m_Bounds.DeepCopy(bounds);
-      m_ScalarBouns[0] = m_Data.min_value();
-      m_ScalarBouns[1] = m_Data.max_value();
+      m_ScalarBouns[0] = m_Data.MinValue();
+      m_ScalarBouns[1] = m_Data.MaxValue();
     }
   }
   else
@@ -223,7 +220,7 @@ void albaVMEItemScalarMatrix::UpdateBounds()
       // to force reading the data. 
       UpdateData();
       
-      if (!m_Data.empty())
+      if (!m_Data.IsEmpty())
         this->UpdateBounds(); // if new data loaded try to update bounds
     }
   }
@@ -299,7 +296,7 @@ int albaVMEItemScalarMatrix::ReadData(albaString &filename, int resolvedURL)
 int albaVMEItemScalarMatrix::UpdateReader(albaString &filename)
 //-------------------------------------------------------------------------
 {
-  vnl_matrix<double> data;
+  albaDynamicMatrix data;
 
   albaTagItem *item = m_TagArray->GetTag("SCALAR_MATRIX_DIMENSIONS");
   if (item) 
@@ -307,7 +304,7 @@ int albaVMEItemScalarMatrix::UpdateReader(albaString &filename)
     int r,c;
     r = (int)item->GetComponentAsDouble(0);
     c = (int)item->GetComponentAsDouble(1);
-    data.set_size(r,c);
+    data.Resize(r,c);
   }
 
   if (m_IOMode != MEMORY)
@@ -315,9 +312,9 @@ int albaVMEItemScalarMatrix::UpdateReader(albaString &filename)
     if (GetCrypting())
     {
 #ifdef ALBA_USE_CRYPTO
-      vcl_stringstream decrypted_raw_matrix;
+      std::stringstream decrypted_raw_matrix;
       decrypted_raw_matrix << m_DecryptedFileString.c_str();
-      data.read_ascii(decrypted_raw_matrix);
+      data.ReadFromStream(decrypted_raw_matrix);
 #else
       albaErrorMacro("Encrypted data not supported: ALBA not linked to Crypto library.");
       return ALBA_ERROR;
@@ -325,12 +322,7 @@ int albaVMEItemScalarMatrix::UpdateReader(albaString &filename)
     }
     else
     {
-      vcl_ifstream v_raw_matrix(filename, std::ios::in);
-      if(v_raw_matrix.is_open() != 0)
-      {
-        data.read_ascii(v_raw_matrix);
-      }
-      else
+      if(data.ReadFromFile(filename)!= ALBA_OK)
       {
         albaErrorMacro("Error accessing scalar data file.");
         return ALBA_ERROR;
@@ -346,15 +338,15 @@ int albaVMEItemScalarMatrix::UpdateReader(albaString &filename)
       albaErrorMacro("Error extracting item from the archive!");
       return ALBA_ERROR;
     }
-    vcl_stringstream raw_matrix_string;
+    std::stringstream raw_matrix_string;
     raw_matrix_string << m_InputMemory << std::endl;
-    data.read_ascii(raw_matrix_string);
+    data.ReadFromStream(raw_matrix_string);
     delete m_InputMemory;
     m_InputMemory = NULL;
     m_InputMemorySize = 0;
   }
 
-  if (data.empty())
+  if (data.IsEmpty())
   {
     albaErrorMacro("Cannot read data file " << filename);
     return ALBA_ERROR;
@@ -369,7 +361,7 @@ int albaVMEItemScalarMatrix::UpdateReader(albaString &filename)
 int albaVMEItemScalarMatrix::InternalStoreData(const char *url)
 //-------------------------------------------------------------------------
 {
-  if (!GetData().empty())
+  if (!GetData().IsEmpty())
   {
     bool found = false;
     albaString filename;
@@ -426,10 +418,10 @@ int albaVMEItemScalarMatrix::InternalStoreData(const char *url)
     int ret = ALBA_OK; // value returned by StoreToURL() function at the end of saving to file
     if ((IsDataPresent() && (!found || (m_URL != url))) || ((IsDataPresent() == found) && (found == IsDataModified())))
     {       
-      vnl_matrix<double> data = GetData();
+      albaDynamicMatrix data = GetData();
 
       // problems retrieving data... (e.g. when a file has been erroneously deleted or corrupted...)
-      if (data.empty())
+      if (data.IsEmpty())
       {
         return 0;
       }
@@ -438,8 +430,8 @@ int albaVMEItemScalarMatrix::InternalStoreData(const char *url)
       ReleaseOutputMemory();
 
       int r,c;
-      r = data.rows();
-      c = data.columns();
+      r = data.GetRowsNum();
+      c = data.GetColsNum();
       albaTagItem item;
       item.SetName("SCALAR_MATRIX_DIMENSIONS");
       item.SetNumberOfComponents(2);
@@ -450,8 +442,8 @@ int albaVMEItemScalarMatrix::InternalStoreData(const char *url)
       //unsigned data_size = data.size();
       //double *s = new double[data_size];
       //data.copy_out(s);
-      vcl_stringstream data_stream;
-      data.print(data_stream);
+      std::stringstream data_stream;
+      data_stream << data;
       m_DataString = data_stream.str().c_str();
       /*m_DataString << s[0];
       for (int i = 1; i < data_size; i++)
@@ -484,12 +476,12 @@ int albaVMEItemScalarMatrix::InternalStoreData(const char *url)
       }
       else
       {
-        vcl_ofstream writer(filename);
-        if (!writer.bad())
-        {
-          writer << m_DataString.GetCStr() << std::endl;
-          writer.close();
-        }
+				std::ofstream writer(filename);
+				if (!writer.bad())
+				{
+					writer << m_DataString.GetCStr() << std::endl;
+					writer.close();
+				}
         else
         {
           albaErrorMacro("Error on writing data!");
@@ -539,7 +531,7 @@ void albaVMEItemScalarMatrix::ErrorHandler(void *ptr)
 void albaVMEItemScalarMatrix::ReleaseData()
 //-------------------------------------------------------------------------
 {
-  m_Data.clear();
+  m_Data.Reset();
 }
 
 //-------------------------------------------------------------------------
@@ -549,7 +541,7 @@ void albaVMEItemScalarMatrix::GetOutputMemory(const char *&out_str, int &size)
   if (!m_DataString.IsEmpty())
   {
     out_str = m_DataString.GetCStr();
-    size = m_Data.size();
+    size = m_Data.GetSize();
   }
   else
   {
@@ -583,6 +575,6 @@ void albaVMEItemScalarMatrix::Print(std::ostream& os, const int tabs) const
 
   // to do: implement DUMP of internally stored data
   os << indent << "Scalar Range: " << m_ScalarBouns[0] << m_ScalarBouns[1] << std::endl;
-  os << indent << "Num rows: " << m_Data.rows() << std::endl;
-  os << indent << "Num columns: " << m_Data.columns() << std::endl;
+  os << indent << "Num rows: " << m_Data.GetRowsNum() << std::endl;
+  os << indent << "Num columns: " << m_Data.GetColsNum() << std::endl;
 }

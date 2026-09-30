@@ -34,8 +34,11 @@ PURPOSE.  See the above copyright notice for more information.
 albaTextFileReaderHelper::albaTextFileReaderHelper()
 {
 	m_ProgressHelper = 0;
+	m_LineSize = 128;
 	m_Buffer = NULL;
 	m_FilePointer = NULL;
+	m_LineSize = 0;
+	m_Line = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -46,10 +49,11 @@ albaTextFileReaderHelper::~albaTextFileReaderHelper()
 
 
 //----------------------------------------------------------------------------
-int albaTextFileReaderHelper::GetLine(bool toUpper)
+int albaTextFileReaderHelper::GetLine(bool toUpper, bool skipEmptyLines)
 {
 	char readValue;
 	int readedChars = 0;
+	bool onlyWhitespace = true;
 
 	do
 	{
@@ -62,12 +66,25 @@ int albaTextFileReaderHelper::GetLine(bool toUpper)
 				break;
 		}
 
-		if(toUpper)
+		if (toUpper)
 			m_Line[readedChars] = readValue = (toupper(m_Buffer[m_BufferPointer]));
 		else
 			m_Line[readedChars] = readValue = m_Buffer[m_BufferPointer];
-	
+
+		if (readValue != ' ' && readValue != '\t' && readValue != '\r' && readValue != '\n')
+			onlyWhitespace = false;
+
 		readedChars++;
+
+		if(readedChars >= m_LineSize)
+		{
+			m_LineSize *= 2;
+			char *newLine = new char[m_LineSize];
+			memcpy(newLine, m_Line, readedChars);
+			delete[] m_Line;
+			m_Line = newLine;
+		}
+
 		m_BufferPointer++;
 		m_BufferLeft--;
 	} while (readValue != '\n');
@@ -78,8 +95,11 @@ int albaTextFileReaderHelper::GetLine(bool toUpper)
 	m_BytesReaded += readedChars + 1;
 	m_CurrentLine++;
 
-	if(m_ProgressHelper)
+	if (m_ProgressHelper)
 		m_ProgressHelper->UpdateProgressBar(((double)m_BytesReaded) * 100 / m_FileSize);
+
+	if (readedChars >0 && skipEmptyLines && onlyWhitespace)
+		return GetLine(toUpper, skipEmptyLines);
 
 	return readedChars;
 }
@@ -127,6 +147,9 @@ int albaTextFileReaderHelper::ReadInit(albaString &fileName, int textMode, int s
 	m_FileSize = ftell(m_FilePointer);
 	fseek(m_FilePointer, 0L, SEEK_SET);
 
+	m_LineSize = 256;
+	m_Line = new char[m_LineSize];
+
 	m_Buffer = new char[READ_BUFFER_SIZE];
 	m_BytesReaded = m_BufferLeft = m_BufferPointer = 0;
 
@@ -136,6 +159,12 @@ int albaTextFileReaderHelper::ReadInit(albaString &fileName, int textMode, int s
 void albaTextFileReaderHelper::ReadFinalize()
 {
 	cppDEL(m_ProgressHelper);
+	if(m_Line)
+	{
+		delete[] m_Line;
+		m_Line = NULL;
+		m_LineSize = 0;
+	}
 	if (m_Buffer)
 	{
 		delete[] m_Buffer;

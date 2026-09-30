@@ -34,13 +34,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
-
-#include <vcl_vector.h>
-#include <vcl_algorithm.h>
-#include <vcl_map.h>
-#include <vcl_list.h>
-#include <vnl/vnl_matrix.h>
-
 #include "albaString.h"
 
 vtkStandardNewMacro(albaParabolicMeshToLinearMeshFilter);
@@ -111,8 +104,8 @@ int albaParabolicMeshToLinearMeshFilter::RequestData( vtkInformation *vtkNotUsed
   //-----------------------
     
   vtkPoints *points = vtkPoints::New();
-  vcl_map<int, int> oldIdToNewIdMap;
-  typedef vcl_map<int, int>::const_iterator  Iter;
+  std::map<int, int> oldIdToNewIdMap;
+  typedef std::map<int, int>::const_iterator  Iter;
   numPointsNew = 0;
     
   // load the connectivity and store the new geometry
@@ -123,7 +116,7 @@ int albaParabolicMeshToLinearMeshFilter::RequestData( vtkInformation *vtkNotUsed
       int ptId = input->GetCell(i)->GetPointId(j);
       if (oldIdToNewIdMap.find(ptId) == oldIdToNewIdMap.end())
       {
-        oldIdToNewIdMap.insert(vcl_map<int,int>::value_type(ptId, numPointsNew));        
+        oldIdToNewIdMap.insert(std::map<int,int>::value_type(ptId, numPointsNew));        
         numPointsNew++;
 
         //add another point to output

@@ -47,11 +47,6 @@ template class ALBA_EXPORT albaAutoPointer<albaTransformBase>;
 
 /** albaVMEOutput - the output data structure of a VME node.
   albaVMEOutput is the output produced by a VME node.
-
-  @todo
-  - add a GetITKMesh
-  - add a GetITKImage
-  - try to remove the restore of old data_pipe timestamp inside GetDataBounds()
   */
 class ALBA_EXPORT albaVMEOutput : public albaObject
 {

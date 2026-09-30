@@ -18,7 +18,7 @@
 #define __CPP_UNIT_albaVMEOutputScalarMatrixTest_H__
 
 #include "albaTest.h"
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 /** Test for albaMatrix; Use this suite to trace memory problems */
 class albaVMEOutputScalarMatrixTest : public albaTest
@@ -43,7 +43,7 @@ private:
   void TestUpdate_GetNumberOfRows_GetNumberOfCols();
 
 	bool m_Result;
-  vnl_matrix<double> in_data;
+  albaDynamicMatrix m_InData;
 };
 
 #endif

@@ -39,10 +39,11 @@
 #include "albaVMEItem.h"
 #include "albaVMESurface.h"
 #include "vtkMatrix4x4.h"
+#include "vtkPolyData.h"
 #include "vtkTransform.h"
 #include "albaVMERoot.h"
-#include "albaClassicICPRegistration.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "vtkIterativeClosestPointTransform.h"
 #include "albaVMEIterator.h"
 
 //----------------------------------------------------------------------------
@@ -200,19 +201,55 @@ void albaOpClassicICPRegistration::OpDo()
 
 	
 
-	vtkALBASmartPointer<albaClassicICPRegistration> icp; //to be deleted 
-	//albaProgressMacro(icp,"classic ICP - registering");
-	icp->SetConvergence(m_Convergence);
+#include <fstream>
+#include "vtkIterativeClosestPointTransform.h"
+
+	// Replace the albaClassicICPRegistration block in OpDo() with:
+	vtkALBASmartPointer<vtkIterativeClosestPointTransform> icp;
 	icp->SetSource(inputTraFilter->GetOutput());
 	icp->SetTarget(targetTraFilter->GetOutput());
-	icp->SetResultsFileName(m_ReportFilename.GetCStr());
-	icp->SaveResultsOn();
+	icp->SetMaximumMeanDistance(m_Convergence);
+	icp->SetCheckMeanDistance(1);
+	icp->StartByMatchingCentroidsOn();
 	icp->Update();
-	vtkALBASmartPointer<vtkMatrix4x4> appo_matrix;
-	icp->GetMatrix(appo_matrix);
+
+	vtkMatrix4x4 *appo_matrix = icp->GetMatrix();
 	icp_matrix->SetVTKMatrix(appo_matrix);
-   //modified by Stefano 7-11-2004
-  double error = icp->GetRegistrationError();
+
+	double error = icp->GetMeanDistance();
+	double attitude[3];
+
+	vtkALBASmartPointer<vtkTransform> resultTransform;
+	resultTransform->SetMatrix(appo_matrix);
+	resultTransform->GetOrientation(attitude);
+
+	std::ofstream resultsFile(m_ReportFilename.GetCStr(), std::ios::out);
+	if (resultsFile.is_open())
+	{
+		resultsFile << "Rotation:\n";
+		resultsFile << appo_matrix->GetElement(0, 0) << " " << appo_matrix->GetElement(0, 1) << " " << appo_matrix->GetElement(0, 2) << "\n";
+		resultsFile << appo_matrix->GetElement(1, 0) << " " << appo_matrix->GetElement(1, 1) << " " << appo_matrix->GetElement(1, 2) << "\n";
+		resultsFile << appo_matrix->GetElement(2, 0) << " " << appo_matrix->GetElement(2, 1) << " " << appo_matrix->GetElement(2, 2) << "\n";
+
+		resultsFile << "\nTranslation:\n";
+		resultsFile << appo_matrix->GetElement(0, 3) << " "
+			<< appo_matrix->GetElement(1, 3) << " "
+			<< appo_matrix->GetElement(2, 3) << "\n";
+
+		resultsFile << "\nPose Matrix:\n";
+		for (int row = 0; row < 4; row++)
+		{
+			resultsFile << appo_matrix->GetElement(row, 0) << " "
+				<< appo_matrix->GetElement(row, 1) << " "
+				<< appo_matrix->GetElement(row, 2) << " "
+				<< appo_matrix->GetElement(row, 3) << "\n";
+		}
+
+		resultsFile << "\nAttitude Vector:\n";
+		resultsFile << attitude[0] << " " << attitude[1] << " " << attitude[2] << "\n";
+		resultsFile << "\n\nerror: " << error << "\n";
+		resultsFile.close();
+	}
 
 	albaMatrix::Multiply4x4(*icp_matrix, *inputMatr, *final_matrix);
 

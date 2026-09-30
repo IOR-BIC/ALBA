@@ -42,8 +42,6 @@
 #include "vtkPolyData.h"
 #endif
 
-#include <vnl/vnl_vector.h>
-
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -71,7 +69,7 @@ albaVMEOutputScalarMatrix::~albaVMEOutputScalarMatrix()
 }
 
 //-------------------------------------------------------------------------
-vnl_matrix<double> &albaVMEOutputScalarMatrix::GetScalarData()
+albaDynamicMatrix &albaVMEOutputScalarMatrix::GetScalarData()
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
@@ -102,27 +100,27 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
   scalarInterpolator->Update();
   if (scalarInterpolator->GetCurrentItem() != NULL)
   {
-    vnl_matrix<double> scalar = scalarInterpolator->GetCurrentItem()->GetData();
-    if (scalar.size() != 0)
+    albaDynamicMatrix scalar = scalarInterpolator->GetCurrentItem()->GetData();
+    if (scalar.GetSize() != 0)
     {
-      vnl_matrix<double> mat = scalarInterpolator->GetScalarData();
+      albaDynamicMatrix mat = scalarInterpolator->GetScalarData();
 
       int num_of_points = 0;
       int o = scalar_vme->GetScalarArrayOrientation();
       int x_coord_type = scalar_vme->GetTypeForXCoordinates();
-      vnl_vector<double> vx;
-      vnl_vector<double> vy;
-      vnl_vector<double> vz;
+      std::vector<double> vx;
+      std::vector<double> vy;
+      std::vector<double> vz;
       if (x_coord_type == albaVMEScalarMatrix::USE_SCALAR)
       {
         int sx = scalar_vme->GetScalarIdForXCoordinate();
         if (o == albaVMEScalarMatrix::ROWS)
         {
-          vx = mat.get_row(sx);
+          vx = mat.GetRow(sx);
         }
         else
         {
-          vx = mat.get_column(sx);
+          vx = mat.GetColumn(sx);
         }
         num_of_points = vx.size();
       }
@@ -132,11 +130,11 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
         int sy = scalar_vme->GetScalarIdForYCoordinate();
         if (o == albaVMEScalarMatrix::ROWS)
         {
-          vy = mat.get_row(sy);
+          vy = mat.GetRow(sy);
         }
         else
         {
-          vy = mat.get_column(sy);
+          vy = mat.GetColumn(sy);
         }
         num_of_points = vy.size();
       }
@@ -146,11 +144,11 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
         int sz = scalar_vme->GetScalarIdForZCoordinate();
         if (o == albaVMEScalarMatrix::ROWS)
         {
-          vz = mat.get_row(sz);
+          vz = mat.GetRow(sz);
         }
         else
         {
-          vz = mat.get_column(sz);
+          vz = mat.GetColumn(sz);
         }
         num_of_points = vz.size();
       }
@@ -160,7 +158,7 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
       double x_coord, y_coord, z_coord;
       vtkALBASmartPointer<vtkPoints> points;
       vtkALBASmartPointer<vtkCellArray> verts;
-      vnl_vector<double> vs;
+      std::vector<double> vs;
       vtkALBASmartPointer<vtkDoubleArray> scalars;
       scalars->SetNumberOfValues(num_of_points);
       scalars->SetNumberOfComponents(1);
@@ -169,23 +167,23 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
       {
         if (o == albaVMEScalarMatrix::ROWS)
         {
-          active_scalar = active_scalar >= mat.rows() ? mat.rows() - 1 : active_scalar;
-          vs = mat.get_row(active_scalar);
+          active_scalar = active_scalar >= mat.GetRowsNum() ? mat.GetRowsNum() - 1 : active_scalar;
+          vs = mat.GetRow(active_scalar);
         }
         else
         {
-          active_scalar = active_scalar >= mat.columns() ? mat.columns() - 1 : active_scalar;
-          vs = mat.get_column(active_scalar);
+          active_scalar = active_scalar >= mat.GetColsNum() ? mat.GetColsNum() - 1 : active_scalar;
+          vs = mat.GetColumn(active_scalar);
         }
         scalar_vme->SetActiveScalarOnGeometry(active_scalar);
-        vs.copy_out((double *)scalars->GetVoidPointer(0));
+        std::copy(vs.begin(), vs.end(), (double *)scalars->GetVoidPointer(0));
       }
       for (int p = 0; p< num_of_points; p++)
       {
         // X coordinate
         if (x_coord_type == albaVMEScalarMatrix::USE_SCALAR)
         {
-          x_coord = vx.get(p);
+          x_coord = vx[p];
         }
         else if (x_coord_type == albaVMEScalarMatrix::USE_PROGRESS_NUMBER)
         {
@@ -198,7 +196,7 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
         // Y coordinate
         if (y_coord_type == albaVMEScalarMatrix::USE_SCALAR)
         {
-          y_coord = vy.get(p);
+          y_coord = vy[p];
         }
         else if (y_coord_type == albaVMEScalarMatrix::USE_PROGRESS_NUMBER)
         {
@@ -211,7 +209,7 @@ void albaVMEOutputScalarMatrix::UpdateVTKRepresentation()
         // Z coordinate
         if (z_coord_type == albaVMEScalarMatrix::USE_SCALAR)
         {
-          z_coord = vz.get(p);
+          z_coord = vz[p];
         }
         else if (z_coord_type == albaVMEScalarMatrix::USE_PROGRESS_NUMBER)
         {
@@ -251,11 +249,11 @@ albaGUI* albaVMEOutputScalarMatrix::CreateGui()
   {
     this->Update();
   }
-  vnl_matrix<double> data = GetScalarData();
+  albaDynamicMatrix data = GetScalarData();
   m_NumberOfRows = "";
-  m_NumberOfRows << (int)data.rows();
+  m_NumberOfRows << data.GetRowsNum();
   m_NumberOfColumns = "";
-  m_NumberOfColumns << (int)data.columns();
+  m_NumberOfColumns << data.GetColsNum();
   m_Gui->Label(_("Rows:"),&m_NumberOfRows);
   m_Gui->Label(_("Columns:"),&m_NumberOfColumns);
 	m_Gui->Divider(); 
@@ -267,11 +265,11 @@ albaGUI* albaVMEOutputScalarMatrix::CreateGui()
 void albaVMEOutputScalarMatrix::Update()
 //-------------------------------------------------------------------------
 {
-  vnl_matrix<double> data = GetScalarData();
+  albaDynamicMatrix data = GetScalarData();
   m_NumberOfRows = "";
-  m_NumberOfRows << (int)data.rows();
+  m_NumberOfRows << data.GetRowsNum();
   m_NumberOfColumns = "";
-  m_NumberOfColumns << (int)data.columns();
+  m_NumberOfColumns << data.GetColsNum();
   if (m_Gui)
   {
     m_Gui->Update();

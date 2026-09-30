@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: vtkALBAErythrocyteSourceTest
- Authors: Roberto Mucci
+ Module: albaDynamicMatrixTest
+ Authors: Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -14,21 +14,26 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_vtkALBAErythrocyteSourceTEST_H
-#define CPP_UNIT_vtkALBAErythrocyteSourceTEST_H
+#ifndef CPP_UNIT_albaDynamicMatrixTest_H
+#define CPP_UNIT_albaDynamicMatrixTest_H
 
 #include "albaTest.h"
 
-class vtkALBAErythrocyteSourceTest : public albaTest
+class albaDynamicMatrixTest : public albaTest
 {
-  CPPUNIT_TEST_SUITE( vtkALBAErythrocyteSourceTest );
+public: 
+
+  CPPUNIT_TEST_SUITE( albaDynamicMatrixTest );
   CPPUNIT_TEST( TestDynamicAllocation );
-	CPPUNIT_TEST( TestExecuteData );
+	//CPPUNIT_TEST(TestReadMatrix);
+	CPPUNIT_TEST(TestBigFileRead);
   CPPUNIT_TEST_SUITE_END();
 
-  protected:
-		void TestDynamicAllocation();
-    void TestExecuteData();
+protected:
+  void TestFixture();
+  void TestDynamicAllocation();
+  void TestReadMatrix();
+	void TestBigFileRead();
 };
 
 #endif

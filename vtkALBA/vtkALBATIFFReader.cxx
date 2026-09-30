@@ -14,99 +14,94 @@
 
 =========================================================================*/
 #include "albaConfigure.h"
-#include "albaDefines.h" 
+#include "albaDefines.h"
 
 #include "vtkALBATIFFReader.h"
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-#include "itkimage.h"
-#include "itkImageFileReader.h"
-#include "itkTIFFImageIO.h"
-
-#include "itkImageToVTKImageFilter.h"
-
-#include <algorithm>
-#include "albaProgressBarHelper.h"
-#include "itkImageToVTKImageFilter.h"
-#include "vtkImageToStructuredPoints.h"
-#include "itkFlipImageFilter.h"
-
-
-const unsigned int Dimension = 2;
-
-typedef float InputPixelTypeFloat;
-typedef itk::Image< InputPixelTypeFloat, Dimension > ImageType;
-
-typedef itk::ImageToVTKImageFilter< ImageType > ConverteritkTOvtk;
-
+#include <wx/image.h>
 
 
 vtkStandardNewMacro(vtkALBATIFFReader);
 
 //----------------------------------------------------------------------------
-// This function reads a data from a file.  The datas extent/axes
-// are assumed to be the same as the file extent/order.
-void vtkALBATIFFReader::ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo)
+// This function reads data from a TIFF file using wxImage when the standard
+// VTK reader does not provide valid scalar data.
+void vtkALBATIFFReader::ExecuteDataWithInformation(
+	vtkDataObject *out,
+	vtkInformation *outInfo)
 {
 	Superclass::ExecuteDataWithInformation(out, outInfo);
 
 	vtkImageData *outputImg = GetOutput();
-	if (outputImg->GetScalarRange()[0] != 0 || outputImg->GetScalarRange()[1] != 0)
+	if (outputImg == NULL)
 	{
 		return;
 	}
-	else
+
+	double scalarRange[2];
+	outputImg->GetScalarRange(scalarRange);
+
+	if (scalarRange[0] != 0.0 || scalarRange[1] != 0.0)
 	{
-		using ReaderType = itk::ImageFileReader<ImageType>;
-		ReaderType::Pointer reader = ReaderType::New();
-	
-		itk::TIFFImageIO::Pointer tiffIO = itk::TIFFImageIO::New();
-		reader->SetImageIO(tiffIO);
-	
-		reader->SetFileName(FileName);
-	
-		try
+		return;
+	}
+
+	if (wxImage::FindHandler(wxBITMAP_TYPE_TIF) == NULL)
+	{
+		wxImage::AddHandler(new wxTIFFHandler);
+	}
+
+	wxString fileName(FileName, wxConvUTF8);
+	wxImage image;
+
+	if (!image.LoadFile(fileName, wxBITMAP_TYPE_TIF))
+	{
+		albaErrorMacro("Cannot read TIFF file with wxImage:" << FileName);
+		return;
+	}
+
+	if (!image.IsOk() || image.GetData() == NULL)
+	{
+		albaErrorMacro("Invalid TIFF image: " << FileName);
+		return;
+	}
+
+	const int width = image.GetWidth();
+	const int height = image.GetHeight();
+	const unsigned char *source = image.GetData();
+
+	if (width <= 0 || height <= 0)
+	{
+		albaErrorMacro("TIFF image has invalid dimensions: " << FileName);
+		return;
+	}
+
+	outputImg->SetExtent(0, width - 1, 0, height - 1, 0, 0);
+	outputImg->AllocateScalars(VTK_FLOAT, 1);
+
+	const unsigned char *sourcePixel = source;
+	for (int sourceY = 0; sourceY < height; ++sourceY)
+	{
+		// wxImage uses a top-left origin, while VTK uses a bottom-left origin.
+		const int destinationY = height - sourceY - 1;
+
+		for (int x = 0; x < width; ++x)
 		{
-			reader->Update();
+			float *destinationPixel = static_cast<float *>(outputImg->GetScalarPointer(x, destinationY, 0));
+			destinationPixel[0] = (sourcePixel[0] + sourcePixel[1] + sourcePixel[2]) / 3.0f;
+			sourcePixel += 3; // Move to the next pixel (RGB)
 		}
-		catch (itk::ExceptionObject &ex)
-		{
-			vtkErrorMacro("Cannot Read %s \n %s", m_Files[i].c_str(), ex.GetDescription());
-			return;
-		}
-	
-		using FlipFilterType = itk::FlipImageFilter<ImageType>;
-		FlipFilterType::Pointer flipFilter = FlipFilterType::New();
-	
-		FlipFilterType::FlipAxesArrayType flipAxes;
-		flipAxes[0] = false;
-		flipAxes[1] = true;
-		flipFilter->SetFlipAxes(flipAxes);
-	
-		flipFilter->SetInput(reader->GetOutput());
-		flipFilter->Update();
-	
-		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-		itkTOvtk->SetInput(flipFilter->GetOutput());
-		itkTOvtk->Update();
-	
-		vtkImageData *output = itkTOvtk->GetOutput();
-	
-		outputImg->DeepCopy(output);
 	}
 }
-
-
 
 //----------------------------------------------------------------------------
 vtkALBATIFFReader::vtkALBATIFFReader()
 {
-
 }
 
 //----------------------------------------------------------------------------
 vtkALBATIFFReader::~vtkALBATIFFReader()
 {
-
 }

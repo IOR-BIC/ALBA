@@ -51,7 +51,6 @@ SET(vtkALBA_SRCS
   vtkALBAExtrudeToCircle.cxx  							vtkALBAExtrudeToCircle.h
   vtkALBAFillingHole.cxx  								vtkALBAFillingHole.h
   vtkALBAFixTopology.cxx  								vtkALBAFixTopology.h
-  vtkALBAImageUnsharpFilter.cxx  						vtkALBAImageUnsharpFilter.h
   vtkALBAMatrixVectorMath.h  							vtkALBAMatrixVectorMath.cxx
   vtkALBAPoissonSurfaceReconstruction.cxx  				vtkALBAPoissonSurfaceReconstruction.h
   vtkALBAPolyDataMirror.cxx  							vtkALBAPolyDataMirror.h
@@ -80,12 +79,7 @@ SET(vtkALBA_SRCS
   vtkALBAPolyDataDeformation.cpp  						vtkALBAPolyDataDeformation.h
   vtkALBAPolyDataDeformation_M1.cpp  					vtkALBAPolyDataDeformation_M1.h
   vtkALBAPolyDataDeformation_M2.cpp  					vtkALBAPolyDataDeformation_M2.h  
-  ###############################################
-      
-  vtkALBAErythrocyteSource.cpp  							vtkALBAErythrocyteSource.h  
-  vtkALBAImageFillHolesRemoveIslands.cxx  				vtkALBAImageFillHolesRemoveIslands.h  
-  vtkALBABinaryImageFloodFill.cxx  						vtkALBABinaryImageFloodFill.h
-  
+   
   ##vtkbioeng####################################
   vtkALBACollisionDetectionFilter.cxx  					vtkALBACollisionDetectionFilter.h  
   vtkALBARayCastCleaner.cpp  							vtkALBARayCastCleaner.h  
@@ -106,23 +100,13 @@ SET(vtkALBA_SRCS
 )
 
 
-IF (ALBA_USE_ITK)
-SET(vtkALBA_SRCS  ${vtkALBA_SRCS}
-  albaClassicICPRegistration.cxx  						albaClassicICPRegistration.h
-  albaICPUtility.h
-)
-ENDIF (ALBA_USE_ITK)
-
-
 #####PUT HERE FILES THAT DOES NOT NEEDS AN INSTANTIATOR
-SET(vtkALBA_FULL_SRCS
-	${vtkALBA_SRCS}
+SET(vtkALBA_FULL_SRCS ${vtkALBA_SRCS}
   vtkALBAAbstractPointsSource.cpp 						vtkALBAAbstractPointsSource.h
   vtkALBAPastValuesList.cpp  							vtkALBAPastValuesList.h
   albaGPU3DTextureProviderHelper.cpp 						albaGPU3DTextureProviderHelper.h
   vtkALBAIdType64.h
   )
-
 
 # List the kits from VTK that are needed by this project.
 SET(vtkALBA_LIBS ${VTK_LIBRARIES})

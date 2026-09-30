@@ -28,7 +28,7 @@ public:
 	albaTextFileReaderHelper();
 	~albaTextFileReaderHelper();
 
-	int GetLine(bool toUpper=false);
+	int GetLine(bool toUpper=false, bool skipEmptyLines=false);
 	int ReplaceInString(char *str, char from, char to);
 	int ReadInit(albaString &fileName, int textMode, int showProgressBar, albaString progressBarText, albaObserver  *listener);
 
@@ -40,7 +40,8 @@ protected:
 	char *m_Buffer;
 	int m_BufferLeft;
 	int m_BufferPointer;
-	char m_Line[512];
+	char *m_Line;
+	size_t m_LineSize;
 	int m_CurrentLine;
 	long m_FileSize;
 	long m_BytesReaded;

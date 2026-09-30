@@ -21,7 +21,6 @@
 
 #include "albaOperationsTests.h"
 
-#include "albaASCIIImporterUtilityTest.h"
 #include "albaDicomClassesTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaGeometryEditorPolylineGraphTest.h"
@@ -51,7 +50,6 @@
 #include "albaOpDecomposeTimeVarVMETest.h"
 #include "albaOpEditMetadataTest.h"
 #include "albaOpEditNormalsTest.h"
-#include "albaOpEqualizeHistogramTest.h"
 #include "albaOpExporterAbaqusFileTest.h"
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnsysCDBFileTest.h"
@@ -138,8 +136,6 @@
 #include "albaVMEMeshAnsysTextImporterTest.h"
 #include "albaOpImporterPointCloudTest.h"
 #include "albaOpFilterImageTest.h"
-
-#include "itkRawMotionImporterUtilityTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -244,7 +240,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpValidateTreeTest::suite());
 	runner.addTest(albaOpGarbageCollectMSFDirTest::suite());
 	runner.addTest(albaOpScalarToSurfaceTest::suite());
-	runner.addTest(albaASCIIImporterUtilityTest::suite());
 	runner.addTest(albaOpEditMetadataTest::suite());
 	runner.addTest(albaOpFilterVolumeTest::suite());
 	runner.addTest(albaOpTransformOldTest::suite());
@@ -293,9 +288,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpMML3Test::suite());
 	runner.addTest(albaOpExtractGeometryTest::suite());
 	runner.addTest(albaOpImporterDicomTest::suite());
-	runner.addTest(albaItkRawMotionImporterUtilityTest::suite());
 	runner.addTest(albaOpMakeVMETimevaryingTest::suite());
-	runner.addTest(albaOpEqualizeHistogramTest::suite());
 	runner.addTest(albaOpCreateWrappedMeterTest::suite());
 	runner.addTest(albaOpFlipNormalsTest::suite());
 	runner.addTest(albaOpSmoothSurfaceCellsTest::suite());

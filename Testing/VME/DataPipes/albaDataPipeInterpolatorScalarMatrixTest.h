@@ -19,7 +19,7 @@
 
 #include "albaTest.h"
 
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 /** 
    Class Name: albaDataPipeInterpolatorScalarMatrixTest.
@@ -61,7 +61,7 @@ private:
   void TestGetCurrentItem();
   
   bool m_Result;
-  vnl_matrix<double> m_DataMatrix;
+  albaDynamicMatrix m_DataMatrix;
 };
 
 #endif

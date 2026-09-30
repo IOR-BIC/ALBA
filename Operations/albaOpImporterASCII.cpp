@@ -30,13 +30,13 @@
 #include "albaEvent.h"
 #include "albaGUI.h"
 
-#include "albaASCIIImporterUtility.h"
 #include "albaVME.h"
 #include "albaVMEScalarMatrix.h"
 
 #include "albaTagArray.h"
 
 #include <algorithm>
+#include "albaDynamicMatrix.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpImporterASCII);
@@ -206,13 +206,13 @@ int albaOpImporterASCII::ImportASCII()
     std::sort(m_Files.begin(),m_Files.end());
   }
 
-  albaASCIIImporterUtility utility;
+  albaDynamicMatrix dinMatrix;
   for (int t=0; t<m_Files.size(); t++)
   {
-    if(utility.ReadFile(m_Files[t].ToAscii()) == ALBA_OK)
+    if(dinMatrix.ReadFromFile(m_Files[t].ToAscii()) == ALBA_OK)
     {
       import_result = ALBA_OK;
-      m_ScalarData->SetData(utility.GetMatrix(),t);
+      m_ScalarData->SetData(dinMatrix,t);
     }
     else
     {

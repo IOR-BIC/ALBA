@@ -117,11 +117,6 @@ protected:
   int m_Replace;
   int *m_Seed;
 
-  int m_NumIter;
-  float m_TimeStep;
-  float m_Conductance;
-  int m_UseSpacing;
-
   int m_ImageDim;
 
   albaInteractorPicker           *m_Picker;

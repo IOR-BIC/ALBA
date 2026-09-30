@@ -43,8 +43,6 @@
 #include "vtkRectilinearGridReader.h"
 #include "vtkDataSetReader.h"
 
-#include <vnl\vnl_matrix.h>
-
 
 //----------------------------------------------------------------------------
 void albaVMEMapsTest::BeforeTest()

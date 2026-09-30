@@ -51,9 +51,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 
-// vcl includes
-#include <vcl_map.h>
-#include <vcl_vector.h>
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterAnsysCDBFile);
@@ -231,7 +228,7 @@ int albaOpExporterAnsysCDBFile::WriteNodesFile(FILE *file)
     pointsToBeExported = inputUGrid->GetPoints();
   }
 
-  // read all the pointsToBeExported in memory (vnl_matrix)
+  // read all the pointsToBeExported in memory
   int pointIDColumn = 0;
 
   double pointCoordinates[3] = {-9999, -9999, -9999};
@@ -292,7 +289,7 @@ int albaOpExporterAnsysCDBFile::WriteMaterialsFile(FILE *file)
     int numberOfMaterialProperties = materialData->GetNumberOfArrays() - 1; // 1 is the materialsIDArray
 
     // gather material properties array names
-    vcl_vector<wxString> materialProperties;
+    std::vector<wxString> materialProperties;
     for (int arrayID = 0; arrayID < materialData->GetNumberOfArrays(); arrayID++)
     {
       wxString arrayName = materialData->GetArray(arrayID)->GetName();
@@ -341,7 +338,7 @@ int albaOpExporterAnsysCDBFile::WriteElementsFile(FILE *file)
   // create elements matrix 
   int rowsNumber = inputUGrid->GetNumberOfCells();
 
-  // read all the elements with their attribute data in memory (vnl_matrix)
+  // read all the elements with their attribute data in memory
 
   ExportElement *exportVector = CreateExportElements(input, rowsNumber, inputUGrid, file);
   

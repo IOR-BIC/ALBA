@@ -19,7 +19,7 @@
 
 #include "albaTest.h"
 
-#include <vnl/vnl_matrix.h>
+#include "albaDynamicMatrix.h"
 
 /** Test for albaVMEScalarMatrix.*/
 class albaVMEScalarMatrixTest : public albaTest
@@ -46,7 +46,7 @@ private:
   void TestVMEScalarMethods();
   void TestAnimatedVMEScalar();
 
-  vnl_matrix<double> in_data;
+  albaDynamicMatrix m_InData;
 };
 
 #endif

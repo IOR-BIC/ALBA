@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpSegmentationRegionGrowingConnectedThresholdTest
- Authors: Matteo Giacomoni, Di Cosmo Grazia
+ Authors: Matteo Giacomoni, Di Cosmo Grazia, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -31,7 +31,7 @@ public:
   CPPUNIT_TEST( TestStaticAllocation );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestAccept );
-  CPPUNIT_TEST( TestAlgorithm );
+  CPPUNIT_TEST( TestAlgorithmID );
   CPPUNIT_TEST( TestAlgorithmRG );
   CPPUNIT_TEST_SUITE_END();
 
@@ -40,8 +40,11 @@ private:
   void TestStaticAllocation();
   void TestDynamicAllocation();
   void TestAccept();
-  void TestAlgorithm();
+  void TestAlgorithmID();
   void TestAlgorithmRG();
+
+	void TestAlgorithm(char *inputVol,char *compareVol, int seed[3], double threshold[2]);
+
 
   void CompareImageData(vtkImageData *imITK,vtkImageData *imOP);
 

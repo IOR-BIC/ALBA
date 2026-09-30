@@ -71,13 +71,10 @@ SET(PROJECT_SRCS
 	albaVMEPointCloudTest.cpp albaVMEPointCloudTest.h
 	albaVMEOutputWrappedMeterTest.h albaVMEOutputWrappedMeterTest.cpp
 	albaVMEPolylineGraphTest.h albaVMEPolylineGraphTest.cpp
-	albaVMESegmentationVolumeTest.h albaVMESegmentationVolumeTest.cpp
-	albaAttributeSegmentationVolumeTest.h albaAttributeSegmentationVolumeTest.cpp
 	albaVMEOutputComputeWrappingTest.h albaVMEOutputComputeWrappingTest.cpp
 	albaPolylineGraphVertexTest.h albaPolylineGraphVertexTest.cpp
 	albaPolylineGraphEdgeTest.h albaPolylineGraphEdgeTest.cpp
 	albaPolylineGraphBranchTest.h albaPolylineGraphBranchTest.cpp
-	albaDataPipeCustomSegmentationVolumeTest.h albaDataPipeCustomSegmentationVolumeTest.cpp
 	VMEGenericPoseTest.h VMEGenericPoseTest.cpp
 	VMEGenericBoundsTest.h VMEGenericBoundsTest.cpp
 	CustomDataPipeTest.h CustomDataPipeTest.cpp

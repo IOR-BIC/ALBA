@@ -82,12 +82,7 @@ protected:
 
   /** Perform the morphological closing operation */
   void MorphologicalMathematics();
-
-  /** Execute the fitting with Levenberg-Marquet algorithm */
-  void FittingLM();
-
-  void HistogramEqualization();
-
+ 
   void ComputeParam();
 
   void WriteHistogramFiles();

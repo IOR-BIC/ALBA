@@ -57,7 +57,7 @@ bool albaDataPipeInterpolatorScalarMatrix::Accept(albaVME *vme)
 }
 
 //------------------------------------------------------------------------------
-vnl_matrix<double> &albaDataPipeInterpolatorScalarMatrix::GetScalarData()
+albaDynamicMatrix &albaDataPipeInterpolatorScalarMatrix::GetScalarData()
 //------------------------------------------------------------------------------
 {
   OnEvent(&albaEventBase(this,VME_OUTPUT_DATA_PREUPDATE));
@@ -79,8 +79,8 @@ void albaDataPipeInterpolatorScalarMatrix::PreExecute()
     mtime > m_UpdateTime.GetMTime() ||
     !m_CurrentItem->IsDataPresent() ))
   {
-    vnl_matrix<double> scalar = GetCurrentItem()->GetData();
-    if (scalar.size() != 0)
+    albaDynamicMatrix scalar = GetCurrentItem()->GetData();
+    if (!scalar.IsEmpty())
     {
       m_ScalarData = GetCurrentItem()->GetData();
       m_UpdateTime.Modified();

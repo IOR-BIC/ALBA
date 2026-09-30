@@ -512,7 +512,6 @@ void albaViewOrthoSlice::PackageView()
     m_Views[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeOrthoSlice", MUTEX);    
     m_Views[v]->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeOrthoSlice", MUTEX);
 		m_Views[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
-    m_Views[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice", MUTEX);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
     {

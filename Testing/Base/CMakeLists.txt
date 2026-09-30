@@ -34,6 +34,7 @@ SET(PROJECT_SRCS
 	albaVect3dTest.h 				albaVect3dTest.cpp
 	albaEventTest.cpp 				albaEventTest.h
 	multiThreaderTest.cpp 			multiThreaderTest.h
+	albaDynamicMatrixTest.cpp		albaDynamicMatrixTest.h
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})

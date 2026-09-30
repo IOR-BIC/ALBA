@@ -111,8 +111,7 @@ protected:
 	for 2D images. */
 	int GetImageDimensionality(vtkImageData *image);
 
-	/** Computes the Otsu threshold value on the image histogram (replaces
-	itk::OtsuThresholdImageFilter, which has no direct VTK equivalent). */
+	/** Computes the Otsu threshold value on the image histogram */
 	double ComputeOtsuThreshold(vtkImageData *inputImage);
 
 	void MedianFilter(vtkImageData *inputImage, vtkImageData *outputImage);
