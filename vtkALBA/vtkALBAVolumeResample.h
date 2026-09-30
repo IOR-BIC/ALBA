@@ -32,17 +32,17 @@
 #define __vtkALBAVolumeResample_h
 
 #include "albaConfigure.h"
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 #include "vtkImageData.h"
 
 //class vtkImageData;
 class vtkRectilinearGrid;
 
 
-class ALBA_EXPORT vtkALBAVolumeResample: public vtkDataSetToDataSetFilter {
+class ALBA_EXPORT vtkALBAVolumeResample: public vtkDataSetAlgorithm  {
 public:
   static vtkALBAVolumeResample*New();
-  vtkTypeRevisionMacro(vtkALBAVolumeResample, vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkALBAVolumeResample, vtkDataSetAlgorithm );
   
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -86,21 +86,33 @@ public:
   vtkGetMacro( AutoSpacing, int );
   vtkBooleanMacro(AutoSpacing, int );
 
-  void SetOutput(vtkImageData *data) { vtkDataSetSource::SetOutput(data); }
+	/**
+	Specify output Spacing.*/
+	vtkSetVector3Macro(OutputSpacing, double);
+	vtkGetVectorMacro(OutputSpacing, double, 3);
+
+	/**
+	Specify output Extent*/
+	vtkSetVector6Macro(OutputExtent, int);
+	vtkGetVectorMacro(OutputExtent, int, 6);
 
 protected:
   vtkALBAVolumeResample();
   ~vtkALBAVolumeResample();
 
-  void ExecuteInformation();
-  void ExecuteData(vtkDataObject *output);
+  int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector );
   
-  void ExecuteData(vtkImageData *output);
+  void RequestData(vtkInformation* request, vtkImageData *output);
 
-  void ComputeInputUpdateExtents(vtkDataObject *output);
+	int RequestUpdateExtent( vtkInformation *request, vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
+
 
   void PrepareVolume();
   void CalculateTextureCoordinates(const double point[3], const int size[2], const double spacing[2], double ts[2]);
+
+	/** specialize output information type */
+	virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
 	template<typename InputDataType> void CreateImage(const InputDataType *input, vtkDataArray *outputScalars, vtkImageData *outputObject);
 
@@ -128,6 +140,10 @@ protected:
   double        DataBounds[3][2];
   int           DataDimensions[3];
   double        SamplingTableMultiplier[3];
+
+	//Output settings
+	double OutputSpacing[3];
+	int OutputExtent[6];
 
 private:
   vtkALBAVolumeResample(const vtkALBAVolumeResample&);  // Not implemented.

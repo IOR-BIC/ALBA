@@ -47,7 +47,7 @@ public:
   // Constructs with initial values of zero.
   static vtkALBARemoveCellsFilter *New();
 
-  vtkTypeRevisionMacro(vtkALBARemoveCellsFilter, vtkALBACellsFilter);
+  vtkTypeMacro(vtkALBARemoveCellsFilter, vtkALBACellsFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -66,8 +66,8 @@ public:
  
  // Desciption:
  // Get the number of cells that have been removed. GetNumberOfDeletedCells should be depreciated.
- int GetNumberOfDeletedCells(){return this->GetInput()->GetNumberOfCells() - this->GetOutput()->GetNumberOfCells();}
- int GetNumberOfRemovedCells(){return this->GetInput()->GetNumberOfCells() - this->GetOutput()->GetNumberOfCells();} 
+ int GetNumberOfDeletedCells();
+ int GetNumberOfRemovedCells(); 
 
  //Description
  //Set the m_ReverseRemove variable to 0 or 1 , if 1 reverse the removal

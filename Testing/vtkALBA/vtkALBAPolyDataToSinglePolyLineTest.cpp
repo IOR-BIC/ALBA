@@ -68,10 +68,9 @@ void vtkALBAPolyDataToSinglePolyLineTest::TestConversion()
     }
   }
 
-  polyOriginal->Update();
 
   vtkALBASmartPointer<vtkALBAPolyDataToSinglePolyLine> psp;
-  psp->SetInput(polyOriginal);
+  psp->SetInputData(polyOriginal);
   psp->Update();
 
   vtkPolyData *polyResult = psp->GetOutput();

@@ -67,7 +67,6 @@ void albaOpCreateCentroid::OpRun()
 {
 	
 	m_Input->GetOutput()->Update();
-	m_Input->GetOutput()->GetVTKData()->Update();
 
 	albaVect3d centroid = { 0,0,0 };
 	
@@ -75,7 +74,7 @@ void albaOpCreateCentroid::OpRun()
 	tra->SetMatrix(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-	v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
+	v_tpdf->SetInputData((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
 	v_tpdf->SetTransform(tra);
 	v_tpdf->Update();
 	vtkPolyData *tranPoly=v_tpdf->GetOutput();

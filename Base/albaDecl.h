@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 ALBA is a versatile library designed to facilitate the rapid development of specialised applications for the management, visualization, and manipulation of biomedical data. Specifically designed for biomedical/biomechanical applications, ALBA smoothly handles various data types, including medical images (CT scans, X-rays, MRIs, etc.), surfaces, and finite element meshes among others.
 
-Written in C++, based on VTK, ITK, DCDM, wxWidget and Xerces libraries.
+Written in C++, based on VTK, DCDM, wxWidget and Xerces libraries.
 
 <B>Key Features:</B>
 
@@ -125,6 +125,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MENU_FILE_OPEN,
 	MENU_FILE_SAVE,
 	MENU_FILE_SAVEAS,
+	MENU_FILE_SAVEAS_LEGACY,
 	MENU_FILE_MERGE,
 	MENU_FILE_PRINT,
 	MENU_FILE_PRINT_PREVIEW,

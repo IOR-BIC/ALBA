@@ -246,9 +246,9 @@ void albaOpVolumeMeasure::VolumeCompute(albaVME *vme)
 		vtkNEW(m_TriangleFilter);
 		vtkNEW(m_MassProperties);
 
-		m_TriangleFilter->SetInput(vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData()));
+		m_TriangleFilter->SetInputData(vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData()));
 		m_TriangleFilter->Update();
-		m_MassProperties->SetInput(m_TriangleFilter->GetOutput());
+		m_MassProperties->SetInputConnection(m_TriangleFilter->GetOutputPort());
 		m_MassProperties->Update();
 
 		m_NormalizedShapeIndex = albaString::Format(_("%g"),m_MassProperties->GetNormalizedShapeIndex());

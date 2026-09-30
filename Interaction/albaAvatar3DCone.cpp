@@ -63,14 +63,14 @@ albaAvatar3DCone::albaAvatar3DCone()
   m_ConeCursor->SetDirection(0,0,-1);
 
 
-  m_CursorMapper->SetInput(m_ConeCursor->GetOutput());
+  m_CursorMapper->SetInputConnection(m_ConeCursor->GetOutputPort());
   m_CursorActor->SetMapper(m_CursorMapper);
   m_CursorActor->PickableOff();
   m_CursorActor->DragableOff();
   //m_CursorActor->SetOrientation(0,90,0);
  
   m_CursorAxes->SetScaleFactor(CONE_HEIGHT/2);
-  m_CursorAxesMapper->SetInput(m_CursorAxes->GetOutput());
+  m_CursorAxesMapper->SetInputConnection(m_CursorAxes->GetOutputPort());
   m_CursorAxesActor->SetMapper(m_CursorAxesMapper);
   m_CursorAxesActor->PickableOff();
   m_CursorAxesActor->DragableOff();

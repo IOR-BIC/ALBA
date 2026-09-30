@@ -372,10 +372,10 @@ void albaTransformFrameTest::TestMatrixTransformationFromInputFrameToTargetFrame
   vtkPolyDataMapper *cubeMapper = vtkPolyDataMapper::New();
   vtkPolyDataMapper *coneMapper = vtkPolyDataMapper::New();
 
-  inputFrameMapper->SetInput(inputFrameAxes->GetOutput());
-  targetFrameMapper->SetInput(targeFrameAxes->GetOutput());
-  cubeMapper->SetInput(cube->GetOutput());
-  coneMapper->SetInput(cone->GetOutput());
+  inputFrameMapper->SetInputConnection(inputFrameAxes->GetOutputPort());
+  targetFrameMapper->SetInputConnection(targeFrameAxes->GetOutputPort());
+  cubeMapper->SetInputConnection(cube->GetOutputPort());
+  coneMapper->SetInputConnection(cone->GetOutputPort());
 
   vtkActor *inputFrameActor = vtkActor::New();
   vtkActor *targetFrameActor = vtkActor::New();

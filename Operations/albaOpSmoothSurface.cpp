@@ -201,7 +201,7 @@ void albaOpSmoothSurface::OnSmooth()
   }
 
 	vtkALBASmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
-	smoothFilter->SetInput(m_ResultPolydata);
+	smoothFilter->SetInputData(m_ResultPolydata);
 	smoothFilter->SetNumberOfIterations(m_Iterations);
 	smoothFilter->FeatureEdgeSmoothingOn();
 	m_BoundarySmoothing?smoothFilter->BoundarySmoothingOn():smoothFilter->BoundarySmoothingOff();

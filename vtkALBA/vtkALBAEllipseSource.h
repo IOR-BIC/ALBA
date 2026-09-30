@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notice for more information.
 #define __vtkALBAEllipseSource_h
 
 #include "albaConfigure.h"
-#include "vtkPolyDataSource.h"
+#include "vtkPolyDataAlgorithm.h"
 
-class ALBA_EXPORT vtkALBAEllipseSource : public vtkPolyDataSource
+class ALBA_EXPORT vtkALBAEllipseSource : public vtkPolyDataAlgorithm
 {
 public:
   static vtkALBAEllipseSource *New();
-  vtkTypeRevisionMacro(vtkALBAEllipseSource,vtkPolyDataSource);
+  vtkTypeMacro(vtkALBAEllipseSource, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -50,7 +50,7 @@ public:
 
   // Description:
   // Divide line into resolution number of pieces.
-  vtkSetClampMacro(Resolution,int,1,VTK_LARGE_INTEGER);
+  vtkSetClampMacro(Resolution,int,1,VTK_INT_MAX);
   vtkGetMacro(Resolution,int);
 
 	/* 0=XY, 1=YZ, 2=XZ*/
@@ -69,7 +69,9 @@ protected:
   vtkALBAEllipseSource(int res=1);
   ~vtkALBAEllipseSource() {};
 
-  void Execute();
+  /** re-implement execute fixing the algorithm when the number of points of the cutter output is zero.*/
+	int RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
   double Center[3];
   double MajorAxis;
 	double MinorAxis;

@@ -23,6 +23,7 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class vtkALBADataPipe;
+class vtkAlgorithmOutput;
 
 /** a data pipe which simply forwards VTK update events to the VME.
   This data pipe creates an internal vtkSource objects and links to it to 
@@ -41,7 +42,10 @@ public:
   virtual vtkDataSet *GetVTKData();
 
   /** return the bridge object between VTK datapipe and ALBA update mechanism */
-  vtkALBADataPipe *GetVTKDataPipe();
+  virtual vtkALBADataPipe *GetVTKDataPipe();
+
+  /** returns the VTK Data Pipe Output Port */
+	virtual vtkAlgorithmOutput *GetVTKOutputPort();
 
   /** update the data pipe output */
   virtual void Update();
@@ -54,6 +58,20 @@ public:
 
   /** sets the N-th input of the datapipe */
   void SetNthInput(int n, vtkDataSet *input_dataset);
+
+	/** sets the first input connection of the datapipe */
+	void SetInputConnection(vtkAlgorithmOutput *input);
+
+	/** sets the N-th input connection of the datapipe */
+	void SetInputConnection(int n, vtkAlgorithmOutput *input);
+
+  /**
+  * Update the modification time for this object. Many filters rely on
+  * the modification time to determine if they need to recompute their
+  * data. The modification time is a unique monotonically increasing
+  * unsigned long integer.
+  */
+  virtual void Modified();
 
 protected:
   albaDataPipeCustom();

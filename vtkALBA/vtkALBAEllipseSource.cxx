@@ -25,9 +25,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMath.h"
 
 #include <math.h>
-vtkCxxRevisionMacro(vtkALBAEllipseSource, "$Revision: 1.44 $");
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
 vtkStandardNewMacro(vtkALBAEllipseSource);
 
+//----------------------------------------------------------------------------
 vtkALBAEllipseSource::vtkALBAEllipseSource(int res)
 {
   this->Center[0] =  0.0;
@@ -40,9 +42,12 @@ vtkALBAEllipseSource::vtkALBAEllipseSource(int res)
 	this->Resolution = res;
 	
 	m_Plane = 0;
+
+	this->SetNumberOfInputPorts(0);
 }
 
-void vtkALBAEllipseSource::Execute()
+//----------------------------------------------------------------------------
+int vtkALBAEllipseSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int A = 0, B = 1, C = 2;
 
@@ -57,7 +62,9 @@ void vtkALBAEllipseSource::Execute()
 	vtkPoints *newPoints;
 	vtkFloatArray *newTCoords;
 	vtkCellArray *newLines;
-	vtkPolyData *output = this->GetOutput();
+
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
 	vtkDebugMacro(<< "Creating line");
 
@@ -110,8 +117,11 @@ void vtkALBAEllipseSource::Execute()
 
 	output->SetLines(newLines);
 	newLines->Delete();
+
+	return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkALBAEllipseSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

@@ -773,14 +773,13 @@ void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intD
 			pointsForce->InsertPoint(1, intData.m_ForceX, intData.m_ForceY, intData.m_ForceZ);
 			cellArrayForce->Reset();
 			cellArrayForce->InsertNextCell(2, pointIdForce);
-			vectorForce->Update();
 
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> transfVecForce;
 			vtkALBASmartPointer<vtkTransform> transfForce;
 
 			transfForce->Translate(intData.m_CopX, intData.m_CopY, z); //z = 0
 			transfVecForce->SetTransform(transfForce);
-			transfVecForce->SetInput(vectorForce);
+			transfVecForce->SetInputData(vectorForce);
 			transfVecForce->Update();
 
 
@@ -788,7 +787,6 @@ void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intD
 
 			intData.m_ForceList[currentPlatform]->Modified();
 			intData.m_ForceList[currentPlatform]->Update();
-			intData.m_ForceList[currentPlatform]->GetOutput()->GetVTKData()->Update();
 
 			//moment
 
@@ -799,14 +797,13 @@ void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intD
 
 			cellArrayMoment->Reset();
 			cellArrayMoment->InsertNextCell(2, pointIdMoment);
-			vectorMoment->Update();
 
 			vtkALBASmartPointer<vtkTransformPolyDataFilter> transfVecMoment;
 			vtkALBASmartPointer<vtkTransform> transfMoment;
 
 			transfMoment->Translate(intData.m_CopX, intData.m_CopY, z); //z = 0
 			transfVecMoment->SetTransform(transfMoment);
-			transfVecMoment->SetInput(vectorMoment);
+			transfVecMoment->SetInputData(vectorMoment);
 			transfVecMoment->Update();
 
 
@@ -814,7 +811,6 @@ void albaOpImporterC3D::ImportPlatform(albaOpImporterC3D::_InternalC3DData &intD
 
 			intData.m_MomentList[currentPlatform]->Modified();
 			intData.m_MomentList[currentPlatform]->Update();
-			intData.m_MomentList[currentPlatform]->GetOutput()->GetVTKData()->Update();
 
 			progessHelper.UpdateProgressBar(((currentSample + 1 + (currentPlatform * intData.m_NumSamples)) * 100 / (intData.m_NumSamples * intData.m_NumPlatforms)));
 		}

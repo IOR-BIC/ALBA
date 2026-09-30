@@ -38,7 +38,7 @@ class vtkActor;
 class vtkProperty;
 class vtkColorTransferFunction;
 class vtkScalarBarActor;
-
+class vtkTriangleFilter;
 class albaAxes;
 class albaGUIMaterialButton;
 class albaVME;
@@ -105,7 +105,7 @@ protected:
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
   albaAxes                 *m_Axes;
-
+  vtkTriangleFilter       *m_TriangleFilter;
   vtkPolyDataNormals      *m_Normals;
   vtkALBADistanceFilter       *m_DistanceFilter;
   vtkColorTransferFunction *m_Table;

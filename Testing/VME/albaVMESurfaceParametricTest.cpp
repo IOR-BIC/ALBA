@@ -48,7 +48,6 @@ void albaVMESurfaceParametricTest::TestSetData()
 	surface_output->Update();
 	vtkPolyData *polydata = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
 	CPPUNIT_ASSERT(polydata);
-	polydata->Update();
 
 	//default is a sphere with radius 2, phi and theta resolution 10
 	numberOfPolyDataPoints = 82;

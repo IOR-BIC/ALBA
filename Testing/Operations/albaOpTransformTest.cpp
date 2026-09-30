@@ -81,7 +81,6 @@ void albaOpTransformTest::TestResetMove()
 
   albaSmartPointer<albaVMESurface> surface;
   surface->SetData(sphere->GetOutput(),0.0);
-  surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
 
@@ -140,7 +139,6 @@ void albaOpTransformTest::TestResetScale()
 	surfaceOutput->Update();
 
 	vtkPolyData *cubeOutput = vtkPolyData::SafeDownCast(surfaceOutput->GetOutput()->GetVTKData());
-	cubeOutput->Update();
 
 	double endPoint[3];
 	cubeOutput->GetPoint(0, endPoint);

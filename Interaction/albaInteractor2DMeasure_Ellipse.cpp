@@ -31,7 +31,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProperty.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
@@ -222,7 +221,7 @@ void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
 	double angle = angle2 - angle1;
 
 	// Update ellipse rotation
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	ellipseSource->SetTheta(ellipseSource->GetTheta() + angle);
 
 	// Create transform for rotation
@@ -236,7 +235,7 @@ void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
 	else if (m_CurrPlane == 2) // XZ plane
 		rotAxis[1] = 1.0, rotAxis[2] = 0.0; // Y-axis
 
-	transform->RotateWXYZ(angle * vtkMath::RadiansToDegrees(), rotAxis[0], rotAxis[1], rotAxis[2]);
+	transform->RotateWXYZ( vtkMath::DegreesFromRadians(angle), rotAxis[0], rotAxis[1], rotAxis[2]);
 	transform->Translate(-center[0], -center[1], -center[2]);
 	transform->Update();
 
@@ -339,12 +338,12 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double * point2)
 {
 	// Left
-	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceL->SetCenter(point1);
 	pointSourceL->Update();
 
 	// Right
-	vtkPointSource* pointSourceR = (vtkPointSource*)m_PointsStackVectorR[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceR = (vtkPointSource*)m_PointsStackVectorR[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceR->SetCenter(point2);
 	pointSourceR->Update();
 
@@ -352,7 +351,7 @@ void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double 
 	double pointC[3];
 	GetMidPoint(pointC, point1, point2);
 
-	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSource();
+	vtkPointSource* pointSourceC = (vtkPointSource*)m_PointsStackVectorC[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSourceC->SetCenter(pointC);
 	pointSourceC->Update();
 }
@@ -362,7 +361,7 @@ void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double
 {
 
 	int A, B, C;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 
 	if (m_CurrPlane == 0) { A = 0; B = 1; C = 2; } //XY
 	else if (m_CurrPlane == 1) { A = 1; B = 2; C = 0; } //YZ
@@ -386,7 +385,7 @@ void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double
 		rotAxis[1] = 1.0, rotAxis[2] = 0.0; // Y-axis
 
 	//Rotating back to obtain ortho Axiss
-	transform->RotateWXYZ(-angle * vtkMath::RadiansToDegrees(), rotAxis[0], rotAxis[1], rotAxis[2]);
+	transform->RotateWXYZ(-vtkMath::DegreesFromRadians(angle), rotAxis[0], rotAxis[1], rotAxis[2]);
 	transform->Translate(-midPoint[0], -midPoint[1], -midPoint[2]);
 	transform->Update();
 
@@ -492,7 +491,7 @@ void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
 	m_EllipseStackVector[index]->GetProperty()->SetLineWidth(m_LineWidth);
 	m_EllipseStackVector[index]->SetColor(m_Colors[col]);
 
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[index]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[index]->GetSourceAlgorithm();
 	ellipseSource->SetResolution(60);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -621,9 +620,9 @@ void albaInteractor2DMeasure_Ellipse::SetLineWidth(double width)
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_Ellipse::GetMeasurePoints(int index, double *point1, double *point2)
 {
-	vtkPointSource *pointSourceL = (vtkPointSource *)m_PointsStackVectorL[index]->GetSource();
+	vtkPointSource *pointSourceL = (vtkPointSource *)m_PointsStackVectorL[index]->GetSourceAlgorithm();
 	pointSourceL->GetCenter(point1);
-	vtkPointSource *pointSourceR = (vtkPointSource *)m_PointsStackVectorR[index]->GetSource();
+	vtkPointSource *pointSourceR = (vtkPointSource *)m_PointsStackVectorR[index]->GetSourceAlgorithm();
 	pointSourceR->GetCenter(point2);
 }
 
@@ -635,7 +634,7 @@ void albaInteractor2DMeasure_Ellipse::GetCenter(int index, double *center)
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
 	{
-		vtkALBAEllipseSource* ellipseSource = (vtkALBAEllipseSource*)m_EllipseStackVector[index]->GetSource();
+		vtkALBAEllipseSource* ellipseSource = (vtkALBAEllipseSource*)m_EllipseStackVector[index]->GetSourceAlgorithm();
 		ellipseSource->GetCenter(center);
 	}
 }
@@ -775,7 +774,7 @@ bool albaInteractor2DMeasure_Ellipse::IsPointInsideMeasure(double *point, int me
 {
 	if(measureIndex < 0)
 		measureIndex = m_CurrMeasure;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSourceAlgorithm();
 	return ellipseSource->IsPointInEllipse(point);
 }
 
@@ -784,7 +783,7 @@ void albaInteractor2DMeasure_Ellipse::GetMeasureBounds(double bounds[6], int mea
 {
 	if (measureIndex < 0)
 		measureIndex = m_CurrMeasure;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSourceAlgorithm();
 	ellipseSource->GetBounds(bounds);
 }
 
@@ -793,6 +792,6 @@ double albaInteractor2DMeasure_Ellipse::GetMeasurePerimeter(int measureIndex/*=-
 {
 	if (measureIndex < 0)
 		measureIndex = m_CurrMeasure;
-	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSource();
+	vtkALBAEllipseSource *ellipseSource = (vtkALBAEllipseSource *)m_EllipseStackVector[measureIndex]->GetSourceAlgorithm();
 	return ellipseSource->GetPerimeter();
 }

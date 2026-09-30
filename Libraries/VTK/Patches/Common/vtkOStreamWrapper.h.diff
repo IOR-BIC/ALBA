@@ -1,4 +1,0 @@
-56c56
-<   vtkOStreamWrapper& operator << (ostream&);
----
->   //vtkOStreamWrapper& operator << (ostream&);	//meaningless code

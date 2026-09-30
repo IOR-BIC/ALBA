@@ -21,8 +21,9 @@
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
 #include "vtkDataSet.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBAFixedCutter, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBAFixedCutter);
 
 //----------------------------------------------------------------------------
@@ -36,17 +37,27 @@ vtkALBAFixedCutter::~vtkALBAFixedCutter()
 {
 }
 //----------------------------------------------------------------------------
-void vtkALBAFixedCutter::Execute()
+int vtkALBAFixedCutter::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //----------------------------------------------------------------------------
 {
-  vtkCutter::Execute();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
   
-  if(this->GetOutput()->GetNumberOfPoints() == 0)
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  vtkCutter::RequestData( NULL,  inputVector, outputVector);
+	  
+  if(output->GetNumberOfPoints() == 0)
   {
 	  vtkPoints *pts = vtkPoints::New();
-	  pts->InsertNextPoint(this->GetInput()->GetCenter());
-    this->GetOutput()->SetPoints(pts);
+	  pts->InsertNextPoint(input->GetCenter());
+    output->SetPoints(pts);
     pts->Delete();
   }
-  this->GetOutput()->GetPointData()->SetNormals(NULL);
+  output->GetPointData()->SetNormals(NULL);
+
+	return 1;
 }

@@ -66,7 +66,7 @@ public:
 
 	vtkALBAGlobalAxesPolydataActor(int type = HEAD);
   static vtkALBAGlobalAxesPolydataActor *New();
-  vtkTypeRevisionMacro(vtkALBAGlobalAxesPolydataActor,vtkProp3D);
+	vtkTypeMacro(vtkALBAGlobalAxesPolydataActor,vtkProp3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -110,7 +110,7 @@ public:
 
   // Description:
   // Get the actors mtime plus consider its properties and texture if set.
-  unsigned long int GetMTime();
+	vtkMTimeType  GetMTime();
 
   // Description:
   // Get the cube properties.

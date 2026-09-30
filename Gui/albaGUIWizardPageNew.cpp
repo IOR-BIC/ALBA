@@ -165,7 +165,7 @@ void albaGUIWizardPageNew::OnEvent(albaEventBase *alba_event)
 void albaGUIWizardPageNew::UpdateWindowing()
 //----------------------------------------------------------------------------
 {
-  double tableRange[2];
+  double *tableRange;
   double scalarRange[2];
 
   if(m_Rwi == NULL) return;
@@ -173,7 +173,7 @@ void albaGUIWizardPageNew::UpdateWindowing()
   vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
   actorCollection->InitTraversal();
   actorCollection->GetNextItem();
-  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->GetTableRange(tableRange);
+  tableRange=actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->GetRange();
 
   actorCollection->InitTraversal();
   actorCollection->GetNextItem();
@@ -219,7 +219,7 @@ void albaGUIWizardPageNew::UpdateActor()
   vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
   actorCollection->InitTraversal();
   actorCollection->GetNextItem();
-  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->SetTableRange(low,hi);
+  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->SetRange(low,hi);
   m_Rwi->CameraUpdate();
 }
 //--------------------------------------------------------------------------------

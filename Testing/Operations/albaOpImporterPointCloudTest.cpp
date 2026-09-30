@@ -72,7 +72,6 @@ void albaOpImporterPointCloudTest::TestImport()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("ID1")->GetTuple1(19);
 
@@ -119,7 +118,6 @@ void albaOpImporterPointCloudTest::TestFirstCoordCol()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("ID1")->GetTuple1(19);
 
@@ -176,7 +174,6 @@ void albaOpImporterPointCloudTest::TestNumberOfScalars()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("ID1")->GetTuple1(19);
 	CPPUNIT_ASSERT(fabs(scalarValue - 8.346818) < 0.01);
@@ -235,7 +232,6 @@ void albaOpImporterPointCloudTest::TestScalarColumn()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("ID1")->GetTuple1(19);
 	CPPUNIT_ASSERT(fabs(scalarValue - 0.126466) < 0.01);
@@ -293,7 +289,6 @@ void albaOpImporterPointCloudTest::TestScalarNames()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("1_ID")->GetTuple1(19);
 	CPPUNIT_ASSERT(fabs(scalarValue - 8.346818) < 0.01);
@@ -352,7 +347,6 @@ void albaOpImporterPointCloudTest::TestCommentLine()
 
 	node->GetOutput()->Update();
 	vtkPolyData *polyData = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
-	polyData->Update();
 
 	double scalarValue = polyData->GetPointData()->GetScalars("ID1")->GetTuple1(19);
 

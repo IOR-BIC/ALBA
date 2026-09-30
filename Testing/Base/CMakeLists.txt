@@ -3,7 +3,7 @@ PROJECT (albaBaseTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaDLL vtkALBA albaTests)
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaBase albaCore vtkRendering vtkGraphics albaGui albaService albaOperations albaViews albaVisualPipes)
+  SET(PROJECT_LIBS albaTests albaBase albaCore ${VTK_LIBRARIES} albaGui albaService albaOperations albaViews albaVisualPipes)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 SET(PROJECT_SRCS 

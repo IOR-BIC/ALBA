@@ -143,38 +143,38 @@ void albaPipeMeshSliceTest::TestPipeExecution()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch (arrayIndex)
+    switch(arrayIndex)
     {
     case 0:
-    {
-      controlValues[0] = 1.0;
-      controlValues[1] = 12.0;
-    }
-    break;
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
     case 1:
-    {
-      controlValues[0] = 2.0;
-      controlValues[1] = 3.0;
-    }
-    break;
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
     case 2:
-    {
-      controlValues[0] = 1000.0;
-      controlValues[1] = 200000.0;
-    }
-    break;
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
     case 3:
-    {
-      controlValues[0] = 0.33;
-      controlValues[1] = 0.39;
-    }
-    break;
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
     case 4:
-    {
-      controlValues[0] = 0.107;
-      controlValues[1] = 1.07;
-    }
-    break;
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
     case 5:
     {
       controlValues[0] = 1.0;
@@ -189,7 +189,7 @@ void albaPipeMeshSliceTest::TestPipeExecution()
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
-    
+
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
 
@@ -270,38 +270,38 @@ void albaPipeMeshSliceTest::TestPipeExecution_Wireframe()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch (arrayIndex)
+    switch(arrayIndex)
     {
     case 0:
-    {
-      controlValues[0] = 1.0;
-      controlValues[1] = 12.0;
-    }
-    break;
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
     case 1:
-    {
-      controlValues[0] = 2.0;
-      controlValues[1] = 3.0;
-    }
-    break;
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
     case 2:
-    {
-      controlValues[0] = 1000.0;
-      controlValues[1] = 200000.0;
-    }
-    break;
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
     case 3:
-    {
-      controlValues[0] = 0.33;
-      controlValues[1] = 0.39;
-    }
-    break;
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
     case 4:
-    {
-      controlValues[0] = 0.107;
-      controlValues[1] = 1.07;
-    }
-    break;
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
     case 5:
     {
       controlValues[0] = 1.0;
@@ -397,38 +397,38 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch (arrayIndex)
+    switch(arrayIndex)
     {
     case 0:
-    {
-      controlValues[0] = 1.0;
-      controlValues[1] = 12.0;
-    }
-    break;
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
     case 1:
-    {
-      controlValues[0] = 2.0;
-      controlValues[1] = 3.0;
-    }
-    break;
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
     case 2:
-    {
-      controlValues[0] = 1000.0;
-      controlValues[1] = 200000.0;
-    }
-    break;
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
     case 3:
-    {
-      controlValues[0] = 0.33;
-      controlValues[1] = 0.39;
-    }
-    break;
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
     case 4:
-    {
-      controlValues[0] = 0.107;
-      controlValues[1] = 1.07;
-    }
-    break;
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
     case 5:
     {
       controlValues[0] = 1.0;
@@ -444,7 +444,7 @@ void albaPipeMeshSliceTest::TestPipeExecution_WiredActorVisibility()
     CPPUNIT_ASSERT(meshActor != NULL);
 
     m_Renderer->ResetCamera();
-		m_RenderWindow->Render();
+    m_RenderWindow->Render();
 
 		albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
     
@@ -524,38 +524,38 @@ void albaPipeMeshSliceTest::TestPipeExecution_FlipNormal()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch (arrayIndex)
+    switch(arrayIndex)
     {
     case 0:
-    {
-      controlValues[0] = 1.0;
-      controlValues[1] = 12.0;
-    }
-    break;
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
     case 1:
-    {
-      controlValues[0] = 2.0;
-      controlValues[1] = 3.0;
-    }
-    break;
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
     case 2:
-    {
-      controlValues[0] = 1000.0;
-      controlValues[1] = 200000.0;
-    }
-    break;
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
     case 3:
-    {
-      controlValues[0] = 0.33;
-      controlValues[1] = 0.39;
-    }
-    break;
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
     case 4:
-    {
-      controlValues[0] = 0.107;
-      controlValues[1] = 1.07;
-    }
-    break;
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
     case 5:
     {
       controlValues[0] = 1.0;
@@ -657,38 +657,38 @@ void albaPipeMeshSliceTest::TestPipeExecution_UseVTKProperty()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch (arrayIndex)
+    switch(arrayIndex)
     {
     case 0:
-    {
-      controlValues[0] = 1.0;
-      controlValues[1] = 12.0;
-    }
-    break;
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
     case 1:
-    {
-      controlValues[0] = 2.0;
-      controlValues[1] = 3.0;
-    }
-    break;
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
     case 2:
-    {
-      controlValues[0] = 1000.0;
-      controlValues[1] = 200000.0;
-    }
-    break;
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
     case 3:
-    {
-      controlValues[0] = 0.33;
-      controlValues[1] = 0.39;
-    }
-    break;
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
     case 4:
-    {
-      controlValues[0] = 0.107;
-      controlValues[1] = 1.07;
-    }
-    break;
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
     case 5:
     {
       controlValues[0] = 1.0;
@@ -787,38 +787,38 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
   for(int arrayIndex=0; arrayIndex<pipeMeshSlice->GetNumberOfArrays(); arrayIndex++)
   {
     double controlValues[2] = {-9999,-9999};
-    switch (arrayIndex)
+    switch(arrayIndex)
     {
     case 0:
-    {
-      controlValues[0] = 1.0;
-      controlValues[1] = 12.0;
-    }
-    break;
+      {
+        controlValues[0] = 1.0;
+        controlValues[1] = 12.0;
+      }
+      break;
     case 1:
-    {
-      controlValues[0] = 2.0;
-      controlValues[1] = 3.0;
-    }
-    break;
+      {
+        controlValues[0] = 2.0; 
+        controlValues[1] = 3.0;
+      }
+      break;
     case 2:
-    {
-      controlValues[0] = 1000.0;
-      controlValues[1] = 200000.0;
-    }
-    break;
+      {
+        controlValues[0] = 1000.0;
+        controlValues[1] = 200000.0;
+      }
+      break;
     case 3:
-    {
-      controlValues[0] = 0.33;
-      controlValues[1] = 0.39;
-    }
-    break;
+      {
+        controlValues[0] = 0.33;
+        controlValues[1] =  0.39 ;
+      }
+      break;
     case 4:
-    {
-      controlValues[0] = 0.107;
-      controlValues[1] = 1.07;
-    }
-    break;
+      {
+        controlValues[0] = 0.107;
+        controlValues[1] = 1.07;
+      }
+      break;
     case 5:
     {
       controlValues[0] = 1.0;
@@ -832,11 +832,11 @@ void albaPipeMeshSliceTest::TestPipeExecution_Thickness_PickActor()
     vtkActor *meshActor;
     meshActor = (vtkActor *) SelectActorToControl(actorList, PIPE_MESH_ACTOR);
     CPPUNIT_ASSERT(meshActor != NULL);
-    CPPUNIT_ASSERT(meshActor->GetPickable() == FALSE);
+    CPPUNIT_ASSERT(meshActor->GetPickable() == false);
 
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
-		
+
     albaLogMessage("\n Current Array. index:%d name:%s \n", arrayIndex, pipeMeshSlice->GetScalarName(arrayIndex).ToAscii());
 		
 		ProceduralControl(controlValues, meshActor);

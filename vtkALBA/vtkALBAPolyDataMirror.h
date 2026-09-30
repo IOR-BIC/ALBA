@@ -14,7 +14,7 @@
 #ifndef __vtkALBAPolyDataMirror_h
 #define __vtkALBAPolyDataMirror_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "albaConfigure.h"
 
 class vtkDoubleArray;
@@ -25,10 +25,10 @@ class vtkPolyData;
   class name: vtkALBAPolyDataMirror
   Mirror the polydata over one or more axises.
 */
-class ALBA_EXPORT vtkALBAPolyDataMirror : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAPolyDataMirror : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAPolyDataMirror,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAPolyDataMirror,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkALBAPolyDataMirror *New();
@@ -58,7 +58,7 @@ protected:
   ~vtkALBAPolyDataMirror() {};
 
   // Usual data generation method
-  void Execute();
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   int FlipNormals;
   int MirrorXCoordinate;

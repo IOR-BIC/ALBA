@@ -65,8 +65,7 @@ void albaOpImporterImageTest::Test_Single()
 	vtkDataSet* data = img->GetOutput()->GetVTKData();
 
 
-	data->Update();
-  albaString name = img->GetName();
+	albaString name = img->GetName();
   CPPUNIT_ASSERT(!name.Compare("imageTest")); //compare returns 0 if equal
 
   int dim[3];
@@ -108,7 +107,6 @@ void albaOpImporterImageTest::Test_Multi_No_Volume()
   img2 = albaVMEImage::SafeDownCast(node->GetChild(1));
 
   vtkDataSet* data = img1->GetOutput()->GetVTKData();
-  data->Update();
   albaString name = img1->GetName();
   CPPUNIT_ASSERT(!name.Compare("pre0")); //compare returns 0 if equal*/
   int dim[3];
@@ -117,7 +115,6 @@ void albaOpImporterImageTest::Test_Multi_No_Volume()
 
 
 	data = img2->GetOutput()->GetVTKData();
-	data->Update();
 	name = img2->GetName();
 	CPPUNIT_ASSERT(!name.Compare("pre1")); //compare returns 0 if equal*/
 	((vtkImageData*)data)->GetDimensions(dim);
@@ -157,7 +154,6 @@ void albaOpImporterImageTest::Test_Multi_Volume()
 
   CPPUNIT_ASSERT(node->IsA("albaVMEVolumeGray"));
   vtkDataSet* data = node->GetOutput()->GetVTKData();
-  data->Update();
   albaString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("Imported Volume")); //compare returns 0 if equal
 

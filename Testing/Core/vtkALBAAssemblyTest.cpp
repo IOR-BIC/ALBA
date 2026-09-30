@@ -42,6 +42,11 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
+#include <vtkOpenGLHelper.h>
+
+//force moudule init to avoid a crash on shallowcopy
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
 
 //----------------------------------------------------------------------------
 void vtkALBAAssemblyTest::TestFixture()
@@ -63,7 +68,7 @@ void vtkALBAAssemblyTest::PrintSelfTest()
 //----------------------------------------------------------------------------
 {
   vtkALBAAssembly *assembly = vtkALBAAssembly::New();
-  assembly->PrintSelf(std::cout, 3);
+  assembly->PrintSelf(std::cout, vtkIndent(3));
   vtkDEL(assembly);
 }
 //----------------------------------------------------------------------------
@@ -216,7 +221,7 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
   vtkPolyDataMapper *mapper1;
   vtkNEW(mapper1);
 
-  mapper1->SetInput(sph_source1->GetOutput());
+  mapper1->SetInputConnection(sph_source1->GetOutputPort());
 
   // translucent
   vtkActor *sphere1;
@@ -238,7 +243,7 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
   vtkPolyDataMapper *mapper2;
   vtkNEW(mapper2);
 
-  mapper2->SetInput(sph_source2->GetOutput());
+  mapper2->SetInputConnection(sph_source2->GetOutputPort());
 
   // opaque
   vtkActor *sphere2;
@@ -276,7 +281,7 @@ void vtkALBAAssemblyTest::RenderOpaqueGeometryTest()
   vtkDEL(assembly);
 }
 //----------------------------------------------------------------------------
-void vtkALBAAssemblyTest::RenderTranslucentGeometry()
+void vtkALBAAssemblyTest::RenderTranslucentPolygonalGeometryTest()
 //----------------------------------------------------------------------------
 {
 	InitializeRenderWindow();
@@ -296,7 +301,7 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
   vtkPolyDataMapper *mapper1;
   vtkNEW(mapper1);
 
-  mapper1->SetInput(sph_source1->GetOutput());
+  mapper1->SetInputConnection(sph_source1->GetOutputPort());
 
   // translucent
   vtkActor *sphere1;
@@ -318,7 +323,7 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
   vtkPolyDataMapper *mapper2;
   vtkNEW(mapper2);
 
-  mapper2->SetInput(sph_source2->GetOutput());
+  mapper2->SetInputConnection(sph_source2->GetOutputPort());
 
   // opaque
   vtkActor *sphere2;
@@ -336,7 +341,7 @@ void vtkALBAAssemblyTest::RenderTranslucentGeometry()
 	assembly->GetBounds();
 
 	m_Renderer->ResetCamera();
-  CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)m_Renderer) == 1);
+	CPPUNIT_ASSERT(assembly->RenderTranslucentPolygonalGeometry((vtkViewport*)m_Renderer) == 1);
   m_RenderWindow->Render();
 
 	COMPARE_IMAGES("RenderTranslucentGeometry");
@@ -381,7 +386,7 @@ void vtkALBAAssemblyTest::InitPathTraversalTest()
   vtkAssemblyPath *path = assembly->GetNextPath();
 
   CPPUNIT_ASSERT(path->GetNumberOfItems() == 2);
-  CPPUNIT_ASSERT(path->GetFirstNode()->GetProp() == assembly);
+  CPPUNIT_ASSERT(path->GetFirstNode()->GetViewProp() == assembly);
 
   vtkDEL(actor1);
   vtkDEL(actor2);
@@ -419,19 +424,19 @@ void vtkALBAAssemblyTest::GetNextPathTest()
 
   vtkAssemblyPath *path = assembly->GetNextPath();
   path->InitTraversal();
-  CPPUNIT_ASSERT(path->GetNextNode()->GetProp() == assembly);
-  CPPUNIT_ASSERT(path->GetNextNode()->GetProp() == assembly1);
+  CPPUNIT_ASSERT(path->GetNextNode()->GetViewProp() == assembly);
+  CPPUNIT_ASSERT(path->GetNextNode()->GetViewProp() == assembly1);
 
 
   path = assembly->GetNextPath();
   path->InitTraversal();
-  CPPUNIT_ASSERT(path->GetNextNode()->GetProp() == assembly);
-  CPPUNIT_ASSERT(path->GetNextNode()->GetProp() == assembly2);
+  CPPUNIT_ASSERT(path->GetNextNode()->GetViewProp() == assembly);
+  CPPUNIT_ASSERT(path->GetNextNode()->GetViewProp() == assembly2);
 
   path = assembly->GetNextPath();
   path->InitTraversal();
-  CPPUNIT_ASSERT(path->GetNextNode()->GetProp() == assembly);
-  CPPUNIT_ASSERT(path->GetNextNode()->GetProp() == assembly3);
+  CPPUNIT_ASSERT(path->GetNextNode()->GetViewProp() == assembly);
+  CPPUNIT_ASSERT(path->GetNextNode()->GetViewProp() == assembly3);
 
   vtkDEL(actor1);
   vtkDEL(actor2);
@@ -487,7 +492,7 @@ void vtkALBAAssemblyTest::GetBoundsTest()
   vtkPolyDataMapper *mapper1;
   vtkNEW(mapper1);
 
-  mapper1->SetInput(cub_source1->GetOutput());
+  mapper1->SetInputConnection(cub_source1->GetOutputPort());
 
   vtkActor *cube1;
   vtkNEW(cube1);
@@ -510,7 +515,7 @@ void vtkALBAAssemblyTest::GetBoundsTest()
   vtkPolyDataMapper *mapper2;
   vtkNEW(mapper2);
 
-  mapper2->SetInput(cub_source2->GetOutput());
+  mapper2->SetInputConnection(cub_source2->GetOutputPort());
 
   vtkActor *cube2;
   vtkNEW(cube2);

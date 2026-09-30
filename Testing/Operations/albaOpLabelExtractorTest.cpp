@@ -53,7 +53,7 @@ void albaOpLabelExtractorTest::TestLabelRG()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -88,7 +88,6 @@ void albaOpLabelExtractorTest::TestLabelRG()
   surfaceOutputLab->Update();
   vtkPolyData *polydataLab = vtkPolyData::SafeDownCast(surfaceOutputLab->GetVTKData());
   CPPUNIT_ASSERT(polydataLab);
-  polydataLab->Update();
 
 
   albaVMEOutputSurface *surfaceOutput = albaVMEOutputSurface::SafeDownCast(surfaceOriginal->GetOutput());
@@ -96,7 +95,6 @@ void albaOpLabelExtractorTest::TestLabelRG()
   surfaceOutput->Update();
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(surfaceOutput->GetVTKData());
   CPPUNIT_ASSERT(polydata);
-  polydata->Update();
 
   CPPUNIT_ASSERT(polydataLab->GetNumberOfPoints() == polydata->GetNumberOfPoints());
 
@@ -128,7 +126,7 @@ void albaOpLabelExtractorTest::TestLabelSP()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -164,7 +162,6 @@ void albaOpLabelExtractorTest::TestLabelSP()
   vtkDataSet *data = surfaceOutputLab->GetVTKData();
   vtkPolyData *polydataLab = vtkPolyData::SafeDownCast(surfaceOutputLab->GetVTKData());
   CPPUNIT_ASSERT(polydataLab);
-  polydataLab->Update();
 
 
   albaVMEOutputSurface *surfaceOutput = albaVMEOutputSurface::SafeDownCast(surfaceOriginal->GetOutput());
@@ -172,7 +169,6 @@ void albaOpLabelExtractorTest::TestLabelSP()
   surfaceOutput->Update();
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(surfaceOutput->GetVTKData());
   CPPUNIT_ASSERT(polydata);
-  polydata->Update();
 
   CPPUNIT_ASSERT(polydataLab->GetNumberOfPoints() == polydata->GetNumberOfPoints());
 
@@ -203,7 +199,7 @@ void albaOpLabelExtractorTest::TestLabelSmoothRG()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -239,7 +235,6 @@ void albaOpLabelExtractorTest::TestLabelSmoothRG()
   surfaceOutputLab->Update();
   vtkPolyData *polydataLab = vtkPolyData::SafeDownCast(surfaceOutputLab->GetVTKData());
   CPPUNIT_ASSERT(polydataLab);
-  polydataLab->Update();
 
 
   albaVMEOutputSurface *surfaceOutput = albaVMEOutputSurface::SafeDownCast(surfaceOriginal->GetOutput());
@@ -247,7 +242,6 @@ void albaOpLabelExtractorTest::TestLabelSmoothRG()
   surfaceOutput->Update();
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(surfaceOutput->GetVTKData());
   CPPUNIT_ASSERT(polydata);
-  polydata->Update();
 
   CPPUNIT_ASSERT(polydataLab->GetNumberOfPoints() == polydata->GetNumberOfPoints());
 
@@ -279,7 +273,7 @@ void albaOpLabelExtractorTest::TestLabelSmoothSP()
   albaVMEFactory::Initialize();
 
   albaString filename = ALBA_DATA_ROOT;
-  filename << "/Test_LabelExtractor/Test_LabelExtractor.msf";
+  filename << "/Test_LabelExtractor/Test_LabelExtractor.alba";
 
   //Initialize storage
   albaVMEStorage *storage = albaVMEStorage::New();
@@ -316,7 +310,6 @@ void albaOpLabelExtractorTest::TestLabelSmoothSP()
   vtkDataSet *data = surfaceOutputLab->GetVTKData();
   vtkPolyData *polydataLab = vtkPolyData::SafeDownCast(surfaceOutputLab->GetVTKData());
   CPPUNIT_ASSERT(polydataLab);
-  polydataLab->Update();
 
 
   albaVMEOutputSurface *surfaceOutput = albaVMEOutputSurface::SafeDownCast(surfaceOriginal->GetOutput());
@@ -324,7 +317,6 @@ void albaOpLabelExtractorTest::TestLabelSmoothSP()
   surfaceOutput->Update();
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(surfaceOutput->GetVTKData());
   CPPUNIT_ASSERT(polydata);
-  polydata->Update();
 
   CPPUNIT_ASSERT(polydataLab->GetNumberOfPoints() == polydata->GetNumberOfPoints());
 

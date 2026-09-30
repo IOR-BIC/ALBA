@@ -72,9 +72,7 @@ void albaOpBooleanSurfaceTest::TestUnion()
   albaVMESurface *cubo2 = importedSTL2[0];
 
 	vtkPolyData *poly1 = vtkPolyData::SafeDownCast(cubo1->GetOutput()->GetVTKData());
-	poly1->Update();
 	vtkPolyData *poly2 = vtkPolyData::SafeDownCast(cubo2->GetOutput()->GetVTKData());
-	poly2->Update();
 	
 	CPPUNIT_ASSERT(poly1->GetNumberOfPoints()==poly2->GetNumberOfPoints());
 	int numPoints1=poly1->GetNumberOfPoints();
@@ -86,7 +84,6 @@ void albaOpBooleanSurfaceTest::TestUnion()
 	booleanSurface->SetFactor1(cubo1);
 	booleanSurface->SetFactor2(cubo2);
 	booleanSurface->Union();
-	cubo1->GetOutput()->GetVTKData()->Update();
 	cubo1->Update();
 
 	CPPUNIT_ASSERT(poly1->GetNumberOfPoints()==numPoints1+numPoints2);
@@ -132,9 +129,7 @@ void albaOpBooleanSurfaceTest::TestIntersection()
   albaVMESurface *cubo2 = importedSTL2[0];
 
 	vtkPolyData *poly1 = vtkPolyData::SafeDownCast(cubo1->GetOutput()->GetVTKData());
-	poly1->Update();
 	vtkPolyData *poly2 = vtkPolyData::SafeDownCast(cubo2->GetOutput()->GetVTKData());
-	poly2->Update();
 
 	double bounds1[6],bounds2[6];
 	poly1->GetBounds(bounds1);
@@ -146,7 +141,6 @@ void albaOpBooleanSurfaceTest::TestIntersection()
 	booleanSurface->SetFactor1(cubo1);
 	booleanSurface->SetFactor2(cubo2);
 	booleanSurface->Intersection();
-	cubo1->GetOutput()->GetVTKData()->Update();
 	cubo1->Update();
 
 	double boundsOutput[6];
@@ -197,9 +191,7 @@ void albaOpBooleanSurfaceTest::TestDifference()
 	albaVMESurface *cubo2 = importedSTL2[0];
 
 	vtkPolyData *poly1 = vtkPolyData::SafeDownCast(cubo1->GetOutput()->GetVTKData());
-	poly1->Update();
 	vtkPolyData *poly2 = vtkPolyData::SafeDownCast(cubo2->GetOutput()->GetVTKData());
-	poly2->Update();
 
 	double bounds1[6],bounds2[6];
 	poly1->GetBounds(bounds1);
@@ -211,7 +203,6 @@ void albaOpBooleanSurfaceTest::TestDifference()
 	booleanSurface->SetFactor1(cubo1);
 	booleanSurface->SetFactor2(cubo2);
 	booleanSurface->Difference();
-	cubo1->GetOutput()->GetVTKData()->Update();
 	cubo1->Update();
 
 	double boundsOutput[6];

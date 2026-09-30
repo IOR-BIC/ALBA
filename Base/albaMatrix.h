@@ -19,6 +19,7 @@
 
 #include "albaReferenceCounted.h"
 #include "albaMTime.h"
+#include "vtkType.h"
 
 typedef double (*albaMatrixElements)[4];
 
@@ -91,7 +92,7 @@ public:
   double GetElement(const int i, const int j) const {return GetElements()[i][j];}
 
   /** return modification time for this object */
-  unsigned long GetMTime() const;
+  vtkMTimeType GetMTime() const;
 
   /** update modification time stamp for this object */
   void Modified();

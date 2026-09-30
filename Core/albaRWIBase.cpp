@@ -117,8 +117,7 @@ albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 {
   m_Hidden = true;
   this->Show(false);
-	//m_SaveDir = ::wxGetHomeDir().ToAscii(); 
-  m_SaveDir = "";
+	m_SaveDir = "";
   m_Width = m_Height = 10;
   
   m_Camera    = NULL;
@@ -717,20 +716,32 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
 //----------------------------------------------------------------------------
 {
 	int dim[3];
+	vtkRendererCollection * renderers = GetRenderWindow()->GetRenderers();
+
   GetRenderWindow()->OffScreenRenderingOn();
 	  vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
 	  w2i->SetInput(GetRenderWindow());
-    w2i->SetMagnification(magnification);
+    w2i->SetScale(magnification, magnification);
 	  w2i->Update();
     w2i->GetOutput()->GetDimensions(dim);
   GetRenderWindow()->OffScreenRenderingOff();
+
+	vtkRenderer * renderer;
+	vtkCollectionSimpleIterator rsit;
+	renderers->InitTraversal(rsit);
+	renderer = renderers->GetNextRenderer(rsit);
+	while (renderer)
+	{
+		renderer->SetRenderWindow(GetRenderWindow());
+		renderer = renderers->GetNextRenderer(rsit);
+	}
 
   assert( dim[0]>0 && dim[1]>0 );
   unsigned char *buffer = new unsigned char [dim[0]*dim[1]*3];
 
   //flip it - windows Bitmap are upside-down
   vtkALBASmartPointer<vtkImageExport> ie;
-  ie->SetInput(w2i->GetOutput());
+  ie->SetInputConnection(w2i->GetOutputPort());
   ie->ImageLowerLeftOff();
   ie->SetExportVoidPointer(buffer);
   ie->Export();
@@ -817,7 +828,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
 
   vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
   w2i->SetInput(GetRenderWindow());
-  w2i->SetMagnification(magnification);
+  w2i->SetScale(magnification,magnification);
   w2i->Update();
   
   wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
@@ -825,7 +836,7 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
   if (ext == "bmp")
   {
     vtkALBASmartPointer<vtkBMPWriter> w;
-    w->SetInput(w2i->GetOutput());
+    w->SetInputConnection(w2i->GetOutputPort());
     w->SetFileName(filename.GetCStr());
     w->Write();
 
@@ -875,30 +886,28 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
   else if (ext == "jpg")
   {
     vtkALBASmartPointer<vtkJPEGWriter> w;
-    w->SetInput(w2i->GetOutput());
+    w->SetInputConnection(w2i->GetOutputPort());
     w->SetFileName(filename.GetCStr());
     w->Write();
   }
   else if (ext == "tiff")
   {
     vtkALBASmartPointer<vtkTIFFWriter> w;
-    w->SetInput(w2i->GetOutput());
+    w->SetInputConnection(w2i->GetOutputPort());
     w->SetFileName(filename.GetCStr());
     w->Write();
   }
   else if (ext == "ps")
   {
     vtkALBASmartPointer<vtkPostScriptWriter> w;
-    w->SetInput(w2i->GetOutput());
+    w->SetInputConnection(w2i->GetOutputPort());
     w->SetFileName(filename.GetCStr());
     w->Write();
   }
   else if (ext == "png")
   {
     vtkALBASmartPointer<vtkPNGWriter> w;
-    w->SetInput(w2i->GetOutput());
-    w->SetPixelPerMeterX(pixelXMeterX);
-    w->SetPixelPerMeterY(pixelXMeterY);
+    w->SetInputConnection(w2i->GetOutputPort());
     w->SetFileName(filename.GetCStr());
     w->Write();
   }
@@ -1037,7 +1046,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOn();
       vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
       w2i->SetInput(currentView->GetRWI()->GetRenderWindow());
-      w2i->SetMagnification(magnification);
+      w2i->SetScale(magnification,magnification);
       w2i->Update();
       currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOff();
       
@@ -1045,7 +1054,7 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       if (extension == "bmp")
       {
         vtkALBASmartPointer<vtkBMPWriter> w;
-        w->SetInput(w2i->GetOutput());
+        w->SetInputConnection(w2i->GetOutputPort());
         w->SetFileName(temp.ToAscii());
         w->Write();
 
@@ -1095,30 +1104,28 @@ void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int m
       else if (extension == "jpg")
       {
         vtkALBASmartPointer<vtkJPEGWriter> w;
-        w->SetInput(w2i->GetOutput());
+        w->SetInputConnection(w2i->GetOutputPort());
         w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "tiff")
       {
         vtkALBASmartPointer<vtkTIFFWriter> w;
-        w->SetInput(w2i->GetOutput());
+        w->SetInputConnection(w2i->GetOutputPort());
         w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "ps")
       {
         vtkALBASmartPointer<vtkPostScriptWriter> w;
-        w->SetInput(w2i->GetOutput());
+        w->SetInputConnection(w2i->GetOutputPort());
         w->SetFileName(temp.ToAscii());
         w->Write();
       }
       else if (extension == "png")
       {
         vtkALBASmartPointer<vtkPNGWriter> w;
-        w->SetInput(w2i->GetOutput());
-        w->SetPixelPerMeterX(pixelXMeterX);
-        w->SetPixelPerMeterY(pixelXMeterY);
+        w->SetInputConnection(w2i->GetOutputPort());
         w->SetFileName(temp.ToAscii());
         w->Write();
       }
@@ -1210,7 +1217,7 @@ void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
     r->Update();
 
     vtkPNGWriter *w = vtkPNGWriter::New();
-    w->SetInput(r->GetOutput());
+    w->SetInputConnection(r->GetOutputPort());
     w->SetFileName(filename.GetCStr());
     w->Write();
 
@@ -1300,10 +1307,10 @@ void albaRWIBase::EnableStereoMovie(bool enable)
     m_StereoMovieRightEye->SetInput(RenderWindow);
 
     vtkNEW(m_StereoImage);
-    m_StereoImage->AddInput(m_StereoMovieLeftEye->GetOutput());
-    m_StereoImage->AddInput(m_StereoMovieRightEye->GetOutput());
+    m_StereoImage->AddInputConnection(m_StereoMovieLeftEye->GetOutputPort());
+    m_StereoImage->AddInputConnection(m_StereoMovieRightEye->GetOutputPort());
 
     vtkNEW(m_StereoMoviewFrameWriter);
-    m_StereoMoviewFrameWriter->SetInput(m_StereoImage->GetOutput());
+    m_StereoMoviewFrameWriter->SetInputConnection(m_StereoImage->GetOutputPort());
   }
 }

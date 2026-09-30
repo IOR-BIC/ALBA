@@ -119,22 +119,22 @@ void albaGeometryEditorPolylineGraph::CreatePipe()
 	m_Sphere->SetThetaResolution(5);
 
 	vtkNEW(m_Glyph);
-	m_Glyph->SetInput(data);
-	m_Glyph->SetSource(m_Sphere->GetOutput());
+	m_Glyph->SetInputData(data);
+	m_Glyph->SetSourceConnection(m_Sphere->GetOutputPort());
 	m_Glyph->SetScaleModeToDataScalingOff();
 	m_Glyph->SetRange(0.0,1.0);
 	m_Glyph->Update();
 
 	vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOff();
-	m_Tube->SetInput(data);
+	m_Tube->SetInputData(data);
 	m_Tube->SetRadius(m_SphereRadius/2);
 	m_Tube->SetCapping(true);
 	m_Tube->SetNumberOfSides(5);
 
 	vtkNEW(m_AppendPolydata);
-	m_AppendPolydata->AddInput(m_Tube->GetOutput());
-	m_AppendPolydata->AddInput(m_Glyph->GetOutput());
+	m_AppendPolydata->AddInputConnection(m_Tube->GetOutputPort());
+	m_AppendPolydata->AddInputConnection(m_Glyph->GetOutputPort());
 	m_AppendPolydata->Update();
 }
 //----------------------------------------------------------------------------
@@ -377,16 +377,16 @@ int albaGeometryEditorPolylineGraph::AddNewVertex(double vertex[3],vtkIdType bra
 int albaGeometryEditorPolylineGraph::UpdateVMEEditorData(vtkPolyData *polydata)
 //-------------------------------------------------------------------------
 {
-	m_Glyph->SetInput(polydata);
+	m_Glyph->SetInputData(polydata);
 	m_Glyph->Modified();
 	m_Glyph->Update();
-	m_Tube->SetInput(polydata);
+	m_Tube->SetInputData(polydata);
 	m_Tube->Modified();
 	m_Tube->Update();
 
 	m_AppendPolydata->RemoveAllInputs();
-	m_AppendPolydata->AddInput(m_Glyph->GetOutput());
-	m_AppendPolydata->AddInput(m_Tube->GetOutput());
+	m_AppendPolydata->AddInputConnection(m_Glyph->GetOutputPort());
+	m_AppendPolydata->AddInputConnection(m_Tube->GetOutputPort());
 	m_AppendPolydata->Update();
 
 	vtkALBASmartPointer<vtkCharArray> scalar;
@@ -960,7 +960,7 @@ void albaGeometryEditorPolylineGraph::SelectBranch(double position[3])
 
 	vtkALBASmartPointer<vtkTubeFilter> tube;
 	tube->UseDefaultNormalOff();
-	tube->SetInput(poly_selected);
+	tube->SetInputData(poly_selected);
 	tube->SetRadius(m_SphereRadius/1.8);
 	tube->SetCapping(true);
 	tube->SetNumberOfSides(5);

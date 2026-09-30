@@ -34,7 +34,7 @@ class ALBA_EXPORT vtkALBALineStripSource : public vtkALBAAbstractPointsSource
 {
 public:
   static vtkALBALineStripSource *New();
-  vtkTypeRevisionMacro(vtkALBALineStripSource,vtkALBAAbstractPointsSource);
+  vtkTypeMacro(vtkALBALineStripSource,vtkALBAAbstractPointsSource);
 
 protected:
   vtkALBALineStripSource();

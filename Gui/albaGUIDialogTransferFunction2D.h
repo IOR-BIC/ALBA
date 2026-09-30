@@ -24,6 +24,7 @@
 
 #include "vtkProp.h"
 #include "vtkALBATransferFunction2D.h"
+#include <mutex>
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -41,7 +42,7 @@ class vtkRenderWindow;
 class vtkRenderer;
 class vtkVolumeProperty2;
 class vtkALBATransferFunction2D;
-class vtkALBAAdaptiveVolumeMapper;
+class vtkSmartVolumeMapper;
 class vtkImageMapper;
 class vtkALBAImageMapToWidgetColors;
 class vtkImageResample;
@@ -49,16 +50,15 @@ class vtkActor;
 class vtkActor2D;
 class vtkVolume;
 class vtkTextActor;
-class vtkCriticalSection;
 class vtkWidgetActor;
 class vtkInteractorStyleWidget;
 class vtkInteractorStylePreviewImage;
 
+
 //----------------------------------------------------------------------------
 // albaGUIDialogTransferFunction2D :
 //----------------------------------------------------------------------------
-/** This dialog is used to define a 2D transfer function to make a volume Ray Cast.
-@sa vtkALBAAdaptiveVolumeRendering albaVisualPipeVolumeRayCasting*/
+/** This dialog is used to define a 2D transfer function to make a volume Ray Cast.*/
 class ALBA_EXPORT albaGUIDialogTransferFunction2D : public albaGUIDialog
 {
   friend class vtkInteractorStylePreviewImage;
@@ -114,7 +114,7 @@ protected:
   albaRWIBase    				  *m_Rwi3D;
   vtkRenderer             *m_Renderer3D;
   vtkRenderWindow         *m_Window3D;
-  vtkALBAAdaptiveVolumeMapper *m_Mapper3D;
+  vtkSmartVolumeMapper*   m_Mapper3D;
   vtkVolume               *m_Volume3D;
 
   // graph/widget window
@@ -123,7 +123,7 @@ protected:
   vtkRenderWindow *m_GraphWindow;
   vtkWidgetActor  *m_WidgetActor;
 
-  vtkCriticalSection *m_CriticalSection;
+  std::mutex m_CriticalSection;
 
   tfWidget   m_Widget;
   wxListBox *m_WidgetList;

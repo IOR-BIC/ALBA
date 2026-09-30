@@ -65,9 +65,9 @@ albaCxxTypeMacro(albaOpImporterImage);
 albaOpImporterImage::albaOpImporterImage(const wxString& label) : albaOpImporterFile(label)
 {
 	SetWildc("Images (*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff)| *.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff|Bitmap (*.bmp)|*.bmp|JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG (*.png)|*.png|TIFF (*.tif;*.tiff)|*.tif;*.tiff");
-	m_OpType = OPTYPE_IMPORTER;
-	m_Canundo = true;
-	m_Files.clear();
+  m_OpType  = OPTYPE_IMPORTER;
+  m_Canundo = true;
+  m_Files.clear();
 	m_BuildVolumeFlag = true;
 	m_UniformSpacing = true;
 
@@ -92,9 +92,9 @@ albaOpImporterImage::~albaOpImporterImage()
 //----------------------------------------------------------------------------
 enum IMAGE_IMPORTER_ID
 {
-  ID_BUILD_VOLUME = MINID,
+	ID_BUILD_VOLUME = MINID,
 	ID_UNIFORM_SPACING,
-  ID_SPACING,
+	ID_SPACING,
 	ID_SINGLE_SPACING,
 	ID_XFLIP,
 	ID_YFLIP,
@@ -124,10 +124,10 @@ void albaOpImporterImage::OpRun()
   {
     OpStop(OP_RUN_CANCEL);
   }
-	else
-	{
-		if (!m_TestMode)
-		{
+  else
+  {
+    if (!m_TestMode)
+    {
 			const wxString outputTypes[] = { _("Images"), _("Volume") };
 
 			m_Gui->Label("");
@@ -149,16 +149,16 @@ void albaOpImporterImage::OpRun()
 			m_Gui->Bool(ID_ZFLIP, "Flip around Z axis", &m_ZFlip, 1);
 			
 			m_Gui->Label("");
-			m_Gui->OkCancel();
+      m_Gui->OkCancel();
 
-			m_Gui->Update();
+      m_Gui->Update();
 
 			m_Gui->Enable(ID_SPACING, !m_UniformSpacing);
 			m_Gui->Enable(ID_SINGLE_SPACING, m_UniformSpacing);
 
-			ShowGui();
-		}
-	}
+      ShowGui();
+    }
+  }
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterImage::Copy()   
@@ -209,14 +209,14 @@ void albaOpImporterImage::Import()
 //----------------------------------------------------------------------------
 {
 	wxString path, name, ext;
-	std::vector<vtkImageData*> images;
+	std::vector<vtkImageData *> images;
 
 	albaGUIBusyInfo busy("Importing Images.\nPlease wait...", m_TestMode);
 
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
-	vtkImageReader2* reader = NULL;
+	vtkImageReader2 *reader = NULL;
 
 	if (m_UniformSpacing)
 		m_Spacing[2] = m_Spacing[1] = m_Spacing[0];
@@ -258,7 +258,7 @@ void albaOpImporterImage::Import()
 
 		albaSmartPointer <albaVMEImage> importedImage;
 
-		
+
 
 		if (ext == "BMP")
 			reader = vtkBMPReader::New();
@@ -278,37 +278,51 @@ void albaOpImporterImage::Import()
 			}
 			else
 			{
-				albaGUIDialogWarnAndSkipOthers* dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongType);
+				albaGUIDialogWarnAndSkipOthers *dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongType);
 				dialog->ShowModal();
 			}
 		}
+
+		vtkImageData *finalImage;
 
 		if (reader)
 		{
 			reader->SetFileName(m_Files[index].c_str());
 			reader->SetDataSpacing(m_Spacing);
 			reader->Update();
-
+			
 			vtkALBASmartPointer<vtkImageLuminance> lumFilter;
 			if (reader->GetOutput()->GetNumberOfScalarComponents() == 4)
 			{
 				vtkALBASmartPointer<vtkImageExtractComponents> extract;
-				extract->SetInput(reader->GetOutput());
+				extract->SetInputConnection(reader->GetOutputPort());
 				extract->SetComponents(0, 1, 2);
 				extract->Update();
-				lumFilter->SetInput(extract->GetOutput());
+				lumFilter->SetInputConnection(extract->GetOutputPort());
+				finalImage = lumFilter->GetOutput();
+			}
+			else if (reader->GetOutput()->GetNumberOfScalarComponents() == 1)
+			{
+				finalImage = reader->GetOutput();
 			}
 			else
 			{
-				lumFilter->SetInput(reader->GetOutput());
-			}
-			lumFilter->Update();
-			vtkImageData* finalImage = lumFilter->GetOutput();
+				lumFilter->SetInputConnection(reader->GetOutputPort());
+				lumFilter->Update();
 
+				finalImage = lumFilter->GetOutput();
+			}
+
+			//some readers changes the image origin from 0,0,0 we reset this value for compatibility with volume import
+			finalImage->SetOrigin(0, 0, 0);
+
+			//luminance filter does not maintain spacing
+			finalImage->SetSpacing(m_Spacing);
+					
 			vtkALBASmartPointer<vtkImageFlip> xFlipFilter;
 			if (m_XFlip)
 			{
-				xFlipFilter->SetInput(finalImage);
+				xFlipFilter->SetInputData(finalImage);
 				xFlipFilter->SetFilteredAxis(0); // X
 				xFlipFilter->Update();
 				finalImage = xFlipFilter->GetOutput();
@@ -317,7 +331,7 @@ void albaOpImporterImage::Import()
 			vtkALBASmartPointer<vtkImageFlip> yFlipFilter;
 			if (!m_YFlip) //invert Y flip logic for image coordinate system
 			{
-				yFlipFilter->SetInput(finalImage);
+				yFlipFilter->SetInputData(finalImage);
 				yFlipFilter->SetFilteredAxis(1); // Y
 				yFlipFilter->Update();
 				finalImage = yFlipFilter->GetOutput();
@@ -368,9 +382,8 @@ void albaOpImporterImage::Import()
 			vtkDEL(images[i]);
 		}
 
-		vtkDataSet* acc_out;
+		vtkDataSet *acc_out;
 		acc_out = accumulate.GetNewOutput();
-		acc_out->Update();
 
 		albaNEW(m_ImportedVolume);
 		m_ImportedVolume->SetName("Imported Volume");
@@ -402,7 +415,7 @@ void albaOpImporterImage::AddImageToList(std::vector<vtkImageData*> &images, vtk
 		int *groupDims = images[0]->GetDimensions();
 		int* imageDims = image->GetDimensions();
 		vtkImageData* pushImg = NULL;
-		
+
 		if (groupDims[0] == imageDims[0] && groupDims[1] == imageDims[1] && groupDims[2] == imageDims[2])
 		{
 			vtkNEW(pushImg);
@@ -416,9 +429,9 @@ void albaOpImporterImage::AddImageToList(std::vector<vtkImageData*> &images, vtk
 			if (m_TestMode)
 			{
 				albaLogMessage(msg.GetCStr());
-			}
-			else
-			{
+	}
+	else
+  {
 				albaGUIDialogWarnAndSkipOthers* dialog = new albaGUIDialogWarnAndSkipOthers("Wrong image size", msg.GetCStr(), &m_SkipWrongSize);
 				dialog->ShowModal();
 			}
@@ -430,8 +443,8 @@ void albaOpImporterImage::AddImageToList(std::vector<vtkImageData*> &images, vtk
 		vtkNEW(pushImg);
 		pushImg->DeepCopy(image);
 		images.push_back(pushImg);
-	}
-
+  }
+  
 }
 
 //----------------------------------------------------------------------------

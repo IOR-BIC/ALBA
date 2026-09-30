@@ -82,7 +82,6 @@ void albaVMEVectorTest::TestSetData()
   vtkALBASmartPointer<vtkPolyData> line;
   line->SetPoints(pts);
   line->SetLines(cells);
-  line->Update();
 
   result = m_VmeVector->SetData(line,0.0) == ALBA_OK;
 
@@ -100,7 +99,6 @@ void albaVMEVectorTest::TestSetData()
   vtkALBASmartPointer<vtkPolyData> line_bad_1;
   line_bad_1->SetPoints(pts_bad_1);
   line_bad_1->SetLines(cells_bad_1);
-  line_bad_1->Update();
 
   result = m_VmeVector->SetData(line_bad_1,0.0) == ALBA_ERROR;
 
@@ -123,7 +121,6 @@ void albaVMEVectorTest::TestSetData()
   vtkALBASmartPointer<vtkPolyData> line_bad_2;
   line_bad_2->SetPoints(pts_bad_2);
   line_bad_2->SetLines(cells_bad_2);
-  line_bad_2->Update();
 
   result = m_VmeVector->SetData(line_bad_2,0.0) == ALBA_ERROR;
 
@@ -144,10 +141,8 @@ void albaVMEVectorTest::TestGetModule()
   vtkALBASmartPointer<vtkPolyData> line;
   line->SetPoints(pts);
   line->SetLines(cells);
-  line->Update();
 
   m_VmeVector->SetData(line,0.0);
-  m_VmeVector->GetOutput()->GetVTKData()->Update();
   m_VmeVector->Update();
 
   result = m_VmeVector->GetModule() == 1.0;

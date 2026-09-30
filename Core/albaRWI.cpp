@@ -194,8 +194,8 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 		m_RenBack->LightFollowCameraOn(); 
 
 		m_RenFront->SetLayer(1); 
-		m_RenBack->SetLayer(2); 
-		m_AlwaysVisibleRenderer->SetLayer(0);
+		m_RenBack->SetLayer(0); 
+		m_AlwaysVisibleRenderer->SetLayer(2);
 
     m_RenderWindow->SetNumberOfLayers(3);
     m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
@@ -205,9 +205,9 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 	}
 	else
 	{
-		m_RenFront->SetLayer(1); 
+		m_RenFront->SetLayer(0); 
 		assert(m_RenBack == NULL);
-		m_AlwaysVisibleRenderer->SetLayer(0);
+		m_AlwaysVisibleRenderer->SetLayer(1);
 
 		m_RenderWindow->SetNumberOfLayers(2);
     m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
@@ -218,7 +218,7 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
   m_RwiBase->SetRenderWindow(m_RenderWindow);
   m_RwiBase->Initialize();
 
-  assert(m_AlwaysVisibleRenderer->Transparent()	== true);
+	assert(m_AlwaysVisibleRenderer->Transparent()	== true);
 
 	m_ShowOrientator = show_orientator;
 
@@ -270,7 +270,7 @@ albaRWI::~albaRWI()
 
 	if(m_RenFront) 
 	{
-		m_RenFront->RemoveAllProps();
+		m_RenFront->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_RenFront);
 	}
 	vtkDEL(m_ProfilingActor);
@@ -279,7 +279,7 @@ albaRWI::~albaRWI()
 
 	if(m_RenBack)
 	{
-		m_RenBack->RemoveAllProps();
+		m_RenBack->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_RenBack);
 	}
 
@@ -287,7 +287,7 @@ albaRWI::~albaRWI()
 
 	if(m_AlwaysVisibleRenderer)
 	{
-		m_AlwaysVisibleRenderer->RemoveAllProps();
+		m_AlwaysVisibleRenderer->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_AlwaysVisibleRenderer);
 	}
 
@@ -634,11 +634,11 @@ void albaRWI::ResetCameraClippingRange()
 		rFR->ComputeVisiblePropBounds(b1);
 		rAV->ComputeVisiblePropBounds(b2);
 
-		if(b1[0] == VTK_LARGE_FLOAT && b2[0] == VTK_LARGE_FLOAT)
+		if(b1[0] == VTK_FLOAT_MAX && b2[0] == VTK_FLOAT_MAX)
 		{
 			rFR->ResetCameraClippingRange();
 		} 
-		else if (b1[0] == VTK_LARGE_FLOAT )
+		else if (b1[0] == VTK_FLOAT_MAX )
 		{
 			rFR->ResetCameraClippingRange(b2);
 		}
@@ -677,7 +677,7 @@ void albaRWI::ResetCameraClippingRange()
   	{
 	  	rBR->ComputeVisiblePropBounds(b3);
 
-		  if (b3[0] == VTK_LARGE_FLOAT )
+		  if (b3[0] == VTK_FLOAT_MAX )
 		  {
         // do nothing
 			}

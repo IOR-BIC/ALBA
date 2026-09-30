@@ -80,7 +80,6 @@ void albaOpImporterVMEDataSetAttributesTest::TestImportAttributes()
 
   vtkDataSet* data = NULL;
   data = mesh->GetUnstructuredGridOutput()->GetVTKData();
-	data->Update();
 	
   int cells=data->GetNumberOfCells();
 	CPPUNIT_ASSERT(cells==2);
@@ -110,7 +109,6 @@ void albaOpImporterVMEDataSetAttributesTest::TestImportAttributes()
 
   data = NULL;
   data = mesh->GetUnstructuredGridOutput()->GetVTKData();
-  data->Update();
 
   cells=data->GetNumberOfCells();
   CPPUNIT_ASSERT(cells==2);

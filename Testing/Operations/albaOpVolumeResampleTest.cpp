@@ -96,7 +96,6 @@ void albaOpVolumeResampleTest::TestResampleInternal( const char *inFileName, con
   opVolumeResample->TestModeOn();
 
   vtkDataSet *inputDataSet = inputVolume->GetOutput()->GetVTKData();
-  inputDataSet->Update();
 
   double outputSpacing[3];
   double inputDataOrigin[3];
@@ -124,7 +123,6 @@ void albaOpVolumeResampleTest::TestResampleInternal( const char *inFileName, con
   opVolumeResample->Resample();
 
   albaVME *Output = opVolumeResample->GetOutput();
-  Output->GetOutput()->GetVTKData()->Update();
   vtkImageData *outputVTKData=vtkImageData::SafeDownCast(Output->GetOutput()->GetVTKData());
 
   CPPUNIT_ASSERT(outputVTKData!=NULL);
@@ -154,7 +152,7 @@ void albaOpVolumeResampleTest::TestResampleInternal( const char *inFileName, con
 void albaOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename )
 {
   vtkDataSetWriter *writer = vtkDataSetWriter::New();
-  writer->SetInput(outputVolumeVTKData);
+  writer->SetInputData(outputVolumeVTKData);
 
   string fullPathOutputFilename;
   fullPathOutputFilename.append(ALBA_DATA_ROOT);

@@ -36,6 +36,7 @@
 #include "vtkALBASmartPointer.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGridReader.h"
+#include "vtkFloatArray.h"
 
 #define OUTRANGE_SCALAR -1000
 
@@ -69,7 +70,6 @@ void albaVMELabeledVolumeTest::TestVolumeCopy()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->ReparentTo(root);
   volume->Update();
 
@@ -79,7 +79,6 @@ void albaVMELabeledVolumeTest::TestVolumeCopy()
 
   //Get the scalar data of the labeled volume 
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
-  datasetLabel->Update();
   vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
   vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
@@ -115,7 +114,6 @@ void albaVMELabeledVolumeTest::TestGenerateLabeledVolume()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->ReparentTo(root);
   volume->Update();
 
@@ -137,7 +135,6 @@ void albaVMELabeledVolumeTest::TestGenerateLabeledVolume()
 
   //Get the scalar data of the labeled volume 
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
-  datasetLabel->Update();
   vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
   vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
@@ -186,7 +183,6 @@ void albaVMELabeledVolumeTest::TestRemoveLabelTag()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->ReparentTo(root);
   volume->Update();
 
@@ -203,7 +199,6 @@ void albaVMELabeledVolumeTest::TestRemoveLabelTag()
 
   //Get the scalar data of the labeled volume 
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
-  datasetLabel->Update();
   vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
   vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
@@ -240,7 +235,6 @@ void albaVMELabeledVolumeTest::TestSetLabelTag()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->ReparentTo(root);
   volume->Update();
 
@@ -268,7 +262,6 @@ void albaVMELabeledVolumeTest::TestSetLabelTag()
 
   //Get the scalar data of the labeled volume 
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
-  datasetLabel->Update();
   vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
   vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
@@ -316,7 +309,6 @@ void albaVMELabeledVolumeTest::TestDeepCopy()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
-  volume->GetOutput()->GetVTKData()->Update();
   volume->ReparentTo(root);
   volume->Update();
 
@@ -340,7 +332,6 @@ void albaVMELabeledVolumeTest::TestDeepCopy()
 
   //Get the scalar data of the labeled volume 
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
-  datasetLabel->Update();
   vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
   vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
@@ -360,7 +351,6 @@ void albaVMELabeledVolumeTest::TestDeepCopy()
   //Get the scalar data of the copied labeled volume 
   vtkDataArray *labelCopiedScalars;
   vtkDataSet *datasetLabelCopied = labeledCopied->GetOutput()->GetVTKData();
-  datasetLabelCopied->Update();
   vtkRectilinearGrid *recGridCopied = (vtkRectilinearGrid*) datasetLabelCopied;
   labelCopiedScalars = recGridCopied->GetPointData()->GetScalars();
   labelScalars->Modified();

@@ -38,7 +38,7 @@ class ALBA_EXPORT vtkALBAAssembly : public vtkProp3D
 public:
   static vtkALBAAssembly *New();
 
-  vtkTypeRevisionMacro(vtkALBAAssembly,vtkProp3D);
+  vtkTypeMacro(vtkALBAAssembly,vtkProp3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -76,7 +76,8 @@ public:
   assemblies; that is, assemblies that only serve to group and transform
   its parts.*/
   int RenderOpaqueGeometry(vtkViewport *ren);
-  int RenderTranslucentGeometry(vtkViewport *ren);
+  int RenderVolumetricGeometry(vtkViewport* ren);
+  int RenderTranslucentPolygonalGeometry(vtkViewport* ren);
 
   /**
   Release any graphics resources that are being consumed by this actor.
@@ -107,7 +108,7 @@ public:
   /**
   Override default GetMTime method to also consider all of the
   assembly's parts.*/
-  unsigned long int GetMTime();
+	vtkMTimeType GetMTime();
 
   /**
   Shallow copy of an assembly. Overloads the virtual vtkProp method.*/
@@ -121,6 +122,11 @@ public:
   with transformations properly concatenated.*/
   void BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path);
 //ETX  
+
+	/** Does this prop have some translucent polygonal geometry?
+	 This method is called during the rendering process to know if there is
+	 some translucent polygonal geometry. */
+	virtual int HasTranslucentPolygonalGeometry();
 
 protected:
   vtkALBAAssembly();

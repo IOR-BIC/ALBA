@@ -80,7 +80,7 @@ void albaLUTLibrary::PrintLut( std::ostringstream &stringStream, vtkLookupTable 
 {
   stringStream << "lut: " << std::endl;
 
-  lut->PrintSelf(stringStream, 0);
+  lut->PrintSelf(stringStream,vtkIndent(0));
 
   int n = lut->GetNumberOfTableValues();
   if(n>256) n=256;

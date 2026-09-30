@@ -83,7 +83,6 @@ void albaOpExporterMeshTest::TestExporterMesh()
   CPPUNIT_ASSERT(dummyVme->GetChild(0) && dummyVme->GetChild(0)->IsA("albaVMEMesh"));
   albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();
-	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
 	CPPUNIT_ASSERT(vmeMesh);
   CPPUNIT_ASSERT(vmeMesh->GetOutput()->GetVTKData()->GetNumberOfPoints()>0);
   CPPUNIT_ASSERT(vmeMesh->GetOutput()->GetVTKData()->GetNumberOfCells()>0);
@@ -228,7 +227,6 @@ void albaOpExporterMeshTest::TestBackCalculation()
 
 	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();
-	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
 
 
 	// Call the exporter
@@ -300,7 +298,6 @@ void albaOpExporterMeshTest::TestBackCalculationSetValues()
 
 	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();
-	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
 
 
 	// Call the exporter
@@ -381,7 +378,6 @@ void albaOpExporterMeshTest::TestBackCalculationTripleInterval()
 
 	albaVMEMesh *vmeMesh = albaVMEMesh::SafeDownCast(importerVTK->GetOutput());
 	vmeMesh->Update();
-	((vtkUnstructuredGrid *)(vmeMesh->GetOutput()->GetVTKData()))->UpdateData();
 
 
 	// Call the exporter

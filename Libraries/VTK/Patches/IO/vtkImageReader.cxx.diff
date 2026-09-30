@@ -1,4 +1,0 @@
-304c304
-<                                << ", Read = " << self->GetFile()->gcount()
----
->                                << ", Read = " << static_cast<vtkIdType>(self->GetFile()->gcount())

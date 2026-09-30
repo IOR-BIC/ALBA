@@ -65,7 +65,7 @@ albaCxxTypeMacro(albaVMEStorage)
 albaVMEStorage::albaVMEStorage()
 //------------------------------------------------------------------------------
 {
-  SetVersion("2.2");
+  SetVersion("3.0");
   SetFileType("MSF");
   albaNEW(m_Root); // create a root node
   m_Root->SetName("Root");

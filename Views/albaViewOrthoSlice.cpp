@@ -512,7 +512,6 @@ void albaViewOrthoSlice::PackageView()
     m_Views[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeOrthoSlice", MUTEX);    
     m_Views[v]->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeOrthoSlice", MUTEX);
 		m_Views[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
-    m_Views[v]->PlugVisualPipe("albaVMESegmentationVolume", "albaPipeVolumeOrthoSlice", MUTEX);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
     {
@@ -764,7 +763,6 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
 	if (vtkData == NULL)
 		return;
-	vtkData->Update();
 	vtkData->GetCenter(vtkDataCenter);
 	vtkData->GetCenter(m_GizmoHandlePosition);
 	vtkData->GetScalarRange(sr);

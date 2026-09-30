@@ -195,5 +195,3 @@ void vtkALBAPastValuesList::PrintSelf(std::ostream& os) const
     os << i << " " << Values[i] << std::endl ;
   os << std::endl ;
 }
-
-

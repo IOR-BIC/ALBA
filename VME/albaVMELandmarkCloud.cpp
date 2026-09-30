@@ -46,6 +46,7 @@ const bool DEBUG_MODE = false;
 #include "vtkTransform.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetWriter.h"
+#include "vtkCellArrayIterator.h"
 
 #include <vector>
 
@@ -194,10 +195,10 @@ int albaVMELandmarkCloud::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   return ALBA_ERROR;
 }
 //-------------------------------------------------------------------------
-unsigned long albaVMELandmarkCloud::GetMTime()
+vtkMTimeType albaVMELandmarkCloud::GetMTime()
 {
-  unsigned long mtime = Superclass::GetMTime();
-  unsigned long mtimelm;
+	vtkMTimeType mtime = Superclass::GetMTime();
+	vtkMTimeType mtimelm;
   for (int i = 0; i < GetNumberOfChildren(); i++)
   {
     albaVMELandmark *vme = albaVMELandmark::SafeDownCast(GetChild(i));
@@ -620,7 +621,8 @@ vtkPolyData *albaVMELandmarkCloud::NewPolyData(albaTimeStamp t)
     vtkPointData* pdata = polydata->GetPointData();
     vtkALBASmartPointer<vtkBitArray> data;
     pdata->SetScalars(data);
-    AppendPoint(polydata,0,0,0,GetNumberOfLandmarks());
+    if(GetNumberOfLandmarks() >0)
+      AppendPoint(polydata,0,0,0,GetNumberOfLandmarks());
   }
   return polydata;
 }
@@ -776,15 +778,17 @@ int albaVMELandmarkCloud::SetLandmarkVisibility(vtkPolyData *polydata,int idx,bo
       // Create a new CellArray without the cell of the invisible the point.
       //
       vtkALBASmartPointer<vtkCellArray> newcells;
-      cells->InitTraversal();        
-      for (int i = 0; i < cells->GetNumberOfCells(); i++)
+
+      vtkSmartPointer<vtkCellArrayIterator> cellIterator = cells->NewIterator();
+      for (cellIterator->GoToFirstCell(); !cellIterator->IsDoneWithTraversal(); cellIterator->GoToNextCell())
       {
-        vtkIdType npts; 
-        vtkIdType *pts;
-        cells->GetNextCell(npts, pts);
+        vtkIdType npts;
+        const vtkIdType* pts;
+        cellIterator->GetCurrentCell(npts, pts);
+
         if (npts != 1)
         {
-          albaErrorMacro("SetLandmarkVisibility: Corrupted polydata, found a cell with erong number of points: "<<npts );
+          albaErrorMacro("SetLandmarkVisibility: Corrupted polydata, found a cell with wrong number of points: " << npts);
         }
         else if (pts[0] != idx)
         {

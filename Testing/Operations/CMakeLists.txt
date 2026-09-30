@@ -3,7 +3,7 @@ PROJECT (albaOperationsTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS XercesC albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaOperations albaVME albaCommon albaService)
+  SET(PROJECT_LIBS albaTests albaOperations albaVisualPipes albaVME albaCommon albaService)
 ENDIF(ALBA_BUILD_ALBADLL)
 
 
@@ -98,7 +98,6 @@ SET(PROJECT_SRCS
 	albaOpImporterDicomTest.h albaOpImporterDicomTest.cpp
 	itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp
 	albaOpMakeVMETimevaryingTest.h albaOpMakeVMETimevaryingTest.cpp
-	albaOpEqualizeHistogramTest.h albaOpEqualizeHistogramTest.cpp
 	albaOpCreateWrappedMeterTest.h albaOpCreateWrappedMeterTest.cpp
 	albaOpFlipNormalsTest.h albaOpFlipNormalsTest.cpp
 	albaOpSmoothSurfaceCellsTest.h albaOpSmoothSurfaceCellsTest.cpp
@@ -130,6 +129,8 @@ SET(PROJECT_SRCS
 	albaOpImporterDICFileTest.cpp albaOpImporterDICFileTest.h
 	albaOpImporterPointCloudTest.cpp albaOpImporterPointCloudTest.h
 	albaOpFilterImageTest.cpp albaOpFilterImageTest.h
+	albaOpExporterDicFileTest.cpp albaOpExporterDicFileTest.h
+	albaOpImporterDICFileTest.cpp albaOpImporterDICFileTest.h
 )
 
 

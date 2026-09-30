@@ -66,7 +66,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	albaVMEVolumeGray *baseVolume = albaVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
 	baseVolume->Update();
 	baseVolume->GetOutput()->Update();
-	baseVolume->GetOutput()->GetVTKData()->Update();
 	
 	//Check if the input volume is a VMEVolumeGray
 	CPPUNIT_ASSERT(baseVolume != NULL);
@@ -90,13 +89,11 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	xMirrorVolume->DeepCopy(baseVolume);
 	xMirrorVolume->Update();
 	xMirrorVolume->GetOutput()->Update();
-	xMirrorVolume->GetOutput()->GetVTKData()->Update();
 
 	volumeMirrorOp->SetInput(xMirrorVolume);
   volumeMirrorOp->OpRun();
 	volumeMirrorOp->OpDo();
 	xMirrorVolume->GetOutput()->Update();
-	xMirrorVolume->GetOutput()->GetVTKData()->Update();
 	vtkImageData * xMirrorVolVtk = vtkImageData::SafeDownCast(xMirrorVolume->GetOutput()->GetVTKData());
 	vtkDataArray* xMirrorVolScalars = xMirrorVolVtk->GetPointData()->GetScalars();
 		
@@ -123,7 +120,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	yMirrorVolume->DeepCopy(baseVolume);
 	yMirrorVolume->Update();
 	yMirrorVolume->GetOutput()->Update();
-	yMirrorVolume->GetOutput()->GetVTKData()->Update();
 
 	volumeMirrorOp->SetInput(yMirrorVolume);
 	volumeMirrorOp->SetMirrorX(false);
@@ -131,7 +127,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	volumeMirrorOp->OpRun();
 	volumeMirrorOp->OpDo();
 	yMirrorVolume->GetOutput()->Update();
-	yMirrorVolume->GetOutput()->GetVTKData()->Update();
 	vtkImageData * yMirrorVolVtk = vtkImageData::SafeDownCast(yMirrorVolume->GetOutput()->GetVTKData());
 	vtkDataArray* yMirrorVolScalars = yMirrorVolVtk->GetPointData()->GetScalars();
 
@@ -158,7 +153,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	zMirrorVolume->DeepCopy(baseVolume);
 	zMirrorVolume->Update();
 	zMirrorVolume->GetOutput()->Update();
-	zMirrorVolume->GetOutput()->GetVTKData()->Update();
 
 	volumeMirrorOp->SetInput(zMirrorVolume);
 	volumeMirrorOp->SetMirrorY(false);
@@ -166,7 +160,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	volumeMirrorOp->OpRun();
 	volumeMirrorOp->OpDo();
 	zMirrorVolume->GetOutput()->Update();
-	zMirrorVolume->GetOutput()->GetVTKData()->Update();
 	vtkImageData * zMirrorVolVtk = vtkImageData::SafeDownCast(zMirrorVolume->GetOutput()->GetVTKData());
 	vtkDataArray* zMirrorVolScalars = zMirrorVolVtk->GetPointData()->GetScalars();
 
@@ -193,7 +186,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	allMirrorVolume->DeepCopy(baseVolume);
 	allMirrorVolume->Update();
 	allMirrorVolume->GetOutput()->Update();
-	allMirrorVolume->GetOutput()->GetVTKData()->Update();
 
 	volumeMirrorOp->SetInput(allMirrorVolume);
 	volumeMirrorOp->SetMirrorX(true);
@@ -202,7 +194,6 @@ void albaOpVolumeMirrorTest::TestOpRun()
 	volumeMirrorOp->OpRun();
 	volumeMirrorOp->OpDo();
 	allMirrorVolume->GetOutput()->Update();
-	allMirrorVolume->GetOutput()->GetVTKData()->Update();
 	vtkImageData * allMirrorVolVtk = vtkImageData::SafeDownCast(allMirrorVolume->GetOutput()->GetVTKData());
 	vtkDataArray* allMirrorVolScalars = allMirrorVolVtk->GetPointData()->GetScalars();
 

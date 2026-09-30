@@ -54,7 +54,7 @@ public:
 
   /**
   Get the MTime: this is the bit of magic that makes everything work.*/
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   /** Force update of the pipe.*/
   virtual void Update();

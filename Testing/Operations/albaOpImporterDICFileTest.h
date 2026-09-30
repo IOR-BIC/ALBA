@@ -23,10 +23,12 @@ class albaOpImporterDICFileTest : public albaTest
 {
   CPPUNIT_TEST_SUITE( albaOpImporterDICFileTest );
   CPPUNIT_TEST( Test );
+  CPPUNIT_TEST( TestScalarsPreservation );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     void Test();
+    void TestScalarsPreservation();
 };
 
 #endif

@@ -146,7 +146,6 @@ void albaViewSliceSegmentation::VmeCreatePipeForSegmentation(albaVME *vme)
         int slice_mode;
         vtkDataSet *data = vme->GetOutput()->GetVTKData();
         assert(data);
-        data->Update();
         switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:

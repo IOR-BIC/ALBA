@@ -49,6 +49,7 @@ This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOS
 #include "albaProgressBarHelper.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 #include "albaTagArray.h"
 #include "albaVMEVolumeGray.h"
 #include "wx\filename.h"
@@ -1154,8 +1155,7 @@ int albaOpImporterScancoImageIO::ImportFile()
 	data->SetOrigin(m_Origin);
 	data->SetSpacing(m_Spacing);
 
-	data->SetScalarType(m_ScalarsType);
-	data->AllocateScalars();
+	data->AllocateScalars(m_ScalarsType,1);
 	data->GetPointData()->GetScalars()->SetName("Scalars");
 
 	Read(data->GetPointData()->GetScalars()->GetVoidPointer(0));
@@ -1163,7 +1163,6 @@ int albaOpImporterScancoImageIO::ImportFile()
 	wxString path, name, ext;
 	wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
 	
-	data->Update();
 	volume->SetName(name.c_str());
 	volume->SetData(data, 0);
 	volume->GetTagArray()->DeepCopy(m_TagArray);

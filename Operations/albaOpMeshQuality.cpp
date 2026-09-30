@@ -239,7 +239,6 @@ void albaOpMeshQuality::CreatePolydataPipeline()
 {
 	albaVMESurface *surface = albaVMESurface::SafeDownCast(m_Input);
 	vtkPolyData *dataset = vtkPolyData::SafeDownCast(surface->GetSurfaceOutput()->GetVTKData());
-	dataset->Update();
 
 	for(int i=0;i<dataset->GetNumberOfCells();i++)
 	{
@@ -267,7 +266,7 @@ void albaOpMeshQuality::CreatePolydataPipeline()
 	  double BoundingBox[6];
 	  dataset->GetBounds(BoundingBox);
 	  vtkNEW(m_Mapper);
-	  m_Mapper->SetInput(((vtkPolyData*)m_CheckMeshQuality->GetOutput()));
+	  m_Mapper->SetInputData(((vtkPolyData*)m_CheckMeshQuality->GetOutput()));
 
 	  //vtkDataArray *scalars=((vtkPolyData*)m_CheckMeshQuality->GetOutput())->GetCellData()->GetArray("quality");
 
@@ -296,7 +295,7 @@ void albaOpMeshQuality::CreatePolydataPipeline()
 	  m_Rwi->m_RenFront->AddActor(m_BarActor);
 
     vtkNEW(m_FeatureEdgeFilter);
-    m_FeatureEdgeFilter->SetInput(dataset);
+    m_FeatureEdgeFilter->SetInputData(dataset);
     m_FeatureEdgeFilter->FeatureEdgesOn();
     m_FeatureEdgeFilter->NonManifoldEdgesOn();
     m_FeatureEdgeFilter->BoundaryEdgesOff();
@@ -316,13 +315,13 @@ void albaOpMeshQuality::CreatePolydataPipeline()
     double radius = maxBounds / 100;
 
     vtkNEW(m_TubeFilter);
-    m_TubeFilter->SetInput(m_FeatureEdgeFilter->GetOutput());
+    m_TubeFilter->SetInputConnection(m_FeatureEdgeFilter->GetOutputPort());
     m_TubeFilter->SetNumberOfSides(10);
     m_TubeFilter->SetRadius(radius);
     m_TubeFilter->Update();
 
     vtkNEW(m_MapperFeatureEdge);
-    m_MapperFeatureEdge->SetInput(m_TubeFilter->GetOutput());
+    m_MapperFeatureEdge->SetInputConnection(m_TubeFilter->GetOutputPort());
     m_MapperFeatureEdge->Update();
 
     vtkNEW(m_ActorFeatureEdge);

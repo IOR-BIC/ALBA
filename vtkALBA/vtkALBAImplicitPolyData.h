@@ -19,17 +19,17 @@
 #include "vtkImplicitFunction.h"
 #include "vtkTriangleFilter.h"
 #include "vtkIdList.h"
+#include "vtkPointLocator.h"
+#include "albaConfigure.h"
 
 #define PointLocator vtkPointLocator
-#include "vtkPointLocator.h"
-
-#include "albaConfigure.h"
+class vtkPolygon;
 
 class ALBA_EXPORT vtkALBAImplicitPolyData : public vtkImplicitFunction
 {
 public:
   static vtkALBAImplicitPolyData *New();
-  vtkTypeRevisionMacro(vtkALBAImplicitPolyData, vtkImplicitFunction);
+  vtkTypeMacro(vtkALBAImplicitPolyData, vtkImplicitFunction);
 
   void PrintSelf(ostream& os, vtkIndent indent);
   
@@ -69,7 +69,7 @@ protected:
 
   /**
   Return the MTime also considering the Input dependency.*/
-  unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
 	double NoValue;
 	double NoGradient[3];

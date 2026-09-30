@@ -28,7 +28,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-vtkCxxRevisionMacro(vtkALBAOrientationMarkerWidget, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAOrientationMarkerWidget);
 vtkCxxSetObjectMacro(vtkALBAOrientationMarkerWidget, OrientationMarker, vtkProp);
 
@@ -69,6 +68,9 @@ vtkALBAOrientationMarkerWidget::vtkALBAOrientationMarkerWidget()
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetViewport( 0.0, 0.0, 0.2, 0.2 );
   this->Renderer->SetLayer( 0 );
+	//To avoid the color buffer to be cleared when the render window is rendered, we set the PreserveColorBuffer flag to 1
+	//Without this we obtain a black background in the viewport when the orientation marker is enabled
+  this->Renderer->SetPreserveColorBuffer(1);
   this->Renderer->InteractiveOff();
 
   this->Priority = 0.55;
@@ -92,7 +94,7 @@ vtkALBAOrientationMarkerWidget::vtkALBAOrientationMarkerWidget()
   tcoord->SetCoordinateSystemToDisplay();
 
   vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
-  mapper->SetInput( this->Outline );
+  mapper->SetInputData( this->Outline );
   mapper->SetTransformCoordinate( tcoord );
 
   this->OutlineActor = vtkActor2D::New();
@@ -153,16 +155,16 @@ void vtkALBAOrientationMarkerWidget::SetEnabled(int enabling)
     vtkRenderWindow* renwin = this->CurrentRenderer->GetRenderWindow();
     renwin->AddRenderer( this->Renderer );
     // 21.12.2010: Modified by Simone Brazzale
-    // The number of layers is no more incremented, so that the albaInteractorCameraMove
+    // The number of layers is no more incremented, so that the mafInteractorCameraMove
     // can understand where are the FRONT and BACK renderers.
     /*if (renwin->GetNumberOfLayers() < 2)
       {
       renwin->SetNumberOfLayers( 2 );
       }*/
 
-    this->CurrentRenderer->AddProp( this->OutlineActor );
+    this->CurrentRenderer->AddViewProp( this->OutlineActor );
     this->OutlineActor->VisibilityOff();
-    this->Renderer->AddProp( this->OrientationMarker );
+    this->Renderer->AddViewProp( this->OrientationMarker );
     this->OrientationMarker->VisibilityOn();
 
     if (this->Interactive)
@@ -203,9 +205,9 @@ void vtkALBAOrientationMarkerWidget::SetEnabled(int enabling)
     this->Interactor->RemoveObserver( this->EventCallbackCommand );
 
     this->OrientationMarker->VisibilityOff();
-    this->Renderer->RemoveProp( this->OrientationMarker );
+    this->Renderer->RemoveViewProp( this->OrientationMarker );
     this->OutlineActor->VisibilityOff();
-    this->CurrentRenderer->RemoveProp( this->OutlineActor );
+    this->CurrentRenderer->RemoveViewProp( this->OutlineActor );
 
     // if the render window is still around, remove our renderer from it
     if (this->CurrentRenderer->GetRenderWindow())

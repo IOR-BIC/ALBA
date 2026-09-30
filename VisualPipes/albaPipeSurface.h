@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-
+class vtkTrivialProducer;
 
 //----------------------------------------------------------------------------
 // albaPipeSurface :
@@ -40,6 +40,8 @@ public:
 
 protected:
 
-	vtkPolyData* GetInputAsPolyData();
+	vtkAlgorithmOutput* GetPolyDataOutputPort();
+
+	vtkTrivialProducer *m_TrivialProd;
 };  
 #endif // __albaPipeSurface_H__

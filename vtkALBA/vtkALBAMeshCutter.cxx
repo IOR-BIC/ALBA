@@ -25,7 +25,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkPlane.h"
 #include "vtkPolyData.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkMatrix4x4.h"
 #include <unordered_map>
@@ -33,6 +32,7 @@
 
 #include <ostream>
 #include "albaDefines.h"
+#include "vtkALBAToLinearTransform.h"
 #include "vtkTransform.h"
 
 
@@ -43,11 +43,12 @@
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkALBAMeshCutter, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkALBAMeshCutter);
 //------------------------------------------------------------------------------
 #include "albaMemDbg.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -91,11 +92,11 @@ vtkALBAMeshCutter::~vtkALBAMeshCutter()
 //------------------------------------------------------------------------------
 // Overload standard modified time function. If cut function is modified,
 // then this object is modified as well.
-unsigned long vtkALBAMeshCutter::GetMTime()
+vtkMTimeType vtkALBAMeshCutter::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mTime = this->vtkUnstructuredGridToPolyDataFilter::GetMTime();
-  unsigned long time;
+	vtkMTimeType mTime = this->vtkAlgorithm::GetMTime();
+	vtkMTimeType time;
 
   if (CutFunction != NULL )
   {
@@ -107,11 +108,17 @@ unsigned long vtkALBAMeshCutter::GetMTime()
 }
 
 //------------------------------------------------------------------------------
-// Execute method
-void vtkALBAMeshCutter::Execute()
+int vtkALBAMeshCutter::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 //------------------------------------------------------------------------------
 {
-  vtkUnstructuredGrid* input = this->GetInput();
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkUnstructuredGrid  *input = vtkUnstructuredGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   if (LastInput != input || LastInputTimeStamp != input->GetMTime())
   {
     // Make a copy of the input data and build links
@@ -158,7 +165,7 @@ void vtkALBAMeshCutter::Execute()
   }
 
   // Set pointer to output
-  Polydata = this->GetOutput() ;
+  Polydata = output;
 
   // Make sure the cutter is cleared of previous data before you run it !
   Initialize() ;
@@ -168,6 +175,8 @@ void vtkALBAMeshCutter::Execute()
   
   // Run the cutter
   CreateSlice() ;  
+
+	return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -378,13 +387,11 @@ int vtkALBAMeshCutter::GetIntersectionOfLineWithPlane(const double *p0, const do
 // Get list of cells which are adjoined to point
 void vtkALBAMeshCutter::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *idlist) const 
 //-----------------------------------------------------------------------------
-{
-  // get cell neighbours of point
-  vtkCellLinks::Link& lnk = UnstructGrid->GetCellLinks()->GetLink(idpt);
-  vtkIdType* dstList = idlist->WritePointer(0, lnk.ncells);
-  
-  // copy cell id's to idlist
-  memcpy(dstList, lnk.cells, lnk.ncells*sizeof(vtkIdType));  
+{  // Get cell neighbours of point
+  if (!UnstructGrid) 
+    return;
+
+  UnstructGrid->GetPointCells(idpt, idlist);
 }
 
 //-----------------------------------------------------------------------------
@@ -1308,3 +1315,11 @@ void vtkALBAMeshCutter::CalculateLocalCutCoord()
 		CutFunction->GetOrigin(CutTranformedOrigin);
 	}
 }
+
+//------------------------------------------------------------------------------
+int vtkALBAMeshCutter::FillInputPortInformation(int, vtkInformation *info)
+{
+	info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
+	return 1;
+}
+

@@ -132,10 +132,10 @@ void albaOpExporterPLY::ExportSurface()
 
   vtkALBASmartPointer<vtkTriangleFilter>triangles;
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-	triangles->SetInput(out_surface->GetSurfaceData());
+	triangles->SetInputData(out_surface->GetSurfaceData());
 	triangles->Update();
 
-	v_tpdf->SetInput(triangles->GetOutput());
+	v_tpdf->SetInputConnection(triangles->GetOutputPort());
 	v_tpdf->SetTransform(out_surface->GetAbsTransform()->GetVTKTransform());
 	v_tpdf->Update();
 
@@ -143,9 +143,9 @@ void albaOpExporterPLY::ExportSurface()
   albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,writer));
 	writer->SetFileName(m_File.GetCStr());
 	if(this->m_ABSMatrixFlag)
-		writer->SetInput(v_tpdf->GetOutput());
+		writer->SetInputConnection(v_tpdf->GetOutputPort());
 	else
-		writer->SetInput(triangles->GetOutput());
+		writer->SetInputConnection(triangles->GetOutputPort());
 	if(this->m_Binary)
 		writer->SetFileTypeToBinary();
 	else

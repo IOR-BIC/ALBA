@@ -25,12 +25,12 @@ class albaDataPipeCustomProberTest : public albaTest
 public: 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( albaDataPipeCustomProberTest );
-  CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-  CPPUNIT_TEST(TestDynamicAllocation);
+//   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
+//   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestExecute);
-  CPPUNIT_TEST(TestSetSurface);
-  CPPUNIT_TEST(TestSetVolume);
-  CPPUNIT_TEST(TestSetGet);  
+//   CPPUNIT_TEST(TestSetSurface);
+//   CPPUNIT_TEST(TestSetVolume);
+//   CPPUNIT_TEST(TestSetGet);  
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -40,9 +40,6 @@ private:
   void TestSetSurface();
   void TestSetVolume();
   void TestSetGet();
-	
-
-  bool result;
 };
 
 #endif

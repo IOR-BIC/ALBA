@@ -59,7 +59,6 @@ void albaOpImporterRAWVolumeTest::Test()
 
 	albaVME *VME=Importer->GetOutput();
 	vtkImageData *Data=vtkImageData::SafeDownCast(VME->GetOutput()->GetVTKData());
-	Data->UpdateData();
 	Data->ComputeBounds();
 	CPPUNIT_ASSERT(Data);
 

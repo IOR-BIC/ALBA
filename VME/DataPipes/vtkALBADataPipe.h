@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBADataPipe
- Authors: Marco Petrone
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -19,7 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaObserver.h"
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
@@ -29,26 +29,28 @@ class vtkDataSet;
 /** bridge class linking VTK pipeline to VME data pipe update mechanism.
   This object is a bridge between VTK pipeline update mechanism and ALBA
   VME.
+
+  This class uses shallowcopy like vtkPassThroughFilter but operates with multiple input/output 
+
   @sa mflInterpolator
  
   @todo
   -
 */
-class ALBA_EXPORT vtkALBADataPipe : public vtkDataSetToDataSetFilter
+class ALBA_EXPORT vtkALBADataPipe : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkALBADataPipe,vtkDataSetToDataSetFilter);
+  vtkTypeMacro(vtkALBADataPipe, vtkDataSetAlgorithm);
 
   static vtkALBADataPipe *New();
+
+	void SetNumberOfInputs(int n);
 
   /** Set the dataset to be reported as output of the VTK data pipe */
   virtual void SetNthInput(int num, vtkDataSet *input);
 
-  virtual vtkDataSet *GetOutput(int idx);
-  virtual vtkDataSet *GetOutput();
-
   /** A bit of magic making this filter to take into consideration VME data pipe MTime */
-  virtual unsigned long GetMTime();
+	vtkMTimeType GetMTime();
 
   /** return the modification time for internally stored information */
   virtual unsigned long GetInformationTime();
@@ -63,13 +65,12 @@ public:
     Overridden to attempt doing something before the pipeline is checked for the
     MTime (i.e. change the inputs) */
   virtual void UpdateInformation();
-
+  	
 protected:
   vtkALBADataPipe();
   virtual ~vtkALBADataPipe();
-
-  virtual void ExecuteInformation();
-  virtual void Execute();
+  	
+  int RequestData(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector);
 
   albaDataPipe *m_DataPipe; ///< the data pipe this object is linked to
 

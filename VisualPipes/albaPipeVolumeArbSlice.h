@@ -43,6 +43,7 @@ class albaLODActor;
 class albaVMEOutputVolume;
 class vtkTransformFilter;
 class vtkTransform;
+class vtkALBATicksGenerator;
 
 
 /** 
@@ -146,7 +147,7 @@ public:
 
 	/** Get ImageData */
 	vtkImageData *GetImageData() { return m_Image; };
-	vtkALBAVolumeSlicer *GetSliceImageData() { return m_SlicerImage; };
+	vtkALBAVolumeSlicer *GetSliceImageData() { return m_ArbSlicer; };
 	vtkTexture *GetTexture() { return m_Texture; };
 
   /** Set tri-linear interpolation */  
@@ -187,11 +188,11 @@ protected:
   vtkALBAAssembly *m_AssemblyUsed;
   albaVMEOutputVolume *m_VolumeOutput;
 
-  vtkALBAVolumeSlicer				 *m_SlicerImage;
-	vtkALBAVolumeSlicer				 *m_SlicerPolygonal;
-
+  vtkALBAVolumeSlicer		*m_ArbSlicer;
+	
 	vtkTransform					*m_NormalTranform;
 	vtkTransformFilter		*m_NormalTranformFilter;
+  vtkALBATicksGenerator *m_TicksGenerator;
 	vtkImageData					 *m_Image;
 	vtkTexture						 *m_Texture;
 	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
@@ -199,7 +200,7 @@ protected:
   vtkLookupTable         *m_ColorLUT;
   vtkLookupTable         *m_CustomColorLUT;
   vtkPolyDataMapper			 *m_SliceMapper;
-	vtkPolyData						 *m_SlicePolydata;
+	//vtkPolyData						 *m_SlicePolydata;
   vtkActor               *m_SliceActor;
 	
   vtkActor               *m_VolumeBoxActor;

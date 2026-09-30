@@ -191,7 +191,7 @@ void albaPipeMeshTest::TestPipeExecution()
 		pipeMesh->GetAssemblyFront()->GetActors(actorList);
 		actorList->InitTraversal();
 		vtkProp *actor = actorList->GetNextProp();
-		m_Renderer->RemoveAllProps();
+		m_Renderer->RemoveAllViewProps();
 		while (actor)
 		{
 			m_Renderer->AddActor(actor);
@@ -394,7 +394,6 @@ void albaPipeMeshTest::TestPipeDensityMap()
 	albaVMEVolumeGray *volumeInput;
 	albaNEW(volumeInput);
 	volumeInput->SetData((vtkImageData*)volumeImporter->GetOutput(), 0.0);
-	volumeInput->GetOutput()->GetVTKData()->Update();
 	volumeInput->GetOutput()->Update();
 	volumeInput->Update();
 

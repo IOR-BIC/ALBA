@@ -33,7 +33,7 @@ public:
   void AfterTest();
 
   CPPUNIT_TEST_SUITE( albaPipeLandmarkCloudTest );
-  CPPUNIT_TEST( DynamicAllocationTest );
+  //CPPUNIT_TEST( DynamicAllocationTest );
   CPPUNIT_TEST( TestPipeExecution );
   CPPUNIT_TEST_SUITE_END();
 

@@ -66,11 +66,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkTransform.h"
 #include "vtkTimerLog.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
 
 
 #include <assert.h>
 
 #include "vtkXRayVolumeMapper.h"
+#include "vtkDataArray.h"
 
 static const unsigned int MaxTextureResolution    = 512;
 static const unsigned int MinTextureResolution    = 2;
@@ -94,7 +97,6 @@ static float Color[4] = { 0.5f, 0.5f, 0.5f, 1.f };
 
 void ProjectBoxToViewport(const vtkMatrix4x4 *matrixObject, const double (&boundingBox)[6], double (&minMaxViewportCoordinates)[4]);
   
-vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3.2.3 $");
 vtkStandardNewMacro(vtkXRayVolumeMapper);
 
 //------------------------------------------------------------------------------
@@ -516,7 +518,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
 
   // prepare the transformation
   volume->GetMatrix(this->VolumeMatrix);
-  this->TransformMatrix->DeepCopy(renderer->GetActiveCamera()->GetCompositePerspectiveTransformMatrix((double)viewport[2] / viewport[3], 0, 1));
+  this->TransformMatrix->DeepCopy(renderer->GetActiveCamera()->GetCompositeProjectionTransformMatrix((double)viewport[2] / viewport[3], 0, 1));
   vtkMatrix4x4::Multiply4x4(this->TransformMatrix, this->VolumeMatrix, this->TransformMatrix);
   this->VolumeMatrix->Transpose();
   glMatrixMode(GL_MODELVIEW);
@@ -565,7 +567,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
   vtkCamera *camera = renderer->GetActiveCamera();
   double cameraX[3], cameraY[3], cameraZ[3];
   if (enablePerspectiveCorrection) {
-    const double windowUnit = 2 * tan(vtkMath::DegreesToRadians() * 0.5f * camera->GetViewAngle()) * camera->GetDistance() / RenderingViewport[3];
+    const double windowUnit = 2 * tan(vtkMath::RadiansFromDegrees(0.5f * camera->GetViewAngle())) * camera->GetDistance() / RenderingViewport[3];
     camera->GetViewUp(cameraY);
     camera->GetFocalPoint(cameraZ);
     camera->GetPosition(cameraX);
@@ -760,7 +762,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
 
 
 void vtkXRayVolumeMapper::SetInput(vtkDataSet *input) {
-  this->vtkProcessObject::SetNthInput(0, input);
+  this->SetInputData(input);
   ResetTextures();
   }
 
@@ -797,8 +799,11 @@ void vtkXRayVolumeMapper::InitializeRender(bool setup) {
     glClearColor(0, 0, 0, 0);
     
     // disable any antialiasing
-    bool multisamplingExt = (strstr((const char *)glGetString(GL_EXTENSIONS), "GL_EXT_multisample") != NULL ||
-                             strstr((const char *)glGetString(GL_EXTENSIONS), "GL_SGIS_multisample") != NULL);
+    const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
+    bool multisamplingExt = (extensions && 
+    												 (strstr(extensions, "GL_EXT_multisample") != NULL ||
+    												  strstr(extensions, "GL_SGIS_multisample") != NULL));
+
     if (multisamplingExt)
       glDisable(0x809D);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
@@ -867,10 +872,7 @@ bool vtkXRayVolumeMapper::PrepareTextures(bool force) {
   else if (this->NumberOfTextures[0] > 0 && this->NumberOfTextures[1] > 0 && this->NumberOfTextures[2] > 0)
     return true; // nothing to do
 
-  // check the data
-  if (this->GetInput() && this->GetInput()->GetDataReleased())
-    this->GetInput()->Update(); // ensure that the data is loaded
-  if (!this->IsDataValid(true))
+	if (!this->IsDataValid(true))
     return false;
 
   vtkImageData       *imageData = vtkImageData::SafeDownCast(this->GetInput());
@@ -902,7 +904,7 @@ bool vtkXRayVolumeMapper::PrepareTextures(bool force) {
   int dims[3], extent[6];
   if (imageData) {
     double dataSpacing[3];
-    imageData->GetWholeExtent(extent);
+    imageData->GetExtent(extent);
     imageData->GetDimensions(dims);
     imageData->GetOrigin(this->DataOrigin);
     imageData->GetSpacing(dataSpacing);
@@ -914,7 +916,7 @@ bool vtkXRayVolumeMapper::PrepareTextures(bool force) {
       }
     }
   else {
-    gridData->GetWholeExtent(extent);
+    gridData->GetExtent(extent);
     gridData->GetDimensions(dims);
     this->DataOrigin[0] = gridData->GetXCoordinates()->GetTuple(0)[0];
     this->DataOrigin[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
@@ -1264,13 +1266,19 @@ int vtkXRayVolumeMapper::FindColorResolution() {
 
 //-------------------------------------------------------------------
 void vtkXRayVolumeMapper::Update() {
-  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL || 
-      vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
-    this->GetInput()->UpdateInformation();
-    this->GetInput()->SetUpdateExtentToWholeExtent();
-    this->GetInput()->Update();
+  if (vtkImageData::SafeDownCast(this->GetInput()) != NULL ||
+    vtkRectilinearGrid::SafeDownCast(this->GetInput()) != NULL) {
+    this->UpdateInformation();
+    vtkInformation* outInfo = this->GetOutputInformation(0);
+    if (outInfo)
+    {
+      int wholeExtent[6];
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+      outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
     }
+    this->vtkVolumeMapper::Update();
   }
+}
 
 
 //-------------------------------------------------------------------

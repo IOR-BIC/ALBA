@@ -30,7 +30,6 @@
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
-#include "vtkIdType.h"
 #include "vtkTriangleFilter.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkALBAPoissonSurfaceReconstruction.h"
@@ -90,29 +89,24 @@ void vtkALBAFixTopologyTest::TestExecute()
    // put points and cells in polydata
    polydata->SetPoints(points);
    polydata->SetPolys(lines);
-   polydata->Update();
 
    vtkALBASmartPointer<vtkALBAFixTopology> fixTopology;
-   fixTopology->SetInput(polydata);
+   fixTopology->SetInputData(polydata);
    fixTopology->Update();
 
    vtkPolyData *outputFixTopology = fixTopology->GetOutput();
-   outputFixTopology->Update();
 
    vtkALBASmartPointer<vtkTriangleFilter> triangleFilter;
-   triangleFilter->SetInput(polydata);
+   triangleFilter->SetInputData(polydata);
    triangleFilter->Update();
    vtkALBASmartPointer<vtkPolyDataNormals> polyDataNormalsFilter;
-   polyDataNormalsFilter->SetInput(triangleFilter->GetOutput());
+   polyDataNormalsFilter->SetInputConnection(triangleFilter->GetOutputPort());
    polyDataNormalsFilter->Update();
    vtkALBASmartPointer<vtkALBAPoissonSurfaceReconstruction> poissonSurfaceReconstructionFilter;
-   poissonSurfaceReconstructionFilter->SetInput(polyDataNormalsFilter->GetOutput());
+   poissonSurfaceReconstructionFilter->SetInputConnection(polyDataNormalsFilter->GetOutputPort());
    poissonSurfaceReconstructionFilter->Update();
 
-   poissonSurfaceReconstructionFilter->GetOutput()->Update();
-
    vtkPolyData *outputPipeLine = poissonSurfaceReconstructionFilter->GetOutput();
-   outputPipeLine->Update();
 
    //Check if the two results are equals
    CPPUNIT_ASSERT(outputPipeLine->GetNumberOfPoints() == outputFixTopology->GetNumberOfPoints());

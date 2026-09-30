@@ -265,8 +265,6 @@ int albaVMEMesh::SetData(vtkUnstructuredGrid *data, albaTimeStamp t, int mode)
 
 	if (unstructuredGrid)
 	{
-		unstructuredGrid->Update();
-
 		m_NumCells = unstructuredGrid->GetNumberOfCells();
 		m_NumNodes = unstructuredGrid->GetNumberOfPoints();
 		return Superclass::SetData(unstructuredGrid, t, mode);
@@ -286,8 +284,6 @@ int albaVMEMesh::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
 
   if (unstructuredGrid) 
   {
-    unstructuredGrid->Update();
-
 		m_NumCells = unstructuredGrid->GetNumberOfCells();
 		m_NumNodes = unstructuredGrid->GetNumberOfPoints();
     return Superclass::SetData(data,t,mode);

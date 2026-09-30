@@ -144,7 +144,7 @@ void albaOpConnectivitySurface::CreateGui()
 
 
   vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-  connectivityFilter->SetInput(m_OriginalPolydata);
+  connectivityFilter->SetInputData(m_OriginalPolydata);
   connectivityFilter->SetExtractionModeToAllRegions();
   connectivityFilter->Update();
 
@@ -214,7 +214,7 @@ void albaOpConnectivitySurface::OnEvent(albaEventBase *alba_event)
 				else
 				{
 					vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-					connectivityFilter->SetInput(m_OriginalPolydata);
+					connectivityFilter->SetInputData(m_OriginalPolydata);
 					connectivityFilter->SetExtractionModeToAllRegions();
 					connectivityFilter->Update();
 					regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
@@ -288,7 +288,7 @@ void albaOpConnectivitySurface::OnVtkConnect()
 //     return;
 //   }
 	vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-	connectivityFilter->SetInput(m_OriginalPolydata);
+	connectivityFilter->SetInputData(m_OriginalPolydata);
 	int regionNumbers;
 	if(m_ExtractBiggestSurface == 1)
 	{
@@ -303,27 +303,26 @@ void albaOpConnectivitySurface::OnVtkConnect()
 		regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
 	}
 
+	vtkALBASmartPointer<vtkCleanPolyData> clean;
+	clean->SetInputConnection(connectivityFilter->GetOutputPort());
+
+
 	for(int region = 0, deleteRegion = 0; region < regionNumbers; region++)
 	{
     connectivityFilter->InitializeSpecifiedRegionList();
 		connectivityFilter->AddSpecifiedRegion(region);
-		connectivityFilter->Update();
+		clean->Update();
 
-		connectivityFilter->GetOutput()->GetBounds(bounds);
+		clean->GetOutput()->GetBounds(bounds);
 		
 		dimX = (bounds[1] - bounds[0]);
 		dimY = (bounds[3] - bounds[2]);
 		dimZ = (bounds[5] - bounds[4]);
 
-		double maxBound = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
+		double maxBound = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ);
 		
 		if(valueBoundThreshold <= maxBound)
 		{
-
-      vtkALBASmartPointer<vtkCleanPolyData> clean;
-      clean->SetInput(connectivityFilter->GetOutput());
-      clean->Update();
-
 			albaVMESurface *surf;
 			albaNEW(surf);
 			surf->SetData(clean->GetOutput(),surf->GetTimeStamp());

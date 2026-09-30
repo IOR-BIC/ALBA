@@ -291,36 +291,36 @@ vtkDataArray* albaGUILutHistogramEditor::Resample(vtkDataArray *inDA, vtkDataArr
 //----------------------------------------------------------------------------
 {
 
-  if (outDA)
-    vtkDEL(outDA);
+	if (outDA)
+		vtkDEL(outDA);
 
-  double fullSize;
+	double fullSize;
 
-  vtkFloatArray *tmp;
-  vtkNEW(tmp);
+	vtkFloatArray *tmp;
+	vtkNEW(tmp);
 
-  outDA=tmp;
-  
-  //Generating new resampled dataset
-  outDA->SetNumberOfTuples(SUB_SAMPLED_SIZE + 2);
-  outDA->SetName("SCALARS");
+	outDA = tmp;
+
+	//Generating new resampled dataset
+	outDA->SetNumberOfTuples(SUB_SAMPLED_SIZE + 2);
+	outDA->SetName("SCALARS");
 
 
-  fullSize=inDA->GetNumberOfTuples();
+	fullSize = inDA->GetNumberOfTuples();
 
-  for (int i=0;i<SUB_SAMPLED_SIZE;i++)
-  {
-    //copying only a sub-set of the data
-    double value = inDA->GetTuple1( ceil( i * fullSize / (double)SUB_SAMPLED_SIZE ) );
-    outDA->SetTuple1(i,value);
-  }
-  //Add the min and max values in order to obtain the same range after sub-sampling
-  outDA->SetTuple1(SUB_SAMPLED_SIZE,inDA->GetRange()[0]);
-  outDA->SetTuple1(SUB_SAMPLED_SIZE+1,inDA->GetRange()[1]);
+	for (int i = 0; i < SUB_SAMPLED_SIZE; i++)
+	{
+		//copying only a sub-set of the data
+		double value = inDA->GetTuple1(ceil(i * fullSize / (double)SUB_SAMPLED_SIZE));
+		outDA->SetTuple1(i, value);
+	}
+	//Add the min and max values in order to obtain the same range after sub-sampling
+	outDA->SetTuple1(SUB_SAMPLED_SIZE, inDA->GetRange()[0]);
+	outDA->SetTuple1(SUB_SAMPLED_SIZE + 1, inDA->GetRange()[1]);
 
-  outDA->ComputeRange(0);
+	outDA->GetRange();
 
-  return outDA;
+	return outDA;
 }
 
 //----------------------------------------------------------------------------

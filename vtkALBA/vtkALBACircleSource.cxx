@@ -25,7 +25,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMath.h"
 
 #include <math.h>
-vtkCxxRevisionMacro(vtkALBACircleSource, "$Revision: 1.44 $");
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+
 vtkStandardNewMacro(vtkALBACircleSource);
 
 vtkALBACircleSource::vtkALBACircleSource(int res)
@@ -40,9 +42,11 @@ vtkALBACircleSource::vtkALBACircleSource(int res)
   this->Resolution = (res < 3 ? 3 : res);
 
 	m_Plane = 0;
+
+	this->SetNumberOfInputPorts(0);
 }
 
-void vtkALBACircleSource::Execute()
+int vtkALBACircleSource::RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int A = 0, B = 1, C = 2;
 
@@ -57,7 +61,9 @@ void vtkALBACircleSource::Execute()
 	vtkPoints *newPoints;
 	vtkFloatArray *newTCoords;
 	vtkCellArray *newLines;
-	vtkPolyData *output = this->GetOutput();
+
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
 	vtkDebugMacro(<< "Creating line");
 
@@ -107,6 +113,8 @@ void vtkALBACircleSource::Execute()
 
 	output->SetLines(newLines);
 	newLines->Delete();
+
+	return 1;
 }
 
 void vtkALBACircleSource::PrintSelf(ostream& os, vtkIndent indent)

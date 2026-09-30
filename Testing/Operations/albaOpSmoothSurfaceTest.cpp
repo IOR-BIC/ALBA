@@ -53,7 +53,6 @@ void albaOpSmoothSurfaceTest::TestOpRun()
   albaVMESurface *surfaceInput;
   albaNEW(surfaceInput);
   surfaceInput->SetData(sphere->GetOutput(),0.0);
-  surfaceInput->GetOutput()->GetVTKData()->Update();
   surfaceInput->GetOutput()->Update();
   surfaceInput->Update();
 

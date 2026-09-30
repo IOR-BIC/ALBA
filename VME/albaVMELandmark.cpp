@@ -95,11 +95,9 @@ int albaVMELandmark::DeepCopy(albaVME *a)
     SetLandmarkVisibility(lm->GetLandmarkVisibility());
 
     albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
+
     if (dpipe)
-    {
       dpipe->SetInput(m_Polydata);
-      m_Polydata->Update();
-    }
 
     return ALBA_OK;
   }  

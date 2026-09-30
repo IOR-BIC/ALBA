@@ -131,10 +131,11 @@ void albaVMESurfaceTest::TestVMESurfaceVisualization()
   albaSmartPointer<albaVMESurface> sphereSurfaceVME;
 
   vtkALBASmartPointer<vtkSphereSource> sphereSource;
+	sphereSource->Update();
 
   sphereSurfaceVME->SetData(sphereSource->GetOutput(),-1);
 
-  mapper->SetInput(sphereSurfaceVME->GetSurfaceOutput()->GetVTKData());
+  mapper->SetInputData(sphereSurfaceVME->GetSurfaceOutput()->GetVTKData());
 
   renWin->Render();
 }
@@ -197,7 +198,7 @@ int albaVMESurfaceTest::PlayTree(albaVMERoot *root, bool ignoreVisibleToTraverse
       {
         vtkDataSet *vmedata=node->GetOutput()->GetVTKData();
         vtkALBASmartPointer<vtkDataSetMapper> mapper;
-        mapper->SetInput((vtkPolyData *)vmedata);
+        mapper->SetInputData((vtkPolyData *)vmedata);
 
         vtkALBASmartPointer<vtkActor> vmeact;
         vmeact->SetMapper(mapper);
@@ -301,6 +302,8 @@ void albaVMESurfaceTest::CreateVMETestTree()
 
   vtkALBASmartPointer<vtkSphereSource> sphere;
   vtkALBASmartPointer<vtkConeSource> cone;
+	sphere->Update();
+	cone->Update();
 
   int i;
   for (i=0;i<100;i++)
@@ -327,7 +330,7 @@ void albaVMESurfaceTest::CreateVMETestTree()
 
     vcone->SetPose(trans.GetMatrix(),i*.5+75);
 
-    vtkPolyDataSource *morph;
+    vtkPolyDataAlgorithm *morph;
 
     // the morphing tube
     if (i<50)
@@ -346,7 +349,7 @@ void albaVMESurfaceTest::CreateVMETestTree()
       cube->SetZLength(1);
       morph=cube;
     }
-
+		morph->Update();
     vmorph->SetData(morph->GetOutput(),log10((double)(100-i))*50);
     morph->Delete();
   }

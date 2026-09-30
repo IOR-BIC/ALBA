@@ -36,54 +36,29 @@
 #include "albaOpVolumeResample.h"
 #include "albaDeviceButtonsPad.h"
 #include "albaEventInteraction.h"
+#include "albaProgressBarHelper.h"
+
 
 #include "vtkMath.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkALBARegionGrowingLocalGlobalThreshold.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
-#include "vtkImageData.h"
 #include "vtkImageToStructuredPoints.h"
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkImageMedian3D.h"
 #include "vtkImageAccumulate.h"
 #include "vtkImageCast.h"
-#include "vtkALBAContourVolumeMapper.h"
+#include "vtkFlyingEdges3D.h"
 #include "vtkALBAHistogram.h"
-
-#include "itkVTKImageToImageFilter.h"
-#include "itkImageToVTKImageFilter.h"
-#include "itkBinaryErodeImageFilter.h"
-#include "itkBinaryDilateImageFilter.h"
-#include "itkBinaryBallStructuringElement.h"
-#include "itkAdaptiveHistogramEqualizationImageFilter.h"
-#include "albaProgressBarHelper.h"
-
-const unsigned int Dimension = 3;
-
-typedef unsigned char InputPixelType;
-typedef unsigned char OutputPixelType;
-typedef float InputPixelTypeFloat;
-
-typedef itk::Image< InputPixelType,  Dimension >   InputImageType;
-typedef itk::Image< InputPixelTypeFloat,  Dimension >   InputImageTypeFloat;
-typedef itk::Image< OutputPixelType, Dimension >   OutputImageType;
-
-typedef itk::BinaryBallStructuringElement< InputPixelType,Dimension  > StructuringElementType;
-
-typedef itk::BinaryDilateImageFilter< InputImageType,OutputImageType,StructuringElementType >  DilateFilterType;
-typedef itk::BinaryErodeImageFilter< InputImageType,OutputImageType,StructuringElementType >  ErodeFilterType;
-
-typedef itk::AdaptiveHistogramEqualizationImageFilter<InputImageTypeFloat> HistogramEqualizationType;
+#include "vtkImageDilateErode3D.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpSegmentationRegionGrowingLocalAndGlobalThreshold);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(wxString label) :
 albaOp(label)
-//----------------------------------------------------------------------------
 {
   m_OpType  = OPTYPE_OP;
   m_Canundo = true;
@@ -121,7 +96,6 @@ albaOp(label)
 }
 //----------------------------------------------------------------------------
 albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::~albaOpSegmentationRegionGrowingLocalAndGlobalThreshold()
-//----------------------------------------------------------------------------
 {
   albaDEL(m_VolumeOutputMorpho);
   albaDEL(m_VolumeOutputRegionGrowing);
@@ -138,20 +112,17 @@ albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::~albaOpSegmentationRegio
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::Copy()
-//----------------------------------------------------------------------------
 {
   /** return a copy of itself, needs to put it into the undo stack */
   return new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(m_Label);
 }
 //----------------------------------------------------------------------------
 bool albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::InternalAccept(albaVME* vme)
-//----------------------------------------------------------------------------
 {
   return vme && vme->IsA("albaVMEVolumeGray");
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
-//----------------------------------------------------------------------------
 {
   m_VolumeInput = albaVMEVolumeGray::SafeDownCast(m_Input);
 
@@ -189,14 +160,13 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
     m_ComputedMedianFilter = true;
 
     vtkALBASmartPointer<vtkImageMedian3D> median;
-    median->SetInput(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()));
+    median->SetInputData(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()));
     median->SetKernelSize(3,3,3);
     median->Update();
 
     albaVMEVolumeGray *volMediano;
     albaNEW(volMediano);
     vtkDataSet *d = median->GetOutput();
-    d->Update();
     int k = d->GetNumberOfPoints();
     double sr[2];
     d->GetPointData()->GetScalars()->GetRange(sr);
@@ -204,9 +174,9 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
     name<<" - Applied Median Filter";
     volMediano->SetName(name);
     vtkALBASmartPointer<vtkImageToStructuredPoints> f;
-    f->SetInput(median->GetOutput());
+    f->SetInputConnection(median->GetOutputPort());
     f->Update();
-    volMediano->SetData((vtkImageData *)f->GetOutput(),m_VolumeInput->GetTimeStamp());
+    volMediano->SetData(f->GetOutput(),m_VolumeInput->GetTimeStamp());
     volMediano->ReparentTo(m_VolumeInput);
     volMediano->Update();
 
@@ -220,56 +190,39 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
   vtkNEW(m_SegmentedImage);
   vtkNEW(m_MorphoImage);
   
-  //HistogramEqualization();
   CreateGui();
   CreateHistogramDialog();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathematics()
-//----------------------------------------------------------------------------
 {
   //Perform the morphological closing operation
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Please wait, morphological mathematics...");
-	
-	typedef itk::VTKImageToImageFilter< InputImageType > ConvertervtkTOitk;
-  ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-  vtkTOitk->SetInput( m_SegmentedImage );
-  vtkTOitk->Update();
-  progressHelper.UpdateProgressBar(10);
 
-  //Structuring element is a sphere
-  StructuringElementType  structuringElement;
-  structuringElement.SetRadius( m_SphereRadius );  // 3x3 structuring element
-  structuringElement.CreateStructuringElement(); 
+	int kernelSize = 2 * m_SphereRadius + 1;
 
-  DilateFilterType::Pointer binaryDilate = DilateFilterType::New();
-  binaryDilate->SetKernel( structuringElement );
-  binaryDilate->SetInput( vtkTOitk->GetOutput() );
-  binaryDilate->SetDilateValue( m_LowerLabel );
-  binaryDilate->Update();
-  progressHelper.UpdateProgressBar(50);
+	vtkALBASmartPointer<vtkImageDilateErode3D> dilateFilter;
+	dilateFilter->SetInputData(m_SegmentedImage);
+	dilateFilter->SetKernelSize(kernelSize, kernelSize, kernelSize);
+	dilateFilter->SetDilateValue(m_LowerLabel);
+	dilateFilter->SetErodeValue(m_UpperLabel);
+	dilateFilter->Update();
+	progressHelper.UpdateProgressBar(50);
 
-  ErodeFilterType::Pointer  binaryErode  = ErodeFilterType::New();
-  binaryErode->SetKernel(  structuringElement );
-  binaryErode->SetInput( binaryDilate->GetOutput() );
-  binaryErode->SetErodeValue( m_LowerLabel );
-  binaryErode->Update();
-  progressHelper.UpdateProgressBar(90);
+	vtkALBASmartPointer<vtkImageDilateErode3D> erodeFilter;
+	erodeFilter->SetInputConnection(dilateFilter->GetOutputPort());
+	erodeFilter->SetKernelSize(kernelSize, kernelSize, kernelSize);
+	erodeFilter->SetDilateValue(m_UpperLabel);
+	erodeFilter->SetErodeValue(m_LowerLabel);
+	erodeFilter->Update();
+	progressHelper.UpdateProgressBar(100);
 
-  typedef itk::ImageToVTKImageFilter< OutputImageType > ConverteritkTOvtk;
-  ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-  itkTOvtk->SetInput( binaryErode->GetOutput() );
-  itkTOvtk->Update();
-  progressHelper.UpdateProgressBar(100);
-
-  m_MorphoImage->DeepCopy(itkTOvtk->GetOutput());
-  m_MorphoImage->Update();
+	m_MorphoImage->DeepCopy(erodeFilter->GetOutput());
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
-//----------------------------------------------------------------------------
 {
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -277,7 +230,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 	
   //Get the vtk data from the input
   vtkImageData *imageData = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  imageData->Update();
 
   //Get the thresholds values selected by the user
   //double lower,upper;
@@ -295,12 +247,10 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 
   //Save the result of the region growing
   m_SegmentedImage->DeepCopy(localFilter->GetOutput());
-  m_SegmentedImage->Update();
 
 }
 //----------------------------------------------------------------------------
 // widget ID's
-//----------------------------------------------------------------------------
 enum REGION_GROWING_ID
 {
   ID_TO_START = MINID,
@@ -312,7 +262,6 @@ enum REGION_GROWING_ID
   ID_MORPHOLOGICAL,
   ID_APPLY_MEDIAN_FILTER,
   ID_DIALOG_HISTOGRAM,
-  ID_FITTING,
   ID_DIALOG_OK,
   ID_ELIMINATE_HISTOGRAM_VALUES,
   ID_VALUES_TO_ELIMINATE,
@@ -320,20 +269,8 @@ enum REGION_GROWING_ID
 };
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
-//----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
-
-//   wxBoxSizer *sizer3 = new wxBoxSizer(wxHORIZONTAL);
-//   m_Histogram = new albaGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(20,200),wxTAB_TRAVERSAL,true);
-//   m_Histogram->SetListener(m_Gui);
-//   m_Histogram->SetRepresentation(vtkALBAHistogram::BAR_REPRESENTATION);
-//   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-//   hd->Update();
-//   m_Histogram->SetData(hd->GetPointData()->GetScalars());
-// 
-//   sizer3->Add(m_Histogram,wxALIGN_CENTER|wxRIGHT);
-//   m_Gui->Add(sizer3,1);
 
   m_Gui->Button(ID_DIALOG_HISTOGRAM,_("Select points"));
   m_Gui->Label(&m_Point1,false,true);
@@ -355,7 +292,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Bool(ID_ELIMINATE_HISTOGRAM_VALUES,_("Eliminate Values"),&m_EliminateHistogramValues,1);
   m_Gui->Double(ID_VALUES_TO_ELIMINATE,_(""),&m_ValuesToEliminate);
   m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == true);
-  //m_Gui->Button(ID_FITTING,_("Fitting"));
   m_Gui->Divider(1);
 
   m_Gui->Double(ID_THRESHOLD,_("Threshold"),&m_Threshold);
@@ -401,70 +337,15 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->FitGui();
   ShowGui();
 }
-//----------------------------------------------------------------------------
-void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::HistogramEqualization()
-//----------------------------------------------------------------------------
-{
-  vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  im->Update();
 
-  vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
-  vtkImageToFloat->SetOutputScalarTypeToFloat ();
-  vtkImageToFloat->SetInput(im);
-  vtkImageToFloat->Modified();
-  vtkImageToFloat->Update();
-
-  typedef itk::VTKImageToImageFilter< InputImageTypeFloat > ConvertervtkTOitk;
-  ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-  vtkTOitk->SetInput( vtkImageToFloat->GetOutput() );
-  vtkTOitk->Update();
-
-  HistogramEqualizationType::Pointer histeqFilter = HistogramEqualizationType::New();
-
-  //provide minimum info
-  histeqFilter->GetOutput()->ReleaseDataFlagOn(); 
-  HistogramEqualizationType::ImageSizeType radius;
-  radius[0] = 100;
-  radius[1] = 100;
-  radius[2] = 100;
-  radius.Fill(0);
-  histeqFilter->SetRadius(radius);   
-  histeqFilter->SetAlpha(0);
-//   histeqFilter->SetBeta(0); 
-  histeqFilter->SetInput(vtkTOitk->GetOutput());
-  histeqFilter->Update();
-  //   rescaleFilter->SetInput(histeqFilter->GetOutput());
-  //   rescaleFilter->Update();
-
-  typedef itk::ImageToVTKImageFilter< InputImageTypeFloat > ConverteritkTOvtk;
-  ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-  itkTOvtk->SetInput( histeqFilter->GetOutput() );
-  itkTOvtk->Update();
-
-  vtkImageData *imout;
-  vtkNEW(imout);
-  imout->DeepCopy(itkTOvtk->GetOutput());
-  imout->Update();
-
-  albaVMEVolumeGray *v;
-  albaNEW(v);
-  v->SetData(imout,0.0);
-  v->ReparentTo(m_VolumeInput);
-  v->Update();
-
-//   m_VolumeInput->SetData(itkTOvtk->GetOutput(),0.0);
-//   m_VolumeInput->Update();
-}
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialog()
-//----------------------------------------------------------------------------
 {
   m_Dialog = new albaGUIDialog("Histogram", albaCLOSEWINDOW | albaRESIZABLE);
 
   m_Histogram = new albaGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL);
   m_Histogram->SetListener(this);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
   m_Histogram->SetData(hd->GetPointData()->GetScalars());
 
   albaGUI *gui = new albaGUI(this);
@@ -479,7 +360,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDial
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::ComputeParam()
-//----------------------------------------------------------------------------
 {
   double boneParameters[3],softIssueParameters[3];
   double boneMean = (double)m_Point1Value;
@@ -508,23 +388,20 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::ComputeParam()
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles()
-//----------------------------------------------------------------------------
 {
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
   double sr[2];
   hd->GetScalarRange(sr);
   double srw = sr[1]-sr[0];
 
   vtkALBASmartPointer<vtkImageData> imageData;
   imageData->SetDimensions(hd->GetPointData()->GetScalars()->GetNumberOfTuples(),1,1);
-  imageData->SetScalarType(hd->GetPointData()->GetScalars()->GetDataType());
+  imageData->AllocateScalars(hd->GetPointData()->GetScalars()->GetDataType(),1);
   imageData->GetPointData()->SetScalars(hd->GetPointData()->GetScalars());
-  imageData->Update();
   imageData->GetScalarRange(sr);
 
   vtkALBASmartPointer<vtkImageAccumulate> accumulate;
-  accumulate->SetInput(imageData);
+  accumulate->SetInputData(imageData);
   accumulate->SetComponentOrigin(sr[0],0,0);  
   accumulate->SetComponentExtent(0,srw,0,0,0,0);
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
@@ -598,75 +475,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles
   wxSetWorkingDirectory(oldDir);
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
-//----------------------------------------------------------------------------
-{
-  double boneParameters[3],softIssueParameters[3];
-  double boneStDev = (double)(m_Point1Value-m_Point2Value)/3;
-  double boneMean = (double)m_Point1Value;
-  double softIssueStDev = (double)(m_Point3Value-m_Point4Value)/3;
-  double softIssueMean = (double)m_Point3Value;
-  boneParameters[0] = 1/(boneStDev*sqrt(2*vtkMath::Pi()));
-  boneParameters[1] = boneMean;
-  boneParameters[2] = sqrt(2.0)*boneStDev;
-
-  softIssueParameters[0] = 1/(softIssueStDev*sqrt(2*vtkMath::Pi()));
-  softIssueParameters[1] = softIssueMean;
-  softIssueParameters[2] = sqrt(2.0)*softIssueStDev;
-
-  vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
-  double sr[2];
-  hd->GetScalarRange(sr);
-  double srw = sr[1]-sr[0];
-
-  vtkALBASmartPointer<vtkImageData> imageData;
-  imageData->SetDimensions(hd->GetPointData()->GetScalars()->GetNumberOfTuples(),1,1);
-  imageData->SetScalarType(hd->GetPointData()->GetScalars()->GetDataType());
-  imageData->GetPointData()->SetScalars(hd->GetPointData()->GetScalars());
-  imageData->Update();
-  imageData->GetScalarRange(sr);
-
-  vtkALBASmartPointer<vtkImageAccumulate> accumulate;
-  accumulate->SetInput(imageData);
-  accumulate->SetComponentOrigin(sr[0],0,0);  
-  accumulate->SetComponentExtent(0,srw,0,0,0,0);
-  accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
-  accumulate->Update();
-
-  wxString newDir = (albaGetApplicationDirectory()).ToAscii();
-  wxString oldDir = wxGetCwd();
-  wxSetWorkingDirectory(newDir);
-
-  wxString command = "python.exe lm.py";
-  command.Append(" ");
-  command.Append(albaString::Format("%.3f",boneParameters[0]));
-  command.Append(" ");
-  command.Append(albaString::Format("%.3f",boneParameters[1]));
-  command.Append(" ");
-  command.Append(albaString::Format("%.3f",boneParameters[2]));
-  
-  WriteHistogramFiles();
-
-  albaLogMessage(command.ToAscii());
-  wxExecute(command,wxEXEC_SYNC);
-
-  command = "python.exe lm.py";
-  command.Append(" ");
-  command.Append(albaString::Format("%.3f",softIssueParameters[0]));
-  command.Append(" ");
-  command.Append(albaString::Format("%.3f",softIssueParameters[1]));
-  command.Append(" ");
-  command.Append(albaString::Format("%.3f",softIssueParameters[2]));
-
-  albaLogMessage(command.ToAscii());
-  //wxExecute(command,wxEXEC_SYNC);
-
-  wxSetWorkingDirectory(oldDir);
-}
-//----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEventInteraction *ei = albaEventInteraction::SafeDownCast(alba_event))
   {
@@ -728,11 +537,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
         m_Dialog->EndModal(wxID_OK);
       }
       break;
-    case ID_FITTING:
-      {
-        FittingLM();
-      }
-      break;
     case ID_DIALOG_HISTOGRAM:
       {
         m_Dialog->ShowModal();
@@ -744,7 +548,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
         //Convert the output of the region growing into structured points
         vtkALBASmartPointer<vtkImageToStructuredPoints> filter;
-        filter->SetInput(m_SegmentedImage);
+        filter->SetInputData(m_SegmentedImage);
         filter->Update();
 
         //Generate the vme output of the region growing
@@ -770,7 +574,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 
         //Convert the output of the region growing into structured points
         vtkALBASmartPointer<vtkImageToStructuredPoints> filter;
-        filter->SetInput(m_MorphoImage);
+        filter->SetInputData(m_MorphoImage);
         filter->Update();
 
         //Generate the vme output of the morphological closing
@@ -779,16 +583,17 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
         m_VolumeOutputMorpho->ReparentTo(m_VolumeInput);
         m_VolumeOutputMorpho->Update();
 
-        vtkALBASmartPointer<vtkALBAContourVolumeMapper> extractIsosurface;
-        extractIsosurface->SetInput((vtkImageData *)filter->GetOutput());
-        extractIsosurface->SetContourValue(m_UpperLabel);
+        vtkALBASmartPointer<vtkFlyingEdges3D> extractIsosurface;
+        extractIsosurface->SetInputConnection(filter->GetOutputPort());
+        extractIsosurface->SetNumberOfContours(1);
+        extractIsosurface->SetValue(0,m_UpperLabel);
         extractIsosurface->Update();
 
         vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
         int result = ALBA_OK;
         if (m_ApplyConnectivityFilter == true)
         {
-          connectivityFilter->SetInput(extractIsosurface->GetOutput());
+          connectivityFilter->SetInputData(extractIsosurface->GetOutput());
           connectivityFilter->SetExtractionModeToLargestRegion();
           connectivityFilter->Update();
 
@@ -846,7 +651,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
-//----------------------------------------------------------------------------
 {
   if (result == OP_RUN_CANCEL)
   {
@@ -874,7 +678,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
-//----------------------------------------------------------------------------
 {
   if (m_VolumeOutputRegionGrowing )
   {
@@ -897,7 +700,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
-//----------------------------------------------------------------------------
 {
   if (m_VolumeOutputRegionGrowing)
   {

@@ -15,7 +15,7 @@ University of Bedfordshire
 #define __vtkALBALandmarkCloudPolydataFilter_h
 
 #include "vtkPolyData.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 
 
 #include "vtkSphereSource.h"
@@ -31,11 +31,11 @@ University of Bedfordshire
 //
 // Version: Nigel McFarlane 6.3.14
 //------------------------------------------------------------------------------
-class ALBA_EXPORT vtkALBALandmarkCloudPolydataFilter : public vtkPolyDataToPolyDataFilter 
+class ALBA_EXPORT vtkALBALandmarkCloudPolydataFilter : public vtkPolyDataAlgorithm 
 {
 public:
   void PrintSelf(ostream& os, vtkIndent indent) const {}
-  vtkTypeRevisionMacro(vtkALBALandmarkCloudPolydataFilter,vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBALandmarkCloudPolydataFilter,vtkPolyDataAlgorithm);
 
   /// Constructor
   static vtkALBALandmarkCloudPolydataFilter *New();
@@ -132,7 +132,8 @@ protected:
 
   char m_ScalarName[256] ;
 
-  void Execute();
+	/** Execute method */
+  int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   // visual pipes
   std::vector<vtkSphereSource*> m_SphereList ;          // sphere sources
@@ -154,5 +155,3 @@ private:
 };
 
 #endif
-
-

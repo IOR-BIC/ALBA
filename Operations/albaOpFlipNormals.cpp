@@ -130,7 +130,7 @@ void albaOpFlipNormals::OpRun()
 	if(!((vtkPolyData*)m_Input->GetOutput()->GetVTKData()->GetCellData()->GetNormals()))
 	{
 		vtkALBASmartPointer<vtkPolyDataNormals> normalFilter;
-		normalFilter->SetInput((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
+		normalFilter->SetInputData((vtkPolyData*)((albaVME *)m_Input)->GetOutput()->GetVTKData());
 
 		normalFilter->ComputeCellNormalsOn();
 		normalFilter->SplittingOff();
@@ -302,13 +302,13 @@ void albaOpFlipNormals::CreateSurfacePipeline()
 //----------------------------------------------------------------------------
 {
 	m_CellFilter = vtkALBACellsFilter::New();
-	m_CellFilter->SetInput(m_ResultPolydata);
+	m_CellFilter->SetInputData(m_ResultPolydata);
 	m_CellFilter->Update();
 
 	if (!m_TestMode)
 	{
 		m_PolydataMapper	= vtkPolyDataMapper::New();
-		m_PolydataMapper->SetInput(m_CellFilter->GetOutput());
+		m_PolydataMapper->SetInputConnection(m_CellFilter->GetOutputPort());
 		m_PolydataMapper->ScalarVisibilityOn();
 	
 		m_PolydataActor = vtkActor::New();
@@ -321,13 +321,11 @@ void albaOpFlipNormals::CreateNormalsPipe()
 //----------------------------------------------------------------------------
 {
 	vtkNEW(m_CenterPointsFilter);
-	m_CenterPointsFilter->SetInput(m_ResultPolydata);
+	m_CenterPointsFilter->SetInputData(m_ResultPolydata);
 	m_CenterPointsFilter->Update();
 	
 	m_Centers = m_CenterPointsFilter->GetOutput();
-	m_Centers->Update();
 	m_Centers->GetPointData()->SetNormals(m_ResultPolydata->GetCellData()->GetNormals());
-	m_Centers->Update();
 
 	if (!m_TestMode)
   {
@@ -345,13 +343,13 @@ void albaOpFlipNormals::CreateNormalsPipe()
 		m_NormalArrow->Update();
 	
 		vtkNEW(m_NormalGlyph);
-		m_NormalGlyph->SetInput(m_Centers);
-		m_NormalGlyph->SetSource(m_NormalArrow->GetOutput());
+		m_NormalGlyph->SetInputData(m_Centers);
+		m_NormalGlyph->SetSourceConnection(m_NormalArrow->GetOutputPort());
 		m_NormalGlyph->SetVectorModeToUseNormal();
 		m_NormalGlyph->Update();
 	
 		vtkNEW(m_NormalMapper);
-		m_NormalMapper->SetInput(m_NormalGlyph->GetOutput());
+		m_NormalMapper->SetInputConnection(m_NormalGlyph->GetOutputPort());
 		m_NormalMapper->Update();
 	
 		vtkNEW(m_NormalActor);
@@ -453,7 +451,6 @@ void albaOpFlipNormals::OnEvent(albaEventBase *alba_event)
 		case ID_RESET:
 			{
 				m_ResultPolydata->DeepCopy(m_OriginalPolydata);
-				m_ResultPolydata->Update();
 				m_Rwi->m_RenderWindow->Render();
 			}     
 			break ;
@@ -549,7 +546,6 @@ void albaOpFlipNormals::ModifyAllNormal()
 		vtkDEL(p);
 	}
 	m_ResultPolydata->Modified();
-	m_ResultPolydata->Update();
 }
 //----------------------------------------------------------------------------
 void albaOpFlipNormals::TraverseMeshAndMark( double radius )
@@ -586,26 +582,31 @@ void albaOpFlipNormals::TraverseMeshAndMark( double radius )
 					m_UnselectCells ? m_CellFilter->UnmarkCell(cellId) : m_CellFilter->MarkCell(cellId);
 				}
 
-				// get its points
-				m_Mesh->GetCellPoints(cellId, numCellPoints, cellPointsList);
+				vtkNew<vtkIdList> cellPointsList;  // Lista dei punti della cella
+				vtkNew<vtkIdList> cellsFromPoint;  // Lista delle celle che condividono un punto
 
-				// for each cell point
-				for (idPoint=0; idPoint < numCellPoints; idPoint++) 
+				// Get cell points
+				m_Mesh->GetCellPoints(cellId, cellPointsList);
+
+				// Loop through each cell point
+				for (vtkIdType idPoint = 0; idPoint < cellPointsList->GetNumberOfIds(); idPoint++)
 				{
-					// if the point has not been yet visited
-					if ( m_VisitedPoints[ptId=cellPointsList[idPoint]] < 0 )
+					vtkIdType ptId = cellPointsList->GetId(idPoint); // Ottieni ID del punto
+
+					// If the point has not been visited
+					if (m_VisitedPoints[ptId] < 0)
 					{
-						// mark it as visited
+						// Mark it as visited
 						m_VisitedPoints[ptId] = m_PointNumber++;
 					}
 
-					// get neighbor cells from cell point
-					m_Mesh->GetPointCells(ptId,ncells,cellsFromPoint);
+					// Get neighbor cells from this point
+					m_Mesh->GetPointCells(ptId, cellsFromPoint);
 
-					// check connectivity criterion (geometric + distance)
+					// Check connectivity criterion (geometric + distance)
 					for (k=0; k < ncells; k++)
 					{
-						cellId = cellsFromPoint[k];
+						cellId = cellsFromPoint->GetId(k);
 
 						FindTriangleCellCenter(cellId,currentCellCenter);
 						if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)
@@ -778,7 +779,6 @@ void albaOpFlipNormals::FlipNormals()
 		m_ResultPolydata->GetCellData()->GetNormals()->SetTuple3(m_CellFilter->GetIdMarkedCell(i),normal[0],normal[1],normal[2]);
 	}
 	m_ResultPolydata->Modified();
-	m_ResultPolydata->Update();
 }
 //----------------------------------------------------------------------------
 void albaOpFlipNormals::MarkCells()

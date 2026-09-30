@@ -39,37 +39,22 @@
 #include "albaPipePointCloud.h"
 #include "albaPipePolyline.h"
 #include "albaPipeIsosurface.h"
-#ifdef WIN32
-#include "albaPipeIsosurfaceGPU.h"
-#endif
 #include "albaPipeImage3D.h"
 #include "albaPipeVector.h"
 #include "albaPipeMesh.h"
 #include "albaPipeScalar.h"
-#include "albaVisualPipeVolumeRayCasting.h"
-
-#ifdef ALBA_USE_ITK
-  #include "albaPipeScalarMatrix.h"
-#endif
-
+#include "albaPipeScalarMatrix.h"
 #include "albaPipeVolumeMIP.h"
 #include "albaPipeVolumeDRR.h"
 #include "albaPipeVolumeVR.h"
 #include "albaPipeTrajectories.h"
-
 #include "albaPipeWrappedMeter.h"
 #include "albaPipeSurfaceEditor.h"
 #include "albaVisualPipeSlicerSlice.h"
 #include "albaVisualPipePolylineGraph.h"
-
 #include "albaPipeDensityDistance.h"
-
-#ifdef ALBA_USE_ITK  
 #include "albaPipeGraph.h"
-#endif
-
 #include "albaPipePolylineGraphEditor.h"
-
 #include "albaPipeMeshSlice.h"
 #include "albaPipePolylineSlice.h"
 #include "albaPipeSurfaceSlice.h"
@@ -87,7 +72,6 @@
 #include "albaPipeTensorFieldSlice.h"
 #include "albaPipeVolumeSliceBlend.h"
 #include "albaVisualPipeCollisionDetection.h"
-
 #include "albaPipeRayCast.h"
 
 // local include
@@ -146,42 +130,21 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeVector,"Pipe to render vectors ");
   albaPlugPipeMacro(albaPipeLandmarkCloud,"Pipe for render landmark clouds");
   albaPlugPipeMacro(albaPipeIsosurface,"Pipe for render vtk volumes as a iso-surface");
-#ifdef WIN32
-  albaPlugPipeMacro(albaPipeIsosurfaceGPU,"Pipe for render vtk volumes as a iso-surface through a GPU");
-#endif
   albaPlugPipeMacro(albaPipeImage3D,"Pipe for render images");
 	albaPlugPipeMacro(albaPipeMesh,"Pipe for render Mesh");
   albaPlugPipeMacro(albaPipeScalar,"Pipe for render scalar data");
-  albaPlugPipeMacro(albaVisualPipeVolumeRayCasting,"Pipe for render volume data with Ray Cast method.");
-
-#ifdef ALBA_USE_ITK
   albaPlugPipeMacro(albaPipeScalarMatrix,"Pipe for render matrix scalar data");
-#endif
-
   albaPlugPipeMacro(albaPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
   albaPlugPipeMacro(albaPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
-
   albaPlugPipeMacro(albaPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");
-
   albaPlugPipeMacro(albaPipeDensityDistance, "Pipe for visualize the value of scalars on a surface.");
-
   albaPlugPipeMacro(albaPipeTrajectories, "Pipe to render animated Landmark trajectories in a time interval.");
   albaPlugPipeMacro(albaPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
-
   albaPlugPipeMacro(albaPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");
   albaPlugPipeMacro(albaPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
-
   albaPlugPipeMacro(albaVisualPipeSlicerSlice, "Pipe to Visualize Slicer as borders cutted from a plane.");
-
   albaPlugPipeMacro(albaVisualPipePolylineGraph, "Pipe to Visualize Polyline and Graph.");
-
-
-#ifdef ALBA_USE_ITK  
-
   albaPlugPipeMacro(albaPipeGraph, "Pipe to plot scalar graphics.");
-
-#endif
-
   albaPlugPipeMacro(albaPipeCompoundVolume, "Compound pipe for rendering volumes.");
   albaPlugPipeMacro(albaPipeCompoundVolumeIsosurface,"Compound Pipe for render vtk volumes as a iso-surface");
   albaPlugPipeMacro(albaPipeCompoundVolumeMIP, "Compound pipe for render vtk volumes with MIP ray cast method.");
@@ -196,7 +159,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeTensorFieldSlice, "Pipe for rendering of tensor fields using color mapping on the slice of the object.");
   albaPlugPipeMacro(albaPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
   albaPlugPipeMacro(albaVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
-
 	albaPlugPipeMacro(albaPipeVolumeArbSlice, "albaPipeVolumeArbSlice.");
 	albaPlugPipeMacro(albaPipeVolumeArbOrthoSlice, "albaPipeVolumeArbOrthoSlice.");
 	albaPlugPipeMacro(albaPipeVolumeOrthoSlice, "albaPipeVolumeOrthoSlice.");
@@ -204,7 +166,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipePolylineSlice, "albaPipePolylineSlice.");
   albaPlugPipeMacro(albaPipeMeshSlice, "albaPipeMeshSlice.");
 	albaPlugPipeMacro(albaPipePointCloudSlice, "albaPipePointCloudSlice.");
-
   albaPlugPipeMacro(albaPipeRayCast, "Pipe for RayCast Volume rendering of bone-blood-muscle");
 }
 

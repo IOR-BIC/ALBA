@@ -24,7 +24,7 @@
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -37,13 +37,13 @@
 class name: vtkALBAFixTopology
 This class is a filter which use vtkALBAPoissonSurfaceReconstruction class for fixing the topology.
 */
-class ALBA_EXPORT vtkALBAFixTopology : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAFixTopology : public vtkPolyDataAlgorithm
 {
   public:
     /** create instance of the class*/
     static vtkALBAFixTopology *New();
     /** RTTI macro*/
-    vtkTypeRevisionMacro(vtkALBAFixTopology,vtkPolyDataToPolyDataFilter);
+    vtkTypeMacro(vtkALBAFixTopology,vtkPolyDataAlgorithm);
     /** print information*/
     void PrintSelf(ostream& os, vtkIndent indent);
   
@@ -54,7 +54,7 @@ class ALBA_EXPORT vtkALBAFixTopology : public vtkPolyDataToPolyDataFilter
     ~vtkALBAFixTopology();
 
     /** execute the filter*/
-    void Execute();
+    int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   private:
     /** copy constructor not implemented*/

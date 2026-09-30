@@ -3,7 +3,7 @@ PROJECT (albaVisualPipesTests)
 IF(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaDLL vtkALBA albaTests) 
 ELSE(ALBA_BUILD_ALBADLL)
-  SET(PROJECT_LIBS albaTests albaVME albaVisualPipes albaDataPipes GPUAPI vtkRendering vtkGraphics albaService)
+  SET(PROJECT_LIBS albaTests albaVME albaVisualPipes albaDataPipes GPUAPI albaService ${VTK_LIBRARIES})
 ENDIF(ALBA_BUILD_ALBADLL)
  
  
@@ -21,16 +21,12 @@ SET(PROJECT_SRCS
 	albaPipeIsosurfaceTest.h albaPipeIsosurfaceTest.cpp
 	albaPipePointSetTest.h albaPipePointSetTest.cpp
 	albaPipeFactoryVMETest.h albaPipeFactoryVMETest.cpp
-	albaPipeIsosurfaceGPUTest.h albaPipeIsosurfaceGPUTest.cpp
 	albaPipePolylineTest.h albaPipePolylineTest.cpp
 	albaPipeLandmarkCloudTest.h albaPipeLandmarkCloudTest.cpp
 	albaPipeVectorTest.h albaPipeVectorTest.cpp
 	albaPipeMeterTest.h albaPipeMeterTest.cpp
 	albaPipeVolumeProjectedTest.h albaPipeVolumeProjectedTest.cpp
 	albaPipeScalarMatrixTest.h albaPipeScalarMatrixTest.cpp
-	albaVisualPipeVolumeRayCastingTest.h albaVisualPipeVolumeRayCastingTest.cpp
-	albaPipeVolumeMIPTest.h albaPipeVolumeMIPTest.cpp
-	albaPipeVolumeDRRTest.h albaPipeVolumeDRRTest.cpp
 	albaPipePolylineGraphEditorTest.h albaPipePolylineGraphEditorTest.cpp
 	albaPipeMeshSliceTest.h albaPipeMeshSliceTest.cpp
 	albaPipeSurfaceSliceTest.h albaPipeSurfaceSliceTest.cpp
@@ -57,14 +53,22 @@ SET(PROJECT_SRCS
 	albaPipeTensorFieldTest.h albaPipeTensorFieldTest.cpp
 	albaPipeVectorFieldTest.h albaPipeVectorFieldTest.cpp
 	albaVisualPipeSlicerSliceTest.h albaVisualPipeSlicerSliceTest.cpp
-	albaPipeCompoundVolumeVRTest.h albaPipeCompoundVolumeVRTest.cpp
-	albaPipeCompoundVolumeMIPTest.h albaPipeCompoundVolumeMIPTest.cpp
-	albaPipeCompoundVolumeDRRTest.h albaPipeCompoundVolumeDRRTest.cpp
 	albaPipeCompoundVolumeIsosurfaceTest.h albaPipeCompoundVolumeIsosurfaceTest.cpp
-	albaPipeRayCastTest.h albaPipeRayCastTest.cpp
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
 	albaPipePointCloudSliceTest.h albaPipePointCloudSliceTest.cpp
 )
+
+IF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)
+SET(PROJECT_SRCS ${PROJECT_SRCS}
+	albaPipeVolumeDRRTest.h albaPipeVolumeDRRTest.cpp
+	albaPipeVolumeMIPTest.h albaPipeVolumeMIPTest.cpp
+	albaPipeCompoundVolumeDRRTest.h albaPipeCompoundVolumeDRRTest.cpp
+	albaPipeRayCastTest.h albaPipeRayCastTest.cpp
+	albaPipeCompoundVolumeMIPTest.h albaPipeCompoundVolumeMIPTest.cpp
+	albaPipeCompoundVolumeVRTest.h albaPipeCompoundVolumeVRTest.cpp
+)
+ENDIF (NOT DISABLE_GPU_VOLUME_RENDERING_TESTS)
+	
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})

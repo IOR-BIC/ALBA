@@ -60,8 +60,6 @@ void vtkALBAPolyDataMirrorTest::BeforeTest()
 	pointId[2] = 2;
 	cellArray->InsertNextCell(3 , pointId);
 
-	m_TestPolyData->Update();
-
 	vtkDEL(points);
 	vtkDEL(cellArray);
 }
@@ -86,7 +84,7 @@ void vtkALBAPolyDataMirrorTest::TestMirrorX()
 //-------------------------------------------------------------------------
 {
 	vtkALBAPolyDataMirror *tqr = vtkALBAPolyDataMirror::New();
-	tqr->SetInput(m_TestPolyData);
+	tqr->SetInputData(m_TestPolyData);
 
 	tqr->SetMirrorXCoordinate(0);
 	CPPUNIT_ASSERT(tqr->GetMirrorXCoordinate() == 0);
@@ -120,7 +118,7 @@ void vtkALBAPolyDataMirrorTest::TestMirrorY()
 //-------------------------------------------------------------------------
 {
 	vtkALBAPolyDataMirror *tqr = vtkALBAPolyDataMirror::New();
-	tqr->SetInput(m_TestPolyData);
+	tqr->SetInputData(m_TestPolyData);
 
 	tqr->SetMirrorYCoordinate(0);
 	CPPUNIT_ASSERT(tqr->GetMirrorYCoordinate() == 0);
@@ -154,7 +152,7 @@ void vtkALBAPolyDataMirrorTest::TestMirrorZ()
 //-------------------------------------------------------------------------
 {
 	vtkALBAPolyDataMirror *tqr = vtkALBAPolyDataMirror::New();
-	tqr->SetInput(m_TestPolyData);
+	tqr->SetInputData(m_TestPolyData);
 
 	tqr->SetMirrorZCoordinate(0);
 	CPPUNIT_ASSERT(tqr->GetMirrorZCoordinate() == 0);
@@ -188,7 +186,7 @@ void vtkALBAPolyDataMirrorTest::TestFlipNormals()
 //-------------------------------------------------------------------------
 {
 	vtkALBAPolyDataMirror *tqr = vtkALBAPolyDataMirror::New();
-	tqr->SetInput(m_TestPolyData);
+	tqr->SetInputData(m_TestPolyData);
 
 	tqr->SetFlipNormals(0);
 	CPPUNIT_ASSERT(tqr->GetFlipNormals() == 0);

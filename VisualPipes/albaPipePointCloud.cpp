@@ -29,6 +29,7 @@
 #include "vtkPolyData.h"
 #include "albaGUI.h"
 #include "albaGUIMaterialButton.h"
+#include "vtkTrivialProducer.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipePointCloud);
@@ -39,6 +40,7 @@ albaPipePointCloud::albaPipePointCloud()
 :albaPipeGenericPolydata()
 //----------------------------------------------------------------------------
 {
+	m_TrivialProd = NULL;
 	m_Representation = POINTS_REP;
 	m_SkipNormalFilter = true;
 }
@@ -47,6 +49,7 @@ albaPipePointCloud::albaPipePointCloud()
 albaPipePointCloud::~albaPipePointCloud()
 //----------------------------------------------------------------------------
 {
+	vtkDEL(m_TrivialProd);
 }
 
 
@@ -87,18 +90,19 @@ void albaPipePointCloud::UpdateProperty(bool fromTag /*= false*/)
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData *albaPipePointCloud::GetInputAsPolyData()
+vtkAlgorithmOutput* albaPipePointCloud::GetPolyDataOutputPort()
 {
-	if (!m_InputAsPolydata)
+	if (!m_PolydataConnection)
 	{
 		assert(m_Vme->GetOutput()->IsALBAType(albaVMEOutputSurface));
 		albaVMEOutputSurface *surface_output = albaVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
 		assert(surface_output);
 		surface_output->Update();
-		m_InputAsPolydata = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
-		assert(m_InputAsPolydata);
-		m_InputAsPolydata->Update();
+		vtkNEW(m_TrivialProd);
+		m_TrivialProd->SetOutput(surface_output->GetVTKData());
+		m_PolydataConnection = m_TrivialProd->GetOutputPort();
+		
 	}
 
-	return m_InputAsPolydata;
+	return m_PolydataConnection;
 }

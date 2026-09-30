@@ -52,7 +52,7 @@ void vtkALBARemoveCellsFilterTest::RenderData( vtkPolyData *data )
   renderWindowInteractor->SetRenderWindow(renderWindow);
 
   vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInput(data);
+  mapper->SetInputData(data);
   mapper->ScalarVisibilityOn();
   
   vtkALBASmartPointer<vtkActor> actor;
@@ -72,7 +72,7 @@ void vtkALBARemoveCellsFilterTest::TestRemoveMarkedCells()
   sphere->Update();
 
 	vtkALBASmartPointer<vtkALBARemoveCellsFilter> rc;
-  rc->SetInput(sphere->GetOutput());
+  rc->SetInputConnection(sphere->GetOutputPort());
   rc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -100,7 +100,7 @@ void vtkALBARemoveCellsFilterTest::TestMarkCell()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBARemoveCellsFilter> rc;
-  rc->SetInput(sphere->GetOutput());
+  rc->SetInputConnection(sphere->GetOutputPort());
   rc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -122,7 +122,7 @@ void vtkALBARemoveCellsFilterTest::TestUndoMarks()
   sphere->Update();
 
   vtkALBASmartPointer<vtkALBARemoveCellsFilter> rc;
-  rc->SetInput(sphere->GetOutput());
+  rc->SetInputConnection(sphere->GetOutputPort());
   rc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();

@@ -59,8 +59,8 @@ albaDataPipeCustomProber::albaDataPipeCustomProber()
 
   vtkNEW(m_Normals);
   vtkNEW(m_Prober);
-  m_Prober->SetInput((vtkDataSet *)m_Normals->GetOutput());
-  SetInput(m_Prober->GetOutput());
+  m_Prober->SetInputConnection(m_Normals->GetOutputPort());
+  SetInputConnection(m_Prober->GetOutputPort());
 }
 
 //------------------------------------------------------------------------------
@@ -78,11 +78,17 @@ void albaDataPipeCustomProber::SetSurface(albaVME *surface)
   if (m_Surface)
   {
     vtkDataSet *surf_data = m_Surface->GetOutput()->GetVTKData();
-    m_Normals->SetInput((vtkPolyData *)surf_data);
+    m_Normals->SetInputData((vtkPolyData *)surf_data);
+		m_Normals->Modified();
+		m_Normals->Update();
+		
+		m_Prober->Modified();
+		m_Prober->Update();
   }
   else
   {
-    m_Normals->SetInput(NULL);
+    m_Normals->RemoveAllInputs();
+		m_Normals->Modified();
   }
 }
 //------------------------------------------------------------------------------
@@ -94,10 +100,12 @@ void albaDataPipeCustomProber::SetVolume(albaVME *volume)
   {
     vtkDataSet *vol_data = m_Volume->GetOutput()->GetVTKData();
     m_Prober->SetSource(vol_data);
+		m_Prober->Modified();
   }
   else
   {
     m_Prober->SetSource(NULL);
+		m_Prober->Modified();
   }
 }
 //------------------------------------------------------------------------------
@@ -135,7 +143,7 @@ void albaDataPipeCustomProber::PreExecute()
     vtkDataSet *surf_data = m_Surface->GetOutput()->GetVTKData();
     if(vol_data && surf_data)
     {
-      m_Normals->SetInput((vtkPolyData *)surf_data);
+      m_Normals->SetInputData((vtkPolyData *)surf_data);
       m_Normals->ComputePointNormalsOn();
       m_Normals->SplittingOff();
       m_Normals->Update();
@@ -161,6 +169,7 @@ void albaDataPipeCustomProber::PreExecute()
       albaMatrix tmp_matrix = maps_to_volume->GetMatrix();
 
       m_Prober->SetInputMatrix(tmp_matrix.GetVTKMatrix());
+			m_Prober->Update();
     }
   }
   else
@@ -172,6 +181,8 @@ void albaDataPipeCustomProber::PreExecute()
 void albaDataPipeCustomProber::Execute()
 //------------------------------------------------------------------------------
 {
+	m_Prober->Update();
+	SetInput(m_Prober->GetOutput());
 }
 //-----------------------------------------------------------------------
 void albaDataPipeCustomProber::SetModeToDensity()

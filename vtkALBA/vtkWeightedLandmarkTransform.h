@@ -26,7 +26,7 @@ public:
   /** construct the object */
   static vtkWeightedLandmarkTransform *New();
   /** RTTI macro */
-  vtkTypeRevisionMacro(vtkWeightedLandmarkTransform,vtkLandmarkTransform);
+  vtkTypeMacro(vtkWeightedLandmarkTransform,vtkLandmarkTransform);
 
   /**  Set the vector of weights.*/
   void SetWeights(double	*w, int number);

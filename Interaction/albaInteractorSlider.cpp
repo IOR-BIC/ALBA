@@ -108,7 +108,7 @@ albaInteractorSlider::albaInteractorSlider()
 	vtkNEW(m_EditLineSource);
 
 	vtkNEW(m_EditLineMapper);
-	m_EditLineMapper->SetInput(m_EditLineSource->GetOutput());
+	m_EditLineMapper->SetInputConnection(m_EditLineSource->GetOutputPort());
 	m_EditLineMapper->SetTransformCoordinate(m_Coordinate);
 
 	vtkNEW(m_EditLineActor);
@@ -118,7 +118,7 @@ albaInteractorSlider::albaInteractorSlider()
 	vtkNEW(m_DescreaseLineSource);
 
 	vtkNEW(m_DescreaseLineMapper);
-	m_DescreaseLineMapper->SetInput(m_DescreaseLineSource->GetOutput());
+	m_DescreaseLineMapper->SetInputConnection(m_DescreaseLineSource->GetOutputPort());
 	m_DescreaseLineMapper->SetTransformCoordinate(m_Coordinate);
 
 	vtkNEW(m_DescreaseLineActor);
@@ -128,7 +128,7 @@ albaInteractorSlider::albaInteractorSlider()
 	vtkNEW(m_IncreaseLineSource);
 
 	vtkNEW(m_IncreaseLineMapper);
-	m_IncreaseLineMapper->SetInput(m_IncreaseLineSource->GetOutput());
+	m_IncreaseLineMapper->SetInputConnection(m_IncreaseLineSource->GetOutputPort());
 	m_IncreaseLineMapper->SetTransformCoordinate(m_Coordinate);
 
 	vtkNEW(m_IncreaseLineActor);
@@ -138,7 +138,7 @@ albaInteractorSlider::albaInteractorSlider()
 	vtkNEW(m_PadLineSource);
 
 	vtkNEW(m_PadLineMapper);
-	m_PadLineMapper->SetInput(m_PadLineSource->GetOutput());
+	m_PadLineMapper->SetInputConnection(m_PadLineSource->GetOutputPort());
 	m_PadLineMapper->SetTransformCoordinate(m_Coordinate);
 
 	vtkNEW(m_PadLineActor);
@@ -148,7 +148,6 @@ albaInteractorSlider::albaInteractorSlider()
 		
 	// Text
 	vtkNEW(m_TextValueMapper);
-	m_TextValueMapper->GetTextProperty()->AntiAliasingOn();
 	m_TextValueMapper->GetTextProperty()->SetFontFamily(VTK_ARIAL);
 	m_TextValueMapper->GetTextProperty()->SetLineOffset(0.5);
 	m_TextValueMapper->GetTextProperty()->SetLineSpacing(1.5);

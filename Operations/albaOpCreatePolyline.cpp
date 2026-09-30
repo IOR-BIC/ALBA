@@ -261,7 +261,6 @@ void albaOpCreatePolyline::CreatePolyline()
 	polydata->SetPoints(points);
 	polydata->SetLines(cells);
 	polydata->Modified();
-	polydata->Update();
 	
 	// Update Polyline
 	m_Polyline->SetData(vtkPolyData::SafeDownCast(polydata), 0.0, albaVMEGeneric::ALBA_VME_REFERENCE_DATA);

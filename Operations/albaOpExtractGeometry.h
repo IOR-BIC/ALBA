@@ -49,8 +49,9 @@ public:
     ID_RESAMPLE_VOLUME_SPACING,
     ID_RESAMPLE_OK,
     ID_VOLUME_SMOOTHING,
-    ID_VOLUME_SMOOTHING_REPETITIONS,
     ID_EXTRACT_GEOMETRY,
+    ID_VOLUME_SMOOTHING_RADIUSFACTOR,
+    ID_VOLUME_SMOOTHING_STANDARDDEVIATION,
     ID_SURFACE_OPTIMIZATION,
     ID_CONNECTIVITY, 
     ID_CLEAN_SURFACE,
@@ -59,7 +60,6 @@ public:
     ID_DECIMATE_SURFACE,
     ID_DECIMATE_SURFACE_RATE,
     ID_DECIMATE_SURFACE_TOPOLOGY, 
-    ID_AUTO_CONTOUR_VALUE,
     ID_CONTOUR_VALUE,
     ID_PROCESSING_TYPE,
   };
@@ -134,10 +134,10 @@ protected:
   int m_DecimateReductionRate;
   int m_DecimatePreserveTopology;
   int m_SmoothSurfaceIterationsNumber;
-  int m_VolumeSmoothingRepetitions;
+	double m_VolumeSmoothingStandardDeviation;
+	double m_VolumeSmoothingRadiusFactor;
   double m_SurfaceContourValue;
-  int m_AutoSurfaceContourValue;
-
+  
   albaVMEVolumeGray *m_VolumeInput;
   albaVMEVolumeGray *m_ResampledVolume;
   albaVMESurface *m_SurfaceOutput;

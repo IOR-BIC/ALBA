@@ -188,7 +188,7 @@ void albaOpTriangulateSurface::OnTriangle()
   }
 
 	vtkALBASmartPointer<vtkTriangleFilter> smoothFilter;
-	smoothFilter->SetInput(m_ResultPolydata);
+	smoothFilter->SetInputData(m_ResultPolydata);
 	smoothFilter->Update();
 
 	m_ResultPolydata->DeepCopy(smoothFilter->GetOutput());

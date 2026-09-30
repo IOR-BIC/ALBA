@@ -59,7 +59,7 @@ class ALBA_EXPORT vtkALBATextOrientator : public vtkActor2D
 {
  public:
   /** RTTI Macro */
-  vtkTypeRevisionMacro(vtkALBATextOrientator,vtkActor2D);
+  vtkTypeMacro(vtkALBATextOrientator,vtkActor2D);
   /** Print Object Information */
   void PrintSelf(ostream& os, vtkIndent indent);
   /** create an instance of the object */

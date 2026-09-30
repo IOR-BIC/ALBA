@@ -21,7 +21,6 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#pragma runtime_checks( "s", off )
 #include "albaOpExporterLandmarkTest.h"
 #include "albaOpExporterLandmark.h"
 #include "albaOpImporterLandmark.h"

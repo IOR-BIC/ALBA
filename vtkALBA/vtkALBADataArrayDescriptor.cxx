@@ -16,7 +16,6 @@
 #include "vtkALBADataArrayDescriptor.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkALBADataArrayDescriptor, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBADataArrayDescriptor);
 
 // Construct object with default tuple dimension (number of components) of 1.
@@ -143,3 +142,5 @@ void vtkALBADataArrayDescriptor::DeepCopy(vtkALBADataArrayDescriptor *src)
   this->NumberOfTuples = src->NumberOfTuples;
   SetName(src->Name); //creates a copy
 }
+
+

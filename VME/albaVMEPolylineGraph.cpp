@@ -55,9 +55,6 @@ int albaVMEPolylineGraph::SetData(vtkPolyData *data, albaTimeStamp t, int mode)
 
 	vtkPolyData *polydata=data;
 
-	if (polydata)
-		polydata->Update();
-
   int result=ALBA_ERROR;
 	
   albaPolylineGraph *utility = new albaPolylineGraph;

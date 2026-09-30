@@ -82,7 +82,6 @@ void albaOpCreateEditSkeletonTest::TestOpRun()
 	albaNEW(graph);
 	graph->SetData((vtkPolyData*)polyline->GetOutput()->GetVTKData(), 0);
 
-  graph->GetOutput()->GetVTKData()->Update();
   
   CPPUNIT_ASSERT(graph!=NULL);
   CPPUNIT_ASSERT(graph->GetOutput()->GetVTKData()!=NULL);

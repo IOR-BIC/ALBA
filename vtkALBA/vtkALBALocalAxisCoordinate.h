@@ -31,7 +31,6 @@ class name: vtkALBALocalAxisCoordinate.
 class ALBA_EXPORT vtkALBALocalAxisCoordinate : public vtkCoordinate
 {
 public:
-  //vtkTypeRevisionMacro(vtkALBALocalAxisCoordinate,vtkCoordinate);
   /** destructor */
   virtual ~vtkALBALocalAxisCoordinate();
   /** create an instance of the object */

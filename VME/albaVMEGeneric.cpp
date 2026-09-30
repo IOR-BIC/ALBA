@@ -77,7 +77,6 @@ int albaVMEGeneric::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   case ALBA_VME_COPY_DATA:
   {
     // update and make a copy of the VTK dataset
-    data->Update();
     vtkDataSet *new_data=data->NewInstance();
     new_data->DeepCopy(data);
     item->SetData(new_data);
@@ -90,8 +89,10 @@ int albaVMEGeneric::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
   break;
   case ALBA_VME_DETACH_DATA:  
     // reference the dataset and detach it from its source
+
+		//TODO VTK7 add a detach system
     item->SetData(data);
-    data->SetSource(NULL);
+    //data->SetSource(NULL);
   break;
   }
 

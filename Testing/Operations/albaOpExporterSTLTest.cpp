@@ -63,7 +63,7 @@ void albaOpExporterSTLTest::Test()
 
   vtkTriangleFilter *triangleFilter;
 	vtkNEW(triangleFilter);
-  triangleFilter->SetInput(data->GetOutput());
+  triangleFilter->SetInputConnection(data->GetOutputPort());
   triangleFilter->Update();
 
   // this should pass since data has been converted to triangles only
@@ -98,7 +98,6 @@ void albaOpExporterSTLTest::Test()
 	//Test
 	CPPUNIT_ASSERT(node->IsA("albaVMESurface"));
 	vtkDataSet *surface_output = node->GetOutput()->GetVTKData();
-	surface_output->Update();
 	double b1[6];
 	surface_output->GetBounds(b1);
 	double b2[6];
@@ -126,7 +125,6 @@ void albaOpExporterSTLTest::Test()
 	//Test
 	CPPUNIT_ASSERT(node->IsA("albaVMESurface"));
 	surface_output = node->GetOutput()->GetVTKData();
-	surface_output->Update();
 	surface_output->GetBounds(b1);
 	surface_input->GetOutput()->GetVTKData()->GetBounds(b2);
 	CPPUNIT_ASSERT(b1[0]==b2[0]&&b1[1]==b2[1]&&b1[2]==b2[2]);

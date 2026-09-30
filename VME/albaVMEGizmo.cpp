@@ -33,6 +33,7 @@
 
 #include "vtkPolyData.h"
 #include "vtkALBADataPipe.h"
+#include "vtkAlgorithmOutput.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEGizmo)
@@ -44,6 +45,7 @@ albaVMEGizmo::albaVMEGizmo()
 {
   m_Mediator = NULL;
   m_GizmoData = NULL;
+	m_InputConnection = NULL;
   albaNEW(m_Transform);
   albaVMEOutputSurface *output=albaVMEOutputSurface::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
@@ -113,10 +115,12 @@ void albaVMEGizmo::SetData(vtkPolyData *data)
 //-------------------------------------------------------------------------
 {
   assert(data);  // just check if data is set to NULL...
-  if (data!=m_GizmoData)
+	if (data != m_GizmoData || m_InputConnection != NULL)
   {
+		vtkDEL(m_GizmoData);
     m_GizmoData = data;
     m_GizmoData->Register(NULL);
+		m_InputConnection = NULL;
     
     // set data as input to VTK 
     albaDataPipeCustom *dpipe=albaDataPipeCustom::SafeDownCast(GetDataPipe());
@@ -124,6 +128,44 @@ void albaVMEGizmo::SetData(vtkPolyData *data)
     
     Modified();
   }
+}
+
+//----------------------------------------------------------------------------
+void albaVMEGizmo::SetDataConnection(vtkAlgorithmOutput *input)
+{
+	assert(input);  // just check if data is set to NULL...
+	if (input != m_InputConnection || m_GizmoData != NULL)
+	{
+		vtkDEL(m_GizmoData);
+
+    m_InputConnection = input;
+
+		// set data as input to VTK 
+		albaDataPipeCustom *dpipe = albaDataPipeCustom::SafeDownCast(GetDataPipe());
+		dpipe->SetInputConnection(0, input);
+
+		Modified();
+	}
+}
+
+vtkPolyData* albaVMEGizmo::GetData()
+{
+  if (m_GizmoData)
+    return m_GizmoData;
+  else if (m_InputConnection)
+  {
+    // Get the producer (the algorithm that generates the data)
+    vtkAlgorithm* producer = m_InputConnection->GetProducer();
+    producer->Update();
+
+    // Retrieve the data object from the producer using the port index
+    vtkDataObject* data = producer->GetOutputDataObject(m_InputConnection->GetIndex());
+
+    // Cast to the expected data type (vtkPolyData in this case)
+    return vtkPolyData::SafeDownCast(data);
+  }
+  else
+    return NULL;
 }
 
 //-------------------------------------------------------------------------

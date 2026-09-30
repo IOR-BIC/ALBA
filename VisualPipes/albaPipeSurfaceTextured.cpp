@@ -55,12 +55,10 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeSurfaceTextured);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaPipeSurfaceTextured::albaPipeSurfaceTextured()
 :albaPipe()
-//----------------------------------------------------------------------------
 {
   m_Texture         = NULL;
   m_Mapper          = NULL;
@@ -69,6 +67,10 @@ albaPipeSurfaceTextured::albaPipeSurfaceTextured()
   m_MaterialButton  = NULL;
   m_SurfaceMaterial = NULL;
   m_Gui             = NULL;
+
+	m_PlaneTextureMapper = NULL;
+	m_CylinderTextureMapper = NULL;
+	m_SphereTextureMapper = NULL;
 
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
@@ -84,7 +86,6 @@ albaPipeSurfaceTextured::albaPipeSurfaceTextured()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
-//----------------------------------------------------------------------------
 {
   Superclass::Create(n);
   
@@ -102,7 +103,7 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
   surface_output->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
   assert(data);
-  data->Update();
+	vtkAlgorithmOutput *port = surface_output->GetVTKOutputPort();
 
   m_Vme->AddObserver(this);
 
@@ -130,16 +131,15 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
     }
     else
     {
-      m_Mapper->SetInput(data);
+      m_Mapper->SetInputConnection(port);
     }
   }
   else
   {
-    m_Mapper->SetInput(data);
+    m_Mapper->SetInputConnection(port);
   }
   
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
-  m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 
   vtkNEW(m_Texture);
@@ -150,15 +150,16 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
     if (m_SurfaceMaterial->GetMaterialTexture() != NULL)
     {
       vtkImageData *image = m_SurfaceMaterial->GetMaterialTexture();
-      m_Texture->SetInput(image);
+			// if the material has the texture already set as vtkImageData, use it
+			// this set input data to the texture, and not input connection, because the texture is already a static vtkImageData, and not a filter output
+      m_Texture->SetInputData(image);
       image->GetScalarRange(sr);
     }
     else if (m_SurfaceMaterial->GetMaterialTextureID() != -1)
     {
       albaVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(m_SurfaceMaterial->GetMaterialTextureID());
-      texture_vme->GetOutput()->GetVTKData()->Update();
       vtkImageData *image = (vtkImageData *)texture_vme->GetOutput()->GetVTKData();
-      m_Texture->SetInput(image);
+      m_Texture->SetInputConnection(texture_vme->GetOutput()->GetVTKOutputPort());
       image->GetScalarRange(sr);
     }
     else
@@ -228,10 +229,10 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
 
   // selection highlight
   vtkALBASmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(data);  
+	corner->SetInputConnection(port);  
 
   vtkALBASmartPointer<vtkPolyDataMapper> corner_mapper;
-	corner_mapper->SetInput(corner->GetOutput());
+	corner_mapper->SetInputConnection(corner->GetOutputPort());
 
   vtkALBASmartPointer<vtkProperty> corner_props;
 	corner_props->SetColor(1,1,1);
@@ -273,7 +274,6 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
 }
 //----------------------------------------------------------------------------
 albaPipeSurfaceTextured::~albaPipeSurfaceTextured()
-//----------------------------------------------------------------------------
 {
   m_Vme->RemoveObserver(this);
 
@@ -296,6 +296,10 @@ albaPipeSurfaceTextured::~albaPipeSurfaceTextured()
   cppDEL(m_Axes);
   cppDEL(m_MaterialButton);
 
+	vtkDEL(m_PlaneTextureMapper);
+	vtkDEL(m_CylinderTextureMapper);
+	vtkDEL(m_SphereTextureMapper);
+
   if(m_GhostActor) 
   {
     m_AssemblyFront->RemovePart(m_GhostActor);
@@ -304,7 +308,6 @@ albaPipeSurfaceTextured::~albaPipeSurfaceTextured()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::Select(bool sel)
-//----------------------------------------------------------------------------
 {
 	m_Selected = sel;
 	if(m_Actor->GetVisibility()) 
@@ -315,7 +318,6 @@ void albaPipeSurfaceTextured::Select(bool sel)
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::UpdateProperty(bool fromTag)
-//----------------------------------------------------------------------------
 {
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
@@ -327,13 +329,11 @@ void albaPipeSurfaceTextured::UpdateProperty(bool fromTag)
 }
 //----------------------------------------------------------------------------
 albaGUI *albaPipeSurfaceTextured::CreateGui()
-//----------------------------------------------------------------------------
 {
   wxString mapping_mode[3] = {"Plane", "Cylinder","Sphere"};
 
   assert(m_Gui == NULL);
   m_Gui = new albaGUI(this);
-  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"Display list",&m_RenderingDisplayListFlag,0,"Turn on/off \nrendering display list calculation");
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"Scalar vis.", &m_ScalarVisibility,0,"Turn on/off the scalar visibility");
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty);
@@ -368,7 +368,6 @@ albaGUI *albaPipeSurfaceTextured::CreateGui()
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
@@ -443,10 +442,9 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 				m_Gui->Enable(ID_USE_TEXTURE, image != NULL);
 				if (image)
 				{
-					image->Update();
 					m_SurfaceMaterial->SetMaterialTexture(n->GetId());
 					m_SurfaceMaterial->m_MaterialType = mmaMaterial::USE_TEXTURE;
-					m_Texture->SetInput(image);
+          m_Texture->SetInputConnection(n->GetOutput()->GetVTKOutputPort());
 					m_Actor->SetTexture(m_Texture);
 					GetLogicManager()->CameraUpdate();
 					m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, true);
@@ -456,10 +454,6 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 		break;
 		case ID_TEXTURE_MAPPING_MODE:
 			GenerateTextureMapCoordinate();
-			GetLogicManager()->CameraUpdate();
-			break;
-		case ID_RENDERING_DISPLAY_LIST:
-			m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
 			GetLogicManager()->CameraUpdate();
 			break;
 		default:
@@ -477,41 +471,38 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::GenerateTextureMapCoordinate()
-//----------------------------------------------------------------------------
 {
-  vtkPolyData *data = vtkPolyData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
-  data->Update();
+	albaVMEOutputSurface *surface_output = albaVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+	mmaMaterial *material = surface_output->GetMaterial();
+	vtkAlgorithmOutput *port = surface_output->GetVTKOutputPort();
 
-  if (m_SurfaceMaterial->m_TextureMappingMode == mmaMaterial::PLANE_MAPPING)
-  {
-    vtkALBASmartPointer<vtkTextureMapToPlane> plane_texture_mapper;
-    plane_texture_mapper->SetInput(data);
-    plane_texture_mapper->AutomaticPlaneGenerationOn();
-    vtkPolyData *tdata = (vtkPolyData *)plane_texture_mapper->GetOutput();
-    m_Mapper->SetInput(data);
-  }
-  else if (m_SurfaceMaterial->m_TextureMappingMode == mmaMaterial::CYLINDER_MAPPING)
-  {
-    vtkALBASmartPointer<vtkTextureMapToCylinder> cylinder_texture_mapper;
-    cylinder_texture_mapper->SetInput(data);
-    cylinder_texture_mapper->PreventSeamOff();
-    m_Mapper->SetInput((vtkPolyData *)cylinder_texture_mapper->GetOutput());
-  }
-  else if (m_SurfaceMaterial->m_TextureMappingMode == mmaMaterial::SPHERE_MAPPING)
-  {
-    vtkALBASmartPointer<vtkTextureMapToSphere> sphere_texture_mapper;
-    sphere_texture_mapper->SetInput(data);
-    sphere_texture_mapper->PreventSeamOff();
-    m_Mapper->SetInput((vtkPolyData *)sphere_texture_mapper->GetOutput());
-  }
-  else
-  {
-    m_Mapper->SetInput(data);
-  }
+	if (material->m_TextureMappingMode == mmaMaterial::PLANE_MAPPING)
+	{
+		vtkNEW(m_PlaneTextureMapper);
+		m_PlaneTextureMapper->SetInputConnection(port);
+		m_Mapper->SetInputConnection(m_PlaneTextureMapper->GetOutputPort());
+	}
+	else if (material->m_TextureMappingMode == mmaMaterial::CYLINDER_MAPPING)
+	{
+		vtkNEW(m_CylinderTextureMapper);
+		m_CylinderTextureMapper->SetInputConnection(port);
+		m_CylinderTextureMapper->PreventSeamOff();
+		m_Mapper->SetInputConnection(m_CylinderTextureMapper->GetOutputPort());
+	}
+	else if (material->m_TextureMappingMode == mmaMaterial::SPHERE_MAPPING)
+	{
+		vtkNEW(m_SphereTextureMapper);
+		m_SphereTextureMapper->SetInputConnection(port);
+		m_SphereTextureMapper->PreventSeamOff();
+		m_Mapper->SetInputConnection(m_SphereTextureMapper->GetOutputPort());
+	}
+	else
+	{
+		m_Mapper->SetInputConnection(port);
+	}
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::SetEnableActorLOD(bool value)
-//----------------------------------------------------------------------------
 {
   m_EnableActorLOD = (int) value;
   if(m_Gui)
@@ -526,7 +517,6 @@ void albaPipeSurfaceTextured::GetBounds(double bounds[6])
 
 //----------------------------------------------------------------------------
 void albaPipeSurfaceTextured::SetActorPicking(int enable)
-//----------------------------------------------------------------------------
 {
 	m_Actor->SetPickable(enable);
   m_Actor->Modified();

@@ -336,15 +336,15 @@ void albaOpSmoothSurfaceCells::CreateCellFilters()
 //----------------------------------------------------------------------------
 {
   m_CellFilter = vtkALBACellsFilter::New();
-  m_CellFilter->SetInput(m_ResultPolydata);
+  m_CellFilter->SetInputData(m_ResultPolydata);
   m_CellFilter->Update();
 
   m_RemoveSelectedCells = vtkALBARemoveCellsFilter::New();
-  m_RemoveSelectedCells->SetInput(m_ResultPolydata);
+  m_RemoveSelectedCells->SetInputData(m_ResultPolydata);
   m_RemoveSelectedCells->Update();
 
   m_RemoveUnSelectedCells = vtkALBARemoveCellsFilter::New();
-  m_RemoveUnSelectedCells->SetInput(m_ResultPolydata);
+  m_RemoveUnSelectedCells->SetInputData(m_ResultPolydata);
   m_RemoveUnSelectedCells->Update();
 }
 
@@ -371,7 +371,7 @@ void albaOpSmoothSurfaceCells::CreateSurfacePipeline()
 	  if(m_PolydataMapper	==NULL)
 		  m_PolydataMapper	= vtkPolyDataMapper::New();
 		
-	  m_PolydataMapper->SetInput(m_CellFilter->GetOutput());
+	  m_PolydataMapper->SetInputConnection(m_CellFilter->GetOutputPort());
 		m_PolydataMapper->ScalarVisibilityOn();
 	
 	  if(m_PolydataActor == NULL)
@@ -476,7 +476,6 @@ void albaOpSmoothSurfaceCells::OnEvent(albaEventBase *alba_event)
 		case ID_RESET:
 			{
 				m_ResultPolydata->DeepCopy(m_OriginalPolydata);
-				m_ResultPolydata->Update();
 				DestroyCellFilters();
 				CreateSurfacePipeline();
 				InitializeMesh();
@@ -534,32 +533,34 @@ void albaOpSmoothSurfaceCells::TraverseMeshAndMark( double radius )
           m_UnselectCells ? m_RemoveUnSelectedCells->UnmarkCell(cellId) : m_RemoveUnSelectedCells->MarkCell(cellId);
 				}
 
-				// get its points
-				m_Mesh->GetCellPoints(cellId, numCellPoints, cellPointsList);
+				vtkNew<vtkIdList> cellPointsList;  // Lista dei punti della cella
+				vtkNew<vtkIdList> cellsFromPoint;  // Lista delle celle che condividono un punto
 
-				// for each cell point
-				for (idPoint=0; idPoint < numCellPoints; idPoint++) 
+				// Get cell points
+				m_Mesh->GetCellPoints(cellId, cellPointsList);
+
+				// Loop through each cell point
+				for (vtkIdType idPoint = 0; idPoint < cellPointsList->GetNumberOfIds(); idPoint++)
 				{
-					// if the point has not been yet visited
-					ptId=cellPointsList[idPoint];
-					
-					// get neighbor cells from cell point
-					m_Mesh->GetPointCells(ptId,ncells,cellsFromPoint);
+					vtkIdType ptId = cellPointsList->GetId(idPoint); // Ottieni ID del punto
 
-					// check connectivity criterion (geometric + distance)
-					for (k=0; k < ncells; k++)
+					// Get neighbor cells from this point
+					m_Mesh->GetPointCells(ptId, cellsFromPoint);
+
+					// Check connectivity criterion (geometric + distance)
+					for (vtkIdType k = 0; k < cellsFromPoint->GetNumberOfIds(); k++)
 					{
-						cellId = cellsFromPoint[k];
+						vtkIdType neighborCellId = cellsFromPoint->GetId(k);
 
-						FindTriangleCellCenter(cellId,currentCellCenter);
+						FindTriangleCellCenter(neighborCellId, currentCellCenter);
 						if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)
-							< (m_Diameter*m_Diameter / 4))
+							< (m_Diameter * m_Diameter / 4))
 						{
-							// insert next cells to be visited in the other wave
-							m_Wave2->InsertNextId(cellId);
+							// Insert next cells to be visited in the other wave
+							m_Wave2->InsertNextId(neighborCellId);
 						}
-					}//for all cells using this point
-				}//for all points of this cell
+					} // for all cells using this point
+				}
 			}//if cell not yet visited
 		}//for all cells in this wave
 
@@ -705,14 +706,12 @@ void albaOpSmoothSurfaceCells::SmoothCells()
 
   vtkALBASmartPointer<vtkPolyData> toSmoothPolyData;
   toSmoothPolyData->DeepCopy(m_RemoveUnSelectedCells->GetOutput());
-  toSmoothPolyData->Update();
 
   m_RemoveSelectedCells->RemoveMarkedCells();
   m_RemoveSelectedCells->Update();
 
   vtkALBASmartPointer<vtkPolyData> polyData;
   polyData->DeepCopy(m_RemoveSelectedCells->GetOutput());
-  polyData->Update();
 
 
   /*vtkALBASmartPointer<vtkLinearSubdivisionFilter> linearSubdivisionFilter;
@@ -723,7 +722,7 @@ void albaOpSmoothSurfaceCells::SmoothCells()
   int num = linearSubdivisionFilter->GetOutput()->GetNumberOfPoints();*/
 
   vtkALBASmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
-  smoothFilter->SetInput(toSmoothPolyData);
+  smoothFilter->SetInputData(toSmoothPolyData);
   smoothFilter->SetNumberOfIterations(m_SmoothParameterNumberOfInteractions);
   smoothFilter->BoundarySmoothingOff();//always true
   smoothFilter->FeatureEdgeSmoothingOn();
@@ -731,19 +730,18 @@ void albaOpSmoothSurfaceCells::SmoothCells()
   smoothFilter->Update();
 
   vtkALBASmartPointer<vtkAppendPolyData> appendFilter; 
-  appendFilter->AddInput(smoothFilter->GetOutput());
-  appendFilter->AddInput(polyData);
+  appendFilter->AddInputConnection(smoothFilter->GetOutputPort());
+  appendFilter->AddInputData(polyData);
   appendFilter->Update();
 
   vtkALBASmartPointer<vtkCleanPolyData> cleanFilter; 
-  cleanFilter->SetInput(appendFilter->GetOutput());
+  cleanFilter->SetInputConnection(appendFilter->GetOutputPort());
   cleanFilter->Update();
 
 
   m_ResultPolydata->DeepCopy(cleanFilter->GetOutput());
 
 	m_ResultPolydata->Modified();
-	m_ResultPolydata->Update();
 
   DestroyCellFilters();
 

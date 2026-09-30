@@ -32,7 +32,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkPointSource.h"
 #include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataSource.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -305,21 +304,21 @@ void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 
 		switch (m_Action)
 		{
-			case ACTION_ADD_MEASURE:
-			{
-				DrawNewMeasure(pointCoord);
-			}
-			break;
-			case ACTION_EDIT_MEASURE:
-			{
-				EditMeasure(m_CurrMeasure, pointCoord);
-			}
-			break;
-			case ACTION_MOVE_MEASURE:
-			{
-				MoveMeasure(m_CurrMeasure, pointCoord);
-			}
-			break;
+		case ACTION_ADD_MEASURE:
+		{
+			DrawNewMeasure(pointCoord);
+		}
+		break;
+		case ACTION_EDIT_MEASURE:
+		{
+			EditMeasure(m_CurrMeasure, pointCoord);
+		}
+		break;
+		case ACTION_MOVE_MEASURE:
+		{
+			MoveMeasure(m_CurrMeasure, pointCoord);
+		}
+		break;
 			case ACTION_ROTATING_MEASURE:
 			{
 				RotateMeasure(m_CurrMeasure, pointCoord);
@@ -495,7 +494,7 @@ void albaInteractor2DMeasure::SelectMeasure(int index)
 		m_LastEditing = -1;
 
 		if(index >= 0)
-			m_Renderer = m_CurrentRenderer = m_Measure2DVector[index].Renderer;
+		m_Renderer = m_CurrentRenderer = m_Measure2DVector[index].Renderer;
 
 		Update();
 		Render();
@@ -595,9 +594,9 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 
 	if (m_View)
 	{
-		
+
 		wxWindow *window = m_View->GetWindow();
-				switch (m_Action)
+		switch (m_Action)
 		{
 		case ACTION_ADD_MEASURE:
 			albaCursor::SetCursor(window,wxCURSOR_PENCIL);

@@ -65,9 +65,6 @@ int albaVMEVector::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
-  
-  if (polydata)
-    polydata->Update();
 
   // check this is a polydata containing only lines with 2 points (vector)
   if (polydata && polydata->GetPolys()->GetNumberOfCells()==0 && \

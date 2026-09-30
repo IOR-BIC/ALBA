@@ -118,6 +118,11 @@ public:
   /** Serialize the data into the compressed archive.*/
   bool StoreToArchive(wxZipOutputStream &zip);
 
+  /** Get the VTK file version, 0 for default */
+  static int GetVTKFileVersion();
+
+	/** Set the VTK file version, 0 for default */ 
+	static void SetVTKFileVersion(int version);
 protected:
   albaVMEItemVTK(); // to be allocated with New()
   ~albaVMEItemVTK(); // to be deleted with Delete()

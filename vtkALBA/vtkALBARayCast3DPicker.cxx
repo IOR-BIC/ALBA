@@ -22,7 +22,6 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkGenericCell.h"
-#include "vtkIdType.h"
 #include "vtkImageData.h"
 #include "vtkLODProp3D.h"
 #include "vtkMapper.h"
@@ -39,15 +38,12 @@
 #include "vtkVolumeMapper.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkALBARayCast3DPicker, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBARayCast3DPicker);
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Construct object with initial tolerance of 1/40th of window. There are no
 // pick methods and picking is performed from the renderer's actors.
 vtkALBARayCast3DPicker::vtkALBARayCast3DPicker()
-//------------------------------------------------------------------------------
 {
   //this->Tolerance = 0.025; // 1/40th of the renderer window
   this->Tolerance = 0.01; // 1/100th of the renderer window
@@ -59,7 +55,7 @@ vtkALBARayCast3DPicker::vtkALBARayCast3DPicker()
 
   this->Mapper = NULL;
   this->DataSet = NULL;
-  this->GlobalTMin = VTK_LARGE_FLOAT;
+  this->GlobalTMin = VTK_FLOAT_MAX;
   this->Actors = vtkActorCollection::New();
   this->Prop3Ds = vtkProp3DCollection::New();
   this->PickedPositions = vtkPoints::New();
@@ -69,7 +65,6 @@ vtkALBARayCast3DPicker::vtkALBARayCast3DPicker()
 
 //------------------------------------------------------------------------------
 vtkALBARayCast3DPicker::~vtkALBARayCast3DPicker()
-//------------------------------------------------------------------------------
 {
   this->Actors->Delete();
   this->Prop3Ds->Delete();
@@ -80,10 +75,7 @@ vtkALBARayCast3DPicker::~vtkALBARayCast3DPicker()
 
 //------------------------------------------------------------------------------
 // Update state when prop3D is picked.
-void vtkALBARayCast3DPicker::MarkPicked(vtkAssemblyPath *path, vtkProp3D *prop3D, 
-                           vtkAbstractMapper3D *m,
-                           double tMin, double mapperPos[3])
-//------------------------------------------------------------------------------
+void vtkALBARayCast3DPicker::MarkPicked(vtkAssemblyPath *path, vtkProp3D *prop3D, vtkAbstractMapper3D *m, double tMin, double mapperPos[3])
 {
   int i;
   vtkMapper *mapper;
@@ -123,7 +115,6 @@ void vtkALBARayCast3DPicker::MarkPicked(vtkAssemblyPath *path, vtkProp3D *prop3D
 
 //------------------------------------------------------------------------------
 int vtkALBARayCast3DPicker::Pick(double selectionX, double selectionY, double selectionZ, vtkRenderer *renderer)
-//------------------------------------------------------------------------------
 {
   return 0;
 }
@@ -132,7 +123,6 @@ int vtkALBARayCast3DPicker::Pick(double selectionX, double selectionY, double se
 // Perform pick operation with a segment provided! Points are expressed in the 
 // world coordinate system. Return non-zero if something was successfully picked.
 int vtkALBARayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
-//------------------------------------------------------------------------------
 {
   int i;
   vtkProp *prop;
@@ -221,7 +211,7 @@ int vtkALBARayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
   }
   else 
   {
-    props = renderer->GetProps();
+    props = renderer->GetViewProps();
   }
 
   vtkActor *actor;
@@ -236,7 +226,7 @@ int vtkALBARayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
     {
       pickable = 0;
       actor = NULL;
-      propCandidate = path->GetLastNode()->GetProp();
+      propCandidate = path->GetLastNode()->GetViewProp();
       if ( propCandidate->GetPickable() && propCandidate->GetVisibility() )
       {
         pickable = 1;
@@ -313,7 +303,7 @@ int vtkALBARayCast3DPicker::Pick(double *p1, double *p2, vtkRenderer *renderer)
           t = this->IntersectWithLine((double *)p1Mapper, 
                                       (double *)p2Mapper, tol, path, 
                                       (vtkProp3D *)propCandidate, mapper);
-          if ( t < VTK_LARGE_FLOAT )
+          if ( t < VTK_FLOAT_MAX )
           {
             picked = 1;
             this->Prop3Ds->AddItem((vtkProp3D *)prop);
@@ -345,7 +335,6 @@ double vtkALBARayCast3DPicker::IntersectWithLine(double p1[3], double p2[3], dou
                                        vtkAssemblyPath *path, 
                                        vtkProp3D *prop3D, 
                                        vtkAbstractMapper3D *m)
-//------------------------------------------------------------------------------
 {
   vtkIdType numCells, cellId, minCellId;
   int i, minSubId, subId;
@@ -365,7 +354,7 @@ double vtkALBARayCast3DPicker::IntersectWithLine(double p1[3], double p2[3], dou
   }
   else
   {
-    return VTK_LARGE_FLOAT;
+    return VTK_FLOAT_MAX;
   }
 
   if ( (numCells = input->GetNumberOfCells()) < 1 )
@@ -379,7 +368,7 @@ double vtkALBARayCast3DPicker::IntersectWithLine(double p1[3], double p2[3], dou
   minCellId = -1;
   minSubId = -1;
   pcoords[0] = pcoords[1] = pcoords[2] = 0;
-  for (tMin=VTK_LARGE_FLOAT,cellId=0; cellId<numCells; cellId++) 
+  for (tMin=VTK_FLOAT_MAX,cellId=0; cellId<numCells; cellId++) 
   {
     input->GetCell(cellId, this->Cell);
 
@@ -415,7 +404,6 @@ double vtkALBARayCast3DPicker::IntersectWithLine(double p1[3], double p2[3], dou
 //------------------------------------------------------------------------------
 // Initialize the picking process.
 void vtkALBARayCast3DPicker::Initialize()
-//------------------------------------------------------------------------------
 {
   this->CellId = (-1);
   this->SubId = (-1);
@@ -435,12 +423,11 @@ void vtkALBARayCast3DPicker::Initialize()
   this->MapperPosition[2] = 0.0;
 
   this->Mapper = NULL;
-  this->GlobalTMin = VTK_LARGE_FLOAT;
+  this->GlobalTMin = VTK_FLOAT_MAX;
 }
 
 //------------------------------------------------------------------------------
 vtkActorCollection *vtkALBARayCast3DPicker::GetActors()
-//------------------------------------------------------------------------------
 {
   if (this->Actors->GetNumberOfItems() != 
         this->PickedPositions->GetNumberOfPoints()) 
@@ -452,7 +439,6 @@ vtkActorCollection *vtkALBARayCast3DPicker::GetActors()
 
 //------------------------------------------------------------------------------
 void vtkALBARayCast3DPicker::PrintSelf(ostream& os, vtkIndent indent)
-//------------------------------------------------------------------------------
 {
   this->Superclass::PrintSelf(os,indent);
 

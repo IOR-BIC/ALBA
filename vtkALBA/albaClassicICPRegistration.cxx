@@ -35,8 +35,7 @@
 
 #include "albaICPUtility.h"
 
-	vtkCxxRevisionMacro(albaClassicICPRegistration, "$Revision: 1.1.2.1 $");
-  vtkStandardNewMacro(albaClassicICPRegistration);
+vtkStandardNewMacro(albaClassicICPRegistration);
 
 /*//--------------------------------------------------------------------------
 albaClassicICPRegistration* albaClassicICPRegistration::New()
@@ -197,7 +196,7 @@ void albaClassicICPRegistration::SetResultsFileName(const char *name)
 	this->Modified();
 }
 //----------------------------------------------------------------------------
-unsigned long albaClassicICPRegistration::GetMTime()
+vtkMTimeType albaClassicICPRegistration::GetMTime()
 //----------------------------------------------------------------------------
 {
   unsigned long result = vtkIterativeClosestPointTransform::GetMTime();
@@ -291,7 +290,7 @@ void albaClassicICPRegistration::InternalUpdate()
 	{
 		// simple testing file result
 			
-    std::ofstream risultati (this->ResultsFile.ToAscii(),std::ios::out); 
+    std::ofstream risultati (this->ResultsFile,std::ios::out); 
 
 		risultati << "Rotation: " <<"\n" << FFReg_res.R << "\n";
 		risultati << "\n" << "Translation: " <<"\n" << FFReg_res.t << "\n";

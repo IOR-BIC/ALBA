@@ -115,8 +115,6 @@ void albaPipeTensorFieldSliceTest::TestCreate()
 
 	image->GetPointData()->SetActiveTensors("velocity");
 
-	image->Update();
-
 	double bb[6];
 	image->GetBounds(bb);
 

@@ -52,7 +52,7 @@ public:
   /** 
     Overridden to take into consideration the internal transform
     object MTime. */
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
   
 protected:
   

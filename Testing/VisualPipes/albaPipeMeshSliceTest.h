@@ -18,6 +18,7 @@
 #define __CPP_UNIT_albaPipeMeshSliceTest_H__
 
 #include "albaTest.h"
+#include "albaTestDefines.h"
 
 class vtkPolyData;
 class vtkRenderWindowInteractor;
@@ -40,8 +41,12 @@ class albaPipeMeshSliceTest : public albaTest
   CPPUNIT_TEST( TestPipeExecution_WiredActorVisibility );
   CPPUNIT_TEST( TestPipeExecution_FlipNormal );
   CPPUNIT_TEST( TestPipeExecution_UseVTKProperty );
+
+  //TODO REENABLE THIS TEST 
+#ifndef DISABLE_GPU_VOLUME_RENDERING_TESTS
   CPPUNIT_TEST( TestPipeExecution_Thickness_PickActor );
-	CPPUNIT_TEST_SUITE_END();
+#endif
+  	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();

@@ -47,6 +47,7 @@
 #include "wx\tokenzr.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEFactory.h"
+#include <strstream>
 
 //-------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaVME)
@@ -372,8 +373,8 @@ int albaVME::SetParent(albaVME *parent)
   // pipes to allow multiple pipes contemporary 
   // working at different times
   // 
-  if (m_DataPipe)
-    m_DataPipe->SetTimeStamp(t);
+	if (m_DataPipe)
+		m_DataPipe->SetTimeStamp(t);
 
   if (m_MatrixPipe)
     m_MatrixPipe->SetTimeStamp(t);
@@ -1852,7 +1853,7 @@ bool albaVME::WillBeRemovedWithDependencies(albaVME *vme)
 }
 
 //-------------------------------------------------------------------------
-unsigned long albaVME::GetMTime()
+vtkMTimeType albaVME::GetMTime()
 {
 	unsigned long mtime = this->albaTimeStamped::GetMTime();
 	if (m_DependsOnLinkedNode)

@@ -22,9 +22,7 @@
 #include "albaVMETests.h"
 
 #include "CustomDataPipeTest.h"
-#include "albaAttributeSegmentationVolumeTest.h"
 #include "albaCryptTest.h"
-#include "albaDataPipeCustomSegmentationVolumeTest.h"
 #include "albaDataVectorTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaMSFImporterTest.h"
@@ -80,7 +78,6 @@
 #include "albaVMERefSysTest.h"
 #include "albaVMEScalarMatrixTest.h"
 #include "albaVMEScalarTest.h"
-#include "albaVMESegmentationVolumeTest.h"
 #include "albaVMESlicerTest.h"
 #include "albaVMESurfaceEditorTest.h"
 #include "albaVMESurfaceParametricTest.h"
@@ -133,6 +130,7 @@ int	main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
+	/*  */
 	runner.addTest(albaVMEExternalDataTest::suite());
 	runner.addTest(albaVMEVolumeGrayTest::suite());
 	runner.addTest(albaVMESurfaceParametricTest::suite());
@@ -168,8 +166,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEOutputImageTest::suite());
 	//runner.addTest(albaVMEOutputVolumeTest::suite());
 	runner.addTest(albaCryptTest::suite());
-	runner.addTest(albaMatrixInterpolatorTest::suite());
-	runner.addTest(albaVMEGenericTest::suite());
+	runner.addTest(albaMatrixInterpolatorTest::suite()); 
+	runner.addTest(albaVMEGenericTest::suite()); 
 	runner.addTest(albaVMEOutputVTKTest::suite());
 	runner.addTest(albaVMEItemScalarMatrixTest::suite());
 	runner.addTest(albaScalarVectorTest::suite());
@@ -192,15 +190,13 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEMapsTest::suite());
 	runner.addTest(albaVMEOutputWrappedMeterTest::suite());
 	runner.addTest(albaVMEPolylineGraphTest::suite());
-	runner.addTest(albaVMESegmentationVolumeTest::suite());
-	runner.addTest(albaAttributeSegmentationVolumeTest::suite());
 	runner.addTest(albaVMEOutputComputeWrappingTest::suite());
 	runner.addTest(albaPolylineGraphVertexTest::suite());
 	runner.addTest(albaPolylineGraphEdgeTest::suite());
 	runner.addTest(albaPolylineGraphBranchTest::suite());
-	runner.addTest(albaDataPipeCustomSegmentationVolumeTest::suite());
 	runner.addTest(VMEGenericPoseTest::suite());
 	runner.addTest(VMEGenericBoundsTest::suite());
+	/**/
 	runner.addTest(CustomDataPipeTest::suite());
 	runner.addTest(VMEGenericTest::suite());
 

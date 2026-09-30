@@ -185,12 +185,12 @@ void albaOpImporterRAWImages::CreatePipeline()
   vtkNEW(m_BlueImage);
 
   vtkNEW(m_AppendComponents);
-  m_AppendComponents->AddInput(m_BlueImage->GetOutput());
-  m_AppendComponents->AddInput(m_GreenImage->GetOutput());
+  m_AppendComponents->AddInputConnection(m_BlueImage->GetOutputPort());
+  m_AppendComponents->AddInputConnection(m_GreenImage->GetOutputPort());
 
   vtkNEW(m_InterleavedImage);
-  m_InterleavedImage->AddInput(m_AppendComponents->GetOutput());
-  m_InterleavedImage->AddInput(m_RedImage->GetOutput());
+  m_InterleavedImage->AddInputConnection(m_AppendComponents->GetOutputPort());
+  m_InterleavedImage->AddInputConnection(m_RedImage->GetOutputPort());
 
   vtkNEW(m_Texture);
   //  texture input will be set according to update
@@ -199,13 +199,12 @@ void albaOpImporterRAWImages::CreatePipeline()
 
   vtkNEW(m_LookupTable);
 
-  m_Texture->MapColorScalarsThroughLookupTableOn();
   m_Texture->SetLookupTable((vtkLookupTable *)m_LookupTable);
 
   vtkNEW(m_Plane);
 
   vtkNEW(m_Mapper);
-  m_Mapper->SetInput(m_Plane->GetOutput());
+  m_Mapper->SetInputConnection(m_Plane->GetOutputPort());
 
   vtkNEW(m_Actor);
   m_Actor->SetMapper(m_Mapper);
@@ -216,10 +215,10 @@ void albaOpImporterRAWImages::CreatePipeline()
   vtkNEW(m_GizmoPlane);
 
   vtkALBASmartPointer<vtkOutlineFilter> outlineFilter;
-  outlineFilter->SetInput(((vtkDataSet *)(m_GizmoPlane->GetOutput())));
+  outlineFilter->SetInputConnection(m_GizmoPlane->GetOutputPort());
 
   vtkALBASmartPointer<vtkPolyDataMapper> polyDataMapper;
-  polyDataMapper->SetInput(outlineFilter->GetOutput());
+  polyDataMapper->SetInputConnection(outlineFilter->GetOutputPort());
 
   vtkNEW(m_GizmoActor);
   m_GizmoActor->GetProperty()->SetColor(0.8,0,0);
@@ -551,13 +550,11 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
     case ID_HEADER:
       if(m_Bit == 3)
       {
-        m_Texture->MapColorScalarsThroughLookupTableOff();
         m_Texture->SetLookupTable(NULL);
         m_Gui->Enable(ID_RGB_TYPE,true);
       }
       else
       {
-        m_Texture->MapColorScalarsThroughLookupTableOn();
         m_Texture->SetLookupTable((vtkLookupTable *)m_LookupTable);
         m_Gui->Enable(ID_RGB_TYPE,false);
       }
@@ -568,8 +565,7 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
         m_UseLookupTable = m_Bit != 3;
         m_GuiSlider->Update();
       }
-      else
-        m_Texture->SetMapColorScalarsThroughLookupTable(m_UseLookupTable);
+
       m_SliceSlider->SetRange(0,m_NumberSlices - 1);
       m_Gui->Update();
       UpdateReader();
@@ -856,13 +852,13 @@ void albaOpImporterRAWImages::	UpdateReader()
     m_AppendComponents->Update();
     m_InterleavedImage->Modified();
     m_InterleavedImage->Update();
-    m_Texture->SetInput(m_InterleavedImage->GetOutput());
-    m_Texture->SetInput(m_AppendComponents->GetOutput());
+    m_Texture->SetInputConnection(m_InterleavedImage->GetOutputPort());
+    m_Texture->SetInputConnection(m_AppendComponents->GetOutputPort());
     m_Texture->Modified();
   }
   else
   {
-    m_Texture->SetInput(m_Reader->GetOutput());
+    m_Texture->SetInputConnection(m_Reader->GetOutputPort());
   }
 
   m_Reader->Update();
@@ -973,11 +969,11 @@ bool albaOpImporterRAWImages::Import()
 
     m_AppendComponents->Modified();
     m_InterleavedImage->Modified();
-    convert->SetInput(r->GetOutput());
+    convert->SetInputConnection(r->GetOutputPort());
   }
   else
   {
-    convert->SetInput(r->GetOutput());
+    convert->SetInputConnection(r->GetOutputPort());
   }
 
   convert->Update();
@@ -1078,7 +1074,7 @@ int albaOpImporterRAWImages::GetFileLength(const char * filename)
 //----------------------------------------------------------------------------
 {
   int l,m,len;
-  ifstream file (filename, ios::in|ios::binary);
+  std::ifstream file (filename, ios::in|ios::binary);
   l = file.tellg();
   file.seekg (0, ios::end);
   m = file.tellg();

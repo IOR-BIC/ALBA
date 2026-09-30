@@ -64,16 +64,16 @@ void albaMatrixInterpolator::SetTimeStamp(albaTimeStamp time)
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration also modifications to the Input Array
-unsigned long albaMatrixInterpolator::GetMTime()
+vtkMTimeType albaMatrixInterpolator::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mtime = Superclass::GetMTime();
+	vtkMTimeType mtime = Superclass::GetMTime();
   
   albaVMEGenericAbstract *vme = (albaVMEGenericAbstract *)m_VME;
 
   if (vme && vme->GetMatrixVector())
   {
-    unsigned long arrayMTime = vme->GetMatrixVector()->GetMTime();
+		vtkMTimeType arrayMTime = vme->GetMatrixVector()->GetMTime();
     if (arrayMTime > mtime)
     {
       return arrayMTime;

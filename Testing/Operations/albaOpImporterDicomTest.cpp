@@ -104,13 +104,11 @@ void albaOpImporterDicomTest::TestCreateVolume()
 	    if(VME->IsA("albaVMEVolumeGray"))
 	    {
 	      vtkRectilinearGrid *data=vtkRectilinearGrid::SafeDownCast(VME->GetOutput()->GetVTKData());
-	      data->UpdateData();
 	      data->GetScalarRange(sr);
 	    }
 	    else 
 	    {
 	      CPPUNIT_ASSERT(VME->IsA("albaVMEImage"));
-	      VME->GetOutput()->GetVTKData()->UpdateData();
 	      VME->GetOutput()->GetVTKData()->GetScalarRange(sr);
 	    }
 	       

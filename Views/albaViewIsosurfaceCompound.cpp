@@ -161,7 +161,7 @@ void albaViewIsosurfaceCompound::UpdateISO()
 
 		if (pipe)
 		{
-			pipe->SetContourValue((float)m_ContourValueIso);
+			pipe->SetContourValue(m_ContourValueIso);
  
 			CameraUpdate();
 		}

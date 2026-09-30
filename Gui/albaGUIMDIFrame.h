@@ -21,7 +21,6 @@
 #include <wx/laywin.h>
 #include <wx/mdi.h>
 #include <vector>
-
 #include "albaGUIDockManager.h"
 #include "albaServiceClient.h"
 
@@ -30,13 +29,12 @@
 // forward reference
 //----------------------------------------------------------------------------
 class albaObserver;
-class vtkProcessObject;
+class vtkAlgorithm;
 class vtkViewport;
 class vtkObject;
 class albaGUIMDIFrameCallback; 
-//class albaGUIDockSettings;
+class vtkAlgorithm;
 class albaGUI;
-
 /**
   Class Name: albaGUIMDIFrame.
   Represents the main frame of a ALBA Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
@@ -111,7 +109,7 @@ class ALBA_EXPORT albaGUIMDIFrame: public wxMDIParentFrame, public albaServiceCl
   void BindToProgressBar(vtkObject* vtkobj);
 
   /** Link a vtk process object (filter) to the progress bar. */
-  void BindToProgressBar(vtkProcessObject* filter);
+  void BindToProgressBar(vtkAlgorithm* filter);
 
   /** Link a vtkViewport to the progress bar. */
   void BindToProgressBar(vtkViewport* ren);

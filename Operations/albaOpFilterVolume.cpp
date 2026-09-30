@@ -112,7 +112,6 @@ void albaOpFilterVolume::OpRun()
 { 
 	m_Input->GetOutput()->Update();
   m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-	m_InputData->Update();
   if (!m_ApplyDirectlyOnInput)
   {
 	  vtkNEW(m_ResultImageData);
@@ -283,9 +282,9 @@ void albaOpFilterVolume::OnSmooth()
 
   vtkALBASmartPointer<vtkImageGaussianSmooth> smoothFilter;
 	if (m_ApplyDirectlyOnInput)
-    smoothFilter->SetInput(m_InputData);
+    smoothFilter->SetInputData(m_InputData);
   else
-    smoothFilter->SetInput(m_ResultImageData);
+    smoothFilter->SetInputData(m_ResultImageData);
   smoothFilter->SetDimensionality(m_Dimensionality);
   smoothFilter->SetRadiusFactors(m_SmoothRadius);
   smoothFilter->SetStandardDeviations(m_StandardDeviation);
@@ -294,6 +293,7 @@ void albaOpFilterVolume::OnSmooth()
   if (m_ApplyDirectlyOnInput)
   {
     ((albaVMEVolumeGray *)m_Input)->SetData(smoothFilter->GetOutput(),m_Input->GetTimeStamp());
+		m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
 		GetLogicManager()->CameraUpdate();
   }
   else
@@ -327,15 +327,16 @@ void albaOpFilterVolume::OnMedian()
 
   vtkALBASmartPointer<vtkImageMedian3D> medianFilter;
   if (m_ApplyDirectlyOnInput)
-    medianFilter->SetInput(m_InputData);
+    medianFilter->SetInputData(m_InputData);
   else
-    medianFilter->SetInput(m_ResultImageData);
+    medianFilter->SetInputData(m_ResultImageData);
   medianFilter->SetKernelSize(m_KernelSize[0],m_KernelSize[1],m_KernelSize[2]);
   medianFilter->Update();
 
   if (m_ApplyDirectlyOnInput)
   {
     ((albaVMEVolumeGray *)m_Input)->SetData(medianFilter->GetOutput(),m_Input->GetTimeStamp());
+		m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
 		GetLogicManager()->CameraUpdate();
   }
   else
@@ -448,11 +449,11 @@ void albaOpFilterVolume::OnReplace()
 	if (inputData->IsA("vtkRectilinearGrid"))
 	{
 		outputDataRG->GetPointData()->SetScalars(outputScalars);
-		outputDataRG->Update();
 
 		if (m_ApplyDirectlyOnInput)
 		{
 			((albaVMEVolumeGray *)m_Input)->SetData(outputDataRG, m_Input->GetTimeStamp());
+			m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
 			albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 		}
 		else
@@ -461,11 +462,11 @@ void albaOpFilterVolume::OnReplace()
 	else
 	{
 		outputDataSP->GetPointData()->SetScalars(outputScalars);
-		outputDataSP->Update();
 
 		if (m_ApplyDirectlyOnInput)
 		{
 			((albaVMEVolumeGray *)m_Input)->SetData(outputDataSP, m_Input->GetTimeStamp());
+			m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
 			albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 		}
 		else

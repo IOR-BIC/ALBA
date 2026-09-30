@@ -28,30 +28,24 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include "vtkImageCast.h"
 #include "vtkPointData.h"
-#include "vtkImageData.h"
 #include "vtkImageToStructuredPoints.h"
+#include "vtkDataArray.h"
+#include "vtkSmartPointer.h"
 
-#include "itkVTKImageToImageFilter.h"
-#include "itkImageToVTKImageFilter.h"
-#include "itkAdaptiveHistogramEqualizationImageFilter.h"
-#include "itkGradientMagnitudeImageFilter.h"
-#include "itkSobelEdgeDetectionImageFilter.h"
-#include "itkMedianImageFilter.h"
-#include "itkCannyEdgeDetectionImageFilter.h"
-#include "itkDiscreteGaussianImageFilter.h"
-#include "itkThresholdImageFilter.h"
-#include "itkBinaryThresholdImageFilter.h"
-#include "itkZeroCrossingBasedEdgeDetectionImageFilter.h"
-#include "itkLaplacianRecursiveGaussianImageFilter.h"
-#include "itkRescaleIntensityImageFilter.h"
-#include "itkOtsuThresholdImageFilter.h"
+#include "vtkImageMedian3D.h"
+#include "vtkImageGaussianSmooth.h"
+#include "vtkImageThreshold.h"
+#include "vtkImageAccumulate.h"
+#include "vtkImageGradientMagnitude.h"
+#include "vtkImageSobel2D.h"
+#include "vtkImageSobel3D.h"
+#include "vtkImageMagnitude.h"
+#include "vtkImageLaplacian.h"
+
+#include <cmath>
 
 #include "vtkALBASmartPointer.h"
 #include "albaGUIBusyInfo.h"
-
-typedef itk::VTKImageToImageFilter< ImageType > ConvertervtkTOitk;
-typedef itk::ImageToVTKImageFilter< ImageType > ConverteritkTOvtk;
-
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpFilterImage);
@@ -63,7 +57,7 @@ albaOpFilterImage::albaOpFilterImage(wxString label) :albaOp(label)
 	m_ImgOut = NULL;
 	m_Canundo = true;
 
-	m_MedianRadius[0]= m_MedianRadius[1] = m_GaussianMaxKernelSize = m_GaussianVariance = m_CannyVariance = m_ZeroEdgeVariance =1;
+	m_MedianRadius[0] = m_MedianRadius[1] = m_GaussianMaxKernelSize = m_GaussianVariance = m_CannyVariance = 1;
 	m_ThresholdOutsideValue = 0;
 	m_ThresholdBinaryValues[0] = 0;
 	m_ThresholdBinaryValues[1] = 255;
@@ -85,7 +79,7 @@ bool albaOpFilterImage::InternalAccept(albaVME *node)
 }
 
 //----------------------------------------------------------------------------
-albaOp* albaOpFilterImage::Copy()
+albaOp *albaOpFilterImage::Copy()
 {
 	albaOpFilterImage *cp = new albaOpFilterImage(m_Label);
 	return cp;
@@ -97,11 +91,10 @@ void albaOpFilterImage::OpRun()
 	if (m_ImgOut == NULL)
 	{
 		vtkImageData *im = vtkImageData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
-		im->Update();
 
 		vtkALBASmartPointer<vtkImageCast> vtkImageToFloat;
 		vtkImageToFloat->SetOutputScalarTypeToFloat();
-		vtkImageToFloat->SetInput(im);
+		vtkImageToFloat->SetInputData(im);
 		vtkImageToFloat->Modified();
 		vtkImageToFloat->Update();
 
@@ -119,22 +112,20 @@ void albaOpFilterImage::OpRun()
 			vtkImageData *outputImageData;
 			vtkNEW(outputImageData);
 			outputImageData->SetDimensions(inputDimensions[0], inputDimensions[1], inputDimensions[2]);
-			outputImageData->SetNumberOfScalarComponents(1);
-			outputImageData->SetScalarType(vtkImageToFloat->GetOutput()->GetScalarType());
-			outputImageData->AllocateScalars();
+			outputImageData->AllocateScalars(vtkImageToFloat->GetOutput()->GetScalarType(), 1);
 
 
-			vtkDataArray *outScalars=outputImageData->GetPointData()->GetScalars();
+			vtkDataArray *outScalars = outputImageData->GetPointData()->GetScalars();
 			vtkDataArray *inScalars = vtkImageToFloat->GetOutput()->GetPointData()->GetScalars();
 
-			for(int i=0;i<inScalars->GetNumberOfTuples();i++)
+			for (int i = 0; i < inScalars->GetNumberOfTuples(); i++)
 			{
 				float grayValue = 0;
-				for (int j = 0; j< inScalars->GetNumberOfComponents(); j++)
+				for (int j = 0; j < inScalars->GetNumberOfComponents(); j++)
 					grayValue += inScalars->GetComponent(i, j);
 
 				grayValue /= (double)inScalars->GetNumberOfComponents();
-						
+
 				outScalars->SetTuple1(i, grayValue);
 			}
 
@@ -148,7 +139,7 @@ void albaOpFilterImage::OpRun()
 			m_ImgOut->SetData(vtkImageToFloat->GetOutput(), m_Input->GetTimeStamp());
 			vtkImageToFloat->GetOutput()->GetScalarRange(m_ImgRange);
 		}
-	
+
 		m_ImgOut->Update();
 		m_ImgOut->ReparentTo(m_Input);
 		m_ImgOut->Delete();
@@ -166,7 +157,7 @@ void albaOpFilterImage::OpRun()
 
 	if (!m_TestMode)
 	{
-	
+
 		CreateGui();
 	}
 
@@ -213,95 +204,88 @@ void albaOpFilterImage::OnEvent(albaEventBase *alba_event)
 			else
 				switch (e->GetId())
 				{
-					case wxOK:
-						OpStop(OP_RUN_OK);
-						break;
+				case wxOK:
+					OpStop(OP_RUN_OK);
+					break;
 
-					case wxCANCEL:
-						OpStop(OP_RUN_CANCEL);
-						break;
+				case wxCANCEL:
+					OpStop(OP_RUN_CANCEL);
+					break;
 
-					case ID_UNDO:
-						UndoFilter();
-					default:
-						Superclass::OnEvent(alba_event);
-						break;
+				case ID_UNDO:
+					UndoFilter();
+				default:
+					Superclass::OnEvent(alba_event);
+					break;
 				}
 		}
- 		else
- 		{
- 			Superclass::OnEvent(alba_event);
- 		}
+		else
+		{
+			Superclass::OnEvent(alba_event);
+		}
 	}
+}
+
+//----------------------------------------------------------------------------
+int albaOpFilterImage::GetImageDimensionality(vtkImageData *image)
+{
+	// Single-slice images (Z extent == 1) are treated as 2D so that the
+	// 2D-specific filters (Sobel2D, etc.) and the dimensionality-aware
+	// ones (GradientMagnitude, Laplacian) operate only in the X/Y plane.
+	int dims[3];
+	image->GetDimensions(dims);
+	return (dims[2] > 1) ? 3 : 2;
 }
 
 //----------------------------------------------------------------------------
 void albaOpFilterImage::RunFilter(FilterTypes filterType)
 {
-	albaGUIBusyInfo busy("Applying filter...",m_TestMode);
-		
-	ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-	vtkImageData *newGrayImage = NULL;
-	vtkDataSet * imgSrc = m_ImgOut->GetOutput()->GetVTKData();
+	albaGUIBusyInfo busy("Applying filter...", m_TestMode);
 
-
-	vtkTOitk->SetInput(vtkImageData::SafeDownCast(imgSrc));
-	vtkTOitk->Update();
+	vtkImageData *imgSrc = vtkImageData::SafeDownCast(m_ImgOut->GetOutput()->GetVTKData());
 
 	vtkImageData *undoItem;
 	vtkNEW(undoItem);
 	undoItem->DeepCopy(imgSrc);
 	m_UndoStack.push_back(undoItem);
 
-	ImageType::Pointer outImg = ImageType::New();
+	vtkALBASmartPointer<vtkImageData> outImg;
+
 	switch (filterType)
 	{
-		default:
-			break;
-		case MEDIAN_FILTER:
-			MedianFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case GAUSSIAN_DISCRETE_FILTER:
-			GaussianBlurFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case THRESHOLD_FILTER:
-			ThresholdFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case THRESHOLD_BINARY_FILTER:
-			ThresholdBinaryFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case OTSU_THRESHOLD_FILTER:
-			OtsuThresholdFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case GRADIENT_MAGNITUDE:
-			GradientMaglitudeFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case SOBEL_EDGE:
-			SobelFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case CANNY_EDGE:
-			CannyEdgeFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case ZERO_CROSSING_EDGE:
-			ZeroCrossingEdgeFilter(vtkTOitk->GetOutput(), outImg);
-			break;
-		case LAPLACIAN_RECURSIVE_FILTER:
-			LaplacianRecursiveFilter(vtkTOitk->GetOutput(), outImg);
-			break;
+	default:
+		break;
+	case MEDIAN_FILTER:
+		MedianFilter(imgSrc, outImg);
+		break;
+	case GAUSSIAN_DISCRETE_FILTER:
+		GaussianBlurFilter(imgSrc, outImg);
+		break;
+	case THRESHOLD_FILTER:
+		ThresholdFilter(imgSrc, outImg);
+		break;
+	case THRESHOLD_BINARY_FILTER:
+		ThresholdBinaryFilter(imgSrc, outImg);
+		break;
+	case OTSU_THRESHOLD_FILTER:
+		OtsuThresholdFilter(imgSrc, outImg);
+		break;
+	case GRADIENT_MAGNITUDE:
+		GradientMaglitudeFilter(imgSrc, outImg);
+		break;
+	case SOBEL_EDGE:
+		SobelFilter(imgSrc, outImg);
+		break;
+	case CANNY_EDGE:
+		CannyEdgeFilter(imgSrc, outImg);
+		break;
+	case LAPLACIAN_RECURSIVE_FILTER:
+		LaplacianRecursiveFilter(imgSrc, outImg);
+		break;
 	}
 
-
-
-	ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-	itkTOvtk->SetInput(outImg);
-	itkTOvtk->Update();
-
-	vtkALBASmartPointer<vtkImageData> imOut;
-	imOut->DeepCopy(itkTOvtk->GetOutput());
-	imOut->Update();
-
 	vtkALBASmartPointer<vtkImageToStructuredPoints> imTosp;
-	imTosp->SetInput(imOut);
+	imTosp->SetInputData(outImg);
 	imTosp->Update();
 
 	m_ImgOut->SetData((vtkImageData *)imTosp->GetOutput(), m_Input->GetTimeStamp());
@@ -311,8 +295,6 @@ void albaOpFilterImage::RunFilter(FilterTypes filterType)
 
 	if (m_Gui)
 		m_Gui->Enable(ID_UNDO, true);
-
-	vtkDEL(newGrayImage);
 }
 
 //----------------------------------------------------------------------------
@@ -324,14 +306,14 @@ void albaOpFilterImage::CreateGui()
 	m_Gui->Label("Filters:", 1);
 	m_Gui->Label("");
 
-	m_Gui->Label("Median Filter:",1);
+	m_Gui->Label("Median Filter:", 1);
 	m_Gui->VectorN(-1, "Radius", m_MedianRadius, 2, 1, 100, "Radius for the Median Filer in X,Y");
 	m_Gui->Button(MEDIAN_FILTER, "Apply");
 	m_Gui->Divider(1);
 	m_Gui->Divider(0);
 	m_Gui->Divider(0);
 
-	m_Gui->Label("Gaussian Filter:",1);
+	m_Gui->Label("Gaussian Filter:", 1);
 	m_Gui->Double(-1, "Variance", &m_GaussianVariance, 0, 100, 2);
 	m_Gui->Integer(-1, "Max K Size", &m_GaussianMaxKernelSize, 1, 100);
 	m_Gui->Button(GAUSSIAN_DISCRETE_FILTER, "Apply");
@@ -339,9 +321,9 @@ void albaOpFilterImage::CreateGui()
 	m_Gui->Divider(0);
 	m_Gui->Divider(0);
 
-	m_Gui->Label("Threshold Filter:",1);
+	m_Gui->Label("Threshold Filter:", 1);
 	m_Gui->Double(-1, "Out Value", &m_ThresholdOutsideValue, -3000, 3000, 2);
-	m_Gui->Double(-1, "Limit", &m_ThresholdLimit, m_ImgRange[0], m_ImgRange[1],2);
+	m_Gui->Double(-1, "Limit", &m_ThresholdLimit, m_ImgRange[0], m_ImgRange[1], 2);
 	m_Gui->Bool(-1, "Threshold Below", &m_ThesholdBelow, 1);
 	m_Gui->Button(THRESHOLD_FILTER, "Apply");
 	m_Gui->Divider(1);
@@ -355,7 +337,7 @@ void albaOpFilterImage::CreateGui()
 	m_Gui->Divider(1);
 	m_Gui->Divider(0);
 	m_Gui->Divider(0);
-	
+
 
 	m_Gui->Label("OTSU Threshold Filter:", 1);
 	m_Gui->Button(OTSU_THRESHOLD_FILTER, "Apply");
@@ -380,13 +362,6 @@ void albaOpFilterImage::CreateGui()
 	m_Gui->Double(-1, "Variance", &m_CannyVariance, 0, 100, 2);
 	m_Gui->VectorN(-1, "Threshold", m_CannyThesholds, 2, 0, 100);
 	m_Gui->Button(CANNY_EDGE, "Apply");
-	m_Gui->Divider(1);
-	m_Gui->Divider(0);
-	m_Gui->Divider(0);
-
-	m_Gui->Label("Zero Crossing Det. Filter:", 1);
-	m_Gui->Double(-1, "Variance", &m_ZeroEdgeVariance, 0, 100, 2);
-	m_Gui->Button(ZERO_CROSSING_EDGE, "Apply");
 	m_Gui->Divider(1);
 	m_Gui->Divider(0);
 	m_Gui->Divider(0);
@@ -416,180 +391,262 @@ void albaOpFilterImage::UndoFilter()
 	GetLogicManager()->VmeShow(m_ImgOut, false);
 	GetLogicManager()->VmeShow(m_ImgOut, true);
 
-	if(m_Gui)
+	if (m_Gui)
 		m_Gui->Enable(ID_UNDO, m_UndoStack.size());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::MedianFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::MedianFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::MedianImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	vtkALBASmartPointer<vtkImageMedian3D> filter;
+	filter->SetInputData(inputImage);
 
-	ImageType::SizeType indexRadius;
-	indexRadius[0] = m_MedianRadius[0]; // radius along x
-	indexRadius[1] = m_MedianRadius[1]; // radius along y
-
-	filter->SetRadius(indexRadius);
+	// KernelSize expects full width per axis: width = 2*radius + 1.
+	// Z kernel is 1 (no cross-slice filtering).
+	filter->SetKernelSize(m_MedianRadius[0] * 2 + 1, m_MedianRadius[1] * 2 + 1, 1);
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	outputImage->DeepCopy(filter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::GaussianBlurFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::GaussianBlurFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::DiscreteGaussianImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	int dimensionality = GetImageDimensionality(inputImage);
+	double stdDev = std::sqrt(m_GaussianVariance);
 
-	filter->SetVariance(m_GaussianVariance);
-	filter->SetMaximumKernelWidth(m_GaussianMaxKernelSize);
+	vtkALBASmartPointer<vtkImageGaussianSmooth> filter;
+	filter->SetInputData(inputImage);
+
+	// SetStandardDeviations() accepts standard deviation values per axis.
+	filter->SetStandardDeviations(stdDev, stdDev, dimensionality == 3 ? stdDev : 0.0);
+
+	// RadiusFactors controls kernel half-width per axis.
+	filter->SetRadiusFactors(m_GaussianMaxKernelSize, m_GaussianMaxKernelSize, dimensionality == 3 ? m_GaussianMaxKernelSize : 0);
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	outputImage->DeepCopy(filter->GetOutput());
 }
 
-
 //----------------------------------------------------------------------------
-void albaOpFilterImage::ThresholdFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::ThresholdFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::ThresholdImageFilter<ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	vtkALBASmartPointer<vtkImageThreshold> filter;
+	filter->SetInputData(inputImage);
+	filter->SetReplaceIn(false);
+	filter->SetReplaceOut(true);
+	filter->SetOutValue(m_ThresholdOutsideValue);
 
-	filter->SetOutsideValue(m_ThresholdOutsideValue);
+	// ThresholdByUpper keeps values >= limit, replaces values < limit.
+	// ThresholdByLower keeps values <= limit, replaces values > limit.
 	if (m_ThesholdBelow)
-		filter->ThresholdBelow(m_ThresholdLimit);
+		filter->ThresholdByUpper(m_ThresholdLimit);
 	else
-		filter->ThresholdAbove(m_ThresholdLimit);
+		filter->ThresholdByLower(m_ThresholdLimit);
 
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	outputImage->DeepCopy(filter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::ThresholdBinaryFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::ThresholdBinaryFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::BinaryThresholdImageFilter<ImageType,ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	vtkALBASmartPointer<vtkImageThreshold> filter;
+	filter->SetInputData(inputImage);
 
-	filter->SetInsideValue(m_ThresholdBinaryValues[0]);
-	filter->SetOutsideValue(m_ThresholdBinaryValues[1]);
-	filter->SetLowerThreshold(m_ThresholdBinaryLimits[0]);
-	filter->SetUpperThreshold(m_ThresholdBinaryLimits[1]);
+	filter->ThresholdBetween(m_ThresholdBinaryLimits[0], m_ThresholdBinaryLimits[1]);
+	filter->SetReplaceIn(true);
+	filter->SetInValue(m_ThresholdBinaryValues[0]);
+	filter->SetReplaceOut(true);
+	filter->SetOutValue(m_ThresholdBinaryValues[1]);
 
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
-
+	outputImage->DeepCopy(filter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::OtsuThresholdFilter(const ImageType *inputImage, ImageType *outputImage)
+double albaOpFilterImage::ComputeOtsuThreshold(vtkImageData *inputImage)
 {
-	using FilterType = itk::OtsuThresholdImageFilter<ImageType, ImageType>;
+	const int numBins = 256;
+	double range[2];
+	inputImage->GetScalarRange(range);
 
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	double spacing = (range[1] - range[0]) / numBins;
+	if (spacing <= 0)
+		return range[0];
 
-	filter->Update();
+	// Build histogram using vtkImageAccumulate.
+	vtkALBASmartPointer<vtkImageAccumulate> histogram;
+	histogram->SetInputData(inputImage);
+	histogram->SetComponentExtent(0, numBins - 1, 0, 0, 0, 0);
+	histogram->SetComponentOrigin(range[0], 0, 0);
+	histogram->SetComponentSpacing(spacing, 0, 0);
+	histogram->Update();
 
-	// Rescale the pixel values
-	using RescalerType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
-	RescalerType::Pointer rescaler = RescalerType::New();
-	rescaler->SetInput(filter->GetOutput());
-	rescaler->SetOutputMinimum(0);
-	rescaler->SetOutputMaximum(255);
-	rescaler->Update();
+	vtkDataArray *bins = histogram->GetOutput()->GetPointData()->GetScalars();
 
+	double total = 0.0;
+	double sumAll = 0.0;
+	for (int i = 0; i < numBins; i++)
+	{
+		double count = bins->GetComponent(i, 0);
+		total += count;
+		sumAll += i * count;
+	}
 
-	outputImage->Graft(rescaler->GetOutput());
+	double sumB = 0.0, weightB = 0.0, maxVariance = 0.0;
+	int bestBin = 0;
+
+	for (int i = 0; i < numBins; i++)
+	{
+		weightB += bins->GetComponent(i, 0);
+		if (weightB == 0)
+			continue;
+
+		double weightF = total - weightB;
+		if (weightF <= 0)
+			break;
+
+		sumB += i * bins->GetComponent(i, 0);
+
+		double meanB = sumB / weightB;
+		double meanF = (sumAll - sumB) / weightF;
+		double diff = meanB - meanF;
+		double variance = weightB * weightF * diff * diff;
+
+		if (variance > maxVariance)
+		{
+			maxVariance = variance;
+			bestBin = i;
+		}
+	}
+
+	// Bin center of the best-scoring bin, translated back to image intensity.
+	return range[0] + (bestBin + 0.5) * spacing;
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::GradientMaglitudeFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::OtsuThresholdFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::GradientMagnitudeImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	double otsuThreshold = ComputeOtsuThreshold(inputImage);
 
+	vtkALBASmartPointer<vtkImageThreshold> filter;
+	filter->SetInputData(inputImage);
+	filter->ThresholdByUpper(otsuThreshold);
+	filter->SetReplaceIn(true);
+	filter->SetInValue(255);
+	filter->SetReplaceOut(true);
+	filter->SetOutValue(0);
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	outputImage->DeepCopy(filter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::SobelFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::GradientMaglitudeFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::SobelEdgeDetectionImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
-
+	vtkALBASmartPointer<vtkImageGradientMagnitude> filter;
+	filter->SetInputData(inputImage);
+	filter->SetDimensionality(GetImageDimensionality(inputImage));
 	filter->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	outputImage->DeepCopy(filter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::CannyEdgeFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::SobelFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::CannyEdgeDetectionImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	// vtkImageSobel2D/3D output a 2 or 3-component gradient vector.
+	// vtkImageMagnitude collapses it to a scalar edge-response image.
+	vtkSmartPointer<vtkImageData> sobelOutput;
 
- 	filter->SetVariance(m_CannyVariance);
- 	filter->SetLowerThreshold(m_CannyThesholds[0]);
-	filter->SetUpperThreshold(m_CannyThesholds[1]);
+	if (GetImageDimensionality(inputImage) == 2)
+	{
+		vtkALBASmartPointer<vtkImageSobel2D> sobel;
+		sobel->SetInputData(inputImage);
+		sobel->Update();
+		sobelOutput = sobel->GetOutput();
+	}
+	else
+	{
+		vtkALBASmartPointer<vtkImageSobel3D> sobel;
+		sobel->SetInputData(inputImage);
+		sobel->Update();
+		sobelOutput = sobel->GetOutput();
+	}
 
-	filter->Update();
+	vtkALBASmartPointer<vtkImageMagnitude> magnitude;
+	magnitude->SetInputData(sobelOutput);
+	magnitude->Update();
 
-	// Rescale the pixel values
-	using RescalerType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
-	RescalerType::Pointer rescaler = RescalerType::New();
-	rescaler->SetInput(filter->GetOutput());
-	rescaler->SetOutputMinimum(0);
-	rescaler->SetOutputMaximum(255);
-	rescaler->Update();
-
-
-
-	outputImage->Graft(rescaler->GetOutput());
+	outputImage->DeepCopy(magnitude->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::ZeroCrossingEdgeFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::CannyEdgeFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::ZeroCrossingBasedEdgeDetectionImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	// Approximation of Canny edge detection algorithm.
+	// Pipeline: Gaussian smoothing -> Sobel gradient -> magnitude -> double threshold.
+	// Note: This implementation does NOT perform non-maximum suppression
+	// nor hysteresis edge-linking, resulting in thicker edges.
+	int dimensionality = GetImageDimensionality(inputImage);
+	double sigma = std::sqrt(m_CannyVariance);
 
-	filter->SetVariance(m_ZeroEdgeVariance);
-	filter->Update();
+	vtkALBASmartPointer<vtkImageGaussianSmooth> smooth;
+	smooth->SetInputData(inputImage);
+	smooth->SetStandardDeviations(sigma, sigma, dimensionality == 3 ? sigma : 0.0);
+	smooth->Update();
 
+	vtkSmartPointer<vtkImageData> sobelOutput;
 
-	// Rescale the pixel values
-	using RescalerType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
-	RescalerType::Pointer rescaler = RescalerType::New();
-	rescaler->SetInput(filter->GetOutput());
-	rescaler->SetOutputMinimum(0);
-	rescaler->SetOutputMaximum(255);
-	rescaler->Update();
+	if (dimensionality == 2)
+	{
+		vtkALBASmartPointer<vtkImageSobel2D> sobel;
+		sobel->SetInputData(smooth->GetOutput());
+		sobel->Update();
+		sobelOutput = sobel->GetOutput();
+	}
+	else
+	{
+		vtkALBASmartPointer<vtkImageSobel3D> sobel;
+		sobel->SetInputData(smooth->GetOutput());
+		sobel->Update();
+		sobelOutput = sobel->GetOutput();
+	}
 
-	outputImage->Graft(rescaler->GetOutput());
+	vtkALBASmartPointer<vtkImageMagnitude> magnitude;
+	magnitude->SetInputData(sobelOutput);
+	magnitude->Update();
+
+	vtkALBASmartPointer<vtkImageThreshold> threshold;
+	threshold->SetInputData(magnitude->GetOutput());
+	threshold->ThresholdBetween(m_CannyThesholds[0], m_CannyThesholds[1]);
+	threshold->SetReplaceIn(true);
+	threshold->SetInValue(255);
+	threshold->SetReplaceOut(true);
+	threshold->SetOutValue(0);
+	threshold->Update();
+
+	outputImage->DeepCopy(threshold->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void albaOpFilterImage::LaplacianRecursiveFilter(const ImageType *inputImage, ImageType *outputImage)
+void albaOpFilterImage::LaplacianRecursiveFilter(vtkImageData *inputImage, vtkImageData *outputImage)
 {
-	using FilterType = itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType>;
-	FilterType::Pointer filter = FilterType::New();
-	filter->SetInput(inputImage);
+	int dimensionality = GetImageDimensionality(inputImage);
 
-	filter->Update();
+	// Apply recursive Gaussian smoothing (sigma = 1.0) before Laplacian operator.
+	vtkALBASmartPointer<vtkImageGaussianSmooth> smooth;
+	smooth->SetInputData(inputImage);
+	smooth->SetStandardDeviations(1.0, 1.0, dimensionality == 3 ? 1.0 : 0.0);
+	smooth->Update();
 
-	outputImage->Graft(filter->GetOutput());
+	vtkALBASmartPointer<vtkImageLaplacian> laplacian;
+	laplacian->SetInputData(smooth->GetOutput());
+	laplacian->SetDimensionality(dimensionality);
+	laplacian->Update();
+
+	outputImage->DeepCopy(laplacian->GetOutput());
 }

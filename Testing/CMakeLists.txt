@@ -1,5 +1,5 @@
 # Load CppUnit stuff
-INCLUDE(${ALBA_SOURCE_DIR}/Libraries/modules/FindCppUnit.cmake)
+INCLUDE(${ALBA_SOURCE_DIR}/Libs/modules/FindCppUnit.cmake)
 IF (CPPUNIT_RELEASE_FOUND OR CPPUNIT_DEBUG_FOUND)
   #MESSAGE("Found Cppunit library")
   INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
@@ -26,11 +26,13 @@ SET(PROJECT_SRCS
 	)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS ${wxWidgets_LIBRARIES} )
+SET(PROJECT_LIBS ${wxWidgets_LIBRARIES} ${VTK_LIBRARIES})
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+
+OPTION(DISABLE_GPU_VOLUME_RENDERING_TESTS "Disable GPU Volume rendering Tests (Ie. virtual servers)" OFF)
  
 OPTION(BUILD_BASE_TESTING "Enable building of testing for BASE classes" OFF)
 IF (BUILD_BASE_TESTING)
@@ -103,3 +105,5 @@ IF (ALBA_USE_WXMOZILLA)
     SUBDIRS(exMozilla)
   ENDIF (BUILD_WXMOZILLA_TESTING)
 ENDIF (ALBA_USE_WXMOZILLA)
+
+CONFIGURE_FILE( albaTestDefines.h.in ${ALBA_BINARY_DIR}/albaTestDefines.h @ONLY IMMEDIATE )

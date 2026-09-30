@@ -22,12 +22,15 @@
 
 #include <float.h>
 #include <math.h>
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
 
 //----------------------------------------------------------------------------
 vtkALBAAbstractPointsSource::vtkALBAAbstractPointsSource()
 {
   this->NumberOfPoints = 0;
 	points=vtkPoints::New();
+	this->SetNumberOfInputPorts(0);
 }
 
 //----------------------------------------------------------------------------
@@ -38,12 +41,20 @@ vtkALBAAbstractPointsSource::~vtkALBAAbstractPointsSource()
 
 
 //----------------------------------------------------------------------------
-void vtkALBAAbstractPointsSource::Execute()
+int vtkALBAAbstractPointsSource::RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
+	vtkInformation* outInfo = outputVector->GetInformationObject(0);
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+	if (output == NULL)
+	{
+		vtkErrorMacro(<< "Output polydata cannot be NULL.");
+		return 0;
+	}
+
   vtkIdType i;
   vtkCellArray *newVerts;
 	vtkPoints *newPoints;
-  vtkPolyData *output = this->GetOutput();
 
 	newPoints = vtkPoints::New();
 	if(NumberOfPoints>0)
@@ -68,11 +79,8 @@ void vtkALBAAbstractPointsSource::Execute()
   
 	SetCellArrayToOutput(output,newVerts);
   newVerts->Delete();
-}
 
-//----------------------------------------------------------------------------
-void vtkALBAAbstractPointsSource::ExecuteInformation()
-{
+	return 1;
 }
 
 
@@ -112,4 +120,5 @@ void vtkALBAAbstractPointsSource::ClearPoints()
 	points->SetNumberOfPoints(0);
 	Modified();
 }
+
 

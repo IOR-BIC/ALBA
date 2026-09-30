@@ -44,8 +44,7 @@
 #include "vtkDataSet.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkVolumeRayCastMapper.h"
-#include "vtkVolumeRayCastCompositeFunction.h"
+#include "vtkGPUVolumeRayCastMapper.h"
 #include "vtkVolumeProperty.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
@@ -58,8 +57,11 @@
 #include "vtkProperty.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkImageData.h"
 #include "albaTagArray.h"
+
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL2);
+VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeRayCast);
@@ -83,6 +85,8 @@ albaPipeRayCast::albaPipeRayCast(double skinOpacity,double fatMassOpacity,double
   m_OutlineMapper   = NULL;
 
   m_RayCastCleaner  = NULL;
+
+	m_ResampleFilter = NULL;
 
   //Setting Opacity 
   //Default values 0.15 - 0.8 - 0.2  
@@ -114,13 +118,13 @@ void albaPipeRayCast::Create(albaSceneNode *n)
   m_Vme->AddObserver(this);
 
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
   
   //If the volume is not loaded this dataset->update() calls update-event
   //in this case we disable temporary the call to UpdateFromData() in order
   //to have a single call to that function
   //if the volume is already loaded m_Onloading changes simple do nothing
   m_OnLoading=true;
-  dataset->Update();
   m_OnLoading=false;
 
 
@@ -135,10 +139,10 @@ void albaPipeRayCast::Create(albaSceneNode *n)
     
   // selection box
   vtkNEW(m_OutlineBox);
-  m_OutlineBox->SetInput(dataset);
+  m_OutlineBox->SetInputConnection(port);
 
   vtkNEW(m_OutlineMapper);
-  m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+  m_OutlineMapper->SetInputConnection(m_OutlineBox->GetOutputPort());
 
   vtkNEW(m_OutlineActor);
   m_OutlineActor->SetMapper(m_OutlineMapper);
@@ -181,6 +185,7 @@ albaPipeRayCast::~albaPipeRayCast()
   vtkDEL(m_OutlineBox);
 	vtkDEL(m_OutlineMapper);
   vtkDEL(m_RayCastCleaner);
+	vtkDEL(m_ResampleFilter);
 
 }
 
@@ -329,14 +334,12 @@ void albaPipeRayCast::SetThresholding()
 void albaPipeRayCast::UpdateFromData()
 //----------------------------------------------------------------------------
 {
-  vtkALBAVolumeResample		 *resampleFilter;	
+
 
   vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
-  dataset->Update();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
 
   int resampled=false;
-
-  vtkImageData *volume;
 
   //volume spacing 
   double volSpacing[3];
@@ -351,14 +354,10 @@ void albaPipeRayCast::UpdateFromData()
       
     
     resampled=true;
-
-
-
-    vtkNEW(volume);
-    vtkNEW(resampleFilter);
+    if(m_ResampleFilter == NULL)
+    	vtkNEW(m_ResampleFilter);
 
     // the resample filter
-    resampleFilter->SetZeroValue(0);
     double bounds[6];
     rgrid->GetBounds(bounds);
 
@@ -366,7 +365,6 @@ void albaPipeRayCast::UpdateFromData()
     volSpacing[0] = (bounds[1]-bounds[0]) / (double) rgrid->GetXCoordinates()->GetNumberOfTuples();
     volSpacing[1] = (bounds[3]-bounds[2]) / (double) rgrid->GetYCoordinates()->GetNumberOfTuples();
     volSpacing[2] = (bounds[5]-bounds[4]) / (double) rgrid->GetZCoordinates()->GetNumberOfTuples();
-
 
     //compute Output extent 
     int output_extent[6];
@@ -377,16 +375,6 @@ void albaPipeRayCast::UpdateFromData()
     output_extent[4] = 0;
     output_extent[5] = (bounds[5] - bounds[4]) / volSpacing[2];
 
-    //Setting the origin to the filter using volume bounds
-    resampleFilter->SetVolumeOrigin(bounds[0],bounds[2], bounds[4]);
-
-    volume->SetSpacing(volSpacing);
-    //output scalars are of the same type of input
-    volume->SetScalarType(rgrid->GetPointData()->GetScalars()->GetDataType());
-    volume->SetExtent(output_extent);
-    volume->SetUpdateExtent(output_extent);
-    volume->SetOrigin(bounds[0],bounds[2],bounds[4]);
-
     double sr[2];
     rgrid->GetScalarRange(sr);
 
@@ -394,18 +382,19 @@ void albaPipeRayCast::UpdateFromData()
     double l = (sr[1] + sr[0]) * 0.5;
 
     //Setting Filter parameters 
-    resampleFilter->SetWindow(w);
-    resampleFilter->SetLevel(l);
-    resampleFilter->SetInput(rgrid);
-    resampleFilter->SetOutput(volume);
-    resampleFilter->AutoSpacingOff();
-    resampleFilter->Update();
+		m_ResampleFilter->SetZeroValue(0);
+    m_ResampleFilter->SetWindow(w);
+    m_ResampleFilter->SetLevel(l);
+		m_ResampleFilter->SetVolumeOrigin(bounds[0], bounds[2], bounds[4]);
+		m_ResampleFilter->SetOutputSpacing(volSpacing);
+    m_ResampleFilter->SetInputConnection(port);
+		m_ResampleFilter->SetOutputExtent(output_extent);
+    m_ResampleFilter->AutoSpacingOff();
+    m_ResampleFilter->Update();
 
 		cppDEL(wait);
   }
-  //Else if input is an Structured Point we use it directly
-  else 
-    volume=vtkImageData::SafeDownCast(dataset);
+ 
 
   wxBusyCursor *wait=NULL;
 
@@ -417,7 +406,11 @@ void albaPipeRayCast::UpdateFromData()
   //scalars shifted by - lower range 
   if (m_RayCastCleaner==NULL)
     vtkNEW(m_RayCastCleaner);
-  m_RayCastCleaner->SetInput(volume);
+
+	if (resampled)
+		m_RayCastCleaner->SetInputConnection(m_ResampleFilter->GetOutputPort());
+	else
+		m_RayCastCleaner->SetInputConnection(port);
   m_RayCastCleaner->SetBloodLowerThreshold(m_BloodLowerThreshold);
   m_RayCastCleaner->SetBloodUpperThreshold(m_BloodUpperThreshold);
   m_RayCastCleaner->SetBoneLowerThreshold(m_BoneLowerThreshold);
@@ -427,29 +420,16 @@ void albaPipeRayCast::UpdateFromData()
     m_RayCastCleaner->SetModalityToMR();
   m_RayCastCleaner->Update();
 
-  //Deleting unnecessary stuff
-  if (resampled)
-  {
-    vtkDEL(volume);
-    vtkDEL(resampleFilter);
-  }
   
-
-
-  //Create Raycast Mapper and relative functions  
-
-  if (m_RayCastMapper==NULL)
-    vtkNEW(m_RayCastMapper);
+  //Create Raycast Mapper and relative functions
+  if (m_RayCastMapper == NULL)
+    m_RayCastMapper = vtkGPUVolumeRayCastMapper::New();
   if (m_ColorFunction==NULL)
     vtkNEW(m_ColorFunction);
   if (m_OpacityFunction==NULL)
     vtkNEW(m_OpacityFunction);
 
-  //The ray cast function know how to render the data
-  vtkALBASmartPointer<vtkVolumeRayCastCompositeFunction> compositeFunction;
-  compositeFunction->SetCompositeMethodToClassifyFirst();
-  m_RayCastMapper->SetVolumeRayCastFunction(compositeFunction);
-  m_RayCastMapper->SetInput((vtkImageData *)m_RayCastCleaner->GetOutput());
+  m_RayCastMapper->SetInputConnection(m_RayCastCleaner->GetOutputPort());
   
   //Create a empty volume to manage the mapper
   if (m_Volume==NULL)

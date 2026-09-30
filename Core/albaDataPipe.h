@@ -31,6 +31,7 @@ class albaVME;
 
 #ifdef ALBA_USE_VTK
   class vtkDataSet;
+  class vtkAlgorithmOutput;
 #endif
 
 /** abstract class for process objects producing data as output of a VME.
@@ -76,6 +77,9 @@ public:
   /**
     Return a VTK dataset corresponding to the current time.*/
   virtual vtkDataSet *GetVTKData() {return NULL;}
+
+	/** returns the VTK Data Pipe Output Port */
+  virtual vtkAlgorithmOutput *GetVTKOutputPort() { return NULL; };
 #endif
 
   /** Set/Get the current time */
@@ -83,7 +87,7 @@ public:
   albaTimeStamp GetTimeStamp() {return m_CurrentTime;}
 
   /** return modification time */
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
   /** This function returns true if the VME is accepted by this Pipe. */
   virtual bool Accept(albaVME *vme) {return vme!=NULL;}

@@ -29,7 +29,7 @@ protected:
   
 public:
   static albaLODActor *New();
-  vtkTypeRevisionMacro(albaLODActor,vtkOpenGLActor);
+  vtkTypeMacro(albaLODActor,vtkOpenGLActor);
 
   // Description:
   void Render(vtkRenderer *ren, vtkMapper *mapper);

@@ -46,7 +46,6 @@
 #include "vtkImageActor.h"
 #include "vtkDataSetWriter.h"
 #include "vtkImageData.h"
-#include "vtkImageData.h"
 
 #include <iostream>
 #include "vtkDataSet.h"
@@ -112,12 +111,12 @@ void albaVMESlicerTest::TestBug2454And2524Regression()
 	numPoints = surfaceData->GetNumberOfPoints();
 	CPPUNIT_ASSERT(numPoints == 4);
 
-	slicerMapper->SetInput(surfaceData);
+	slicerMapper->SetInputData(surfaceData);
 
 	vtkALBASmartPointer<vtkTexture> slicerTexure;
 	vtkImageData *texture = vmeSlicer->GetSurfaceOutput()->GetTexture();
 	CPPUNIT_ASSERT(texture);
-	slicerTexure->SetInput(texture);
+	slicerTexure->SetInputData(texture);
 
 	vtkALBASmartPointer<vtkActor> slicerActor;
 	slicerActor->SetMapper(slicerMapper);

@@ -93,7 +93,7 @@ albaVMERefSys::albaVMERefSys()
   m_XAxisTransform->Update();
 
   m_XAxis = vtkTransformPolyDataFilter::New();
-  m_XAxis->SetInput(m_XArrow->GetOutput());
+  m_XAxis->SetInputConnection(m_XArrow->GetOutputPort());
   m_XAxis->SetTransform(m_XAxisTransform);
   m_XAxis->Update();	
 
@@ -110,7 +110,7 @@ albaVMERefSys::albaVMERefSys()
   m_YAxisTransform->Update();
 
   m_YAxis = vtkTransformPolyDataFilter::New();
-  m_YAxis->SetInput(m_YArrow->GetOutput());
+  m_YAxis->SetInputConnection(m_YArrow->GetOutputPort());
   m_YAxis->SetTransform(m_YAxisTransform);
   m_YAxis->Update();
 
@@ -126,7 +126,7 @@ albaVMERefSys::albaVMERefSys()
   m_ZAxisTransform->Update();
 
   m_ZAxis  = vtkTransformPolyDataFilter::New();
-  m_ZAxis->SetInput(m_ZArrow->GetOutput());
+  m_ZAxis->SetInputConnection(m_ZArrow->GetOutputPort());
   m_ZAxis->SetTransform(m_ZAxisTransform);
   m_ZAxis->Update();
 
@@ -144,9 +144,9 @@ albaVMERefSys::albaVMERefSys()
 
   // this filter do not copy the scalars also if all input 
   m_Axes = vtkAppendPolyData::New();    
-  m_Axes->AddInput(m_XAxis->GetOutput()); // data has the scalars.
-  m_Axes->AddInput(m_YAxis->GetOutput());
-  m_Axes->AddInput(m_ZAxis->GetOutput());
+  m_Axes->AddInputConnection(m_XAxis->GetOutputPort()); // data has the scalars.
+  m_Axes->AddInputConnection(m_YAxis->GetOutputPort());
+  m_Axes->AddInputConnection(m_ZAxis->GetOutputPort());
 
   m_Axes->Update();
 
@@ -156,12 +156,11 @@ albaVMERefSys::albaVMERefSys()
 
   vtkALBASmartPointer<vtkPolyData> axes_surface;
   axes_surface = m_Axes->GetOutput();
-  axes_surface->SetSource(NULL);
   axes_surface->GetPointData()->SetScalars(data);
   vtkDEL(data);
 
   m_ScaleAxis  = vtkTransformPolyDataFilter::New();
-  m_ScaleAxis->SetInput(axes_surface.GetPointer());
+  m_ScaleAxis->SetInputData(axes_surface.GetPointer());
   m_ScaleAxis->SetTransform(m_ScaleAxisTransform);
   m_ScaleAxis->Update();
 

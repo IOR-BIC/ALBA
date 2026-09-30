@@ -189,7 +189,7 @@ void albaOpCleanSurface::OnClean()
 
 	vtkALBASmartPointer<vtkCleanPolyData> cleanFilter;
 	cleanFilter->SetTolerance(0.0); // aacc expose from GUI?
-	cleanFilter->SetInput(m_ResultPolydata);
+	cleanFilter->SetInputData(m_ResultPolydata);
 	cleanFilter->Update();
 
 	m_ResultPolydata->DeepCopy(cleanFilter->GetOutput());

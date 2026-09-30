@@ -84,9 +84,9 @@ void albaGizmoPath::Constructor(albaVME *imputVme, albaObserver *listener, const
 
   CreateVMEGizmo();
   
-  m_VmeGizmoPath->SetData(m_LineSource->GetOutput());
+  m_VmeGizmoPath->SetDataConnection(m_LineSource->GetOutputPort());
 
-  assert(m_VmeGizmoPath->GetData()->GetNumberOfPoints());
+  assert(m_VmeGizmoPath->GetData()->GetNumberOfPoints()==2);
 
 
   CreateInteractor();

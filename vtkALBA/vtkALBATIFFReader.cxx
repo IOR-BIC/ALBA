@@ -42,15 +42,14 @@ typedef itk::ImageToVTKImageFilter< ImageType > ConverteritkTOvtk;
 
 
 
-vtkCxxRevisionMacro(vtkALBATIFFReader, "$Revision: 1.80 $");
 vtkStandardNewMacro(vtkALBATIFFReader);
 
 //----------------------------------------------------------------------------
 // This function reads a data from a file.  The datas extent/axes
 // are assumed to be the same as the file extent/order.
-void vtkALBATIFFReader::ExecuteData(vtkDataObject *output)
+void vtkALBATIFFReader::ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo)
 {
-	Superclass::ExecuteData(output);
+	Superclass::ExecuteDataWithInformation(out, outInfo);
 
 	vtkImageData *outputImg = GetOutput();
 	if (outputImg->GetScalarRange()[0] != 0 || outputImg->GetScalarRange()[1] != 0)
@@ -61,38 +60,40 @@ void vtkALBATIFFReader::ExecuteData(vtkDataObject *output)
 	{
 		using ReaderType = itk::ImageFileReader<ImageType>;
 		ReaderType::Pointer reader = ReaderType::New();
-
+	
 		itk::TIFFImageIO::Pointer tiffIO = itk::TIFFImageIO::New();
 		reader->SetImageIO(tiffIO);
-
+	
 		reader->SetFileName(FileName);
-
+	
 		try
 		{
 			reader->Update();
 		}
-		catch (itk::ExceptionObject& ex)
+		catch (itk::ExceptionObject &ex)
 		{
 			vtkErrorMacro("Cannot Read %s \n %s", m_Files[i].c_str(), ex.GetDescription());
 			return;
 		}
-
+	
 		using FlipFilterType = itk::FlipImageFilter<ImageType>;
 		FlipFilterType::Pointer flipFilter = FlipFilterType::New();
-
+	
 		FlipFilterType::FlipAxesArrayType flipAxes;
 		flipAxes[0] = false;
 		flipAxes[1] = true;
 		flipFilter->SetFlipAxes(flipAxes);
-
+	
 		flipFilter->SetInput(reader->GetOutput());
 		flipFilter->Update();
-
+	
 		ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
 		itkTOvtk->SetInput(flipFilter->GetOutput());
 		itkTOvtk->Update();
-
-		outputImg->DeepCopy(itkTOvtk->GetOutput());
+	
+		vtkImageData *output = itkTOvtk->GetOutput();
+	
+		outputImg->DeepCopy(output);
 	}
 }
 

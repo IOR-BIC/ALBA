@@ -55,7 +55,7 @@ Camera must be in ParallelProjection and aligned with world axis
 class ALBA_EXPORT vtkALBASimpleRulerActor2D : public vtkActor2D
 {
 public:
-	vtkTypeRevisionMacro(vtkALBASimpleRulerActor2D, vtkActor2D);
+	vtkTypeMacro(vtkALBASimpleRulerActor2D,vtkActor2D);
 	void PrintSelf(ostream& os, vtkIndent indent);
 	static	vtkALBASimpleRulerActor2D *New();
 

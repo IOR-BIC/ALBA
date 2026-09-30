@@ -47,13 +47,15 @@ public:
 	/** Get the filename to import */
 	albaString GetFileName() const { return m_FileName; }
 
+	/** Imports informations, return ALBA_OK on success.  */
+	int ImportFile();
+
+
 protected:
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
-	/** Imports informations, return ALBA_OK on success.  */
-	int ImportFile();
 	 
 	friend class albaOpImporterDICFileTest;
   

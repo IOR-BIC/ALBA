@@ -51,7 +51,6 @@
 #include "albaOpDecomposeTimeVarVMETest.h"
 #include "albaOpEditMetadataTest.h"
 #include "albaOpEditNormalsTest.h"
-#include "albaOpEqualizeHistogramTest.h"
 #include "albaOpExporterAbaqusFileTest.h"
 #include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnsysCDBFileTest.h"
@@ -136,7 +135,6 @@
 #include "albaVMEDataSetAttributesImporterTest.h"
 #include "albaVMEMeshAnsysTextExporterTest.h"
 #include "albaVMEMeshAnsysTextImporterTest.h"
-#include "albaOpImporterDICFileTest.h"
 #include "albaOpImporterPointCloudTest.h"
 #include "albaOpFilterImageTest.h"
 
@@ -151,6 +149,8 @@
 #include "vtkFileOutputWindow.h"
 #include "vtkALBASmartPointer.h"
 #include "albaVMEOutputNULL.h"
+#include "albaOpExporterDicFileTest.h"
+#include "albaOpImporterDicFileTest.h"
 
 // Visual Leak Detector
 //#include <vld.h>
@@ -224,8 +224,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpConnectivitySurfaceTest::suite());
 	runner.addTest(albaOpRemoveCellsTest::suite());
 	runner.addTest(albaOpBooleanSurfaceTest::suite());
-	runner.addTest(albaOpEditNormalsTest::suite());
-	runner.addTest(albaOpExporterImagesTest::suite());
+	runner.addTest(albaOpEditNormalsTest::suite()); 
+	runner.addTest(albaOpExporterImagesTest::suite()); 
 	runner.addTest(albaOpImporterMSFTest::suite());
 	runner.addTest(albaOpImporterExternalFileTest::suite());
 	runner.addTest(albaOpOpenExternalFileTest::suite());
@@ -294,7 +294,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterDicomTest::suite());
 	runner.addTest(albaItkRawMotionImporterUtilityTest::suite());
 	runner.addTest(albaOpMakeVMETimevaryingTest::suite());
-	runner.addTest(albaOpEqualizeHistogramTest::suite());
 	runner.addTest(albaOpCreateWrappedMeterTest::suite());
 	runner.addTest(albaOpFlipNormalsTest::suite());
 	runner.addTest(albaOpSmoothSurfaceCellsTest::suite());
@@ -312,8 +311,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterVTKXMLTest::suite());
 	runner.addTest(albaOpInteractiveClipSurfaceTest::suite());
 	runner.addTest(albaOpCreateEditSkeletonTest::suite());
-	runner.addTest(albaOpRegisterClustersTest::suite());
-	runner.addTest(albaOpClassicICPRegistrationTest::suite());
+	runner.addTest(albaOpRegisterClustersTest::suite()); 
+	runner.addTest(albaOpClassicICPRegistrationTest::suite()); 
 	runner.addTest(albaOpMML3ParameterViewTest::suite());
 	runner.addTest(albaOpInteractionDebuggerTest::suite());
 	runner.addTest(albaOpIterativeRegistrationTest::suite()); 
@@ -326,6 +325,10 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterDICFileTest::suite());
 	runner.addTest(albaOpImporterPointCloudTest::suite());
 	runner.addTest(albaOpFilterImageTest::suite()); /* */
+
+runner.addTest(albaOpExporterDicFileTest::suite());
+	
+
 
 	runner.run( controller );
 

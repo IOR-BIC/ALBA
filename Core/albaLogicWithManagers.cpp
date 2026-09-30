@@ -188,7 +188,6 @@
 #include "albaOpExtractIsosurface.h"
 #include "albaOpExtractImageFromArbitraryView.h"
 #include "albaOpExtrusionHoles.h"
-#include "albaOpEqualizeHistogram.h"
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
 #include "albaOpFilterVolume.h"
@@ -801,6 +800,9 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		case MENU_FILE_SAVEAS:
 			OnFileSaveAs();
+			break;
+		case MENU_FILE_SAVEAS_LEGACY:
+			OnFileSaveAs(true);
 			break;
 		case MENU_FILE_PRINT:
 			if (m_ViewManager && m_PrintSupport)
@@ -1448,14 +1450,14 @@ void albaLogicWithManagers::OnFileSave()
   }
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OnFileSaveAs()
+void albaLogicWithManagers::OnFileSaveAs(bool legacy)
 {
   if(m_VMEManager) 
   {
 	  albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
-	  int saved=m_VMEManager->MSFSaveAs();
+	  int saved=m_VMEManager->MSFSaveAs(legacy);
 	  //If there is a wizard running we need to continue it after save operation
 	  if (m_WizardManager && m_WizardRunning)
 		  m_WizardManager->WizardContinue(saved!=ALBA_ERROR);
@@ -2004,7 +2006,9 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
 	Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
 	Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
+#ifdef ALBA_USE_BTK
 	Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
+#endif
 	Plug(new albaOpImporterAnalogWS("EMG"));
 	Plug(new albaOpImporterGRFWS("GRF"));
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
@@ -2111,7 +2115,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpFillHoles(), _("Modify"));
 	Plug(new albaOpMeshDeformation(), _("Modify"));
 	Plug(new albaOpMakeVMETimevarying(), _("Modify"));
-	Plug(new albaOpEqualizeHistogram(), _("Modify"));
 	Plug(new albaOpSmoothSurfaceCells(), _("Modify"));
 	Plug(new albaOpTransformAtoB(), "Modify");
 
@@ -2413,6 +2416,7 @@ void albaLogicWithManagers::CreateMenu()
 	albaGUI::AddMenuItem(file_menu, MENU_FILE_OPEN, _("&Open   \tCtrl+O"), FILE_OPEN_xpm);
 	albaGUI::AddMenuItem(file_menu, MENU_FILE_SAVE, _("&Save  \tCtrl+S"), FILE_SAVE_xpm);
 	file_menu->Append(MENU_FILE_SAVEAS, _("Save &As  \tCtrl+Shift+S"));
+	file_menu->Append(MENU_FILE_SAVEAS_LEGACY, _("Save &As  (Legacy mode)"));
 
 	m_ImportMenu = new wxMenu;
 	file_menu->AppendSeparator();
@@ -2648,6 +2652,7 @@ void albaLogicWithManagers::EnableMenuAndToolbar()
 	EnableItem(MENU_FILE_OPEN, enable);
 	EnableItem(MENU_FILE_SAVE, enable);
 	EnableItem(MENU_FILE_SAVEAS, enable);
+	EnableItem(MENU_FILE_SAVEAS_LEGACY, enable);
 	EnableItem(MENU_FILE_MERGE, enable);
 	EnableItem(MENU_FILE_QUIT, enable);
 	EnableItem(wxID_FILE1, enable);

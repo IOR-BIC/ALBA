@@ -27,8 +27,9 @@
 #include "vtkCellArray.h"
 #include "vtkCharArray.h"
 #include "vtkLookupTable.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBACellsFilter, "$Revision: 1.1.2.1 $");  
 vtkStandardNewMacro(vtkALBACellsFilter);
 
 // Constructs with initial  values.
@@ -97,16 +98,21 @@ void vtkALBACellsFilter::SetMarkedOpacity(double opacity)
 
 // Description:
 // Perform cell removal
-void vtkALBACellsFilter::Execute()
+int vtkALBACellsFilter::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
-  if (!this->IsInitialized)
-    {
-    this->Initialize();
-    }
-    
-  vtkPolyData *input = this->GetInput();
-  vtkPolyData *output = this->GetOutput();
-  
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	// Initialize some frequently used values.
+	vtkPolyData  *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+	if (!this->IsInitialized)
+	{
+		this->Initialize();
+	}
+	    
   // num of cells that will be in the output
   vtkIdType numCells = this->CellIdList->GetNumberOfIds();
   // dont know how many points... cant be more than the input
@@ -121,6 +127,7 @@ void vtkALBACellsFilter::Execute()
     // Copy unremoved cells to the output... 
     output->CopyCells(input, this->CellIdList);
   
+		return 1;
 }
 
 void vtkALBACellsFilter::Initialize()
@@ -131,11 +138,8 @@ void vtkALBACellsFilter::Initialize()
   // matter if the user lets the vtk pipeline execute once first and heads
   // into the event loop like the filter was intended to do originally.
   
-  // This also gets around the problem when the user is in the event
-  // loop but some filter has been modified upstream, changing the data.
-  this->GetInput()->Update();
   
-  vtkIdType numCells = this->GetInput()->GetNumberOfCells();
+  vtkIdType numCells = vtkPolyData::SafeDownCast(this->GetInput())->GetNumberOfCells();
   this->CellIdList->SetNumberOfIds(numCells);
   
   for (vtkIdType i=0; i < numCells; i++)
@@ -269,3 +273,5 @@ void vtkALBACellsFilter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
 }
+
+

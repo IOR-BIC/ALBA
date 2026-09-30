@@ -23,15 +23,13 @@
 #ifndef __vtkALBAPointsOutlineCornerFilter_h
 #define __vtkALBAPointsOutlineCornerFilter_h
 
-#include "vtkDataSetToPolyDataFilter.h"
-#include "albaConfigure.h"
-
+#include "vtkPolyDataAlgorithm.h"
 class vtkOutlineCornerSource;
 
-class ALBA_EXPORT vtkALBALandmarkCloudOutlineCornerFilter : public vtkDataSetToPolyDataFilter
+class vtkALBALandmarkCloudOutlineCornerFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBALandmarkCloudOutlineCornerFilter,vtkDataSetToPolyDataFilter);
+  vtkTypeMacro(vtkALBALandmarkCloudOutlineCornerFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -52,8 +50,12 @@ protected:
   ~vtkALBALandmarkCloudOutlineCornerFilter();
 
   vtkOutlineCornerSource *OutlineCornerSource;
-  void Execute();
-  void ExecuteInformation();
+
+	/** Execute method */
+	int RequestData(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
+	/** only check if input is not null */
+	int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   double CornerFactor;
 	double CloudRadius;
@@ -63,5 +65,3 @@ private:
 };
 
 #endif
-
-

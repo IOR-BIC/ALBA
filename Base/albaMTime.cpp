@@ -62,7 +62,7 @@ void albaMTime::Modified()
 }
 
 //-------------------------------------------------------------------------
-unsigned long int albaMTime::GetMTime() const
+vtkMTimeType albaMTime::GetMTime() const
 //-------------------------------------------------------------------------
 {
   return m_ModifiedTime;

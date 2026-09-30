@@ -37,8 +37,8 @@
 #include "wx/filename.h"
 
 #ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+	#include "vtkAlgorithm.h"
   #include "vtkVersion.h"
-  #include "vtkProcessObject.h"
   #include "vtkViewport.h"
   #include "vtkCommand.h"
 
@@ -56,7 +56,7 @@ class albaGUIMDIFrameCallback : public vtkCommand
       assert(m_Frame);
       if(caller->IsA("vtkProcessObject"))
       {
-        vtkProcessObject *po = (vtkProcessObject*)caller;
+        vtkAlgorithm *po = (vtkAlgorithm*)caller;
 
         if(m_mode==0) // ProgressEvent-Callback
         {
@@ -92,7 +92,7 @@ class albaGUIMDIFrameCallback : public vtkCommand
     int m_mode;
     albaGUIMDIFrame *m_Frame;
 };
-#endif //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#endif 
 
 //----------------------------------------------------------------------------
 // albaGUIMDIFrame
@@ -509,13 +509,13 @@ void albaGUIMDIFrame::BindToProgressBar(vtkObject* vtkobj)
 {
 	if(vtkobj->IsA("vtkViewport")) 
 		BindToProgressBar((vtkViewport*)vtkobj);
-  else if(vtkobj->IsA("vtkProcessObject")) 
-		BindToProgressBar((vtkProcessObject*)vtkobj);
+  else if(vtkobj->IsA("vtkAlgorithm")) 
+		BindToProgressBar((vtkAlgorithm*)vtkobj);
 	else 
     albaLogMessage("wrong vtkObject passed to BindToProgressBar");
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::BindToProgressBar(vtkProcessObject* filter)
+void albaGUIMDIFrame::BindToProgressBar(vtkAlgorithm* filter)
 //-----------------------------------------------------------
 {
   filter->AddObserver(vtkCommand::ProgressEvent,m_ProgressCallback);

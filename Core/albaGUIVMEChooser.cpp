@@ -67,8 +67,6 @@ albaGUIVMEChooser::~albaGUIVMEChooser()
 
   delete m_ChooserTree;
 }
-
-
 //----------------------------------------------------------------------------
 std::vector<albaVME*> albaGUIVMEChooser::ShowChooserDialog()
 //----------------------------------------------------------------------------

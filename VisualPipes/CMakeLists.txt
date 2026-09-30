@@ -13,7 +13,6 @@ SET(PROJECT_SRCS
   albaPipeSurface.cpp 						albaPipeSurface.h
   albaPipeRefSys.cpp 						albaPipeRefSys.h
   albaPipeScalar.cpp  						albaPipeScalar.h
-  albaVisualPipeVolumeRayCasting.cpp  		albaVisualPipeVolumeRayCasting.h
   albaPipeVolumeMIP.cpp  					albaPipeVolumeMIP.h
   albaPipeDensityDistance.cpp  				albaPipeDensityDistance.h
   albaPipeTrajectories.cpp  					albaPipeTrajectories.h
@@ -76,21 +75,12 @@ IF (ALBA_USE_VTK)
   )
 ENDIF (ALBA_USE_VTK)
 
-IF(WIN32)
-  SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
-  albaPipeIsosurfaceGPU.cpp  				albaPipeIsosurfaceGPU.h
-  )
-ENDIF(WIN32)
-
-
-
 IF (ALBA_USE_CRYPTO)
   SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto )
 ENDIF (ALBA_USE_CRYPTO)
 
 IF (ALBA_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} albaVME vtkIO vtkRendering vtkGraphics vtkHybrid albaDataPipes ${wxWidgets_LIBRARIES})
+  SET(PROJECT_LIBS ${PROJECT_LIBS} albaVME ${VTK_LIBRARIES} albaDataPipes ${wxWidgets_LIBRARIES})
 ENDIF (ALBA_USE_VTK)
 
 # Create the library.
@@ -102,10 +92,6 @@ ADD_DEPENDENCIES(${PROJECT_NAME} albaService)
 IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
 ENDIF (ALBA_USE_VTK)
-
-IF (ALBA_USE_WX)
-  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (ALBA_USE_WX)
 
 IF (ALBA_USE_ITK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_ITK_LIBRARY)

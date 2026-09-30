@@ -50,7 +50,7 @@
 
 #pragma warning(push)
 #pragma warning(disable:4996)
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #pragma warning(pop)
 
 #include <vector>
@@ -68,13 +68,13 @@ class vtkCellLocator;
 // EXPORT_STL_VECTOR(ALBA_EXPORT,vtkIdType);
     
 
-class ALBA_EXPORT vtkALBAPolyDataDeformation_M1 : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAPolyDataDeformation_M1 : public vtkPolyDataAlgorithm
 {
 public:
 
   static vtkALBAPolyDataDeformation_M1 *New();
 
-  vtkTypeRevisionMacro(vtkALBAPolyDataDeformation_M1, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkALBAPolyDataDeformation_M1, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   friend class CMatrixTestM1;
@@ -108,7 +108,7 @@ protected:
       double dblWeight;       //<weight of this parametrization
     } VERTEX_PARAM;
   public:    
-    vtkstd::vector< VERTEX_PARAM > m_Parametrization;  //<parametrization
+    std::vector< VERTEX_PARAM > m_Parametrization;  //<parametrization
   };
       
 
@@ -258,7 +258,7 @@ protected:
 #pragma region Munkres
   //This class was adopted from John Weaver code (GNU - see below) and thoroughly modified 
   template <class T>
-  class ALBA_EXPORT CMatrix 
+  class CMatrix 
   {
   public:
     /** Constructor. */
@@ -302,7 +302,7 @@ protected:
 
   private:
     inline bool FindUncoveredInMatrix(double,int&,int&);
-    inline bool PairInList(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
+    inline bool PairInList(const std::pair<int,int> &, const std::list<std::pair<int,int> > &);
     int Step1(void);
     int Step2(void);
     int Step3(void);
@@ -397,12 +397,12 @@ public:
     vtkPolyData* modified, vtkIdList* correspondence);
 
   /** Return this object's modified time. */  
-  /*virtual*/ unsigned long int GetMTime();
+  /*virtual*/ vtkMTimeType GetMTime();
 protected:
   /** 
   By default, UpdateInformation calls this method to copy information
   unmodified from the input to the output.*/
-  /*virtual*/void ExecuteInformation();
+  /*virtual*/int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   /**
   This method is the one that should be used by subclasses, right now the 
@@ -580,7 +580,7 @@ protected:
   mesh vertex and skeleton vertex pEdge->m_Verts[iWSkelEdge] and sigma2.
   This function is (see Blanco's paper): e^-(dist2(x,skelvertex)/sigma2).
   sigma2 should be 2*dist2(skelvertex,centroid(skelvertex)) */
-  void ComputeParametrization(vtkstd::vector< vtkIdType >& points, 
+  void ComputeParametrization(std::vector< vtkIdType >& points, 
     CSkeletonEdge* pEdge, int iWSkelEdge, double sigma2);
   //void ComputeParametrization(CSkeletonEdge* pNextEdge, 
   //   CSkeletonEdge* pEdge, int iWSkelEdge);
@@ -630,8 +630,8 @@ CMunkres::FindUncoveredInMatrix(double item, int &row, int &col)
 }
 
 inline bool vtkALBAPolyDataDeformation_M1::
-CMunkres::PairInList(const vtkstd::pair<int,int> &needle, 
-                       const vtkstd::list<std::pair<int,int> > &haystack) 
+CMunkres::PairInList(const std::pair<int,int> &needle, 
+                       const std::list<std::pair<int,int> > &haystack) 
 {
   for (std::list<std::pair<int,int> >::const_iterator i = haystack.begin(); i != haystack.end() ; i++)
   {

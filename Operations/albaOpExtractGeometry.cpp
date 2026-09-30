@@ -42,7 +42,6 @@
 #include "vtkDecimatePro.h"
 #include "vtkALBAFixTopology.h"
 #include "vtkImageCast.h"
-#include "vtkImageData.h"
 #include "vtkALBAVolumeToClosedSmoothSurface.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkPointData.h"
@@ -52,25 +51,17 @@
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkTriangleFilter.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkImageGaussianSmooth.h"
 
-#include "itkImage.h"
-#include "itkImageToVTKImageFilter.h"
-#include "itkVTKImageToImageFilter.h"
-#include "itkBinomialBlurImageFilter.h"
-
-
-typedef  itk::Image< unsigned char, 3> UCharImage;
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExtractGeometry);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaOpExtractGeometry::albaOpExtractGeometry(const wxString &label) :
 albaOp(label)
-//----------------------------------------------------------------------------
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo	= true;
@@ -84,8 +75,8 @@ albaOp(label)
   m_DecimateReductionRate = 50;
   m_DecimatePreserveTopology = 0;
 
-  m_VolumeSmoothingRepetitions = 1;
-  m_AutoSurfaceContourValue = 1;
+  m_VolumeSmoothingStandardDeviation = 1.0;
+  m_VolumeSmoothingRadiusFactor = 1.5;
   m_SurfaceContourValue = 0;
   m_SmoothSurfaceIterationsNumber = 50;
 
@@ -101,7 +92,7 @@ albaOp(label)
 
   m_ScalarRange[0] = m_ScalarRange[1] = 0.0;
   m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = 0;
-
+  
   m_ResampleGui = NULL;
   m_ExtractSurfaceGui = NULL;
 
@@ -109,7 +100,6 @@ albaOp(label)
 }
 //----------------------------------------------------------------------------
 albaOpExtractGeometry::~albaOpExtractGeometry()
-//----------------------------------------------------------------------------
 {
   albaDEL(m_SurfaceOutput);
   if(m_ResampledVolume)
@@ -118,19 +108,16 @@ albaOpExtractGeometry::~albaOpExtractGeometry()
 }
 //----------------------------------------------------------------------------
 bool albaOpExtractGeometry::InternalAccept(albaVME*node)
-//----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("albaVMEVolumeGray") );
 }
 //----------------------------------------------------------------------------
 albaOp *albaOpExtractGeometry::Copy()   
-//----------------------------------------------------------------------------
 {
   return (new albaOpExtractGeometry(m_Label));
 }
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::OpRun()   
-//----------------------------------------------------------------------------
 {
   m_VolumeInput = albaVMEVolumeGray::SafeDownCast(m_Input);
 
@@ -152,7 +139,6 @@ void albaOpExtractGeometry::OpRun()
 }
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::CreateGui()
-//----------------------------------------------------------------------------
 {
   // interface:
   m_Gui = new albaGUI(this);
@@ -179,19 +165,16 @@ void albaOpExtractGeometry::CreateGui()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::CreateExtractSurfaceGui()
-//----------------------------------------------------------------------------
 {
   m_ExtractSurfaceGui = new albaGUI(this);
 
   m_ExtractSurfaceGui->Label(albaString("Pre-processing volume"), true);
   m_ExtractSurfaceGui->Bool(ID_VOLUME_SMOOTHING, "Volume Smoothing", &m_VolumeSmoothing, 1);
-  m_ExtractSurfaceGui->Slider(ID_VOLUME_SMOOTHING_REPETITIONS, wxString("Iterations"), &m_VolumeSmoothingRepetitions, 1, 5);
-  m_ExtractSurfaceGui->Enable(ID_VOLUME_SMOOTHING_REPETITIONS, m_VolumeSmoothing>0);
+	m_ExtractSurfaceGui->Double(ID_VOLUME_SMOOTHING_STANDARDDEVIATION, _("Standard deviation"), &m_VolumeSmoothingStandardDeviation, 0.1, 10.0);
+	m_ExtractSurfaceGui->Double(ID_VOLUME_SMOOTHING_RADIUSFACTOR, _("Radius factor"), &m_VolumeSmoothingRadiusFactor, 0.1, 10.0);
   m_ExtractSurfaceGui->Divider();
 
-  m_ExtractSurfaceGui->Bool(ID_AUTO_CONTOUR_VALUE, _("Auto contour value"), &m_AutoSurfaceContourValue, 1);
   m_SurfaceContourValueSlider = m_ExtractSurfaceGui->FloatSlider(ID_CONTOUR_VALUE, _("Contour value"), &m_SurfaceContourValue, m_ScalarRange[0], m_ScalarRange[1]);
-  m_ExtractSurfaceGui->Enable(ID_CONTOUR_VALUE, m_AutoSurfaceContourValue<=0);
 
   //////////////////////////////////////////////////////////////////////////
   // Surface Processing
@@ -223,7 +206,6 @@ void albaOpExtractGeometry::CreateExtractSurfaceGui()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::CreateSurfaceDecimationGui()
-//----------------------------------------------------------------------------
 {
   if(!m_ExtractSurfaceGui)
     return;
@@ -272,7 +254,6 @@ void albaOpExtractGeometry::CreateSurfaceDecimationGui()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::CreateResampleGui()
-//----------------------------------------------------------------------------
 {
   m_ResampleGui = new albaGUI(this);
 
@@ -296,7 +277,6 @@ void albaOpExtractGeometry::CreateResampleGui()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
@@ -326,12 +306,9 @@ void albaOpExtractGeometry::OnEvent(albaEventBase *alba_event)
       }
     case ID_VOLUME_SMOOTHING:
       {
-        m_ExtractSurfaceGui->Enable(ID_VOLUME_SMOOTHING_REPETITIONS, m_VolumeSmoothing>0);
+        m_ExtractSurfaceGui->Enable(ID_VOLUME_SMOOTHING_RADIUSFACTOR, m_VolumeSmoothing>0);
+        m_ExtractSurfaceGui->Enable(ID_VOLUME_SMOOTHING_STANDARDDEVIATION, m_VolumeSmoothing>0);
         break;
-      }
-    case ID_AUTO_CONTOUR_VALUE:
-      {
-        m_ExtractSurfaceGui->Enable(ID_CONTOUR_VALUE, m_AutoSurfaceContourValue<=0);
       }
     case ID_SMOOTH_SURFACE:
       {
@@ -361,7 +338,6 @@ void albaOpExtractGeometry::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::OpStop(int result)
-//----------------------------------------------------------------------------
 {
   if(m_Gui)
     HideGui();
@@ -369,7 +345,6 @@ void albaOpExtractGeometry::OpStop(int result)
 }
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::OpUndo()
-//----------------------------------------------------------------------------
 {
   if (m_SurfaceOutput != NULL)
   {
@@ -378,7 +353,6 @@ void albaOpExtractGeometry::OpUndo()
 }
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::OpDo()
-//----------------------------------------------------------------------------
 {
   m_VolumeInput->ReparentTo(m_Input->GetParent());
 
@@ -387,122 +361,40 @@ void albaOpExtractGeometry::OpDo()
     m_SurfaceOutput->ReparentTo(m_Input);
   }
 }
+
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::VolumeSmoothing()
-//----------------------------------------------------------------------------
 {
-  //////////////////////////////////////////////////////////////////////////
-  // Image smoothing filter
-  //////////////////////////////////////////////////////////////////////////
-  typedef itk::BinomialBlurImageFilter<UCharImage, UCharImage> ITKBinomialBlurImageFilter;
-  ITKBinomialBlurImageFilter::Pointer smoothingFilter = ITKBinomialBlurImageFilter::New();
-  //////////////////////////////////////////////////////////////////////////
+  vtkALBASmartPointer<vtkImageCast> imageCast;
+  imageCast->SetInputData(m_OriginalData);
+  imageCast->SetOutputScalarTypeToUnsignedChar();
+  imageCast->ClampOverflowOn();
+  imageCast->Update();
 
-  vtkDataArray *originalScalars = m_OriginalData->GetPointData()->GetScalars();
+  vtkALBASmartPointer<vtkImageGaussianSmooth> smoothingFilter;
+  smoothingFilter->SetInputData(imageCast->GetOutput());
 
-  int dim[3];
-  double spacing[3];
-  m_OriginalData->GetDimensions(dim);
-  m_OriginalData->GetSpacing(spacing);
+  // Apply the Gaussian smoothing to the complete 3D volume.
+  smoothingFilter->SetDimensionality(3);
 
+  smoothingFilter->SetStandardDeviations( m_VolumeSmoothingStandardDeviation, m_VolumeSmoothingStandardDeviation, m_VolumeSmoothingStandardDeviation);
 
-  //////////////////////////////////////////////////////////////////////////
-  // scalars to replace the original ones.
-  //////////////////////////////////////////////////////////////////////////
+  smoothingFilter->SetRadiusFactors( m_VolumeSmoothingRadiusFactor, m_VolumeSmoothingRadiusFactor, m_VolumeSmoothingRadiusFactor);
 
-  vtkALBASmartPointer<vtkUnsignedCharArray> smoothedVolumeScalars;
-  smoothedVolumeScalars->SetName("SCALARS");
-  smoothedVolumeScalars->SetNumberOfTuples(originalScalars->GetNumberOfTuples());
-  //////////////////////////////////////////////////////////////////////////
+  smoothingFilter->Update();
 
+  vtkALBASmartPointer<vtkImageData> smoothedImage;
+  smoothedImage->DeepCopy(smoothingFilter->GetOutput());
 
- 
-  //////////////////////////////////////////////////////////////////////////
-  // Iteration to process every single slice scalars
-  //////////////////////////////////////////////////////////////////////////
-
-  vtkALBASmartPointer<vtkUnsignedCharArray> sliceScalars;
-  sliceScalars->SetName("SCALARS");
-  sliceScalars->SetNumberOfTuples(dim[0]*dim[1]);
-
-  for (int i= 0;i<dim[2];i++)
-  {
-    for (int k=0;k<(dim[0]*dim[1]);k++)
-    {
-      unsigned char value = originalScalars->GetTuple1(k+i*(dim[0]*dim[1]));
-      sliceScalars->SetTuple1(k,value);
-    }
-
-    vtkALBASmartPointer<vtkImageData> im;
-    im->SetDimensions(dim[0],dim[1],1);
-    im->SetSpacing(spacing[0],spacing[1],0.0);
-    im->GetPointData()->AddArray(sliceScalars);
-    im->GetPointData()->SetActiveScalars("SCALARS");
-    im->SetScalarTypeToUnsignedChar();
-    im->Update();
-
-    vtkALBASmartPointer<vtkImageData> filteredImage;
-
-    vtkALBASmartPointer<vtkImageCast> vtkImageToUnsignedChar;
-    vtkImageToUnsignedChar->SetOutputScalarTypeToUnsignedChar();
-    vtkImageToUnsignedChar->SetInput(im);
-    vtkImageToUnsignedChar->Modified();
-    vtkImageToUnsignedChar->Update();
-
-    typedef itk::VTKImageToImageFilter< UCharImage > ConvertervtkTOitk;
-    ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-    vtkTOitk->SetInput( vtkImageToUnsignedChar->GetOutput() );
-    vtkTOitk->Update();
-
-    smoothingFilter->SetRepetitions(m_VolumeSmoothingRepetitions);
-    smoothingFilter->SetInput( ((UCharImage*)vtkTOitk->GetOutput()) );
-
-    try
-    {
-      smoothingFilter->Update();
-    }
-    catch ( itk::ExceptionObject &err )
-    {
-      std::cout << "ExceptionObject caught !" << std::endl; 
-      std::cout << err << std::endl; 
-    }
-
-    typedef itk::ImageToVTKImageFilter< UCharImage > ConverteritkTOvtk;
-    ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-    itkTOvtk->SetInput( smoothingFilter->GetOutput() ); 
-
-    filteredImage = ((vtkImageData*)itkTOvtk->GetOutput());
-    filteredImage->Update();
-
-    vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
-
-
-    for (int k=0;k<filteredImage->GetNumberOfPoints();k++)
-    {
-      unsigned char value = binaryScalars->GetTuple1(k);
-      smoothedVolumeScalars->SetTuple1(k+i*(dim[0]*dim[1]),value);
-    }
-  }
-  //////////////////////////////////////////////////////////////////////////
-
-  vtkALBASmartPointer<vtkImageData> newImageData;
-  newImageData->CopyStructure(m_OriginalData);
-  newImageData->Update();
-  newImageData->GetPointData()->AddArray(smoothedVolumeScalars);
-  newImageData->GetPointData()->SetActiveScalars("SCALARS");
-  newImageData->SetScalarTypeToUnsignedChar();
-  newImageData->Update();
-
-  m_ResampledVolume->SetData(newImageData,m_ResampledVolume->GetTimeStamp());
+  m_ResampledVolume->SetData(smoothedImage, m_ResampledVolume->GetTimeStamp());
 }
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::SurfaceCleaning()
-//----------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkCleanPolyData>clearFilter;
 
-  clearFilter->SetInput(m_SurfaceData);
+  clearFilter->SetInputData(m_SurfaceData);
   clearFilter->ConvertLinesToPointsOff();
   clearFilter->ConvertPolysToLinesOff();
   clearFilter->ConvertStripsToPolysOff();
@@ -513,17 +405,16 @@ void albaOpExtractGeometry::SurfaceCleaning()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::SurfaceDecimation()
-//----------------------------------------------------------------------------
 {
   // triangle
   vtkALBASmartPointer<vtkTriangleFilter> triangleFilter;
-  triangleFilter->SetInput(m_SurfaceData);
+  triangleFilter->SetInputData(m_SurfaceData);
   triangleFilter->Update();
   m_SurfaceData->DeepCopy(triangleFilter->GetOutput());
 
   //decimate
   vtkALBASmartPointer<vtkDecimatePro> decimate;
-  decimate->SetInput(m_SurfaceData);
+  decimate->SetInputData(m_SurfaceData);
   decimate->SetPreserveTopology(1); 
   int m_Reduction = 50;
   decimate->SetTargetReduction(m_Reduction/100.0);
@@ -536,11 +427,10 @@ void albaOpExtractGeometry::SurfaceDecimation()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::SurfaceSmoothing()
-//----------------------------------------------------------------------------
 {
 
   vtkALBASmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
-  smoothFilter->SetInput(m_SurfaceData);
+  smoothFilter->SetInputData(m_SurfaceData);
   smoothFilter->SetNumberOfIterations(m_SmoothSurfaceIterationsNumber);
   smoothFilter->FeatureEdgeSmoothingOn();
   smoothFilter->Update();
@@ -550,10 +440,9 @@ void albaOpExtractGeometry::SurfaceSmoothing()
 
 //----------------------------------------------------------------------------
 void albaOpExtractGeometry::SurfaceConnectivity()
-//----------------------------------------------------------------------------
 {
   vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-  connectivityFilter->SetInput(m_SurfaceData);
+  connectivityFilter->SetInputData(m_SurfaceData);
   connectivityFilter->Update();
 
   m_SurfaceData->DeepCopy((vtkPolyData*)(connectivityFilter->GetOutput()));
@@ -562,11 +451,10 @@ void albaOpExtractGeometry::SurfaceConnectivity()
 
 //----------------------------------------------------------------------------
 int albaOpExtractGeometry::GenerateIsosurface()
-//----------------------------------------------------------------------------
 {
   if(m_VolumeSmoothing)
   {
-    // smoothing volume with some itk filters
+    // smoothing volume
 
     albaString smoothedVolumeName = "smoothed_";
     smoothedVolumeName += m_Input->GetName();
@@ -599,7 +487,6 @@ int albaOpExtractGeometry::GenerateIsosurface()
 
     m_ResampledVolume->Update();
     m_OriginalData = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampledVolume)->GetOutput()->GetVTKData());
-    m_OriginalData->Update();
 
     m_VolumeInput = m_ResampledVolume;
     m_VolumeInput->Update();
@@ -612,27 +499,12 @@ int albaOpExtractGeometry::GenerateIsosurface()
   // VTKalbaContourVolumeMapper
 
   m_SurfaceExtractor = vtkALBAVolumeToClosedSmoothSurface::New();
-  m_SurfaceExtractor->SetInput(m_OriginalData);
-  m_SurfaceExtractor->AutoLODRenderOn();
-  m_SurfaceExtractor->AutoLODCreateOn();
-
-  m_SurfaceExtractor->SetEnableContourAnalysis(0);
-
+  m_SurfaceExtractor->SetInputData(m_OriginalData);
   m_SurfaceExtractor->SetFillHoles(m_ProcessingType==1);
   
 
-  // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
-  // and then call surface->Delete() when the VME is created
-
-  if(m_AutoSurfaceContourValue<0)
-  {
-    float value = 0.5f * (m_ScalarRange[0] + m_ScalarRange[1]);
-    while (value < m_ScalarRange[1] && m_SurfaceExtractor->EstimateRelevantVolume(value) > 0.3f)
-      value += 0.05f * (m_ScalarRange[1] + m_ScalarRange[0]) + 1.f;
-
-    m_SurfaceContourValue = value;
-
-  }
+  double* scalarRange = m_OriginalData->GetScalarRange();
+  m_SurfaceContourValue = (scalarRange[0] + scalarRange[1]) / 2.0;
   m_SurfaceExtractor->SetContourValue(m_SurfaceContourValue);
 
   m_SurfaceExtractor->Update();
@@ -641,14 +513,13 @@ int albaOpExtractGeometry::GenerateIsosurface()
 
   if(m_Connectivity)
     SurfaceConnectivity();
-  m_SurfaceData->Update();
 
   albaGUIBusyInfo wait(_("Extracting Isosurface: please wait ..."));
 
   if (m_ProcessingType==0)
   {
     vtkALBASmartPointer<vtkALBAFixTopology> fixTopologyFilter;
-    fixTopologyFilter->SetInput(m_SurfaceData);
+    fixTopologyFilter->SetInputData(m_SurfaceData);
     fixTopologyFilter->Update();
     m_SurfaceData->DeepCopy(fixTopologyFilter->GetOutput());
   }
@@ -661,8 +532,6 @@ int albaOpExtractGeometry::GenerateIsosurface()
   {
     // vtkCleanPolyData
     SurfaceCleaning();
-
-    m_SurfaceData->Update();
   }
 
   if(m_SmoothSurface)
@@ -670,14 +539,12 @@ int albaOpExtractGeometry::GenerateIsosurface()
     //vtkSmoothPolyDataFilter
     SurfaceSmoothing();
 
-    m_SurfaceData->Update();
   }
 
   if(m_DecimateSurface)
   {
     // (vtkTriangleFilter) + vtkDecimate 
     SurfaceDecimation();
-    m_SurfaceData->Update();
   }
 
 
@@ -704,7 +571,6 @@ int albaOpExtractGeometry::GenerateIsosurface()
 
 //----------------------------------------------------------------------------
 int albaOpExtractGeometry::Resample()
-//----------------------------------------------------------------------------
 {
   int answer = wxMessageBox(_("The data will be resampled! Proceed?"),_("Confirm"), wxYES_NO|wxICON_EXCLAMATION , NULL);
   

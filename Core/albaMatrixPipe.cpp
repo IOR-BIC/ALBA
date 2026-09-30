@@ -119,14 +119,14 @@ const albaMatrix &albaMatrixPipe::GetMatrix()
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration also modifications to the Input Array
-unsigned long albaMatrixPipe::GetMTime()
+vtkMTimeType albaMatrixPipe::GetMTime()
 //------------------------------------------------------------------------------
 {
-  unsigned long mtime = this->Superclass::GetMTime();
+	vtkMTimeType mtime = this->Superclass::GetMTime();
 
   if (m_VME)
   {
-    unsigned long vmeMTime = m_VME->GetMTime();
+		vtkMTimeType vmeMTime = m_VME->GetMTime();
     if (vmeMTime > mtime)
     {
       return vmeMTime;

@@ -568,7 +568,7 @@ void albaInteractorGenericMouse::Rotate(double *p1, double *p2, double *viewup)
           double p2oSquared = vtkMath::Distance2BetweenPoints(p2, o);
           double p1oSquared = vtkMath::Distance2BetweenPoints(p1, o);
           
-          double angle = vtkMath::RadiansToDegrees() * acos((p1p2Squared - p2oSquared - p1oSquared) / (-2 * sqrt(p2oSquared) * sqrt(p1oSquared)));
+          double angle = vtkMath::DegreesFromRadians( acos((p1p2Squared - p2oSquared - p1oSquared) / (-2 * sqrt(p2oSquared) * sqrt(p1oSquared))) );
 
           if (angleIsPositive) 
           {
@@ -860,7 +860,7 @@ void albaInteractorGenericMouse::SendTransformMatrix(const albaMatrix &matrix, i
   // have to recreate the time stamp :-(
   albaSmartPointer<albaMatrix> tmatrix;
   tmatrix->DeepCopy(&matrix);
-  tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
+  tmatrix->SetTimeStamp(vtkTimerLog::GetUniversalTime());
 
   event.SetMatrix(tmatrix);
   event.Set2DPosition(m_MousePointer2DPosition[0],m_MousePointer2DPosition[1]);
@@ -1184,8 +1184,8 @@ void albaInteractorGenericMouse::TrackballRoll()
      atan2((double)m_LastMousePointer2DPosition[1] - (double)disp_refSysCenter[1],
            (double)m_LastMousePointer2DPosition[0] - (double)disp_refSysCenter[0]);
    
-   newAngle *= vtkMath::RadiansToDegrees();
-   oldAngle *= vtkMath::RadiansToDegrees();
+   newAngle = vtkMath::DegreesFromRadians(newAngle);
+   oldAngle = vtkMath::DegreesFromRadians(oldAngle);
    
    albaTransform t;
    t.Translate(-pivotPoint[0], -pivotPoint[1], -pivotPoint[2],POST_MULTIPLY);
@@ -1312,7 +1312,7 @@ void albaInteractorGenericMouse::NormalOnSurface()
 
 	// fill it with cellnormals
 	vtkALBASmartPointer<vtkPolyDataNormals> normalsOnPoly;
-	normalsOnPoly->SetInput(polyCopy);
+	normalsOnPoly->SetInputData(polyCopy);
 	normalsOnPoly->ComputeCellNormalsOff();
 	normalsOnPoly->ComputePointNormalsOn();
 	normalsOnPoly->Update();

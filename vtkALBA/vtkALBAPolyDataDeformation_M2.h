@@ -50,7 +50,7 @@
 
 #pragma warning(push)
 #pragma warning(disable:4996)
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 #pragma warning(pop)
 
 #include <vector>
@@ -69,10 +69,10 @@ class CSkeletonVertex;
 // EXPORT_STL_VECTOR(ALBA_EXPORT,CSkeletonVertex*);
 // EXPORT_STL_VECTOR(ALBA_EXPORT,vtkIdType);
 
-class ALBA_EXPORT vtkALBAPolyDataDeformation_M2 : public vtkPolyDataToPolyDataFilter
+class ALBA_EXPORT vtkALBAPolyDataDeformation_M2 : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAPolyDataDeformation_M2, vtkPolyDataToPolyDataFilter);
+	vtkTypeMacro(vtkALBAPolyDataDeformation_M2, vtkPolyDataAlgorithm);
 
   static vtkALBAPolyDataDeformation_M2 *New();
 
@@ -122,8 +122,8 @@ protected:
     LOCAL_FRAME m_LF;             //<local frame system
     CSkeletonVertex* m_pMatch;    //<matched vertex
     
-    vtkstd::vector< CSkeletonEdge* > m_OneRingEdges;    //<edges around this vertex
-    vtkstd::vector< CSkeletonVertex* > m_JoinedVertices;//<vertices of other curves with the same coordinates
+		std::vector< CSkeletonEdge* > m_OneRingEdges;    //<edges around this vertex
+		std::vector< CSkeletonVertex* > m_JoinedVertices;//<vertices of other curves with the same coordinates
     
     //N.B. planes are computed in relationship to skeleton edge that goes from this vertex!
     //=> if the vertex is the terminal node for another edge, normals must be inverse
@@ -197,7 +197,7 @@ protected:
     CSkeletonEdge* m_pMatch;      //<matched edge
     int m_nMark;                  //<edge tag for internal use        
     
-    vtkstd::vector< vtkIdType > m_ROI; //<vertices in the influence of this edge
+		std::vector< vtkIdType > m_ROI; //<vertices in the influence of this edge
 
   public:
     CSkeletonEdge() 
@@ -234,8 +234,8 @@ protected:
   class ALBA_EXPORT CSkeleton
   {
   public:
-    vtkstd::vector< CSkeletonVertex* > m_Vertices;
-    vtkstd::vector< CSkeletonEdge* > m_Edges;
+		std::vector< CSkeletonVertex* > m_Vertices;
+		std::vector< CSkeletonEdge* > m_Edges;
 
   public:
     ~CSkeleton();
@@ -317,7 +317,7 @@ protected:
 
   private:
     inline bool FindUncoveredInMatrix(double,int&,int&);
-    inline bool PairInList(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
+		inline bool PairInList(const std::pair<int, int> &, const std::list<std::pair<int, int> > &);
     int Step1(void);
     int Step2(void);
     int Step3(void);
@@ -412,12 +412,12 @@ public:
     vtkPolyData* modified, vtkIdList* correspondence);
 
   /** Return this object's modified time. */  
-  /*virtual*/ unsigned long int GetMTime();
+	/*virtual*/ vtkMTimeType GetMTime();
 protected:
   /** 
   By default, UpdateInformation calls this method to copy information
   unmodified from the input to the output.*/
-  /*virtual*/void ExecuteInformation();
+	/*virtual*/int RequestInformation(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
   /**
   This method is the one that should be used by subclasses, right now the 
@@ -615,7 +615,7 @@ protected:
   mesh vertex and skeleton vertex pEdge->m_Verts[iWSkelEdge] and sigma2.
   This function is (see Blanco's paper): e^-(dist2(x,skelvertex)/sigma2).
   sigma2 should be 2*dist2(skelvertex,centroid(skelvertex)) */
-  void ComputeParametrization(vtkstd::vector< vtkIdType >& points, 
+	void ComputeParametrization(std::vector< vtkIdType >& points,
     CSkeletonEdge* pEdge, int iWSkelEdge, double sigma2);
   //void ComputeParametrization(CSkeletonEdge* pNextEdge, 
   //   CSkeletonEdge* pEdge, int iWSkelEdge);
@@ -668,8 +668,7 @@ CMunkres::FindUncoveredInMatrix(double item, int &row, int &col)
 }
 
 inline bool vtkALBAPolyDataDeformation_M2::
-CMunkres::PairInList(const vtkstd::pair<int,int> &needle, 
-                       const vtkstd::list<std::pair<int,int> > &haystack) 
+CMunkres::PairInList(const std::pair<int,int> &needle, const std::list<std::pair<int,int> > &haystack) 
 {
   for (std::list<std::pair<int,int> >::const_iterator i = haystack.begin(); i != haystack.end() ; i++)
   {

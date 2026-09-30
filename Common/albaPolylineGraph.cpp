@@ -26,7 +26,6 @@ hack for albaLogMessage was used.
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkCell.h"
-#include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkMath.h"
 #include "vtkIndent.h"
@@ -46,7 +45,7 @@ hack for albaLogMessage was used.
 #endif
 #endif
 
-const /*static*/ vtkIdType albaPolylineGraph::m_UndefinedId = VTK_LARGE_ID ;
+const /*static*/ vtkIdType albaPolylineGraph::m_UndefinedId = VTK_ID_MAX;
 const /*static*/ int albaPolylineGraph::m_UndefinedInt = -1 ;
 const /*static*/ char* albaPolylineGraph::m_UndefinedName = "****" ;
 

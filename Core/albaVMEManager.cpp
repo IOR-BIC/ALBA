@@ -46,10 +46,11 @@
 #include "albaTagArray.h"
 
 #include <fstream>
+#include "albaVMEItemVTK.h"
+#include "vtkDataWriter.h"
 
 //----------------------------------------------------------------------------
 albaVMEManager::albaVMEManager()
-//----------------------------------------------------------------------------
 {
   m_Modified    = false;
 	m_MakeBakFile = true;
@@ -77,7 +78,6 @@ albaVMEManager::albaVMEManager()
 }
 //----------------------------------------------------------------------------
 albaVMEManager::~albaVMEManager()
-//----------------------------------------------------------------------------
 {
   if(m_Storage) 
     NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
@@ -136,26 +136,22 @@ void albaVMEManager::OnEvent(albaEventBase *alba_event)
 
 //----------------------------------------------------------------------------
 albaVMERoot *albaVMEManager::GetRoot()
-//----------------------------------------------------------------------------
 {
   return (m_Storage?m_Storage->GetRoot():NULL);
 }
 //----------------------------------------------------------------------------
 albaVMEStorage *albaVMEManager::GetStorage()
-//----------------------------------------------------------------------------
 {
   return m_Storage;
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::SetApplicationStamp(albaString &appstamp)
-//----------------------------------------------------------------------------
 {
   // Add a single application stamp; this is done automatically while creating the application with the application name
   m_AppStamp.push_back(appstamp);
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::SetApplicationStamp(std::vector<albaString> appstamp)
-//----------------------------------------------------------------------------
 {
   // Add a vector of time stamps; this can be done manually for adding compatibility with other applications. 
   // The application name itself must not be included since it was already added with the other call (see function above).
@@ -167,7 +163,6 @@ void albaVMEManager::SetApplicationStamp(std::vector<albaString> appstamp)
 
 //----------------------------------------------------------------------------
 void albaVMEManager::RemoveTempDirectory()
-//----------------------------------------------------------------------------
 {
   if (m_TmpDir != "")
   {
@@ -190,7 +185,6 @@ void albaVMEManager::RemoveTempDirectory()
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::MSFNew()
-//----------------------------------------------------------------------------
 {
   if (m_Storage)
   {
@@ -225,7 +219,6 @@ void albaVMEManager::MSFNew()
 
 //----------------------------------------------------------------------------
 void albaVMEManager::AddCreationDate(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   wxString dateAndTime;
   wxDateTime time = wxDateTime::UNow(); // get time with millisecond precision
@@ -268,7 +261,6 @@ bool albaVMEManager::CheckFileUpdated(const wxString& filePath, const wxDateTime
 
 //----------------------------------------------------------------------------
 int  albaVMEManager::MSFOpen(int file_id)
-//----------------------------------------------------------------------------
 {
   m_FileHistoryIdx = file_id - wxID_FILE1;
 	albaString file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx); // get the filename from history
@@ -276,7 +268,6 @@ int  albaVMEManager::MSFOpen(int file_id)
 }
 //----------------------------------------------------------------------------
 int albaVMEManager::MSFOpen(albaString filename)
-//----------------------------------------------------------------------------
 {
   wxWindowDisabler *disableAll;
   wxBusyCursor *wait_cursor;
@@ -435,7 +426,6 @@ int albaVMEManager::MSFOpen(albaString filename)
 }
 //----------------------------------------------------------------------------
 const char *albaVMEManager::ZIPOpen(albaString filename)
-//----------------------------------------------------------------------------
 {
   wxString path, name, ext;
   
@@ -573,7 +563,6 @@ const char *albaVMEManager::ZIPOpen(albaString filename)
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::ZIPSave(albaString filename)
-//----------------------------------------------------------------------------
 {
   m_ZipFile = filename.IsEmpty() ? "" : filename;
 
@@ -592,7 +581,6 @@ void albaVMEManager::ZIPSave(albaString filename)
 }
 //----------------------------------------------------------------------------
 bool albaVMEManager::MakeZip(const albaString &zipname, wxArrayString *files)
-//----------------------------------------------------------------------------
 {
   wxString name, path, short_name, ext;
   wxFileOutputStream out(zipname.GetCStr());
@@ -630,8 +618,7 @@ bool albaVMEManager::MakeZip(const albaString &zipname, wxArrayString *files)
   return zip.Close() && out.Close();
 }
 //----------------------------------------------------------------------------
-int albaVMEManager::MSFSave()
-//----------------------------------------------------------------------------
+int albaVMEManager::MSFSave(int legacy_mode)
 {
   int ret=ALBA_OK;
 
@@ -714,7 +701,21 @@ int albaVMEManager::MSFSave()
 
 	wxDateTime beforeSaveTime = wxDateTime::Now(); // Assume now if it doesn't exist yet
 
-  if (m_Storage->Store() != ALBA_OK) // store the tree
+	albaString currentVersion = m_Storage->GetVersion();
+	int currentVTKFilesVersion = albaVMEItemVTK::GetVTKFileVersion();
+
+  if(legacy_mode)
+  {
+    m_Storage->SetVersion("2.2");
+		albaVMEItemVTK::SetVTKFileVersion(vtkDataWriter::VTK_LEGACY_READER_VERSION_4_2);
+  }
+
+	int res = m_Storage->Store(); // store the tree
+
+	m_Storage->SetVersion(currentVersion); // restore the current version
+	albaVMEItemVTK::SetVTKFileVersion(currentVTKFilesVersion); // restore the current VTK file version
+
+  if (res != ALBA_OK) // store the tree
   {
     albaErrorMessage(_("Error during saving, try to save to another location"));
 		return false;
@@ -740,8 +741,7 @@ int albaVMEManager::MSFSave()
   return ret;
 }
 //----------------------------------------------------------------------------
-int albaVMEManager::MSFSaveAs()   
-//----------------------------------------------------------------------------
+int albaVMEManager::MSFSaveAs(int legacy_mode)
 {
   int retValue;
   albaString oldFileName;
@@ -749,7 +749,7 @@ int albaVMEManager::MSFSaveAs()
   m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
   m_ZipFile = "";
   m_MakeBakFile = false;
-  retValue=MSFSave();
+  retValue=MSFSave(legacy_mode);
   //if the user cancel save operation the name will be empty 
   if (m_MSFFile=="")
     m_MSFFile=oldFileName;
@@ -759,7 +759,6 @@ int albaVMEManager::MSFSaveAs()
 
 //----------------------------------------------------------------------------
 void albaVMEManager::VmeAdd(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   if(vme != NULL)
   {
@@ -774,7 +773,6 @@ void albaVMEManager::VmeAdd(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::VmeRemove(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   if(vme != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(n)*/) 
   {
@@ -785,13 +783,11 @@ void albaVMEManager::VmeRemove(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::TimeSet(double time)
-//----------------------------------------------------------------------------
 {
   if(m_Storage->GetRoot()) m_Storage->GetRoot()->SetTreeTime(time); // set the tree time
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::TimeGetBounds(double *min, double *max)
-//----------------------------------------------------------------------------
 {
   albaTimeStamp b[2];
   if(m_Storage->GetRoot()) 
@@ -809,7 +805,6 @@ void albaVMEManager::TimeGetBounds(double *min, double *max)
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::NotifyRemove(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   albaVMEIterator *iter = vme->NewIterator();
   iter->IgnoreVisibleToTraverse(true); // ignore visible to traverse flag and visits all nodes
@@ -820,7 +815,6 @@ void albaVMEManager::NotifyRemove(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::NotifyAdd(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   bool checkSingleFile = vme->IsALBAType(albaVMERoot);
   
@@ -861,14 +855,12 @@ void albaVMEManager::NotifyAdd(albaVME *vme)
 }
 //----------------------------------------------------------------------------
 void albaVMEManager::SetFileHistoryMenu(wxMenu *menu)
-//----------------------------------------------------------------------------
 {
   m_FileHistory.UseMenu(menu);
 	m_FileHistory.Load(*m_Config); // Loads file history from registry
 }
 //----------------------------------------------------------------------------
 bool albaVMEManager::AskConfirmAndSave()
-//----------------------------------------------------------------------------
 {
   bool go = true;
 	if (m_Modified) // check if the msf has been modified

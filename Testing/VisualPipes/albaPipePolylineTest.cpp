@@ -122,13 +122,13 @@ void albaPipePolylineTest::TestPipeExecution()
 		break;
 		case TEST_POLYLINE_SPLINE_MODE:
 		{
-			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->SetSplineMode(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 		}
 		break;
 		case TEST_TUBE:
 		{
-			pipePolyline->SetSplineMode(FALSE);
+			pipePolyline->SetSplineMode(false);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 			pipePolyline->SetRepresentation(albaPipePolyline::TUBES);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_POLYLINE_REPRESENTATION));
@@ -136,7 +136,7 @@ void albaPipePolylineTest::TestPipeExecution()
 		break;
 		case TEST_TUBE_SPLINE_MODE:
 		{
-			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->SetSplineMode(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 		}
 		break;
@@ -150,7 +150,7 @@ void albaPipePolylineTest::TestPipeExecution()
 		break;
 		case TEST_TUBE_CAPPING:
 		{
-			pipePolyline->SetTubeCapping(TRUE);
+			pipePolyline->SetTubeCapping(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_TUBE_CAPPING));
 		}
 		break;
@@ -171,7 +171,7 @@ void albaPipePolylineTest::TestPipeExecution()
 		break;
 		case TEST_GLYPH_SPLINE_MODE:
 		{
-			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->SetSplineMode(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 			pipePolyline->SetRadius(1.0);
 			pipePolyline->SetGlyphResolution(10.0);
@@ -230,7 +230,6 @@ void albaPipePolylineTest::TestPipeDensityMap()
 	albaVMEVolumeGray *volumeInput;
 	albaNEW(volumeInput);
 	volumeInput->SetData((vtkImageData*)volumeImporter->GetOutput(), 0.0);
-	volumeInput->GetOutput()->GetVTKData()->Update();
 	volumeInput->GetOutput()->Update();
 	volumeInput->Update();
 
@@ -271,13 +270,13 @@ void albaPipePolylineTest::TestPipeDensityMap()
 		break;
 		case TEST_POLYLINE_SPLINE_MODE:
 		{
-			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->SetSplineMode(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 		}
 		break;
 		case TEST_TUBE:
 		{
-			pipePolyline->SetSplineMode(FALSE);
+			pipePolyline->SetSplineMode(false);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 			pipePolyline->SetRepresentation(albaPipePolyline::TUBES);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_POLYLINE_REPRESENTATION));
@@ -285,7 +284,7 @@ void albaPipePolylineTest::TestPipeDensityMap()
 		break;
 		case TEST_TUBE_SPLINE_MODE:
 		{
-			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->SetSplineMode(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 		}
 		break;
@@ -299,7 +298,7 @@ void albaPipePolylineTest::TestPipeDensityMap()
 		break;
 		case TEST_TUBE_CAPPING:
 		{
-			pipePolyline->SetTubeCapping(TRUE);
+			pipePolyline->SetTubeCapping(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_TUBE_CAPPING));
 		}
 		break;
@@ -320,7 +319,7 @@ void albaPipePolylineTest::TestPipeDensityMap()
 		break;
 		case TEST_GLYPH_SPLINE_MODE:
 		{
-			pipePolyline->SetSplineMode(TRUE);
+			pipePolyline->SetSplineMode(true);
 			pipePolyline->OnEvent(&albaEvent(this, albaPipePolyline::ID_SPLINE));
 			pipePolyline->SetRadius(1.0);
 			pipePolyline->SetGlyphResolution(10.0);

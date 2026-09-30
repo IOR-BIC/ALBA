@@ -84,7 +84,6 @@ int albaVMEVolumeRGBTest::CreateVolumeWithImageData()
   int returnValue = -1;
   returnValue = m_VmeVolumeRGB->SetData(imageData, 0);
 
-  m_VmeVolumeRGB->GetOutput()->GetVTKData()->Update();
 
   // destroy VTK data
   imageData->Delete();
@@ -145,13 +144,11 @@ int albaVMEVolumeRGBTest::CreateVolumeWithRectilinearGrid()
   rectilinearGrid->GetPointData()->AddArray(scalarsG);
   rectilinearGrid->GetPointData()->AddArray(scalarsB);
   rectilinearGrid->Modified();
-  rectilinearGrid->Update();
 
   // try to set this data to the volume
   int returnValue = -1;
   returnValue = m_VmeVolumeRGB->SetData(rectilinearGrid, 0);
 
-  m_VmeVolumeRGB->GetOutput()->GetVTKData()->Update();
 
   // destroy VTK data
   rectilinearGrid->Delete();

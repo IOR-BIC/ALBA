@@ -26,8 +26,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataSetWriter.h"
 #include "vtkMath.h"
 #include "vtkALBARGtoSPImageFilter.h"
+#include "vtkInformation.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkALBAVolumeOrthoSlicer, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkALBAVolumeOrthoSlicer);
 
 #define EPSILON 1e-6
@@ -46,61 +48,61 @@ void vtkALBAVolumeOrthoSlicer::PropagateUpdateExtent(vtkDataObject *output)
 {
 }
 
-//=========================================================================
+//----------------------------------------------------------------------------
 vtkALBAVolumeOrthoSlicer::vtkALBAVolumeOrthoSlicer()
 {
   SclicingMode = ORTHOSLICER_X_SLICE;
-	vtkSource::SetNthOutput(0, vtkImageData::New());
-	// Releasing data
-	Outputs[0]->ReleaseData();
-	Outputs[0]->Delete();
 	Origin[0] = Origin[1] = Origin[2] = 0;
 }
 
-//=========================================================================
-void vtkALBAVolumeOrthoSlicer::ExecuteInformation()
+//----------------------------------------------------------------------------
+int vtkALBAVolumeOrthoSlicer::FillOutputPortInformation(int port, vtkInformation* info)
 {
-	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
-	vtkImageData *inputID = vtkImageData::SafeDownCast(GetInput());
-	vtkImageData *output = vtkImageData::SafeDownCast(GetOutput());
-  int dims[3], outDims[3], wholeExtent[6];
-  
-	if (inputID == NULL && inputRG == NULL)
+	// now add our info
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+	return 1;
+}
+
+
+//----------------------------------------------------------------------------
+int vtkALBAVolumeOrthoSlicer::RequestInformation(vtkInformation *request,	vtkInformationVector **inputVector,	vtkInformationVector *outputVector)
+{
+	// get the info objects
+	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+	if (inInfo == NULL)
 	{
-		vtkErrorMacro("Missing input");
-		return;
+		vtkErrorMacro(<< "Missing input");
+		return 0;
 	}
 
-	if (output == NULL)
-	{
-		vtkErrorMacro("Output error");
-		return;
-	}
+	int dims[3], outDims[3], wholeExtent[6];
 
-	if (inputRG)
-		inputRG->GetWholeExtent(wholeExtent);
-	else
-		inputID->GetWholeExtent(wholeExtent);
+	// Retrieve the whole extent from the input pipeline information
+	inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
 
 	dims[0] = wholeExtent[1] - wholeExtent[0] + 1;
 	dims[1] = wholeExtent[3] - wholeExtent[2] + 1;
 	dims[2] = wholeExtent[5] - wholeExtent[4] + 1;
 
-	switch (this->SclicingMode) {
-		case ORTHOSLICER_X_SLICE:
-			outDims[0] = dims[1];
-			outDims[1] = dims[2];
-			outDims[2] = 1;
-			break;
-		case ORTHOSLICER_Y_SLICE:
-			outDims[0] = dims[0];
-			outDims[1] = dims[2];
-			outDims[2] = 1;
-			break;
-		case ORTHOSLICER_Z_SLICE:
-			outDims[0] = dims[0];
-			outDims[1] = dims[1];
-			outDims[2] = 1;
+	switch (this->SclicingMode)
+	{
+	case ORTHOSLICER_X_SLICE:
+		outDims[0] = dims[1];
+		outDims[1] = dims[2];
+		outDims[2] = 1;
+		break;
+	case ORTHOSLICER_Y_SLICE:
+		outDims[0] = dims[0];
+		outDims[1] = dims[2];
+		outDims[2] = 1;
+		break;
+	case ORTHOSLICER_Z_SLICE:
+		outDims[0] = dims[0];
+		outDims[1] = dims[1];
+		outDims[2] = 1;
+		break;
 	}
 
 	wholeExtent[0] = 0;
@@ -109,11 +111,16 @@ void vtkALBAVolumeOrthoSlicer::ExecuteInformation()
 	wholeExtent[3] = outDims[1] - 1;
 	wholeExtent[4] = 0;
 	wholeExtent[5] = outDims[2] - 1;
-  output->SetWholeExtent( wholeExtent );
+
+	// Set the whole extent on the output pipeline information,
+	// NOT directly on the output data object.
+	outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent, 6);
+
+	return 1;
 }
 
-//=========================================================================
-void vtkALBAVolumeOrthoSlicer::Execute()
+//----------------------------------------------------------------------------
+int vtkALBAVolumeOrthoSlicer::RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 	int inputDims[3], projectedDims[3];
 	vtkRectilinearGrid *inputRG = vtkRectilinearGrid::SafeDownCast(GetInput());
@@ -175,16 +182,18 @@ void vtkALBAVolumeOrthoSlicer::Execute()
 			SliceScalars(inputDims, (double*)inputPointer, (double*)outputPointer);
 			break;
 		default:
-			vtkErrorMacro(<< "vtkALBAVolumeSlicer: Scalar type is not supported");
-			return;
+			vtkErrorMacro(<< "vtkALBAVolumeOrthoSlicer: Scalar type is not supported");
+			return 0;
 	}
 
 	if (inputRG)
-		GenerateOutputFromRG(inputRG, projectedDims, slicedScalars);
+		GenerateOutputFromRG(request, inputRG, projectedDims, slicedScalars);
 	else
-		GenerateOutputFromID(inputID, projectedDims, slicedScalars);
+		GenerateOutputFromID(request, inputID, projectedDims, slicedScalars);
 
 	vtkDEL(slicedScalars);
+
+	return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -258,7 +267,7 @@ void vtkALBAVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScala
 }
 
 //----------------------------------------------------------------------------
-void vtkALBAVolumeOrthoSlicer::GenerateOutputFromID(vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
+void vtkALBAVolumeOrthoSlicer::GenerateOutputFromID(vtkInformation *request, vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
 {
 	double inputSpacing[3];
 	double outputSpacing[3];
@@ -282,15 +291,15 @@ void vtkALBAVolumeOrthoSlicer::GenerateOutputFromID(vtkImageData * inputSP, int 
 			outputSpacing[2] = 1;
 	}
 
-	output->SetScalarType(inputSP->GetScalarType());
-	output->SetNumberOfScalarComponents(inputSP->GetNumberOfScalarComponents());
+	output->SetScalarType(inputSP->GetScalarType(),request);
+	output->SetNumberOfScalarComponents(inputSP->GetNumberOfScalarComponents(),request);
 	output->SetDimensions(projectedDims);
 	output->SetSpacing(outputSpacing);
 	output->GetPointData()->SetScalars(projScalars);
 }
 
 //----------------------------------------------------------------------------
-void vtkALBAVolumeOrthoSlicer::GenerateOutputFromRG(vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
+void vtkALBAVolumeOrthoSlicer::GenerateOutputFromRG(vtkInformation *request, vtkRectilinearGrid * inputRG, int * projectedDims, vtkDataArray * projScalars)
 {
 	//Generate temporary rectilinear grid output
 	vtkRectilinearGrid *rgOut = vtkRectilinearGrid::New();
@@ -336,13 +345,13 @@ void vtkALBAVolumeOrthoSlicer::GenerateOutputFromRG(vtkRectilinearGrid * inputRG
 	rgOut->GetPointData()->SetScalars(projScalars);
 	
 	
-	vtkALBARGtoSPImageFilter *rgtospFilter = vtkALBARGtoSPImageFilter::New();
-	rgtospFilter->SetInput(rgOut);
-	rgtospFilter->Update();
+	vtkALBARGtoSPImageFilter *rgtosoFilter = vtkALBARGtoSPImageFilter::New();
+	rgtosoFilter->SetInputData(rgOut);
+	rgtosoFilter->Update();
 	
-	GetOutput()->DeepCopy(rgtospFilter->GetOutput());
+	GetOutput()->DeepCopy(rgtosoFilter->GetOutput());
 
-	vtkDEL(rgtospFilter);
+	vtkDEL(rgtosoFilter);
 	vtkDEL(rgOut);
 }
 
@@ -409,14 +418,15 @@ void vtkALBAVolumeOrthoSlicer::GetSlicingInfo(int* plane1, int* plane2, double* 
 				break;
 		}
 		int nCoordinates = coordinates->GetNumberOfTuples();
+		double *coordPointer = (double *) coordinates->GetVoidPointer(0);
 		double n0, n1;
 		double l, r;
-		coordinates->GetTuple(0, &n1);
+		n1 = coordPointer[0];
 		for (int i = 1; i < nCoordinates; i++)
 		{
 			//n0 was last n1
 			n0 = n1;
-			coordinates->GetTuple(i,&n1);
+			n1 = coordPointer[i];
 
 			l = MIN(n0, n1);
 			r = MAX(n0, n1);

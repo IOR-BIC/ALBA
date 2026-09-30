@@ -1,4 +1,0 @@
-29a30,32
-> #if (defined(WIN64) || defined(_WIN64))
-> 	vtkLargeInteger(unsigned __int64 n);
-> #endif

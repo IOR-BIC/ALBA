@@ -79,7 +79,7 @@ void vtkALBAVolumeResampleTest::TestResampleInternal( const char *inFileName , c
 
   vtkALBAVolumeResample *resample = vtkALBAVolumeResample::New();
   resample->SetZeroValue(0);
-  resample->SetInput(reader->GetOutput());
+  resample->SetInputConnection(reader->GetOutputPort());
 
   resample->SetVolumeOrigin(inputDataOrigin);
   PrintDouble3(cout, inputDataOrigin, "inputDataOrigin");
@@ -114,12 +114,7 @@ void vtkALBAVolumeResampleTest::TestResampleInternal( const char *inFileName , c
   resample->SetLevel(l);
   resample->AutoSpacingOff();
   
-  vtkImageData *outputSP = vtkImageData::New();
   
-  outputSP->SetSource(NULL);
-  outputSP->SetOrigin(inputDataOrigin);
-  outputSP->SetSpacing(inputDataSpacing);
-  outputSP->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
   
   double resamplingBoxBounds[6];
   rg->GetBounds(resamplingBoxBounds);
@@ -130,12 +125,14 @@ void vtkALBAVolumeResampleTest::TestResampleInternal( const char *inFileName , c
   outputSPExtent[3] = (resamplingBoxBounds[3] - resamplingBoxBounds[2]) / inputDataSpacing[1];
   outputSPExtent[4] = 0;
   outputSPExtent[5] = (resamplingBoxBounds[5] - resamplingBoxBounds[4]) / inputDataSpacing[2];
-  outputSP->SetExtent(outputSPExtent);
-  outputSP->SetUpdateExtent(outputSPExtent);
-  outputSP->Modified();
 
-  resample->SetOutput(outputSP);
+	resample->SetOutputSpacing(inputDataSpacing);
+	resample->SetOutputExtent(outputSPExtent);
+
+  //resample->SetOutput(outputSP);
   resample->Update();
+
+	vtkImageData *outputSP = vtkImageData::SafeDownCast(resample->GetOutput());
   
   double inBounds[6] = {0,0,0};
   rg->GetBounds(inBounds);
@@ -150,14 +147,13 @@ void vtkALBAVolumeResampleTest::TestResampleInternal( const char *inFileName , c
   
   reader->Delete();
   resample->Delete(); 
-  outputSP->Delete();
   transform->Delete();
 }
 
 void vtkALBAVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename )
 {
   vtkALBASmartPointer<vtkDataSetWriter> writer;
-  writer->SetInput(outputVolumeVTKData);
+  writer->SetInputData(outputVolumeVTKData);
 
   string fullPathOutputFilename;
   fullPathOutputFilename.append(GET_TEST_DATA_DIR());

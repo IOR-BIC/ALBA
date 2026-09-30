@@ -1,4 +1,0 @@
-745c745
-<   binId = xBinCoord + yBinCoord*this->NumberOfDivisions[1] + 
----
->   binId = xBinCoord + yBinCoord*this->NumberOfDivisions[0] + 

@@ -129,7 +129,7 @@ void albaVMEOutputVolume::Update()
     m_VtkDataType = "";
     m_VtkDataType << vtkData->GetClassName();
 
-		double b[6];
+    double b[6];
     GetVMELocalBounds(b);
     m_VolumeBounds[0] = "";
     m_VolumeBounds[0] << " xmin: " << albaString::Format("%g",RoundValue(b[0])).ToAscii() << "   xmax: " << albaString::Format("%g",RoundValue(b[1])).ToAscii();
@@ -145,9 +145,8 @@ void albaVMEOutputVolume::Update()
 			((vtkRectilinearGrid *)vtkData)->GetDimensions(dims);
 		m_VolumeDims.Printf("[%d, %d, %d]", dims[0], dims[1], dims[2]);
 		
-		double srange[2];
-		vtkData->Update();
-		vtkData->GetScalarRange(srange);
+    double srange[2];
+    vtkData->GetScalarRange(srange);
     m_ScaralRangeString = albaString::Format("min: %6.2f max: %6.2f", srange[0], srange[1]);;
   }
   

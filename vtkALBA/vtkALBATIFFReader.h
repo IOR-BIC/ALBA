@@ -24,15 +24,13 @@ class ALBA_EXPORT vtkALBATIFFReader : public vtkTIFFReader
 {
 public:
   static vtkALBATIFFReader *New();
-  vtkTypeRevisionMacro(vtkALBATIFFReader, vtkTIFFReader);
+  vtkTypeMacro(vtkALBATIFFReader, vtkTIFFReader);
 
 protected:
   vtkALBATIFFReader();
   ~vtkALBATIFFReader();
 
-  virtual void ExecuteData(vtkDataObject *out);
-
-  void LoadDataFromWX();
+	void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo) override;
 
 private:
   vtkALBATIFFReader(const vtkALBATIFFReader&);  // Not implemented.

@@ -40,7 +40,7 @@ protected:
 #endif // _WIN32
 
 public:
-  vtkTypeRevisionMacro(vtkALBAFile, vtkObject);
+  vtkTypeMacro(vtkALBAFile, vtkObject);
   static vtkALBAFile* New();
 
 protected:
@@ -184,7 +184,7 @@ inline long long vtkALBAFile::GetCurrentPos() throw(...)
 class ALBA_EXPORT vtkALBAFile2 : public vtkALBAFile
 {
 public:
-  vtkTypeRevisionMacro(vtkALBAFile2, vtkALBAFile);
+  vtkTypeMacro(vtkALBAFile2, vtkALBAFile);
   static vtkALBAFile2* New();
 
 protected:

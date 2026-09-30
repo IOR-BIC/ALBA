@@ -171,7 +171,7 @@ bool vtkInteractorStylePreviewImage::FindValueAndGradient(int x, int y, double &
   y -= actorCoordinates[1];
   if (x >= 0 && y >= 0 && x < imageSize[0] && y < imageSize[1]) 
   {
-    vtkImageData *data = m_Dialog->m_SliceFilter->GetInput();
+    vtkImageData *data = vtkImageData::SafeDownCast(m_Dialog->m_SliceFilter->GetInput());
     const int *origImageSize = data->GetDimensions();
     x = int(double(x) / imageSize[0] * origImageSize[0] + 0.5f);
     y = int(double(y) / imageSize[1] * origImageSize[1] + 0.5f);

@@ -178,13 +178,11 @@ void albaOpFilterSurfaceTest::TestOnClean()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   CPPUNIT_ASSERT( polyIn->GetNumberOfPoints() == 24 );
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -195,13 +193,12 @@ void albaOpFilterSurfaceTest::TestOnClean()
   surface->Update();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   CPPUNIT_ASSERT( polyOut->GetNumberOfPoints() == 8 );
 
   vtkALBASmartPointer<vtkCleanPolyData> cleanFilter;
   cleanFilter->SetTolerance(0.0);
-  cleanFilter->SetInput(inputVtkFilter);
+  cleanFilter->SetInputData(inputVtkFilter);
   cleanFilter->Update();
 
   vtkPolyData *outputVtkFilter = cleanFilter->GetOutput();
@@ -229,11 +226,9 @@ void albaOpFilterSurfaceTest::TestOnSmooth()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -244,11 +239,10 @@ void albaOpFilterSurfaceTest::TestOnSmooth()
   surface->Update();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   vtkALBASmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
   smoothFilter->SetNumberOfIterations(op->GetNumberOfIterations());
-  smoothFilter->SetInput(inputVtkFilter);
+  smoothFilter->SetInputData(inputVtkFilter);
   smoothFilter->Update();
 
   vtkPolyData *outputVtkFilter = smoothFilter->GetOutput();
@@ -277,11 +271,9 @@ void albaOpFilterSurfaceTest::TestOnDecimate()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -292,16 +284,14 @@ void albaOpFilterSurfaceTest::TestOnDecimate()
   surface->Update();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   vtkALBASmartPointer<vtkDecimatePro> decimateFilter;
   decimateFilter->SetPreserveTopology(op->GetPreserveTopology());
   decimateFilter->SetTargetReduction(op->GetTargetReduction()/100.0);
-  decimateFilter->SetInput(inputVtkFilter);
+  decimateFilter->SetInputData(inputVtkFilter);
   decimateFilter->Update();
 
   vtkPolyData *outputVtkFilter = decimateFilter->GetOutput();
-  outputVtkFilter->Update();
 
   CheckPolydata(polyOut,outputVtkFilter);
 
@@ -326,11 +316,9 @@ void albaOpFilterSurfaceTest::TestOnTriangulate()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -341,14 +329,12 @@ void albaOpFilterSurfaceTest::TestOnTriangulate()
   surface->Update();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   vtkALBASmartPointer<vtkTriangleFilter> triangleFilter;
-  triangleFilter->SetInput(inputVtkFilter);
+  triangleFilter->SetInputData(inputVtkFilter);
   triangleFilter->Update();
 
   vtkPolyData *outputVtkFilter = triangleFilter->GetOutput();
-  outputVtkFilter->Update();
   
   CheckPolydata(polyOut,outputVtkFilter);
   
@@ -373,11 +359,9 @@ void albaOpFilterSurfaceTest::TestOnVtkConnect()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -385,14 +369,12 @@ void albaOpFilterSurfaceTest::TestOnVtkConnect()
   op->OpDo();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-  connectivityFilter->SetInput(inputVtkFilter);
+	connectivityFilter->SetInputData(inputVtkFilter);
   connectivityFilter->Update();
 
   vtkPolyData *outputVtkFilter = connectivityFilter->GetOutput();
-  outputVtkFilter->Update();
 
   CheckPolydata(polyOut,outputVtkFilter);
 
@@ -417,11 +399,9 @@ void albaOpFilterSurfaceTest::TestOnStripper()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -429,14 +409,12 @@ void albaOpFilterSurfaceTest::TestOnStripper()
   op->OpDo();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   vtkALBASmartPointer<vtkStripper> stripperFilter;
-  stripperFilter->SetInput(inputVtkFilter);
+  stripperFilter->SetInputData(inputVtkFilter);
   stripperFilter->Update();
 
   vtkPolyData *outputVtkFilter = stripperFilter->GetOutput();
-  outputVtkFilter->Update();
 
   CheckPolydata(polyOut,outputVtkFilter);
 
@@ -461,11 +439,9 @@ void albaOpFilterSurfaceTest::TestOnGenerateNormals()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -473,17 +449,15 @@ void albaOpFilterSurfaceTest::TestOnGenerateNormals()
   op->OpDo();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   vtkALBASmartPointer<vtkPolyDataNormals> normalsFilter;
   normalsFilter->SetFlipNormals(op->GetFlipNormals());
   normalsFilter->SetSplitting(op->GetEdgeSplit());
   normalsFilter->SetFeatureAngle(op->GetFeatureAngle());
-  normalsFilter->SetInput(inputVtkFilter);
+  normalsFilter->SetInputData(inputVtkFilter);
   normalsFilter->Update();
 
   vtkPolyData *outputVtkFilter = normalsFilter->GetOutput();
-  outputVtkFilter->Update();
 
   CheckPolydata(polyOut,outputVtkFilter);
   CheckNormals(polyOut,outputVtkFilter);
@@ -509,11 +483,9 @@ void albaOpFilterSurfaceTest::TestUndo()
   surface->Update();
 
   vtkPolyData *polyIn = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyIn->Update();
 
   vtkALBASmartPointer<vtkPolyData> inputVtkFilter;
   inputVtkFilter->DeepCopy(polyIn);
-  inputVtkFilter->Update();
 
   op->SetInput(surface);
   op->OpRun();
@@ -526,7 +498,6 @@ void albaOpFilterSurfaceTest::TestUndo()
   op->OpUndo();
 
   vtkPolyData *polyOut = vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
-  polyOut->Update();
 
   CheckPolydata(polyOut,polyIn);
 

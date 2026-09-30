@@ -148,9 +148,7 @@ IF (ALBA_USE_VTK)
 	albaOpMakeVMETimevarying.cpp  albaOpMakeVMETimevarying.h
 	albaOpSegmentationRegionGrowingConnectedThreshold.cpp  albaOpSegmentationRegionGrowingConnectedThreshold.h
 	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
-	  
-	albaOpEqualizeHistogram.cpp  albaOpEqualizeHistogram.h
-	  
+	  	  
 	albaOpExporterAnalogWS.cpp		albaOpExporterAnalogWS.h
 	albaOpExporterGRFWS.cpp		albaOpExporterGRFWS.h
 	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
@@ -235,7 +233,7 @@ SET(PROJECT_LIBS "albaVME" "albaInteraction" ${wxWidgets_LIBRARIES})
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 
 IF (ALBA_USE_VTK)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} albaCommon vtkCommon vtkALBA)
+  SET(PROJECT_LIBS ${PROJECT_LIBS} albaCommon ${VTK_LIBRARIES} vtkALBA)
 ENDIF (ALBA_USE_VTK)
 
 IF (ALBA_USE_GDCM)
@@ -253,10 +251,6 @@ ADD_DEPENDENCIES(${PROJECT_NAME} albaVME albaCommon vtkALBA albaService)
 IF (ALBA_USE_VTK)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_VTK_LIBRARY)
 ENDIF (ALBA_USE_VTK)
-
-IF (ALBA_USE_WX)
-  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
-ENDIF (ALBA_USE_WX)
 
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})

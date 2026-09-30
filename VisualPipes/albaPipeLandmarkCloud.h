@@ -28,7 +28,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 class albaVMELandmarkCloud;
 class albaVMELandmark;
-class vtkDataSet;
+class vtkAlgorithmOutput;
 class albaGUIMaterialButton;
 class vtkALBALandmarkCloudOutlineCornerFilter;
 
@@ -64,7 +64,6 @@ public:
   enum PIPE_LM_CLOUD_WIDGET_ID
   {
     ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
-    ID_RENDERING_DISPLAY_LIST,
     ID_LAST
   };
 
@@ -88,7 +87,7 @@ protected:
   albaGUIMaterialButton *m_MaterialButton;
 
   /** Create visual-pipe for closed cloud or single landmark */
-  virtual void CreateCloudPipe(vtkDataSet *data, double radius, double resolution);
+  virtual void CreateCloudPipe(vtkAlgorithmOutput *port, double radius, double resolution);
 
   /** Remove visual-pipe for closed cloud */
   virtual void RemoveClosedCloudPipe();

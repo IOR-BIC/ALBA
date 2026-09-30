@@ -254,8 +254,7 @@ protected:
 	virtual void VolumeWindowing(albaVME *volume);
 	void OnEventGizmoRotate(vtkMatrix4x4 *matrix, int planeSkip);
 
-	void SetSlices();
-					
+	void SetSlices(int skipPlane=-1);					
 
 	void CreateViewCameraNormalFeedbackActors();
 	void UpdateWindowing(bool enable,albaVME *vme);

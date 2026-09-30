@@ -60,9 +60,11 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
+#include <vtkAssignAttribute.h>
 
 #include "albaGUIBusyInfo.h"
 #include <float.h>
+#include "vtkALBASmartPointer.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVectorFieldMapWithArrows);
@@ -474,7 +476,6 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
 
   m_Vme->Update();
   m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetVTKData()->Update();
 
   int nScalars = GetNumberOfScalars();
   int nVectors = GetNumberOfVectors();
@@ -494,12 +495,11 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
 
   // transform dataset to polydata
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInput(m_Vme->GetOutput()->GetVTKData());
+  filter->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
 
   // build surface mapper
   m_SurfaceMapper = vtkPolyDataMapper::New();
-  m_SurfaceMapper->SetInput(filter->GetOutput());
-  m_SurfaceMapper->ImmediateModeRenderingOn();
+  m_SurfaceMapper->SetInputConnection(filter->GetOutputPort());
 
   // assign right mapping mode
   if (m_DataType==POINT_DATA) {
@@ -556,7 +556,7 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
   {
     vtkPolyDataNormals* f_normals;
     vtkNEW(f_normals);
-    f_normals->SetInput(filter->GetOutput());
+    f_normals->SetInputConnection(filter->GetOutputPort());
 
     // set normals to points or cells
     if (m_DataType==POINT_DATA)
@@ -628,16 +628,19 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
   m_Line->SetResolution(m_GlyphRes);
 
   // build glyph
+	m_AttributeAssigner = vtkAssignAttribute::New();
+	m_AttributeAssigner->SetInputConnection(m_Vme->GetOutput()->GetVTKOutputPort());
+	m_AttributeAssigner->Assign(da_normals->GetName(), vtkDataSetAttributes::NORMALS, m_DataType);
+	m_AttributeAssigner->Assign(GetVectorFieldName(m_VectorFieldIndex), vtkDataSetAttributes::VECTORS, m_DataType);
+	m_AttributeAssigner->Assign(GetScalarFieldName(m_ScalarFieldIndex), vtkDataSetAttributes::SCALARS, m_DataType);
+
   m_Glyph = vtkGlyph3D::New();
-  m_Glyph->SetInput(m_Vme->GetOutput()->GetVTKData());        
-  m_Glyph->SetSource(m_Arrow->GetOutput());
+  m_Glyph->SetInputConnection(m_AttributeAssigner->GetOutputPort());        
+  m_Glyph->SetSourceConnection(m_Arrow->GetOutputPort());
 
   m_Glyph->SetScaleFactor(scale_factor);
   m_Glyph->SetRange(m_SurfaceMapper->GetLookupTable()->GetRange());
 
-  m_Glyph->SelectInputNormals(da_normals->GetName());
-  m_Glyph->SelectInputVectors(GetVectorFieldName(m_VectorFieldIndex));
-  m_Glyph->SelectInputScalars(GetScalarFieldName(m_ScalarFieldIndex));
 
   m_Glyph->SetVectorModeToUseVector();
   m_Glyph->SetScaleModeToScaleByVector();
@@ -646,8 +649,7 @@ void albaPipeVectorFieldMapWithArrows::CreateVTKPipe()
 
   // build mapper  
   m_GlyphMapper = vtkPolyDataMapper::New();
-  m_GlyphMapper->SetInput(m_Glyph->GetOutput());
-  m_GlyphMapper->ImmediateModeRenderingOn();
+  m_GlyphMapper->SetInputConnection(m_Glyph->GetOutputPort());
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
 
@@ -671,7 +673,6 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
 
   m_Vme->Update();
   m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetVTKData()->Update();
 
   int nScalars = GetNumberOfScalars();
   int nVectors = GetNumberOfVectors();
@@ -681,6 +682,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   }
 
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
+	vtkAlgorithmOutput *port = m_Vme->GetOutput()->GetVTKOutputPort();
   vtkPointData* pd = ds->GetPointData();
   vtkCellData* cd = ds->GetCellData();
   if (pd == NULL || cd == NULL)
@@ -696,7 +698,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
 
   // transform dataset to polydata
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
-  filter->SetInput(ds);
+  filter->SetInputConnection(port);
   
   // get normals from cells or points
   vtkDataArray* da_normals;
@@ -713,7 +715,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   {
     vtkPolyDataNormals* f_normals;
     vtkNEW(f_normals);
-    f_normals->SetInput(filter->GetOutput());
+    f_normals->SetInputConnection(filter->GetOutputPort());
 
     // set them to points or cells
     if (m_DataType==POINT_DATA)
@@ -821,7 +823,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   // select arrows or lines for glyphs
   if (m_GlyphType == GLYPH_LINES)
   {
-    m_Glyph->SetSource(m_Line->GetOutput());
+    m_Glyph->SetSourceConnection(m_Line->GetOutputPort());
   }
   else if (m_GlyphType == GLYPH_ARROWS)
   {
@@ -831,7 +833,7 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
     m_Arrow->SetShaftResolution(m_GlyphRes);
     m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
     m_Arrow->Update();
-    m_Glyph->SetSource(m_Arrow->GetOutput());
+    m_Glyph->SetSourceConnection(m_Arrow->GetOutputPort());
   }
  
   // compute new scaling value to view dimensions
@@ -864,14 +866,14 @@ void albaPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   // change visualization type
   if (nOfComponents==3)
   {
-    m_Glyph->SelectInputVectors(GetVectorFieldName(m_VectorFieldIndex));
+		m_AttributeAssigner->Assign(GetVectorFieldName(m_VectorFieldIndex), vtkDataSetAttributes::VECTORS, m_DataType);
     m_Glyph->SetVectorModeToUseVector();
     m_Glyph->SetScaleModeToScaleByVector();
     m_Glyph->SetColorModeToColorByVector();
   }
   else
   {
-    m_Glyph->SelectInputScalars(GetScalarFieldName(m_ScalarFieldIndex));
+		m_AttributeAssigner->Assign(GetScalarFieldName(m_ScalarFieldIndex), vtkDataSetAttributes::SCALARS, m_DataType);
     m_Glyph->SetVectorModeToUseNormal();
     m_Glyph->SetScaleModeToScaleByScalar();
     m_Glyph->SetColorModeToColorByScalar();

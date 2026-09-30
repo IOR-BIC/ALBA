@@ -26,13 +26,15 @@
 #ifndef __vtkALBADistanceFilter_h
 #define __vtkALBADistanceFilter_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 #include "vtkMatrix4x4.h"
 #include "vtkTransform.h"
 
 #include "albaConfigure.h"
 
 #define DISTANCE_FILTER_SCALARS_NAME "DistanceFilterScalars"
+
+class vtkPointSet;
 
 /**
 Class Name:vtkALBADistanceFilter.
@@ -44,18 +46,21 @@ from isosurfaces of defined value obtained by interpolating into the source data
 For example, we can compute distances on a geometry
 (specified as Input) from an isosurface in a volume (Source).
 */
-class ALBA_EXPORT vtkALBADistanceFilter : public vtkDataSetToDataSetFilter {
+class ALBA_EXPORT vtkALBADistanceFilter : public vtkDataSetAlgorithm  {
   public:
     /** create an instance of the object */
     static vtkALBADistanceFilter *New();
     /** RTTI Macro */
-    vtkTypeRevisionMacro(vtkALBADistanceFilter, vtkDataSetToDataSetFilter);
+    vtkTypeMacro(vtkALBADistanceFilter, vtkDataSetAlgorithm );
     
     /**   Specify the point locations used to Distance input. Any geometry  can be used.*/
     void SetSource(vtkDataSet *data);
-    /** Retireve the Source pointer */
+    /** Retrieve the Source pointer */
     vtkDataSet *GetSource();
     
+		/** Retrieve the Input pointer */
+		vtkDataSet *GetInput();
+
     /**   Set Macro, Specify the transformation matrix that should be applied to input points prior to rendering*/
     vtkSetObjectMacro(InputMatrix, vtkMatrix4x4);
     /**  Get Macro,Specify the transformation matrix that should be applied to input points prior to rendering*/
@@ -116,15 +121,16 @@ class ALBA_EXPORT vtkALBADistanceFilter : public vtkDataSetToDataSetFilter {
     ~vtkALBADistanceFilter();
 
     /** get modified time*/
-    unsigned long int GetMTime();
+		vtkMTimeType GetMTime();
 
     /** execute information*/
-    void ExecuteInformation();
+    //int RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
     /** execute data*/
-    void ExecuteData(vtkDataObject *output);
-    /** compute and update extents */
-    void ComputeInputUpdateExtents(vtkDataObject *output);
-
+		int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+		/** execute data*/
+		void RequestData(vtkInformation* request, vtkPointSet *output);
+    //void ExecuteData(vtkDataObject *output);
+    
     /**  Prepare special data fast traversing in the volume*/
     void PrepareVolume();
 
@@ -164,6 +170,3 @@ class ALBA_EXPORT vtkALBADistanceFilter : public vtkDataSetToDataSetFilter {
   };
 
 #endif
-
-
-

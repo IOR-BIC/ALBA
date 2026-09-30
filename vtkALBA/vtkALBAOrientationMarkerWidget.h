@@ -88,7 +88,7 @@ class ALBA_EXPORT vtkALBAOrientationMarkerWidget : public vtkInteractorObserver
 {
 public:
   static vtkALBAOrientationMarkerWidget* New();
-  vtkTypeRevisionMacro(vtkALBAOrientationMarkerWidget, vtkInteractorObserver);
+  vtkTypeMacro(vtkALBAOrientationMarkerWidget, vtkInteractorObserver);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   

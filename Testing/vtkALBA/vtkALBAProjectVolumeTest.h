@@ -29,9 +29,9 @@ class vtkALBAProjectVolumeTest : public albaTest
     /** Start Test Suite */
     CPPUNIT_TEST_SUITE( vtkALBAProjectVolumeTest );
     CPPUNIT_TEST( TestDynamicAllocation );
-    CPPUNIT_TEST( TestExecutionProjectionModeToX );
-    CPPUNIT_TEST( TestExecutionProjectionModeToY );
- 		CPPUNIT_TEST( TestExecutionProjectionModeToZ );
+    CPPUNIT_TEST( TestExecutionProjectionSideToX );
+    CPPUNIT_TEST( TestExecutionProjectionSideToY );
+ 		CPPUNIT_TEST( TestExecutionProjectionSideToZ );
 		CPPUNIT_TEST(TestRangeProjectionX);
 		CPPUNIT_TEST(TestRangeProjectionY);
 		CPPUNIT_TEST(TestRangeProjectionZ);
@@ -46,11 +46,11 @@ class vtkALBAProjectVolumeTest : public albaTest
     /** Allocate and Deallocate filter */
     void TestDynamicAllocation();
     /** Test for projection on X and validate the result */
-    void TestExecutionProjectionModeToX();
+    void TestExecutionProjectionSideToX();
 		/** Test for projection on Y and validate the result */
-    void TestExecutionProjectionModeToY();
+    void TestExecutionProjectionSideToY();
     /** Test for projection on Z and validate the result */
-    void TestExecutionProjectionModeToZ();
+    void TestExecutionProjectionSideToZ();
 		/** Test for projection on X and validate the result */
 		void TestRangeProjectionX();
 		/** Test for projection on Y and validate the result */

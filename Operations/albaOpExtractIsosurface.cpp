@@ -58,7 +58,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkProperty.h"
 #include "vtkActor.h"
-#include "vtkALBAContourVolumeMapper.h"
+#include "albaPipeIsosurface.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkInteractorStyleTrackballCamera.h" 
@@ -74,6 +74,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTriangleFilter.h"
 #include "vtkCleanPolyData.h"
 #include "vtkPolyDataConnectivityFilter.h"
+#include "albaSceneNode.h"
 
 const bool DEBUG_MODE = false;
 
@@ -98,7 +99,6 @@ enum EXTRACT_ISOSURFACE_ID
 	ID_DECREASE_SLICE,
 	ID_VIEW_SLICE,
 	ID_OPTIMIZE_CONTOUR,
-	ID_AUTO_LOD,
 
 	ID_MULTIPLE_CONTOURS,
 	ID_NUM_OF_CONTOURS,
@@ -151,12 +151,12 @@ albaOp(label)
 
   m_Box = NULL;
 
-  m_ContourVolumeMapper  = NULL; 
+  m_PipeIso = NULL;
   m_OutlineFilter  = NULL;
   m_OutlineMapper  = NULL;
-
+  m_VolNode = NULL;
+  m_PipeIso = NULL;
   m_DensityPicker  = NULL;
-  m_IsoValueVector.clear();
 
   m_TrilinearInterpolationOn = true;
 }
@@ -176,8 +176,9 @@ albaOpExtractIsosurface::~albaOpExtractIsosurface()
     iter->Delete();
   }
 
-  m_IsoValueVector.clear();
-  vtkDEL(m_ContourVolumeMapper);
+  if(m_VolNode)
+    m_VolNode->DeletePipe();
+  cppDEL(m_VolNode);
   m_Output = NULL;
 }
 //----------------------------------------------------------------------------
@@ -301,7 +302,6 @@ void albaOpExtractIsosurface::CreateOpDialog()
 
   wxCheckBox *chk_slice = new wxCheckBox(m_Dialog, ID_VIEW_SLICE,       "Slice", p, wxSize(80,20));
   wxCheckBox *chk_opt =   new wxCheckBox(m_Dialog, ID_OPTIMIZE_CONTOUR, "Optimize", p, wxSize(80,20));
-  wxCheckBox *chk_lod =   new wxCheckBox(m_Dialog, ID_AUTO_LOD,         "Auto-lod", p, wxSize(80,20));
 	wxCheckBox *chk_clean =   new wxCheckBox(m_Dialog, ID_CLEAN,_("Clean"), p, wxSize(80,20));
 	wxCheckBox *chk_triangulate =   new wxCheckBox(m_Dialog, ID_TRIANGULATE, _("Triangulate"), p, wxSize(80,20));
 	wxCheckBox *chk_connect = new wxCheckBox(m_Dialog, ID_CONNECTIVITY, _("Connectivity"), p, wxSize(80, 20));
@@ -339,7 +339,6 @@ void albaOpExtractIsosurface::CreateOpDialog()
   chk_triangulate->SetValidator( albaGUIValidator(this, ID_TRIANGULATE, chk_triangulate, &m_Triangulate));
 	chk_connect->SetValidator(albaGUIValidator(this, ID_CONNECTIVITY, chk_connect, &m_Connectivity));
 	chk_opt->SetValidator(albaGUIValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Optimize));
-  chk_lod->SetValidator(albaGUIValidator(this, ID_AUTO_LOD, chk_lod, &m_Autolod));
 
   chk_multi->SetValidator(albaGUIValidator(this, ID_MULTIPLE_CONTOURS, chk_multi, &m_MultiContoursFlag));
   text_num_of_contours->SetValidator(albaGUIValidator(this, ID_NUM_OF_CONTOURS,text_num_of_contours, &m_NumberOfContours, 1, 100));
@@ -365,7 +364,6 @@ void albaOpExtractIsosurface::CreateOpDialog()
   wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
 //  h_sizer3->Add(foo,       1,wxEXPAND);	
   h_sizer3->Add(chk_interpolation,0,wxLEFT);
-  h_sizer3->Add(chk_lod,   0,wxLEFT);
   h_sizer3->Add(chk_opt,   0,wxLEFT);
   h_sizer3->Add(chk_slice, 0,wxLEFT);
 	h_sizer3->Add(chk_clean, 0,wxLEFT);
@@ -411,11 +409,15 @@ void albaOpExtractIsosurface::CreateOpDialog()
 //----------------------------------------------------------------------------
 void albaOpExtractIsosurface::CreateVolumePipeline()
 {
-  vtkDataSet *dataset = m_Input->GetOutput()->GetVTKData();
-  m_ContourVolumeMapper = vtkALBAContourVolumeMapper::New();
-  m_ContourVolumeMapper->SetInput(dataset);
-  m_ContourVolumeMapper->AutoLODRenderOn();
-  m_ContourVolumeMapper->AutoLODCreateOn();
+  vtkDataSet* dataset = m_Input->GetOutput()->GetVTKData();
+	if (!m_TestMode)
+		m_VolNode = new albaSceneNode(NULL, NULL, m_Input, m_Rwi->m_RenFront);
+  else
+		m_VolNode = new albaSceneNode(NULL, NULL, m_Input, NULL);
+
+
+	m_PipeIso = new albaPipeIsosurface;
+  m_PipeIso->Create(m_VolNode);
 
   double min = m_MinDensity;
   double max = m_MaxDensity;
@@ -423,39 +425,19 @@ void albaOpExtractIsosurface::CreateVolumePipeline()
   double range[2] = {0, 0};
   dataset->GetScalarRange(range);
 
-  float value = 0.5f * (range[0] + range[1]);
-  while (value < range[1] && m_ContourVolumeMapper->EstimateRelevantVolume(value) > 0.3f)
-    value += 0.05f * (range[1] + range[0]) + 1.f;
+ 
+  m_IsoValue=(range[0]+range[1])/2.0;
+  m_PipeIso->SetContourValue(m_IsoValue);
 
-  m_IsoValue=value;
-  m_IsoValueVector.push_back(m_IsoValue);
-  m_ContourVolumeMapper->SetContourValue(m_IsoValue);
-
-  /*vtkPolyData *contour = vtkPolyData::New();
-  m_ContourVolumeMapper->GetOutput(0, contour);
-
-  m_ContourMapper = vtkPolyDataMapper::New();
-  m_ContourMapper->SetInput(contour);
-  m_ContourMapper->ScalarVisibilityOff();
-
-  contour->Delete();*/
 
   if (!m_TestMode)
   {
-    m_ContourActor = vtkVolume::New();
-    m_ContourActor->SetMapper(m_ContourVolumeMapper);
-    m_ContourActor->PickableOff();
-
-    m_ContourVolumeMapper->Modified();
-    m_ContourVolumeMapper->Update();
-    m_Rwi->m_RenFront->AddActor(m_ContourActor);
-
     // bounding box actor
     m_OutlineFilter = vtkOutlineCornerFilter::New();
-    m_OutlineFilter->SetInput(dataset);
+    m_OutlineFilter->SetInputData(dataset);
 
     m_OutlineMapper = vtkPolyDataMapper::New();
-    m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
+    m_OutlineMapper->SetInputConnection(m_OutlineFilter->GetOutputPort());
 
     m_Box = vtkActor::New();
     m_Box->SetMapper(m_OutlineMapper);
@@ -495,28 +477,21 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
   m_SliceYVect[1] = 1.0;
   m_SliceYVect[2] = 0.0;
 
-  m_PolydataSlicer = vtkALBAVolumeSlicer::New();
-  m_VolumeSlicer	= vtkALBAVolumeSlicer::New();
-  m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
-  m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
-  m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
-  m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
-  m_VolumeSlicer->SetInput(dataset);
-  m_PolydataSlicer->SetInput(dataset);
+  m_ArbSlicer = vtkALBAVolumeSlicer::New();
+  m_ArbSlicer->SetPlaneOrigin(m_SliceOrigin);
+  m_ArbSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_ArbSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_ArbSlicer->SetInputData(dataset);
+
 	
   m_SliceImage = vtkImageData::New();
 
-  m_SliceImage->SetScalarType(dataset->GetPointData()->GetScalars()->GetDataType());
-  m_SliceImage->SetNumberOfScalarComponents(dataset->GetPointData()->GetScalars()->GetNumberOfComponents());  
-  //m_SliceImage->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
-  double textureRes=512;
-  m_SliceImage->SetExtent(0, textureRes - 1, 0, textureRes - 1, 0, 0);
-  m_SliceImage->SetSpacing(xspc, yspc, 1.f);
+  double textureRes = 512;
+	m_ArbSlicer->SetOutputDimentions(textureRes,textureRes,1);
+	m_ArbSlicer->SetOutputSpacing(xspc, yspc, 1.0f);
+  m_ArbSlicer->Update();
 
-  m_VolumeSlicer->SetOutput(m_SliceImage);
-  m_VolumeSlicer->Update();
+	m_SliceImage->DeepCopy(m_ArbSlicer->GetTextureOutput());
 
   mmaVolumeMaterial *material = ((albaVMEVolume *)m_Input)->GetMaterial();
   double sr[2];
@@ -546,16 +521,13 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
   m_SliceTexture->InterpolateOn();
   m_SliceTexture->SetQualityTo32Bit();
   m_SliceTexture->SetLookupTable(material->m_ColorLut);
-  m_SliceTexture->MapColorScalarsThroughLookupTableOn();
-  m_SliceTexture->SetInput(m_SliceImage);
+  m_SliceTexture->SetInputData(m_SliceImage);
 
   m_Polydata	= vtkPolyData::New();
-  m_PolydataSlicer->SetOutput(m_Polydata);
-  m_PolydataSlicer->SetTexture(m_SliceImage);
-  m_PolydataSlicer->Update();
+	m_Polydata->DeepCopy(m_ArbSlicer->GetPolyDataOutput());
 
   m_SlicerMapper	= vtkPolyDataMapper::New();
-  m_SlicerMapper->SetInput(m_Polydata);
+  m_SlicerMapper->SetInputData(m_Polydata);
   m_SlicerMapper->ScalarVisibilityOff();
 
   m_SlicerActor = vtkActor::New();
@@ -566,28 +538,16 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
 
   m_PIPRen->AddActor(m_SlicerActor);
 
-  vtkPolyData *contour = vtkPolyData::New();
-  m_ContourVolumeMapper->GetOutput(0, contour);
-
-  if(contour==NULL)
-  {
-    wxMessageBox("Operation out of memory");
-    return;
-  }
-
   m_CutterPlane = vtkPlane::New();
   m_CutterPlane->SetOrigin(m_SliceImage->GetOrigin());
   m_CutterPlane->SetNormal(0,0,1);
 
   m_IsosurfaceCutter = vtkALBAFixedCutter::New();
   m_IsosurfaceCutter->SetCutFunction(m_CutterPlane);  
-  m_IsosurfaceCutter->SetInput(contour);
-  m_IsosurfaceCutter->Update();
-
-  contour->Delete();
-
+  UpdateCutterInput();
+  
   m_PolydataMapper	= vtkPolyDataMapper::New();
-  m_PolydataMapper->SetInput(m_IsosurfaceCutter->GetOutput());
+  m_PolydataMapper->SetInputConnection(m_IsosurfaceCutter->GetOutputPort());
   m_PolydataMapper->ScalarVisibilityOff();
 
   m_PolydataActor = vtkActor::New();
@@ -602,12 +562,14 @@ void albaOpExtractIsosurface::DeleteOpDialog()
 {
   m_Mouse->RemoveObserver(m_DensityPicker);
 
-  m_Rwi->m_RenFront->RemoveActor(m_ContourActor);
+  m_VolNode->DeletePipe();
+  cppDEL(m_VolNode);
   m_Rwi->m_RenFront->RemoveActor(m_Box);
 
-  //vtkDEL(m_ContourMapper);
-  vtkDEL(m_ContourActor);
-  vtkDEL(m_Box);
+	if (m_VolNode)
+		m_VolNode->DeletePipe();
+	cppDEL(m_VolNode);
+	vtkDEL(m_Box);
   vtkDEL(m_OutlineFilter);
   vtkDEL(m_OutlineMapper);
   albaDEL(m_DensityPicker);
@@ -617,8 +579,7 @@ void albaOpExtractIsosurface::DeleteOpDialog()
   m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
 
   vtkDEL(m_PIPRen);
-  vtkDEL(m_VolumeSlicer);
-  vtkDEL(m_PolydataSlicer);
+  vtkDEL(m_ArbSlicer);
   vtkDEL(m_SliceImage);
   vtkDEL(m_SliceTexture);
   vtkDEL(m_Polydata);
@@ -700,35 +661,15 @@ void albaOpExtractIsosurface::OnEvent(albaEventBase *alba_event)
     case ID_VIEW_SLICE:
       if(this->m_ShowSlice)
       {
-        vtkPolyData *contour = m_ContourVolumeMapper->GetOutput();
-        if(contour == NULL)
-        {
-          wxMessageBox("Operation out of memory");
-        }
-        else
-        {
-          m_IsosurfaceCutter->SetInput(contour);
-          m_IsosurfaceCutter->Update();
-        }
+        UpdateCutterInput();
+
         m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
-        contour->Delete() ; // NMcF
       }
       else
         m_Rwi->m_RenderWindow->RemoveRenderer(m_PIPRen);
-      //m_Dialog->FindItem(ID_SLICE)->Enable(m_ShowSlice != 0);
-      //m_Dialog->FindItem(ID_SLICE_SLIDER)->Enable(m_ShowSlice != 0);
-      //m_Dialog->FindItem(ID_INCREASE_SLICE)->Enable(m_ShowSlice != 0);
-      //m_Dialog->FindItem(ID_DECREASE_SLICE)->Enable(m_ShowSlice != 0);
 
       m_Rwi->m_RenderWindow->Render();
       break;
-    case ID_AUTO_LOD:
-      // toggle auto lod for polydata extraction
-      if (m_ContourVolumeMapper->GetAutoLODCreate())
-        m_ContourVolumeMapper->AutoLODCreateOff() ;
-      else
-        m_ContourVolumeMapper->AutoLODCreateOn() ;
-      break ;
     case VME_PICKED:
       {
         vtkDataSet *vol = m_Input->GetOutput()->GetVTKData();
@@ -736,8 +677,6 @@ void albaOpExtractIsosurface::OnEvent(albaEventBase *alba_event)
         vtkPoints *pts = NULL; 
         pts = (vtkPoints *)e->GetVtkObj();
         pts->GetPoint(0,pos);
-        vol->SetUpdateExtentToWholeExtent();
-        vol->Update();
         int pid = vol->FindPoint(pos);
         vtkDataArray *scalars = vol->GetPointData()->GetScalars();
         if (scalars && pid != -1)
@@ -775,7 +714,7 @@ void albaOpExtractIsosurface::OnEvent(albaEventBase *alba_event)
       break;
     case ID_TRILINEAR_INTERPOLATION_ON:
       {
-        m_VolumeSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == true);
+        m_ArbSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == true);
         m_Rwi->CameraUpdate();
       }
     default:
@@ -786,50 +725,39 @@ void albaOpExtractIsosurface::OnEvent(albaEventBase *alba_event)
 }
 
 //------------------------------------------------------------------------------
+void albaOpExtractIsosurface::UpdateCutterInput()
+{
+	vtkPolyData* contourPD = vtkPolyData::New();
+	m_PipeIso->ExctractIsosurface(contourPD);
+
+	m_IsosurfaceCutter->SetInputData(contourPD);
+	m_IsosurfaceCutter->Update();
+
+	contourPD->Delete();
+}
+
+//------------------------------------------------------------------------------
 // Modify and extract the isosurface
 // Called from various gui events in OnEvent()
-void albaOpExtractIsosurface::UpdateSurface(bool use_lod)
+void albaOpExtractIsosurface::UpdateSurface()
 {
   if (!m_TestMode)
   {
     m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
   }
-  if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
+  if (m_PipeIso->GetContourValue() != m_IsoValue) 
   {
-    m_ContourVolumeMapper->SetContourValue(m_IsoValue);
-    m_IsoValueVector.clear();
-    m_IsoValueVector.push_back(m_IsoValue);
-    m_ContourVolumeMapper->Update();
+    m_PipeIso->SetContourValue(m_IsoValue);
 
     if (DEBUG_MODE)
     {
       albaLogMessage(m_Input->GetName());
       std::ostringstream stringStream;
-      m_ContourVolumeMapper->Print(stringStream);
       albaLogMessage(stringStream.str().c_str());
     }
     
-    if (!m_TestMode)
-    {
-      vtkPolyData *contour;/* = vtkPolyData::New();
-      m_IsosurfaceCutter->SetInput(contour);
-      m_IsosurfaceCutter->Update();*/
-      //m_ContourMapper->SetInput(contour);
-      if (m_ShowSlice)
-      {
-        contour = m_ContourVolumeMapper->GetOutput();
-        if(contour == NULL)
-        {
-          m_Rwi->m_RenderWindow->Render();
-          wxMessageBox("Operation out of memory");
-          return;
-        }
-        m_IsosurfaceCutter->SetInput(contour);
-        m_IsosurfaceCutter->Update();
-
-        contour->Delete();
-      }
-    }
+    if (!m_TestMode && m_ShowSlice)
+      UpdateCutterInput();
   }
 
   if (!m_TestMode)
@@ -842,17 +770,13 @@ void albaOpExtractIsosurface::UpdateSurface(bool use_lod)
 void albaOpExtractIsosurface::UpdateSlice()
 {
   m_SliceOrigin[2] = m_Slice;
-  m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin[0], m_SliceOrigin[1], m_SliceOrigin[2]);
-  m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
-  m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_VolumeSlicer->SetPlaneAxisY(m_SliceYVect);
-  m_PolydataSlicer->SetPlaneAxisX(m_SliceXVect);
-  m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
+  m_ArbSlicer->SetPlaneOrigin(m_SliceOrigin[0], m_SliceOrigin[1], m_SliceOrigin[2]);
+  m_ArbSlicer->SetPlaneAxisX(m_SliceXVect);
+  m_ArbSlicer->SetPlaneAxisY(m_SliceYVect);
 
-  m_VolumeSlicer->Update();
-  m_PolydataSlicer->Update();
+  m_ArbSlicer->Update();
 
-  m_CutterPlane->SetOrigin(m_VolumeSlicer->GetPlaneOrigin());
+  m_CutterPlane->SetOrigin(m_ArbSlicer->GetPlaneOrigin());
   m_IsosurfaceCutter->Update();
 
   this->m_PIPRen->ResetCameraClippingRange();
@@ -865,10 +789,9 @@ void albaOpExtractIsosurface::UpdateSlice()
 // Called from OpRun()
 void albaOpExtractIsosurface::ExtractSurface()
 {
-	
-	albaGUIBusyInfo wait(_("Extracting Isosurface: please wait ..."),m_TestMode);
-	
-	m_ContourVolumeMapper->SetEnableContourAnalysis(m_Optimize != 0);
+
+  albaGUIBusyInfo wait(_("Extracting Isosurface: please wait ..."), m_TestMode);
+
 
 	if (m_NumberOfContours > 1)
 	{
@@ -876,84 +799,88 @@ void albaOpExtractIsosurface::ExtractSurface()
 		m_OutputGroup->SetName("Extract isosurface output");
 	}
 
+  if (m_MultiContoursFlag == 0)
+    m_NumberOfContours = 1;
+
 	// IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
 	// and then call surface->Delete() when the VME is created
 	int divisor = m_NumberOfContours - 1;
 	divisor = divisor == 0 ? 1 : divisor;
 	double step = (m_MaxRange - m_MinRange) / divisor;
 
+  
+
 	for (int contour = 0; contour < m_NumberOfContours; contour++)
 	{
 		if (m_MultiContoursFlag != 0)
 		{
 			m_IsoValue = m_MinRange + step * contour;
-			m_IsoValueVector.push_back(m_IsoValue);
-			m_ContourVolumeMapper->SetContourValue(m_IsoValue);
-			m_ContourVolumeMapper->Update();
+			m_PipeIso->SetContourValue(m_IsoValue);
 		}
+		
+		vtkPolyData* surface = vtkPolyData::New();
 
-		vtkPolyData *surface;
-		surface = m_ContourVolumeMapper->GetOutput();
-		vtkALBASmartPointer<vtkCleanPolyData>clearFilter;
-		vtkALBASmartPointer<vtkTriangleFilter>triangleFilter;
+  m_PipeIso->ExctractIsosurface(surface);
 
-		if (m_Clean)
-		{
-			clearFilter->SetInput(surface);
-			surface->Delete();
-			clearFilter->ConvertLinesToPointsOff();
-			clearFilter->ConvertPolysToLinesOff();
-			clearFilter->ConvertStripsToPolysOff();
-			//clearFilter->PointMergingOff();
-			clearFilter->Update();
-			surface = clearFilter->GetOutput();
-		}
+  vtkALBASmartPointer<vtkCleanPolyData>clearFilter;
+  vtkALBASmartPointer<vtkTriangleFilter>triangleFilter;
 
-		if (m_Triangulate)
-		{
-			triangleFilter->SetInput(surface);
-			if (!m_Clean)
-				surface->Delete();
-			triangleFilter->Update();
-			surface = triangleFilter->GetOutput();
-		}
+  if (m_Clean)
+  {
+    clearFilter->SetInputData(surface);
+    surface->Delete();
+    clearFilter->ConvertLinesToPointsOff();
+    clearFilter->ConvertPolysToLinesOff();
+    clearFilter->ConvertStripsToPolysOff();
+    //clearFilter->PointMergingOff();
+    clearFilter->Update();
+    surface = clearFilter->GetOutput();
+  }
 
-		if (m_Connectivity)
-		{
-			vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-			connectivityFilter->SetInput(surface);
-			connectivityFilter->Update();
+  if (m_Triangulate)
+  {
+    triangleFilter->SetInputData(surface);
+    if (!m_Clean)
+      surface->Delete();
+    triangleFilter->Update();
+    surface = triangleFilter->GetOutput();
+  }
 
-			surface->DeepCopy((vtkPolyData*)(connectivityFilter->GetOutput()));
-		}
+  if (m_Connectivity)
+  {
+    vtkALBASmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+    connectivityFilter->SetInputData(surface);
+    connectivityFilter->Update();
 
-		if (surface == NULL)
-		{
-			wxMessageBox(_("Operation out of memory"));
-			return;
-		}
-		m_ContourVolumeMapper->Update();
+    surface->DeepCopy((vtkPolyData*)(connectivityFilter->GetOutput()));
+  }
 
-		wxString name = albaString::Format("%s Isosurface %g", m_Input->GetName(), m_IsoValue);
+  if (surface == NULL)
+  {
+    wxMessageBox(_("Operation out of memory"));
+    return;
+  }
 
-		albaVMESurface *vme_surf;
-		albaNEW(vme_surf);
-		vme_surf->SetName(name.ToAscii());
-		//vme_surf->SetDataByDetaching(surface,0);
-		vme_surf->SetData(surface, 0);
-		vme_surf->GetOutput()->Update();
-		if (!m_Clean && !m_Triangulate) {
-			surface->Delete();
-		}
+  wxString name = albaString::Format("%s Isosurface %g", m_Input->GetName(), m_IsoValue);
 
-		if (m_OutputGroup != NULL)
-		{
-			vme_surf->ReparentTo(m_OutputGroup);
-		}
-		else
-		{
-			m_Output = vme_surf;
-		}
+  albaVMESurface* vme_surf;
+  albaNEW(vme_surf);
+  vme_surf->SetName(name.ToAscii());
+  //vme_surf->SetDataByDetaching(surface,0);
+  vme_surf->SetData(surface, 0);
+  vme_surf->GetOutput()->Update();
+  if (!m_Clean && !m_Triangulate) {
+    surface->Delete();
+  }
+
+  if (m_OutputGroup != NULL)
+  {
+    vme_surf->ReparentTo(m_OutputGroup);
+  }
+  else
+  {
+    m_Output = vme_surf;
+  }
 	}
 
 	if (m_OutputGroup != NULL)
@@ -961,20 +888,7 @@ void albaOpExtractIsosurface::ExtractSurface()
 		m_Output = m_OutputGroup;
 	}
 }
-//----------------------------------------------------------------------------
-albaString albaOpExtractIsosurface::GetParameters()
-{
-  wxString parameter;
-  for (int contour = 0; contour < m_NumberOfContours; contour++)
-  {
-    parameter.Append("Contour value = ");
-    parameter.Append(albaString::Format("%f", m_IsoValueVector[contour]));
-    parameter.Append(", ");
-  }
-  parameter.RemoveLast(2);
 
-  return parameter;
-}
 
 //----------------------------------------------------------------------------
 void albaOpExtractIsosurface::SetIsoValue(double isoValue)

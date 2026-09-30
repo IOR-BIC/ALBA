@@ -252,10 +252,7 @@ void albaVMEMaps::InternalPreUpdate()
 void albaVMEMaps::InternalUpdate()
 //-------------------------------------------------------------------------
 {
-  if (m_PolyData)
-  {
-    m_PolyData->Update();
-  }
+
 }
 
 //-------------------------------------------------------------------------
@@ -462,9 +459,10 @@ void albaVMEMaps::UpdateFilter()
   if(!vme)
     return;
   vtkPolyData *data = (vtkPolyData *)vme->GetOutput()->GetVTKData();
-  data->Update();
 
-  m_Normals->SetInput(data);
+  vme->Update();
+
+  m_Normals->SetInputData(data);
   m_Normals->ComputePointNormalsOn();
   m_Normals->SplittingOff();
   m_Normals->Update();
@@ -486,10 +484,9 @@ void albaVMEMaps::UpdateFilter()
     }
 
     vtkDataSet *datasetvol = m_Volume->GetOutput()->GetVTKData();
-    datasetvol->Update();
     m_DistanceFilter->SetDistanceModeToScalar();
     m_DistanceFilter->SetSource(datasetvol);
-    m_DistanceFilter->SetInput((vtkDataSet::SafeDownCast(m_Normals->GetOutput())));
+    m_DistanceFilter->SetInputConnection(m_Normals->GetOutputPort());
     m_DistanceFilter->SetMaxDistance(m_MaxDistance);
     m_DistanceFilter->SetThreshold(m_FirstThreshold);
     m_DistanceFilter->SetInputMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
@@ -500,7 +497,6 @@ void albaVMEMaps::UpdateFilter()
 
     if(polyout = m_DistanceFilter->GetPolyDataOutput())
     {
-      polyout->Update();
 
       scalars->DeepCopy(polyout->GetPointData()->GetScalars());
 
@@ -512,7 +508,6 @@ void albaVMEMaps::UpdateFilter()
       m_PolyData->GetPointData()->SetActiveScalars("Distance_density");
 
       m_PolyData->Modified();
-      m_PolyData->Update();
     }
   }
 }

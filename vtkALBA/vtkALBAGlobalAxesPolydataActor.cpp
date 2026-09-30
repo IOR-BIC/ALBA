@@ -36,7 +36,6 @@
 #include "vtkDirectory.h"
 #include "vtkTransformPolydataFilter.h"
 
-vtkCxxRevisionMacro(vtkALBAGlobalAxesPolydataActor, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkALBAGlobalAxesPolydataActor);
 
 #include "albaConfigure.h"
@@ -86,7 +85,7 @@ void vtkALBAGlobalAxesPolydataActor::SetType(int type)
 
 	vtkPolyDataMapper *headMapper = vtkPolyDataMapper::New();
 	this->Actor = vtkActor::New();
-	headMapper->SetInput(this->Reader->GetOutput());
+	headMapper->SetInputConnection( this->Reader->GetOutputPort() );
 	this->Actor->SetMapper(headMapper);
 	this->Actor->SetVisibility(1);
 	headMapper->Delete();
@@ -153,7 +152,6 @@ int vtkALBAGlobalAxesPolydataActor::RenderTranslucentPolygonalGeometry(vtkViewpo
 
   //return this->Assembly->RenderTranslucentPolygonalGeometry( vp );
 
-  assert(false);
   return false;
 }
 
@@ -165,7 +163,6 @@ int vtkALBAGlobalAxesPolydataActor::HasTranslucentPolygonalGeometry()
   this->UpdateProps();
 
   //return this->Assembly->HasTranslucentPolygonalGeometry();
-  assert(false);
   return false;
 }
 
@@ -189,7 +186,7 @@ double *vtkALBAGlobalAxesPolydataActor::GetBounds()
 }
 
 //-------------------------------------------------------------------------
-unsigned long int vtkALBAGlobalAxesPolydataActor::GetMTime()
+vtkMTimeType vtkALBAGlobalAxesPolydataActor::GetMTime()
 {
   return this->Assembly->GetMTime();
 }
@@ -273,12 +270,11 @@ void vtkALBAGlobalAxesPolydataActor::SetInitialPose(vtkMatrix4x4* initMatrix)
   transformer = vtkTransformPolyDataFilter::New();
 
   initTransform->SetMatrix(initMatrix);
-  transformer->SetInput(data);
+  transformer->SetInputData(data);
   transformer->SetTransform(initTransform);
   transformer->Update();
 
   data->DeepCopy(transformer->GetOutput());
-  data->Update();
   data->Modified();
   ((vtkPolyDataMapper*)this->Actor->GetMapper())->Update();
   ((vtkPolyDataMapper*)this->Actor->GetMapper())->Modified();

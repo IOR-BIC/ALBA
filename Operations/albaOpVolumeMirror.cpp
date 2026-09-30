@@ -33,6 +33,7 @@
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkPointData.h"
+#include "vtkDataArray.h"
 #include "vtkDataSetWriter.h"
 #include "vtkALBASmartPointer.h"
 
@@ -225,8 +226,6 @@ void albaOpVolumeMirror::Preview()
 	}
 	outScalars->Modified();
 
-	m_OutputImageData->Update();
-	
   ((albaVMEVolumeGray *)m_Input)->SetData(m_OutputImageData,m_Input->GetTimeStamp());
 
   albaEventMacro(albaEvent(this, CAMERA_UPDATE));

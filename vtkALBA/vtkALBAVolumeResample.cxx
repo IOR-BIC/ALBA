@@ -20,8 +20,12 @@
 #include "vtkALBAVolumeResample.h"
 
 #include "assert.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "vtkAlgorithm.h"
+#include "vtkExecutive.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkALBAVolumeResample, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkALBAVolumeResample);
 
 typedef unsigned short u_short;
@@ -78,6 +82,9 @@ void vtkALBAVolumeResample::myDBG(const char *msg,int index)
 // Constructor sets default values
 vtkALBAVolumeResample::vtkALBAVolumeResample() 
 {
+	this->OutputExtent[0] = this->OutputExtent[1] = this->OutputExtent[2] = this->OutputExtent[3] = this->OutputExtent[4] = this->OutputExtent[5] = 0;
+	this->OutputSpacing[0] = this->OutputSpacing[1] = this->OutputSpacing[2] = 0;
+
   this->VolumeOrigin[0] = this->VolumeOrigin[1] = this->VolumeOrigin[2] = this->VolumeAxisX[1] = this->VolumeAxisX[2] = this->VolumeAxisY[0] = this->VolumeAxisY[2] = 0.f;
   this->VolumeAxisX[0]  = this->VolumeAxisY[1]  = 1.f;
 
@@ -89,6 +96,14 @@ vtkALBAVolumeResample::vtkALBAVolumeResample()
   this->AutoSpacing = true;
 
   this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkALBAVolumeResample::FillOutputPortInformation(int port, vtkInformation* info)
+{
+	// now add our info
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+	return 1;
 }
 
 
@@ -128,21 +143,20 @@ void vtkALBAVolumeResample::SetVolumeAxisY(double axis[3]) {
 }
 
 //----------------------------------------------------------------------------
-void vtkALBAVolumeResample::ExecuteInformation() {
-  for (int i = 0; i < this->GetNumberOfOutputs(); i++) {
+int vtkALBAVolumeResample::RequestInformation(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector) 
+{
+  for (int i = 0; i < this->GetNumberOfOutputPorts(); i++) {
     if (vtkImageData::SafeDownCast(this->GetOutput(i))) {
       vtkImageData *output = (vtkImageData*)this->GetOutput(i);
       
       int dims[3];
+			output->SetExtent(OutputExtent);
       output->GetDimensions(dims); // this is the number of pixels in each direction...
-      // modified by Marco. 25-10-2003
-      // now we allow output volumes, with Z!=1 for resampling the volume
-      //if (dims[2] != 1) {
-      //  dims[2] = 1;
-      //  output->SetDimensions(dims);
-      //  }
-      output->SetWholeExtent(output->GetExtent());
-      output->SetUpdateExtentToWholeExtent();
+      
+      vtkInformation* outInfo = this->GetOutputInformation(0);
+      int wholeExtent[6];
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+      outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
 
       if (this->AutoSpacing) { // select spacing
         this->PrepareVolume();
@@ -192,21 +206,36 @@ void vtkALBAVolumeResample::ExecuteInformation() {
           this->Modified();
           }
         }
+    else {
+				output->SetSpacing(OutputSpacing);
+			}
+
       output->SetOrigin(this->VolumeOrigin);
       }
-    else {
-      }
     }
+
+	return 1;
   }
 
 //----------------------------------------------------------------------------
-void vtkALBAVolumeResample::ExecuteData(vtkDataObject *outputData) {
-  this->PrepareVolume();
+int vtkALBAVolumeResample::RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector ){
+	// get the info objects
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  if (vtkImageData::SafeDownCast(outputData))
-    this->ExecuteData((vtkImageData*)outputData);
+	// Initialize some frequently used values.
+	vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+	if (output)
+	{
+  this->PrepareVolume();
+		output->SetExtent(OutputExtent);
+
+		if (output)
+			this->RequestData(request, output);
   
-  outputData->Modified();
+		output->Modified();
+	}
+	return 1;
   }
 
 //----------------------------------------------------------------------------
@@ -280,25 +309,31 @@ void vtkALBAVolumeResample::PrepareVolume() {
 
 
 //----------------------------------------------------------------------------
-void vtkALBAVolumeResample::ComputeInputUpdateExtents(vtkDataObject *output) {
-  vtkDataObject *input = this->GetInput();
-  input->SetUpdateExtentToWholeExtent();
-  }
+int	vtkALBAVolumeResample::RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  this->vtkDataSetAlgorithm::RequestUpdateExtent(request, inputVector, outputVector);
+
+  vtkInformation* outInfo = this->GetOutputInformation(0);
+  int wholeExtent[6];
+  outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), wholeExtent[0], wholeExtent[1], wholeExtent[2], wholeExtent[3], wholeExtent[4], wholeExtent[5]);
+
+  return 1;
+}
 
 
 //----------------------------------------------------------------------------
-void vtkALBAVolumeResample::ExecuteData(vtkImageData *outputObject)
+void vtkALBAVolumeResample::RequestData(vtkInformation* request, vtkImageData *outputObject) 
 {
-	int extent[6];
-	outputObject->GetWholeExtent(extent);
-	outputObject->SetExtent(extent);
-	//outputObject->SetNumberOfScalarComponents(1);
-	outputObject->AllocateScalars();
-
-	vtkDataArray* outputScalars = outputObject->GetPointData()->GetScalars();
-	vtkDataArray* inputScalars = GetInput()->GetPointData()->GetScalars();
-
+	vtkDataSet *input =	vtkDataSet::SafeDownCast(this->GetInput());
+	vtkDataArray* inputScalars = input->GetPointData()->GetScalars();
 	const void *inputPointer = inputScalars->GetVoidPointer(0);
+
+	int *dims = outputObject->GetDimensions();
+	vtkDataArray 			*outputScalars = inputScalars->NewInstance();
+	outputScalars->SetNumberOfTuples(dims[0] * dims[1] * dims[2]);
+	void *outputPointer = outputScalars->GetVoidPointer(0);
+	
 	switch (inputScalars->GetDataType())
 	{
 		case VTK_CHAR:
@@ -337,7 +372,7 @@ void vtkALBAVolumeResample::ExecuteData(vtkImageData *outputObject)
 template<typename InputDataType>
 void vtkALBAVolumeResample::CreateImage(const InputDataType *input, vtkDataArray *outputScalars, vtkImageData *outputObject)
 {
-	const void *outputPointer = outputObject->GetPointData()->GetScalars()->GetVoidPointer(0);
+	const void *outputPointer = outputScalars->GetVoidPointer(0);
 	switch (outputScalars->GetDataType())
 	{
 		case VTK_CHAR:
@@ -369,6 +404,7 @@ void vtkALBAVolumeResample::CreateImage(const InputDataType *input, vtkDataArray
 			vtkErrorMacro(<< "vtkALBAVolumeResample: Scalar type is not supported");
 			return;
 	}
+	outputObject->GetPointData()->SetScalars(outputScalars);
 }
 
 //----------------------------------------------------------------------------

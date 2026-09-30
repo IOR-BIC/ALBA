@@ -188,7 +188,7 @@ void albaComputeHausdorffDistance::ComputeHausdorffDistance()
 			points->GetPoint(2, c);
 
 			double area = vtkTriangle::TriangleArea(a, b, c);
-			
+
 			//area is used to estimate the cell size;
 			m_TotalAreaSurf1 += area;
 		}
@@ -881,25 +881,21 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
 
   long progress = 0;
 
-  cleaner->SetInput(m_Surf1);
+  cleaner->SetInputData(m_Surf1);
   cleaner->ConvertPolysToLinesOff();
-  cleaner->GetOutput()->Update();
-  triangulator->SetInput(cleaner->GetOutput());
+  triangulator->SetInputConnection(cleaner->GetOutputPort());
   triangulator->Update();
   m_CleanSurf1->DeepCopy(triangulator->GetOutput());
   m_CleanSurf1->Modified();
-  m_CleanSurf1->Update();
 
   progress+=FILTER_PERC/2.0;
   
-  cleaner->SetInput(m_Surf2);
+  cleaner->SetInputData(m_Surf2);
   cleaner->ConvertPolysToLinesOff();
-  cleaner->GetOutput()->Update();
-  triangulator->SetInput(cleaner->GetOutput());
+  triangulator->SetInputConnection(cleaner->GetOutputPort());
   triangulator->Update();
   m_CleanSurf2->DeepCopy(triangulator->GetOutput());
   m_CleanSurf2->Modified();
-  m_CleanSurf2->Update();
 
   progress+=FILTER_PERC/2.0;
 	m_ProgBarHelper->UpdateProgressBar(progress);

@@ -1,0 +1,4 @@
+81c81
+<   m_Exporter->SetInput( inputImage );
+---
+>   m_Exporter->SetInputData( inputImage );

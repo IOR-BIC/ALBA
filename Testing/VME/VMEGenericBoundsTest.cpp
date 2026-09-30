@@ -87,6 +87,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   box_source->SetXLength(1);
   box_source->SetYLength(1);
   box_source->SetZLength(1);
+	box_source->Update();
 
   // set data for the different boxes at time 0
   box0->SetData(box_source->GetOutput(),0);

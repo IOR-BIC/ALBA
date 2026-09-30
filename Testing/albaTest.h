@@ -72,7 +72,7 @@ protected:
 	void CompareImage(albaString suiteName, albaString imageName, int index = -1);
 
 	void CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, albaString imageName, int index=-1);
-
+	
 	void InitializeRenderWindow();
 
 	void RenderData(vtkDataSet *data);
@@ -82,7 +82,7 @@ protected:
 	TestApp *m_App;
 	vtkRenderer *m_Renderer;
 	vtkRenderWindow *m_RenderWindow;
-	vtkRenderWindowInteractor *m_RenderWindowInteractor;
+	vtkRenderWindowInteractor* m_RenderWindowInteractor;
 
 	albaString m_WorkingDir;
 };

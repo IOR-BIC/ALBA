@@ -33,8 +33,7 @@ class vtkOutlineSource;
 class vtkImageCast;
 class vtkPiecewiseFunction;
 class vtkVolumeProperty;
-class vtkVolumeRayCastMIPFunction;
-class vtkALBAVolumeRayCastMapper;
+class vtkGPUVolumeRayCastMapper;
 class vtkActor;
 class vtkLODProp3D;
 class vtkLookupTable;
@@ -97,8 +96,7 @@ protected:
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
   //vtkColorTransferFunction    *m_ColorTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
-  vtkVolumeRayCastMIPFunction *m_MIPFunction;
-  vtkALBAVolumeRayCastMapper      *m_VolumeMapper;
+  vtkGPUVolumeRayCastMapper       *m_VolumeMapper;
   vtkVolume					  *m_Volume;
   vtkLookupTable      *m_ColorLUT;
 

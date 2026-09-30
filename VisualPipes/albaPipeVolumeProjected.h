@@ -33,6 +33,7 @@ class vtkPolyDataMapper;
 class vtkALBAProjectSP;
 class vtkALBAProjectVolume;
 class vtkRectilinearGrid;
+class vtkALBATicksGenerator;
 
 //----------------------------------------------------------------------------
 // albaPipeVolumeProjected :
@@ -82,6 +83,10 @@ public:
   void SetActorPicking(int enable = true);
 
 protected:   
+
+  /** Create the TICKs for the volume projection */
+  void CreateTICKs();
+
 	int       m_CamPosition;
   vtkActor *m_RXActor;
   vtkActor *m_TickActor;
@@ -96,5 +101,8 @@ protected:
 
   vtkWindowLevelLookupTable *m_Lut;
   vtkALBAAssembly            *m_UsedAssembly;
-};  
+	vtkALBATicksGenerator *m_TicksGenerator;
+
+private:
+};
 #endif // __albaPipeVolumeProjected_H__

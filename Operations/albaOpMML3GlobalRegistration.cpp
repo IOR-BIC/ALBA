@@ -82,8 +82,7 @@ vtkPolyData* albaOpMML3GlobalRegistration::TransformPolydata(vtkPolyData* polyda
     m_Modified = false ;
   }
 
-  m_PolydataTransform->SetInput(polydata_atlas) ;
-  m_PolydataTransform->GetOutput()->Update() ;
+  m_PolydataTransform->SetInputData(polydata_atlas) ;
   return m_PolydataTransform->GetOutput() ;
 }
 

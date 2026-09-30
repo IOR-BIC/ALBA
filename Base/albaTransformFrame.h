@@ -66,7 +66,7 @@ class ALBA_EXPORT albaTransformFrame : public albaTransformBase
   /** 
     Return current modification time, taking inro consideration also
     Input, InputFrame and TargetFrame. */
-  virtual unsigned long GetMTime();
+  virtual vtkMTimeType GetMTime();
 
 protected:
   void InternalUpdate();

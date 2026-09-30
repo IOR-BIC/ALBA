@@ -236,7 +236,7 @@ void albaOpMeasureAxisRotations::UpdateRotations()
 	
 	quaternion.AngleAxis(angle, axisComp);
 
-	angle *= vtkMath::RadiansToDegrees();
+	angle = vtkMath::DegreesFromRadians(angle);
 	
 	m_Rotations[0] = axisComp[0] * angle;
 	m_Rotations[1] = axisComp[1] * angle;

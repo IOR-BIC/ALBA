@@ -8,7 +8,7 @@
 # Description:
 # CMake Project file for the ALBA.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4) 
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10) 
 
 PROJECT (ALBA)
 
@@ -161,10 +161,10 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the ALBA tree.
 #-----------------------------------------------------------------------------
-ALBA_SUBPROJECT(MFL Libraries)
+ALBA_SUBPROJECT(MFL Libs)
 
 IF (MFL_CONFIG_FOUND)
-  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${ALBA_BINARY_DIR}/Libraries") 
+  FIND_FILE (USE_MFL_FILE UseMFL.cmake "${ALBA_BINARY_DIR}/Libs") 
   IF (USE_MFL_FILE)
     DBG_MESSAGE("ALBA: MFL Configured")
     SET (ALBA_CAN_BUILD 1)
@@ -195,7 +195,7 @@ IF (ALBA_CAN_BUILD)
               "${ALBA_SOURCE_DIR}/Core" "${ALBA_SOURCE_DIR}/Service" "${ALBA_SOURCE_DIR}/Gui" "${ALBA_SOURCE_DIR}/IO" "${ALBA_SOURCE_DIR}/Operations" "${ALBA_SOURCE_DIR}/VME" "${ALBA_SOURCE_DIR}/VisualPipes" "${ALBA_SOURCE_DIR}/Views"
               "${ALBA_SOURCE_DIR}/VME/DataPipes" "${ALBA_SOURCE_DIR}/vtkALBA" "${ALBA_BINARY_DIR}/vtkALBA"  "${ALBA_SOURCE_DIR}/GPUAPI" 
               "${ALBA_SOURCE_DIR}/GPUAPI/GLEW" "${ALBA_SOURCE_DIR}/GPUAPI/FBO")
-  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/albaDLL" "${ALBA_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
+  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/albaDLL" "${ALBA_BINARY_DIR}/Libs/ITK/Src/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
 	
 	if(BUILD_TESTING)
 	  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${ALBA_SOURCE_DIR}/Testing" )
@@ -289,22 +289,8 @@ ENDIF(WIN32)
     ENDIF(NOT tmp_manifest)
 	ENDIF(WIN32)
 
-  # Export Build settings and library dependences
-  INCLUDE(CMakeExportBuildSettings)
   
-  CMAKE_EXPORT_BUILD_SETTINGS(
-  ${ALBA_BINARY_DIR}/ALBABuildSettings.cmake
-  )
-  
-  IF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
-    cmake_policy(SET CMP0033 OLD)
-  ENDIF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
-  
-  EXPORT_LIBRARY_DEPENDENCIES(
-  ${ALBA_BINARY_DIR}/ALBALibraryDepends.cmake
-  )
-
-  CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
+ CONFIGURE_FILE( ${ALBA_SOURCE_DIR}/ALBAConfig.cmake.in ${ALBA_BINARY_DIR}/ALBAConfig.cmake @ONLY IMMEDIATE )
   
   #### Include directory for binary distribution of ALBA
   SET(ALBA_INSTALL_INCLUDE_DIRS ${INCLUDE_DIRS})
