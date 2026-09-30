@@ -43,12 +43,6 @@ public:
 
   albaTypeMacro(albaMatrixPipe,albaTransformBase);
   
-  void UpdateMatrixObserverOn() {m_UpdateMatrixObserverFlag=1;}
-  void UpdateMatrixObserverOff() {m_UpdateMatrixObserverFlag=0;}
-  void SetUpdateMatrixObserverFlag(bool flag) {m_UpdateMatrixObserverFlag=flag;}
-  bool GetUpdateMatrixObserverFlag() {return m_UpdateMatrixObserverFlag;}
-
-  /** set the VME connected to this class. return ALBA_ERROR if "vme" is not accepted */
   int SetVME(albaVME *vme);
   /** return the VME this matrix pipe is connected to */
   albaVME *GetVME() {return m_VME;}
@@ -89,7 +83,6 @@ protected:
   /** To be redefined by subclasses to override Pipe behavior */
   virtual void InternalUpdate();
 
-  bool          m_UpdateMatrixObserverFlag;
   bool          m_Updating;
   albaVME        *m_VME; ///< pointer to VME
 

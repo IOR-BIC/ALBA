@@ -636,7 +636,6 @@ void albaOpClipSurface::OpUndo()
 int albaOpClipSurface::Clip()
 //----------------------------------------------------------------------------
 {
-	albaTransform targetSurfTra;
 
 	wxBusyCursor *wait_cursor=NULL;
 
@@ -651,8 +650,9 @@ int albaOpClipSurface::Clip()
       return ALBA_ERROR;
 		}
 
-
-		targetSurfTra.Concatenate(*m_Input->GetOutput()->GetAbsMatrix()->Invert(),true);
+		albaTransform targetSurfTra;
+		
+		targetSurfTra.Concatenate(m_Input->GetOutput()->GetAbsMatrix()->GetInverse(),true);
 		targetSurfTra.Concatenate(*m_ClipperVME->GetOutput()->GetAbsMatrix(), true);
 		targetSurfTra.Update();
 
