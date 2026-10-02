@@ -63,7 +63,7 @@ albaOpFilterVolume::albaOpFilterVolume(const wxString &label)
 
   m_Dimensionality  = 3;
   m_SmoothRadius[0] = m_SmoothRadius[1] = m_SmoothRadius[2] = 1.5;
-  m_StandardDeviation[0] = m_StandardDeviation[1] = m_StandardDeviation[2] = 2.0;
+  m_StandardDeviation[0] = m_StandardDeviation[1] = m_StandardDeviation[2] = 1.0;
 
   m_KernelSize[0] = m_KernelSize[1] = m_KernelSize[2] = 1;
 
@@ -120,6 +120,12 @@ void albaOpFilterVolume::OpRun()
 		vtkNEW(m_OriginalImageData);
 		m_OriginalImageData->DeepCopy(m_InputData);
   }
+
+	double spacing[3];
+	m_InputData->GetSpacing(spacing);
+	
+	for(int i=0;i<3;i++)
+			m_SmoothRadius[i] = spacing[i]*5.0;
 	
 	if (!m_TestMode)
 	{
@@ -138,8 +144,8 @@ void albaOpFilterVolume::CreateGui()
  
 	m_Gui->Divider(2);
 	m_Gui->Label(_("Smooth"),true);
-  m_Gui->Vector(ID_STANDARD_DEVIATION,_("Sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
-  m_Gui->Vector(ID_RADIUS_FACTOR,_("Radius: "),m_SmoothRadius,1,10,2,_("radius for smooth filter"));
+  m_Gui->Vector(ID_STANDARD_DEVIATION,_("Sd: "),m_StandardDeviation,0.1,5,2,_("standard deviation for smooth filter"));
+  m_Gui->Vector(ID_RADIUS_FACTOR,_("Radius: "),m_SmoothRadius,0,10,2,_("radius for smooth filter"));
   m_Gui->Button(ID_SMOOTH,_("Apply smooth"));
 
 	m_Gui->Divider(2);
