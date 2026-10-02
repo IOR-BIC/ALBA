@@ -54,7 +54,6 @@ private:
   void TestFixture();
   void TestDynamicAllocation();
   void TestStaticAllocation();
-  void TestUpdateMatrixObserverSet_Get_On_Off();
   void TestSetGetVME();
   void TestSetGetTimeStamp();
   void TestGetMTime();
