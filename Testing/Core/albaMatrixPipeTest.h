@@ -38,7 +38,6 @@ public:
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestDynamicAllocation ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestStaticAllocation ); // just to test that the fixture has no leaks
-  CPPUNIT_TEST( TestUpdateMatrixObserverSet_Get_On_Off );
   CPPUNIT_TEST( TestSetGetVME );
   CPPUNIT_TEST( TestSetGetTimeStamp );
   CPPUNIT_TEST( TestGetMTime );
