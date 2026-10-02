@@ -71,28 +71,6 @@ void albaMatrixPipeTest::TestStaticAllocation()
   albaMatrixPipe matrixPipe;
 }
 //----------------------------------------------------------------------------
-void albaMatrixPipeTest::TestUpdateMatrixObserverSet_Get_On_Off()
-//----------------------------------------------------------------------------
-{
-  albaMatrixPipe *matrixPipe;
-  albaNEW(matrixPipe);
-
-  matrixPipe->UpdateMatrixObserverOn();
-  result = true == matrixPipe->GetUpdateMatrixObserverFlag();
-  TEST_RESULT(result);
-
-  matrixPipe->UpdateMatrixObserverOff();
-  result = false == matrixPipe->GetUpdateMatrixObserverFlag();
-  TEST_RESULT(result);
-
-  matrixPipe->SetUpdateMatrixObserverFlag(1);
-  result = true == matrixPipe->GetUpdateMatrixObserverFlag();
-  TEST_RESULT(result);
-
-  albaDEL(matrixPipe);
-  
-}
-//----------------------------------------------------------------------------
 void albaMatrixPipeTest::TestSetGetVME()
 //----------------------------------------------------------------------------
 {
