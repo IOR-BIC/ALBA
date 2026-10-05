@@ -41,56 +41,7 @@
 #include "vtkRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
-albaCxxTypeMacro(albaOpFilterVolume);
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
-albaOpFilterVolume::albaOpFilterVolume(const wxString &label) 
-:albaOp(label)
-//----------------------------------------------------------------------------
-{
-	m_OpType	= OPTYPE_OP;
-	m_Canundo	= true;
-
-	m_InputPreserving = false;
-
-  m_PreviewResultFlag	= false;
-	m_ClearInterfaceFlag= false;
-  
-	m_ResultImageData	  = NULL;
-	m_OriginalImageData = NULL;
-  m_InputData         = NULL;
-
-  m_Dimensionality  = 3;
-  m_SmoothRadius[0] = m_SmoothRadius[1] = m_SmoothRadius[2] = 1.5;
-  m_StandardDeviation[0] = m_StandardDeviation[1] = m_StandardDeviation[2] = 2.0;
-
-  m_KernelSize[0] = m_KernelSize[1] = m_KernelSize[2] = 1;
-
-  m_ApplyDirectlyOnInput = true;
-}
-//----------------------------------------------------------------------------
-albaOpFilterVolume::~albaOpFilterVolume()
-//----------------------------------------------------------------------------
-{
-	vtkDEL(m_ResultImageData);
-	vtkDEL(m_OriginalImageData);
-}
-//----------------------------------------------------------------------------
-bool albaOpFilterVolume::InternalAccept(albaVME*node)
-//----------------------------------------------------------------------------
-{
-  return (node && node->IsALBAType(albaVMEVolumeGray));
-}
-//----------------------------------------------------------------------------
-albaOp *albaOpFilterVolume::Copy()
-//----------------------------------------------------------------------------
-{
-  return (new albaOpFilterVolume(m_Label));
-}
-//----------------------------------------------------------------------------
 // Constants:
-//----------------------------------------------------------------------------
 enum FILTER_SURFACE_ID
 {
 	ID_SMOOTH = MINID,
@@ -102,40 +53,75 @@ enum FILTER_SURFACE_ID
 	ID_REPLACE_MAX,
 	ID_REPLACE_VALUE,
 	ID_REPLACE,
-	ID_PREVIEW,
-	ID_RESET_ALL,
-  ID_APPLY_ON_INPUT,
+	ID_RESET,
 };
+
 //----------------------------------------------------------------------------
-void albaOpFilterVolume::OpRun()   
+albaCxxTypeMacro(albaOpFilterVolume);
+
+
+
 //----------------------------------------------------------------------------
-{ 
+albaOpFilterVolume::albaOpFilterVolume(const wxString &label) 
+:albaOp(label)
+{
+	m_OpType	= OPTYPE_OP;
+	m_Canundo	= true;
+
+	m_OutputVolumeRegistered = false;
+  
+  m_InputData         = NULL;
+
+  m_Dimensionality  = 3;
+  m_SmoothRadius[0] = m_SmoothRadius[1] = m_SmoothRadius[2] = 1.5;
+  m_StandardDeviation[0] = m_StandardDeviation[1] = m_StandardDeviation[2] = 2.0;
+
+  m_KernelSize[0] = m_KernelSize[1] = m_KernelSize[2] = 1;
+
+}
+//----------------------------------------------------------------------------
+albaOpFilterVolume::~albaOpFilterVolume()
+{
+}
+//----------------------------------------------------------------------------
+bool albaOpFilterVolume::InternalAccept(albaVME*node)
+{
+  return (node && node->IsALBAType(albaVMEVolumeGray));
+}
+//----------------------------------------------------------------------------
+albaOp *albaOpFilterVolume::Copy()
+{
+  return (new albaOpFilterVolume(m_Label));
+}
+//----------------------------------------------------------------------------
+void albaOpFilterVolume::OpRun()
+{
 	m_Input->GetOutput()->Update();
-  m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-  if (!m_ApplyDirectlyOnInput)
-  {
-	  vtkNEW(m_ResultImageData);
-		m_ResultImageData->DeepCopy(m_InputData);
-		
-		vtkNEW(m_OriginalImageData);
-		m_OriginalImageData->DeepCopy(m_InputData);
-  }
+	m_InputData = (vtkImageData *)m_Input->GetOutput()->GetVTKData();
+
+	albaNEW(m_OutputVolume);
+	m_OutputVolume->DeepCopy(m_Input);
+
+	albaString name = m_Input->GetName();
+	name << " filtered";
+	m_OutputVolume->SetName(name);
+	m_OutputVolume->ReparentTo(m_Input);
 	
+	GetLogicManager()->VmeShow(m_OutputVolume, true);
+
 	if (!m_TestMode)
 	{
 		CreateGui();
-	  ShowGui();
+		ShowGui();
 	}
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::CreateGui()
-//----------------------------------------------------------------------------
 {
   // interface:
   m_Gui = new albaGUI(this);
-		
-  m_Gui->Bool(ID_APPLY_ON_INPUT,_("Apply on input"),&m_ApplyDirectlyOnInput,1,_("Check this flag for big volumes to save memory"));
- 
+		 
 	m_Gui->Divider(2);
 	m_Gui->Label(_("Smooth"),true);
   m_Gui->Vector(ID_STANDARD_DEVIATION,_("Sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
@@ -160,10 +146,7 @@ void albaOpFilterVolume::CreateGui()
 	m_Gui->Button(ID_REPLACE, _("Apply replace"));
 	
   m_Gui->Divider(2);
-  m_Gui->Button(ID_PREVIEW,_("Preview"));
-  m_Gui->Button(ID_RESET_ALL,_("Clear"));
-  m_Gui->Enable(ID_PREVIEW,false);
-  m_Gui->Enable(ID_RESET_ALL,false);
+  m_Gui->Button(ID_RESET,_("Reset"));
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
@@ -171,53 +154,46 @@ void albaOpFilterVolume::CreateGui()
 	m_Gui->OkCancel();
 	m_Gui->Label("");
 
+	m_Gui->Enable(ID_RESET, false);
 	m_Gui->Enable(wxOK, false);
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OpDo()
-//----------------------------------------------------------------------------
 {
-  if (m_ResultImageData)
+  if (m_OutputVolume->GetParent()!=m_Input)
   {
-    ((albaVMEVolumeGray *)m_Input)->SetData(m_ResultImageData,m_Input->GetTimeStamp());
+		//if the output volume is not a child of the input volume, it means that the operation has been undone and we have to reparent the output volume to the input volume.
+		if(m_OutputVolumeRegistered)
+		{
+			m_OutputVolume->UnRegister(this);
+			m_OutputVolumeRegistered = false;
+		}
+		m_OutputVolume->ReparentTo(m_Input);
 		GetLogicManager()->CameraUpdate();
   }
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OpUndo()
-//----------------------------------------------------------------------------
 {
-  if (m_OriginalImageData)
-  {
-    ((albaVMEVolumeGray *)m_Input)->SetData(m_OriginalImageData,m_Input->GetTimeStamp());
+	if (m_OutputVolume->GetParent() == m_Input)
+	{
+		//Register the output volume to this operation to avoid that it will be destroyed until the operation is destroyed.
+		m_OutputVolumeRegistered = true;
+		m_OutputVolume->Register(this);
+		m_OutputVolume->ReparentTo(NULL);
 		GetLogicManager()->CameraUpdate();
-  }
+	}
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
     switch(e->GetId())
-    {	
-      case ID_APPLY_ON_INPUT:
-        if (m_ApplyDirectlyOnInput)
-        {
-          wxMessageBox(_("Filters are applied directly to the input volume. No undo can be done to retrieve previous volume."),_("Warning"));
-          vtkDEL(m_ResultImageData);
-          vtkDEL(m_OriginalImageData);
-        }
-        else
-        {
-          m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-          vtkNEW(m_ResultImageData);
-          m_ResultImageData->DeepCopy(m_InputData);
-
-          vtkNEW(m_OriginalImageData);
-          m_OriginalImageData->DeepCopy(m_InputData);
-        }
-      break;
+    {
       case ID_SMOOTH:
         OnSmooth();
       break;
@@ -237,183 +213,125 @@ void albaOpFilterVolume::OnEvent(albaEventBase *alba_event)
 			}
 			break;
 			case ID_REPLACE:
-			{
 				OnReplace();
-			}
 			break;
-      case ID_PREVIEW:
-        OnPreview(); 
-      break;
-      case ID_RESET_ALL:
-        OnClear(); 
+      case ID_RESET:
+        OnReset(); 
       break;
       case wxOK:
-        if(m_PreviewResultFlag)
-          OnPreview();
         OpStop(OP_RUN_OK);        
       break;
       case wxCANCEL:
-        if(m_ClearInterfaceFlag)
-          OnClear();
-        OpStop(OP_RUN_CANCEL);        
+         OpStop(OP_RUN_CANCEL);        
       break;
     }
   }
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OpStop(int result)
-//----------------------------------------------------------------------------
 {
 	HideGui();
 	albaEventMacro(albaEvent(this,result));
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OnSmooth()
-//----------------------------------------------------------------------------
 {
+	wxBusyCursor *wait_cursor = NULL;
+
 	if (!m_TestMode)
 	{
-		wxBusyCursor wait;
+		wait_cursor = new wxBusyCursor();
 		m_Gui->Enable(ID_SMOOTH,false);
-	  m_Gui->Enable(ID_RADIUS_FACTOR,false);
-	  m_Gui->Enable(ID_RADIUS_FACTOR,false);
+	  m_Gui->Enable(ID_MEDIAN,false);
+	  m_Gui->Enable(ID_REPLACE,false);
 		m_Gui->Update();
 	}
 
   vtkALBASmartPointer<vtkImageGaussianSmooth> smoothFilter;
-	if (m_ApplyDirectlyOnInput)
-    smoothFilter->SetInputData(m_InputData);
-  else
-    smoothFilter->SetInputData(m_ResultImageData);
+	smoothFilter->SetInputData(m_OutputVolume->GetOutput()->GetVTKData());
   smoothFilter->SetDimensionality(m_Dimensionality);
   smoothFilter->SetRadiusFactors(m_SmoothRadius);
   smoothFilter->SetStandardDeviations(m_StandardDeviation);
+
+	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, smoothFilter));
+	
 	smoothFilter->Update();
 
-  if (m_ApplyDirectlyOnInput)
-  {
-    ((albaVMEVolumeGray *)m_Input)->SetData(smoothFilter->GetOutput(),m_Input->GetTimeStamp());
-		m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-		GetLogicManager()->CameraUpdate();
-  }
-  else
-    m_ResultImageData->DeepCopy(smoothFilter->GetOutput());
-
-  m_PreviewResultFlag = !m_ApplyDirectlyOnInput;
+  m_OutputVolume->SetData(smoothFilter->GetOutput(),m_Input->GetTimeStamp());
+	m_OutputVolume->GetOutput()->Update();
+	GetLogicManager()->CameraUpdate();
 
   if (!m_TestMode)
   {
 	  m_Gui->Enable(ID_SMOOTH,true);
-		m_Gui->Enable(ID_RADIUS_FACTOR,true);
-	  m_Gui->Enable(ID_RADIUS_FACTOR,true);
+		m_Gui->Enable(ID_MEDIAN,true);
+	  m_Gui->Enable(ID_REPLACE,true);
 	
-		m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-		m_Gui->Enable(ID_RESET_ALL,m_PreviewResultFlag);
+		m_Gui->Enable(ID_RESET,true);
 		m_Gui->Enable(wxOK,true);
-	  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
+		m_Gui->Update();
+
+		
+		cppDEL(wait_cursor);
   }
 }
+
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OnMedian()
-//----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-	  wxBusyCursor wait;
-	  m_Gui->Enable(ID_MEDIAN,false);
-	  m_Gui->Enable(ID_KERNEL_SIZE,false);
-	  m_Gui->Update();
-  }
-
-  vtkALBASmartPointer<vtkImageMedian3D> medianFilter;
-  if (m_ApplyDirectlyOnInput)
-    medianFilter->SetInputData(m_InputData);
-  else
-    medianFilter->SetInputData(m_ResultImageData);
-  medianFilter->SetKernelSize(m_KernelSize[0],m_KernelSize[1],m_KernelSize[2]);
-  medianFilter->Update();
-
-  if (m_ApplyDirectlyOnInput)
-  {
-    ((albaVMEVolumeGray *)m_Input)->SetData(medianFilter->GetOutput(),m_Input->GetTimeStamp());
-		m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-		GetLogicManager()->CameraUpdate();
-  }
-  else
-    m_ResultImageData->DeepCopy(medianFilter->GetOutput());
-
-  m_PreviewResultFlag = !m_ApplyDirectlyOnInput;
-
-  if (!m_TestMode)
-  {
-	  m_Gui->Enable(ID_MEDIAN,true);
-	  m_Gui->Enable(ID_KERNEL_SIZE,true);
-	
-	  m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-	  m_Gui->Enable(ID_RESET_ALL,m_PreviewResultFlag);
-	  m_Gui->Enable(wxOK,true);
-	  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
-  }
-}
-//----------------------------------------------------------------------------
-void albaOpFilterVolume::OnPreview()
-//----------------------------------------------------------------------------
-{
-	wxBusyCursor wait;
-	
-  ((albaVMEVolumeGray *)m_Input)->SetData(m_ResultImageData,m_Input->GetTimeStamp());
-
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_RESET_ALL,true);
-	m_Gui->Enable(wxOK,true);
-
-	m_PreviewResultFlag   = false;
-	m_ClearInterfaceFlag	= true;
-
-	GetLogicManager()->CameraUpdate();
-}
-//----------------------------------------------------------------------------
-void albaOpFilterVolume::OnClear()
-//----------------------------------------------------------------------------
-{
-	if (!m_TestMode)
-	{
-		wxBusyCursor wait;
-	}
-
-  ((albaVMEVolumeGray *)m_Input)->SetData(m_OriginalImageData,m_Input->GetTimeStamp());
-	
-  if (!m_ApplyDirectlyOnInput)
-  {
-    m_ResultImageData->DeepCopy(m_OriginalImageData);
-  }
+	wxBusyCursor *wait_cursor = NULL;
 
 	if (!m_TestMode)
 	{
-		m_Gui->Enable(ID_SMOOTH,true);
-		m_Gui->Enable(ID_RADIUS_FACTOR,true);
-	  m_Gui->Enable(ID_STANDARD_DEVIATION,true);
-	
-		m_Gui->Enable(ID_PREVIEW,false);
-		m_Gui->Enable(ID_RESET_ALL,false);
-		m_Gui->Enable(wxOK,false);
+		wait_cursor = new wxBusyCursor();
+		m_Gui->Enable(ID_SMOOTH, false);
+		m_Gui->Enable(ID_MEDIAN, false);
+		m_Gui->Enable(ID_REPLACE, false);
 		m_Gui->Update();
 	}
+  vtkALBASmartPointer<vtkImageMedian3D> medianFilter;
+  medianFilter->SetInputData(m_OutputVolume->GetOutput()->GetVTKData());
+  medianFilter->SetKernelSize(m_KernelSize[0],m_KernelSize[1],m_KernelSize[2]);
 
-	m_PreviewResultFlag = false;
-	m_ClearInterfaceFlag= false;
+	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, medianFilter));
 
+  medianFilter->Update();
+
+	m_OutputVolume->SetData(medianFilter->GetOutput(), m_Input->GetTimeStamp());
+	m_OutputVolume->GetOutput()->Update();
 	GetLogicManager()->CameraUpdate();
+
+	if (!m_TestMode)
+	{
+		m_Gui->Enable(ID_SMOOTH, true	);
+		m_Gui->Enable(ID_MEDIAN, true);
+		m_Gui->Enable(ID_REPLACE, true);
+
+	  m_Gui->Enable(ID_RESET,true);
+	  m_Gui->Enable(wxOK,true);
+		m_Gui->Update();
+
+		cppDEL(wait_cursor);
+  }
 }
 
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OnReplace()
 {
-	vtkImageData *inputData;
-	if (m_ApplyDirectlyOnInput)
-		inputData = m_InputData;
-	else
-		inputData = m_ResultImageData;
+	wxBusyCursor *wait_cursor = NULL;
+
+	if (!m_TestMode)
+	{
+		wait_cursor = new wxBusyCursor();
+		m_Gui->Enable(ID_SMOOTH, false);
+		m_Gui->Enable(ID_MEDIAN, false);
+		m_Gui->Enable(ID_REPLACE, false);
+		m_Gui->Update();
+	}
+
+	vtkDataSet *inputData = m_OutputVolume->GetOutput()->GetVTKData();
 
 	vtkDataArray *inputScalars = inputData->GetPointData()->GetScalars();
 	vtkDataArray *outputScalars;
@@ -449,38 +367,48 @@ void albaOpFilterVolume::OnReplace()
 	if (inputData->IsA("vtkRectilinearGrid"))
 	{
 		outputDataRG->GetPointData()->SetScalars(outputScalars);
-
-		if (m_ApplyDirectlyOnInput)
-		{
-			((albaVMEVolumeGray *)m_Input)->SetData(outputDataRG, m_Input->GetTimeStamp());
-			m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-			albaEventMacro(albaEvent(this, CAMERA_UPDATE));
-		}
-		else
-			m_ResultImageData->DeepCopy(outputDataRG);
+		m_OutputVolume->SetData(outputDataRG, m_Input->GetTimeStamp());
 	}
 	else
 	{
 		outputDataSP->GetPointData()->SetScalars(outputScalars);
-
-		if (m_ApplyDirectlyOnInput)
-		{
-			((albaVMEVolumeGray *)m_Input)->SetData(outputDataSP, m_Input->GetTimeStamp());
-			m_InputData = (vtkImageData*)m_Input->GetOutput()->GetVTKData();
-			albaEventMacro(albaEvent(this, CAMERA_UPDATE));
-		}
-		else
-			m_ResultImageData->DeepCopy(outputDataSP);
+		m_OutputVolume->SetData(outputDataSP, m_Input->GetTimeStamp());
 	}
+	m_OutputVolume->GetOutput()->Update();
+	GetLogicManager()->CameraUpdate();
 
-
-	m_PreviewResultFlag = !m_ApplyDirectlyOnInput;
 
 	if (!m_TestMode)
 	{
-		m_Gui->Enable(ID_PREVIEW, m_PreviewResultFlag);
-		m_Gui->Enable(ID_RESET_ALL, m_PreviewResultFlag);
+		m_Gui->Enable(ID_SMOOTH, true);
+		m_Gui->Enable(ID_MEDIAN, true);
+		m_Gui->Enable(ID_REPLACE, true);
+
+		m_Gui->Enable(ID_RESET, true);
 		m_Gui->Enable(wxOK, true);
-		m_Gui->Enable(wxCANCEL, m_PreviewResultFlag);
+		m_Gui->Update();
+
+		cppDEL(wait_cursor);
 	}
+}
+
+//----------------------------------------------------------------------------
+void albaOpFilterVolume::OnReset()
+{
+
+	m_OutputVolume->SetData(m_InputData, m_Input->GetTimeStamp());
+	m_OutputVolume->GetOutput()->Update();
+
+	if (!m_TestMode)
+	{
+		m_Gui->Enable(ID_SMOOTH, true);
+		m_Gui->Enable(ID_MEDIAN, true);
+		m_Gui->Enable(ID_REPLACE, true);
+
+		m_Gui->Enable(ID_RESET, false);
+		m_Gui->Enable(wxOK, false);
+		m_Gui->Update();
+	}
+
+	GetLogicManager()->CameraUpdate();
 }
