@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpFilterVolumeTest
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -42,7 +42,7 @@ public:
   CPPUNIT_TEST( TestOnClear );
   CPPUNIT_TEST( TestAccept );
   CPPUNIT_TEST( TestUndo );
-  CPPUNIT_TEST( TestApplyFiltersToInputData );
+  CPPUNIT_TEST( TestApplyMultipleFilters );
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -54,7 +54,7 @@ private:
   void TestOnClear();
   void TestAccept();
   void TestUndo();
-  void TestApplyFiltersToInputData();
+  void TestApplyMultipleFilters();
 
   void CreateDataTest();
   vtkImageData *m_InputIM;

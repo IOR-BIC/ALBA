@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpFilterVolumeTest
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -172,7 +172,6 @@ void albaOpFilterVolumeTest::TestOnSmooth()
 
   albaOpFilterVolume *op = new albaOpFilterVolume();
   op->TestModeOn();
-  op->ApplyFiltersToInputDataOff();
   op->SetInput(volumeIM);
   op->OpRun();
   double radius[3];
@@ -182,7 +181,7 @@ void albaOpFilterVolumeTest::TestOnSmooth()
   op->OnSmooth();
   op->OpDo();
 
-  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
+  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetOutput())->GetOutput()->GetVTKData();
 
   vtkALBASmartPointer<vtkImageGaussianSmooth> filterSmooth;
   filterSmooth->SetInputData(m_InputIM);
@@ -212,16 +211,15 @@ void albaOpFilterVolumeTest::TestOnClear()
 
   albaOpFilterVolume *op = new albaOpFilterVolume();
   op->TestModeOn();
-  op->ApplyFiltersToInputDataOff();
   op->SetInput(volumeIM);
   op->OpRun();
   int kernelSize[3];
   op->OnMedian();
   op->OnSmooth();
-  op->OnClear();
+  op->OnReset();
   op->OpDo();
 
-  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
+  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetOutput())->GetOutput()->GetVTKData();
 
   m_Result = outputIM->GetNumberOfPoints() == m_InputIM->GetNumberOfPoints();
   TEST_RESULT;
@@ -235,7 +233,7 @@ void albaOpFilterVolumeTest::TestOnClear()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpFilterVolumeTest::TestApplyFiltersToInputData()
+void albaOpFilterVolumeTest::TestApplyMultipleFilters()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEVolumeGray> volumeIM;
@@ -245,7 +243,6 @@ void albaOpFilterVolumeTest::TestApplyFiltersToInputData()
 
   albaOpFilterVolume *op = new albaOpFilterVolume();
   op->TestModeOn();
-  op->ApplyFiltersToInputDataOn();
   op->SetInput(volumeIM);
   op->OpRun();
   int kernelSize[3];
@@ -259,7 +256,7 @@ void albaOpFilterVolumeTest::TestApplyFiltersToInputData()
   op->OpDo();
   op->OpUndo();
 
-  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
+  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetOutput())->GetOutput()->GetVTKData();
 
   vtkALBASmartPointer<vtkImageGaussianSmooth> filterSmooth;
   filterSmooth->SetInputData(m_InputIM);
@@ -294,24 +291,19 @@ void albaOpFilterVolumeTest::TestUndo()
 
   albaOpFilterVolume *op = new albaOpFilterVolume();
   op->TestModeOn();
-  op->ApplyFiltersToInputDataOff();
   op->SetInput(volumeIM);
   op->OpRun();
   int kernelSize[3];
   op->OnMedian();
   op->OnSmooth();
   op->OpDo();
+
+	int nChildren = op->GetInput()->GetNumberOfChildren();
+
   op->OpUndo();
 
-
-  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
-
-  for (int i=0;i<outputIM->GetNumberOfPoints();i++)
-  {
-    m_Result = (outputIM->GetPointData()->GetScalars()->GetTuple1(i) == m_InputIM->GetPointData()->GetScalars()->GetTuple1(i));
-    TEST_RESULT;
-  }
-
+	CPPUNIT_ASSERT(op->GetInput()->GetNumberOfChildren() == nChildren-1);
+  
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
@@ -325,7 +317,6 @@ void albaOpFilterVolumeTest::TestOnMedian()
 
   albaOpFilterVolume *op = new albaOpFilterVolume();
   op->TestModeOn();
-  op->ApplyFiltersToInputDataOff();
   op->SetInput(volumeIM);
   op->OpRun();
   int kernelSize[3];
@@ -333,7 +324,7 @@ void albaOpFilterVolumeTest::TestOnMedian()
   op->OnMedian();
   op->OpDo();
 
-  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetInput())->GetOutput()->GetVTKData();
+  vtkImageData *outputIM = (vtkImageData*)albaVMEVolumeGray::SafeDownCast(op->GetOutput())->GetOutput()->GetVTKData();
 
   vtkALBASmartPointer<vtkImageMedian3D> filterMedian;
   filterMedian->SetInputData(m_InputIM);

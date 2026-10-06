@@ -76,7 +76,7 @@ albaOpFilterVolume::albaOpFilterVolume(const wxString &label)
   m_SmoothRadius[0] = m_SmoothRadius[1] = m_SmoothRadius[2] = 1.5;
   m_StandardDeviation[0] = m_StandardDeviation[1] = m_StandardDeviation[2] = 2.0;
 
-  m_KernelSize[0] = m_KernelSize[1] = m_KernelSize[2] = 1;
+  m_KernelSize[0] = m_KernelSize[1] = m_KernelSize[2] = 3;
 
 }
 //----------------------------------------------------------------------------
@@ -101,6 +101,7 @@ void albaOpFilterVolume::OpRun()
 
 	albaNEW(m_OutputVolume);
 	m_OutputVolume->DeepCopy(m_Input);
+	m_Output = m_OutputVolume;
 
 	albaString name = m_Input->GetName();
 	name << " filtered";
