@@ -45,6 +45,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPoints.h"
 #include "albaPipeMeshSlice.h"
 #include "albaVMEProsthesis.h"
+#include "albaEventInteraction.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -560,7 +561,64 @@ void albaViewRXCT::OnEventMouseMove( albaEvent *e )
   }
   p->GetPoint(0,newSliceLocalOrigin);
 	BoundsValidate(newSliceLocalOrigin);
-  if (m_MoveAllSlices)
+
+
+	bool altPressed = wxGetKeyState(WXK_ALT);
+
+	if (altPressed)
+	{
+		int gizmoId = -1;
+		for (int i = 0; i < CT_CHILD_VIEWS_NUMBER; i++)
+			if (e->GetSender() == m_GizmoSlice[i])
+			{
+				gizmoId = i;
+				break;
+			}
+
+		if (gizmoId >= 0 && m_CurrentVolume)
+		{
+			albaViewCompound *slicesView = (albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW];
+			int slicePosition = -1;
+
+			for (int i = 0; i < CT_CHILD_VIEWS_NUMBER; i++)
+				if (m_Sort[i] == gizmoId)
+				{
+					slicePosition = i;
+					break;
+				}
+
+			if (slicePosition >= 0)
+			{
+				int farestSliceId = slicePosition < (CT_CHILD_VIEWS_NUMBER / 2) ? CT_CHILD_VIEWS_NUMBER - 1 : 0;
+
+				double farthestSliceOrigin[3];
+				albaViewSlice *slice = (albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(farestSliceId);
+
+				slice->GetSlice(farthestSliceOrigin);
+
+				int positionsDistance = slicePosition - farestSliceId;
+				double sliceDistance = newSliceLocalOrigin[2] - farthestSliceOrigin[2];
+				double fixedDistance = sliceDistance / positionsDistance;
+
+				for (int position = 0; position < CT_CHILD_VIEWS_NUMBER; position++)
+				{
+					int currentGizmoId = m_Sort[position];
+					albaViewSlice *slice = (albaViewSlice *)slicesView->GetSubView(position);
+					double sliceOrigin[3];
+
+					slice->GetSlice(sliceOrigin);
+					sliceOrigin[2] = farthestSliceOrigin[2] + fixedDistance * (position - farestSliceId);
+
+					m_GizmoSlice[currentGizmoId]->UpdateGizmoSliceInLocalPositionOnAxis(currentGizmoId, albaGizmoSlice::GIZMO_SLICE_Z, sliceOrigin[2]);
+					m_Pos[currentGizmoId] = sliceOrigin[2];
+
+					slice->SetSlice(sliceOrigin);
+					slice->CameraUpdate();
+				}
+			}
+		}
+	}
+  else if (m_MoveAllSlices)
   {
     double oldSliceLocalOrigin[3], delta[3], b[CT_CHILD_VIEWS_NUMBER];
 		albaViewCompound * slicesView = (albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW];
@@ -762,8 +820,12 @@ albaGUI* albaViewRXCT::CreateGui()
 
   m_Gui->Bool(ID_MOVE_ALL_SLICES,"Move all",&m_MoveAllSlices,1);
 
+	m_Gui->HintBox(-1, "Hold Alt to drag slices\nproportionally");
+
+
   m_Gui->Button(ID_ADJUST_SLICES,"Adjust Slices");
 	m_Gui->Button(ID_BALANCE_SLICES, "Balance Slices");
+
 
 
   m_Gui->Divider(1);
