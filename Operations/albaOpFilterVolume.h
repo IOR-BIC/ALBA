@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 class vtkImageData;
 class albaEvent;
-
+class albaVMEVolumeGray;
 //----------------------------------------------------------------------------
 // albaOpFilterVolume :
 //----------------------------------------------------------------------------
@@ -49,12 +49,6 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
-  void ApplyFiltersToInputData(bool apply) {m_ApplyDirectlyOnInput = apply;};
-
-  void ApplyFiltersToInputDataOn() {ApplyFiltersToInputData(true);};
-
-  void ApplyFiltersToInputDataOff() {ApplyFiltersToInputData(false);};
-
   /** Set the Standard Deviation for the smooth filter */
   void SetStandardDeviation(double stDev[3]){m_StandardDeviation[0] = stDev[0];m_StandardDeviation[1] = stDev[1];m_StandardDeviation[2] = stDev[2];};
 
@@ -76,7 +70,7 @@ public:
 protected:
 
 	/** Return true for the acceptable vme type. */
-	bool InternalAccept(albaVME*node);
+	bool InternalAccept(albaVME *node);
 
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -84,12 +78,10 @@ protected:
   /** Create the Operation GUI */
   void CreateGui();
 	
-	bool m_ClearInterfaceFlag;
-	bool m_PreviewResultFlag;
+	bool m_OutputVolumeRegistered;
 
-	vtkImageData	*m_ResultImageData;
-	vtkImageData	*m_OriginalImageData;
-  vtkImageData  *m_InputData;
+	vtkImageData  *m_InputData;
+	albaVMEVolumeGray *m_OutputVolume;
 
 	int    m_Dimensionality;
   double m_SmoothRadius[3];
@@ -100,19 +92,14 @@ protected:
 	double m_ReplaceRange[2];
 	double m_ReplaceValue;
 
-  int m_ApplyDirectlyOnInput; ///< For big volume data, torn on this flag to save memory and apply filters directly to the input data.
-
   /** Smooth the surface. */
 	void OnSmooth();
 
   /** Execute median filter.*/
   void OnMedian();
 
-	/** Make the preview of the surface filtering. */
-	void OnPreview();  
-
 	/** Clear all the surface applied filtering. */
-	void OnClear();
+	void OnReset();
 
 	/** Replaces values inside range with defined value*/
 	void OnReplace();
