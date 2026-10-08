@@ -14,3 +14,16 @@
 - Follow the existing project formatting and naming conventions.
 - Write code comments and variable names in English.
 - Preserve CRLF line endings and use spaces for indentation as defined by `.editorconfig`.
+
+## Branching Policy
+
+- `master` and `develop` are the two long-lived branches.
+- For every feature or fix: create a branch from `master`, named
+  `feature/<short-name>`. All commits for that work happen on this branch.
+- When the work is ready, merge the branch into `develop` first.
+- Only after tests pass on `develop`, merge the SAME branch into `master`.
+  Never merge `develop` into `master` directly.
+- Direct commits to `master` are allowed only for changes that cannot affect
+  code or tests (icons, splash screen, documentation). If more than one such
+  commit is needed, create a branch instead, even for non-code changes.
+- Never force-push, never rewrite history on a shared branch.
