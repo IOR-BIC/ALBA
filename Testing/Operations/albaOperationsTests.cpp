@@ -51,7 +51,6 @@
 #include "albaOpEditMetadataTest.h"
 #include "albaOpEditNormalsTest.h"
 #include "albaOpExporterAbaqusFileTest.h"
-#include "albaOpExporterAnalogWSTest.h"
 #include "albaOpExporterAnsysCDBFileTest.h"
 #include "albaOpExporterAnsysInputFileTest.h" 
 #include "albaOpExporterImagesTest.h"
@@ -75,11 +74,8 @@
 #include "albaOpFreezeVMETest.h"
 #include "albaOpGarbageCollectMSFDirTest.h"
 #include "albaOpImporterAbaqusFileTest.h"
-#include "albaOpImporterASCIITest.h"
-#include "albaOpImporterAnalogWSTest.h"
 #include "albaOpImporterAnsysCDBFileTest.h"
 #include "albaOpImporterAnsysInputFileTest.h"
-#include "albaOpImporterC3DTest.h"
 #include "albaOpImporterDicomTest.h"
 #include "albaOpImporterExternalFileTest.h"
 #include "albaOpImporterGRFWSTest.h"
@@ -90,7 +86,6 @@
 #include "albaOpImporterMSF1xTest.h"
 #include "albaOpImporterMSFTest.h"
 #include "albaOpImporterMeshTest.h"
-#include "albaOpImporterMotionDataTest.h"
 #include "albaOpImporterRAWImagesTest.h"
 #include "albaOpImporterRAWVolumeTest.h"
 #include "albaOpImporterSTLTest.h"
@@ -234,7 +229,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpAddLandmarkTest::suite());
 	runner.addTest(albaOpApplyTrajectoryTest::suite());
 	runner.addTest(albaOpExtractIsosurfaceTest::suite());
-	runner.addTest(albaOpImporterASCIITest::suite());
  	runner.addTest(albaOpExporterMSFTest::suite());
 	runner.addTest(albaOpFilterSurfaceTest::suite());
 	runner.addTest(albaOpValidateTreeTest::suite());
@@ -260,7 +254,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterLandmarkTest::suite());
 	runner.addTest(albaOpImporterLandmarkTest::suite());
 	runner.addTest(albaOpImporterGRFWSTest::suite());
-	runner.addTest(albaOpImporterAnalogWSTest::suite());
 	runner.addTest(albaGeometryEditorPolylineGraphTest::suite());
 	runner.addTest(albaOpMatrixVectorMathTest::suite());
 	runner.addTest(albaOpVolumeMeasureTest::suite());
@@ -296,12 +289,9 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpCropDeformableROITest::suite());
 	runner.addTest(albaOpMoveTest::suite());
 	runner.addTest(albaOpTransformTest::suite());
-	runner.addTest(albaOpExporterAnalogWSTest::suite());
 	runner.addTest(albaOpExporterGRFWSTest::suite());
 	runner.addTest(albaOpExporterLandmarkWSTest::suite()); 
 	runner.addTest(albaDicomClassesTest::suite()); 
-	runner.addTest(albaOpImporterC3DTest::suite());
-	runner.addTest(albaOpImporterMotionDataTest::suite());
 	runner.addTest(albaOpFillHolesTest::suite());
 	runner.addTest(albaOpImporterVTKXMLTest::suite());
 	runner.addTest(albaOpInteractiveClipSurfaceTest::suite());

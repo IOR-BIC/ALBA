@@ -25,7 +25,6 @@
 #include "albaDataPipeInterpolatorTest.h"
 #include "albaDataPipeInterpolatorVTKTest.h"
 #include "albaDataPipeCustomTest.h"
-#include "albaDataPipeInterpolatorScalarMatrixTest.h"
 #include "albaDataPipeCustomProberTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaServiceLocator.h"
@@ -74,7 +73,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDataPipeInterpolatorTest::suite());
 	runner.addTest(albaDataPipeInterpolatorVTKTest::suite());
 	runner.addTest(albaDataPipeCustomTest::suite());
-	runner.addTest(albaDataPipeInterpolatorScalarMatrixTest::suite());
 	runner.addTest(albaDataPipeCustomProberTest::suite());
 
 	runner.run( controller );
