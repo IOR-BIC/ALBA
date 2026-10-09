@@ -224,7 +224,6 @@
 
 //TMP
 #include "albaOpImporterExternalFile.h"
-#include "albaOpImporterVMEDataSetAttributes.h"
 #include "albaOpExporterLandmarkWS.h"
 #include "albaOpApplyTrajectory.h"
 #include "albaOpCreateProsthesis.h"
@@ -2029,7 +2028,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
 
 	Plug(new albaOpImporterExternalFile());
-	Plug(new albaOpImporterVMEDataSetAttributes(), "TMP to test");
 	Plug(new albaOpExporterLandmarkWS(), "TMP to test");
 
 

@@ -198,7 +198,6 @@ ENDIF (ALBA_USE_GDCM)
     albaOpImporterMesh.cpp				albaOpImporterMesh.h
     albaOpExporterMesh.cpp				albaOpExporterMesh.h
     albaOpScalarToSurface.cpp			albaOpScalarToSurface.h
-    albaOpImporterVMEDataSetAttributes.cpp	albaOpImporterVMEDataSetAttributes.h
 	
 	albaOpExporterLandmark.cpp		albaOpExporterLandmark.h
     albaOpClassicICPRegistration.cpp	albaOpClassicICPRegistration.h

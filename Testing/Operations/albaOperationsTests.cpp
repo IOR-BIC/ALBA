@@ -89,7 +89,6 @@
 #include "albaOpImporterRAWImagesTest.h"
 #include "albaOpImporterRAWVolumeTest.h"
 #include "albaOpImporterSTLTest.h"
-#include "albaOpImporterVMEDataSetAttributesTest.h"
 #include "albaOpImporterVRMLTest.h"
 #include "albaOpImporterVTKTest.h"
 #include "albaOpImporterVTKXMLTest.h"
@@ -243,7 +242,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterMeshTest::suite()); 
 	runner.addTest(albaOpExporterMeshTest::suite());  
 	runner.addTest(albaVMEDataSetAttributesImporterTest::suite());
-	runner.addTest(albaOpImporterVMEDataSetAttributesTest::suite());
 	runner.addTest(albaOpCreateMeterTest::suite());
 	runner.addTest(albaOpCreateProberTest::suite());
 	runner.addTest(albaOpCreateRefSysTest::suite());
