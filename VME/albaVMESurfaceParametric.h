@@ -79,7 +79,7 @@ public:
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();
 	
-  /** Precess events coming from other objects */ 
+  /** Precess events coming from GUI and other objects */ 
   virtual void OnEvent(albaEventBase *alba_event);
 
   /**
