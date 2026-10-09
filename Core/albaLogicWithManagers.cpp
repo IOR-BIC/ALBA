@@ -1981,7 +1981,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterVRML("VRML"));
 	Plug(new albaOpImporterVTK("VTK"));
 	Plug(new albaOpImporterVTKXML("VTK xml"));
-	Plug(new albaOpImporterMetaImage("ITK MetaImage"));
+	Plug(new albaOpImporterMetaImage());
 	Plug(new albaOpImporterMSF("ALBA"));
 	Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -2012,7 +2012,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterPLY("PLY"));
 	Plug(new albaOpExporterVTK("VTK"));
 	Plug(new albaOpExporterVTKXML("VTK xml"));
-	Plug(new albaOpExporterMetaImage("ITK MetaImage"));
+	Plug(new albaOpExporterMetaImage());
 #ifdef ALBA_USE_GDCM
 	Plug(new albaOpExporterDicom("Dicom"), "", true, dicomSettings);
 #endif
