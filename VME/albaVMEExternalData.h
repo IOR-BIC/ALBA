@@ -28,6 +28,11 @@ class ALBA_EXPORT albaVMEExternalData : public albaVMEGroup
 public:
   albaTypeMacro(albaVMEExternalData,albaVMEGroup);
 
+	enum EXTERNAL_DATA_WIDGET_ID
+	{
+		ID_OPEN_FILE = Superclass::ID_LAST,
+		ID_LAST
+	};
 
 void PrintSelf(std::ostream& os,const int indent);
 
@@ -39,6 +44,12 @@ void PrintSelf(std::ostream& os,const int indent);
 
   /**  Set the file name*/
   void SetFileName(const char *filename);
+
+	/** Internally used to create a new instance of the GUI.*/
+	virtual albaGUI *CreateGui();
+
+	/** Precess events coming from GUI and other objects */
+	virtual void OnEvent(albaEventBase *alba_event);
 
 
   /**  Get the file name */

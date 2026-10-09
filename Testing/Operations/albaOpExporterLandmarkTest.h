@@ -31,7 +31,6 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-    void TestOnVmeRawMotionData();
 		void TestOnLandmarkImporter();
     void TestMultipleExports();
 };

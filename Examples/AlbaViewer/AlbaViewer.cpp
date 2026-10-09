@@ -58,14 +58,11 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpImporterAnsysInputFile.h"
 #include "albaOpImporterAbaqusFile.h"
 #include "albaOpImporterMesh.h"
-#include "albaOpImporterASCII.h"
 #include "albaGUIDicomSettings.h"
 #include "albaOpImporterDicom.h"
 #include "albaOpImporterLandmark.h"
 #include "albaOpImporterLandmarkTXT.h"
 #include "albaOpImporterLandmarkWS.h"
-#include "albaOpImporterC3D.h"
-#include "albaOpImporterAnalogWS.h"
 #include "albaOpImporterGRFWS.h"
 #include "albaOpImporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
@@ -125,7 +122,6 @@ bool AlbaViewer::OnInit()
 	m_Logic->Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
 	m_Logic->Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
-	m_Logic->Plug(new albaOpImporterASCII("ASCII"));
 
 #ifdef ALBA_USE_GDCM
 	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
@@ -134,8 +130,6 @@ bool AlbaViewer::OnInit()
 	m_Logic->Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
 	m_Logic->Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
 	m_Logic->Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
-	m_Logic->Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
-	m_Logic->Plug(new albaOpImporterAnalogWS("EMG"));
 	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
 	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	m_Logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));

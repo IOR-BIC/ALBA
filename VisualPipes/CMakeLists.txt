@@ -49,7 +49,6 @@ SET(PROJECT_SRCS
   albaPipeVolumeArbOrthoSlice.cpp			albaPipeVolumeArbOrthoSlice.h
   albaPipePointCloud.cpp					albaPipePointCloud.h
   albaPipePointCloudSlice.cpp					albaPipePointCloudSlice.h
-  albaPipeScalarMatrix.cpp  					albaPipeScalarMatrix.h
   )
 
 IF (ALBA_USE_VTK)
@@ -65,7 +64,6 @@ IF (ALBA_USE_VTK)
   albaPipeSurfaceTextured.cpp  				albaPipeSurfaceTextured.h
   albaPipeVector.cpp  						albaPipeVector.h
   albaPipeVolumeProjected.cpp  				albaPipeVolumeProjected.h
-  albaPipeGraph.cpp  						albaPipeGraph.h
   )
 ENDIF (ALBA_USE_VTK)
 

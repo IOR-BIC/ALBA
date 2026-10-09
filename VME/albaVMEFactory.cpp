@@ -40,8 +40,6 @@
 #include "albaVMEProber.h"
 #include "albaVMERefSys.h"
 #include "albaVMERoot.h"
-#include "albaVMEScalarMatrix.h"
-#include "albaVMEItemScalarMatrix.h"
 #include "albaVMEScalar.h"
 #include "albaVMESlicer.h"
 #include "albaVMESurface.h"
@@ -65,8 +63,6 @@
 #include "albaVMEMaps.h"
 #include "albaVMESurfaceEditor.h"
 #include "albaVMELabeledVolume.h"
-#include "albaVMERawMotionData.h"
-#include "albaVMEAnalog.h"
 
 #include "albaIndent.h"
 #include <string>
@@ -111,7 +107,6 @@ albaVMEFactory::albaVMEFactory()
   //
   albaPlugObjectMacro(albaTagArray,"a basic kind of attribute used to store key-value pairs");
   albaPlugObjectMacro(albaVMEItemVTK,"a VME item storing VTK datasets");
-  albaPlugObjectMacro(albaVMEItemScalarMatrix,"a VME item storing matrix scalar data through vnl matrix");
   albaPlugObjectMacro(mmaMeter,"Meter attributes");
   albaPlugObjectMacro(mmaMaterial,"Material attributes");
   albaPlugObjectMacro(mmaVolumeMaterial,"Volume material attributes");
@@ -138,7 +133,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEPointSet,"Point set");
   albaPlugVMEMacro(albaVMERefSys,"Reference System");
   albaPlugVMEMacro(albaVMEScalar,"Scalar");
-  albaPlugVMEMacro(albaVMEScalarMatrix,"Scalar Matrix");
   albaPlugVMEMacro(albaVMESlicer,"Slicer");
   albaPlugVMEMacro(albaVMEVector,"Vector");
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
@@ -147,8 +141,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMESurfaceEditor,"Surface Editor");
   albaPlugVMEMacro(albaVMELabeledVolume,"Labeled Volume");
   albaPlugVMEMacro(albaVMEMaps, "VME representing density-distace surface scalars");
-  albaPlugVMEMacro(albaVMERawMotionData,"Raw Motion Data");
-  albaPlugVMEMacro(albaVMEAnalog,"EMG scalar data");
 }
 
 //------------------------------------------------------------------------------

@@ -61,7 +61,7 @@ static int m_ErrorCount = 0;
 //----------------------------------------------------------------------------
 albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) : albaOpImporterFile(label)
 {
-	SetWildc("VTK XML ImageData (*.vti)|*.vti|VTK XML PolyData (*.vtp)|*.vtp|VTK XML StructuredGrid (*.vts)|*.vts|VTK XML RectilinearGrid (*.vtr)|*.vtr|VTK XML UnstructuredGrid (*.vtu)|*.vtu");
+	SetWildc("VTK XML (*.vti;*.vtp;*.vts;*.vtr;*.vtu)|*.vti;*.vtp;*.vts;*.vtr;*.vtu| VTK XML ImageData (*.vti)|*.vti|VTK XML PolyData (*.vtp)|*.vtp|VTK XML StructuredGrid (*.vts)|*.vts|VTK XML RectilinearGrid (*.vtr)|*.vtr|VTK XML UnstructuredGrid (*.vtu)|*.vtu");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Input   = NULL;
