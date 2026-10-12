@@ -104,11 +104,8 @@
 #include "albaGUIDicomSettings.h"
 #include "albaOpImporterDicom.h"
 #endif
-#include "albaOpImporterGRFWS.h"
 #include "albaOpImporterImage.h"
 #include "albaOpImporterLandmark.h"
-#include "albaOpImporterLandmarkTXT.h"
-#include "albaOpImporterLandmarkWS.h"
 #include "albaOpImporterMSF.h"
 #include "albaOpImporterMSF1x.h"
 #include "albaOpImporterMesh.h"
@@ -134,7 +131,6 @@
 #ifdef ALBA_USE_GDCM
 #include "albaOpExporterDicom.h"
 #endif 
-#include "albaOpExporterGRFWS.h"
 #include "albaOpExporterLandmark.h"
 #include "albaOpExporterMSF.h"
 #include "albaOpExporterMesh.h"
@@ -224,7 +220,6 @@
 
 //TMP
 #include "albaOpImporterExternalFile.h"
-#include "albaOpExporterLandmarkWS.h"
 #include "albaOpApplyTrajectory.h"
 #include "albaOpCreateProsthesis.h"
 #include "albaOpDecomposeTimeVarVME.h"
@@ -1993,11 +1988,8 @@ void albaLogicWithManagers::PlugStandardOperations()
 	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
 	Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
 #endif
-	Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
-	Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
-	Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
+	Plug(new albaOpImporterLandmark("Landmark"));
 
-	Plug(new albaOpImporterGRFWS("GRF"));
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
@@ -2019,7 +2011,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterImages("Images"));
 	Plug(new albaOpExporterLandmark("Landmark"));
 	Plug(new albaOpExporterWrappedMeter());
-	Plug(new albaOpExporterGRFWS());
 	Plug(new albaOpExporterMeters());
 	Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
@@ -2028,7 +2019,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
 
 	Plug(new albaOpImporterExternalFile());
-	Plug(new albaOpExporterLandmarkWS(), "TMP to test");
 
 
 	//------------------------------------------------------------

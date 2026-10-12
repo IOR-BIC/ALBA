@@ -83,8 +83,6 @@ IF (ALBA_USE_VTK)
 	albaGeometryEditorPolylineGraph.cpp	albaGeometryEditorPolylineGraph.h
 	albaOpCreateLabeledVolume.cpp	albaOpCreateLabeledVolume.h
 	albaOpImporterLandmark.cpp		albaOpImporterLandmark.h
-	albaOpImporterLandmarkTXT.cpp	albaOpImporterLandmarkTXT.h
-	albaOpImporterLandmarkWS.cpp		albaOpImporterLandmarkWS.h
 
 	albaOpMatrixVectorMath.cpp		albaOpMatrixVectorMath.h
 
@@ -148,10 +146,7 @@ IF (ALBA_USE_VTK)
 	albaOpMakeVMETimevarying.cpp  albaOpMakeVMETimevarying.h
 	albaOpSegmentationRegionGrowingConnectedThreshold.cpp  albaOpSegmentationRegionGrowingConnectedThreshold.h
 	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
-	  	  
-	albaOpExporterGRFWS.cpp		albaOpExporterGRFWS.h
-	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
-	  
+	  	  	  
 	albaOpExporterFEMCommon.cpp	albaOpExporterFEMCommon.h
 	
 	albaOpESPCalibration.cpp		albaOpESPCalibration.h
@@ -201,7 +196,6 @@ ENDIF (ALBA_USE_GDCM)
 	
 	albaOpExporterLandmark.cpp		albaOpExporterLandmark.h
     albaOpClassicICPRegistration.cpp	albaOpClassicICPRegistration.h
-    albaOpImporterGRFWS.cpp			albaOpImporterGRFWS.h
     albaOpSmoothSurfaceCells.cpp		albaOpSmoothSurfaceCells.h
     albaOpExporterMeters.cpp			albaOpExporterMeters.h
     albaOpInteractionDebugger.cpp	albaOpInteractionDebugger.h

@@ -63,13 +63,10 @@ SET(PROJECT_SRCS
 	albaOpExporterVTKTest.h albaOpExporterVTKTest.cpp
 	albaOpExporterLandmarkTest.h albaOpExporterLandmarkTest.cpp
 	albaOpImporterLandmarkTest.h albaOpImporterLandmarkTest.cpp
-	albaOpImporterGRFWSTest.h albaOpImporterGRFWSTest.cpp
 	albaGeometryEditorPolylineGraphTest.h albaGeometryEditorPolylineGraphTest.cpp
 	albaOpMatrixVectorMathTest.h albaOpMatrixVectorMathTest.cpp
 	albaOpVolumeMeasureTest.h albaOpVolumeMeasureTest.cpp
 	albaOpImporterRAWImagesTest.h albaOpImporterRAWImagesTest.cpp
-	albaOpImporterLandmarkTXTTest.h albaOpImporterLandmarkTXTTest.cpp
-	albaOpImporterLandmarkWSTest.h albaOpImporterLandmarkWSTest.cpp
 	albaOpExtrusionHolesTest.h albaOpExtrusionHolesTest.cpp
 	albaOpExporterWrappedMeterTest.h albaOpExporterWrappedMeterTest.cpp
 	albaOpFreezeVMETest.h albaOpFreezeVMETest.cpp
@@ -99,8 +96,6 @@ SET(PROJECT_SRCS
 	albaOpMeshQualityTest.h albaOpMeshQualityTest.cpp
 	albaOpCropDeformableROITest.h albaOpCropDeformableROITest.cpp
 	albaOpMoveTest.h albaOpMoveTest.cpp
-	albaOpExporterGRFWSTest.h albaOpExporterGRFWSTest.cpp
-	albaOpExporterLandmarkWSTest.h albaOpExporterLandmarkWSTest.cpp
 	albaDicomClassesTest.h albaDicomClassesTest.cpp
 	albaOpFillHolesTest.h albaOpFillHolesTest.cpp
 	albaOpImporterVTKXMLTest.h albaOpImporterVTKXMLTest.cpp
