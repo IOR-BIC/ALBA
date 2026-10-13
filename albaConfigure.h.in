@@ -38,7 +38,6 @@
 #cmakedefine ALBA_USE_CRYPTO
 #cmakedefine ALBA_USE_CURL
 #cmakedefine ALBA_USE_WXMOZILLA
-#cmakedefine ALBA_USE_BTK
 #cmakedefine ALBA_USE_GDCM
 // special defined for albaInteraction modules
 #cmakedefine ALBA_USE_P5_GLOVE

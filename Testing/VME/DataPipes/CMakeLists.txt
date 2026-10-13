@@ -15,7 +15,6 @@ SET(PROJECT_SRCS
 	albaDataPipeInterpolatorTest.h 				albaDataPipeInterpolatorTest.cpp
 	albaDataPipeInterpolatorVTKTest.h 			albaDataPipeInterpolatorVTKTest.cpp
 	albaDataPipeCustomTest.h 					albaDataPipeCustomTest.cpp
-	albaDataPipeInterpolatorScalarMatrixTest.h 	albaDataPipeInterpolatorScalarMatrixTest.cpp
 	albaDataPipeCustomProberTest.h 				albaDataPipeCustomProberTest.cpp
 	albaDataPipesTests.h 						albaDataPipesTests.cpp
 )

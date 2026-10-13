@@ -27,7 +27,6 @@
 
 #include "albaOpImporterVMEDataSetAttributesTest.h"
 #include "albaOpImporterMesh.h"
-#include "albaOpImporterVMEDataSetAttributes.h"
 
 #include "albaString.h"
 #include "albaVMERoot.h"
@@ -91,7 +90,7 @@ void albaOpImporterVMEDataSetAttributesTest::TestImportAttributes()
   attributesFileName << dirPrefix;
   attributesFileName << "EPTO1_element.lis";
 
-  albaOpImporterVMEDataSetAttributes* attributesImporter = NULL;
+  c* attributesImporter = NULL;
   attributesImporter = new albaOpImporterVMEDataSetAttributes("attributes importer");
   attributesImporter->TestModeOn();
 

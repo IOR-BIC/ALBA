@@ -49,10 +49,6 @@ ENDIF (ALBA_USE_CRYPTO)
 
 IF (ALBA_USE_VTK)
   SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  albaVMEOutputScalarMatrix.cpp  			albaVMEOutputScalarMatrix.h
-  albaVMEScalarMatrix.cpp  					albaVMEScalarMatrix.h
-  albaVMEItemScalarMatrix.cpp  				albaVMEItemScalarMatrix.h
-
   albaVMEGeneric.cpp  						albaVMEGeneric.h
   albaVMEGizmo.cpp  							albaVMEGizmo.h
   albaVMEImage.cpp  							albaVMEImage.h
@@ -83,10 +79,6 @@ IF (ALBA_USE_VTK)
   albaVMEVolumeGray.cpp  					albaVMEVolumeGray.h
   albaVMEVolumeRGB.cpp  						albaVMEVolumeRGB.h
   mmaMeter.cpp  							mmaMeter.h
-  ###########
-  albaVMERawMotionData.cpp  					albaVMERawMotionData.h
-  albaVMEAnalog.cpp  						albaVMEAnalog.h
-  
   )
 ENDIF (ALBA_USE_VTK)
 

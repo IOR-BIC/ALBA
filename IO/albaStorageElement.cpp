@@ -254,32 +254,12 @@ albaString albaStorageElement::UpgradeAttribute(const char *attribute)
   albaString att_name;
   albaString new_att_name = "";
   GetAttribute(attribute,att_name);
-  if (att_name.Equals("albaVMEItemScalar"))
-  {
-    new_att_name = "albaVMEItemScalarMatrix";
-    SetAttribute(attribute, new_att_name);
-    return new_att_name;
-  }
   if (att_name.FindFirst("albaVME") != -1)
   {
-    if (att_name.Equals("albaVMEScalar"))
-    {
-      new_att_name = "albaVMEScalarMatrix";
-      SetAttribute(attribute, new_att_name);
-    }
-    else
-    {
-      new_att_name = att_name;
-    }
+    
+    new_att_name = att_name;
     albaStorageElement *data_vector = FindNestedElement("DataVector");
     albaString item_type;
-    if (data_vector && data_vector->GetAttribute("ItemTypeName", item_type))
-    {
-      if (item_type.Equals("albaVMEItemScalar"))
-      {
-        data_vector->SetAttribute("ItemTypeName", "albaVMEItemScalarMatrix");
-      }
-    }
     return new_att_name;
   }
   
