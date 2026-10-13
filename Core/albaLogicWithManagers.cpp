@@ -143,6 +143,7 @@
 #include "albaOpExporterMetaImage.h"
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
+#include "albaOpExporterPointCloud.h"
 
 // OPERATIONS
 #include "albaOp2DMeasure.h"
@@ -2010,6 +2011,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterRAW("Raw"));
 	Plug(new albaOpExporterImages("Images"));
 	Plug(new albaOpExporterLandmark("Landmark"));
+	Plug(new albaOpExporterPointCloud());
 	Plug(new albaOpExporterWrappedMeter());
 	Plug(new albaOpExporterMeters());
 	Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");

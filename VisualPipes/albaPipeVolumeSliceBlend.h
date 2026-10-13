@@ -40,7 +40,7 @@ class vtkCamera;
 class vtkALBAAssembly;
 class vtkOutlineSource;
 class vtkPlaneSource;
-class albaLODActor;
+class vtkOpenGLActor;
 
 //----------------------------------------------------------------------------
 // albaPipeVolumeSliceBlend :
@@ -126,7 +126,7 @@ protected:
 
   vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  albaLODActor            *m_Actor;
+  vtkOpenGLActor *m_Actor;
 
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;

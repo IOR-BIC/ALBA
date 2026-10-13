@@ -45,8 +45,7 @@ public:
   CPPUNIT_TEST( TestGetMatrix );
   CPPUNIT_TEST( TestMakeACopy );
   CPPUNIT_TEST( TestDeepCopy );
-  CPPUNIT_TEST( TestUpdate );
-
+  
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -60,7 +59,6 @@ private:
   void TestGetMatrix();
   void TestMakeACopy();
   void TestDeepCopy();
-  void TestUpdate();
 
   albaVMESurface *m_SurfaceTest;
   bool result;

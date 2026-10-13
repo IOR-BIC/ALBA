@@ -50,7 +50,7 @@
 #include "vtkVolume.h"
 #include "vtkImageResample.h"
 #include "vtkImageCast.h"
-#include "albaLODActor.h"
+#include "vtkOpenGLActor.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
