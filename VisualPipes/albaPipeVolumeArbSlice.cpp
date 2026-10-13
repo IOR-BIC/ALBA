@@ -36,7 +36,6 @@
 #include "albaGUIFloatSlider.h"
 #include "albaMatrix.h"
 
-#include "albaLODActor.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"
 #include "vtkMath.h"
@@ -60,12 +59,12 @@
 #include "vtkFloatArray.h"
 #include "vtkTransformFilter.h"
 #include "vtkALBATicksGenerator.h"
+#include "vtkOpenGLActor.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeArbSlice);
 //----------------------------------------------------------------------------
 
-#include "albaMemDbg.h"
 #include "vtkTransform.h"
 #include "vtkObject.h"
 

@@ -29,7 +29,6 @@
 #include "albaVME.h"
 #include "albaAxes.h"
 
-#include "albaLODActor.h"
 #include "vtkALBAAssembly.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
@@ -39,6 +38,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
+#include "vtkOpenGLActor.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeBox);

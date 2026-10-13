@@ -56,11 +56,10 @@ void albaOpImporterImageTest::Test_Single()
   importer->Import();
 	albaVME *node=importer->GetOutput();
 	
-	CPPUNIT_ASSERT(node->IsA("albaVMEGroup"));
-	CPPUNIT_ASSERT(node->GetNumberOfChildren() == 1);
+	CPPUNIT_ASSERT(node->IsA("albaVMEImage"));
 
   albaVMEImage* img;
-	img = albaVMEImage::SafeDownCast(node->GetChild(0));
+	img = albaVMEImage::SafeDownCast(node);
 
 	vtkDataSet* data = img->GetOutput()->GetVTKData();
 

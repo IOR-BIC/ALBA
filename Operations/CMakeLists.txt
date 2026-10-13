@@ -201,6 +201,7 @@ ENDIF (ALBA_USE_GDCM)
     albaOpInteractionDebugger.cpp	albaOpInteractionDebugger.h
 	albaOpFilterImage.cpp			albaOpFilterImage.h
 	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
+	albaOpExporterPointCloud.cpp	albaOpExporterPointCloud.h
   )
 
 

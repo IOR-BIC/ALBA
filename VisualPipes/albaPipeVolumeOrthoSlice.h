@@ -40,7 +40,7 @@ class vtkALBAVolumeOrthoSlicer;
 class vtkCamera;
 class vtkALBAAssembly;
 class vtkOutlineSource;
-class albaLODActor;
+class vtkOpenGLActor;
 class albaVMEOutputVolume;
 class vtkPlaneSource;
 class vtkALBATicksGenerator;
@@ -198,7 +198,7 @@ protected:
 
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  albaLODActor            *m_Actor;
+  vtkOpenGLActor *m_Actor;
 
   bool                    m_SliceParametersInitialized;
   bool                    m_ShowVolumeBox;
