@@ -227,7 +227,7 @@ void albaOpImporterImage::Import()
 	if (numFiles == 1)
 		m_BuildVolumeFlag = false;
 	
-	if (!m_BuildVolumeFlag)
+	if (!m_BuildVolumeFlag && numFiles != 1)
 	{
 		albaNEW(m_ImportedGroup);
 		m_ImportedGroup->SetName("Imported Images");
@@ -299,6 +299,7 @@ void albaOpImporterImage::Import()
 				extract->SetComponents(0, 1, 2);
 				extract->Update();
 				lumFilter->SetInputConnection(extract->GetOutputPort());
+				lumFilter->Update();
 				finalImage = lumFilter->GetOutput();
 			}
 			else if (reader->GetOutput()->GetNumberOfScalarComponents() == 1)
@@ -347,7 +348,13 @@ void albaOpImporterImage::Import()
 				importedImage->SetData(finalImage, m_Input->GetMTime());
 				importedImage->SetName(name);
 				SetNaturalTag(importedImage);
-				importedImage->ReparentTo(m_ImportedGroup);
+				if (numFiles != 1)
+					importedImage->ReparentTo(m_ImportedGroup);
+				else
+				{
+					importedImage->ReparentTo(m_Input);
+					m_Output = importedImage;
+				}
 			}
 			vtkDEL(reader);
 		}
@@ -392,7 +399,7 @@ void albaOpImporterImage::Import()
 
 		m_Output = m_ImportedVolume;
 	}
-	else
+	else if (numFiles != 1)
 	{
 		m_Output = m_ImportedGroup;
 	}

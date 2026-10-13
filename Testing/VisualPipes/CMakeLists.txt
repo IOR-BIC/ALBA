@@ -26,7 +26,6 @@ SET(PROJECT_SRCS
 	albaPipeVectorTest.h albaPipeVectorTest.cpp
 	albaPipeMeterTest.h albaPipeMeterTest.cpp
 	albaPipeVolumeProjectedTest.h albaPipeVolumeProjectedTest.cpp
-	albaPipeScalarMatrixTest.h albaPipeScalarMatrixTest.cpp
 	albaPipePolylineGraphEditorTest.h albaPipePolylineGraphEditorTest.cpp
 	albaPipeMeshSliceTest.h albaPipeMeshSliceTest.cpp
 	albaPipeSurfaceSliceTest.h albaPipeSurfaceSliceTest.cpp
@@ -37,7 +36,6 @@ SET(PROJECT_SRCS
 	albaPipePolylineSliceTest.h albaPipePolylineSliceTest.cpp
 	albaPipeWrappedMeterTest.h albaPipeWrappedMeterTest.cpp
 	albaPipeDensityDistanceTest.h albaPipeDensityDistanceTest.cpp
-	albaPipeGraphTest.h albaPipeGraphTest.cpp
 	albaPipeCompoundTest.h albaPipeCompoundTest.cpp
 	albaPipeCompoundVolumeTest.h albaPipeCompoundVolumeTest.cpp
 	albaPipeCompoundVolumefixedScalarsTest.h albaPipeCompoundVolumeFixedScalarsTest.cpp

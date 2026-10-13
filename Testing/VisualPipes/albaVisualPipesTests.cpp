@@ -29,7 +29,6 @@
 #include "albaPipeDensityDistanceTest.h"
 #include "albaPipeFactoryVMETest.h"
 #include "albaPipeGizmoTest.h"
-#include "albaPipeGraphTest.h"
 #include "albaPipeImage3DTest.h"
 #include "albaPipeIsosurfaceTest.h"
 #include "albaPipeLandmarkCloudTest.h"
@@ -40,7 +39,6 @@
 #include "albaPipePolylineGraphEditorTest.h"
 #include "albaPipePolylineSliceTest.h"
 #include "albaPipePolylineTest.h"
-#include "albaPipeScalarMatrixTest.h"
 #include "albaPipeScalarTest.h"
 #include "albaPipeSliceTest.h"
 #include "albaPipeSurfaceEditorTest.h"
@@ -139,7 +137,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeVectorTest::suite()); 
 	runner.addTest(albaPipeMeterTest::suite());
 	runner.addTest(albaPipeVolumeProjectedTest::suite());
-	runner.addTest(albaPipeScalarMatrixTest::suite()); 
 	runner.addTest(albaPipePolylineGraphEditorTest::suite()); 
 	runner.addTest(albaPipeMeshSliceTest::suite());
 	runner.addTest(albaPipeSurfaceSliceTest::suite());
@@ -150,7 +147,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipePolylineSliceTest::suite()); 
 	runner.addTest(albaPipeWrappedMeterTest::suite()); 
 	runner.addTest(albaPipeDensityDistanceTest::suite());
-	runner.addTest(albaPipeGraphTest::suite());
 	runner.addTest(albaPipeCompoundTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());

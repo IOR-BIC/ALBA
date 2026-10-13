@@ -260,7 +260,6 @@ void albaViewGlobalSliceCompound::PackageView()
 	m_ViewGlobalSlice->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeOrthoSlice");
   m_ViewGlobalSlice->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeOrthoSlice");
   m_ViewGlobalSlice->PlugVisualPipe("albaVMEMesh", "albaPipeMeshSlice");
-  m_ViewGlobalSlice->PlugVisualPipe("albaVMEAnalog", "albaPipeBox", NON_VISIBLE);
   m_ViewGlobalSlice->PlugVisualPipe("albaVMELandmark", "albaPipeSurfaceSlice");
   m_ViewGlobalSlice->PlugVisualPipe("albaVMELandmarkCloud", "albaPipeSurfaceSlice");
 	m_ViewGlobalSlice->PlugVisualPipe("albaVMEPointCloud", "albaPipePointCloudSlice");

@@ -33,7 +33,7 @@ class albaOp;
 class ALBA_EXPORT albaOpImporterExternalFile: public albaOp
 {
 public:
-  albaOpImporterExternalFile(const wxString &label = "ExternalFileImporter");
+  albaOpImporterExternalFile(const wxString &label = "External File");
  ~albaOpImporterExternalFile(); 
 
   albaTypeMacro(albaOpImporterExternalFile, albaOp);

@@ -98,20 +98,14 @@
 #include "albaCursor.h"
 
 //IMPORTERS
-#include "albaOpImporterASCII.h"
-#include "albaOpImporterAnalogWS.h"
 #include "albaOpImporterAnsysCDBFile.h"
 #include "albaOpImporterAnsysInputFile.h"
-#include "albaOpImporterC3D.h"
 #ifdef ALBA_USE_GDCM
 #include "albaGUIDicomSettings.h"
 #include "albaOpImporterDicom.h"
 #endif
-#include "albaOpImporterGRFWS.h"
 #include "albaOpImporterImage.h"
 #include "albaOpImporterLandmark.h"
-#include "albaOpImporterLandmarkTXT.h"
-#include "albaOpImporterLandmarkWS.h"
 #include "albaOpImporterMSF.h"
 #include "albaOpImporterMSF1x.h"
 #include "albaOpImporterMesh.h"
@@ -137,7 +131,6 @@
 #ifdef ALBA_USE_GDCM
 #include "albaOpExporterDicom.h"
 #endif 
-#include "albaOpExporterGRFWS.h"
 #include "albaOpExporterLandmark.h"
 #include "albaOpExporterMSF.h"
 #include "albaOpExporterMesh.h"
@@ -226,14 +219,7 @@
 #include "albaOpTransformAtoB.h"
 
 //TMP
-#include "albaOpImporterEmgWS.h"
 #include "albaOpImporterExternalFile.h"
-#include "albaOpImporterMotionData.h"
-#include "albaOpImporterRawMotionData.h"
-#include "albaOpImporterVMEDataSetAttributes.h"
-#include "albaVMERawMotionData.h"
-#include "albaOpExporterAnalogWS.h"
-#include "albaOpExporterLandmarkWS.h"
 #include "albaOpApplyTrajectory.h"
 #include "albaOpCreateProsthesis.h"
 #include "albaOpDecomposeTimeVarVME.h"
@@ -1989,7 +1975,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterVRML("VRML"));
 	Plug(new albaOpImporterVTK("VTK"));
 	Plug(new albaOpImporterVTKXML("VTK xml"));
-	Plug(new albaOpImporterMetaImage("ITK MetaImage"));
+	Plug(new albaOpImporterMetaImage());
 	Plug(new albaOpImporterMSF("ALBA"));
 	Plug(new albaOpImporterMSF1x("MSF 1.x"));
 	Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
@@ -1997,20 +1983,13 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
 	Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
 	Plug(new albaOpMeshScarlarsImporter("Mesh Scalars from Lis files"), ("Finite Element"));
-	Plug(new albaOpImporterASCII("ASCII"));
 
 #ifdef ALBA_USE_GDCM
 	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
 	Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
 #endif
-	Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
-	Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
-	Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
-#ifdef ALBA_USE_BTK
-	Plug(new albaOpImporterC3D("C3D"), "Landmark Suite");
-#endif
-	Plug(new albaOpImporterAnalogWS("EMG"));
-	Plug(new albaOpImporterGRFWS("GRF"));
+	Plug(new albaOpImporterLandmark("Landmark"));
+
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
@@ -2024,7 +2003,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterPLY("PLY"));
 	Plug(new albaOpExporterVTK("VTK"));
 	Plug(new albaOpExporterVTKXML("VTK xml"));
-	Plug(new albaOpExporterMetaImage("ITK MetaImage"));
+	Plug(new albaOpExporterMetaImage());
 #ifdef ALBA_USE_GDCM
 	Plug(new albaOpExporterDicom("Dicom"), "", true, dicomSettings);
 #endif
@@ -2032,7 +2011,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterImages("Images"));
 	Plug(new albaOpExporterLandmark("Landmark"));
 	Plug(new albaOpExporterWrappedMeter());
-	Plug(new albaOpExporterGRFWS());
 	Plug(new albaOpExporterMeters());
 	Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
@@ -2040,13 +2018,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
 	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
 
-	Plug(new albaOpImporterEmgWS("EmgWS"), "TMP to test");
-	Plug(new albaOpImporterExternalFile(), "TMP to test");
-	Plug(new albaOpImporterRawMotionData("Raw motion data"), "TMP to test");
-	Plug(new albaOpImporterMotionData<albaVMERawMotionData>("Raw Motion Data (template)", "RAW Motion Data (*.MAN)|*.MAN", "Dictionary (*.txt)|*.txt"), "TMP to test");
-	Plug(new albaOpImporterVMEDataSetAttributes(), "TMP to test");
-	Plug(new albaOpExporterAnalogWS(), "TMP to test");
-	Plug(new albaOpExporterLandmarkWS(), "TMP to test");
+	Plug(new albaOpImporterExternalFile());
 
 
 	//------------------------------------------------------------

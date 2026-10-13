@@ -40,7 +40,6 @@ SET(PROJECT_SRCS
 	albaOpAddLandmarkTest.h albaOpAddLandmarkTest.cpp
 	albaOpApplyTrajectoryTest.h albaOpApplyTrajectoryTest.cpp
 	albaOpExtractIsosurfaceTest.h albaOpExtractIsosurfaceTest.cpp
-	albaOpImporterASCIITest.h albaOpImporterASCIITest.cpp
 	albaOpExporterMSFTest.h albaOpExporterMSFTest.cpp
 	albaOpFilterSurfaceTest.h albaOpFilterSurfaceTest.cpp
 	albaOpValidateTreeTest.h albaOpValidateTreeTest.cpp
@@ -55,7 +54,6 @@ SET(PROJECT_SRCS
 	albaOpImporterMeshTest.h albaOpImporterMeshTest.cpp
 	albaOpExporterMeshTest.h albaOpExporterMeshTest.cpp
 	albaVMEDataSetAttributesImporterTest.h albaVMEDataSetAttributesImporterTest.cpp
-	albaOpImporterVMEDataSetAttributesTest.h albaOpImporterVMEDataSetAttributesTest.cpp
 	albaOpCreateMeterTest.h albaOpCreateMeterTest.cpp
 	albaOpCreateProberTest.h albaOpCreateProberTest.cpp
 	albaOpCreateRefSysTest.h albaOpCreateRefSysTest.cpp
@@ -65,14 +63,10 @@ SET(PROJECT_SRCS
 	albaOpExporterVTKTest.h albaOpExporterVTKTest.cpp
 	albaOpExporterLandmarkTest.h albaOpExporterLandmarkTest.cpp
 	albaOpImporterLandmarkTest.h albaOpImporterLandmarkTest.cpp
-	albaOpImporterGRFWSTest.h albaOpImporterGRFWSTest.cpp
-	albaOpImporterAnalogWSTest.h albaOpImporterAnalogWSTest.cpp
 	albaGeometryEditorPolylineGraphTest.h albaGeometryEditorPolylineGraphTest.cpp
 	albaOpMatrixVectorMathTest.h albaOpMatrixVectorMathTest.cpp
 	albaOpVolumeMeasureTest.h albaOpVolumeMeasureTest.cpp
 	albaOpImporterRAWImagesTest.h albaOpImporterRAWImagesTest.cpp
-	albaOpImporterLandmarkTXTTest.h albaOpImporterLandmarkTXTTest.cpp
-	albaOpImporterLandmarkWSTest.h albaOpImporterLandmarkWSTest.cpp
 	albaOpExtrusionHolesTest.h albaOpExtrusionHolesTest.cpp
 	albaOpExporterWrappedMeterTest.h albaOpExporterWrappedMeterTest.cpp
 	albaOpFreezeVMETest.h albaOpFreezeVMETest.cpp
@@ -102,12 +96,7 @@ SET(PROJECT_SRCS
 	albaOpMeshQualityTest.h albaOpMeshQualityTest.cpp
 	albaOpCropDeformableROITest.h albaOpCropDeformableROITest.cpp
 	albaOpMoveTest.h albaOpMoveTest.cpp
-	albaOpExporterAnalogWSTest.h albaOpExporterAnalogWSTest.cpp
-	albaOpExporterGRFWSTest.h albaOpExporterGRFWSTest.cpp
-	albaOpExporterLandmarkWSTest.h albaOpExporterLandmarkWSTest.cpp
 	albaDicomClassesTest.h albaDicomClassesTest.cpp
-	albaOpImporterC3DTest.h albaOpImporterC3DTest.cpp
-	albaOpImporterMotionDataTest.h albaOpImporterMotionDataTest.cpp
 	albaOpFillHolesTest.h albaOpFillHolesTest.cpp
 	albaOpImporterVTKXMLTest.h albaOpImporterVTKXMLTest.cpp
 	albaOpInteractiveClipSurfaceTest.h albaOpInteractiveClipSurfaceTest.cpp

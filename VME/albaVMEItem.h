@@ -328,7 +328,7 @@ protected:
 /** albaVMEItemAsynchObserver - used by the albaVMEItem to synchronize the asynchronous
 loading data from remote storages.
 
-@sa albaVMEItemVTK albaVMEItemScalar
+@sa albaVMEItemVTK
 */
 class ALBA_EXPORT albaVMEItemAsynchObserver : public albaObserver
 {

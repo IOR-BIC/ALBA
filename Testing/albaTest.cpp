@@ -274,8 +274,10 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 			albaLogMessage("CompareImages has found differences. File %s stored.", imageFileNew.ToAscii());
 		}
 
-		CPPUNIT_ASSERT(result);
-
+		albaString assertionMessage;
+		assertionMessage.Printf("Image comparison failed: %s", imageFileStored.ToAscii());
+		CPPUNIT_ASSERT_MESSAGE(assertionMessage.GetCStr(), result);
+		
 		// End visualization control
 		vtkDEL(imageMath);
 		vtkDEL(imageReader);
