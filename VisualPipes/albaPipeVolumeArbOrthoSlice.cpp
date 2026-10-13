@@ -36,7 +36,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "albaGUIFloatSlider.h"
 
-#include "albaLODActor.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkImageData.h"
@@ -56,6 +55,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkALBAticksGenerator.h"
+#include "vtkOpenGLActor.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeArbOrthoSlice);
