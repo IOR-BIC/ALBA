@@ -95,8 +95,8 @@ int albaOpImporterScancoImageIO::CheckVersion(const char header[16])
   }
   else
   {
-    int preHeaderSize = albaOpImporterScancoImageIO::DecodeInt(header);
-    int imageHeaderSize = albaOpImporterScancoImageIO::DecodeInt(header + 4);
+    int preHeaderSize = DecodeInt(header);
+    int imageHeaderSize = DecodeInt(header + 4);
     if (preHeaderSize == 20 && imageHeaderSize == 140)
     {
       fileType = 2;
@@ -167,8 +167,8 @@ void albaOpImporterScancoImageIO::DecodeDate(const void * data, int &year, int &
   const uint64_t millisPerDay = 3600 * 24 * 1000;
 
   // Read the date as a long integer with units of 1e-7 seconds
-  int      d1 = albaOpImporterScancoImageIO::DecodeInt(data);
-  int      d2 = albaOpImporterScancoImageIO::DecodeInt(static_cast<const char *>(data) + 4);
+  int      d1 = DecodeInt(data);
+  int      d2 = DecodeInt(static_cast<const char *>(data) + 4);
   uint64_t tVMS = d1 + (static_cast<uint64_t>(d2) << 32);
   uint64_t time = tVMS / 10000 + julianOffset * millisPerDay;
 
@@ -212,8 +212,8 @@ void albaOpImporterScancoImageIO::EncodeDate(void * target)
 
   const int d1 = (int)currentTimeVMS;
   const int d2 = (int)(currentTimeVMS >> 32);
-  albaOpImporterScancoImageIO::EncodeInt(d1, target);
-  albaOpImporterScancoImageIO::EncodeInt(d2, static_cast<char *>(target) + 4);
+  EncodeInt(d1, target);
+  EncodeInt(d2, static_cast<char *>(target) + 4);
 }
 
 //----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ bool albaOpImporterScancoImageIO::CanReadFile(const char * filename)
       infile.read(buffer, 512);
       if (!infile.bad())
       {
-        int fileType = albaOpImporterScancoImageIO::CheckVersion(buffer);
+        int fileType = CheckVersion(buffer);
         canRead = (fileType > 0);
       }
     }
@@ -365,111 +365,111 @@ int albaOpImporterScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned lo
   }
 
   char * h = this->m_RawHeader;
-  albaOpImporterScancoImageIO::StripString(this->m_Version, h, 16);
+  StripString(this->m_Version, h, 16);
   h += 16;
-  int dataType = albaOpImporterScancoImageIO::DecodeInt(h);
+  int dataType = DecodeInt(h);
   h += 4;
-  const int numBytes = albaOpImporterScancoImageIO::DecodeInt(h);
+  const int numBytes = DecodeInt(h);
   h += 4;
   (void)numBytes;
-  const int numBlocks = albaOpImporterScancoImageIO::DecodeInt(h);
+  const int numBlocks = DecodeInt(h);
   h += 4;
   (void)numBlocks;
-  this->m_PatientIndex = albaOpImporterScancoImageIO::DecodeInt(h);
+  this->m_PatientIndex = DecodeInt(h);
   h += 4;
-  this->m_ScannerID = albaOpImporterScancoImageIO::DecodeInt(h);
+  this->m_ScannerID = DecodeInt(h);
   h += 4;
   int year, month, day, hour, minute, second, milli;
-  albaOpImporterScancoImageIO::DecodeDate(h, year, month, day, hour, minute, second, milli);
+  DecodeDate(h, year, month, day, hour, minute, second, milli);
   h += 8;
   int pixdim[3], physdim[3];
-  pixdim[0] = albaOpImporterScancoImageIO::DecodeInt(h);
+  pixdim[0] = DecodeInt(h);
   h += 4;
-  pixdim[1] = albaOpImporterScancoImageIO::DecodeInt(h);
+  pixdim[1] = DecodeInt(h);
   h += 4;
-  pixdim[2] = albaOpImporterScancoImageIO::DecodeInt(h);
+  pixdim[2] = DecodeInt(h);
   h += 4;
-  physdim[0] = albaOpImporterScancoImageIO::DecodeInt(h);
+  physdim[0] = DecodeInt(h);
   h += 4;
-  physdim[1] = albaOpImporterScancoImageIO::DecodeInt(h);
+  physdim[1] = DecodeInt(h);
   h += 4;
-  physdim[2] = albaOpImporterScancoImageIO::DecodeInt(h);
+  physdim[2] = DecodeInt(h);
   h += 4;
 
   const bool isRAD = (dataType == 9 || physdim[2] == 0);
 
   if (isRAD) // RAD file
   {
-    this->m_MeasurementIndex = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_MeasurementIndex = DecodeInt(h);
     h += 4;
-    this->m_DataRange[0] = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_DataRange[0] = DecodeInt(h);
     h += 4;
-    this->m_DataRange[1] = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_DataRange[1] = DecodeInt(h);
     h += 4;
-    this->m_MuScaling = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_MuScaling = DecodeInt(h);
     h += 4;
-    albaOpImporterScancoImageIO::StripString(this->m_PatientName, h, 40);
+    StripString(this->m_PatientName, h, 40);
     h += 40;
-    this->m_ZPosition = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ZPosition = DecodeInt(h) * 1e-3;
     h += 4;
     /* unknown */ h += 4;
-    this->m_SampleTime = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SampleTime = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_Energy = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Energy = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_Intensity = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Intensity = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_ReferenceLine = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ReferenceLine = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_StartPosition = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_StartPosition = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_EndPosition = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_EndPosition = DecodeInt(h) * 1e-3;
     h += 4;
     h += 88 * 4;
   }
   else // ISQ file or RSQ file
   {
-    this->m_SliceThickness = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SliceThickness = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_SliceIncrement = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SliceIncrement = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_StartPosition = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_StartPosition = DecodeInt(h) * 1e-3;
     h += 4;
     this->m_EndPosition = this->m_StartPosition + physdim[2] * 1e-3 * (pixdim[2] - 1) / pixdim[2];
-    this->m_DataRange[0] = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_DataRange[0] = DecodeInt(h);
     h += 4;
-    this->m_DataRange[1] = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_DataRange[1] = DecodeInt(h);
     h += 4;
-    this->m_MuScaling = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_MuScaling = DecodeInt(h);
     h += 4;
-    this->m_NumberOfSamples = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_NumberOfSamples = DecodeInt(h);
     h += 4;
-    this->m_NumberOfProjections = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_NumberOfProjections = DecodeInt(h);
     h += 4;
-    this->m_ScanDistance = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ScanDistance = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_ScannerType = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_ScannerType = DecodeInt(h);
     h += 4;
-    this->m_SampleTime = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SampleTime = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_MeasurementIndex = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_MeasurementIndex = DecodeInt(h);
     h += 4;
-    this->m_Site = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_Site = DecodeInt(h);
     h += 4;
-    this->m_ReferenceLine = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ReferenceLine = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_ReconstructionAlg = albaOpImporterScancoImageIO::DecodeInt(h);
+    this->m_ReconstructionAlg = DecodeInt(h);
     h += 4;
-    albaOpImporterScancoImageIO::StripString(this->m_PatientName, h, 40);
+    StripString(this->m_PatientName, h, 40);
     h += 40;
-    this->m_Energy = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Energy = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_Intensity = albaOpImporterScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Intensity = DecodeInt(h) * 1e-3;
     h += 4;
     h += 83 * 4;
   }
 
-  int dataOffset = albaOpImporterScancoImageIO::DecodeInt(h);
+  int dataOffset = DecodeInt(h);
 
   // fix m_SliceThickness and m_SliceIncrement if they were truncated
   if (physdim[2] != 0)
@@ -577,7 +577,7 @@ int albaOpImporterScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned lo
     unsigned long hsize = 0;
     for (int i = 0; i < 4; ++i)
     {
-      hsize = albaOpImporterScancoImageIO::DecodeInt(h + i * 128 + 24);
+      hsize = DecodeInt(h + i * 128 + 24);
       if ((1 + hskip + hsize) * 512 > headerSize)
       {
         break;
@@ -594,16 +594,16 @@ int albaOpImporterScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned lo
     if (calHeader && calHeaderSize >= 1024)
     {
       h = calHeader;
-      albaOpImporterScancoImageIO::StripString(this->m_CalibrationData, h + 28, 64);
+      StripString(this->m_CalibrationData, h + 28, 64);
       // std::string calFile(h + 112, 256);
       // std::string s3(h + 376, 256);
-      this->m_RescaleType = albaOpImporterScancoImageIO::DecodeInt(h + 632);
-      albaOpImporterScancoImageIO::StripString(this->m_RescaleUnits, h + 648, 16);
+      this->m_RescaleType = DecodeInt(h + 632);
+      StripString(this->m_RescaleUnits, h + 648, 16);
       // std::string s5(h + 700, 16);
       // std::string calFilter(h + 772, 16);
-      this->m_RescaleSlope = albaOpImporterScancoImageIO::DecodeDouble(h + 664);
-      this->m_RescaleIntercept = albaOpImporterScancoImageIO::DecodeDouble(h + 672);
-      this->m_MuWater = albaOpImporterScancoImageIO::DecodeDouble(h + 688);
+      this->m_RescaleSlope = DecodeDouble(h + 664);
+      this->m_RescaleIntercept = DecodeDouble(h + 672);
+      this->m_MuWater = DecodeDouble(h + 688);
     }
   }
 
@@ -650,11 +650,11 @@ int albaOpImporterScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned lo
   // Read the pre-header
   // AIM header is divided into 3 sections: a preheader, a struct containing volume info, and a processing log
   char * preheader = h;
-  int    preheaderSize = albaOpImporterScancoImageIO::DecodeInt(h);
+  int    preheaderSize = DecodeInt(h);
   h += intSize;
-  int structSize = albaOpImporterScancoImageIO::DecodeInt(h);
+  int structSize = DecodeInt(h);
   h += intSize;
-  int logSize = albaOpImporterScancoImageIO::DecodeInt(h);
+  int logSize = DecodeInt(h);
   h += intSize;
 
   // read the rest of the header
@@ -691,7 +691,7 @@ int albaOpImporterScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned lo
     h += 20;
   }
 
-  int dataType = albaOpImporterScancoImageIO::DecodeInt(h);
+  int dataType = DecodeInt(h);
   h += 4;
 
   // The struct contains the following data:
@@ -701,7 +701,7 @@ int albaOpImporterScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned lo
   int structValues[21];
   for (int & structValue : structValues)
   {
-    structValue = albaOpImporterScancoImageIO::DecodeInt(h);
+    structValue = DecodeInt(h);
     h += intSize;
   }
 
@@ -712,7 +712,7 @@ int albaOpImporterScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned lo
     // AIMDATA_V030
     for (float & i : elementSize)
     {
-      i = 1e-6 * albaOpImporterScancoImageIO::DecodeInt(h);
+      i = 1e-6 * DecodeInt(h);
       if (i == 0)
       {
         i = 1.0;
@@ -725,7 +725,7 @@ int albaOpImporterScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned lo
     // AIMDATA_V020
     for (float & i : elementSize)
     {
-      i = albaOpImporterScancoImageIO::DecodeFloat(h);
+      i = DecodeFloat(h);
       if (i == 0)
       {
         i = 1.0;
@@ -1014,7 +1014,7 @@ int albaOpImporterScancoImageIO::ReadImageInformation()
   if (!infile.bad())
   {
     bytesRead = static_cast<unsigned long>(infile.gcount());
-    fileType = albaOpImporterScancoImageIO::CheckVersion(this->m_RawHeader);
+    fileType = CheckVersion(this->m_RawHeader);
   }
 
   if (fileType == 0)
@@ -1233,11 +1233,11 @@ void albaOpImporterScancoImageIO::Read(void * buffer)
     // Get the size of the compressed data
     char head[8];
     infile.read(head, intSize);
-    size = static_cast<unsigned int>(albaOpImporterScancoImageIO::DecodeInt(head));
+    size = static_cast<unsigned int>(DecodeInt(head));
     if (intSize == 8)
     {
       // Read the high word of a 64-bit int
-      unsigned int high = albaOpImporterScancoImageIO::DecodeInt(head + 4);
+      unsigned int high = DecodeInt(head + 4);
       size += (static_cast<uint64_t>(high) << 32);
     }
     input = new char[size - intSize];
