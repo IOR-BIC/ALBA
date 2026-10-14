@@ -1331,8 +1331,8 @@ void albaOpImporterScancoImageIO::Read(void * buffer)
     {
       do
       {
-        unsigned char l = inPtr[0];
-        unsigned char v = inPtr[1];
+        unsigned char v = inPtr[0];
+        unsigned char l = inPtr[1];
         inPtr += 2;
         if (l > outSize)
         {
