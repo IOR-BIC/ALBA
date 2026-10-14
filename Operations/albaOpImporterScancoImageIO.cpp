@@ -12,7 +12,7 @@ This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
-This file is an adaption to ALBA/VTK of https://github.com/KitwareMedical/ITKIOScanco
+This file is an adaption to ALBA/VTK of https://github.com/InsightSoftwareConsortium/ITK/tree/main/Modules/IO/IOScanco/src
 =========================================================================*/
 /*=========================================================================
  *
