@@ -34,7 +34,7 @@ class albaEvent;
 class ALBA_EXPORT albaOpExporterMSF: public albaOp
 {
 public:
-  albaOpExporterMSF(const wxString &label = "MSFExporter");
+  albaOpExporterMSF(const wxString &label = "Export SubTree");
  ~albaOpExporterMSF(); 
   
   albaTypeMacro(albaOpExporterMSF, albaOp);
