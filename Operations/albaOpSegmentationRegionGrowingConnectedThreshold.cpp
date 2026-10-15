@@ -324,7 +324,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   volToSurface->SetContourValue(m_Replace / 2.0);
   volToSurface->Update();
 
-  vtkPolyData *surface = volToSurface->GetOutput();
+  vtkPolyData *surface = vtkPolyData::SafeDownCast(volToSurface->GetOutput());
 
   //Generating Surface VME
   albaNEW(m_SurfaceOut);
