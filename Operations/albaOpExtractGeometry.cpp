@@ -500,7 +500,7 @@ int albaOpExtractGeometry::GenerateIsosurface()
 
   m_SurfaceExtractor = vtkALBAVolumeToClosedSmoothSurface::New();
   m_SurfaceExtractor->SetInputData(m_OriginalData);
-  m_SurfaceExtractor->SetFillHoles(m_ProcessingType==1);
+  m_SurfaceExtractor->SetFillBorderHoles(m_ProcessingType==1);
   
 
   double* scalarRange = m_OriginalData->GetScalarRange();
@@ -509,7 +509,7 @@ int albaOpExtractGeometry::GenerateIsosurface()
 
   m_SurfaceExtractor->Update();
   
-  m_SurfaceData = m_SurfaceExtractor->GetOutput();
+  m_SurfaceData = vtkPolyData::SafeDownCast(m_SurfaceExtractor->GetOutput());
 
   if(m_Connectivity)
     SurfaceConnectivity();
