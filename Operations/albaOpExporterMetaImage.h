@@ -35,7 +35,7 @@ class vtkMetaImageWriter;
 class ALBA_EXPORT albaOpExporterMetaImage: public albaOp
 {
 public:
-  albaOpExporterMetaImage(const wxString &label = "Exporter MetaImage (.mha)");
+  albaOpExporterMetaImage(const wxString &label = "MetaImage (.mha)");
  ~albaOpExporterMetaImage(); 
   
   albaTypeMacro(albaOpExporterMetaImage, albaOp);

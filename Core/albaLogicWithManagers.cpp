@@ -1999,7 +1999,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	// Exporter Menu:
 	//------------------------------------------------------------
 
-	Plug(new albaOpExporterMSF("ALBA"));
+	Plug(new albaOpExporterMSF());
 	Plug(new albaOpExporterSTL("STL"));
 	Plug(new albaOpExporterPLY("PLY"));
 	Plug(new albaOpExporterVTK("VTK"));
