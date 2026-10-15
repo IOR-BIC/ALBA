@@ -62,7 +62,6 @@ albaOp(label)
 	m_ABSMatrixFlag = 0;
 
 	m_FileDir = albaGetLastUserFolder();
-  m_ForceUnsignedShortScalarOutputForStructuredPoints = false;
 }
 //----------------------------------------------------------------------------
 albaOpExporterVTKXML::~albaOpExporterVTKXML()
@@ -91,7 +90,6 @@ enum VTK_EXPORTER_ID
   ID_VTK_BINARY_FILE = MINID,
 	ID_ABS_MATRIX,
   ID_CHOOSE_FILENAME,
-  ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterVTKXML::OpRun()   
@@ -137,8 +135,6 @@ void albaOpExporterVTKXML::OpRun()
 
   m_Gui->Divider(2);
   m_Gui->Label("Force UNSIGNED SHORT scalar output");
-  m_Gui->Bool(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, "", &m_ForceUnsignedShortScalarOutputForStructuredPoints);
-  m_Gui->Enable(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, isStructuredPoints ? true : false);
   m_Gui->Divider(2);
 
 	m_Gui->OkCancel();
