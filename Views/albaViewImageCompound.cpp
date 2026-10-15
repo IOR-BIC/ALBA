@@ -374,6 +374,7 @@ void albaViewImageCompound::UpdateWindowing(bool enable)
 	}
 	else
 	{
+		m_LutWidget->Enable(false);
 		m_LutSlider->SetRange(-100,100);
 		m_LutSlider->SetSubRange(-100,100);
 	}

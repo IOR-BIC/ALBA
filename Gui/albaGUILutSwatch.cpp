@@ -59,7 +59,7 @@ albaGUILutSwatch::albaGUILutSwatch(wxWindow* parent, wxWindowID id, const wxPoin
 {
 	m_Listener = NULL;
 	m_Editable = false;
-	m_Enabled = false;
+	m_Enabled = true;
 	SetLut(NULL);
 
 	m_MouseInWindow = false;
