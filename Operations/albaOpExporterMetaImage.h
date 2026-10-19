@@ -58,7 +58,7 @@ public:
   void SetFileName(const char *file_name) {m_File = file_name;};
 
   /** Export image data. */
-  void ExportMetaImage();
+  int ExportMetaImage();
 
 
 	/** Return an xpm-icon that can be used to represent this operation */

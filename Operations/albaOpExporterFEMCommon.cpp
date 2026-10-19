@@ -79,28 +79,29 @@ void albaOpExporterFEMCommon::CreateGui()
 {
 	m_Gui = new albaGUI(this);
 
-	m_Gui->Label("Absolute matrix", true);
-	m_Gui->Bool(ID_ABS_MATRIX, "Apply", &m_ABSMatrixFlag, 0);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute Matrix", &m_ABSMatrixFlag, true);
 	m_Gui->Divider(1);
 
 	bool hasMaterials = HasMaterials();
 
-	m_Gui->Label(_("FEM Exporter Properties"), true);
+
+	m_HasConfiguration = albaVMEMesh::LoadConfigurationTags((albaVMEMesh *)m_Input, m_Configuration);
 
 	if (hasMaterials)
 	{
+		m_Gui->Label(_("FEM Exporter Properties"), true);
+		m_Gui->Label("");
+
 		m_Gui->Label("Elasticity Gap value");
 		m_Gui->Double(ID_GAP_VALUE, "", &m_Egap);
 		m_Gui->Divider();
 		m_Gui->Label("");
-	}
 
-	m_Gui->Divider(2);
 
-	m_HasConfiguration=albaVMEMesh::LoadConfigurationTags((albaVMEMesh *)m_Input, m_Configuration);
+		m_Gui->Divider(2);
 
-	if (hasMaterials)
-	{
+
 		m_Gui->Label("Density Back Calculation", true);
 		m_Gui->Bool(ID_ENABLE_BACKCALCULATION, "Enable", &m_EnableBackCalculation);
 		m_Gui->Divider();
@@ -153,8 +154,6 @@ void albaOpExporterFEMCommon::CreateGui()
 
 		m_GuiASDensityThreeIntervals->Divider(2);
 
-		//   EnableTwoIntervals(true);
-
 		m_GuiASDensityThreeIntervals->Enable(ID_DENSITY_INTERVAL_0, true);
 		m_GuiASDensityThreeIntervals->Enable(ID_DENSITY_INTERVAL_1, true);
 
@@ -176,7 +175,6 @@ void albaOpExporterFEMCommon::CreateGui()
 	m_Gui->Divider();
 
 	ShowGui();
-
 }
 
 //----------------------------------------------------------------------------

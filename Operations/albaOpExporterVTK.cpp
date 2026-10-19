@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpExporterVTK
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -39,7 +39,6 @@
 #include "vtkAbstractTransform.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
-#include "vtkImageData.h"
 #include "vtkPolyData.h"
 #include "albaVMEGroup.h"
 #include "albaProgressBarHelper.h"
@@ -47,12 +46,9 @@
 #include "vtkTransformFilter.h"
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterVTK);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpExporterVTK::albaOpExporterVTK(const wxString &label) :
-albaOp(label)
-//----------------------------------------------------------------------------
+albaOpExporterVTK::albaOpExporterVTK(const wxString &label) : albaOp(label)
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
@@ -67,18 +63,15 @@ albaOp(label)
 }
 //----------------------------------------------------------------------------
 albaOpExporterVTK::~albaOpExporterVTK()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 bool albaOpExporterVTK::InternalAccept(albaVME *node)
-//----------------------------------------------------------------------------
 { 
   return (node->IsALBAType(albaVME) && !node->IsALBAType(albaVMERoot) && !node->IsALBAType(albaVMEGroup));
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpExporterVTK::Copy()   
-//----------------------------------------------------------------------------
 {
   albaOpExporterVTK *cp = new albaOpExporterVTK(m_Label);
   cp->m_File = m_File;
@@ -86,36 +79,30 @@ albaOp* albaOpExporterVTK::Copy()
 }
 //----------------------------------------------------------------------------
 // constants
-//----------------------------------------------------------------------------
 enum VTK_EXPORTER_ID
 {
   ID_VTK_BINARY_FILE = MINID,
 	ID_ABS_MATRIX,
 	ID_LEGACY_MODE,
-  ID_CHOOSE_FILENAME,
   ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterVTK::OpRun()
-//----------------------------------------------------------------------------
 {
 	vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
 	assert(inputData);
 
 	albaString wildc = "vtk Data (*.vtk)|*.vtk";
 
-	m_FileDir = albaGetLastUserFolder();
-	m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
-
 	m_Gui = new albaGUI(this);
-	m_Gui->FileSave(ID_CHOOSE_FILENAME, _("VTK file"), &m_File, wildc);
-/*	m_Gui->Label("File type", true);*/
+
+	m_Gui->Label("");
 	m_Gui->Bool(ID_VTK_BINARY_FILE, "Binary File type", &m_Binary, 1);
-
+	m_Gui->Label("");
 	m_Gui->Bool(ID_LEGACY_MODE, "VTK File Version 4.2", &m_LegacyMode, 1);
-
-/*	m_Gui->Label("Absolute matrix", true);*/
+	m_Gui->Label("");
 	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
+	m_Gui->Label("");
 
 	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMEPointSet") || m_Input->IsA("albaVMEGroup") || m_Input->IsA("albaVMEMesh") || m_Input->IsA("albaVMEPolyline"))
 		m_Gui->Enable(ID_ABS_MATRIX, true);
@@ -129,29 +116,24 @@ void albaOpExporterVTK::OpRun()
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	m_Gui->Label("");
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
 	m_Gui->Label("");
-
-	m_Gui->Enable(wxOK, !m_File.IsEmpty());
 
 	ShowGui();
 }
 //----------------------------------------------------------------------------
 void albaOpExporterVTK::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
     switch(e->GetId())
     {
       case wxOK:
-        ExportVTK();
-        OpStop(OP_RUN_OK);
-      break;
-      case ID_CHOOSE_FILENAME:
-        m_Gui->Enable(wxOK, !m_File.IsEmpty());
+        if (ExportVTK() == ALBA_OK)
+          OpStop(OP_RUN_OK);
+        else
+          OpStop(OP_RUN_CANCEL);
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
@@ -167,10 +149,21 @@ void albaOpExporterVTK::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaOpExporterVTK::ExportVTK()
-//----------------------------------------------------------------------------
+int albaOpExporterVTK::ExportVTK()
 {					
 	m_Input->GetOutput()->Update();
+
+	if(m_File.IsEmpty())
+	{
+		m_FileDir = albaGetLastUserFolder();
+		m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
+
+		m_File = albaGetSaveFile(m_FileDir, "vtk Data (*.vtk)|*.vtk", _("Choose VTK file"));
+
+		if(m_File.IsEmpty())
+			return ALBA_ERROR;
+	}
+
 	if(this->m_Input->IsA("albaVMELandmarkCloud"))
 	{
     if(((albaVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
@@ -180,16 +173,17 @@ void albaOpExporterVTK::ExportVTK()
 		else
 		{
 			albaMessage( _("Data not present!"), _("Warning"), wxOK|wxICON_WARNING);
+			return ALBA_ERROR;
 		}
 	}
 	else
 	{
     SaveVTKData();
 	}
+	return ALBA_OK;
 }
 //----------------------------------------------------------------------------
 void albaOpExporterVTK::SaveVTKData()
-//----------------------------------------------------------------------------
 {
 	albaProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);

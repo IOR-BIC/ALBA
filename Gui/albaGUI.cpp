@@ -259,18 +259,19 @@ void albaGUI::Enable(int mod_id, bool enable)
 // max length for short label: "1234567890"
 
 //----------------------------------------------------------------------------
-void albaGUI::Divider(long style)
+void albaGUI::Divider(bool showLine)
 {
-	if (style == 0) //simple empty space
-	{
-		wxStaticText* div = new wxStaticText(this, -1, "", dp, wxSize(FW, 2), 0);
-		Add(div, 0, wxALL, M);
-	}
-	else
+	if (showLine) 
 	{
 		wxStaticLine *div = new wxStaticLine(this, -1, dp, wxSize(FW, 1));
 		Add(div, 0, wxALL, 2 * M);
 	}
+	else //simple empty space
+	{
+		wxStaticText *div = new wxStaticText(this, -1, "", dp, wxSize(FW, 2), 0);
+		Add(div, 0, wxALL, M);
+	}
+	
 }
 
 //----------------------------------------------------------------------------

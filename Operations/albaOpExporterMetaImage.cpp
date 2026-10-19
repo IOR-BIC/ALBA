@@ -77,26 +77,17 @@ enum VTK_EXPORTER_ID
 {
   ID_VTK_BINARY_FILE = MINID,
 	ID_ABS_MATRIX,
-  ID_CHOOSE_FILENAME,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterMetaImage::OpRun()
 {
-	vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
-	assert(inputData);
-
-	albaString wildc = "Meta Data Image (*.mha)|*.mha";
-
-	m_FileDir = albaGetLastUserFolder();
-	m_File = m_FileDir + "\\" + m_Input->GetName() + ".mha";
-
 	m_Gui = new albaGUI(this);
-	m_Gui->FileSave(ID_CHOOSE_FILENAME, _("Mha file"), &m_File, wildc);
-	m_Gui->Bool(ID_VTK_BINARY_FILE, "Use Compression", &m_Compression, 1);
-	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
-	
-	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
+	m_Gui->Bool(ID_VTK_BINARY_FILE, "Use Compression", &m_Compression, 1);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
+	m_Gui->Label("");
+
 	m_Gui->Divider(1);
 	m_Gui->OkCancel();
 	m_Gui->Label("");
@@ -113,12 +104,11 @@ void albaOpExporterMetaImage::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case wxOK:
-        ExportMetaImage();
-        OpStop(OP_RUN_OK);
-      break;
-      case ID_CHOOSE_FILENAME:
-        m_Gui->Enable(wxOK, !m_File.IsEmpty());
-      break;
+				if (ExportMetaImage() == ALBA_OK)
+					OpStop(OP_RUN_OK);
+				else
+					OpStop(OP_RUN_CANCEL);
+			break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
@@ -133,8 +123,20 @@ void albaOpExporterMetaImage::OnEvent(albaEventBase *alba_event)
 
 
 //----------------------------------------------------------------------------
-void albaOpExporterMetaImage::ExportMetaImage()
+int albaOpExporterMetaImage::ExportMetaImage()
 {
+
+	if (m_File.IsEmpty())
+	{
+		m_FileDir = albaGetLastUserFolder();
+		m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
+
+		m_File = albaGetSaveFile(m_FileDir, "vtk Data (*.vtk)|*.vtk", _("Choose VTK file"));
+
+		if (m_File.IsEmpty())
+			return ALBA_ERROR;
+	}
+
 	m_Input->GetOutput()->Update();
 
 	//Setting Metadata Tags
@@ -151,7 +153,6 @@ void albaOpExporterMetaImage::ExportMetaImage()
 	}
 
 	vtkALBASmartPointer<vtkMetaImageWriter> writer;
-
 
 	//Absolute Matrix
 	if (m_ABSMatrixFlag)
@@ -189,6 +190,8 @@ void albaOpExporterMetaImage::ExportMetaImage()
 	writer->SetFileName(m_File.GetCStr());
 	writer->SetCompression(m_Compression != 0);
 	writer->Write();
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
