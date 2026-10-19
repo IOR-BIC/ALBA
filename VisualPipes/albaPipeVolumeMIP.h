@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class albaLODActor;
+class vtkOpenGLActor;
 class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkOutlineSource;
@@ -103,7 +103,7 @@ protected:
 	/** For vtkRectilinearGrid */
 	vtkOutlineSource       *m_Box;
 	vtkPolyDataMapper	     *m_Mapper;
-	albaLODActor            *m_Actor;
+  vtkOpenGLActor *m_Actor;
 	vtkOutlineCornerFilter *m_OutlineBox;
 
 };

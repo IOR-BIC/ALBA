@@ -34,7 +34,6 @@
 #include "albaPolylineGraphVertexTest.h"
 #include "albaScalarVectorTest.h"
 #include "albaServiceLocator.h"
-#include "albaVMEAnalogTest.h"
 #include "albaVMEExternalDataTest.h"
 #include "albaVMEFactoryTest.h"
 #include "albaVMEGenericAbstractTest.h"
@@ -43,7 +42,6 @@
 #include "albaVMEGroupTest.h"
 #include "albaVMEImageTest.h"
 #include "albaVMEInfoTextTest.h"
-#include "albaVMEItemScalarMatrixTest.h"
 #include "albaVMEItemTest.h"
 #include "albaVMEItemVTKTest.h"
 #include "albaVMELabeledVolumeTest.h"
@@ -61,7 +59,6 @@
 #include "albaVMEOutputPointSetTest.h"
 #include "albaVMEOutputPolylineEditorTest.h"
 #include "albaVMEOutputPolylineTest.h"
-#include "albaVMEOutputScalarMatrixTest.h"
 #include "albaVMEOutputScalarTest.h"
 #include "albaVMEOutputSurfaceEditorTest.h"
 #include "albaVMEOutputSurfaceTest.h"
@@ -74,9 +71,7 @@
 #include "albaVMEPolylineSplineTest.h"
 #include "albaVMEPolylineTest.h"
 #include "albaVMEProberTest.h"
-#include "albaVMERawMotionDataTest.h"
 #include "albaVMERefSysTest.h"
-#include "albaVMEScalarMatrixTest.h"
 #include "albaVMEScalarTest.h"
 #include "albaVMESlicerTest.h"
 #include "albaVMESurfaceEditorTest.h"
@@ -137,7 +132,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMESurfaceTest::suite());
 	runner.addTest(albaVMEGroupTest::suite());
 	runner.addTest(albaVMEGizmoTest::suite());
-	runner.addTest(albaVMEScalarMatrixTest::suite());
 	runner.addTest(albaVMEScalarTest::suite());
 	runner.addTest(albaVMEPolylineTest::suite());
 	runner.addTest(albaVMEPolylineSplineTest::suite());
@@ -161,7 +155,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEOutputPointSetTest::suite());
 	runner.addTest(albaVMEOutputScalarTest::suite());
 	runner.addTest(albaVMEOutputLandmarkCloudTest::suite());
-	runner.addTest(albaVMEOutputScalarMatrixTest::suite());
 	runner.addTest(albaVMEOutputMeshTest::suite());
 	runner.addTest(albaVMEOutputImageTest::suite());
 	//runner.addTest(albaVMEOutputVolumeTest::suite());
@@ -169,7 +162,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaMatrixInterpolatorTest::suite()); 
 	runner.addTest(albaVMEGenericTest::suite()); 
 	runner.addTest(albaVMEOutputVTKTest::suite());
-	runner.addTest(albaVMEItemScalarMatrixTest::suite());
 	runner.addTest(albaScalarVectorTest::suite());
 	runner.addTest(albaVMEGenericAbstractTest::suite());
 	runner.addTest(albaVMEItemTest::suite());
@@ -178,11 +170,9 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEMeterTest::suite());
 	runner.addTest(albaMSFImporterTest::suite());
 //	runner.addTest(albaVMESlicerTest::suite());
-	runner.addTest(albaVMERawMotionDataTest::suite());
 	runner.addTest(albaPolylineGraphTest::suite());
 	runner.addTest(albaVMEWrappedMeterTest::suite());
 	runner.addTest(albaVMELabeledVolumeTest::suite());
-	runner.addTest(albaVMEAnalogTest::suite());
 	runner.addTest(albaVMEOutputSurfaceEditorTest::suite());
 	runner.addTest(albaVMEOutputPolylineEditorTest::suite());
 	runner.addTest(albaVMESurfaceEditorTest::suite());

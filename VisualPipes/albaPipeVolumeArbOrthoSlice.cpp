@@ -36,7 +36,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "albaGUIFloatSlider.h"
 
-#include "albaLODActor.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkImageData.h"
@@ -56,6 +55,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkALBAticksGenerator.h"
+#include "vtkOpenGLActor.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaPipeVolumeArbOrthoSlice);
@@ -79,6 +79,7 @@ albaPipeVolumeArbOrthoSlice::albaPipeVolumeArbOrthoSlice():albaPipe()
 	m_Box = NULL;
 	m_Mapper = NULL;
 	m_Actor = NULL;
+	m_ColorLUT = NULL;
 
 	m_TickActor = NULL;
 	m_TicksGenerator = NULL;
@@ -135,6 +136,7 @@ void albaPipeVolumeArbOrthoSlice::Create(albaSceneNode *n)
     material->UpdateProp();
   }
   
+	m_ColorLUT = material->m_ColorLut;
 
   // overwrite the plane vector, because the slices have to be orthogonal
   m_XVector[0][0] = 0.0001;	//modified by Paolo 29-10-2003 should be 0 !!! check into Sasha's filter

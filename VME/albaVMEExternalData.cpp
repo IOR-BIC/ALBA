@@ -25,6 +25,7 @@
 #include "albaVMEExternalData.h"
 
 #include <wx/filefn.h>
+#include <wx/utils.h>
 
 #include "albaTagArray.h"
 #include "albaStorage.h"
@@ -32,6 +33,7 @@
 #include "albaStorageElement.h"
 
 #include <vtkIndent.h>
+#include "albaGUI.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMEExternalData)
@@ -94,6 +96,44 @@ void albaVMEExternalData::SetFileName(const char *filename)
   this->GetTagArray()->SetTag(item);
 }
 
+//----------------------------------------------------------------------------
+albaGUI *albaVMEExternalData::CreateGui()
+{
+  albaVME::CreateGui();
+  if (m_Gui)
+    m_Gui->Button(ID_OPEN_FILE, "Open File");
+
+	return m_Gui;
+}
+
+//----------------------------------------------------------------------------
+void albaVMEExternalData::OnEvent(albaEventBase *alba_event)
+{
+	// Events to be sent up or down in the tree are simply forwarded.
+	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
+	{
+		switch (e->GetId())
+		{
+		case ID_OPEN_FILE:
+		{
+			const albaString fileName = GetAbsoluteFileName();
+
+			if (!wxLaunchDefaultApplication(fileName.GetCStr()))
+			{
+				albaErrorMessage("Unable to open external file with the default application.");
+			}
+		}
+		break;
+
+		default:
+			Superclass::OnEvent(alba_event);
+		}
+	}
+	else
+	{
+		Superclass::OnEvent(alba_event);
+	}
+}
 //-------------------------------------------------------------------------
 const char* albaVMEExternalData::GetExtension()
 //-------------------------------------------------------------------------

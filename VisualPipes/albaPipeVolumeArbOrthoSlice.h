@@ -33,7 +33,7 @@ class albaVMEOutputVolume;
 class albaGUIFloatSlider;
 class vtkLookupTable;
 class vtkOutlineSource;
-class albaLODActor;
+class vtkOpenGLActor;
 class vtkALBATicksGenerator;
 
 
@@ -153,7 +153,7 @@ protected:
 	vtkActor							 *m_TickActor;
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  albaLODActor            *m_Actor;
+  vtkOpenGLActor *m_Actor;
 	vtkALBATicksGenerator *m_TicksGenerator;
 
 	albaPipeVolumeArbSlice *m_SlicingPipes[3];

@@ -35,7 +35,7 @@ class vtkMetaImageWriter;
 class ALBA_EXPORT albaOpExporterMetaImage: public albaOp
 {
 public:
-  albaOpExporterMetaImage(const wxString &label = "Exporter ITK MetaImage");
+  albaOpExporterMetaImage(const wxString &label = "MetaImage (.mha)");
  ~albaOpExporterMetaImage(); 
   
   albaTypeMacro(albaOpExporterMetaImage, albaOp);
@@ -54,11 +54,11 @@ public:
   void ExportAsBynaryOff() {m_Compression = 0;};
   void SetExportAsBynary(int binary_file) {m_Compression = binary_file;};
 
-  /** Set the filename for the .stl to export */
+  /** Set the filename for the mha to export */
   void SetFileName(const char *file_name) {m_File = file_name;};
 
   /** Export image data. */
-  void ExportMetaImage();
+  int ExportMetaImage();
 
 
 	/** Return an xpm-icon that can be used to represent this operation */

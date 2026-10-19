@@ -47,7 +47,7 @@ class ALBA_EXPORT albaOpImporterLandmark : public albaOp
 {
 public:
   /** object constructor */
-	albaOpImporterLandmark(wxString label);
+	albaOpImporterLandmark(wxString label="Landmark");
   /** object destructor */
 	~albaOpImporterLandmark();
   /** method for clone object */

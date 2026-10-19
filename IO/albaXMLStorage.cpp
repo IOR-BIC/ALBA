@@ -494,7 +494,6 @@ int albaXMLStorage::InternalRestore()
 							}
               else
               {
-                // Paolo 30-11-2007: due to changes on name for albaVMEScalar (to albaVMEScalarMatrix)
                 if (doc_version_f < 2.0)
                 {
                   albaErrorMessageMacro("Wrong file version v"<<m_DocumentVersion.GetCStr()<<", should be > v"<<m_Version.GetCStr());

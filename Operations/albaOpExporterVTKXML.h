@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpExporterVTKXML
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -58,7 +58,7 @@ public:
   void SetFileName(const char *file_name) {m_File = file_name;};
 
   /** Export vtk data. */
-  void ExportVTK();
+  int ExportVTK();
 
   /** vtk pipeline to save data on disk. */
   void SaveVTKData();
@@ -73,6 +73,5 @@ protected:
   albaVME   *m_Vme; 
 	int				m_Binary;
 	int				m_ABSMatrixFlag;
-  int       m_ForceUnsignedShortScalarOutputForStructuredPoints;
 };
 #endif

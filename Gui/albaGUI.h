@@ -116,7 +116,7 @@ public:
   void SetListener(albaObserver *listener)   {m_Listener = listener;}; 
 
   /** Separator widget. */
-	void Divider(long style = 0);
+	void Divider(bool showLine = false);
 	
 	/** Label widget. */
   void Label(albaString label,bool bold = false, bool multiline = false);

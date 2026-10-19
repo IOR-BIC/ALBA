@@ -97,12 +97,6 @@ albaOp* albaOpDecomposeTimeVarVME::Copy()
 bool albaOpDecomposeTimeVarVME::InternalAccept(albaVME* node)
 //----------------------------------------------------------------------------
 {
-  //Until VMEAnalog is non time varying
-  if (node->IsA("albaVMEScalarMatrix"))
-  {
-    return false;
-  }
-
   return (node && node->IsAnimated());
 }
 

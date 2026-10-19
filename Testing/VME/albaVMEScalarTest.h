@@ -19,7 +19,7 @@
 
 #include "albaTest.h"
 
-/** Test for albaVMEScalarMatrix.*/
+/** Test for albaVMEScalar.*/
 class albaVMEScalarTest : public albaTest
 {
 public: 

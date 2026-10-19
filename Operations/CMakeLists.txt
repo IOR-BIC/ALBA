@@ -83,8 +83,6 @@ IF (ALBA_USE_VTK)
 	albaGeometryEditorPolylineGraph.cpp	albaGeometryEditorPolylineGraph.h
 	albaOpCreateLabeledVolume.cpp	albaOpCreateLabeledVolume.h
 	albaOpImporterLandmark.cpp		albaOpImporterLandmark.h
-	albaOpImporterLandmarkTXT.cpp	albaOpImporterLandmarkTXT.h
-	albaOpImporterLandmarkWS.cpp		albaOpImporterLandmarkWS.h
 
 	albaOpMatrixVectorMath.cpp		albaOpMatrixVectorMath.h
 
@@ -148,11 +146,7 @@ IF (ALBA_USE_VTK)
 	albaOpMakeVMETimevarying.cpp  albaOpMakeVMETimevarying.h
 	albaOpSegmentationRegionGrowingConnectedThreshold.cpp  albaOpSegmentationRegionGrowingConnectedThreshold.h
 	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp	albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
-	  	  
-	albaOpExporterAnalogWS.cpp		albaOpExporterAnalogWS.h
-	albaOpExporterGRFWS.cpp		albaOpExporterGRFWS.h
-	albaOpExporterLandmarkWS.cpp	albaOpExporterLandmarkWS.h
-	  
+	  	  	  
 	albaOpExporterFEMCommon.cpp	albaOpExporterFEMCommon.h
 	
 	albaOpESPCalibration.cpp		albaOpESPCalibration.h
@@ -168,8 +162,6 @@ IF (ALBA_USE_VTK)
 	
 	albaOpCreatePolyline.cpp	albaOpCreatePolyline.h
 	
-	albaOpImporterEmgWS.cpp albaOpImporterEmgWS.h
-	albaOpImporterRawMotionData.cpp albaOpImporterRawMotionData.h albaOpImporterMotionData.h
 	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
 	albaOpShowHistory.cpp	albaOpShowHistory.h
 	albaOpNearestLandmark.cpp  albaOpNearestLandmark.h
@@ -192,13 +184,8 @@ SET(PROJECT_SRCS ${PROJECT_SRCS}
     )
 ENDIF (ALBA_USE_GDCM)
 
-IF(ALBA_USE_BTK)
-	 SET(PROJECT_SRCS ${PROJECT_SRCS} albaOpImporterC3D.cpp			albaOpImporterC3D.h)
-ENDIF(ALBA_USE_BTK)
-
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
-    albaOpImporterASCII.cpp				albaOpImporterASCII.h
     albaVMEDataSetAttributesImporter.cpp	albaVMEDataSetAttributesImporter.h
     albaVMEMeshAnsysTextImporter.cpp		albaVMEMeshAnsysTextImporter.h
     albaVMEMeshAnsysTextExporter.cpp		albaVMEMeshAnsysTextExporter.h
@@ -206,21 +193,15 @@ ENDIF(ALBA_USE_BTK)
     albaOpImporterMesh.cpp				albaOpImporterMesh.h
     albaOpExporterMesh.cpp				albaOpExporterMesh.h
     albaOpScalarToSurface.cpp			albaOpScalarToSurface.h
-    albaOpImporterVMEDataSetAttributes.cpp	albaOpImporterVMEDataSetAttributes.h
 	
-	##########################################
-	# itkRawMotionImporterUtility.cxx
-    # itkRawMotionImporterUtility.h
-    albaOpImporterMotionData.h
-    albaOpExporterLandmark.cpp		albaOpExporterLandmark.h
+	albaOpExporterLandmark.cpp		albaOpExporterLandmark.h
     albaOpClassicICPRegistration.cpp	albaOpClassicICPRegistration.h
-    albaOpImporterGRFWS.cpp			albaOpImporterGRFWS.h
-    albaOpImporterAnalogWS.cpp		albaOpImporterAnalogWS.h
     albaOpSmoothSurfaceCells.cpp		albaOpSmoothSurfaceCells.h
     albaOpExporterMeters.cpp			albaOpExporterMeters.h
     albaOpInteractionDebugger.cpp	albaOpInteractionDebugger.h
 	albaOpFilterImage.cpp			albaOpFilterImage.h
 	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
+	albaOpExporterPointCloud.cpp	albaOpExporterPointCloud.h
   )
 
 
@@ -238,11 +219,6 @@ IF (ALBA_USE_GDCM)
  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_GDCM_LIBRARY)
  SET(PROJECT_LIBS ${PROJECT_LIBS} ${GDCM_LIBRARIES})
 ENDIF (ALBA_USE_GDCM)
-
-IF (ALBA_USE_BTK)
- ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_BTK_LIBRARY)
-ENDIF (ALBA_USE_BTK)
-
 
 ADD_DEPENDENCIES(${PROJECT_NAME} albaVME albaCommon vtkALBA albaService)
 

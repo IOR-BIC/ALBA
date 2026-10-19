@@ -119,7 +119,7 @@ void albaGetOpenMultiFiles(const char * path, const char * wild, std::vector<wxS
 wxString albaGetSaveFile(const char * initial, const char * wild, const char * title, wxWindow *parent, bool warnOverWrite)
 {
   wxString path, name, ext;
-	wxString defaultname = "NewFile";
+	wxString defaultname = "";
 	wxFileName::SplitPath(initial,&path,&name,&ext);
 	if (name != "" && ext != "")
 	{

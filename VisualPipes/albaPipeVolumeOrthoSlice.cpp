@@ -32,7 +32,7 @@
 #include "albaVME.h"
 #include "albaVMEOutputVolume.h"
 #include "albaGUIFloatSlider.h"
-#include "albaLODActor.h"
+#include "vtkOpenGLActor.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAAssembly.h"
 #include "vtkMath.h"

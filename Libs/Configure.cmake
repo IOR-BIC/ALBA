@@ -34,9 +34,8 @@ ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
   OPTION(ALBA_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 
-# options for GDCM and BTK from ALBAMedical
+# options for GDCM 
 OPTION(ALBA_USE_GDCM "Find and Link the GDCM library." ON)
-OPTION(ALBA_USE_BTK "Find and Link the BTK library." ON)
 
 
 #
@@ -93,13 +92,6 @@ IF (ALBA_USE_CRYPTO)
   MFL_SUBPROJECT(CRYPTO CRYPTO)
 ENDIF(ALBA_USE_CRYPTO)
 
-
-#
-# BTK Library
-#
-IF (ALBA_USE_BTK)
-  MFL_SUBPROJECT(BTK BTK)
-ENDIF(ALBA_USE_BTK)
 
 #
 # wxMozilla Library

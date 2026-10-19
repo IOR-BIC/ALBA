@@ -86,42 +86,38 @@ void albaVMEFactoryTest::Initialize_CreateVMEInstance()
 			found = true;
 	}
 	CPPUNIT_ASSERT(found);
-
-  albaVMEFactory *vme_factory = NULL;
-  vme_factory = (albaVMEFactory*) albaVMEFactory::GetInstance();
-
+  
+	int vmeNum1 = vmeFactory->GetNodeNames().size();
+  
   albaPlugVME<albaVMECustom>("a custom vme"); // plug a vme in the main node factory
+	int vmeNum2 = vmeFactory->GetNodeNames().size();
+	CPPUNIT_ASSERT(vmeNum2 == vmeNum1 + 1);
 
-  albaVME *vme0 = vme_factory->CreateVMEInstance("albaVMENotExisting");
-  albaVME *vme1 = vme_factory->CreateVMEInstance("albaVMECustom");
+
+  albaVME *vme0 = vmeFactory->CreateVMEInstance("albaVMENotExisting");
+  albaVME *vme1 = vmeFactory->CreateVMEInstance("albaVMECustom");
 
   CPPUNIT_ASSERT(vme0 == NULL);
   CPPUNIT_ASSERT(vme1!=NULL);
 
   CPPUNIT_ASSERT(vme1->IsALBAType(albaVMECustom));
 
-  std::vector<std::string> vmes = vme_factory->GetNodeNames();
-  int s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 33); //33 VMES are registered in constructor actually, 
-                            //please modify also the test when (un)plugged inside alba and update this number
+                            
            
   // test factory contents
   //poor proof to register again an already registered vme
   albaPlugVME<albaVMECustom>("a custom vme"); // plug a vme in the main node factory again
-  vmes = vme_factory->GetNodeNames();
-  s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 33);
 
+  int vmeNum3 = vmeFactory->GetNodeNames().size();;
+  CPPUNIT_ASSERT(vmeNum3 == vmeNum2);
+
+	std::vector<std::string> vmes = vmeFactory->GetNodeNames();
   found=false;
   for (int i=0;i<vmes.size();i++)
-  {
-		std::string test;
-		test = vmes[i];
     if (vmes[i]=="albaVMECustom")
       found=true;
-  }
-  
-	CPPUNIT_ASSERT(found);
+
+  CPPUNIT_ASSERT(found);
   // cleanup factory products
   vme1->Delete();
 }

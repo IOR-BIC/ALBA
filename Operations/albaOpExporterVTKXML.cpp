@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpExporterVTKXML
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -62,7 +62,6 @@ albaOp(label)
 	m_ABSMatrixFlag = 0;
 
 	m_FileDir = albaGetLastUserFolder();
-  m_ForceUnsignedShortScalarOutputForStructuredPoints = false;
 }
 //----------------------------------------------------------------------------
 albaOpExporterVTKXML::~albaOpExporterVTKXML()
@@ -90,61 +89,26 @@ enum VTK_EXPORTER_ID
 {
   ID_VTK_BINARY_FILE = MINID,
 	ID_ABS_MATRIX,
-  ID_CHOOSE_FILENAME,
-  ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterVTKXML::OpRun()   
 //----------------------------------------------------------------------------
-{
-  vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
-  assert(inputData);
-
-  bool isStructuredPoints = inputData->IsA("vtkImageData") != 0;
-
-  albaString wildc;
-  if(inputData->IsA("vtkRectilinearGrid"))
-  {
-    wildc = "vtk xml Data (*.vtr)|*.vtr";
-  }
-  if(inputData->IsA("vtkPolyData"))
-  {
-    wildc = "vtk xml Data (*.vtp)|*.vtp";
-  }
-  if(inputData->IsA("vtkImageData"))
-  {
-    wildc = "vtk xml Data (*.vti)|*.vti";
-  }
-  if(inputData->IsA("vtkUnstructuredGrid"))
-  {
-    wildc = "vtk xml Data (*.vtu)|*.vtu";
-  }
-  if(inputData->IsA("vtkStructuredGrid"))
-  {
-    wildc = "vtk xml Data (*.vts)|*.vts";
-  }
-
+{ 
   m_Gui = new albaGUI(this);
-  m_Gui->FileSave(ID_CHOOSE_FILENAME, _("vtk xml file"), &m_File, wildc);
-	m_Gui->Label("file type",true);
-	m_Gui->Bool(ID_VTK_BINARY_FILE,"binary",&m_Binary,0);
-	m_Gui->Label("absolute matrix",true);
-	m_Gui->Bool(ID_ABS_MATRIX,"apply",&m_ABSMatrixFlag,0);
-	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMEPointSet") || m_Input->IsA("albaVMEGroup"))
-		m_Gui->Enable(ID_ABS_MATRIX,true);
+	
+	m_Gui->Label("");
+  m_Gui->Bool(ID_VTK_BINARY_FILE, "Binary File type", &m_Binary, 1);
+	m_Gui->Label("");
+  m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
+	m_Gui->Label("");
+
+	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMEPointSet") || m_Input->IsA("albaVMEGroup") || m_Input->IsA("albaVMEMesh") || m_Input->IsA("albaVMEPolyline"))
+		m_Gui->Enable(ID_ABS_MATRIX, true);
 	else
 		m_Gui->Enable(ID_ABS_MATRIX,false);
 
   m_Gui->Divider(2);
-  m_Gui->Label("Force UNSIGNED SHORT scalar output");
-  m_Gui->Bool(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, "", &m_ForceUnsignedShortScalarOutputForStructuredPoints);
-  m_Gui->Enable(ID_FORCE_UNSIGNED_SHORT_SCALARS_OUTPUT_FOR_STRUCTURED_POINTS, isStructuredPoints ? true : false);
-  m_Gui->Divider(2);
-
-	m_Gui->OkCancel();
-  m_Gui->Enable(wxOK, !m_File.IsEmpty());
-	
-	m_Gui->Divider();
+	m_Gui->OkCancel();	
 
 	ShowGui();
 }
@@ -160,9 +124,6 @@ void albaOpExporterVTKXML::OnEvent(albaEventBase *alba_event)
         ExportVTK();
         OpStop(OP_RUN_OK);
       break;
-      case ID_CHOOSE_FILENAME:
-        m_Gui->Enable(wxOK, !m_File.IsEmpty());
-      break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
@@ -174,25 +135,49 @@ void albaOpExporterVTKXML::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaOpExporterVTKXML::ExportVTK()
-//----------------------------------------------------------------------------
-{					
+int albaOpExporterVTKXML::ExportVTK()
+{	
+	vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
+	assert(inputData);
+
+	if (m_File.IsEmpty())
+	{
+		albaString wildc;
+		if (inputData->IsA("vtkRectilinearGrid"))
+			wildc = "vtk xml Data (*.vtr)|*.vtr";
+		else if (inputData->IsA("vtkPolyData"))
+			wildc = "vtk xml Data (*.vtp)|*.vtp";
+		else if (inputData->IsA("vtkImageData"))
+			wildc = "vtk xml Data (*.vti)|*.vti";		
+		else if (inputData->IsA("vtkUnstructuredGrid"))
+			wildc = "vtk xml Data (*.vtu)|*.vtu";
+		else if (inputData->IsA("vtkStructuredGrid"))
+			wildc = "vtk xml Data (*.vts)|*.vts";
+
+		m_FileDir = albaGetLastUserFolder();
+		m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
+
+		m_File = albaGetSaveFile(m_FileDir, wildc, _("Choose VTK file"));
+
+		if (m_File.IsEmpty())
+			return ALBA_ERROR;
+	}
+
 	m_Input->GetOutput()->Update();
 	if(this->m_Input->IsA("albaVMELandmarkCloud"))
 	{
     if(((albaVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
-		{
       SaveVTKData();
-    }
 		else
 		{
 			albaMessage( _("Data not present!"), _("Warning"), wxOK|wxICON_WARNING);
+			return ALBA_ERROR;
 		}
 	}
 	else
-	{
     SaveVTKData();
-	}
+
+	return ALBA_OK;
 }
 //----------------------------------------------------------------------------
 void albaOpExporterVTKXML::SaveVTKData()

@@ -46,7 +46,7 @@
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkTexture.h"
-#include "albaLODActor.h"
+#include "vtkOpenGLActor.h"
 #include "vtkRenderer.h"
 #include "vtkLookupTable.h"
 #include "vtkActor.h"
@@ -79,7 +79,7 @@ albaPipeSurfaceTextured::albaPipeSurfaceTextured()
   m_UseTexture      = 0;
   m_UseLookupTable  = 0;
 
-  m_EnableActorLOD  = 0;
+  
 
 	m_ShowAxis = 1;
   m_SelectionVisibility = 1;
@@ -172,30 +172,6 @@ void albaPipeSurfaceTextured::Create(albaSceneNode *n/*, bool use_axes*/)
 
   vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
-  m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
-  
-  if (m_EnableActorLOD == false)
-  {
-
-	  /*
-	  
-	  if( sz < m_PixelThreshold)
-	  {
-		  // Assign the actor's transformation matrix to the m_FlagActor 
-		  // to put this one at the same position of the actor
-		  m_FlagActor->PokeMatrix(GetMatrix());
-
-		  glPointSize( m_FlagDimension );
-		  m_FlagActor->Render(ren,m_FlagMapper); 
-		  glPointSize( 1 );
-	  }
-
-	  */
-	  //
-	  // code section in albaLODActor.cpp
-	  //
-	  m_Actor->SetPixelThreshold(1);
-  }
 
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
   {
@@ -353,8 +329,6 @@ albaGUI *albaPipeSurfaceTextured::CreateGui()
   m_Gui->Lut(ID_LUT,"Lut",m_SurfaceMaterial->m_ColorLut);
   m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
   m_Gui->Divider(2);
-  m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
-
   if (m_SurfaceMaterial == NULL)
   {
     albaVMEOutputSurface *surface_output = albaVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
@@ -389,11 +363,6 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 		break;
 		case ID_LUT:
 			m_SurfaceMaterial->UpdateFromLut();
-			GetLogicManager()->CameraUpdate();
-			break;
-		case ID_ENABLE_LOD:
-			m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
-			m_OutlineActor->SetEnableHighThreshold(m_EnableActorLOD);
 			GetLogicManager()->CameraUpdate();
 			break;
 		case ID_USE_VTK_PROPERTY:
@@ -500,13 +469,6 @@ void albaPipeSurfaceTextured::GenerateTextureMapCoordinate()
 	{
 		m_Mapper->SetInputConnection(port);
 	}
-}
-//----------------------------------------------------------------------------
-void albaPipeSurfaceTextured::SetEnableActorLOD(bool value)
-{
-  m_EnableActorLOD = (int) value;
-  if(m_Gui)
-    m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------

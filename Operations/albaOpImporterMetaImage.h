@@ -45,7 +45,7 @@ to the user and no data will be imported.*/
 class ALBA_EXPORT albaOpImporterMetaImage: public albaOpImporterFile 
 {
 public:
-  albaOpImporterMetaImage(const wxString &label = "Importer Meta Image");
+  albaOpImporterMetaImage(const wxString &label = "Meta Image (.mha)");
  ~albaOpImporterMetaImage(); 
   
   albaTypeMacro(albaOpImporterMetaImage, albaOpImporterFile);

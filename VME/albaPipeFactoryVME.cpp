@@ -43,7 +43,6 @@
 #include "albaPipeVector.h"
 #include "albaPipeMesh.h"
 #include "albaPipeScalar.h"
-#include "albaPipeScalarMatrix.h"
 #include "albaPipeVolumeMIP.h"
 #include "albaPipeVolumeDRR.h"
 #include "albaPipeVolumeVR.h"
@@ -53,7 +52,6 @@
 #include "albaVisualPipeSlicerSlice.h"
 #include "albaVisualPipePolylineGraph.h"
 #include "albaPipeDensityDistance.h"
-#include "albaPipeGraph.h"
 #include "albaPipePolylineGraphEditor.h"
 #include "albaPipeMeshSlice.h"
 #include "albaPipePolylineSlice.h"
@@ -133,7 +131,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeImage3D,"Pipe for render images");
 	albaPlugPipeMacro(albaPipeMesh,"Pipe for render Mesh");
   albaPlugPipeMacro(albaPipeScalar,"Pipe for render scalar data");
-  albaPlugPipeMacro(albaPipeScalarMatrix,"Pipe for render matrix scalar data");
   albaPlugPipeMacro(albaPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
   albaPlugPipeMacro(albaPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
   albaPlugPipeMacro(albaPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");
@@ -144,7 +141,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
   albaPlugPipeMacro(albaVisualPipeSlicerSlice, "Pipe to Visualize Slicer as borders cutted from a plane.");
   albaPlugPipeMacro(albaVisualPipePolylineGraph, "Pipe to Visualize Polyline and Graph.");
-  albaPlugPipeMacro(albaPipeGraph, "Pipe to plot scalar graphics.");
   albaPlugPipeMacro(albaPipeCompoundVolume, "Compound pipe for rendering volumes.");
   albaPlugPipeMacro(albaPipeCompoundVolumeIsosurface,"Compound Pipe for render vtk volumes as a iso-surface");
   albaPlugPipeMacro(albaPipeCompoundVolumeMIP, "Compound pipe for render vtk volumes with MIP ray cast method.");
