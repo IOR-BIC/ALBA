@@ -219,6 +219,7 @@
 #include "albaOpComputeHausdorffDistance.h"
 #include "albaOpCreateCentroid.h"
 #include "albaOpTransformAtoB.h"
+#include "albaOpImageCalibration.h"
 
 //TMP
 #include "albaOpImporterExternalFile.h"
@@ -2091,6 +2092,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpMakeVMETimevarying(), _("Modify"));
 	Plug(new albaOpSmoothSurfaceCells(), _("Modify"));
 	Plug(new albaOpTransformAtoB(), "Modify");
+	Plug(new albaOpImageCalibration(), "Modify");
 
 	Plug(new albaOpMeasure2D("2D Measure"), "Measure");
 	Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");

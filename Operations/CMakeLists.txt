@@ -202,6 +202,7 @@ ENDIF (ALBA_USE_GDCM)
 	albaOpFilterImage.cpp			albaOpFilterImage.h
 	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
 	albaOpExporterPointCloud.cpp	albaOpExporterPointCloud.h
+	albaOpImageCalibration.cpp 		albaOpImageCalibration.h
   )
 
 
