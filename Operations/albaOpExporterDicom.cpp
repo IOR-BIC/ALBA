@@ -117,8 +117,6 @@ void albaOpExporterDicom::OpRun()
 
   bool isStructuredPoints = inputData->IsA("vtkImageData");
 
-  albaString wildc = "vtk Data (*.vtk)|*.vtk";
-
 	wxString lastDicomDir = GetSetting()->GetLastDicomDir();
 
 	if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
