@@ -39,7 +39,7 @@ class vtkALBAVolumeSlicer;
 class vtkCamera;
 class vtkALBAAssembly;
 class vtkOutlineSource;
-class albaLODActor;
+class vtkOpenGLActor;
 class albaVMEOutputVolume;
 class vtkTransformFilter;
 class vtkTransform;
@@ -210,9 +210,8 @@ protected:
 
 	vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  albaLODActor           *m_Actor;
-
-
+	vtkOpenGLActor *m_Actor;
+	
 	bool										m_VolIdentityMtr;
 	albaMatrix						 *m_VolInverseMtr;
 	albaMatrix						 *m_VolInvRotMtr;

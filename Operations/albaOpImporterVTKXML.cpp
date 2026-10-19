@@ -123,23 +123,9 @@ void albaOpImporterVTKXML::OpRun()
   if(!m_FileName.IsEmpty())
   {
     if (ImportFile() == ALBA_OK)
-    {
-      wxString path, name, ext;
-      wxFileName::SplitPath(m_FileName.GetCStr(),&path,&name,&ext);
-      albaTagItem tag_Nature;
-      tag_Nature.SetName("VME_NATURE");
-      tag_Nature.SetValue("NATURAL");
-      m_Output->GetTagArray()->SetTag(tag_Nature);
-      m_Output->ReparentTo(m_Input);
-      m_Output->SetName(name.ToAscii());
-
       result = OP_RUN_OK;
-    }
-    else
-    {
-      if(!this->m_TestMode)
+    else if(!this->m_TestMode)
         albaMessage(_("Unsupported file format"), _("I/O Error"), wxICON_ERROR );
-    }
   }
   albaEventMacro(albaEvent(this,result));
 }
@@ -197,11 +183,7 @@ int albaOpImporterVTKXML::ImportFile()
 				m_VmeGeneric->SetDataByDetaching(data, 0);
 				m_Output = m_VmeGeneric;
 			}
-
-			return ALBA_OK;
 		}
-
-		ResetErrorCount();
 	}
 	else if (ext == "vtp")
 	{
@@ -231,11 +213,7 @@ int albaOpImporterVTKXML::ImportFile()
 				m_VmeGeneric->SetDataByDetaching(data, 0);
 				m_Output = m_VmeGeneric;
 			}
-
-			return ALBA_OK;
 		}
-
-		ResetErrorCount();
 	}
 	else if (ext == "vtr")
 	{
@@ -261,11 +239,7 @@ int albaOpImporterVTKXML::ImportFile()
 				m_VmeGeneric->SetDataByDetaching(data, 0);
 				m_Output = m_VmeGeneric;
 			}
-
-			return ALBA_OK;
 		}
-
-		ResetErrorCount();
 	}
 	else if (ext == "vtu")
 	{
@@ -287,11 +261,7 @@ int albaOpImporterVTKXML::ImportFile()
 				m_VmeGeneric->SetDataByDetaching(data, 0);
 				m_Output = m_VmeGeneric;
 			}
-
-			return ALBA_OK;
 		}
-
-		ResetErrorCount();
 	}
 	else if (ext == "vts")
 	{
@@ -306,13 +276,24 @@ int albaOpImporterVTKXML::ImportFile()
 
 			m_VmeGeneric->SetDataByDetaching(data, 0);
 			m_Output = m_VmeGeneric;
-
-			return ALBA_OK;
 		}
-
-		ResetErrorCount();
 	}
 
-  return ALBA_ERROR;
+	if (m_ErrorCount == 0)
+	{
+		albaTagItem tag_Nature;
+		tag_Nature.SetName("VME_NATURE");
+		tag_Nature.SetValue("NATURAL");
+		m_Output->GetTagArray()->SetTag(tag_Nature);
+		m_Output->ReparentTo(m_Input);
+		m_Output->SetName(name.ToAscii());
+
+		return ALBA_OK;
+	}
+	else
+	{
+		ResetErrorCount();
+		return ALBA_ERROR;
+	}
 }
 

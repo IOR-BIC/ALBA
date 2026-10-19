@@ -288,7 +288,7 @@ void albaOpSegmentation::OpDo()
   volToSurface->Update();
   
   vtkPolyData *surface;
-  surface=volToSurface->GetOutput();
+  surface=vtkPolyData::SafeDownCast(volToSurface->GetOutput());
 
   //Generating Surface VME
   albaNEW(m_OutputSurface);

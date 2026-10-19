@@ -54,9 +54,7 @@
 #include "albaOpExporterAnsysCDBFileTest.h"
 #include "albaOpExporterAnsysInputFileTest.h" 
 #include "albaOpExporterImagesTest.h"
-#include "albaOpExporterGRFWSTest.h"
 #include "albaOpExporterLandmarkTest.h"
-#include "albaOpExporterLandmarkWSTest.h"
 #include "albaOpExporterMSFTest.h"
 #include "albaOpExporterMeshTest.h"
 #include "albaOpExporterMetersTest.h"
@@ -78,11 +76,8 @@
 #include "albaOpImporterAnsysInputFileTest.h"
 #include "albaOpImporterDicomTest.h"
 #include "albaOpImporterExternalFileTest.h"
-#include "albaOpImporterGRFWSTest.h"
 #include "albaOpImporterImageTest.h"
-#include "albaOpImporterLandmarkTXTTest.h"
 #include "albaOpImporterLandmarkTest.h"
-#include "albaOpImporterLandmarkWSTest.h"
 #include "albaOpImporterMSF1xTest.h"
 #include "albaOpImporterMSFTest.h"
 #include "albaOpImporterMeshTest.h"
@@ -251,13 +246,10 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterVTKTest::suite());
 	runner.addTest(albaOpExporterLandmarkTest::suite());
 	runner.addTest(albaOpImporterLandmarkTest::suite());
-	runner.addTest(albaOpImporterGRFWSTest::suite());
 	runner.addTest(albaGeometryEditorPolylineGraphTest::suite());
 	runner.addTest(albaOpMatrixVectorMathTest::suite());
 	runner.addTest(albaOpVolumeMeasureTest::suite());
 	runner.addTest(albaOpImporterRAWImagesTest::suite());
-	runner.addTest(albaOpImporterLandmarkTXTTest::suite());
-	runner.addTest(albaOpImporterLandmarkWSTest::suite());
 	runner.addTest(albaOpExtrusionHolesTest::suite());
 	runner.addTest(albaOpExporterWrappedMeterTest::suite());
 	runner.addTest(albaOpFreezeVMETest::suite());
@@ -287,8 +279,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpCropDeformableROITest::suite());
 	runner.addTest(albaOpMoveTest::suite());
 	runner.addTest(albaOpTransformTest::suite());
-	runner.addTest(albaOpExporterGRFWSTest::suite());
-	runner.addTest(albaOpExporterLandmarkWSTest::suite()); 
 	runner.addTest(albaDicomClassesTest::suite()); 
 	runner.addTest(albaOpFillHolesTest::suite());
 	runner.addTest(albaOpImporterVTKXMLTest::suite());

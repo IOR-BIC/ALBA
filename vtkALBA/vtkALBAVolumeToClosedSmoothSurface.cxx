@@ -47,23 +47,33 @@ vtkStandardNewMacro(vtkALBAVolumeToClosedSmoothSurface);
 
 //----------------------------------------------------------------------------
 vtkALBAVolumeToClosedSmoothSurface::vtkALBAVolumeToClosedSmoothSurface()
-//----------------------------------------------------------------------------
 {
   //Setting default values
-  FillHoles = true;
+  FillBorderHoles = true;
   SmoothSurface = true;
 }
 
 //----------------------------------------------------------------------------
 vtkALBAVolumeToClosedSmoothSurface::~vtkALBAVolumeToClosedSmoothSurface()
-//----------------------------------------------------------------------------
 { 
+}
+
+int vtkALBAVolumeToClosedSmoothSurface::FillInputPortInformation(int vtkNotUsed(port), vtkInformation *info)
+{
+	info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");
+	info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkRectilinearGrid");
+	return 1;
+}
+
+int vtkALBAVolumeToClosedSmoothSurface::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation *info)
+{
+	info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+	return 1;
 }
 
 
 //----------------------------------------------------------------------------
 void vtkALBAVolumeToClosedSmoothSurface::GetTransformFactor( int toUnity,double *bounds, double *scale, double *traslation )
-//----------------------------------------------------------------------------
 {
   double size[3];
 
@@ -103,7 +113,7 @@ void vtkALBAVolumeToClosedSmoothSurface::GetTransformFactor( int toUnity,double 
 //X,Y,Z to point ID define
 #define COORD_TO_ID(x,y,z)  (z)*(inputDimensions[0])*(inputDimensions[1]) + (y)*(inputDimensions[0]) + (x)
 
-
+//----------------------------------------------------------------------------
 int vtkALBAVolumeToClosedSmoothSurface::RequestData(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
 	// get the info objects
@@ -157,10 +167,10 @@ int vtkALBAVolumeToClosedSmoothSurface::RequestData(vtkInformation* vtkNotUsed(r
 		polydata = rgContourFilter->GetOutput();
     }
   
-	if (FillHoles)
+	if (FillBorderHoles)
 	{
 		vtkALBASmartPointer<vtkPlaneCollection> planes;
-		double n[6][3] = { {-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1} };
+		double n[6][3] = { {1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1} };
 		double o[6][3] = {
 				{volBounds[0],0,0},{volBounds[1],0,0},
 				{0,volBounds[2],0},{0,volBounds[3],0},
@@ -176,7 +186,7 @@ int vtkALBAVolumeToClosedSmoothSurface::RequestData(vtkInformation* vtkNotUsed(r
 		vtkNEW(fillHolesFilter);
 		fillHolesFilter->SetInputData(polydata);
 		fillHolesFilter->SetClippingPlanes(planes);
-		fillHolesFilter->GenerateFacesOn(); // chiude i bordi
+		fillHolesFilter->GenerateFacesOn(); // close the holes
 		fillHolesFilter->Update();
 
 		polydata = fillHolesFilter->GetOutput();
@@ -227,7 +237,6 @@ int vtkALBAVolumeToClosedSmoothSurface::RequestData(vtkInformation* vtkNotUsed(r
 		transformFilter2->SetTransform(transform2);
 		transformFilter2->SetInputConnection(smoothFilter->GetOutputPort());
 		transformFilter2->Update();
-
 
 		//inverse transform to align outputs to original bounds 
 		polydata->GetBounds(bounds);

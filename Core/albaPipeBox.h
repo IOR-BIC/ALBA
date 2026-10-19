@@ -24,7 +24,7 @@
 class vtkOutlineCornerFilter;
 class vtkOutlineSource;
 class vtkPolyDataMapper;
-class albaLODActor;
+class vtkOpenGLActor;
 class vtkProperty;
 class albaAxes;
 
@@ -68,11 +68,11 @@ protected:
 
   vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
-  albaLODActor            *m_Actor;
+  vtkOpenGLActor *m_Actor;
   vtkOutlineCornerFilter *m_OutlineBox;
   vtkPolyDataMapper      *m_OutlineMapper;
   vtkProperty            *m_OutlineProperty;
-  albaLODActor            *m_OutlineActor;
+  vtkOpenGLActor *m_OutlineActor;
   albaAxes                *m_Axes;
 
   int m_BoundsMode;

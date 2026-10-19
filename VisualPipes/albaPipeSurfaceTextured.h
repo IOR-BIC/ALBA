@@ -30,7 +30,7 @@
 class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
-class albaLODActor;
+class vtkOpenGLActor;
 class albaGUIMaterialButton;
 class mmaMaterial;
 class vtkActor;
@@ -60,10 +60,7 @@ public:
   /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
-  /** Let to enable/disable the Level Of Detail behavior.*/
-  void SetEnableActorLOD(bool value);
-
-	/** Return Bounds */
+  /** Return Bounds */
 	void GetBounds(double bounds[6]);
 
   /** IDs for the GUI */
@@ -76,7 +73,6 @@ public:
     ID_USE_TEXTURE,
     ID_USE_LOOKUP_TABLE,
     ID_LUT,
-    ID_ENABLE_LOD,
     ID_LAST
   };
 
@@ -111,8 +107,8 @@ public:
 protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
-  albaLODActor             *m_Actor;
-  albaLODActor             *m_OutlineActor;
+  vtkOpenGLActor *m_Actor;
+  vtkOpenGLActor *m_OutlineActor;
   albaAxes                 *m_Axes;
   vtkActor               *m_GhostActor;
 
@@ -123,7 +119,6 @@ protected:
   int m_UseVTKProperty;
   int m_UseTexture;
   int m_UseLookupTable;
-  int m_EnableActorLOD;
 
 	int m_ShowAxis;
 

@@ -199,7 +199,6 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 	vtkImageData *imgToComp;
 	vtkALBASmartPointer<vtkImageCast> vtkImageToUChar;
 
-
 	if (imDataComp->GetScalarType() != VTK_UNSIGNED_CHAR)
 	{
 		albaLogMessage("Converting image tho unsigned short in order to save it as PNG format");
@@ -210,20 +209,14 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 		imgToComp = vtkImageToUChar->GetOutput();
 	}
 	else
-	{
 		imgToComp = imDataComp;
-	}
 
 	wxString imageFolder = GetTestDataDir(suiteName);
 	albaString imageFileBase;
 	if (index >= 0)
-	{
 		imageFileBase.Printf("%s\\%s%d", imageFolder.ToAscii(), imageName.GetCStr(), index);
-	}
 	else
-	{
 		imageFileBase.Printf("%s\\%s", imageFolder.ToAscii(), imageName.GetCStr());
-	}
 
 	wxString ext = ".png";
 	vtkPNGWriter *imageWriter;
@@ -274,13 +267,13 @@ void albaTest::CompareVTKImage(vtkImageData *imDataComp, albaString suiteName, a
 			albaLogMessage("CompareImages has found differences. File %s stored.", imageFileNew.ToAscii());
 		}
 
-		albaString assertionMessage;
-		assertionMessage.Printf("Image comparison failed: %s", imageFileStored.ToAscii());
-		CPPUNIT_ASSERT_MESSAGE(assertionMessage.GetCStr(), result);
-		
+
 		// End visualization control
 		vtkDEL(imageMath);
 		vtkDEL(imageReader);
+		albaString assertionMessage;
+		assertionMessage.Printf("Image comparison failed:\n %s", imageFileStored.ToAscii());
+		CPPUNIT_ASSERT_MESSAGE(assertionMessage.GetCStr(), result);
 	}
 	else
 	{
@@ -302,9 +295,16 @@ void albaTest::InitializeRenderWindow()
 
 	m_Renderer->SetBackground(0.1, 0.1, 0.1);
 
+	// Disable every kind of antialiasing.
+	m_Renderer->UseFXAAOff();
+
+	// Disable order-independent transparency.
+	m_Renderer->UseDepthPeelingOff();
+
 	m_RenderWindow->AddRenderer(m_Renderer);
 	m_RenderWindow->SetSize(800, 600);
 	m_RenderWindow->SetPosition(200, 200);
+	m_RenderWindow->SetMultiSamples(0);
 
 	m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 

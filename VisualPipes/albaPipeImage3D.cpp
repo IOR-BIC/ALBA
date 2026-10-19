@@ -114,6 +114,7 @@ void albaPipeImage3D::Create(albaSceneNode *n)
 		double sr[2];
 		output->GetVTKData()->GetScalarRange(sr);
 		m_ImageLUT->SetRange(sr);
+    m_ImageTexture->SetColorModeToMapScalars();
     m_ImageTexture->SetLookupTable(m_ImageLUT);
   }
 

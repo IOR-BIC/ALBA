@@ -30,7 +30,6 @@
 #include "albaEventIOTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaGUITreeContextualMenuTest.h"
-#include "albaLODActorTest.h"
 #include "albaMatrixPipeTest.h"
 #include "albaOpContextStackTest.h"
 #include "albaOpCopyTest.h"
@@ -177,7 +176,7 @@ int main(int argc, char* argv[])
 	//this test must be run first because manages factories
 	//runner.addTest(albaCoreFactoryTest::suite());
 	runner.addTest(vtkALBAAssemblyTest::suite());
-	/*runner.addTest(albaAbsMatrixPipeTest::suite());
+	runner.addTest(albaAbsMatrixPipeTest::suite());
 	runner.addTest(mmaVolumeMaterialTest::suite());
 	runner.addTest(mmaMaterialTest::suite());
 	runner.addTest(mmaApplicationLayoutTest::suite());
@@ -216,7 +215,6 @@ int main(int argc, char* argv[])
 	runner.addTest(albaVMEIteratorTest::suite());
 	runner.addTest(albaVMEFactoryTest::suite());
 	runner.addTest(albaMatrixPipeTest::suite());
-	runner.addTest(albaLODActorTest::suite());
 	runner.addTest(albaGUITreeContextualMenuTest::suite());
 	runner.addTest(albaEventIOTest::suite());
 	runner.addTest(albaDataPipeTest::suite());
@@ -224,7 +222,7 @@ int main(int argc, char* argv[])
 	runner.addTest(albaAttributeTraceabilityTest::suite());
 	runner.addTest(albaAttributeTest::suite());
 	runner.addTest(albaViewPlotTest::suite());
-	runner.addTest(albaProgressBarHelperTest::suite());*/
+	runner.addTest(albaProgressBarHelperTest::suite());
 
 	runner.run(controller);
 

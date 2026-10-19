@@ -61,9 +61,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUIDicomSettings.h"
 #include "albaOpImporterDicom.h"
 #include "albaOpImporterLandmark.h"
-#include "albaOpImporterLandmarkTXT.h"
-#include "albaOpImporterLandmarkWS.h"
-#include "albaOpImporterGRFWS.h"
 #include "albaOpImporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
 
@@ -127,10 +124,7 @@ bool AlbaViewer::OnInit()
 	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
 	m_Logic->Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
 #endif
-	m_Logic->Plug(new albaOpImporterLandmark("Landmark"), "Landmark Suite");
-	m_Logic->Plug(new albaOpImporterLandmarkTXT("Landmark TXT"), "Landmark Suite");
-	m_Logic->Plug(new albaOpImporterLandmarkWS("Landmark WS"), "Landmark Suite");
-	m_Logic->Plug(new albaOpImporterGRFWS("GRF"));
+	m_Logic->Plug(new albaOpImporterLandmark("Landmark"));
 	m_Logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	m_Logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 
