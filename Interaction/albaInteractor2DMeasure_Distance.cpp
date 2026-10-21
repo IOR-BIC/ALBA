@@ -504,6 +504,20 @@ void albaInteractor2DMeasure_Distance::GetMeasureLinePoints(int index, double *p
 	}
 }
 
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure_Distance::GetDistance(int index)
+{
+	double point1[3], point2[3];
+	// Return line points values
+	if (index >= 0 && index < GetMeasureCount())
+	{
+		GetMeasureLinePoints(index, point1, point2);
+		return DistanceBetweenPoints(point1, point2);
+	}
+	else
+		return 0.0;
+}
+
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
 bool albaInteractor2DMeasure_Distance::Load(albaVME *input, wxString tag)

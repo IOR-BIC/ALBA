@@ -2092,7 +2092,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpMakeVMETimevarying(), _("Modify"));
 	Plug(new albaOpSmoothSurfaceCells(), _("Modify"));
 	Plug(new albaOpTransformAtoB(), "Modify");
-	Plug(new albaOpImageCalibration(), "Modify");
 
 	Plug(new albaOpMeasure2D("2D Measure"), "Measure");
 	Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");
@@ -2108,6 +2107,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpClassicICPRegistration("Surface"), _("Register"));
 
 	Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
+	Plug(new albaOpImageCalibration(), _("Calibration"));
 
 
 	Plug(new albaOpApplyTrajectory(), "TMP to test");
@@ -2151,7 +2151,7 @@ void albaLogicWithManagers::PlugStandardViews()
 	vrx->PackageView();
 	Plug(vrx);
 
-	//View RX Compound
+	//View virtual RX
 	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
 	vvrx->PackageView();
 	Plug(vvrx);

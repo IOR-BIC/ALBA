@@ -62,12 +62,19 @@ protected:
 	void UpdateGui();
 	void SetActiveInteractor();
 
+	void OpDo();
+	void OpUndo();
+
+
 	int m_SelectedIterator;
 	int m_Units;
 
 	double m_Distance;
 	double m_Diameter;
 	double m_Radius;
+
+	double m_InputSpacing[3];
+	double m_NewSpacing[3];
 
 	albaInteractor2DMeasure_Distance *m_DistanceInteractor;
 	albaInteractor2DMeasure_CenterPoint *m_CenterPointInteractor;
