@@ -127,8 +127,9 @@ void albaOpImageCalibration::CreateGui()
 
 	wxString unitChoices[2] =	{ "Cm", "Inches" };
 
-	m_Gui->Combo(ID_ITERATOR, _("Iterator"), &m_SelectedIterator, 4,
-		iteratorChoices);
+	m_Gui->Radio(ID_ITERATOR, _("Iterator"), &m_SelectedIterator, 4, iteratorChoices);
+	m_Gui->Label("");
+
 	m_Gui->Radio(ID_UNITS, _("Units"), &m_Units, 2, unitChoices);
 
 	m_Gui->Double(ID_DISTANCE, _("Distance"), &m_Distance, 0.0, 1000000.0);
@@ -180,6 +181,11 @@ void albaOpImageCalibration::SetActiveInteractor()
 	//on change interactor remove current measure
 	m_ActiveInteractor->RemoveAllMeasures();
 
+
+	//set constraint for distance interactor
+	//constraint mode and gui order is the same so we can use m_SelectedIterator to set constraint 
+	if (m_SelectedIterator != CIRCLE)
+		m_DistanceInteractor->SetConstraint(m_SelectedIterator);
 	
 	albaInteractor2DMeasure *nextInteractor = (m_SelectedIterator == CIRCLE) ? (albaInteractor2DMeasure *)m_CenterPointInteractor : m_DistanceInteractor;
 	if (nextInteractor == m_ActiveInteractor)
@@ -231,7 +237,7 @@ void albaOpImageCalibration::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == albaInteractor2DMeasure::ID_MEASURE_ADDED)
+	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == albaInteractor2DMeasure::ID_MEASURE_CHANGED)
 	{
 		UpdateGui();
 	}
