@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpExporterSTL
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -39,12 +39,9 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpExporterSTL);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpExporterSTL::albaOpExporterSTL(const wxString &label) :
-albaOp(label)
-//----------------------------------------------------------------------------
+albaOpExporterSTL::albaOpExporterSTL(const wxString &label) : albaOp(label)
 {
   m_OpType  = OPTYPE_EXPORTER;
   m_Canundo = true;
@@ -55,88 +52,51 @@ albaOp(label)
 }
 //----------------------------------------------------------------------------
 albaOpExporterSTL::~albaOpExporterSTL()
-//----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
 bool albaOpExporterSTL::InternalAccept(albaVME*node)
-//----------------------------------------------------------------------------
 {
   return (node && node->GetOutput()->IsALBAType(albaVMEOutputSurface));
 }
 //----------------------------------------------------------------------------
 // constants
-//----------------------------------------------------------------------------
 enum STL_EXPORTER_ID
 {
   ID_STL_BINARY_FILE = MINID,
 	ID_ABS_MATRIX_TO_STL,
-  ID_CHOOSE_FILENAME,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterSTL::OpRun()   
-//----------------------------------------------------------------------------
 {
   albaString wildc = "Stereo Litography (*.stl)|*.stl";
 
   m_Gui = new albaGUI(this);
-	m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc,"Save As...");
-  m_Gui->Label("file type",true);
-	m_Gui->Bool(ID_STL_BINARY_FILE,"binary",&m_Binary,0);
-	m_Gui->Label("absolute matrix",true);
-	m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"apply",&m_ABSMatrixFlag,0);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_STL_BINARY_FILE, "Binary File type", &m_Binary, 1);
+	m_Gui->Bool(ID_ABS_MATRIX_TO_STL, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
+	m_Gui->Label("");
+  m_Gui->Divider(1);
 	m_Gui->OkCancel();
   m_Gui->Enable(wxOK,m_File != "");
 	
-	m_Gui->Divider();
 
 	ShowGui();
 }
 //----------------------------------------------------------------------------
 void albaOpExporterSTL::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
     switch(e->GetId())
     {
       case wxOK:
-				/*{
-					//albaString FileDir = albaGetApplicationDirectory().ToAscii();
-					//FileDir<<"\\";
-          albaString name = m_Input->GetName();
-          if (name.FindChr('\\') != -1 || name.FindChr('/') != -1 || name.FindChr(':') != -1 || 
-            name.FindChr('?')  != -1 || name.FindChr('"') != -1 || name.FindChr('<') != -1 || 
-            name.FindChr('>')  != -1 || name.FindChr('|') != -1 )
-          {
-            albaMessage("Node name contains invalid chars.\nA node name can not contain chars like \\ / : * ? \" < > |");
-            m_File = "";
-          }
-          else
-          {
-            m_FileDir << this->m_Input->GetName();
-            m_FileDir << ".stl";
-            albaString wildc = "STL (*.stl)|*.stl";
-            m_File = albaGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).ToAscii();
-          }
-
-					if(m_File.IsEmpty())
-					{
-            OpStop(OP_RUN_CANCEL);
-					}
-					else
-          {
-            ExportSurface();
-            OpStop(OP_RUN_OK);
-          }
-				}*/
-        ExportSurface();
-        OpStop(OP_RUN_OK);
+        if(ExportSurface())
+          OpStop(OP_RUN_OK);
+        else
+          OpStop(OP_RUN_CANCEL);
       break;
-      case ID_CHOOSE_FILENAME:
-        m_Gui->Enable(wxOK,m_File != "");
-      break;
-      case wxCANCEL:
+        case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
       default:
@@ -147,15 +107,25 @@ void albaOpExporterSTL::OnEvent(albaEventBase *alba_event)
 }
 //----------------------------------------------------------------------------
 void albaOpExporterSTL::OpStop(int result)
-//----------------------------------------------------------------------------
 {
 	HideGui();
 	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void albaOpExporterSTL::ExportSurface()
-//----------------------------------------------------------------------------
+int albaOpExporterSTL::ExportSurface()
 {
+
+	if (m_File.IsEmpty())
+	{
+		m_FileDir = albaGetLastUserFolder();
+		m_File = m_FileDir + "\\" + m_Input->GetName() + ".stl";
+
+		m_File = albaGetSaveFile(m_FileDir, "Stereo Litography (*.stl)|*.stl", _("Choose STL file"));
+
+		if (m_File.IsEmpty())
+			return ALBA_ERROR;
+	}
+
   albaVMEOutputSurface *out_surface = albaVMEOutputSurface::SafeDownCast(m_Input->GetOutput());
   out_surface->Update();
 
@@ -180,10 +150,11 @@ void albaOpExporterSTL::ExportSurface()
 	else
 		writer->SetFileTypeToASCII();
 	writer->Update();
+
+	return ALBA_OK;
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpExporterSTL::Copy()   
-//----------------------------------------------------------------------------
 {
   albaOpExporterSTL *cp = new albaOpExporterSTL(m_Label);
   cp->m_File = m_File;

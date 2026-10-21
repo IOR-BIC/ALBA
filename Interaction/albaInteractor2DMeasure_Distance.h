@@ -56,6 +56,9 @@ public:
 	/** Get measure line extremity points*/
 	void GetMeasureLinePoints(int index, double *point1, double *point2);
 
+	/** Get the i-th Distance*/
+	double GetDistance(int index);
+
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 

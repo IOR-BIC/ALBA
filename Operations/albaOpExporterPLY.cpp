@@ -71,20 +71,19 @@ enum PLY_EXPORTER_ID
 {
   ID_PLY_BINARY_FILE = MINID,
 	ID_ABS_MATRIX_TO_PLY,
-  ID_CHOOSE_FILENAME,
 };
 //----------------------------------------------------------------------------
 void albaOpExporterPLY::OpRun()   
 //----------------------------------------------------------------------------
 {
-  albaString wildc = "Polygon File Format (*.ply)|*.ply";
 
   m_Gui = new albaGUI(this);
-	m_Gui->FileSave(ID_CHOOSE_FILENAME,"ply file", &m_File, wildc,"Save As...");
-  m_Gui->Label("file type",true);
-	m_Gui->Bool(ID_PLY_BINARY_FILE,"binary",&m_Binary,0);
-	m_Gui->Label("absolute matrix",true);
-	m_Gui->Bool(ID_ABS_MATRIX_TO_PLY,"apply",&m_ABSMatrixFlag,0);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_PLY_BINARY_FILE, "Binary File type", &m_Binary, 1);
+	m_Gui->Label("");
+	m_Gui->Bool(ID_ABS_MATRIX_TO_PLY, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
+	m_Gui->Label("");
+	m_Gui->Divider(true);
 	m_Gui->OkCancel();
   m_Gui->Enable(wxOK,m_File != "");
 	
@@ -101,11 +100,10 @@ void albaOpExporterPLY::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case wxOK:
-        ExportSurface();
-        OpStop(OP_RUN_OK);
-      break;
-      case ID_CHOOSE_FILENAME:
-        m_Gui->Enable(wxOK,m_File != "");
+        if(ExportSurface()==ALBA_OK)
+					OpStop(OP_RUN_OK);
+				else
+					OpStop(OP_RUN_CANCEL);
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
@@ -124,9 +122,21 @@ void albaOpExporterPLY::OpStop(int result)
 	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void albaOpExporterPLY::ExportSurface()
+int albaOpExporterPLY::ExportSurface()
 //----------------------------------------------------------------------------
 {
+	if (m_File.IsEmpty())
+	{
+		m_FileDir = albaGetLastUserFolder();
+		m_File = m_FileDir + "\\" + m_Input->GetName() + ".ply";
+
+		m_File = albaGetSaveFile(m_FileDir, "Polygon File Format (*.ply)|*.ply", _("Choose PLY file"));
+
+		if (m_File.IsEmpty())
+			return ALBA_ERROR;
+	}
+
+
   albaVMEOutputSurface *out_surface = albaVMEOutputSurface::SafeDownCast(m_Input->GetOutput());
   out_surface->Update();
 
@@ -151,6 +161,8 @@ void albaOpExporterPLY::ExportSurface()
 	else
 		writer->SetFileTypeToASCII();
 	writer->Update();
+
+	return ALBA_OK;
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpExporterPLY::Copy()   

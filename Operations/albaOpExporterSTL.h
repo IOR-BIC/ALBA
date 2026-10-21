@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpExporterSTL
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -58,7 +58,7 @@ public:
   void SetExportAsBynary(int binary_file) {m_Binary = binary_file;};
 
   /** Export the surface. */
-  void ExportSurface();
+  int ExportSurface();
 
 	/** Return an xpm-icon that can be used to represent this operation */
 	virtual char ** GetIcon();

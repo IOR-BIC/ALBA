@@ -120,7 +120,6 @@
 #include "albaOpImporterAbaqusFile.h"
 #include "albaOpMeshScarlarsImporter.h"
 #include "albaOpImporterDicFile.h"
-#include "albaOpExporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
 #include "albaOpImporterScancoImageIO.h"
 
@@ -144,6 +143,8 @@
 #include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
 #include "albaOpExporterPointCloud.h"
+#include "albaOpExporterDicFile.h"
+
 
 // OPERATIONS
 #include "albaOp2DMeasure.h"
@@ -218,6 +219,7 @@
 #include "albaOpComputeHausdorffDistance.h"
 #include "albaOpCreateCentroid.h"
 #include "albaOpTransformAtoB.h"
+#include "albaOpImageCalibration.h"
 
 //TMP
 #include "albaOpImporterExternalFile.h"
@@ -1994,6 +1996,8 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
 	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
+	Plug(new albaOpImporterExternalFile());
+
 
 	//------------------------------------------------------------
 	// Exporter Menu:
@@ -2019,9 +2023,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpExporterAbaqusFile("Abaqus File"), "Finite Element");
 	Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
 	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
-
-	Plug(new albaOpImporterExternalFile());
-
 
 	//------------------------------------------------------------
 	// Operation Menu:
@@ -2106,6 +2107,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpClassicICPRegistration("Surface"), _("Register"));
 
 	Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
+	Plug(new albaOpImageCalibration(), _("Calibration"));
 
 
 	Plug(new albaOpApplyTrajectory(), "TMP to test");
@@ -2149,7 +2151,7 @@ void albaLogicWithManagers::PlugStandardViews()
 	vrx->PackageView();
 	Plug(vrx);
 
-	//View RX Compound
+	//View virtual RX
 	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
 	vvrx->PackageView();
 	Plug(vvrx);
