@@ -101,12 +101,11 @@ void albaPipePolylineGraphEditor::Create(albaSceneNode *n)
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
-	vtkALBASmartPointer<vtkALBAToLinearTransform>VTKTransform;
-	VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_Plane->SetTransform(VTKTransform);
+	
 
 	m_Cutter->SetInputConnection(port);
 	m_Cutter->SetCutFunction(m_Plane);
+	m_Cutter->SetInputTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform());
 	m_Cutter->Update();
 
 	vtkNEW(m_Mapper);

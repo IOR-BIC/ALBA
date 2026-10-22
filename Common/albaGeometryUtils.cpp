@@ -25,6 +25,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkMath.h"
 #include "vtkLine.h"
 #include "vtkTransform.h"
+#include "vtkLinearTransform.h"
+#include "vtkPlane.h"
 #include "albaVect3d.h"
 
 #define VTK_NO_INTERSECTION 0
@@ -338,5 +340,18 @@ int albaGeometryUtils::PointUpDownLine(double *point, double *lp1, double *lp2, 
 		return -1;
 	else
 		return 0;
+}
+
+//----------------------------------------------------------------------------
+void albaGeometryUtils::PlaneToInputSpace(vtkPlane *inputPlane, vtkLinearTransform *inputTransform, vtkPlane *outputPlane)
+{
+	double origin[3], normal[3];
+	inputPlane->GetOrigin(origin);
+	inputPlane->GetNormal(normal);
+	vtkAbstractTransform *inverseTra = inputTransform->GetInverse();
+	inverseTra->TransformPoint(origin, origin);
+	inverseTra->TransformNormalAtPoint(origin, normal, normal);
+	outputPlane->SetOrigin(origin);
+	outputPlane->SetNormal(normal);
 }
 

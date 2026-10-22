@@ -185,12 +185,11 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
 
-	vtkNEW(m_VTKTransform);
-	m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_Plane->SetTransform(m_VTKTransform);
+	
 
 	m_Cutter = vtkALBAFixedCutter::New();
 	m_Cutter->SetCutFunction(m_Plane);
+	m_Cutter->SetInputTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform());
 
 	//////////////////////////////////
 	vtkNEW(m_AppendPolyData);

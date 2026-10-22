@@ -724,8 +724,8 @@ void albaVMESurfaceParametric::CreateCube()
 {
 	vtkALBASmartPointer<vtkCubeSource> surf;
 	surf->SetXLength(m_CubeXLength);
-	surf->SetZLength(m_CubeYLength);
-	surf->SetYLength(m_CubeZLength);
+	surf->SetZLength(m_CubeZLength);
+	surf->SetYLength(m_CubeYLength);
 	surf->Update();
 	m_PolyData->DeepCopy(surf->GetOutput());
 	m_DataPipe->Modified();
