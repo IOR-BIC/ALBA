@@ -249,9 +249,9 @@ void albaViewSlice::VmeCreatePipe(albaVME *vme)
 
 		albaPipeFactory *pipe_factory  = albaPipeFactory::GetInstance();
     assert(pipe_factory!=NULL);
-    albaObject *obj= NULL;
-    obj = pipe_factory->CreateInstance(pipe_name);
-    albaPipe *pipe = (albaPipe*)obj;
+
+    albaPipe *pipe = (albaPipe*)pipe_factory->CreateInstance(pipe_name);;
+
     if (pipe != NULL)
     {
       pipe->SetListener(this);

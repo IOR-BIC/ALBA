@@ -91,7 +91,7 @@ albaPipeSurfaceSlice::albaPipeSurfaceSlice()
 
 	m_ShowSelection = false;
 
-	m_VTKTransform = NULL;
+	//m_VTKTransform = NULL;
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
@@ -180,12 +180,12 @@ void albaPipeSurfaceSlice::Create(albaSceneNode *n/*, bool use_axes*/)
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
-	vtkNEW(m_VTKTransform);
-	m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_Plane->SetTransform(m_VTKTransform);
-
+	//vtkNEW(m_VTKTransform);
+	//m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
+	
 	m_Cutter->SetInputConnection(port);
 	m_Cutter->SetCutFunction(m_Plane);
+	m_Cutter->SetInputTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform());
 	m_Cutter->Update();
 	if (scalars != NULL)
 	{
@@ -290,7 +290,7 @@ albaPipeSurfaceSlice::~albaPipeSurfaceSlice()
   vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineActor);
-	vtkDEL(m_VTKTransform);
+	//vtkDEL(m_VTKTransform);
   vtkDEL(m_Plane);
   vtkDEL(m_Cutter);
   cppDEL(m_Axes);
@@ -401,11 +401,6 @@ void albaPipeSurfaceSlice::OnEvent(albaEventBase *alba_event)
       m_SphereSource->SetPhiResolution(((albaVMELandmarkCloud *)m_Vme)->GetSphereResolution());
     }
   }
-	else if (alba_event->GetId() == VME_ABSMATRIX_UPDATE)
-	{
-		if(m_VTKTransform)  m_VTKTransform->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix());
-		if(m_Plane)  m_Plane->SetTransform(m_VTKTransform);
-	}
 }
 
 //----------------------------------------------------------------------------

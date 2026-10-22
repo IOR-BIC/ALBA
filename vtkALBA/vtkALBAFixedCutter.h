@@ -19,6 +19,13 @@
 
 #include "albaConfigure.h"
 #include "vtkCutter.h"
+
+
+//----------------------------------------------------------------------------
+// forward declarations
+class vtkPlane;
+class vtkLinearTransform;
+
 /**
 class name:  vtkALBAFixedCutter
 specialization of vtkCutter in which after execution if the number of points is zero, it will added one point
@@ -35,10 +42,21 @@ public:
   /** create an instance of the object */
   static vtkALBAFixedCutter* New();
 
+  /** Redefine of SetCutFunction in order to store the external cut function instead of CutFunction 
+      CutFunction will be set on RequestData */
+	virtual void SetCutFunction(vtkImplicitFunction *cutFunc);
+
+	vtkGetObjectMacro(InputTransform, vtkLinearTransform);
+	virtual void SetInputTransform(vtkLinearTransform *transform) {InputTransform = transform;}
+
 protected:
   /** reimplement execute fixing the algorithm when the number of points of the cutter output is zero.*/
   int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
+  vtkImplicitFunction *ExternalCutFunc;
+  vtkPlane *LocalCutFunction;
+
+  vtkLinearTransform *InputTransform;
 private:
     /** Copy Constructor , not implemented */
 	vtkALBAFixedCutter(const vtkALBAFixedCutter&);

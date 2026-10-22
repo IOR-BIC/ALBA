@@ -84,7 +84,6 @@ enum RAW_EXPORTER_ID
 {
 	ID_SINGLE_FILE = MINID,
 	ID_INT,
-
 };
 //----------------------------------------------------------------------------
 void albaOpExporterRAW::OpRun()   
@@ -102,10 +101,10 @@ void albaOpExporterRAW::OpRun()
 		m_Gui = new albaGUI(this);
 		m_Gui->SetListener(this);
 
-		m_Gui->Bool(ID_SINGLE_FILE,"single file",&m_SingleFile);
+		m_Gui->Bool(ID_SINGLE_FILE,"Single file",&m_SingleFile,true);
 		m_Gui->Divider();
 
-		m_Gui->Integer(ID_INT,"slice offset: ", &m_Offset,MININT,MAXINT,"only if not single file");
+		m_Gui->Integer(ID_INT,"Slice offset: ", &m_Offset,MININT,MAXINT,"only if not single file");
 
 		m_Gui->Label("");
 		m_Gui->OkCancel(); 

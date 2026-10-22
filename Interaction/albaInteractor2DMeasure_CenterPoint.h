@@ -59,6 +59,8 @@ public:
 	/** Get measure line extremity points*/
 	void GetMeasureLinePoints(int index, double *point1, double *point2);
 
+	double GetCircleRadius(int index);
+
 	void GetCenter(int index, double *center);
 	
 	bool Load(albaVME *input, wxString tag);

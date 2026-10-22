@@ -543,6 +543,24 @@ void albaInteractor2DMeasure_CenterPoint::GetMeasureLinePoints(int index, double
 		lineSource->GetPoint2(point2);
 	}
 }
+
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure_CenterPoint::GetCircleRadius(int index)
+{
+	double point1[3], point2[3];
+	// Return line points values
+	if (index >= 0 && index < GetMeasureCount())
+	{
+		vtkLineSource *lineSource = (vtkLineSource *)m_LineStackVector[index]->GetSourceAlgorithm();
+		lineSource->GetPoint1(point1);
+		lineSource->GetPoint2(point2);
+
+		return DistanceBetweenPoints(point1, point2) / 2.0;
+	}
+	else 
+		return 0.0;
+}
+
 //----------------------------------------------------------------------------
 void albaInteractor2DMeasure_CenterPoint::GetCenter(int index, double *center)
 {

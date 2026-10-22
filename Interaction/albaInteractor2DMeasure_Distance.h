@@ -32,6 +32,12 @@ class vtkActor2D;
 class ALBA_EXPORT albaInteractor2DMeasure_Distance : public albaInteractor2DMeasure
 {
 public:
+	enum MEASURE_CONSTRAINTS
+	{
+		NO_CONSTRAINT = 0,
+		HORIZONTAL_CONSTRAINT,
+		VERTICAL_CONSTRAINT,
+	};
 
 	albaTypeMacro(albaInteractor2DMeasure_Distance, albaInteractor2DMeasure);
 
@@ -56,9 +62,17 @@ public:
 	/** Get measure line extremity points*/
 	void GetMeasureLinePoints(int index, double *point1, double *point2);
 
+	/** Get the i-th Distance*/
+	double GetDistance(int index);
+
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 
+	/** Getter for GetConstraint */
+	int GetConstraint() const { return m_Constraint; }
+
+	/** Setter for SetConstraint */
+	void SetConstraint(int val) { m_Constraint = val; }
 protected:
 
 	albaInteractor2DMeasure_Distance();
@@ -84,6 +98,8 @@ protected:
 	double m_MinDistance;
 	double m_LineTickWidth;
 	double m_TickLenght;
+
+	int m_Constraint;
 
 private:
 	albaInteractor2DMeasure_Distance(const albaInteractor2DMeasure_Distance&);   // Not implemented.

@@ -34,26 +34,28 @@
 #include "albaDefines.h"
 #include "vtkALBAToLinearTransform.h"
 #include "vtkTransform.h"
-
+//#include "albaMemDbg.h"
+#include "vtkALBASmartPointer.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "albaGeometryUtils.h"
+#include "vtkLinearTransform.h"
 
 #if _MSC_VER >= 1400
 #include <intrin.h>
 #pragma intrinsic(memcpy, memset, fabs)
 #endif
 
+
 //------------------------------------------------------------------------------
 // standard macros
 vtkStandardNewMacro(vtkALBAMeshCutter);
-//------------------------------------------------------------------------------
-#include "albaMemDbg.h"
-#include "vtkALBASmartPointer.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
+
+
 
 //------------------------------------------------------------------------------
 // Constructor
 vtkALBAMeshCutter::vtkALBAMeshCutter()
-//------------------------------------------------------------------------------
 {
   CutFunction = NULL ;
   UnstructGrid = vtkUnstructuredGrid::New() ;
@@ -69,12 +71,11 @@ vtkALBAMeshCutter::vtkALBAMeshCutter()
   Ptlist = vtkIdList::New();
 
   PointsInCells = NULL;
+  InputTransform = NULL;
 }
 
 //------------------------------------------------------------------------------
-// Destructor
 vtkALBAMeshCutter::~vtkALBAMeshCutter()
-//------------------------------------------------------------------------------
 {
   UnstructGrid->Delete() ;
   Idlist0->Delete();
@@ -90,10 +91,7 @@ vtkALBAMeshCutter::~vtkALBAMeshCutter()
 }
 
 //------------------------------------------------------------------------------
-// Overload standard modified time function. If cut function is modified,
-// then this object is modified as well.
 vtkMTimeType vtkALBAMeshCutter::GetMTime()
-//------------------------------------------------------------------------------
 {
 	vtkMTimeType mTime = this->vtkAlgorithm::GetMTime();
 	vtkMTimeType time;
@@ -102,6 +100,8 @@ vtkMTimeType vtkALBAMeshCutter::GetMTime()
   {
     time = CutFunction->GetMTime();
     mTime = ( time > mTime ? time : mTime );
+		time = InputTransform ? InputTransform->GetMTime() : 0;
+		mTime = (time > mTime ? time : mTime);
   }
 
   return mTime;
@@ -109,7 +109,6 @@ vtkMTimeType vtkALBAMeshCutter::GetMTime()
 
 //------------------------------------------------------------------------------
 int vtkALBAMeshCutter::RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
-//------------------------------------------------------------------------------
 {
 	// get the info objects
 	vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
@@ -263,26 +262,19 @@ vtkUnstructuredGrid * vtkALBAMeshCutter::RemoveUnusedPoints(vtkUnstructuredGrid*
 	return output;
 }
 //------------------------------------------------------------------------------
-// Set cutting plane
 void vtkALBAMeshCutter::SetCutFunction(vtkPlane *P)
-//------------------------------------------------------------------------------
 {
   CutFunction = P ;
 }
 
 //------------------------------------------------------------------------------
-// Set cutting plane
 vtkPlane* vtkALBAMeshCutter::GetCutFunction()
-//------------------------------------------------------------------------------
 {
   return CutFunction ;
 }
 
 //------------------------------------------------------------------------------
-// Find the output point idout corresponding to the input edge (id0,id1)
-// This returns true if the the input edge is in the table
 bool vtkALBAMeshCutter::GetOutputPointWhichCutsEdge(vtkIdType id0, vtkIdType id1, vtkIdType *idout, double *lambda) const
-//------------------------------------------------------------------------------
 {
   unsigned long long key = GetEdgeKey(id0, id1);
   InvEdgeMappingType::const_iterator it = InvEdgeMapping.find(key);
@@ -297,10 +289,7 @@ bool vtkALBAMeshCutter::GetOutputPointWhichCutsEdge(vtkIdType id0, vtkIdType id1
 }
 
 //------------------------------------------------------------------------------
-// Find the output point idout corresponding to the single input point id0
-// This returns true if the the input point is in the table
 bool vtkALBAMeshCutter::GetOutputPointWhichCutsPoint(vtkIdType id0, vtkIdType *idout) const
-//------------------------------------------------------------------------------
 {    
   unsigned long long key = id0;
   InvEdgeMappingType::const_iterator it = InvEdgeMapping.find(key);
@@ -314,10 +303,7 @@ bool vtkALBAMeshCutter::GetOutputPointWhichCutsPoint(vtkIdType id0, vtkIdType *i
 }
 
 //------------------------------------------------------------------------------
-// Get the output cell corresponding to the input cell
-// returns true if the input id was found
 bool vtkALBAMeshCutter::GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkIdType *idout)
-//------------------------------------------------------------------------------
 {
   //BES: this function is not used - it is not optimized
   unsigned int i ;
@@ -335,13 +321,7 @@ bool vtkALBAMeshCutter::GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkIdTyp
 
 
 //------------------------------------------------------------------------------
-// Get intersection of line with plane
-// Edge is defined by coords of endpoints (p0, p1).
-// Plane is defined by origin and normal.
-// Returns type of intersection.
-// lambda returns fractional distance of interpolated point along edge (0 <= lambda <= 1).
 int vtkALBAMeshCutter::GetIntersectionOfLineWithPlane(const double *p0, const double *p1, const double *origin, const double *norm, double *coords, double *lambda) const
-//------------------------------------------------------------------------------
 {
   int i ;
 
@@ -384,9 +364,7 @@ int vtkALBAMeshCutter::GetIntersectionOfLineWithPlane(const double *p0, const do
 
 
 //-----------------------------------------------------------------------------
-// Get list of cells which are adjoined to point
 void vtkALBAMeshCutter::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *idlist) const 
-//-----------------------------------------------------------------------------
 {  // Get cell neighbours of point
   if (!UnstructGrid) 
     return;
@@ -395,9 +373,7 @@ void vtkALBAMeshCutter::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *idli
 }
 
 //-----------------------------------------------------------------------------
-// Get list of cells which are adjoined to edge
 void vtkALBAMeshCutter::GetCellNeighboursOfEdge(const Edge& edge, vtkIdList *idlist) const
-//-----------------------------------------------------------------------------
 {
   Idlist0->Reset();
   Idlist1->Reset();  
@@ -437,11 +413,7 @@ void vtkALBAMeshCutter::GetCellNeighboursOfEdge(const Edge& edge, vtkIdList *idl
 }
 
 //------------------------------------------------------------------------
-//computes the intersection of the given plane with the mesh bounding box
-//returns coordinates of the first intersection in pts, returns false, if the bounding box is not intersected
-bool vtkALBAMeshCutter::GetIntersectionOfBoundsWithPlane(const double *origin, 
-                                                            const double *norm, double* pts)
-//------------------------------------------------------------------------
+bool vtkALBAMeshCutter::GetIntersectionOfBoundsWithPlane(const double *origin, const double *norm, double* pts)
 {
   double DataBounds[3][2];
   UnstructGrid->GetBounds(&DataBounds[0][0]);  
@@ -487,10 +459,7 @@ bool vtkALBAMeshCutter::GetIntersectionOfBoundsWithPlane(const double *origin,
 }
 
 //------------------------------------------------------------------------
-//gets the first cell intersected by the current plane
-//the search starts with cells sharing the given point
 vtkIdType vtkALBAMeshCutter::GetFirstIntersectedCell(vtkIdType ptId)
-//------------------------------------------------------------------------
 {
   double* origin = CutTranformedOrigin;
   double* normal = CutTranformedNormal;
@@ -574,11 +543,7 @@ vtkIdType vtkALBAMeshCutter::GetFirstIntersectedCell(vtkIdType ptId)
 }
 
 //------------------------------------------------------------------------------
-// Find where the edges cross the plane and create polydata points
-// It creates the table EdgeMapping which maps output points to the input mesh.
-// It also creates IntersectedCells, which is a list of the input cells which were intersected.
 void vtkALBAMeshCutter::FindPointsInPlane()
-//------------------------------------------------------------------------------
 {
   double* origin = CutTranformedOrigin;
   double* normal = CutTranformedNormal;
@@ -738,9 +703,7 @@ void vtkALBAMeshCutter::FindPointsInPlane()
 }
 
 //------------------------------------------------------------------------------
-// Get the list of input cells which are attached to the output point
 void vtkALBAMeshCutter::GetInputCellsOnOutputPoint(vtkIdType idout, vtkIdList *cellids) const
-//------------------------------------------------------------------------------
 {
   vtkIdType id0, id1 ;
   double lamtemp ;
@@ -759,11 +722,7 @@ void vtkALBAMeshCutter::GetInputCellsOnOutputPoint(vtkIdType idout, vtkIdList *c
 }
 
 //------------------------------------------------------------------------------
-// Create and fill table of cells, PointsInCells.
-// There is an entry for every input cell.
-// Entry i is the list of output points in input cell i.
 void vtkALBAMeshCutter::AssignPointsToCells()
-//------------------------------------------------------------------------------
 {
   int i, j ;
   vtkIdList *cellids = vtkIdList::New() ;
@@ -789,10 +748,7 @@ void vtkALBAMeshCutter::AssignPointsToCells()
 }
 
 //------------------------------------------------------------------------------
-// Are all the point ids members of this face
-// Undefined id's are ignored, eg if the list is {1, 3, -1} and the face is {1, 3, 10, 11}, the result is true
 bool vtkALBAMeshCutter::AllIdsInFace(vtkCell *face, vtkIdList *idlist)
-//------------------------------------------------------------------------------
 {
   int i, j ;
   bool found ;
@@ -817,10 +773,7 @@ bool vtkALBAMeshCutter::AllIdsInFace(vtkCell *face, vtkIdList *idlist)
 }
 
 //------------------------------------------------------------------------------
-// Find a face containing all id's in the list
-// Undefined id's are ignored, ie the result can still be true if some of the id's are undefined
 bool vtkALBAMeshCutter::FindFaceContainingAllIds(vtkCell *cell, vtkIdList *idlist, vtkIdType *faceid)
-//------------------------------------------------------------------------------
 {
   int nf = cell->GetNumberOfFaces();
   for (int i = 0; i < nf; i++)
@@ -836,11 +789,7 @@ bool vtkALBAMeshCutter::FindFaceContainingAllIds(vtkCell *cell, vtkIdList *idlis
 }
 
 //------------------------------------------------------------------------------
-// Construct the polygonal slice through the cell
-// This involves putting the intersection points associated with this cell in the correct order to form a polygon.
-// NB If the cell is cut by fewer than 3 points, no polygon is created.
 bool vtkALBAMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *polygon)
-//------------------------------------------------------------------------------
 {
   int i, j ;
   bool connected[8][8] ;
@@ -1020,9 +969,7 @@ bool vtkALBAMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *p
 }
 
 //------------------------------------------------------------------------------
-// calculate the normal of the output polygon, given the list of point id's
 void vtkALBAMeshCutter::CalculatePolygonNormal(vtkIdList *idlist, double *norm)
-//------------------------------------------------------------------------------
 {
   int i, j ;
   double x[8][3] ;
@@ -1070,9 +1017,7 @@ void vtkALBAMeshCutter::CalculatePolygonNormal(vtkIdList *idlist, double *norm)
 }
 
 //------------------------------------------------------------------------------
-// Transfer the scalars by interpolation from input to output
 void vtkALBAMeshCutter::TransferScalars()
-//------------------------------------------------------------------------------
 {
   int i, j ;
   double tuple0[100], tuple1[100], tuple_interp[100] ;
@@ -1153,9 +1098,7 @@ void vtkALBAMeshCutter::TransferScalars()
 
 
 //------------------------------------------------------------------------------
-// Initialize the cutter
 void vtkALBAMeshCutter::Initialize()
-//------------------------------------------------------------------------------
 {
   EdgeMapping.clear();
   InvEdgeMapping.clear();
@@ -1170,10 +1113,7 @@ void vtkALBAMeshCutter::Initialize()
 
 
 //------------------------------------------------------------------------------
-// Create the polydata slice
-// There must have been a call to UnstructGrid->BuildLinks() for this to work
 void vtkALBAMeshCutter::CreateSlice()
-//------------------------------------------------------------------------------
 {
   int i ;
   vtkIdList *polygon = vtkIdList::New() ;
@@ -1214,9 +1154,7 @@ void vtkALBAMeshCutter::CreateSlice()
 }
 
 //------------------------------------------------------------------------------
-// print self
 void vtkALBAMeshCutter::PrintSelf(ostream& os, vtkIndent indent)
-//------------------------------------------------------------------------------
 {
   int i, j, ni ;
 
@@ -1273,6 +1211,7 @@ void vtkALBAMeshCutter::PrintSelf(ostream& os, vtkIndent indent)
 
 }
 
+//------------------------------------------------------------------------------
 void vtkALBAMeshCutter::ToRotationMatrix(vtkMatrix4x4 *matrix)
 {
 	//remove translation components
@@ -1281,32 +1220,18 @@ void vtkALBAMeshCutter::ToRotationMatrix(vtkMatrix4x4 *matrix)
 	matrix->SetElement(2,3,0);
 }
 
+//------------------------------------------------------------------------------
 void vtkALBAMeshCutter::CalculateLocalCutCoord()
 {
 	//Getting Mesh coordinates
-	vtkLinearTransform *trans=vtkLinearTransform::SafeDownCast(CutFunction->GetTransform());
-	if(trans)
+	if(InputTransform)
 	{
-		double origin[4],normal[4];
-		vtkMatrix4x4 *inverse;
-		vtkNEW(inverse);
-		//Getting slicing transform matrix
-		trans->GetMatrix(inverse);
-		//Inverting matrix to obtain slice to mesh transform matrix
-		inverse->Invert();
-
-		//vtkMatrix4x4 MultiplyPoint requires a 4d vector with last element set to 1
-		origin[3]=normal[3]=1;
-		CutFunction->GetNormal(normal);
-		CutFunction->GetOrigin(origin);
-
-		//Getting mesh local origin
-		inverse->MultiplyPoint(origin,CutTranformedOrigin);
-
-		//Isolate rotation matrix
-		ToRotationMatrix(inverse);
-		//Using rotation matrix to calculate mesh local normal
-		inverse->MultiplyPoint(normal,CutTranformedNormal);
+    vtkALBASmartPointer<vtkPlane> tmpPlane;
+    
+		albaGeometryUtils::PlaneToInputSpace(CutFunction, InputTransform, tmpPlane);
+		
+		tmpPlane->GetNormal(CutTranformedNormal);
+		tmpPlane->GetOrigin(CutTranformedOrigin);
 	}
 	else
 	{
@@ -1323,3 +1248,97 @@ int vtkALBAMeshCutter::FillInputPortInformation(int, vtkInformation *info)
 	return 1;
 }
 
+//------------------------------------------------------------------------------
+inline void vtkALBAMeshCutter::AddMapping(vtkIdType idout, const Edge &edge, double lambda)
+{
+	EdgeMappingType em = { idout, edge.id0, edge.id1, lambda, POINT_TO_EDGE };
+	EdgeMapping.push_back(em);
+
+	InvEdgeMapping.insert(InvEdgeMappingType::value_type(GetEdgeKey(edge), EdgeMapping.size() - 1));
+}
+
+//------------------------------------------------------------------------------
+inline void vtkALBAMeshCutter::AddMapping(vtkIdType idout, vtkIdType id0, double lambda)
+{
+	EdgeMappingType em = { idout, id0, undefinedId, lambda, POINT_TO_POINT };
+	EdgeMapping.push_back(em);
+
+	InvEdgeMapping.insert(InvEdgeMappingType::value_type(id0, EdgeMapping.size() - 1));
+}
+
+//------------------------------------------------------------------------
+inline unsigned long long vtkALBAMeshCutter::GetEdgeKey(vtkIdType id0, vtkIdType id1) const
+{
+	unsigned long long key;
+	unsigned long *pkey = (unsigned long *)&key;
+	if (id0 < id1) {
+		pkey[0] = id0; pkey[1] = id1;
+	}
+	else {
+		pkey[0] = id1; pkey[1] = id0;
+	}
+
+	return key;
+}
+
+//------------------------------------------------------------------------------
+inline bool vtkALBAMeshCutter::GetInputEdgeCutByPoint(vtkIdType idout, vtkIdType *id0, vtkIdType *id1, double *lambda) const
+{
+	//RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
+	//idout is the index into EdgeMapping, thus we do not need search for it
+	assert(idout >= 0 && idout < (int)EdgeMapping.size());
+	const EdgeMappingType &edge = EdgeMapping[idout];
+	if (edge.mtype != POINT_TO_EDGE)
+		return false;
+
+	assert(edge.idout == idout);
+
+	*id0 = edge.id0;
+	*id1 = edge.id1;
+	*lambda = edge.lambda;
+	return true;
+}
+
+//------------------------------------------------------------------------------
+inline bool vtkALBAMeshCutter::GetInputPointCutByPoint(vtkIdType idout, vtkIdType *id0) const
+{
+	//RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
+	//idout is the index into EdgeMapping, thus we do not need search for it
+	assert(idout >= 0 && idout < (int)EdgeMapping.size());
+	const EdgeMappingType &edge = EdgeMapping[idout];
+	if (edge.mtype != POINT_TO_POINT)
+		return false;
+
+	assert(edge.idout == idout);
+
+	*id0 = edge.id0;
+	return true;
+}
+
+//------------------------------------------------------------------------------
+inline vtkIdType vtkALBAMeshCutter::GetInputCellCutByOutputCell(vtkIdType idout)
+{
+	assert(idout >= 0 && idout < (int)CellMapping.size());
+	return CellMapping[idout];
+}
+
+//------------------------------------------------------------------------------
+inline int vtkALBAMeshCutter::GetIntersectionOfEdgeWithPlane(const Edge &edge, double *coords, double *lambda) const
+{
+	return GetIntersectionOfLineWithPlane(&PointsCoords[3 * edge.id0],
+		&PointsCoords[3 * edge.id1], CutFunction->GetOrigin(),
+		CutFunction->GetNormal(), coords, lambda);
+}
+
+//------------------------------------------------------------------------------
+inline void vtkALBAMeshCutter::InterpolateScalars(double *tup0, double *tup1, double *tupout, double lambda, int ncomponents, int dattype)
+{
+	for (int j = 0; j < ncomponents; j++)
+		tupout[j] = (1.0 - lambda) * tup0[j] + lambda * tup1[j];
+
+	if (dattype != VTK_FLOAT && dattype != VTK_DOUBLE) {
+		// the real data type of the scalars is integer, so add 0.5 to ensure correct rounding when they are put back into the polydata
+		for (int j = 0; j < ncomponents; j++)
+			tupout[j] += 0.5;
+	}
+}

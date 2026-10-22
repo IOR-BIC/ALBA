@@ -18,7 +18,11 @@ PURPOSE. See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 // includes :
+
 //----------------------------------------------------------------------------
+// forward declarations
+class vtkPlane;
+class vtkLinearTransform;
 
 /**
   Class Name: albaGeometryUtils.
@@ -67,8 +71,10 @@ public:
 
 	static bool FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance, int plane = XY);
 
-	//Returns 1 if the point is up, -1 if is down and 0 if the point is in the line (plane default 0=XY, 1=YZ, 2=XZ)
+	/*Returns 1 if the point is up, -1 if is down and 0 if the point is in the line(plane default 0 = XY, 1 = YZ, 2 = XZ) */
 	static int PointUpDownLine(double *point, double *lp1, double *lp2, int plane = XY);
 
+	/* Takes a plane and a transform and outputs the plane transformed into the input space */
+	static void PlaneToInputSpace(vtkPlane *inputPlane, vtkLinearTransform *inputTransform, vtkPlane *outputPlane);
 };
 #endif

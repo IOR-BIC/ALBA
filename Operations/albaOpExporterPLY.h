@@ -58,7 +58,7 @@ public:
   void SetExportAsBynary(int binary_file) {m_Binary = binary_file;};
 
   /** Export the surface. */
-  void ExportSurface();
+  int ExportSurface();
 
 protected:
 
