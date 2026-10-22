@@ -33,6 +33,7 @@
 class vtkIdList;
 class vtkCell;
 class vtkMatrix4x4;
+class vtkLinearTransform;
 
 /** 
 
@@ -75,6 +76,9 @@ public:
 	vtkSetMacro(PlaneTolerance, double);
 	vtkGetMacro(PlaneTolerance, double);
 
+	vtkGetObjectMacro(InputTransform, vtkLinearTransform);
+	virtual void SetInputTransform(vtkLinearTransform *transform) { InputTransform = transform; }
+
   
 protected:
   /** constructor */
@@ -114,6 +118,7 @@ protected:
   vtkPolyData *InPolydata;
   vtkPolyData *OutPolydata ;
 
+	vtkLinearTransform *InputTransform;
     
 	std::vector<vtkIdType> PointsMapping;  //<mapping from output points to input points
 
