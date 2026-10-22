@@ -46,7 +46,7 @@ public:
 		ID_RADIUS
 	};
 
-	albaOpImageCalibration(const wxString &label = "Image Calibration");
+	albaOpImageCalibration(const wxString &label = "Image Spatial Calibration");
 	~albaOpImageCalibration();
 
 	albaTypeMacro(albaOpImageCalibration, albaOp);
