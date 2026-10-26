@@ -36,6 +36,7 @@
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkPointData.h"
+#include "Libs/VTK/Src/VTK/Common/Core/vtkSMPTools.h"
 
 
 //-----------------------------------------------------------
@@ -160,6 +161,9 @@ void vtkALBADistanceFilterTest::TestFilter_Scalar_Density()
 //----------------------------------------------------------------------------
 void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 {
+	//Disable multitheading to obtain a deterministic filter output
+	vtkSMPTools::Initialize(1);
+
 	albaVMEStorage *storage = albaVMEStorage::New();
 	storage->GetRoot()->SetName("root");
 	storage->GetRoot()->Initialize();
@@ -214,4 +218,6 @@ void vtkALBADistanceFilterTest::TestFilter_Vector_Distance()
 	volume->ReparentTo(NULL);
 	cppDEL(importer);
 	albaDEL(storage);
+
+	vtkSMPTools::Initialize(0);
 }
