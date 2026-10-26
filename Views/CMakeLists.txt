@@ -13,23 +13,18 @@ SET(PROJECT_SRCS
   albaViewRXCT.cpp									albaViewRXCT.h
   albaViewSlice.cpp								albaViewSlice.h
   albaViewGlobalSlice.cpp					albaViewGlobalSlice.h
-  albaViewGlobalSliceCompound.cpp	albaViewGlobalSliceCompound.h
   albaViewImage.cpp								albaViewImage.h
   albaViewRXCompound.cpp						albaViewRXCompound.h
   albaView3D.cpp										albaView3D.h
   albaViewImageCompound.cpp				albaViewImageCompound.h
-  albaViewCT.cpp										albaViewCT.h
   albaViewCompoundWindowing.cpp		albaViewCompoundWindowing.h
   albaViewVTKCompound.cpp					albaViewVTKCompound.h
-  albaViewSlicer.cpp								albaViewSlicer.h
   albaViewSliceOnCurve.cpp					albaViewSliceOnCurve.h
   albaViewSliceOnCurveCompound.cpp	albaViewSliceOnCurveCompound.h
-  albaViewSliceGlobal.cpp					albaViewSliceGlobal.h
   albaViewArbitraryOrthoSlice.cpp	albaViewArbitraryOrthoSlice.h
   albaViewSliceBlendRX.cpp					albaViewSliceBlendRX.h
   albaViewSliceBlend.cpp						albaViewSliceBlend.h
   albaViewSliceSegmentation.cpp		albaViewSliceSegmentation.h
-  albaViewIsosurfaceCompound.cpp		albaViewIsosurfaceCompound.h
   albaViewVirtualRX.cpp					albaViewVirtualRX.h
 )
 
