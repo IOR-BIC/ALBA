@@ -99,6 +99,8 @@ SET(vtkALBA_SRCS
   vtkALBATicksGenerator.cpp									vtkALBATicksGenerator.h
   vtkALBAMeshLinearizationFilter.cpp 					vtkALBAMeshLinearizationFilter.h
   albaMeshLinearizationProvider.cpp						albaMeshLinearizationProvider.h
+  
+  vtkALBAModificationTracker.cxx						vtkALBAModificationTracker.h
 )
 
 
