@@ -97,6 +97,8 @@ SET(vtkALBA_SRCS
   
   vtkALBAConnectedRegionsContourTriangulator.cxx			vtkALBAConnectedRegionsContourTriangulator.h
   vtkALBATicksGenerator.cpp									vtkALBATicksGenerator.h
+  vtkALBAMeshLinearizationFilter.cpp 					vtkALBAMeshLinearizationFilter.h
+  albaMeshLinearizationProvider.cpp						albaMeshLinearizationProvider.h
 )
 
 
