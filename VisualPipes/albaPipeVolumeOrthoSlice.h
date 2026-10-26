@@ -207,5 +207,8 @@ protected:
 	bool										m_ShowTICKs;
 	bool										m_Pickable;
   int                     m_Interpolate;
+
+	double m_GUIOrigin[3];     ///< origin of the cutting plane for the GUI.
+
 };
 #endif // __albaPipeVolumeOrthoSlice_H__B
