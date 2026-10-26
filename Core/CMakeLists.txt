@@ -54,7 +54,6 @@ IF (ALBA_USE_VTK)
   albaSceneGraph.cpp  			albaSceneGraph.h
   albaSceneNode.cpp  			albaSceneNode.h
   albaViewCompound.cpp  			albaViewCompound.h
-  albaViewHTML.cpp  				albaViewHTML.h
   albaViewManager.cpp  			albaViewManager.h
   albaViewPlot.cpp  				albaViewPlot.h
   albaViewVTK.cpp  				albaViewVTK.h
