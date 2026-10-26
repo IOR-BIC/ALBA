@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_ALBAVIEWRXCTTEST_H__
-#define __CPP_UNIT_ALBAVIEWRXCTTEST_H__
+#ifndef __CPP_UNIT_albaViewOrthoSliceTest_H__
+#define __CPP_UNIT_albaViewOrthoSliceTest_H__
 
 #include "albaTest.h"
 

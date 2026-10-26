@@ -62,7 +62,6 @@
 #include "albaVMEStorageTest.h"
 #include "albaVMEStorageTest2.h"
 #include "albaVMETest.h"
-#include "albaViewHTMLTest.h"
 #include "albaViewManagerTest.h"
 #include "albaViewPlotTest.h"
 #include "albaViewVTKTest.h"
@@ -190,7 +189,6 @@ int main(int argc, char* argv[])
 	runner.addTest(albaViewVTKTest::suite());
 	runner.addTest(albaViewPlotTest::suite());
 	runner.addTest(albaViewManagerTest::suite());
-	runner.addTest(albaViewHTMLTest::suite());
 	runner.addTest(albaUserTest::suite());
 	runner.addTest(albaTimeMapTest::suite());
 	runner.addTest(albaTimeMapScalarTest::suite());

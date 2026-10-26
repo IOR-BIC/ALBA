@@ -10,7 +10,6 @@ ENDIF(ALBA_BUILD_ALBADLL)
 SET(PROJECT_SRCS 
   albaCoreTests.h albaCoreTests.cpp
 	albaViewVTKTest.h albaViewVTKTest.cpp
-	albaViewHTMLTest.h albaViewHTMLTest.cpp
 	albaAttributeTest.h albaAttributeTest.cpp
 	albaTagItemTest.h albaTagItemTest.cpp
 	albaTagArrayTest.h albaTagArrayTest.cpp

@@ -253,15 +253,11 @@
 #include "albaView3D.h"
 #include "albaViewArbitraryOrthoSlice.h"
 #include "albaViewArbitrarySlice.h"
-#include "albaViewCT.h"
 #include "albaViewCompound.h"
 #include "albaViewCompoundWindowing.h"
 #include "albaViewGlobalSlice.h"
-#include "albaViewGlobalSliceCompound.h"
-#include "albaViewHTML.h"
 #include "albaViewImage.h"
 #include "albaViewImageCompound.h"
-#include "albaViewIsosurfaceCompound.h"
 #include "albaViewOrthoSlice.h"
 #include "albaViewPlot.h"
 #include "albaViewRX.h"
@@ -270,10 +266,8 @@
 #include "albaViewSlice.h"
 #include "albaViewSliceBlend.h"
 #include "albaViewSliceBlendRX.h"
-#include "albaViewSliceGlobal.h"
 #include "albaViewSliceOnCurve.h"
 #include "albaViewSliceOnCurveCompound.h"
-#include "albaViewSlicer.h"
 #include "albaViewVTK.h"
 #include "albaViewVTKCompound.h"
 #include "albaViewVirtualRX.h"
@@ -2136,129 +2130,66 @@ void albaLogicWithManagers::PlugStandardViews()
 	//View VTK
 	Plug(new albaViewVTK("Surface"));
 
-	//View Arbitrary Slice
-	albaViewArbitrarySlice *varbitrary = new albaViewArbitrarySlice("Arbitrary Slice");
-	varbitrary->PackageView();
-	Plug(varbitrary);
+	
+	//View Isosurface
+	albaViewVTK *viso = new albaViewVTK("Isosurface");
+	viso->PlugVisualPipe("albaVMEVolumeGray", "albaPipeIsosurface", MUTEX);
+	Plug(viso);
 
 	//View Orthoslice
 	albaViewOrthoSlice *vortho = new albaViewOrthoSlice("Orthoslice");
 	vortho->PackageView();
 	Plug(vortho);
 
-	//View RX Compound
-	albaViewRXCompound *vrx = new albaViewRXCompound("RX");
-	vrx->PackageView();
-	Plug(vrx);
-
-	//View virtual RX
-	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
-	vvrx->PackageView();
-	Plug(vvrx);
-
-	//View Isosurface
-	albaViewVTK *viso = new albaViewVTK("Isosurface");
-	viso->PlugVisualPipe("albaVMEVolumeGray", "albaPipeIsosurface", MUTEX);
-	Plug(viso);
-
-	//View Isosurface Compound
-	albaViewIsosurfaceCompound *visoc = new albaViewIsosurfaceCompound("Isosurface Compound");
-	visoc->PackageView();
-	Plug(visoc);
-
-	//View RXCT
-	albaViewRXCT *vrxct = new albaViewRXCT("RX-CT");
-	vrxct->PackageView();
-	Plug(vrxct);
-
-	//View Global Slice Compound
-	albaViewGlobalSliceCompound *vglobal = new albaViewGlobalSliceCompound("Global Slice");
-	vglobal->PackageView();
-	Plug(vglobal);
-
-	//View Image Compound
-	albaViewImageCompound *vimageC = new albaViewImageCompound("Image");
-	vimageC->PackageView();
-	Plug(vimageC);
-
-	//View 3D
-	Plug(new albaView3D("3D"));
+	//View Arbitrary Slice
+	albaViewArbitrarySlice *varbitrary = new albaViewArbitrarySlice("Arbitrary Slice");
+	varbitrary->PackageView();
+	Plug(varbitrary);
 
 	//View Arbitrary Orthoslice
 	albaViewArbitraryOrthoSlice *varbitraryortho = new albaViewArbitraryOrthoSlice("Arbitrary Orthoslice", albaAxes::BODY);
 	varbitraryortho->PackageView();
 	Plug(varbitraryortho);
 
-	//View Slice On Curve Compound
-	albaViewSliceOnCurveCompound *vsliceoncurveC = new albaViewSliceOnCurveCompound("Slice On Curve");
-	vsliceoncurveC->PackageView();
-	Plug(vsliceoncurveC);
-
-	//View Image
-	albaViewImage *vimage = new albaViewImage("Image");
-	//vimage->PackageView();
-	Plug(vimage);
-
-	// 	//View Compound Windowing 
-	// 	albaViewCompoundWindowing *vCompWind = new albaViewCompoundWindowing("Compound Windowing (albaViewCompoundWindowing)");
-	// 	vCompWind->PackageView();
-	// 	Plug(vCompWind);
-
-	//View CT 
-	albaViewCT *vCT = new albaViewCT("CT");
-	vCT->PackageView();
-	Plug(vCT);
-
 	//View Global Slice 
 	albaViewGlobalSlice *vGlobalS = new albaViewGlobalSlice("Global Slice");
-	//vGlobalS->PackageView();
 	Plug(vGlobalS);
-
-	//View RX 
-	albaViewRX *vRX = new albaViewRX("RX");
-	//vRX->PackageView();
-	Plug(vRX);
-
-	//View Slice
-	albaViewSlice *vslice = new albaViewSlice("Slice");
-	//vslice->PackageView();
-	Plug(vslice);
-
-	//View Slice Blend
-	albaViewSliceBlend *vSliceBlend = new albaViewSliceBlend("Slice Blend");
-	//vSliceBlend->PackageView();
-	Plug(vSliceBlend);
 
 	//View Slice Blend RX
 	albaViewSliceBlendRX *vSliceBlendRX = new albaViewSliceBlendRX("Slice Blend RX");
 	vSliceBlendRX->PackageView();
 	Plug(vSliceBlendRX);
 
-	//View Slice Global
-	albaViewSliceGlobal *vSliceGlobal = new albaViewSliceGlobal("Slice Slice Global");
-	//vSliceGlobal->PackageView();
-	Plug(vSliceGlobal);
+	//View Slice On Curve Compound
+	albaViewSliceOnCurveCompound *vsliceoncurveC = new albaViewSliceOnCurveCompound("Slice On Curve");
+	vsliceoncurveC->PackageView();
+	Plug(vsliceoncurveC);
 
-	//View Slice On Curve
-	albaViewSliceOnCurve *vsliceoncurve = new albaViewSliceOnCurve("Slice On Curve");
-	vsliceoncurve->PackageView();
-	Plug(vsliceoncurve);
+	//View virtual RX
+	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
+	vvrx->PackageView();
+	Plug(vvrx);
 
-	//View Slicer
-	albaViewSlicer *vslicer = new albaViewSlicer("Slicer");
-	vslicer->PackageView();
-	Plug(vslicer);
+	//View RXCT
+	albaViewRXCT *vrxct = new albaViewRXCT("RX-CT");
+	vrxct->PackageView();
+	Plug(vrxct);
+
+
+
+	//View Image Compound
+	albaViewImageCompound *vimageC = new albaViewImageCompound("Image");
+	vimageC->PackageView();
+	Plug(vimageC);
+
+
+	//View 3D
+	Plug(new albaView3D("3D"));
 
 	//View RayCast
 	albaViewVTK *vRayCast = new albaViewVTK("3D Volume Rendering");
 	vRayCast->PlugVisualPipe("albaVMEVolumeGray", "albaPipeRayCast", MUTEX);
 	Plug(vRayCast);
-
-	//View HTML
-	albaViewHTML *vHtml = new albaViewHTML("HTML");
-	//vHtml->PackageView();
-	Plug(vHtml);
-
 }
 
 //----------------------------------------------------------------------------
