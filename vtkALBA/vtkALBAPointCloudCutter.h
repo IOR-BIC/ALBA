@@ -33,14 +33,15 @@
 class vtkIdList;
 class vtkCell;
 class vtkMatrix4x4;
+class vtkLinearTransform;
 
 /** 
 
  class name: vtkALBAPointCloudCutter
 VTK filter which cuts a point cloud with a plane.
-This is very similar to vtkCutter().
+This is very similar to vtkALBAFixedCutter().
 
-Differences from vtkCutter():
+Differences from vtkALBAFixedCutter():
 1) vtkALBAPointCloudCutter() returns points close to the cutting plane
 2) since the points are dimensionless, by cut we mean all the points that are less than a specific distance from the plane
 3) input and outputs does not have cells
@@ -75,6 +76,8 @@ public:
 	vtkSetMacro(PlaneTolerance, double);
 	vtkGetMacro(PlaneTolerance, double);
 
+	vtkGetObjectMacro(InputTransform, vtkLinearTransform);
+	virtual void SetInputTransform(vtkLinearTransform *transform) { InputTransform = transform; }
   
 protected:
   /** constructor */
@@ -114,6 +117,7 @@ protected:
   vtkPolyData *InPolydata;
   vtkPolyData *OutPolydata ;
 
+	vtkLinearTransform *InputTransform;
     
 	std::vector<vtkIdType> PointsMapping;  //<mapping from output points to input points
 

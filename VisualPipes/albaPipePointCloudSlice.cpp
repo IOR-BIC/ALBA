@@ -78,10 +78,7 @@ vtkAlgorithmOutput* albaPipePointCloudSlice::GetPolyDataOutputPort()
 		m_Plane->SetOrigin(m_Origin);
 		m_Plane->SetNormal(m_Normal);
 
-		vtkALBAToLinearTransform* m_VTKTransform = vtkALBAToLinearTransform::New();
-		m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-		m_Plane->SetTransform(m_VTKTransform);
-
+		
 		m_Cutter->SetInputConnection(port);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->SetPlaneTolerance(m_Tolerance);

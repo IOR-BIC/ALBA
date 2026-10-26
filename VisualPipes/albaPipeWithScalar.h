@@ -173,7 +173,7 @@ protected:
 	void DeleteHistogramDialog();
 	
 	/** Updates the Component Management in GUI and set current component */
-	void UpdateComonentsMangaement();
+	void UpdateComponentsMangaement();
 
 protected:
 	vtkDataArray *GetCurrentScalars();

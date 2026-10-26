@@ -203,10 +203,10 @@ void vtkALBAPointCloudCutterTest::TestSlicePointsWithTransform()
   vtkALBASmartPointer<vtkPlane> plane;
   plane->SetOrigin(1.0, 1.0, 1.0);
   plane->SetNormal(0.0, 0.0, 1.0);
-  plane->SetTransform(transform);
 
   cutter->SetInputData(input);
   cutter->SetCutFunction(plane);
+	cutter->SetInputTransform(transform);
   cutter->Update();
 
   vtkPolyData *output = cutter->GetOutput();

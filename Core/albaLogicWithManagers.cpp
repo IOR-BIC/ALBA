@@ -219,6 +219,7 @@
 #include "albaOpComputeHausdorffDistance.h"
 #include "albaOpCreateCentroid.h"
 #include "albaOpTransformAtoB.h"
+#include "albaOpImageCalibration.h"
 
 //TMP
 #include "albaOpImporterExternalFile.h"
@@ -2106,6 +2107,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpClassicICPRegistration("Surface"), _("Register"));
 
 	Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
+	Plug(new albaOpImageCalibration(), _("Calibration"));
 
 
 	Plug(new albaOpApplyTrajectory(), "TMP to test");
@@ -2149,7 +2151,7 @@ void albaLogicWithManagers::PlugStandardViews()
 	vrx->PackageView();
 	Plug(vrx);
 
-	//View RX Compound
+	//View virtual RX
 	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
 	vvrx->PackageView();
 	Plug(vvrx);

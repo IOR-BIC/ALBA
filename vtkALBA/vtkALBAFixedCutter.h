@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBAFixedCutter
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -19,10 +19,21 @@
 
 #include "albaConfigure.h"
 #include "vtkCutter.h"
-/**
-class name:  vtkALBAFixedCutter
-specialization of vtkCutter in which after execution if the number of points is zero, it will added one point
-that is the center of the input.
+
+
+//----------------------------------------------------------------------------
+// forward declarations
+class vtkPlane;
+class vtkLinearTransform;
+
+/** vtkALBAFixedCutter` extends `vtkCutter` by allowing an input pose transformation to be specified. 
+The transformation is used to account for the input dataset's position and orientation when computing the cut.
+
+The output is generated in the same coordinate system and position as the input dataset, 
+while the specified transformation is applied internally so that the cut is correctly 
+computed according to the cutting plane.
+
+The input transformation can be specified using `SetInputTransform()`.
 */
 class ALBA_EXPORT vtkALBAFixedCutter : public vtkCutter
 {
@@ -35,10 +46,21 @@ public:
   /** create an instance of the object */
   static vtkALBAFixedCutter* New();
 
+  /** Redefine of SetCutFunction in order to store the external cut function instead of CutFunction 
+      CutFunction will be set on RequestData */
+	virtual void SetCutFunction(vtkImplicitFunction *cutFunc);
+
+	vtkGetObjectMacro(InputTransform, vtkLinearTransform);
+	virtual void SetInputTransform(vtkLinearTransform *transform) {InputTransform = transform;}
+
 protected:
   /** reimplement execute fixing the algorithm when the number of points of the cutter output is zero.*/
   int RequestData( vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
+  vtkImplicitFunction *ExternalCutFunc;
+  vtkPlane *LocalCutFunction;
+
+  vtkLinearTransform *InputTransform;
 private:
     /** Copy Constructor , not implemented */
 	vtkALBAFixedCutter(const vtkALBAFixedCutter&);

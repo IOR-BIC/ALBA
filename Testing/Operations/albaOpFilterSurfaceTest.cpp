@@ -52,6 +52,8 @@
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkStripper.h"
 #include "vtkPolyDataNormals.h"
+#include "vtkPolyDataWriter.h"
+#include "vtkSMPTools.h"
 
 //----------------------------------------------------------------------------
 void albaOpFilterSurfaceTest::TestFixture()
@@ -344,6 +346,9 @@ void albaOpFilterSurfaceTest::TestOnTriangulate()
 void albaOpFilterSurfaceTest::TestOnVtkConnect()
 //----------------------------------------------------------------------------
 {
+	//Disable multitheading to obtain a deterministic filter output
+  vtkSMPTools::Initialize(1);
+
   albaOpFilterSurface *op = new albaOpFilterSurface();
   op->TestModeOn();
 
@@ -379,6 +384,8 @@ void albaOpFilterSurfaceTest::TestOnVtkConnect()
   CheckPolydata(polyOut,outputVtkFilter);
 
   albaDEL(op);
+
+  vtkSMPTools::Initialize(0);
 }
 //----------------------------------------------------------------------------
 void albaOpFilterSurfaceTest::TestOnStripper()

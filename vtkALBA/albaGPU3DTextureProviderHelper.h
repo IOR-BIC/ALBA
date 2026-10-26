@@ -23,14 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 class vtkImageData;
 class albaGPUOGL;
 
-struct TextureList
-{
-	int m_TexetureID;
-	vtkImageData *m_Volume;
-	albaGPUOGL* m_pGPUProvider;    //<GPU provider for GPU computation
-	float m_DataDims[3]; //<area covered by input data (in mm)
-	int m_ReferenceCount;
-};
+
 
 
 class albaGPU3DTextureProviderHelper 

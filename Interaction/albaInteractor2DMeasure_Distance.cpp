@@ -46,6 +46,8 @@ albaInteractor2DMeasure_Distance::albaInteractor2DMeasure_Distance() : albaInter
 	m_LineTickWidth = 2.0;
 	m_TickLenght = -1;
 
+	m_Constraint = NO_CONSTRAINT;
+
 	Color color{ 0.4, 0.4, 1, 1.0 };
 
 	SetColorDefault(color.R, color.G, color.B, 0.65);
@@ -139,21 +141,45 @@ void albaInteractor2DMeasure_Distance::EditMeasure(int index, double *point)
 	double point1[3];
 	double point2[3];
 
-	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[index]->GetSourceAlgorithm();
+	vtkLineSource *lineSource = (vtkLineSource *)m_LineStackVector[index]->GetSourceAlgorithm();
 	lineSource->GetPoint1(point1);
 	lineSource->GetPoint2(point2);
+
+	int constrainedCoordinate = -1;
+
+	switch (m_Constraint)
+	{
+	case HORIZONTAL_CONSTRAINT:
+		if (m_CurrPlane == 0)
+			constrainedCoordinate = Y;
+		else if (m_CurrPlane == 1 || m_CurrPlane == 2)
+			constrainedCoordinate = Z;
+		break;
+	case VERTICAL_CONSTRAINT:
+		if (m_CurrPlane == 0 || m_CurrPlane == 2)
+			constrainedCoordinate = X;
+		else if (m_CurrPlane == 1)
+			constrainedCoordinate = Y;
+		break;
+	}
 
 	if (m_CurrPoint == POINT_1)
 	{
 		point1[X] = point[X];
 		point1[Y] = point[Y];
 		point1[Z] = point[Z];
+
+		if (constrainedCoordinate >= 0)
+			point1[constrainedCoordinate] = point2[constrainedCoordinate];
 	}
 	else if (m_CurrPoint == POINT_2)
 	{
 		point2[X] = point[X];
 		point2[Y] = point[Y];
 		point2[Z] = point[Z];
+
+		if (constrainedCoordinate >= 0)
+			point2[constrainedCoordinate] = point1[constrainedCoordinate];
 	}
 
 	m_LastEditing = index;
@@ -502,6 +528,20 @@ void albaInteractor2DMeasure_Distance::GetMeasureLinePoints(int index, double *p
 		lineSource->GetPoint1(point1);
 		lineSource->GetPoint2(point2);
 	}
+}
+
+//----------------------------------------------------------------------------
+double albaInteractor2DMeasure_Distance::GetDistance(int index)
+{
+	double point1[3], point2[3];
+	// Return line points values
+	if (index >= 0 && index < GetMeasureCount())
+	{
+		GetMeasureLinePoints(index, point1, point2);
+		return DistanceBetweenPoints(point1, point2);
+	}
+	else
+		return 0.0;
 }
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////

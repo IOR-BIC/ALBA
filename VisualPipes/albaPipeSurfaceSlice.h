@@ -140,7 +140,7 @@ protected:
   int m_ScalarVisibility;
   albaGUIMaterialButton *m_MaterialButton;
 
-	vtkALBAToLinearTransform* m_VTKTransform;
+	//vtkALBAToLinearTransform* m_VTKTransform;
 
   vtkTextureMapToPlane *m_PlaneTextureMapper;
   vtkTextureMapToCylinder *m_CylinderTextureMapper;

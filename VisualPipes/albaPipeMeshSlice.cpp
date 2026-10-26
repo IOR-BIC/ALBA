@@ -33,7 +33,8 @@
 #include "vtkPlane.h"
 #include "vtkALBAPolyDataNormals.h"
 #include "vtkALBAToLinearTransform.h"
-
+#include "albaMeshLinearizationProvider.h"
+#include "vtkALBAMeshLinearizationFilter.h"
 #include <vector>
 
 // local debug facility
@@ -49,6 +50,7 @@ albaPipeMeshSlice::albaPipeMeshSlice():albaPipeGenericPolydata()
 	m_BorderElementsWiredActor = 1;
   m_Plane           = NULL;
   m_Cutter          = NULL;
+	m_LinearizationProvider = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +58,7 @@ albaPipeMeshSlice::~albaPipeMeshSlice()
 {
 	vtkDEL(m_Plane);
 	vtkDEL(m_Cutter);
+	cppDEL(m_LinearizationProvider);
 }
 
 //----------------------------------------------------------------------------
@@ -72,16 +75,16 @@ vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
 
 		m_Plane = vtkPlane::New();
 		m_Cutter = vtkALBAMeshCutter::New();
+		m_LinearizationProvider = new albaMeshLinearizationProvider();
 
 		m_Plane->SetOrigin(m_Origin);
 		m_Plane->SetNormal(m_Normal);
 
-		vtkALBAToLinearTransform* m_VTKTransform = vtkALBAToLinearTransform::New();
-		m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-		m_Plane->SetTransform(m_VTKTransform);
+		vtkALBAMeshLinearizationFilter *linearizationFilter = m_LinearizationProvider->GetFilter(port);
 
-		m_Cutter->SetInputConnection(port);
-		m_Cutter->SetCutFunction(m_Plane);
+		m_Cutter->SetInputConnection(linearizationFilter->GetOutputPort());
+		m_Cutter->SetPlane(m_Plane);
+		m_Cutter->SetInputTransform(m_Vme->GetOutput()->GetTransform()->GetVTKTransform());
 		m_Cutter->Update();
 
 		m_PolydataConnection = m_Cutter->GetOutputPort();
@@ -111,7 +114,7 @@ vtkAlgorithmOutput* albaPipeMeshSlice::GetPolyDataOutputPort()
 	{
     m_Plane->SetNormal(m_Normal);
 		m_Plane->SetOrigin(m_Origin);
-		m_Cutter->SetCutFunction(m_Plane);
+		m_Cutter->SetPlane(m_Plane);
 		m_Cutter->Update();
     
 		if(m_NormalsFilter)

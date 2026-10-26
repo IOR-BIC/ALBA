@@ -25,6 +25,7 @@
 #include "albaPipeGenericPolydata.h"
 
 class vtkALBAMeshCutter;
+class albaMeshLinearizationProvider;
 class vtkPlane; 
 
 //----------------------------------------------------------------------------
@@ -48,6 +49,7 @@ public:
 
 protected:
   vtkPlane				        *m_Plane;
-  vtkALBAMeshCutter		    *m_Cutter;
+  vtkALBAMeshCutter *m_Cutter;
+  albaMeshLinearizationProvider *m_LinearizationProvider;
 };  
 #endif // __albaPipeMeshSlice_H__B

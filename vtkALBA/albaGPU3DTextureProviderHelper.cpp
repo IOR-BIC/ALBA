@@ -34,6 +34,14 @@ PURPOSE.  See the above copyright notice for more information.
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
 #define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 
+struct TextureList
+{
+	int m_TexetureID;
+	vtkImageData *m_Volume;
+	albaGPUOGL* m_pGPUProvider;    //<GPU provider for GPU computation
+	float m_DataDims[3]; //<area covered by input data (in mm)
+	int m_ReferenceCount;
+};
 
 //Global vector with all current registered 3d texture 
 std::vector<TextureList> glo_Textures;

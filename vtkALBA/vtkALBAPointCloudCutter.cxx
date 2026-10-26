@@ -31,7 +31,10 @@
 #include <ostream>
 #include "albaDefines.h"
 #include "vtkTransform.h"
-
+#include "vtkALBASmartPointer.h"
+#include "vtkInformationVector.h"
+#include "vtkInformation.h"
+#include "albaGeometryUtils.h"
 
 
 //------------------------------------------------------------------------------
@@ -39,10 +42,6 @@
 vtkStandardNewMacro(vtkALBAPointCloudCutter);
 
 //------------------------------------------------------------------------------
-#include "albaMemDbg.h"
-#include "vtkALBASmartPointer.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -51,6 +50,7 @@ vtkALBAPointCloudCutter::vtkALBAPointCloudCutter()
 {
   CutFunction = NULL ;
   InPolydata = NULL ;
+  InputTransform = NULL;
   CutTranformedNormal[0] = CutTranformedNormal[1] = CutTranformedNormal[2] = CutTranformedOrigin[0] = CutTranformedOrigin[1] = CutTranformedOrigin[2] = 0;
   CutTranformedNormal[3] = CutTranformedOrigin[3] = 1; //for point multiplication purpose 
   PlaneTolerance = 0.05;
@@ -77,6 +77,8 @@ vtkMTimeType vtkALBAPointCloudCutter::GetMTime()
   {
     time = CutFunction->GetMTime();
     mTime = ( time > mTime ? time : mTime );
+		time = InputTransform ? InputTransform->GetMTime() : 0;
+		mTime = (time > mTime ? time : mTime);
   }
 
   return mTime;
@@ -357,31 +359,16 @@ void vtkALBAPointCloudCutter::CalculateLocalCutCoord()
     CutTranformedNormal[0] = CutTranformedNormal[1] = CutTranformedNormal[2] = CutTranformedOrigin[0] = CutTranformedOrigin[1] = CutTranformedOrigin[2] = 0;
     return;
   }
-	//Getting Mesh coordinates
-	vtkLinearTransform *trans = vtkLinearTransform::SafeDownCast(CutFunction->GetTransform());
-	if (trans)
+
+	//Getting Cut data in Input Space (if transform is present)
+	if (InputTransform)
 	{
-		double origin[4], normal[4];
-		vtkMatrix4x4 *inverse;
-		vtkNEW(inverse);
-		//Getting slicing transform matrix
-		trans->GetMatrix(inverse);
-		//Inverting matrix to obtain slice to mesh transform matrix
-		inverse->Invert();
+		vtkALBASmartPointer<vtkPlane> tmpPlane;
 
-		//vtkMatrix4x4 MultiplyPoint requires a 4d vector with last element set to 1
-		origin[3] = normal[3] = 1;
-		CutFunction->GetNormal(normal);
-		CutFunction->GetOrigin(origin);
+		albaGeometryUtils::PlaneToInputSpace(CutFunction, InputTransform, tmpPlane);
 
-		//Getting mesh local origin
-		inverse->MultiplyPoint(origin, CutTranformedOrigin);
-
-		//Isolate rotation matrix
-		ToRotationMatrix(inverse);
-
-		//Using rotation matrix to calculate mesh local normal
-		inverse->MultiplyPoint(normal, CutTranformedNormal);
+		tmpPlane->GetNormal(CutTranformedNormal);
+		tmpPlane->GetOrigin(CutTranformedOrigin);
 	}
 	else
 	{
