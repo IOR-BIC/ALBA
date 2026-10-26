@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBAFixedCutter
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -26,10 +26,14 @@
 class vtkPlane;
 class vtkLinearTransform;
 
-/**
-class name:  vtkALBAFixedCutter
-specialization of vtkCutter in which after execution if the number of points is zero, it will added one point
-that is the center of the input.
+/** vtkALBAFixedCutter` extends `vtkCutter` by allowing an input pose transformation to be specified. 
+The transformation is used to account for the input dataset's position and orientation when computing the cut.
+
+The output is generated in the same coordinate system and position as the input dataset, 
+while the specified transformation is applied internally so that the cut is correctly 
+computed according to the cutting plane.
+
+The input transformation can be specified using `SetInputTransform()`.
 */
 class ALBA_EXPORT vtkALBAFixedCutter : public vtkCutter
 {
