@@ -34,6 +34,9 @@ while the specified transformation is applied internally so that the cut is corr
 computed according to the cutting plane.
 
 The input transformation can be specified using `SetInputTransform()`.
+
+vtkALBAFixedCutter also removes the normals of the output to maintain the material property when rendered 
+(a black line is drawn elsewere).
 */
 class ALBA_EXPORT vtkALBAFixedCutter : public vtkCutter
 {

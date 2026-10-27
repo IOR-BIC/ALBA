@@ -76,6 +76,8 @@ int vtkALBAFixedCutter::RequestData( vtkInformation *vtkNotUsed(request), vtkInf
 
   vtkCutter::RequestData( NULL,  inputVector, outputVector);
 
+	output->GetPointData()->SetNormals(NULL);
+
 	CutFunction = ExternalCutFunc;
 	  
 	return 1;
