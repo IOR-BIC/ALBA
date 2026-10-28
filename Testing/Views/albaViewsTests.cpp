@@ -27,6 +27,7 @@
 #include "albaViewRXCTTest.h"
 #include "albaViewSliceTest.h"
 #include "albaViewGlobalSliceTest.h"
+#include "albaViewGlobalSliceCompoundTest.h"
 #include "albaViewImageTest.h"
 #include "albaViewRXCompoundTest.h"
 #include "albaView3DTest.h"
@@ -74,6 +75,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaViewRXCTTest::suite());
 	runner.addTest(albaViewSliceTest::suite());
 	runner.addTest(albaViewGlobalSliceTest::suite());
+	runner.addTest(albaViewGlobalSliceCompoundTest::suite());
 	runner.addTest(albaViewImageTest::suite());
 	runner.addTest(albaViewRXCompoundTest::suite());
 	runner.addTest(albaView3DTest::suite());

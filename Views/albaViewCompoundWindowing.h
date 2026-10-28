@@ -85,20 +85,14 @@ protected:
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual albaGUI  *CreateGui()=0;
 
-  /** Function for enable/disable all gui widgets. */
-  virtual void EnableWidgets(bool enable);
-
+  /** sets the current lut and activate the lut/windowing buttons*/
+  void SetLutAndSlider(vtkLookupTable *lut, double *dataRange);
+  
   /** A function with windowing activate/deactivate conditions*/
   virtual bool ActivateWindowing(albaVME *vme);
 
-  /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
+	/** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
 	virtual void UpdateWindowing(bool enable,albaVME *vme);
-
-  /** Update windowing for image data*/
-  virtual void ImageWindowing(albaVMEImage *image);
-
-  /** Update windowing for volume data*/
-  virtual void VolumeWindowing(albaVME *volume);
 
 	albaGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
 	albaGUILutSlider		*m_LutSlider;

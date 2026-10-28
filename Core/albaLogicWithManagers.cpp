@@ -255,7 +255,7 @@
 #include "albaViewArbitrarySlice.h"
 #include "albaViewCompound.h"
 #include "albaViewCompoundWindowing.h"
-#include "albaViewGlobalSlice.h"
+#include "albaViewGlobalSliceCompound.h"
 #include "albaViewImage.h"
 #include "albaViewImageCompound.h"
 #include "albaViewOrthoSlice.h"
@@ -2151,9 +2151,10 @@ void albaLogicWithManagers::PlugStandardViews()
 	varbitraryortho->PackageView();
 	Plug(varbitraryortho);
 
-	//View Global Slice 
-	albaViewGlobalSlice *vGlobalS = new albaViewGlobalSlice("Global Slice");
-	Plug(vGlobalS);
+	//View Global Slice Compound
+	albaViewGlobalSliceCompound *vglobal = new albaViewGlobalSliceCompound("Global Slice");
+	vglobal->PackageView();
+	Plug(vglobal);
 
 	//View Slice Blend RX
 	albaViewSliceBlendRX *vSliceBlendRX = new albaViewSliceBlendRX("Slice Blend RX");
