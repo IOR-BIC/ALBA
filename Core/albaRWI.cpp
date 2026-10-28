@@ -243,8 +243,11 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 	m_GridNormal  = GRID_Z;
 
 	m_Grid = vtkALBAGridActor::New();
+	
 	m_RenFront->AddActor(m_Grid);
 	m_RenFront->AddActor2D(m_Grid->GetLabelActor());
+	m_Grid->SetUseBounds(false);
+	m_Grid->GetLabelActor()->SetUseBounds(false);
 	SetGridNormal(m_GridNormal);
 	SetGridVisibility(m_ShowGrid != 0);
 
@@ -700,15 +703,8 @@ void albaRWI::UpdateCameraParameters()
 {
 	m_Camera->GetPosition(m_CameraPosition);
 	m_Camera->GetFocalPoint(m_FocalPoint);
-	//m_Camera->GetViewUp(m_CameraViewUp);
-	double *ori = m_Camera->GetOrientation();
-	/*m_CameraOrientation[0] = ori[0];
-	m_CameraOrientation[1] = ori[1];
-	m_CameraOrientation[2] = ori[2];*/
 	if (m_Gui)
-	{
 		m_Gui->Update();
-	}
 }
 //----------------------------------------------------------------------------
 void albaRWI::CameraReset(albaVME *vme, double zoom)
@@ -717,15 +713,13 @@ void albaRWI::CameraReset(albaVME *vme, double zoom)
 	if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
-	if(m_Grid && m_ShowGrid) 
-		m_Grid->VisibilityOff();
+// 	if(m_Grid && m_ShowGrid) 
+// 		m_Grid->VisibilityOff();
 
-	albaEventMacro(albaEvent(this,CAMERA_PRE_RESET,m_RenFront)); //- Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
 	CameraReset(ComputeVisibleBounds(vme), zoom);
-	if(m_Grid && m_ShowGrid) 
-		m_Grid->VisibilityOn();
+// 	if(m_Grid && m_ShowGrid) 
+// 		m_Grid->VisibilityOn();
 
-	albaEventMacro(albaEvent(this,CAMERA_POST_RESET,m_RenFront));
 	m_RenFront->ResetCameraClippingRange();
 	m_RenderWindow->Render();
 	UpdateCameraParameters();
@@ -897,8 +891,6 @@ albaGUI *albaRWI::CreateGui()
 		m_Gui->Label("Camera parameters", true);
 		m_Gui->Vector(ID_FOCAL_POINT, "Focal pnt.", m_FocalPoint);
 		m_Gui->Vector(ID_CAMERA_POSITION, "Position", m_CameraPosition);
-		//m_Gui->Vector(ID_CAMERA_VIEW_UP, "view up", m_CameraViewUp);
-		//m_Gui->Vector(ID_CAMERA_ORIENTATION, "orientation", m_CameraOrientation);
 		albaGUICrossIncremental *ci = m_Gui->CrossIncremental(ID_CAMERA_ORIENTATION,"Orientation", &m_StepCameraOrientation, &m_TopBottomAccumulation, &m_LeftRigthAccumulation,albaGUICrossIncremental::ID_COMPLETE_LAYOUT,"Change the rotation step value from the entry.",false);
 		ci->EnableStep(true);
 		m_Gui->Divider(2);
@@ -1014,7 +1006,6 @@ void albaRWI::OnEvent(albaEventBase *alba_event)
 		case ID_CAMERA_POSITION:
 			m_Camera->SetPosition(m_CameraPosition);
 			m_Camera->SetFocalPoint(m_FocalPoint);
-			//m_Camera->SetViewUp(m_CameraViewUp);
 			CameraUpdate();
 			break;
 		case ID_CAMERA_ORIENTATION:

@@ -1032,33 +1032,8 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case ID_APP_SETTINGS:
 			m_SettingsDialog->ShowModal();
 			break;
-		case CAMERA_PRE_RESET:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
-				//assert(ren);
-				m_InteractionManager->PreResetCamera(ren);
-				//albaLogMessage("CAMERA_PRE_RESET");
-			}
-#endif
-			break;
-		case CAMERA_POST_RESET:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				vtkRenderer *ren = (vtkRenderer*)e->GetVtkObj();
-				//assert(ren); //modified by Marco. 2-11-2004 Commented out to allow reset camera of all cameras.
-				m_InteractionManager->PostResetCamera(ren);
-				//albaLogMessage("CAMERA_POST_RESET");
-			}
-#endif
-			break;
 		case CAMERA_UPDATE:
 			CameraUpdate();
-
 			break;
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
