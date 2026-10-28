@@ -193,37 +193,6 @@ IF(VTK_FOUND)
   #2   ADD_DEPENDENCIES(${PROJECT_NAME} ${MFL_BUILD_TARGETS})
   #2 ENDIF (MFL_BUILD_TARGETS)
 
-  # Create Tcl wrappers if VTK is wrapped in Tcl.
-  IF(VTK_WRAP_TCL)
-    VTK_WRAP_TCL2(${PROJECT_NAME}TCL vtkALBATCL_SRCS ${vtkALBA_SRCS})
-    ADD_LIBRARY(${PROJECT_NAME}TCL ${vtkALBATCL_SRCS})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME}TCL vtkCommonTCL ${PROJECT_NAME})
-
-    # Create the list of kits that are required.
-    SET(VTKLOCAL_KITS "")
-    FOREACH(c ${vtkALBA_LIBS})
-      SET(VTKLOCAL_KITS "${VTKLOCAL_KITS} ${c}")
-    ENDFOREACH(c)
-    FOREACH(c ${vtkALBA_SRCS})
-      GET_FILENAME_COMPONENT(VTKLOCAL_LAST_CLASS ${c} NAME_WE)
-    ENDFOREACH(c)
-
-    IF(CMAKE_CONFIGURATION_TYPES)
-      FOREACH(config ${CMAKE_CONFIGURATION_TYPES})
-        SET(VTKLOCAL_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}/${config}")
-        CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in
-                       ${PROJECT_BINARY_DIR}/${config}/pkgIndex.tcl
-                       @ONLY IMMEDIATE)
-      ENDFOREACH(config)
-    ELSE(CMAKE_CONFIGURATION_TYPES)
-      SET(VTKLOCAL_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}")
-      CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in
-                     ${PROJECT_BINARY_DIR}/pkgIndex.tcl
-                     @ONLY IMMEDIATE)
-    ENDIF(CMAKE_CONFIGURATION_TYPES)
-
-  ENDIF(VTK_WRAP_TCL)
-
   # Create Python wrappers if VTK is wrapped in Python.
   IF(VTK_WRAP_PYTHON)
     VTK_WRAP_PYTHON2(${PROJECT_NAME}Python vtkALBAPYTHON_SRCS ${vtkALBA_SRCS})
