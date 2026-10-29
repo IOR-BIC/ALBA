@@ -235,7 +235,6 @@ protected:
 	/**Sets GPU Acceleration On/Off according to current status*/
 	void SetEnableGPU();
 
-	void OnLUTChooser();
 	virtual void OnLUTRangeModified();
 
 	void OnReset();

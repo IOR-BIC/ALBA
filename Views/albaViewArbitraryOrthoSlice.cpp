@@ -458,9 +458,6 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 		case ID_RANGE_MODIFIED:
 			OnLUTRangeModified();
 		break;
-		case ID_LUT_CHOOSER:
-			OnLUTChooser();
-		break;
 		case ID_RESET:
 			OnReset();
 		break;
@@ -782,7 +779,6 @@ void albaViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 	if (m_Gui)
 	{
 		m_Gui->Enable(ID_RESET, enable);
-		m_Gui->Enable(ID_LUT_CHOOSER, enable);
 		m_Gui->Enable(ID_SHOW_GIZMO, enable);
 		m_Gui->Enable(ID_SLICING_ORIGIN, enable);
 		m_Gui->FitGui();
@@ -946,17 +942,6 @@ void albaViewArbitraryOrthoSlice::OnLUTRangeModified()
 		m_LutSlider->GetSubRange(&low, &hi);
 		m_ColorLUT->SetTableRange(low, hi);
 		GetLogicManager()->CameraUpdate();
-	}
-}
-//----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::OnLUTChooser()
-{
-	if (m_InputVolume)
-	{
-		double *sr;
-
-		sr = m_ColorLUT->GetRange();
-		m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
 	}
 }
 //----------------------------------------------------------------------------
