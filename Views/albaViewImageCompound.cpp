@@ -284,7 +284,6 @@ albaGUI* albaViewImageCompound::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = albaView::CreateGui();
 
-	m_Gui->AddGui(((albaViewImage*)m_ChildViewList[ID_VIEW_IMAGE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "lut", m_ColorLUT);
 	m_LutWidget->Enable(false);
 
