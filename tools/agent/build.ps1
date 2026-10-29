@@ -1,9 +1,11 @@
 param()
 
-$bldDir = Join-Path $PSScriptRoot '..\..\..\bld'
-$buildCmd = 'MSBuild ALBA.sln /verbosity:quiet /p:Configuration=Release'
+. "$PSScriptRoot\common.ps1"
 
-Push-Location $bldDir
+Add-MSBuildToPath
+$buildCmd = 'MSBuild ALBA.sln /m /verbosity:quiet /p:Configuration=Release'
+
+Push-Location $BldDir
 try {
     & "$PSScriptRoot\run-logged.ps1" -Name build -Command $buildCmd
     exit $LASTEXITCODE
