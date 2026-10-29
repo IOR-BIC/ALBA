@@ -128,11 +128,6 @@ SET (CONFIGURE_ERROR 0)
 #-----------------------------------------------------------------------------
 INCLUDE (${CMAKE_ROOT}/Modules/FindThreads.cmake)
 
-# Create the header to configure the classes.
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/albaConfigure.h.in
-             ${PROJECT_BINARY_DIR}/albaConfigure.h
-             @ONLY)
-
 
 #-----------------------------------------------------------------------------
 # Installer configuration
@@ -333,6 +328,12 @@ ENDIF(WIN32)
 ELSE (ALBA_CAN_BUILD)
   MESSAGE (FATAL_ERROR "MFL library not found or configuration error, cannot build ALBA")
 ENDIF (ALBA_CAN_BUILD)
+
+# Create the header to configure the classes. It must be generated after the
+# MFL configuration (ALBA_USE_* options) and after ALBA_DATA_ROOT is found.
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/albaConfigure.h.in
+             ${PROJECT_BINARY_DIR}/albaConfigure.h
+             @ONLY)
 
 MARK_AS_ADVANCED(
    USE_MFL_FILE

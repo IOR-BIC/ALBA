@@ -15,9 +15,12 @@ Always use exactly these commands. Never invent, replace, or bypass them.
 
 - Configure (only if CMakeLists.txt changed, or the build directory is empty):
   `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1`
-  On an empty build tree it runs cmake twice: `albaConfigure.h` is generated
-  before the `ALBA_USE_*` options are declared.
 - Build: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/build.ps1`
+  After the first successful build it sets `COMPILE_LIBRARIES=OFF`, so the
+  external libraries (VTK, GDCM, XercesC, CURL, CRYPTO) are not rebuilt again.
+- Rebuild the external libraries (only if asked, or if something under `Libs/`
+  changed): `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1 -CompileLibraries`,
+  then the build.
 - Test: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/test.ps1`
 
 ### Execution rules
