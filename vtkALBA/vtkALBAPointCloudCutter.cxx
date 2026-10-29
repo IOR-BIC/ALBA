@@ -68,9 +68,8 @@ vtkALBAPointCloudCutter::~vtkALBAPointCloudCutter()
 // Overload standard modified time function. If cut function is modified,
 // then this object is modified as well.
 vtkMTimeType vtkALBAPointCloudCutter::GetMTime()
-//------------------------------------------------------------------------------
 {
-  vtkMTimeType mTime = this->vtkAlgorithm::GetMTime();
+  vtkMTimeType mTime = Superclass::GetMTime();
   vtkMTimeType time;
 
   if (CutFunction != NULL )
