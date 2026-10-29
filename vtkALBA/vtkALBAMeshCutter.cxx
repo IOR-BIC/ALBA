@@ -44,6 +44,21 @@ vtkALBAMeshCutter::~vtkALBAMeshCutter()
 }
 
 //----------------------------------------------------------------------------
+vtkMTimeType vtkALBAMeshCutter::GetMTime()
+{
+	vtkMTimeType mTime = Superclass::GetMTime();
+	vtkMTimeType time;
+
+	if (InputTransform != NULL)
+	{
+		time = InputTransform->GetMTime();
+		mTime = (time > mTime ? time : mTime);
+	}
+
+	return mTime;
+}
+
+//----------------------------------------------------------------------------
 void vtkALBAMeshCutter::SetPlane(vtkPlane *plane)
 {
 	vtk3DLinearGridPlaneCutter::SetPlane(plane);

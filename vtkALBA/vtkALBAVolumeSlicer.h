@@ -207,7 +207,7 @@ protected:
 	double	OutputSpacing[3];
   
 	//look-up table that maps fine samples to voxel indices - see CreateImage  
-  int* StIndices[3];
+  vtkIdType* StIndices[3];
   float* StOffsets[3];
 
   //last data set processed in PrepareVolume  

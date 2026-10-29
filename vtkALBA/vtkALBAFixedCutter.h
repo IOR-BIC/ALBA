@@ -49,6 +49,10 @@ public:
   /** create an instance of the object */
   static vtkALBAFixedCutter* New();
 
+	/** Overload standard modified time function. If cut function is modified,
+  then this object is modified as well. */
+	virtual vtkMTimeType GetMTime();
+
   /** Redefine of SetCutFunction in order to store the external cut function instead of CutFunction 
       CutFunction will be set on RequestData */
 	virtual void SetCutFunction(vtkImplicitFunction *cutFunc);

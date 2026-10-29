@@ -795,7 +795,7 @@ void vtkALBAVolumeSlicer::CreateSamplingTable(float* voxelcoords[3])
   {
     for (int i = 0; i < 3; i++)
     {
-      StIndices[i] = new int   [SamplingTableSize + 1];
+      StIndices[i] = new vtkIdType[SamplingTableSize + 1];
       StOffsets[i] = new float [SamplingTableSize + 1];
     }
   }
@@ -814,18 +814,18 @@ void vtkALBAVolumeSlicer::CreateSamplingTable(float* voxelcoords[3])
     const int lastIndex = this->DataDimensions[c] - 1;
     const float coordToIndex = float(SamplingTableSize - 1) / coords[lastIndex];
 
-    for (int i = 0, ti0 = 0, idxCur = -indexMultiplier; i <= lastIndex; i++, idxCur += indexMultiplier) 
+    for (vtkIdType i = 0, ti0 = 0, idxCur = -indexMultiplier; i <= lastIndex; i++, idxCur += indexMultiplier) 
     {
-      const int ti1 = (i != lastIndex) ? coords[i] * coordToIndex : (SamplingTableSize);
+      const vtkIdType ti1 = (i != lastIndex) ? coords[i] * coordToIndex : (SamplingTableSize);
       if (ti1 <= ti0)
         continue; //this should not happen for typical data
 
       //samples with indices ti0 to ti1 will be mapped to voxel with index idxCur
       //and will have offsets going from 1 to 0 (uniformly)
-      int nRange = ti1 - ti0;
+      vtkIdType nRange = ti1 - ti0;
       float fDist = 1.0f / nRange;
 
-      int* stIndices = &StIndices[c][ti0];
+      vtkIdType* stIndices = &StIndices[c][ti0];
       float* stOffsets = &StOffsets[c][ti0];
 
       for (int j = 0; j <= nRange; j++) 
@@ -931,7 +931,7 @@ void vtkALBAVolumeSlicer::CreateImage(const InputDataType *input, OutputDataType
       
   memset(output, 0, sizeof(OutputDataType) * xs * ys * numComp);
   OutputDataType* pixel = output;
-  int samplingOffs[8] = { 
+  vtkIdType samplingOffs[8] = { 
     0,    //voxel [i,j,k]
     1,    //voxel [i + 1,j,k]
     this->DataDimensions[0],    //voxel [i,j+1,k]
@@ -963,8 +963,8 @@ void vtkALBAVolumeSlicer::CreateImage(const InputDataType *input, OutputDataType
         continue;   //point is outside the volume
 
       //get the voxel where the current pixel lies
-      int index = StIndices[0][pi[0]] + StIndices[1][pi[1]] + StIndices[2][pi[2]];
-      for (int comp = 0; comp < numComp; comp++) 
+      vtkIdType index = StIndices[0][pi[0]] + StIndices[1][pi[1]] + StIndices[2][pi[2]];
+      for (vtkIdType comp = 0; comp < numComp; comp++) 
       {
         double sample = 0.0;
         if(m_TriLinearInterpolationOn)
