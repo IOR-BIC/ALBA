@@ -1,33 +1,55 @@
 # ALBA - agent instructions
 
 ## Environment
-- Windows only. C++ with VTK 9 and wxWidgets, built with CMake and Visual Studio.
+- Windows only. C++ with VTK 9 and wxWidgets, built with CMake and Visual Studio 2022.
 - Unit tests use CppUnit.
 - Use English for all identifiers and comments.
-- Model and provider configuration live in the machine's global OpenCode
-  config (`~/.config/opencode/opencode.json`), not in this repo.
+- Folder layout: sources in the repository root (e.g. `C:\Alba\ALBA`), build tree
+  in the sibling folder with the `_B` suffix (e.g. `C:\Alba\ALBA_B`). The scripts
+  below derive both paths, nothing is hardcoded.
+- MSBuild is used from PATH if `VsDevCmd.bat` was called before starting the
+  agent, otherwise the scripts locate it with `vswhere`.
 
 ## Build and test
-Always use these commands. Never invent, replace, or bypass the build/test commands.
+Always use exactly these commands. Never invent, replace, or bypass them.
 
 - Configure (only if CMakeLists.txt changed, or the build directory is empty):
   `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1`
 - Build: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/build.ps1`
+  After the first successful build it sets `COMPILE_LIBRARIES=OFF`, so the
+  external libraries (VTK, GDCM, XercesC, CURL, CRYPTO) are not rebuilt again.
+- Rebuild the external libraries (only if asked, or if something under `Libs/`
+  changed): `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1 -CompileLibraries`,
+  then the build.
 - Test: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/test.ps1`
 
 ### Execution rules
+- These scripts are long-running (configure and build can take well over 10
+  minutes). If the tool's foreground timeout cannot cover that, run the script
+  in the background and wait for its completion notification instead of
+  polling.
+- Run one script at a time. Do not chain them, and do not use Start-Job or
+  Start-Process yourself.
+- Wait until the script returns its exit code. Do not run other scripts, edit
+  files, or draw conclusions while it is running.
+- Never kill or restart a running script. Only the user may interrupt it.
+- Never delete, rename, or recreate the build directory without explicit
+  permission from the user. If configure or build fails, investigate the error
+  first and ask before considering a clean build.
+- Each script prints the exit code and the first matching errors. The full log
+  is saved under `build-logs/`.
+- A task is complete only when build and test both exit with code 0.
 
-- **Never impose a timeout** on configure and build. These operations are allowed to take as long as necessary. Do not terminate them because they appear to be taking too long. The user will interrupt them manually if necessary.
-- **Always wait for each script to finish and return its exit code before taking any other action.** Do not start another command, inspect or modify the project, launch another build/test/configure process, or make changes based on an incomplete result while a script is still running.
-- Configure, build, and test are **synchronous operations**. After starting one of the scripts, wait until it has completely terminated before proceeding.
-- **Never run configure, build, or test concurrently or in the background.**
-- **Never delete, rename, recreate, or otherwise discard the build directory without explicitly asking the user for permission first.** Recreating the build directory can take hours and may leave the project unavailable for a long time.
-- If configure or build fails, **do not automatically delete or recreate the build directory**. Investigate the error first and ask the user before considering any operation that would remove the existing build directory.
-- If a clean build is considered necessary, explain why and **ask the user for confirmation before deleting the build directory**.
-- The build directory is considered valuable state and must be preserved unless the user explicitly authorizes its removal.
-- Do not use Start-Job, Start-Process, background execution, shell operators, or any other mechanism that allows the script to continue running after the command invocation returns.
-- Each script prints the exit code and the first matching errors. The full log is saved under `build-logs/`.
-- A task is not complete until build and test both exit with code 0.
+## Tests
+- Tests read their input files from `ALBA_DATA_ROOT` (`Testing/unittestData`),
+  which is part of the repository: never write there.
+- Output files go under `GET_TEST_DATA_DIR() + "\\"`, which is inside the build
+  tree. Never use bare relative file names: the current directory may have
+  been changed by a previous test.
+- Use `CPPUNIT_ASSERT`, not `assert`: tests run in Release, where `assert` is
+  compiled out.
+- After running the tests, `git status` must show no new or modified files in
+  the source tree.
 
 ## Git
 - Branching policy is in CONTRIBUTING.md — read it before any git operation.

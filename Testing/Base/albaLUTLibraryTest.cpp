@@ -99,13 +99,8 @@ void albaLUTLibraryTest::TestSetGetDir()
 	}
 
   // store lookup table to file
-  std::string dirPrefix = ALBA_DATA_ROOT;
-  dirPrefix  +=  "/Test_LUTStorage/";
-
-  CPPUNIT_ASSERT(wxDirExists(dirPrefix.c_str()));
-
-  std::string libDir = dirPrefix;
-  libDir += "/LUTLib/";
+  std::string libDir = GET_TEST_DATA_DIR() + "\\LUTLib\\";
+  wxMkdir(libDir.c_str());
 
   CPPUNIT_ASSERT(wxDirExists(libDir.c_str()));
   
@@ -132,15 +127,18 @@ void albaLUTLibraryTest::TestAdd()
   lutLib->SetDir(oldDir.c_str());
   lutLib->Load();
 
-  string newDir = dirPrefix  + "TestAddLutToLibraryDir/";
+  string newDir = GET_TEST_DATA_DIR() + "\\TestAddLutToLibraryDir\\";
   lutLib->SetDir(newDir.c_str());
   lutLib->Save();
 
   vtkALBASmartPointer<vtkLookupTable> anotherLUT;
   lutPreset(4, anotherLUT);
 
-  lutLib->Add(anotherLUT, "anotherLUT"); 
-  
+  lutLib->Add(anotherLUT, "anotherLUT");
+
+  CPPUNIT_ASSERT(lutLib->GetNumberOfLuts() == 4);
+  CPPUNIT_ASSERT(wxFileExists((newDir + "anotherLUT.lut").c_str()));
+
   cppDEL(lutLib);
 }
 
@@ -157,7 +155,18 @@ void albaLUTLibraryTest::TestRemove()
 
   lutLib->Load();
 
-  lutLib->Remove("anotherLUT"); 
+  // work on a copy of the library: Remove() also deletes the lut file
+  string newDir = GET_TEST_DATA_DIR() + "\\TestRemove\\";
+  lutLib->SetDir(newDir.c_str());
+  lutLib->Save();
+
+  vtkALBASmartPointer<vtkLookupTable> anotherLUT;
+  lutPreset(4, anotherLUT);
+  lutLib->Add(anotherLUT, "anotherLUT");
+
+  CPPUNIT_ASSERT(lutLib->Remove("anotherLUT") == ALBA_OK);
+  CPPUNIT_ASSERT(lutLib->GetNumberOfLuts() == 3);
+  CPPUNIT_ASSERT(!wxFileExists((newDir + "anotherLUT.lut").c_str()));
 
   cppDEL(lutLib);
 }
@@ -175,15 +184,14 @@ void albaLUTLibraryTest::TestLoadSave()
 
   lutLib->Load();
 
-  lutLib->Remove("anotherLUT"); 
-  
-  std::string newDirPrefix = ALBA_DATA_ROOT;
-  newDirPrefix  +=  "/Test_LUTStorage/";
+  string newDir = GET_TEST_DATA_DIR() + "\\TestSave\\";
 
-  string newDir = newDirPrefix  + "TestSave/";
-  
   lutLib->SetDir(newDir.c_str());
   lutLib->Save();
+
+  CPPUNIT_ASSERT(wxFileExists((newDir + "lutDefault.lut").c_str()));
+  CPPUNIT_ASSERT(wxFileExists((newDir + "lutEField.lut").c_str()));
+  CPPUNIT_ASSERT(wxFileExists((newDir + "lutGlow.lut").c_str()));
 
   cppDEL(lutLib);
 }
