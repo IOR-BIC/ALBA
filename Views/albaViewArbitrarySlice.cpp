@@ -469,9 +469,6 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 		case ID_RANGE_MODIFIED:
 			OnLUTRangeModified();
 			break;
-		case ID_LUT_CHOOSER:
-			OnLUTChooser();
-			break;
 		case ID_RESET:
 			OnReset();
 			break;
@@ -695,7 +692,6 @@ void albaViewArbitrarySlice::EnableWidgets(bool enable)
 	{
 		m_Gui->Enable(ID_RESET, enable);
 		m_Gui->Enable(ID_COMBO_GIZMOS, enable);
-		m_Gui->Enable(ID_LUT_CHOOSER, enable);
  		m_Gui->Enable(ID_GIZMO_TRANSLATE, enable);
  		m_Gui->Enable(ID_GIZMO_ROTATE, enable);
 		m_Gui->FitGui();
@@ -909,18 +905,6 @@ void albaViewArbitrarySlice::OnLUTRangeModified()
 		GetLogicManager()->CameraUpdate();
 	}
 }
-//----------------------------------------------------------------------------
-void albaViewArbitrarySlice::OnLUTChooser()
-{
-	if (m_InputVolume)
-	{
-		double *sr;
-
-		sr = m_ColorLUT->GetRange();
-		m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
-	}
-}
-
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::TrilinearInterpolationOn()
 {

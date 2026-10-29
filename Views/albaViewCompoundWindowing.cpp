@@ -89,14 +89,7 @@ void albaViewCompoundWindowing::OnEvent(albaEventBase *alba_event)
 					CameraUpdate();
 			}
 			break;
-		case ID_LUT_CHOOSER:
-			{
-				double *sr;
-				sr = m_ColorLUT->GetRange();
-				m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-			}
-			break;
-    default:
+		default:
 			Superclass::OnEvent(alba_event);
   }
 }
