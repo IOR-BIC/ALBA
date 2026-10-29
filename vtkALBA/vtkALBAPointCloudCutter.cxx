@@ -50,6 +50,7 @@ vtkALBAPointCloudCutter::vtkALBAPointCloudCutter()
 {
   CutFunction = NULL ;
   InPolydata = NULL ;
+  InputTransform = NULL;
   CutTranformedNormal[0] = CutTranformedNormal[1] = CutTranformedNormal[2] = CutTranformedOrigin[0] = CutTranformedOrigin[1] = CutTranformedOrigin[2] = 0;
   CutTranformedNormal[3] = CutTranformedOrigin[3] = 1; //for point multiplication purpose 
   PlaneTolerance = 0.05;

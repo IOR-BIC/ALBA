@@ -532,8 +532,6 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 	
 	m_Gui->Divider();
 
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
-
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Label("Slicing Origin:", true);
@@ -802,7 +800,6 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
-	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0], (long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0], (long)currentVolumeMaterial->GetTableRange()[1]);
 }
@@ -922,7 +919,6 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 
 	m_InputVolume = NULL;
 	m_ColorLUT = NULL;
-	m_LutWidget->SetLut(m_ColorLUT);
 }
 
 //----------------------------------------------------------------------------

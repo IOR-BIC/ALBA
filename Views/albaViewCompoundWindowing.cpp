@@ -51,25 +51,18 @@
 //----------------------------------------------------------------------------
 albaViewCompoundWindowing::albaViewCompoundWindowing( wxString label, int num_row, int num_col)
 : albaViewCompound(label,num_row,num_col)
-//----------------------------------------------------------------------------
 {
-	m_LutWidget       = NULL;
 	m_LutSlider       = NULL;
 	m_ColorLUT        = NULL;
 }
 //----------------------------------------------------------------------------
 albaViewCompoundWindowing::~albaViewCompoundWindowing()
-//----------------------------------------------------------------------------
 {
-	//m_ColorLUT        = NULL;
-  if(m_LutWidget)
-	  cppDEL(m_LutWidget);
 	cppDEL(m_LutSlider);
 }
 
 //----------------------------------------------------------------------------
 void albaViewCompoundWindowing::CreateGuiView()
-//----------------------------------------------------------------------------
 {
 	m_GuiView = new albaGUI(this);
   
@@ -77,26 +70,23 @@ void albaViewCompoundWindowing::CreateGuiView()
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));
-  EnableWidgets(false);
-  m_GuiView->Add(m_LutSlider);
+  
+	UpdateWindowing(false,NULL);
+  
+	m_GuiView->Add(m_LutSlider);
   m_GuiView->Reparent(m_Win);
 }
 //----------------------------------------------------------------------------
 void albaViewCompoundWindowing::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
 {
   switch(alba_event->GetId()) 
   {
 		case ID_RANGE_MODIFIED:
 			{
-				//Windowing
-				if(GetSceneGraph()->GetSelectedVme())
-				{
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
-					GetLogicManager()->CameraUpdate();
-				}
+					CameraUpdate();
 			}
 			break;
 		case ID_LUT_CHOOSER:
@@ -113,76 +103,18 @@ void albaViewCompoundWindowing::OnEvent(albaEventBase *alba_event)
 
 //----------------------------------------------------------------------------
 void albaViewCompoundWindowing::VmeShow(albaVME *vme, bool show)
-//----------------------------------------------------------------------------
 {
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
     m_ChildViewList[i]->VmeShow(vme, show);
   
-	if(ActivateWindowing(vme))
+	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
-  
+
 	GetLogicManager()->CameraUpdate();
-}
-//----------------------------------------------------------------------------
-void albaViewCompoundWindowing::EnableWidgets(bool enable)
-//----------------------------------------------------------------------------
-{
- 	if(m_Gui)
-		m_Gui->Enable(ID_LUT_CHOOSER,enable);
-  m_LutSlider->Enable(enable);
-}
-
-//----------------------------------------------------------------------------
-void albaViewCompoundWindowing::UpdateWindowing(bool enable,albaVME *vme)
-//----------------------------------------------------------------------------
-{
-  EnableWidgets(enable);
-
-  //Windowing can be applied on Volumes or on Images
-  albaVME      *Volume		= NULL;
-	albaVMEImage *Image	  = NULL;
-	
-	
-  if(vme->GetOutput()->IsA("albaVMEOutputVolume")) {
-		Volume = vme;
-	}
-	else if(vme->IsA("albaVMEImage")) {
-		Image = albaVMEImage::SafeDownCast(vme);
-	}
-
-  if(Volume) {
-		if(enable && (albaVMEOutputVolume::SafeDownCast(Volume->GetOutput())))
-		{
-      VolumeWindowing(Volume);
-		}
-		else
-		{
-      m_ColorLUT = NULL;
-      if(m_LutWidget)
-        m_LutWidget->SetLut(m_ColorLUT);
-			m_LutSlider->SetRange(-100,100);
-			m_LutSlider->SetSubRange(-100,100);
-		}
-	}
-	else if(Image) {
-		if(enable)
-		{
-      ImageWindowing(Image);
-		}
-		else
-		{
-      m_ColorLUT = NULL;
-      if(m_LutWidget)
-        m_LutWidget->SetLut(m_ColorLUT);
-			m_LutSlider->SetRange(-100,100);
-			m_LutSlider->SetSubRange(-100,100);
-		}
-	}
 }
 
 //----------------------------------------------------------------------------
 bool albaViewCompoundWindowing::ActivateWindowing(albaVME *vme)
-//----------------------------------------------------------------------------
 {
   bool conditions     = false;
   bool nodeHasPipe    = false;
@@ -215,35 +147,43 @@ bool albaViewCompoundWindowing::ActivateWindowing(albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
-void albaViewCompoundWindowing::ImageWindowing(albaVMEImage *image)
-//----------------------------------------------------------------------------
+void albaViewCompoundWindowing::UpdateWindowing(bool enable, albaVME *vme)
 {
-  double sr[2];
-  vtkDataSet *data = image->GetOutput()->GetVTKData();
+	if (enable)
+	{
+		double *dataRange;
+		dataRange=vme->GetOutput()->GetVTKData()->GetScalarRange();
 
-  //Get scalar range of the image
-  data->GetScalarRange(sr);
-
-  m_ColorLUT = (vtkLookupTable*)((albaPipeImage3D *)m_ChildViewList[0]->GetNodePipe(image))->GetLUT();
-  if(m_LutWidget)
-    m_LutWidget->SetLut(m_ColorLUT);
-  m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-  m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+		if (albaVMEVolumeGray::SafeDownCast(vme))
+			SetLutAndSlider(((albaVMEVolumeGray *)vme)->GetMaterial()->m_ColorLut,dataRange);
+		else if (albaVMEImage::SafeDownCast(vme))
+			SetLutAndSlider(((albaVMEImage *)vme)->GetMaterial()->m_ColorLut,dataRange);
+	}
+	else
+	{
+		SetLutAndSlider(NULL,NULL);
+	}
 }
 
 //----------------------------------------------------------------------------
-void albaViewCompoundWindowing::VolumeWindowing(albaVME *volume)
-//----------------------------------------------------------------------------
+void albaViewCompoundWindowing::SetLutAndSlider(vtkLookupTable *lut, double *dataRange)
 {
-  double sr[2];
-  volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
-  
-  mmaVolumeMaterial *currentSurfaceMaterial = ((albaVMEOutputVolume *)volume->GetOutput())->GetMaterial();
-  m_ColorLUT = albaVMEVolumeGray::SafeDownCast(volume)->GetMaterial()->m_ColorLut;
-  if(m_LutWidget)
-    m_LutWidget->SetLut(m_ColorLUT);
-  m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-  //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-  m_LutSlider->SetSubRange((long)currentSurfaceMaterial->GetTableRange()[0],(long)currentSurfaceMaterial->GetTableRange()[1]);
+	m_ColorLUT = lut;
 
+	if (m_LutSlider)
+	{
+		if (m_ColorLUT)
+		{
+			m_LutSlider->SetRange(dataRange);
+			double *sr = m_ColorLUT->GetTableRange();
+			m_LutSlider->SetSubRange(sr);
+		}
+		else
+		{
+			m_LutSlider->SetRange(0, 1);
+			m_LutSlider->SetSubRange(0, 1);
+		}
+		m_LutSlider->Enable(m_ColorLUT != NULL);
+	}
 }
+

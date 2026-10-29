@@ -32,14 +32,10 @@
 #include "albaViewRXCompoundTest.h"
 #include "albaView3DTest.h"
 #include "albaViewImageCompoundTest.h"
-#include "albaViewCTTest.h"
-#include "albaViewSlicerTest.h"
 #include "albaViewVTKCompoundTest.h"
 #include "albaViewSliceOnCurveCompoundTest.h"
 #include "albaViewSliceOnCurveTest.h"
-#include "albaViewSliceGlobalTest.h"
 #include "albaViewCompoundWindowingTest.h"
-#include "albaViewIsosurfaceCompoundTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -84,14 +80,10 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaViewRXCompoundTest::suite());
 	runner.addTest(albaView3DTest::suite());
 	runner.addTest(albaViewImageCompoundTest::suite());
-	runner.addTest(albaViewCTTest::suite());
-	runner.addTest(albaViewSlicerTest::suite());
 	runner.addTest(albaViewVTKCompoundTest::suite());
 	runner.addTest(albaViewSliceOnCurveCompoundTest::suite());
 	runner.addTest(albaViewSliceOnCurveTest::suite());
-	runner.addTest(albaViewSliceGlobalTest::suite());
 	runner.addTest(albaViewCompoundWindowingTest::suite());
-	runner.addTest(albaViewIsosurfaceCompoundTest::suite());
 	
 	runner.run( controller );
 

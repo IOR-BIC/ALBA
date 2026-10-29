@@ -20,7 +20,6 @@
 #include "vtkTriangleFilter.h"
 #include "vtkIdList.h"
 #include "vtkPointLocator.h"
-#include "albaConfigure.h"
 
 #define PointLocator vtkPointLocator
 class vtkPolygon;
@@ -79,9 +78,7 @@ protected:
 	vtkTriangleFilter *Tri;
 	vtkPolyData *Input;
 	PointLocator *Locator;
-  vtkPolygon *Poly;
-  vtkIdList *Cells;
-
+ 
   /** friend test class */
   friend class vtkALBAImplicitPolyDataTest;
 };

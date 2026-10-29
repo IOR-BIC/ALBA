@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: vtkALBAFixedCutter
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -48,7 +48,8 @@ vtkALBAFixedCutter::~vtkALBAFixedCutter()
 //----------------------------------------------------------------------------
 void vtkALBAFixedCutter::SetCutFunction(vtkImplicitFunction *cutFunc)
 {
-	ExternalCutFunc = CutFunction =  cutFunc;
+	vtkCutter::SetCutFunction(cutFunc);
+	ExternalCutFunc =  cutFunc;
 }
 
 //----------------------------------------------------------------------------
@@ -75,16 +76,9 @@ int vtkALBAFixedCutter::RequestData( vtkInformation *vtkNotUsed(request), vtkInf
 
   vtkCutter::RequestData( NULL,  inputVector, outputVector);
 
+	output->GetPointData()->SetNormals(NULL);
+
 	CutFunction = ExternalCutFunc;
 	  
-  if(output->GetNumberOfPoints() == 0)
-  {
-	  vtkPoints *pts = vtkPoints::New();
-	  pts->InsertNextPoint(input->GetCenter());
-    output->SetPoints(pts);
-    pts->Delete();
-  }
-  output->GetPointData()->SetNormals(NULL);
-
 	return 1;
 }

@@ -294,7 +294,6 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 
 			m_InputVolume = NULL;
 			m_ColorLUT = NULL;
-			m_LutWidget->SetLut(m_ColorLUT);
 		}
 	}
 
@@ -589,9 +588,6 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = albaView::CreateGui();
-
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "Lut", m_ColorLUT);
-
 	m_Gui->Divider();
 	m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON, "Interpolation", &m_TrilinearInterpolationOn, 1);
 	m_Gui->Divider();
@@ -717,7 +713,6 @@ void albaViewArbitrarySlice::VolumeWindowing(albaVME *volume)
 
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
-	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0],(long)currentVolumeMaterial->GetTableRange()[1]);
 }

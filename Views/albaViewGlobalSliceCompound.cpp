@@ -54,11 +54,6 @@ enum SUBVIEW_ID
   ID_VIEW_GLOBAL_SLICE = 0,
 };
 
-enum VIEW_WIDGET_ID
-{
-	ID_FIRST = MINID,
-	ID_LAST
-};
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewGlobalSliceCompound);
 
@@ -68,16 +63,12 @@ albaViewGlobalSliceCompound::albaViewGlobalSliceCompound( wxString label, int nu
 : albaViewCompoundWindowing(label,num_row,num_col)
 
 {
-	/*m_LutWidget = NULL;
-	m_LutSlider = NULL;
-	m_ColorLUT = NULL;*/
 }
 //----------------------------------------------------------------------------
 albaViewGlobalSliceCompound::~albaViewGlobalSliceCompound()
 
 {
 	m_ColorLUT = NULL;
-	cppDEL(m_LutWidget);
 	cppDEL(m_LutSlider);
 }
 //----------------------------------------------------------------------------
@@ -95,40 +86,6 @@ albaView *albaViewGlobalSliceCompound::Copy(albaObserver *Listener, bool lightCo
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
   v->Create();
   return v;
-}
-
-void albaViewGlobalSliceCompound::OnEvent(albaEventBase *alba_event)
-{
-	switch (alba_event->GetId())
-	{
-	case ID_RANGE_MODIFIED:
-	{
-		
-			double low, hi;
-			m_LutSlider->GetSubRange(&low, &hi);
-
-			for (int i = 0; i < m_LUTs.size(); i++)
-				m_LUTs[i]->SetTableRange(low, hi);
-			
-			CameraUpdate();
-	}
-	break;
-	case ID_LUT_CHOOSER:
-	{
-		double *sr;
-		sr = m_ColorLUT->GetRange();
-		
-		for (int i = 0; i < m_LUTs.size(); i++)
-			m_LUTs[i]->SetTableRange(sr[0], sr[1]);
-
-		m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
-
-		CameraUpdate();
-	}
-	break;
-	default:
-		Superclass::OnEvent(alba_event);
-	}
 }
 
 //----------------------------------------------------------------------------
@@ -156,23 +113,9 @@ void albaViewGlobalSliceCompound::VmeShow(albaVME *vme, bool show)
 			if (!vmeFound)
 			{
 				m_VisibleVMEs.push_back(vme);
-				m_LUTs.push_back(albaVMEVolumeGray::SafeDownCast(vme)->GetMaterial()->m_ColorLut);
-
-				if (m_LUTs.size() == 1)
-				{
-					m_LutSlider->SetRange(m_LUTs[0]->GetTableRange());
-					m_LutSlider->SetSubRange(m_LUTs[0]->GetTableRange());
-				}
-				else
-				{
-					double low, hi;
-					m_LutSlider->GetSubRange(&low, &hi);
-					m_LUTs[m_LUTs.size()-1]->SetTableRange(low,hi);
-				}
-
+				if (m_SelectedVME == vme)
+					UpdateWindowing(true, vme);
 			}
-
-			m_LutSlider->Enable(true);
 		}
 		else
 		{
@@ -182,15 +125,13 @@ void albaViewGlobalSliceCompound::VmeShow(albaVME *vme, bool show)
 				if (m_VisibleVMEs[i] == vme)
 				{
 					m_VisibleVMEs.erase(m_VisibleVMEs.begin() + i);
-					m_LUTs.erase(m_LUTs.begin() + i);
 					break;
 				}
 			}
 
-			m_LutSlider->Enable(m_LUTs.size()>0);
+			if (m_SelectedVME == vme)
+				UpdateWindowing(false, NULL);
 		}
-
-		UpdateLutSlider();
 	}
 
 	CameraUpdate();
@@ -201,15 +142,32 @@ void albaViewGlobalSliceCompound::VmeSelect(albaVME *node, bool select)
 {
 	Superclass::VmeSelect(node, select);
 
-	if(node->IsA("albaVMEVolumeGray") || node->IsA("albaVMELabeledVolume"))
+	if (select)
 	{
-		m_ColorLUT = select ? albaVMEVolumeGray::SafeDownCast(node)->GetMaterial()->m_ColorLut : NULL;
-
-		if (m_LutWidget)
+		m_SelectedVME = node;
+		if (node->IsA("albaVMEVolumeGray") || node->IsA("albaVMELabeledVolume"))
 		{
-			m_LutWidget->SetLut(m_ColorLUT);
-			m_LutWidget->Enable(m_ColorLUT != NULL);
+			bool visible = false;
+
+			if (select)
+			{
+				for (int i = 0; i < m_VisibleVMEs.size(); i++)
+				{
+					if (m_VisibleVMEs[i] == node)
+					{
+						visible = true;
+						break;
+					}
+				}
+			}
+			if (select && visible)
+				UpdateWindowing(true, node);
 		}
+	}
+	else
+	{
+		m_SelectedVME = NULL;
+		UpdateWindowing(false, NULL);
 	}
 }
 
@@ -220,35 +178,10 @@ albaGUI* albaViewGlobalSliceCompound::CreateGui()
   m_Gui = albaView::CreateGui();
 
 	m_Gui->AddGui(((albaViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
-	m_LutWidget->Enable(false);
 	m_Gui->Divider(0);
 	m_Gui->FitGui();
 	m_Gui->Update();
   return m_Gui;
-}
-
-void albaViewGlobalSliceCompound::UpdateLutSlider()
-{
-	double min = VTK_DOUBLE_MAX, max = VTK_DOUBLE_MIN;
-
-	for(int i = 0; i < m_VisibleVMEs.size(); i++)
-	{
-		double *range = m_VisibleVMEs[i]->GetOutput()->GetVTKData()->GetScalarRange();
-		if (range[0] < min) min = range[0];
-		if (range[1] > max) max = range[1];
-	}
-
-	double subRange[2];
-	m_LutSlider->GetSubRange(subRange);
-
-	if (subRange[0] < min) 
-		subRange[0] = min;
-	if (subRange[1] > max) 
-		subRange[1] = max;
-
-	m_LutSlider->SetRange(min, max);
-	m_LutSlider->SetSubRange(subRange);
 }
 
 //-------------------------------------------------------------------------

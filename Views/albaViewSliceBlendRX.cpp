@@ -307,6 +307,13 @@ void albaViewSliceBlendRX::CreateGuiView()
 }
 
 //----------------------------------------------------------------------------
+char **albaViewSliceBlendRX::GetIcon()
+{
+#include "pic/VIEW_ARBITRARY.xpm"
+	return VIEW_ARBITRARY_xpm;
+}
+
+//----------------------------------------------------------------------------
 void albaViewSliceBlendRX::EnableWidgets(bool enable)
 {
 	if (m_Gui)

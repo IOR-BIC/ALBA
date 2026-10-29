@@ -9,6 +9,7 @@ ToDo:
     maybe try a tiny dataset.
 =========================================================================*/
 
+#include "albaDefines.h"
 #include "vtkObjectFactory.h"
 #include "vtkALBAImplicitPolyData.h"
 #include "vtkPolygon.h"
@@ -18,7 +19,6 @@ vtkStandardNewMacro(vtkALBAImplicitPolyData);
 // Constructor
 //----------------------------------------------------------------------------
 vtkALBAImplicitPolyData::vtkALBAImplicitPolyData()
-//----------------------------------------------------------------------------
 {
 	this->NoGradient[0] = 0.0;
 	this->NoGradient[1] = 0.0;
@@ -27,13 +27,10 @@ vtkALBAImplicitPolyData::vtkALBAImplicitPolyData()
 	this->Tri     = NULL;
 	this->Input   = NULL;
   this->Locator = NULL;
-  this->Poly    = NULL;
-  this->Cells   = NULL;
 	this->ConcaveMode = false;
 }
 //----------------------------------------------------------------------------
 void vtkALBAImplicitPolyData::SetInput(vtkPolyData *input) 
-//----------------------------------------------------------------------------
 {
   if( this->Input != input ) 
   {
@@ -60,11 +57,6 @@ void vtkALBAImplicitPolyData::SetInput(vtkPolyData *input)
     this->Locator->SetDataSet( this->Input );
     this->Locator->BuildLocator();
 
-    if( this->Cells   != NULL ) this->Cells->Delete();
-	  this->Cells = vtkIdList::New();
-    this->Cells->SetNumberOfIds( this->Input->GetNumberOfCells() );
-
-    this->Poly = vtkPolygon::New();
     this->Modified();
   }
 }
@@ -72,7 +64,6 @@ void vtkALBAImplicitPolyData::SetInput(vtkPolyData *input)
 
 //----------------------------------------------------------------------------
 vtkMTimeType vtkALBAImplicitPolyData::GetMTime()
-//----------------------------------------------------------------------------
 {
 	vtkMTimeType mTime = this->vtkImplicitFunction::GetMTime();
 	vtkMTimeType inputMTime;
@@ -88,18 +79,14 @@ vtkMTimeType vtkALBAImplicitPolyData::GetMTime()
 // Destructor
 //----------------------------------------------------------------------------
 vtkALBAImplicitPolyData::~vtkALBAImplicitPolyData()
-//----------------------------------------------------------------------------
 {
   if( this->Tri     != NULL ) this->Tri->Delete();
   if( this->Locator != NULL ) this->Locator->Delete();
-  if( this->Poly    != NULL ) this->Poly->Delete();
-  if( this->Cells   != NULL ) this->Cells->Delete();
 }
 // Evaluate for point x[3].
 // Method using combination of implicit planes
 //----------------------------------------------------------------------------
 double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
-//----------------------------------------------------------------------------
 {
 	// See if data set with polygons has been specified
 	if( this->Input == NULL || Input->GetNumberOfCells() == 0 ) 
@@ -108,8 +95,10 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
     return this->NoValue;
   }
 
+  vtkIdList *cells = vtkIdList::New();
 	int cellNum, pid;
-	vtkCell *cell;
+  vtkGenericCell *cell= vtkGenericCell::New();
+
 	double dot, ret = ConcaveMode ? VTK_FLOAT_MAX : -VTK_FLOAT_MAX, cNormal[3], closestPoint[3];
 
     // get point id of closest point in data set
@@ -118,13 +107,14 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
   {
     this->Input->GetPoint( pid, closestPoint );
     // get cells it belongs to
-		this->Input->GetPointCells( pid, Cells );
+		this->Input->GetPointCells( pid, cells );
     // for each cell
-  	for( cellNum=0; cellNum<Cells->GetNumberOfIds(); cellNum++ ) 
+  	for( cellNum=0; cellNum<cells->GetNumberOfIds(); cellNum++ ) 
     {
-    	cell = this->Input->GetCell( Cells->GetId( cellNum ) );
+			this->Input->GetCell(cells->GetId(cellNum), cell);
+
       // get cell normal
-      Poly->ComputeNormal( cell->GetPoints(), cNormal );
+      vtkPolygon::ComputeNormal( cell->GetPoints(), cNormal );
       dot = ( cNormal[0]*(x[0]-closestPoint[0]) +
               cNormal[1]*(x[1]-closestPoint[1]) +
               cNormal[2]*(x[2]-closestPoint[2]) );
@@ -136,12 +126,13 @@ double vtkALBAImplicitPolyData::EvaluateFunction(double x[3])
   if(ConcaveMode && ret == VTK_FLOAT_MAX) ret = NoValue;
 	else if (!ConcaveMode && ret == -VTK_FLOAT_MAX) ret = NoValue;
   
+  vtkDEL(cell);
+  vtkDEL(cells);
 	return ret;
 }
 // Evaluate function gradient at point x[3].
 //----------------------------------------------------------------------------
 void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
-//----------------------------------------------------------------------------
 {
 	int i;
 	// See if data set with polygons has been specified
@@ -152,8 +143,9 @@ void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
     return;
   }
 
+	vtkIdList *cells = vtkIdList::New();
 	int cellNum, pid;
-	vtkCell *cell;
+	vtkGenericCell *cell = vtkGenericCell::New();
 	double dot, ret = -VTK_FLOAT_MAX, cNormal[3], closestPoint[3];
 
     // get point id of closest point in data set
@@ -162,13 +154,13 @@ void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
   {
    	this->Input->GetPoint( pid, closestPoint );
    	// get cells it belongs to
-		this->Input->GetPointCells( pid, Cells );
+		this->Input->GetPointCells( pid, cells );
    	// for each cell
- 		for( cellNum=0; cellNum<Cells->GetNumberOfIds(); cellNum++ ) 
+ 		for( cellNum=0; cellNum<cells->GetNumberOfIds(); cellNum++ ) 
     {
-    	cell = this->Input->GetCell( Cells->GetId( cellNum ) );
+			this->Input->GetCell(cells->GetId(cellNum), cell);
       // get cell normal
-      Poly->ComputeNormal( cell->GetPoints(), cNormal );
+      vtkPolygon::ComputeNormal( cell->GetPoints(), cNormal );
       dot = ( cNormal[0]*(x[0]-closestPoint[0]) +
               cNormal[1]*(x[1]-closestPoint[1]) +
               cNormal[2]*(x[2]-closestPoint[2]) );
@@ -179,10 +171,12 @@ void vtkALBAImplicitPolyData::EvaluateGradient( double x[3], double n[3] )
   }
   if( ret == -VTK_FLOAT_MAX)
     for( i=0; i<3; i++ ) n[i] = this->NoGradient[i];
+
+  vtkDEL(cell);
+  vtkDEL(cells);
 }
 //----------------------------------------------------------------------------
 void vtkALBAImplicitPolyData::PrintSelf(ostream& os, vtkIndent indent)
-//----------------------------------------------------------------------------
 {
   vtkImplicitFunction::PrintSelf(os,indent);
 

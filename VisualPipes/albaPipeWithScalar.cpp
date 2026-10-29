@@ -121,7 +121,6 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 	double sr[2] = { 0,1 };
 	if (scalars)
 	{
-		scalars->Modified();
 		scalars->GetRange(sr);
 		m_ActiveScalarType = POINT_TYPE;
 	}
@@ -130,7 +129,6 @@ void albaPipeWithScalar::ManageScalarOnExecutePipe(vtkDataSet * dataSet)
 		scalars = dataSet->GetCellData()->GetScalars();
 		if (scalars)
 		{
-			scalars->Modified();
 			scalars->GetRange(sr);
 			m_ActiveScalarType = CELL_TYPE;
 		}
@@ -240,7 +238,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			case ID_SCALARS:
 			{
 				m_ActiveScalarType = (m_ScalarIndex < m_PointCellArraySeparation) ? POINT_TYPE : CELL_TYPE;
-				UpdateComonentsMangaement();
+				UpdateComponentsMangaement();
 				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateScalarBarTitle();
 				GetLogicManager()->CameraUpdate();
@@ -276,7 +274,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 					ShowScalarBarActor(m_ShowScalarBar);
 				}
 
-				UpdateComonentsMangaement();
+				UpdateComponentsMangaement();
 				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateScalarBarTitle();
 				GetLogicManager()->CameraUpdate();
@@ -478,7 +476,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 	if (!scalars)
 		return;
 
-		if (m_Histogram)
+	if (m_Histogram)
 		m_Histogram->SetData(scalars,m_ComponentIndex);
 
   m_Table->SetTableRange(sr);
@@ -511,7 +509,7 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 }
 
 //----------------------------------------------------------------------------
-void albaPipeWithScalar::UpdateComonentsMangaement()
+void albaPipeWithScalar::UpdateComponentsMangaement()
 {
 	if (m_Gui)
 	{

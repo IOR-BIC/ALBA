@@ -31,8 +31,6 @@
 #include "albaGUIViewWin.h"
 #include "albaGUI.h"
 #include "albaInteractor.h"
-#include "albaAvatar.h"
-#include "albaAvatar3D.h"
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
 

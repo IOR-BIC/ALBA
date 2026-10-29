@@ -320,25 +320,6 @@ void albaInteractionManager::ViewSelected(albaView *view)
   OnViewSelected(&e);
 }
 
-//------------------------------------------------------------------------------
-void albaInteractionManager::PreResetCamera(vtkRenderer *ren)
-{ 
-  // propagate event to all avatars...
-  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
-  {
-    it->second->OnEvent(&albaEventBase(this,CAMERA_PRE_RESET,ren));
-  }
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::PostResetCamera(vtkRenderer *ren)
-{
-  // propagate event to all avatars...
-  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
-  {
-    it->second->OnEvent(&albaEventBase(this,CAMERA_POST_RESET,ren));
-  }
-}
 
 //------------------------------------------------------------------------------
 void albaInteractionManager::VmeSelected(albaVME *vme)

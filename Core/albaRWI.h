@@ -37,7 +37,6 @@ class albaAxes;
 class albaGUI;
 class albaGUIPicButton;
 class vtkALBATextOrientator;
-class vtkALBAProfilingActor;
 
 //----------------------------------------------------------------------------
 // constants:
@@ -122,9 +121,6 @@ public:
 	/** Set Orientator Text Properties */
 	void SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale = 1);
 
-	/** Set Profiling Information Text Visibility*/
-	void SetProfilingActorVisibility(bool show);
-
 	virtual albaGUI *GetGui();
 
 	/** Update member variables and GUI elements according to vtkCamera position, focal point, view up, ...*/
@@ -176,12 +172,9 @@ protected:
 
 	int           m_StereoType;
 	vtkALBATextOrientator     *m_Orientator;
-	int          m_ShowProfilingInformation;
 	int          m_ShowOrientator;
 	albaObserver  *m_Listener;
 
-
-	vtkALBAProfilingActor *m_ProfilingActor;
 
 	albaString m_StereoMovieDir;
 	int       m_StereoMovieEnable;

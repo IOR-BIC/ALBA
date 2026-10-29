@@ -51,10 +51,5 @@ void vtkALBAFixedCutterTest::TestExecute()
 
   filter->Update();
 
-  //If the cutter has any points , the filter should place a single point in default position
-  CPPUNIT_ASSERT( filter->GetOutput()->GetNumberOfPoints() == 1 );
-
-  CPPUNIT_ASSERT( filter->GetOutput()->GetPoint(0)[0] == 0 );
-  CPPUNIT_ASSERT( filter->GetOutput()->GetPoint(0)[1] == 0 );
-  CPPUNIT_ASSERT( filter->GetOutput()->GetPoint(0)[2] == 0 );
+  CPPUNIT_ASSERT( filter->GetOutput()->GetNumberOfPoints() == 0 );
 }

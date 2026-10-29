@@ -117,9 +117,9 @@ void albaPipeVolumeOrthoSlice::InitializeSliceParameters(int direction, double s
 	m_ShowBounds = show_bounds;
   m_Interpolate = interpolate;
 
-  m_Origin[0] = slice_origin[0];
-  m_Origin[1] = slice_origin[1];
-  m_Origin[2] = slice_origin[2];
+  m_GUIOrigin[0] = m_Origin[0] = slice_origin[0];
+	m_GUIOrigin[1] = m_Origin[1] = slice_origin[1];
+	m_GUIOrigin[2] = m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
@@ -149,9 +149,9 @@ void albaPipeVolumeOrthoSlice::Create(albaSceneNode *n)
 
 	if (!m_SliceParametersInitialized)
 	{
-    m_Origin[0] = (b[0] + b[1])*.5;
-    m_Origin[1] = (b[2] + b[3])*.5;
-    m_Origin[2] = (b[4] + b[5])*.5;
+		m_GUIOrigin[0] = m_Origin[0] = (b[0] + b[1])*.5;
+		m_GUIOrigin[1] = m_Origin[1] = (b[2] + b[3])*.5;
+		m_GUIOrigin[2] = m_Origin[2] = (b[4] + b[5])*.5;
 	}
 
 	CreateSlice();
@@ -361,11 +361,15 @@ void albaPipeVolumeOrthoSlice::SetSlice(double* origin, double* normal)
 		for (int i = 0; i < 3; i++)
 			if (m_Slicer[i] && m_Origin[i] != origin[i])
 			{
-				m_Origin[i] = origin[i];
+				m_GUIOrigin[i] = m_Origin[i] = origin[i];
 				m_Slicer[i]->SetPlaneOrigin(m_Origin);
 				UpdatePlaneOrigin(i);
 				m_Slicer[i]->Update();
 			}
+	if(m_Gui)
+	{
+		m_Gui->Update();
+	}
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::GetSlice(double *origin, double *normal)
@@ -413,15 +417,15 @@ albaGUI *albaPipeVolumeOrthoSlice::CreateGui()
 	{
 		if (m_SliceDirection == SLICE_X || m_SliceDirection == SLICE_ORTHO)
 		{
-			m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_Origin[0],b[0],b[1]);
+			m_SliceSlider[0] = m_Gui->FloatSlider(ID_SLICE_SLIDER_X,"x",&m_GUIOrigin[0],b[0],b[1]);
 		}
 		if (m_SliceDirection == SLICE_Y || m_SliceDirection == SLICE_ORTHO)
 		{
-			m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_Origin[1],b[2],b[3]);
+			m_SliceSlider[1] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Y,"y",&m_GUIOrigin[1],b[2],b[3]);
 		}
 		if (m_SliceDirection == SLICE_Z || m_SliceDirection == SLICE_ORTHO)
 		{
-			m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
+			m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_GUIOrigin[2],b[4],b[5]);
 		}
 	}
 	m_Gui->Divider();
@@ -445,7 +449,7 @@ void albaPipeVolumeOrthoSlice::OnEvent(albaEventBase *alba_event)
       case ID_SLICE_SLIDER_X:
       case ID_SLICE_SLIDER_Y:
       case ID_SLICE_SLIDER_Z:
-        SetOrigin(m_Origin);
+        SetOrigin(m_GUIOrigin);
 				GetLogicManager()->CameraUpdate();
       break;
 			case ID_OPACITY_SLIDER:
