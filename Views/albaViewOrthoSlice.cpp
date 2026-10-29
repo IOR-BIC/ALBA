@@ -203,6 +203,7 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 		else
 		{
 			m_CurrentVolume = NULL;
+			m_LutWidget->SetLut(NULL);
       RemoveVolumeFromGizmo();
     }
 	}

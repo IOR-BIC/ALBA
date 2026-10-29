@@ -458,9 +458,6 @@ void albaViewArbitraryOrthoSlice::OnEventThis(albaEventBase *alba_event)
 		case ID_RANGE_MODIFIED:
 			OnLUTRangeModified();
 		break;
-		case ID_LUT_CHOOSER:
-			OnLUTChooser();
-		break;
 		case ID_RESET:
 			OnReset();
 		break;
@@ -531,8 +528,6 @@ albaGUI* albaViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Bool(ID_GPUENABLED, "Enable GPU Acceleration", &m_EnableGPU, 1, "Enable GPU Acceleration");
 	
 	m_Gui->Divider();
-
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
@@ -784,7 +779,6 @@ void albaViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 	if (m_Gui)
 	{
 		m_Gui->Enable(ID_RESET, enable);
-		m_Gui->Enable(ID_LUT_CHOOSER, enable);
 		m_Gui->Enable(ID_SHOW_GIZMO, enable);
 		m_Gui->Enable(ID_SLICING_ORIGIN, enable);
 		m_Gui->FitGui();
@@ -802,7 +796,6 @@ void albaViewArbitraryOrthoSlice::VolumeWindowing(albaVME *volume)
 
 	mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_InputVolume->GetOutput())->GetMaterial();
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
-	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0], (long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0], (long)currentVolumeMaterial->GetTableRange()[1]);
 }
@@ -922,7 +915,6 @@ void albaViewArbitraryOrthoSlice::HideVolume()
 
 	m_InputVolume = NULL;
 	m_ColorLUT = NULL;
-	m_LutWidget->SetLut(m_ColorLUT);
 }
 
 //----------------------------------------------------------------------------
@@ -950,17 +942,6 @@ void albaViewArbitraryOrthoSlice::OnLUTRangeModified()
 		m_LutSlider->GetSubRange(&low, &hi);
 		m_ColorLUT->SetTableRange(low, hi);
 		GetLogicManager()->CameraUpdate();
-	}
-}
-//----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::OnLUTChooser()
-{
-	if (m_InputVolume)
-	{
-		double *sr;
-
-		sr = m_ColorLUT->GetRange();
-		m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
 	}
 }
 //----------------------------------------------------------------------------

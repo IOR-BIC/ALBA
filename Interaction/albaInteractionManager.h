@@ -151,12 +151,7 @@ public:
   /** Return the renderer of the currently selected view,
   if its a VTK based view otherwise return NULL.*/
   vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
-
-  /** used to propagate PreReset camera event */
-  void PreResetCamera(vtkRenderer *ren);
-  /** used to propagate PostReset camera event */
-  void PostResetCamera(vtkRenderer *ren);
-
+    
   /** propagate VME_SELECTED event */
   void  VmeSelected(albaVME *vme);
 

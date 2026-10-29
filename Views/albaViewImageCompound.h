@@ -58,8 +58,7 @@ public:
 	/** IDs for the view GUI */
 	enum VIEW_SLICE_WIDGET_ID
 	{
-		ID_LUT_CHOOSER = Superclass::ID_LAST,
-		ID_REVERSE_LUT,
+		ID_REVERSE_LUT = Superclass::ID_LAST,
 		ID_VIEW_RULER,
 		ID_INTERPOLATE,
 		ID_LAST
