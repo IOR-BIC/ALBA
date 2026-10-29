@@ -34,7 +34,6 @@
 #include "vtkALBAGridActorTest.h"
 #include "vtkALBAProjectVolumeTest.h"
 #include "vtkALBAClipSurfaceBoundingBoxTest.h"
-#include "vtkALBAProfilingActorTest.h"
 #include "vtkALBARulerActor2DTest.h"
 #include "vtkALBASimpleRulerActor2DTest.h"
 #include "vtkALBAFixedCutterTest.h"
@@ -159,7 +158,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(vtkALBAGridActorTest::suite());
 	runner.addTest(vtkALBAProjectVolumeTest::suite());
 	runner.addTest(vtkALBAClipSurfaceBoundingBoxTest::suite());
-	runner.addTest(vtkALBAProfilingActorTest::suite());
 	runner.addTest(vtkALBARulerActor2DTest::suite());
 	runner.addTest(vtkALBASimpleRulerActor2DTest::suite());
 	runner.addTest(vtkALBAFixedCutterTest::suite());

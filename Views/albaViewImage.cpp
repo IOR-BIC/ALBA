@@ -55,25 +55,21 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewImage);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 albaViewImage::albaViewImage(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
 :albaViewVTK(label,camera_position,show_axes,show_grid, stereo)
-//----------------------------------------------------------------------------
 {
   m_CurrentImage = NULL;
 	m_CanSpin = false;
 }
 //----------------------------------------------------------------------------
 albaViewImage::~albaViewImage()
-//----------------------------------------------------------------------------
 {
 
 }
 //----------------------------------------------------------------------------
 albaView *albaViewImage::Copy(albaObserver *Listener, bool lightCopyEnabled)
-//----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
   albaViewImage *v = new albaViewImage(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType);
@@ -87,7 +83,6 @@ albaView *albaViewImage::Copy(albaObserver *Listener, bool lightCopyEnabled)
 }
 //----------------------------------------------------------------------------
 void albaViewImage::Create()
-//----------------------------------------------------------------------------
 {
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
@@ -112,69 +107,23 @@ void albaViewImage::Create()
 
 //-------------------------------------------------------------------------
 albaGUI *albaViewImage::CreateGui()
-//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = albaView::CreateGui();
-
-  m_AttachCamera = new albaAttachCamera(m_Gui, m_Rwi, this);
-  m_Gui->AddGui(m_AttachCamera->GetGui());
 	m_Gui->Divider();
 
   return m_Gui;
 }
 //----------------------------------------------------------------------------
-void albaViewImage::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
-{
-  /*if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId()) 
-    {
-      default:
-        albaEventMacro(*alba_event);
-      break;
-    }
-  }
-  else
-  {
-    albaEventMacro(*alba_event);
-  }*/
-  //albaEventMacro(*alba_event);
-	Superclass::OnEvent(alba_event);
-}
-//----------------------------------------------------------------------------
 void albaViewImage::VmeShow(albaVME *vme, bool show)
-//----------------------------------------------------------------------------
 {
   if (vme->IsALBAType(albaVMEImage))
   {
-    if (show)
-    {
-      m_AttachCamera->SetVme(vme);
-      Superclass::VmeShow(vme, show);
-    }
-    else
-    {
-      m_AttachCamera->SetVme(NULL);
-      Superclass::VmeShow(vme, show);
-    }
-    CameraUpdate();
+    Superclass::VmeShow(vme, show);
     m_Rwi->CameraReset(vme);
-    m_Rwi->CameraUpdate();
   }
   else
 	{
 		Superclass::VmeShow(vme, show);
-	}
-}
-//----------------------------------------------------------------------------
-void albaViewImage::VmeDeletePipe(albaVME *vme)
-//----------------------------------------------------------------------------
-{
-	albaViewVTK::VmeDeletePipe(vme);
-	if (m_AttachCamera)
-	{
-		m_AttachCamera->SetVme(NULL);
 	}
 }

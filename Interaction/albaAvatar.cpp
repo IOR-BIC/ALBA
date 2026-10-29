@@ -139,7 +139,11 @@ void albaAvatar::SetActor3D(vtkProp3D *avatar)
     Shutdown();
   }
 
-  m_Actor3D=avatar;
+	m_Actor3D = avatar;
+  
+	//Avoid bound computation in camera reset
+	if (m_Actor3D)
+    m_Actor3D->SetUseBounds(false);
 
   if (old_flag)
   {
@@ -159,6 +163,10 @@ void albaAvatar::SetActor2D(vtkActor2D *avatar)
   }
 
   m_Actor2D=avatar;
+
+  //Avoid bound computation in camera reset
+  if (m_Actor2D)
+    m_Actor2D->SetUseBounds(false);
 
   if (old_flag)
   {
@@ -307,20 +315,6 @@ int albaAvatar::InternalRestore(albaStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-void albaAvatar::OnPreResetCamera(albaEventBase *event)
-//------------------------------------------------------------------------------
-{
-  if (m_Renderer&&(vtkRenderer *)event->GetData()==m_Renderer.GetPointer())
-    Hide(); // Hide to avoid this avatar influence the Frustom size
-}
-//------------------------------------------------------------------------------
-void albaAvatar::OnPostResetCamera(albaEventBase *event)
-//------------------------------------------------------------------------------
-{
-  if (m_Renderer&&(vtkRenderer *)event->GetData()==m_Renderer.GetPointer())
-    Show(); // Display again the avatar
-}
-//------------------------------------------------------------------------------
 void albaAvatar::OnViewSelected(albaEvent *e)
 //------------------------------------------------------------------------------
 {
@@ -334,15 +328,7 @@ void albaAvatar::OnEvent(albaEventBase *event)
 
   albaID id=event->GetId();
   
-  if (id==CAMERA_PRE_RESET)
-  {
-    OnPreResetCamera(event);
-  }
-  else if (id==CAMERA_POST_RESET)
-  {
-    OnPostResetCamera(event);
-  }
-  else if (id==VIEW_SELECT)
+  if (id==VIEW_SELECT)
   {
     albaEvent *e=albaEvent::SafeDownCast(event);
     OnViewSelected(e);

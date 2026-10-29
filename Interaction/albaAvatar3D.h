@@ -218,9 +218,6 @@ protected:
   /** process an event signaling a change of the tracked bounds */
   void OnUpdateBoundsEvent(albaDeviceButtonsPadTracker *tracker);
 
-  /** process event sent after a camera reset */
-  virtual void OnPostResetCamera(albaEventBase *event);
-
   /** Internally used to redefine the 3D picker class */  
   void SetPicker3D(vtkALBARayCast3DPicker *picker);
 
