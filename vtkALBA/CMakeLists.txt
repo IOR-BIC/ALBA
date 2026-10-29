@@ -38,7 +38,6 @@ SET(vtkALBA_SRCS
   vtkALBAVolumeResample.h  								vtkALBAVolumeResample.cxx
   vtkALBAPolyDataToSinglePolyLine.cxx  					vtkALBAPolyDataToSinglePolyLine.h
   vtkALBATextOrientator.cxx  							vtkALBATextOrientator.h
-  vtkALBAProfilingActor.cxx  							vtkALBAProfilingActor.h
   vtkALBAXYPlotActor.cxx  								vtkALBAXYPlotActor.h
   vtkALBAPolyDataNormals.cxx  							vtkALBAPolyDataNormals.h
   ##from vtkALBA

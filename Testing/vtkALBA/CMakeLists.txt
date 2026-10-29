@@ -26,7 +26,6 @@ SET(PROJECT_SRCS
 	vtkALBAGridActorTest.h vtkALBAGridActorTest.cpp
 	vtkALBAProjectVolumeTest.h vtkALBAProjectVolumeTest.cpp
 	vtkALBAClipSurfaceBoundingBoxTest.h vtkALBAClipSurfaceBoundingBoxTest.cpp
-	vtkALBAProfilingActorTest.h vtkALBAProfilingActorTest.cpp
 	vtkALBARulerActor2DTest.h vtkALBARulerActor2DTest.cpp
 	vtkALBASimpleRulerActor2DTest.h vtkALBASimpleRulerActor2DTest.cpp
 	vtkALBAFixedCutterTest.h vtkALBAFixedCutterTest.cpp

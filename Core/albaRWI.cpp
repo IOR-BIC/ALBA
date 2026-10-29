@@ -52,7 +52,6 @@
 #include "vtkActor2D.h"
 #include "vtkDataSet.h"
 #include "vtkALBATextOrientator.h"
-#include "vtkALBAProfilingActor.h"
 
 #define DEFAULT_BG_COLOR 0.28
 
@@ -74,7 +73,6 @@ albaRWI::albaRWI()
 	m_Grid    = NULL;
 	m_Axes    = NULL;
 
-	m_ProfilingActor = NULL;
 	for (int b=0; b<6; b++)
 	{
 		m_CameraButtons[b] = NULL;
@@ -88,8 +86,7 @@ albaRWI::albaRWI()
 	m_StereoMovieDir    = "";
 	m_StereoMovieEnable = 0;
 	m_ParallelView = 0;
-	m_ShowProfilingInformation = 0;
-
+	
 	m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
 	m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
 	m_StepCameraOrientation = 10.0;
@@ -113,8 +110,6 @@ albaRWI::albaRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_a
 	m_Axes    = NULL;
 	m_AxesType = axesType;
 
-	m_ProfilingActor = NULL;
-
 	for (int b=0; b<6; b++)
 	{
 		m_CameraButtons[b] = NULL;
@@ -127,8 +122,7 @@ albaRWI::albaRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_a
 
 	m_StereoMovieDir    = "";
 	m_StereoMovieEnable = 0;
-	m_ShowProfilingInformation = 0;
-
+	
 	m_StepCameraOrientation = 10.0;
 	m_TopBottomAccumulation = 0.0;
 	m_LeftRigthAccumulation = 0.0;
@@ -234,11 +228,6 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 	m_Orientator->SetTextColor(1.0,1.0,1.0);
 	m_Orientator->SetBackgroundColor(0.0,0.0,0.0);
 
-	vtkNEW(m_ProfilingActor);
-	m_RenFront->AddActor2D(m_ProfilingActor);
-	m_ProfilingActor->SetVisibility(m_ShowProfilingInformation);
-
-
 	m_ShowGrid    = use_grid;
 	m_GridNormal  = GRID_Z;
 
@@ -246,6 +235,7 @@ void albaRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use
 	
 	m_RenFront->AddActor(m_Grid);
 	m_RenFront->AddActor2D(m_Grid->GetLabelActor());
+	//Do not use Grid bounds in camera reset
 	m_Grid->SetUseBounds(false);
 	m_Grid->GetLabelActor()->SetUseBounds(false);
 	SetGridNormal(m_GridNormal);
@@ -276,7 +266,6 @@ albaRWI::~albaRWI()
 		m_RenFront->RemoveAllViewProps();
 		m_RenderWindow->RemoveRenderer(m_RenFront);
 	}
-	vtkDEL(m_ProfilingActor);
 
 	vtkDEL(m_RenFront);
 
@@ -531,12 +520,6 @@ void albaRWI::SetOrientatorVisibility(bool show)
 			m_Gui->Update();
 		}
 	}
-}
-//----------------------------------------------------------------------------
-void albaRWI::SetProfilingActorVisibility(bool show)
-//----------------------------------------------------------------------------
-{
-	m_ProfilingActor->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
 void albaRWI::SetGridColor(const wxColor &col)
@@ -851,7 +834,6 @@ enum RWI_WIDGET_ID
 	ID_CAMERA_VIEW_UP,
 	ID_CAMERA_ORIENTATION,
 	ID_SHOW_ORIENTATOR,
-	ID_SHOW_PROFILING_INFORMATION,
 };
 //-------------------------------------------------------------------------
 albaGUI *albaRWI::CreateGui()
@@ -901,7 +883,7 @@ albaGUI *albaRWI::CreateGui()
 	m_Gui->Double(ID_GRID_POS,"Grid pos",	&m_GridPosition);
 	m_Gui->Color(ID_GRID_COLOR,"Grid color",&m_GridColour);
 	m_Gui->Divider(2);
-	m_Gui->Bool(ID_SHOW_AXES,"Show axes",&m_ShowAxes,0);
+	m_Gui->Bool(ID_SHOW_AXES,"Show axes",&m_ShowAxes,1);
 	m_Gui->Color(ID_BG_COLOR,"Back color",&m_BGColour);
 		
 	if (m_StereoType)
@@ -915,8 +897,7 @@ albaGUI *albaRWI::CreateGui()
 	}
 
 	m_Gui->Divider(2);
-	m_Gui->Bool(ID_SHOW_ORIENTATOR,"Orientation",&m_ShowOrientator);
-	m_Gui->Bool(ID_SHOW_PROFILING_INFORMATION,"fps",&m_ShowProfilingInformation);
+	m_Gui->Bool(ID_SHOW_ORIENTATOR,"Orientation",&m_ShowOrientator, 1);
 	m_Gui->Divider();
 	return m_Gui;
 }
@@ -948,12 +929,6 @@ void albaRWI::OnEvent(albaEventBase *alba_event)
 		case ID_SHOW_ORIENTATOR:
 			SetOrientatorVisibility(m_ShowOrientator!= 0);
 			CameraUpdate();
-			break;
-		case ID_SHOW_PROFILING_INFORMATION:
-			{  
-				SetProfilingActorVisibility(m_ShowProfilingInformation!=0);
-				CameraUpdate();
-			}
 			break;
 		case ID_SHOW_AXES:
 			SetAxesVisibility(m_ShowAxes != 0); 
