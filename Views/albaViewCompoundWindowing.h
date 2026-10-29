@@ -48,13 +48,6 @@ public:
   /** destructor. */
   virtual ~albaViewCompoundWindowing(); 
 
-	/** IDs for the view GUI */
-	enum VIEW_SLICE_WIDGET_ID
-	{
-		ID_LUT_CHOOSER = Superclass::ID_LAST,
-		ID_LAST
-	};
-
   /** Redefine this method to package the compounded view */
   virtual void PackageView()=0;
 
@@ -94,7 +87,6 @@ protected:
 	/** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
 	virtual void UpdateWindowing(bool enable,albaVME *vme);
 
-	albaGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
 	albaGUILutSlider		*m_LutSlider;
 	vtkLookupTable	        *m_ColorLUT;
 	};

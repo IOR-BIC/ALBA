@@ -69,7 +69,6 @@ albaViewGlobalSliceCompound::~albaViewGlobalSliceCompound()
 
 {
 	m_ColorLUT = NULL;
-	cppDEL(m_LutWidget);
 	cppDEL(m_LutSlider);
 }
 //----------------------------------------------------------------------------
@@ -179,8 +178,6 @@ albaGUI* albaViewGlobalSliceCompound::CreateGui()
   m_Gui = albaView::CreateGui();
 
 	m_Gui->AddGui(((albaViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"LUT",m_ColorLUT);
-	m_LutWidget->Enable(false);
 	m_Gui->Divider(0);
 	m_Gui->FitGui();
 	m_Gui->Update();

@@ -52,14 +52,12 @@
 albaViewCompoundWindowing::albaViewCompoundWindowing( wxString label, int num_row, int num_col)
 : albaViewCompound(label,num_row,num_col)
 {
-	m_LutWidget       = NULL;
 	m_LutSlider       = NULL;
 	m_ColorLUT        = NULL;
 }
 //----------------------------------------------------------------------------
 albaViewCompoundWindowing::~albaViewCompoundWindowing()
 {
-  cppDEL(m_LutWidget);
 	cppDEL(m_LutSlider);
 }
 
@@ -186,12 +184,6 @@ void albaViewCompoundWindowing::SetLutAndSlider(vtkLookupTable *lut, double *dat
 			m_LutSlider->SetSubRange(0, 1);
 		}
 		m_LutSlider->Enable(m_ColorLUT != NULL);
-	}
-
-	if (m_LutWidget)
-	{
-		m_LutWidget->SetLut(m_ColorLUT);
-		m_LutWidget->Enable(m_ColorLUT != NULL);
 	}
 }
 

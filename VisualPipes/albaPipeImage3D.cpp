@@ -179,7 +179,6 @@ albaPipeImage3D::~albaPipeImage3D()
     m_AssemblyFront->RemovePart(m_GhostActor);
 
   vtkDEL(m_ImagePlane);
-  //vtkDEL(m_ImageLUT);  
   vtkDEL(m_ImageTexture);
   vtkDEL(m_ImageMapper);
   vtkDEL(m_ImageActor);
@@ -220,6 +219,8 @@ void albaPipeImage3D::OnEvent(albaEventBase* alba_event)
       SetInterpolation(m_Interpolation);
       m_Gui->Update();
     }
+    case ID_LUT_CHOOSER:
+			GetLogicManager()->CameraUpdate();
     break;
     }
   }
@@ -238,6 +239,7 @@ albaGUI* albaPipeImage3D::CreateGui()
 {
 	m_Gui = new albaGUI(this);
   m_Gui->Bool(ID_INTERPOLATION, "Enable Interpolation", &m_Interpolation, true);
+  m_Gui->Lut(ID_LUT_CHOOSER, "LUT", m_ImageLUT);
   return m_Gui;
 }
 
