@@ -33,7 +33,6 @@
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEGizmo.h"
 #include "albaVMERefSys.h"
-#include "albaVMESlicer.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
 #include "albaVMEPolyline.h"
@@ -147,7 +146,6 @@ void albaOpFilterSurfaceTest::TestAccept()
 
   albaSmartPointer<albaVMEVolumeGray> volume;
   albaSmartPointer<albaVMEGroup> group;
-  albaSmartPointer<albaVMESlicer> slicer;
   albaSmartPointer<albaVMEPolyline> poly;
   albaSmartPointer<albaVMEImage> image;
   albaSmartPointer<albaVMERefSys> refSys;
@@ -157,7 +155,7 @@ void albaOpFilterSurfaceTest::TestAccept()
   albaSmartPointer<albaVMELandmarkCloud> landmarkCloud;
 
   //Only surface is accepted
-  CPPUNIT_ASSERT( !(op->Accept(landmark) && op->Accept(landmarkCloud) && op->Accept(gizmo) && op->Accept(paramSurface) && op->Accept(volume) && op->Accept(group) && op->Accept(slicer) && op->Accept(poly) && op->Accept(image) && op->Accept(refSys)) );
+  CPPUNIT_ASSERT( !(op->Accept(landmark) && op->Accept(landmarkCloud) && op->Accept(gizmo) && op->Accept(paramSurface) && op->Accept(volume) && op->Accept(group) && op->Accept(poly) && op->Accept(image) && op->Accept(refSys)) );
 
   albaDEL(op);
 }

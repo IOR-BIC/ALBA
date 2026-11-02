@@ -69,9 +69,7 @@ IF (ALBA_USE_VTK)
   albaVMEPointSet.cpp  						albaVMEPointSet.h
   albaVMEPolyline.cpp  						albaVMEPolyline.h
   albaVMEPolylineSpline.cpp  				albaVMEPolylineSpline.h
-  albaVMEProber.cpp  						albaVMEProber.h
   albaVMERefSys.cpp  						albaVMERefSys.h
-  albaVMESlicer.cpp  						albaVMESlicer.h
   albaVMESurface.cpp  						albaVMESurface.h
   albaVMESurfaceParametric.cpp  				albaVMESurfaceParametric.h
   albaVMEVector.cpp  						albaVMEVector.h

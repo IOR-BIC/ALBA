@@ -29,7 +29,6 @@
 #include "albaPipeSurfaceSlice.h"
 #include "albaVME.h"
 #include "albaVMEVolume.h"
-#include "albaVMESlicer.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
 #include "albaVMESurface.h"

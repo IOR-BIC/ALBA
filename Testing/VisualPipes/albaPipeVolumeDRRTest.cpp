@@ -174,11 +174,12 @@ void albaPipeVolumeDRRTest::TestPipeExecution()
     volumeActor = (vtkVolume *) SelectActorToControl(actorList, 0);
     CPPUNIT_ASSERT(volumeActor != NULL);
 
-		printf("\n Visualization: %s \n", strings[i]);
+    albaString testName = "TestPipeExecution_";
+    testName += strings[i];
 
 		m_Renderer->ResetCamera();
 		m_RenderWindow->Render();
-    COMPARE_IMAGES("TestPipeExecution", i);
+    COMPARE_IMAGES(testName.GetCStr());
 
     if(i == COLOR_TEST)
     {

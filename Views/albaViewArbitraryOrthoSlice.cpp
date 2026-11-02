@@ -28,7 +28,6 @@
 #include "albaViewArbitraryOrthoSlice.h"
 #include "albaViewSlice.h"
 #include "albaVme.h"
-#include "albaVMESlicer.h"
 #include "albaMatrix.h"
 #include "albaTransform.h"
 #include "albaPipeSlice.h"
@@ -37,7 +36,6 @@
 #include "albaEvent.h"
 #include "albaAttachCamera.h"
 #include "albaInteractorGenericMouse.h"
-#include "albaVMESlicer.h"
 #include "albaTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
@@ -634,7 +632,7 @@ albaMatrix* albaViewArbitraryOrthoSlice::GetSlicerMatrix(int axis)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::SetRestoreTagToVME(albaVME *vme)
+void albaViewArbitraryOrthoSlice::StoreViewParamsToVMETags(albaVME *vme)
 {
 	albaMatrix *matrix;
 
@@ -675,7 +673,7 @@ void albaViewArbitraryOrthoSlice::SetRestoreTagToVME(albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::RestoreFromVME(albaVME* vme)
+void albaViewArbitraryOrthoSlice::RestoreViewsParamsFromVMETags(albaVME* vme)
 {
 	if (vme == NULL) return;
 	
@@ -1247,7 +1245,7 @@ void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
 	albaVME *n = e.GetVme();
 	
 	if (n != NULL)
-		RestoreFromVME(n);
+		RestoreViewsParamsFromVMETags(n);
 }
 //----------------------------------------------------------------------------
 albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()

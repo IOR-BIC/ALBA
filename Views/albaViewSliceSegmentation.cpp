@@ -36,7 +36,6 @@ const bool DEBUG_MODE = false;
 
 #include "albaVME.h"
 #include "albaVMEVolume.h"
-#include "albaVMESlicer.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
 #include "albaPipeFactory.h"

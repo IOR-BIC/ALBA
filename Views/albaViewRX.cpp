@@ -36,9 +36,7 @@ const bool DEBUG_MODE = false;
 #include "albaVMEVolume.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
-#include "albaVMESlicer.h"
 #include "albaPipeSurfaceSlice.h"
-#include "albaVisualPipeSlicerSlice.h"
 #include "albaVMEVolumeGray.h"
 #include "albaAbsMatrixPipe.h"
 #include "albaTransform.h"
@@ -164,76 +162,6 @@ void albaViewRX::VmeCreatePipe(albaVME *vme)
         positionSlice[2] = (b[5]+b[4])/2;
         ((albaPipeSurfaceSlice *)pipe)->SetSlice(positionSlice, normal);
       }
-      else if(pipe_name.Equals("albaVisualPipeSlicerSlice"))
-      {
-        double normal[3];
-        switch(m_CameraPositionId)
-        {
-        case CAMERA_RX_FRONT:
-          normal[0] = 0;
-          normal[1] = 1;
-          normal[2] = 0;
-          break;
-        case CAMERA_RX_LEFT:
-          normal[0] = 1;
-          normal[1] = 0;
-          normal[2] = 0;
-          break;
-        case CAMERA_OS_P:
-          break;
-          //case CAMERA_OS_REP:
-          //	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-        case CAMERA_PERSPECTIVE:
-          break;
-        default:
-          normal[0] = 0;
-          normal[1] = 0;
-          normal[2] = 1;
-        }
-
-        double positionSlice1[3],positionSlice2[3];
-        double b[6];
-
-        //albaSmartPointer<albaVMEVolumeGray> volume;
-        albaVME *volume;
-
-        volume =m_CurrentVolume->GetVme();
-        volume->GetOutput()->GetBounds(b);
- 
-        double value1; 
-        double value2; 
-
-        if(m_CameraPositionId == CAMERA_RX_FRONT)
-        {
-          value1= b[3] > b[2] ? b[3] : b[2];
-          value2= b[3] > b[2] ? b[2] : b[3];
-          positionSlice1[0] = (b[1]+b[0])/2;
-          positionSlice1[1] = value1 - 0.001;
-          positionSlice1[2] = (b[5]+b[4])/2;
-
-          positionSlice2[0] = (b[1]+b[0])/2;
-          positionSlice2[1] = value2 + 0.001;
-          positionSlice2[2] = (b[5]+b[4])/2;
-        }
-        else if(m_CameraPositionId == CAMERA_RX_LEFT)
-        {
-          value1= b[1] > b[0] ? b[1] : b[0];
-          value2= b[1] > b[0] ? b[0] : b[1];
-          positionSlice1[0] = value1 - 0.001;
-          positionSlice1[1] = (b[3]+b[2])/2;
-          positionSlice1[2] = (b[5]+b[4])/2;
-          
-          positionSlice2[0] = value2 + 0.001;
-          positionSlice2[1] = (b[3]+b[2])/2;
-          positionSlice2[2] = (b[5]+b[4])/2;
-        }
-
-        ((albaVisualPipeSlicerSlice *)pipe)->SetSlice1(positionSlice1);
-        ((albaVisualPipeSlicerSlice *)pipe)->SetSlice2(positionSlice2);
-        ((albaVisualPipeSlicerSlice *)pipe)->SetNormal(normal);
-        
-
-      }
       pipe->Create(n);
     }
     else
@@ -284,15 +212,6 @@ int albaViewRX::GetNodeStatus(albaVME *vme)
         n->SetMutex(true);
       }
     }
-    else if (vme->IsALBAType(albaVMESlicer))
-    {
-      n = m_Sg->Vme2Node(vme);
-      if (n != NULL)
-      {
-        n->SetPipeCreatable(true);
-        n->SetMutex(true);
-      }
-    }
   }
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
@@ -307,26 +226,6 @@ albaGUI *albaViewRX::CreateGui()
 	m_Gui->Divider();
   return m_Gui;
 }
-
-/*//----------------------------------------------------------------------------
-void albaViewRX::VmeShow(albaVME *vme, bool show)
-//----------------------------------------------------------------------------
-{
-  albaViewVTK::VmeShow(vme,show);
-  albaSceneNode *SN = this->GetSceneGraph()->Vme2Node(vme);
-  
-  albaVisualPipeSlicerSlice *pipeSlicer = albaVisualPipeSlicerSlice::SafeDownCast(SN->m_Pipe);
-  if(pipeSlicer)
-  {
-    pipeSlicer->SetThickness(3);
-  }
-  albaPipeSurfaceSlice *pipe = albaPipeSurfaceSlice ::SafeDownCast(SN->m_Pipe);
-  if(pipe)
-  {
-    pipe->SetThickness(3);
-  }
-  CameraUpdate();
-}*/
 
 //----------------------------------------------------------------------------
 void albaViewRX::OnEvent(albaEventBase *alba_event)

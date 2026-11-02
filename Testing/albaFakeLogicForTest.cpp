@@ -204,3 +204,9 @@ void albaFakeLogicForTest::UnRegisterForKeyEvents(albaObserver *listener)
 {
 	return;
 }
+
+//----------------------------------------------------------------------------
+bool albaFakeLogicForTest::IsTimeVaringEnabled()
+{
+	return false;
+}

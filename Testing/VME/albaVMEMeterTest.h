@@ -19,7 +19,7 @@
 
 #include "albaTest.h"
 
-/** Test for albaVMEProber */
+/** Test for albaVMEMeter */
 class albaVMEMeterTest : public albaTest
 {
 

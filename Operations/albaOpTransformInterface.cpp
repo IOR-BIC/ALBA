@@ -156,9 +156,7 @@ void albaOpTransformInterface::OpDo()
 				m_Input->IsA("albaVMESurfaceParametric") ||
 				//  refSys do not scale
 				m_Input->IsA("albaVMERefSys") ||
-				//  slicer  do not scale
-				m_Input->IsA("albaVMESlicer") ||
-				//  slicer  do not scale
+						//  slicer  do not scale
 				m_Input->IsA("albaVMELandmarkCloud")
 			 )
 		 )

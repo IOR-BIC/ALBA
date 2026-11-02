@@ -272,6 +272,9 @@ public:
 
 	void UnRegisterForKeyEvents(albaObserver *listener) override;
 
+
+	bool IsTimeVaringEnabled() override;
+
 protected:
 	//---------------------------------------------------------
 	// Description:

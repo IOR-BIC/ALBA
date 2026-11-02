@@ -62,7 +62,6 @@
 #include "albaPipeWrappedMeterTest.h"
 #include "albaServiceLocator.h"
 #include "albaVisualPipePolylineGraphTest.h"
-#include "albaVisualPipeSlicerSliceTest.h"
 #include "albaPipePointCloudTest.h"
 #include "albaPipePointCloudSliceTest.h"
 
@@ -162,7 +161,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeTensorFieldGlyphsTest::suite());
 	runner.addTest(albaPipeTensorFieldTest::suite());
 	runner.addTest(albaPipeVectorFieldTest::suite());
-	runner.addTest(albaVisualPipeSlicerSliceTest::suite());
 	runner.addTest(albaPipeCompoundVolumeIsosurfaceTest::suite());
 	runner.addTest(albaPipePointCloudSliceTest::suite());
 	/* */

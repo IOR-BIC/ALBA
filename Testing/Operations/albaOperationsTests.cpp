@@ -36,9 +36,7 @@
 #include "albaOpCreateGroupTest.h"
 #include "albaOpCreateLabeledVolumeTest.h"
 #include "albaOpCreateMeterTest.h"
-#include "albaOpCreateProberTest.h"
 #include "albaOpCreateRefSysTest.h"
-#include "albaOpCreateSlicerTest.h"
 #include "albaOpCreateSplineTest.h"
 #include "albaOpCreateSurfaceParametricTest.h"
 #include "albaOpCreateSurfaceTest.h"
@@ -238,9 +236,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterMeshTest::suite());  
 	runner.addTest(albaVMEDataSetAttributesImporterTest::suite());
 	runner.addTest(albaOpCreateMeterTest::suite());
-	runner.addTest(albaOpCreateProberTest::suite());
 	runner.addTest(albaOpCreateRefSysTest::suite());
-	runner.addTest(albaOpCreateSlicerTest::suite());
 	runner.addTest(albaOpCreateSplineTest::suite());
 	runner.addTest(albaOpCreateSurfaceParametricTest::suite());
 	runner.addTest(albaOpExporterVTKTest::suite());

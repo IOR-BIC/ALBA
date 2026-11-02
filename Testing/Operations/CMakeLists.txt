@@ -55,9 +55,7 @@ SET(PROJECT_SRCS
 	albaOpExporterMeshTest.h albaOpExporterMeshTest.cpp
 	albaVMEDataSetAttributesImporterTest.h albaVMEDataSetAttributesImporterTest.cpp
 	albaOpCreateMeterTest.h albaOpCreateMeterTest.cpp
-	albaOpCreateProberTest.h albaOpCreateProberTest.cpp
 	albaOpCreateRefSysTest.h albaOpCreateRefSysTest.cpp
-	albaOpCreateSlicerTest.h albaOpCreateSlicerTest.cpp
 	albaOpCreateSplineTest.h albaOpCreateSplineTest.cpp
 	albaOpCreateSurfaceParametricTest.h albaOpCreateSurfaceParametricTest.cpp
 	albaOpExporterVTKTest.h albaOpExporterVTKTest.cpp

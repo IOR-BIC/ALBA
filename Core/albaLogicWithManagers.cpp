@@ -164,10 +164,8 @@
 #include "albaOpCreateGroup.h"
 #include "albaOpCreateLabeledVolume.h"
 #include "albaOpCreateMeter.h"
-#include "albaOpCreateProber.h"
 #include "albaOpCreateRefSys.h"
 #include "albaOpCreateRefSysFromViewSlice.h"
-#include "albaOpCreateSlicer.h"
 #include "albaOpCreatePolyline.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurface.h"
@@ -1997,7 +1995,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	// Operation Menu:
 	//------------------------------------------------------------
 
-	Plug(new albaOpCreateVolume("Create Volume"), _("Create"));
+	Plug(new albaOpCreateVolume("Volume"), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
 	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
@@ -2006,8 +2004,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
 	Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
-	Plug(new albaOpCreateProber("Prober"), _("Create"));
-	Plug(new albaOpCreateSlicer("Slicer"), _("Create"));
 	Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
 	Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));
@@ -2221,6 +2217,12 @@ void albaLogicWithManagers::UnRegisterForKeyEvents(albaObserver *listener)
   std::vector<albaObserver *>::iterator it = std::find(m_KeyEventListeners.begin(), m_KeyEventListeners.end(), listener);
 	if (it != m_KeyEventListeners.end())
 		m_KeyEventListeners.erase(it);
+}
+
+//----------------------------------------------------------------------------
+bool albaLogicWithManagers::IsTimeVaringEnabled()
+{
+	return m_PlugTimebar;
 }
 
 //----------------------------------------------------------------------------

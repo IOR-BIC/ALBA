@@ -363,8 +363,12 @@ void albaOpAddLandmark::CreateGui()
 	m_Gui->String(ID_LANDMARK_NAME, _("Name"), &m_LandmarkName);
 	m_Gui->Vector(ID_LANDMARK_POSITION, _("Position"), m_LandmarkPosition, MINFLOAT, MAXFLOAT, 2, _("Landmark position"));
 
-	albaString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
-	m_Gui->Bool(ID_CHANGE_TIME, _("Current time"), &m_AddToCurrentTime, 1, tooltip);
+	if (GetLogicManager()->IsTimeVaringEnabled())
+	{
+		albaString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
+		m_Gui->Bool(ID_CHANGE_TIME, _("Current time"), &m_AddToCurrentTime, 1, tooltip);
+	}
+
 	m_Gui->Divider(2);
 
 	m_Gui->Enable(ID_LANDMARK_REMOVE, false);
