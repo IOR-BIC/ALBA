@@ -32,7 +32,6 @@
 #include "albaVMERoot.h"
 #include "albaVMEStorage.h"
 #include "albaVMEFactory.h"
-#include "albaVMESlicer.h"
 #include "albaVMEGroup.h"
 
 
@@ -138,13 +137,7 @@ void albaOpExporterMSFTest::TestExportMSF1()
   albaVME *volume = group->GetChild(1);
   volume->Update();
   CPPUNIT_ASSERT( volume->IsA("albaVMEVolumeGray") );
-  albaVME *slicer = volume->GetChild(0);
-  slicer->Update();
-  CPPUNIT_ASSERT( slicer->IsA("albaVMESlicer") );
-
-  //Check if the link is correct
-  CPPUNIT_ASSERT( albaVMESlicer::SafeDownCast(slicer)->GetSlicedVMELink() == volume );
-
+ 
   //Check if the ABS matrix are equals
   albaVME *groupExported = storageExport->GetRoot()->GetFirstChild();
   groupExported->Update();
@@ -215,21 +208,12 @@ void albaOpExporterMSFTest::TestExportMSF2()
   albaVME *volume = storageImport->GetRoot()->GetFirstChild();
   volume->Update();
   CPPUNIT_ASSERT( volume->IsA("albaVMEVolumeGray") );
-  albaVME *slicer = volume->GetChild(0);
-  slicer->Update();
-  CPPUNIT_ASSERT( slicer->IsA("albaVMESlicer") );
-
-  //Check if the link is correct
-  CPPUNIT_ASSERT( albaVMESlicer::SafeDownCast(slicer)->GetSlicedVMELink() == volume );
 
   //Check if the ABS matrix are equals
   albaVME *volumeExported = storageExport->GetRoot()->GetFirstChild()->GetChild(1);
   volumeExported->Update();
   CPPUNIT_ASSERT( volumeExported->GetOutput()->GetAbsMatrix()->Equals(volume->GetOutput()->GetAbsMatrix()) );
-  albaVME *slicerExported = volumeExported->GetChild(0);
-  slicerExported->Update();
-  CPPUNIT_ASSERT( slicerExported->GetOutput()->GetAbsMatrix()->Equals(slicer->GetOutput()->GetAbsMatrix()) );
-	
+ 	
   albaDEL(op);
   albaDEL(storageExport);
   albaDEL(storageImport);

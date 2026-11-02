@@ -38,7 +38,6 @@
 #include "albaVMEMeter.h"
 #include "albaVMEPointSet.h"
 #include "albaVMERefSys.h"
-#include "albaVMESlicer.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
@@ -401,10 +400,6 @@ albaVME *mmuMSF1xDocument::CreateVMEInstance(albaString &name)
   else if (name == "mflVMERefSys")
   {
     return albaVMERefSys::New();
-  }
-  else if (name == "mflVMESlicer")
-  {
-    return albaVMESlicer::New();
   }
   else
   {

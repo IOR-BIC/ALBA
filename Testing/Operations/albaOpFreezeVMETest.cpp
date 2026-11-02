@@ -34,7 +34,6 @@
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEVolumeGray.h"
 #include "albaOpImporterVTK.h"
-#include "albaVMESlicer.h"
 #include "albaVMEPolylineSpline.h"
 #include "albaVMERefSys.h"
 
@@ -217,85 +216,6 @@ void albaOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	albaDEL(wrappedMeter);
 	albaDEL(vmeParametricSurfaceSTART);
 	albaDEL(vmeParametricSurfaceEND1);
-	cppDEL(freezeOp);
-	albaDEL(storage);
-}
-//-----------------------------------------------------------
-void albaOpFreezeVMETest::TestFreezeVMESlicer() 
-//-----------------------------------------------------------
-{
-	albaVMEStorage *storage = albaVMEStorage::New();
-	storage->GetRoot()->SetName("root");
-	storage->GetRoot()->Initialize();
-
-	albaVMERoot *root=storage->GetRoot();
-
-	albaOpFreezeVME *freezeOp=new albaOpFreezeVME("freeze");
-	freezeOp->TestModeOn();
-
-	albaOpImporterVTK *importer=new albaOpImporterVTK("importer");
-	importer->TestModeOn();
-	importer->SetInput(root);
-	albaString filename=ALBA_DATA_ROOT;
-	filename<<"/VTK_Volumes/volume.vtk";
-	importer->SetFileName(filename.GetCStr());
-	importer->OpRun();
-
-	albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->ReparentTo(root);
-	volume->Update();
-
-	double centerV[3], rotV[3];
-	albaOBB b;
-	rotV[0] = rotV[1] = rotV[2] = 0;
-	volume->GetOutput()->GetVMELocalBounds(b);
-	b.GetCenter(centerV);
-
-	albaVMESlicer *slicer;
-	albaNEW(slicer);
-	slicer->ReparentTo(volume);
-  slicer->SetSlicedVMELink(volume);
-
-	slicer->SetPose(centerV,rotV,0);
-	slicer->Update();
-
-	freezeOp->SetInput(slicer);
-	freezeOp->OpRun();
-
-	albaVMESurface *sliceSurface=(albaVMESurface *)(freezeOp->GetOutput());
-	sliceSurface->ReparentTo(volume);
-	sliceSurface->Update();
-	int numSrc = sliceSurface->GetOutput()->GetVTKData()->GetNumberOfPoints();
-	int numDst = slicer->GetOutput()->GetVTKData()->GetNumberOfPoints();
-
-	int numCellSrc = sliceSurface->GetOutput()->GetVTKData()->GetNumberOfCells();
-	int numCellDst = slicer->GetOutput()->GetVTKData()->GetNumberOfCells();
-
-	CPPUNIT_ASSERT(sliceSurface &&  numSrc == numDst && numCellSrc == numCellDst);
-
-	bool sameValues=true;
-
-	for(int i=0; i< sliceSurface->GetSurfaceOutput()->GetTexture()->GetDimensions()[0]; i++)
-	{
-		for(int j=0; j< sliceSurface->GetSurfaceOutput()->GetTexture()->GetDimensions()[1]; j++)
-		{
-			int value1 = sliceSurface->GetSurfaceOutput()->GetTexture()->GetPointData()->GetScalars()->GetTuple1(i+i*j);
-			int value2 = slicer->GetSurfaceOutput()->GetTexture()->GetPointData()->GetScalars()->GetTuple1(i+i*j);
-			if(value1 != value2)
-				sameValues=false;
-		}
-	}
-
-	CPPUNIT_ASSERT(sameValues);
-
-	volume->ReparentTo(NULL);
-
-	slicer->ReparentTo(NULL);
-	sliceSurface->ReparentTo(NULL);
-	
-
-	cppDEL(importer);	
-	albaDEL(slicer);
 	cppDEL(freezeOp);
 	albaDEL(storage);
 }

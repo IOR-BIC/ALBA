@@ -72,7 +72,6 @@
 #include "albaVMEPolylineTest.h"
 #include "albaVMERefSysTest.h"
 #include "albaVMEScalarTest.h"
-#include "albaVMESlicerTest.h"
 #include "albaVMESurfaceEditorTest.h"
 #include "albaVMESurfaceParametricTest.h"
 #include "albaVMESurfaceTest.h"
@@ -167,7 +166,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMERefSysTest::suite());
 	runner.addTest(albaVMEMeterTest::suite());
 	runner.addTest(albaMSFImporterTest::suite());
-//	runner.addTest(albaVMESlicerTest::suite());
 	runner.addTest(albaPolylineGraphTest::suite());
 	runner.addTest(albaVMEWrappedMeterTest::suite());
 	runner.addTest(albaVMELabeledVolumeTest::suite());

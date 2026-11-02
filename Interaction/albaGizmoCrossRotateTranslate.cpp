@@ -29,7 +29,6 @@
 #include "albaGizmoCrossTranslate.h"
 #include "albaGizmoCrossRotate.h"
 #include "albaEvent.h"
-#include "albaVMESlicer.h"
 #include "albaVMEVolumeGray.h"
 
 #include "albaGizmoCrossRotateAxis.h"
@@ -52,17 +51,8 @@ albaGizmoCrossRotateTranslate::~albaGizmoCrossRotateTranslate()
 
 void albaGizmoCrossRotateTranslate::Create(albaVME *input, albaObserver* listener, bool BuildGUI, int normal)
 {
-	// input should be a albaVMESlicer slicing a albaVMEVolumeGray
-	albaVMESlicer *slicer = NULL;
-	slicer = albaVMESlicer::SafeDownCast(input);
-
-	albaVMEVolumeGray *slicedVolume = NULL;
-	
-	if (slicer)
-		slicedVolume = albaVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
-	else
-		slicedVolume = albaVMEVolumeGray::SafeDownCast(input);
-
+	albaVMEVolumeGray *slicedVolume = albaVMEVolumeGray::SafeDownCast(input);
+		
 	assert(slicedVolume);
 	
 	m_GizmoCrossTranslate = new albaGizmoCrossTranslate(input, this, BuildGUI, normal);

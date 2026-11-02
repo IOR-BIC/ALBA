@@ -33,7 +33,6 @@ const bool DEBUG_MODE = false;
 
 #include "albaVME.h"
 #include "albaVMEVolume.h"
-#include "albaVMESlicer.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
 #include "albaPipeFactory.h"
@@ -397,7 +396,7 @@ int albaViewSlice::GetNodeStatus(albaVME *vme)
 	if (m_Sg != NULL)
 	{
 		n = m_Sg->Vme2Node(vme);
-		if (vme->GetOutput()->IsA("albaVMEOutputVolume") || vme->IsALBAType(albaVMESlicer))
+		if (vme->GetOutput()->IsA("albaVMEOutputVolume"))
 		{
 			if (n != NULL)
 				n->SetMutex(true);

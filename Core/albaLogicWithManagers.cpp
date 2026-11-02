@@ -166,7 +166,6 @@
 #include "albaOpCreateMeter.h"
 #include "albaOpCreateRefSys.h"
 #include "albaOpCreateRefSysFromViewSlice.h"
-#include "albaOpCreateSlicer.h"
 #include "albaOpCreatePolyline.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurface.h"
@@ -2030,7 +2029,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
 	Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
-	Plug(new albaOpCreateSlicer("Slicer"), _("Create"));
 	Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
 	Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));

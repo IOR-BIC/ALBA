@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUI.h"
 #include "albaViewSlice.h"
 #include "albaVme.h"
-#include "albaVMESlicer.h"
 #include "albaMatrix.h"
 #include "albaTransform.h"
 #include "albaPipeImage3D.h"

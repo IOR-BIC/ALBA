@@ -31,7 +31,6 @@ class albaViewVTK;
 class albaGizmoTranslate;
 class albaGizmoRotate;
 class albaVMEVolumeGray;
-class albaVMESlicer;
 class albaMatrix;
 class albaAttachCamera;
 class albaGUI;

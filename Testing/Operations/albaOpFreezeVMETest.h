@@ -27,8 +27,6 @@ class albaOpFreezeVMETest : public albaTest
 	CPPUNIT_TEST( TestFreezeVMESurfaceParametric );
 	CPPUNIT_TEST( TestFreezeVMEMeter );
 	CPPUNIT_TEST( TestFreezeVMEWrappedMeter );
-	CPPUNIT_TEST( TestFreezeVMESlicer );
-	CPPUNIT_TEST( TestFreezeVMEProber );
   CPPUNIT_TEST( TestFreezeVMEProfileSpline );
   CPPUNIT_TEST( TestFreezeVMERefSys );
 	CPPUNIT_TEST_SUITE_END();
@@ -40,7 +38,6 @@ protected:
 	void TestFreezeVMESurfaceParametric();
 	void TestFreezeVMEMeter();
 	void TestFreezeVMEWrappedMeter();
-	void TestFreezeVMESlicer();
   void TestFreezeVMEProfileSpline();
   void TestFreezeVMERefSys();
 };

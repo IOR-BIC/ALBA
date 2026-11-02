@@ -45,7 +45,6 @@ using namespace std;
 
 class albaViewVTK;
 class albaVMEVolumeGray;
-class albaVMESlicer;
 class albaMatrix;
 class albaAttachCamera;
 class albaGUI;
@@ -65,7 +64,7 @@ An RX projection can be performed on each axis (currently available for structur
 
 It is possible to export arbitrary volume slices as image files.
 
-@sa albaGizmoCrossRotateTranslate , albaVMESlicer
+@sa albaGizmoCrossRotateTranslate
 
 */
 

@@ -40,7 +40,6 @@
 #include "albaVMERefSys.h"
 #include "albaVMERoot.h"
 #include "albaVMEScalar.h"
-#include "albaVMESlicer.h"
 #include "albaVMESurface.h"
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEVector.h"
@@ -131,7 +130,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEPointSet,"Point set");
   albaPlugVMEMacro(albaVMERefSys,"Reference System");
   albaPlugVMEMacro(albaVMEScalar,"Scalar");
-  albaPlugVMEMacro(albaVMESlicer,"Slicer");
   albaPlugVMEMacro(albaVMEVector,"Vector");
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
   albaPlugVMEMacro(albaVMEPolylineGraph,"Polyline Graph");

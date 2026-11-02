@@ -49,7 +49,6 @@
 #include "albaPipeTrajectories.h"
 #include "albaPipeWrappedMeter.h"
 #include "albaPipeSurfaceEditor.h"
-#include "albaVisualPipeSlicerSlice.h"
 #include "albaVisualPipePolylineGraph.h"
 #include "albaPipeDensityDistance.h"
 #include "albaPipePolylineGraphEditor.h"
@@ -139,7 +138,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
   albaPlugPipeMacro(albaPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");
   albaPlugPipeMacro(albaPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
-  albaPlugPipeMacro(albaVisualPipeSlicerSlice, "Pipe to Visualize Slicer as borders cutted from a plane.");
   albaPlugPipeMacro(albaVisualPipePolylineGraph, "Pipe to Visualize Polyline and Graph.");
   albaPlugPipeMacro(albaPipeCompoundVolume, "Compound pipe for rendering volumes.");
   albaPlugPipeMacro(albaPipeCompoundVolumeIsosurface,"Compound Pipe for render vtk volumes as a iso-surface");

@@ -39,7 +39,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaVMEPolylineSpline.h"
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEMeter.h"
-#include "albaVMESlicer.h"
 #include "albaVMEWrappedMeter.h"
 #include "albaVMELabeledVolume.h"
 
@@ -259,35 +258,6 @@ void albaOpFreezeVME::OpRun()
 						if(!m_TestMode)
 							OpStop(OP_RUN_OK);
 					}
-				}
-				else if(albaVMESlicer *slicer = albaVMESlicer::SafeDownCast(m_Input))
-				{
-					mmaMaterial *material = slicer->GetMaterial();
-
-					albaSmartPointer<albaVMESurface> newSurface;
-					newSurface->SetName(slicer->GetName());
-					newSurface->SetData(polyData,slicer->GetTimeStamp());
-					vtkALBASmartPointer<vtkImageData> text;
-					text->DeepCopy(slicer->GetSurfaceOutput()->GetTexture());
-					newSurface->GetSurfaceOutput()->SetTexture(text);
-					newSurface->Update();
-
-					if(material)
-					{
-						newSurface->GetMaterial()->DeepCopy(material);
-						newSurface->GetMaterial()->SetMaterialTexture(newSurface->GetSurfaceOutput()->GetTexture());
-						newSurface->GetMaterial()->UpdateProp();
-					}
-
-					newSurface->SetMatrix(*slicer->GetOutput()->GetMatrix());
-					m_Output=newSurface;
-					if (m_Output)
-					{
-						m_Output->ReparentTo(m_Input->GetParent());
-						if(!m_TestMode)
-							OpStop(OP_RUN_OK);
-					}
-
 				}
 				else if(albaVMEWrappedMeter *wrappedMeter = albaVMEWrappedMeter::SafeDownCast(m_Input))
 				{

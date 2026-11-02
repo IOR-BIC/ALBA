@@ -50,7 +50,6 @@ SET(PROJECT_SRCS
 	albaPipeTensorFieldGlyphsTest.h albaPipeTensorFieldGlyphsTest.cpp
 	albaPipeTensorFieldTest.h albaPipeTensorFieldTest.cpp
 	albaPipeVectorFieldTest.h albaPipeVectorFieldTest.cpp
-	albaVisualPipeSlicerSliceTest.h albaVisualPipeSlicerSliceTest.cpp
 	albaPipeCompoundVolumeIsosurfaceTest.h albaPipeCompoundVolumeIsosurfaceTest.cpp
 	albaPipePointCloudTest.cpp albaPipePointCloudTest.h
 	albaPipePointCloudSliceTest.h albaPipePointCloudSliceTest.cpp
