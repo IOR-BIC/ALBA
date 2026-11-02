@@ -70,7 +70,6 @@
 #include "albaVMEPolylineGraphTest.h"
 #include "albaVMEPolylineSplineTest.h"
 #include "albaVMEPolylineTest.h"
-#include "albaVMEProberTest.h"
 #include "albaVMERefSysTest.h"
 #include "albaVMEScalarTest.h"
 #include "albaVMESlicerTest.h"
@@ -166,7 +165,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEGenericAbstractTest::suite());
 	runner.addTest(albaVMEItemTest::suite());
 	runner.addTest(albaVMERefSysTest::suite());
-	runner.addTest(albaVMEProberTest::suite());
 	runner.addTest(albaVMEMeterTest::suite());
 	runner.addTest(albaMSFImporterTest::suite());
 //	runner.addTest(albaVMESlicerTest::suite());

@@ -164,7 +164,6 @@
 #include "albaOpCreateGroup.h"
 #include "albaOpCreateLabeledVolume.h"
 #include "albaOpCreateMeter.h"
-#include "albaOpCreateProber.h"
 #include "albaOpCreateRefSys.h"
 #include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreateSlicer.h"
@@ -2031,7 +2030,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
 	Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
-	Plug(new albaOpCreateProber("Prober"), _("Create"));
 	Plug(new albaOpCreateSlicer("Slicer"), _("Create"));
 	Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
 	Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));

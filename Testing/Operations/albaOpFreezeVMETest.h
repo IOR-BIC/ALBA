@@ -41,7 +41,6 @@ protected:
 	void TestFreezeVMEMeter();
 	void TestFreezeVMEWrappedMeter();
 	void TestFreezeVMESlicer();
-	void TestFreezeVMEProber();
   void TestFreezeVMEProfileSpline();
   void TestFreezeVMERefSys();
 };

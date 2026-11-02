@@ -26,7 +26,6 @@ IF (ALBA_USE_VTK)
 	albaOpCreateInfoText.cpp					albaOpCreateInfoText.h
 	albaOpCreateMeter.cpp	    				albaOpCreateMeter.h
 	albaOpCreateSurfaceParametric.cpp	albaOpCreateSurfaceParametric.h
-	albaOpCreateProber.cpp	    				albaOpCreateProber.h
 	albaOpCreateRefSys.cpp	    				albaOpCreateRefSys.h
 	albaOpCreateRefSysFromViewSlice.cpp	albaOpCreateRefSysFromViewSlice.h
 	albaOpCreateSlicer.cpp	    				albaOpCreateSlicer.h

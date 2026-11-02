@@ -6,7 +6,6 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
   albaDataPipeInterpolator.cpp   albaDataPipeInterpolator.h
   albaDataPipeCustom.cpp  albaDataPipeCustom.h
-  albaDataPipeCustomProber.cpp  albaDataPipeCustomProber.h
   albaDataPipeInterpolatorVTK.cpp albaDataPipeInterpolatorVTK.h
   vtkALBADataPipe.cpp  vtkALBADataPipe.h
   )

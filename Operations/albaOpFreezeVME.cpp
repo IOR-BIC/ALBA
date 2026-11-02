@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEMeter.h"
 #include "albaVMESlicer.h"
-#include "albaVMEProber.h"
 #include "albaVMEWrappedMeter.h"
 #include "albaVMELabeledVolume.h"
 
@@ -289,30 +288,6 @@ void albaOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 
-				}
-				else if(albaVMEProber *prober = albaVMEProber::SafeDownCast(m_Input))
-				{
-					mmaMaterial *material = prober->GetMaterial();
-
-					albaSmartPointer<albaVMESurface> newSurface;
-					newSurface->SetName(prober->GetName());
-					newSurface->SetData(polyData,prober->GetTimeStamp());
-					newSurface->Update();
-
-					if(material)
-					{
-						newSurface->GetMaterial()->DeepCopy(material);
-						newSurface->GetMaterial()->UpdateProp();
-					}
-
-					newSurface->SetMatrix(*prober->GetOutput()->GetMatrix());
-					m_Output=newSurface;
-					if (m_Output)
-					{
-						m_Output->ReparentTo(m_Input->GetParent());
-						if(!m_TestMode)
-							OpStop(OP_RUN_OK);
-					}
 				}
 				else if(albaVMEWrappedMeter *wrappedMeter = albaVMEWrappedMeter::SafeDownCast(m_Input))
 				{

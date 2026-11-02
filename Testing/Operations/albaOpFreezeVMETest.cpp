@@ -34,7 +34,6 @@
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEVolumeGray.h"
 #include "albaOpImporterVTK.h"
-#include "albaVMEProber.h"
 #include "albaVMESlicer.h"
 #include "albaVMEPolylineSpline.h"
 #include "albaVMERefSys.h"
@@ -300,89 +299,7 @@ void albaOpFreezeVMETest::TestFreezeVMESlicer()
 	cppDEL(freezeOp);
 	albaDEL(storage);
 }
-//-----------------------------------------------------------
-void albaOpFreezeVMETest::TestFreezeVMEProber() 
-//-----------------------------------------------------------
-{
-	albaVMEStorage *storage = albaVMEStorage::New();
-	storage->GetRoot()->SetName("root");
-	storage->GetRoot()->Initialize();
 
-	albaVMERoot *root=storage->GetRoot();
-
-	albaOpFreezeVME *freezeOp=new albaOpFreezeVME("freeze");
-	freezeOp->TestModeOn();
-	
-	albaOpImporterVTK *importer=new albaOpImporterVTK("importer");
-	importer->TestModeOn();
-	importer->SetInput(root);
-	albaString filename=ALBA_DATA_ROOT;
-	filename<<"/VTK_Volumes/volume.vtk";
-	importer->SetFileName(filename.GetCStr());
-	importer->OpRun();
-
-	//create a parametric surface
-	albaVMESurfaceParametric *vmeParametricSurfaceSTART;
-	albaNEW(vmeParametricSurfaceSTART);
-	vmeParametricSurfaceSTART->ReparentTo(root);
-	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
-	vmeParametricSurfaceSTART->Update();
-
-	albaVMEVolumeGray *volume=albaVMEVolumeGray::SafeDownCast(importer->GetOutput());
-	volume->ReparentTo(root);
-	volume->Update();
-
-	double centerV[3], rotV[3];
-	albaOBB b;
-	rotV[0] = rotV[1] = rotV[2] = 0;
-	volume->GetOutput()->GetVMELocalBounds(b);
-	b.GetCenter(centerV);
-
-	albaVMEProber *prober;
-	albaNEW(prober);
-
-	prober->SetPose(centerV,rotV,0);
-	prober->SetVolumeLink(volume);
-	prober->SetSurfaceLink(vmeParametricSurfaceSTART);
-	prober->ReparentTo(storage->GetRoot());
-	prober->Modified();
-	prober->Update();
-
-	freezeOp->SetInput(prober);
-	freezeOp->OpRun();
-
-	albaVMESurface *probSurface=(albaVMESurface *)(freezeOp->GetOutput());
-	probSurface->ReparentTo(root);
-	probSurface->Update();
-	//	probSurface->GetOutput()->Update();
-
-	int numSrc = probSurface->GetOutput()->GetVTKData()->GetNumberOfPoints();
-	int numDst = prober->GetOutput()->GetVTKData()->GetNumberOfPoints();
-
-	int numCellSrc = probSurface->GetOutput()->GetVTKData()->GetNumberOfCells();
-	int numCellDst = prober->GetOutput()->GetVTKData()->GetNumberOfCells();
-
-	CPPUNIT_ASSERT(probSurface &&  numSrc == numDst && numCellSrc == numCellDst);
-
-	double range1[2];
-	vtkPolyData *polyProber;
-	polyProber = (vtkPolyData *)prober->GetOutput()->GetVTKData();
-	polyProber->GetPointData()->GetScalars()->GetRange(range1);
-	double range2[2];
-	probSurface->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetRange(range2);
-	CPPUNIT_ASSERT(fabs(range1[0] - range2[0])<0.1 && fabs(range1[1] - range2[1])<0.1);
-
-	volume->ReparentTo(NULL);	
-	prober->ReparentTo(NULL);
-	probSurface->ReparentTo(NULL);
-
-  vmeParametricSurfaceSTART->ReparentTo(NULL);
-  albaDEL(vmeParametricSurfaceSTART);
-	cppDEL(importer);	
-	albaDEL(prober);
-	cppDEL(freezeOp);
-	albaDEL(storage);
-}
 //-----------------------------------------------------------
 void albaOpFreezeVMETest::TestFreezeVMEProfileSpline() 
 //-----------------------------------------------------------

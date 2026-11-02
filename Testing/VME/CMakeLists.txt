@@ -51,7 +51,6 @@ SET(PROJECT_SRCS
 	albaVMEGenericAbstractTest.h albaVMEGenericAbstractTest.cpp
 	albaVMEItemTest.h albaVMEItemTest.cpp
 	albaVMERefSysTest.h albaVMERefSysTest.cpp
-	albaVMEProberTest.h albaVMEProberTest.cpp
 	albaVMEMeterTest.h albaVMEMeterTest.cpp
 	albaMSFImporterTest.h albaMSFImporterTest.cpp
 	albaVMESlicerTest.h albaVMESlicerTest.cpp
