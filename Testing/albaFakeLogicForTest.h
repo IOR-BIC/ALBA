@@ -88,44 +88,33 @@ public:
 
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() override;
 
-
 	virtual void EnableCameraUpdateSkip() override;
-
 
 	virtual void DisableCameraUpdateSkip() override;
 
-
 	virtual bool IsVMEExpanded(albaVME *vme) override;
-
 
 	virtual void CollapseVME(albaVME *vme) override;
 
-
 	virtual void ExpandVME(albaVME *vme) override;
-
 
 	const char* GetAppBuildNum() override;
 
-
 	void SetAppBuildNum(char* buildNum) override;
-
 
 	const char* GetAlbaBuildNum() override;
 
-
 	void SetAlbaBuildNum(char *buildNum) override;
-
 
 	const char *GetCitationPaper() override;
 
-
 	void SetCitationPaper(char *link) override;
-
 
 	void RegisterForKeyEvents(albaObserver *listener) override;
 
-
 	void UnRegisterForKeyEvents(albaObserver *listener) override;
+
+	bool IsTimeVaringEnabled() override;
 
 protected:
 	

@@ -2022,7 +2022,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	// Operation Menu:
 	//------------------------------------------------------------
 
-	Plug(new albaOpCreateVolume("Create Volume"), _("Create"));
+	Plug(new albaOpCreateVolume("Volume"), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
 	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
@@ -2245,6 +2245,12 @@ void albaLogicWithManagers::UnRegisterForKeyEvents(albaObserver *listener)
   std::vector<albaObserver *>::iterator it = std::find(m_KeyEventListeners.begin(), m_KeyEventListeners.end(), listener);
 	if (it != m_KeyEventListeners.end())
 		m_KeyEventListeners.erase(it);
+}
+
+//----------------------------------------------------------------------------
+bool albaLogicWithManagers::IsTimeVaringEnabled()
+{
+	return m_PlugTimebar;
 }
 
 //----------------------------------------------------------------------------
