@@ -639,7 +639,7 @@ albaMatrix* albaViewArbitraryOrthoSlice::GetSlicerMatrix(int axis)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::SetRestoreTagToVME(albaVME *vme)
+void albaViewArbitraryOrthoSlice::StoreViewParamsToVMETags(albaVME *vme)
 {
 	albaMatrix *matrix;
 
@@ -680,7 +680,7 @@ void albaViewArbitraryOrthoSlice::SetRestoreTagToVME(albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitraryOrthoSlice::RestoreFromVME(albaVME* vme)
+void albaViewArbitraryOrthoSlice::RestoreViewsParamsFromVMETags(albaVME* vme)
 {
 	if (vme == NULL) return;
 	
@@ -1266,7 +1266,7 @@ void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
 	albaVME *n = e.GetVme();
 	
 	if (n != NULL)
-		RestoreFromVME(n);
+		RestoreViewsParamsFromVMETags(n);
 }
 //----------------------------------------------------------------------------
 albaViewVTK * albaViewArbitraryOrthoSlice::GetViewArbitrary()

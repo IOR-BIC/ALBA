@@ -135,7 +135,6 @@ albaViewArbitrarySlice::albaViewArbitrarySlice(wxString label, bool show_ruler)
 	m_Border = 1;
 
 	m_TrilinearInterpolationOn = true;
-	m_CameraFollowGizmo = false;
 	m_EnableGPU = true;
 	m_SkipCameraUpdate = 0;
 }
@@ -614,9 +613,7 @@ albaGUI* albaViewArbitrarySlice::CreateGui()
 	m_Gui->Button(ID_RESET,_("Reset"),"");
 
 	m_Gui->Divider();
-	m_Gui->Bool(ID_CAMERA_FOLLOW_GIZMO, "Camera follow gizmos", &m_CameraFollowGizmo, 1, "Camera follow gizmos");
-	m_Gui->Divider();
-
+	
 	m_Gui->Update();
 
 	EnableWidgets(m_InputVolume);
@@ -637,7 +634,7 @@ void albaViewArbitrarySlice::PostMultiplyEventMatrix(albaEventBase *alba_event, 
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
 		tr->SetMatrix(m_SlicingMatrix->GetVTKMatrix());
-		if (isRotation || m_CameraFollowGizmo)
+		if (isRotation)
 			tr->Concatenate(matrix);
 		else
 			tr->Concatenate(rotation.GetVTKMatrix());
@@ -849,14 +846,14 @@ albaMatrix* albaViewArbitrarySlice::GetSlicerMatrix()
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitrarySlice::SetRestoreTagToVME(albaVME *vme)
+void albaViewArbitrarySlice::StoreViewParamsToVMETags(albaVME *vme)
 {
 	albaTagItem tag("ArbSliceMtr", (double *)m_SlicingMatrix, 16);
 	vme->GetTagArray()->SetTag(tag);
 }
 
 //----------------------------------------------------------------------------
-void albaViewArbitrarySlice::RestoreFromVME(albaVME* vme)
+void albaViewArbitrarySlice::RestoreViewsParamsFromVMETags(albaVME* vme)
 {
 	albaTagItem *tag = vme->GetTagArray()->GetTag("ArbSliceMtr");
 	

@@ -316,9 +316,9 @@ void albaOpExtractImageFromArbitraryView::ShowImageSlice()
 	if (m_CurrentImage != NULL)
 	{
 			if (m_View->IsA("albaViewArbitrarySlice"))
-				((albaViewArbitrarySlice*)m_View)->RestoreFromVME(m_CurrentImage);
+				((albaViewArbitrarySlice*)m_View)->RestoreViewsParamsFromVMETags(m_CurrentImage);
 			else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
-				((albaViewArbitraryOrthoSlice*)m_View)->RestoreFromVME(m_CurrentImage);
+				((albaViewArbitraryOrthoSlice*)m_View)->RestoreViewsParamsFromVMETags(m_CurrentImage);
 	}
 }
 
@@ -452,11 +452,11 @@ void albaOpExtractImageFromArbitraryView::SaveTags(albaVMEImage * image)
 
 	if (m_View->IsA("albaViewArbitrarySlice"))
 	{
-		((albaViewArbitrarySlice*)m_View)->SetRestoreTagToVME(image);
+		((albaViewArbitrarySlice*)m_View)->StoreViewParamsToVMETags(image);
 	}
 	else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
 	{
-		((albaViewArbitraryOrthoSlice*)m_View)->SetRestoreTagToVME(image);
+		((albaViewArbitraryOrthoSlice*)m_View)->StoreViewParamsToVMETags(image);
 	}
 
 

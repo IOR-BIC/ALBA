@@ -106,10 +106,10 @@ public:
 	albaMatrix* GetSlicerMatrix();
 
 	/** Set tags to restore view parameter to the in input VME */
-	void SetRestoreTagToVME(albaVME *vme);
+	void StoreViewParamsToVMETags(albaVME *vme);
 
 	/** Restore view parameters from a vme with stored tags*/
-	void RestoreFromVME(albaVME* vme);
+	void RestoreViewsParamsFromVMETags(albaVME* vme);
 	
 	/** Generate Gizmos and pose them in the right position*/
 	void CreateGizmos();
@@ -192,7 +192,6 @@ protected:
 	albaGUI *m_GuiGizmos;
 	
 	int m_SkipCameraUpdate;
-	int m_CameraFollowGizmo;
 	int m_TrilinearInterpolationOn;
 	int m_EnableGPU;
 

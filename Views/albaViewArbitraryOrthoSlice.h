@@ -166,11 +166,11 @@ public:
 	/** Gets the slicing matrix of the selected axis */
 	albaMatrix* GetSlicerMatrix(int axis = Z);
 
-	/** Set tags to restore view parameter to the in input VME */
-	void SetRestoreTagToVME(albaVME *vme);
+	/** Set tags to restore view parameter in vme */
+	void StoreViewParamsToVMETags(albaVME *vme);
 
 	/** Restore view parameters from a vme with stored tags*/
-	void RestoreFromVME(albaVME* vme);
+	void RestoreViewsParamsFromVMETags(albaVME* vme);
 
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);

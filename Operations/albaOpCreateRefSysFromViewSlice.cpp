@@ -102,12 +102,12 @@ void albaOpCreateRefSysFromViewSlice::OpDo()
 		if(m_View->IsA("albaViewArbitrarySlice"))
 		{ 
 			matrix= ((albaViewArbitrarySlice *)m_View)->GetSlicerMatrix();
-			((albaViewArbitrarySlice *)m_View)->SetRestoreTagToVME(m_RefSys);
+			((albaViewArbitrarySlice *)m_View)->StoreViewParamsToVMETags(m_RefSys);
 		}
 		else if (m_View->IsA("albaViewArbitraryOrthoSlice"))
 		{
 			matrix = ((albaViewArbitraryOrthoSlice *)m_View)->GetSlicerMatrix();
-			((albaViewArbitraryOrthoSlice *)m_View)->SetRestoreTagToVME(m_RefSys);
+			((albaViewArbitraryOrthoSlice *)m_View)->StoreViewParamsToVMETags(m_RefSys);
 		}
 
 		m_RefSys->SetAbsMatrix(*matrix);
