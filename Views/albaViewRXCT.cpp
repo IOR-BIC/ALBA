@@ -37,7 +37,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMEVolume.h"
 #include "albaVMESurface.h"
 #include "albaVMESurfaceParametric.h"
-#include "albaVisualPipeSlicerSlice.h"
 #include "albaDeviceButtonsPadMouse.h"
 
 #include "vtkDataSet.h"
@@ -144,7 +143,6 @@ void albaViewRXCT::PackageView()
 		m_ViewsRX[v] = new albaViewRX("RX child view", cam_pos[v]);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeProjected", MUTEX);
 		m_ViewsRX[v]->PlugVisualPipe("albaVMELabeledVolume", "albaPipeVolumeProjected", MUTEX);
-		m_ViewsRX[v]->PlugVisualPipe("albaVMESlicer", "albaVisualPipeSlicerSlice", MUTEX);
 		m_ViewsRX[v]->SetCanSpin(false);
 
 		PlugChildView(m_ViewsRX[v]);
@@ -160,7 +158,6 @@ void albaViewRXCT::PackageView()
 	vs->PlugVisualPipe("albaVMELandmark", "albaPipeSurfaceSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMELandmarkCloud", "albaPipeSurfaceSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEMesh", "albaPipeMeshSlice", MUTEX);
-	vs->PlugVisualPipe("albaVMESlicer", "albaPipeSurfaceSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEMeter", "albaPipePolylineSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEWrappedMeter", "albaPipePolylineSlice", MUTEX);
 	vs->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
@@ -372,7 +369,7 @@ void albaViewRXCT::VmeSelect(albaVME *vme, bool select)
 	if (m_Gui)
 	{
 		albaPipe *p = ((albaViewSlice *)((albaViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
-		if ((vme->IsA("albaVMESurface") || vme->IsA("albaVMESurfaceParametric") || vme->IsA("albaVMESlicer") || vme->IsA("albaVMEProsthesis")) && select&&p)
+		if ((vme->IsA("albaVMESurface") || vme->IsA("albaVMESurfaceParametric") || vme->IsA("albaVMEProsthesis")) && select&&p)
 			m_Gui->Enable(ID_ADJUST_SLICES, true);
 		else
 			m_Gui->Enable(ID_ADJUST_SLICES, false);
@@ -834,7 +831,7 @@ albaGUI* albaViewRXCT::CreateGui()
   m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
 
   albaVME* node=this->GetSceneGraph()->GetSelectedVme();
-  if (node->IsA("albaVMESurface")||node->IsA("albaVMESurfaceParametric")||node->IsA("albaVMESlicer") || node->IsA("albaVMEProsthesis"))
+  if (node->IsA("albaVMESurface")||node->IsA("albaVMESurfaceParametric")|| node->IsA("albaVMEProsthesis"))
     m_Gui->Enable(ID_ADJUST_SLICES,true);
   else
     m_Gui->Enable(ID_ADJUST_SLICES,false);

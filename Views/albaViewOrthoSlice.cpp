@@ -43,7 +43,6 @@
 #include "albaGizmoSlice.h"
 #include "albaVMEGizmo.h"
 #include "albaPipeSurfaceSlice.h"
-#include "albaVisualPipeSlicerSlice.h"
 #include "albaPipePolylineSlice.h"
 #include "albaPipePolyline.h"
 #include "albaDeviceButtonsPadMouse.h"
@@ -718,19 +717,6 @@ void albaViewOrthoSlice::OnEventSetThickness()
 			pipe->SetThickness(m_Border);
 		}
 		if(albaPipeSurfaceSlice *pipe = albaPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
-		{
-			pipe->SetThickness(m_Border);
-		}
-
-		if(albaVisualPipeSlicerSlice *pipe = albaVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
-		{
-			pipe->SetThickness(m_Border);
-		}
-		if(albaVisualPipeSlicerSlice *pipe = albaVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
-		{
-			pipe->SetThickness(m_Border);
-		}
-		if(albaVisualPipeSlicerSlice *pipe = albaVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}

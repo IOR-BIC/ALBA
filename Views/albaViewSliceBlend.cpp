@@ -30,7 +30,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaPipeMeshSlice.h"
 #include "albaVME.h"
 #include "albaVMEVolume.h"
-#include "albaVMESlicer.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
 #include "albaVMEVolumeGray.h"
@@ -236,11 +235,6 @@ int albaViewSliceBlend::GetNodeStatus(albaVME *vme)
       n = m_Sg->Vme2Node(vme);
       //Only a volume can be visualized
       n->SetMutex(true);
-    }
-    else if (vme->IsALBAType(albaVMESlicer))
-    {
-      n = m_Sg->Vme2Node(vme);
-      n->SetPipeCreatable(false);
     }
     else if (vme->IsALBAType(albaVMEImage))
     {

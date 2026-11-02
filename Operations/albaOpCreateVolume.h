@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpCreateVolume
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -64,6 +64,12 @@ public:
   /** Set/Get the volume real dimension.*/
   void GetVolumeDimensions(double dim[3]);
 
+	/** Set/Get the volume origin. */
+	void SetVolumeOrigin(double origin[3]);
+
+	/** Set/Get the volume origin. */
+	void GetVolumeOrigin(double origin[3]);
+
   /** Create the vtkImageData and put it into the albaVolumeGray.*/
   void CreateVolume();
 
@@ -73,8 +79,10 @@ private:
 	/*virtual*/ bool InternalAccept(albaVME*node);
 
   albaVMEVolumeGray *m_Volume;
+  double m_Origin[3];
   double m_Spacing[3]; ///< Voxel spacing of the created volume
-  double m_Dimensions[3]; ///< Dimensions of created volume
+  int m_VoxelNum[3]; ///< Dimensions of created volume
+  double m_Size[3];
   double m_Density; ///< Constant density value that fill the created volume
 };
 #endif

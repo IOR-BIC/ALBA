@@ -82,10 +82,11 @@ public:
 	virtual void UnRegisterForKeyEvents(albaObserver *listener) = 0;
 	
 	//Managers
+	/** Get the Operation Manager */
 	virtual albaOpManager * GetOpManager() const = 0;
-
+	/** Get the View Manager */
 	virtual albaViewManager *GetViewManager() = 0;
-
+	/** Get the Prostheses DB Manager */
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() = 0;
 
 	//Versioning
@@ -102,5 +103,9 @@ public:
 	virtual const char *GetCitationPaper() = 0;
 	/** Set the link to the citation Paper */
 	virtual void SetCitationPaper(char *link) = 0;
+
+
+	//App Settings
+	virtual bool IsTimeVaringEnabled() = 0;
 };
 #endif

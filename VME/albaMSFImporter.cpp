@@ -37,9 +37,7 @@
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEMeter.h"
 #include "albaVMEPointSet.h"
-#include "albaVMEProber.h"
 #include "albaVMERefSys.h"
-#include "albaVMESlicer.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
@@ -291,7 +289,7 @@ albaVME *mmuMSF1xDocument::RestoreVME(albaStorageElement *node, albaVME *parent)
           {
               vme->AddChild(child_vme);
           }
-          else if ((vme->IsALBAType(albaVMEMeter) || vme->IsALBAType(albaVMEProber)) && child_vme->GetTagArray()->IsTagPresent("mflVMELink"))
+          else if (vme->IsALBAType(albaVMEMeter) && child_vme->GetTagArray()->IsTagPresent("mflVMELink"))
           {
             // this is a particular case for albaVMEMeter, in which the links are changed name
             if (albaCString(child_vme->GetName()) == "StartLink")
@@ -402,14 +400,6 @@ albaVME *mmuMSF1xDocument::CreateVMEInstance(albaString &name)
   else if (name == "mflVMERefSys")
   {
     return albaVMERefSys::New();
-  }
-  else if (name == "mflVMEMaps")
-  {
-    return albaVMEProber::New();
-  }
-  else if (name == "mflVMESlicer")
-  {
-    return albaVMESlicer::New();
   }
   else
   {

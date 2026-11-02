@@ -42,7 +42,6 @@
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
 #include "vtkDataSet.h"
-#include "albaVMESlicer.h"
 #include "albaVMEVolumeGray.h"
 
 //----------------------------------------------------------------------------
@@ -206,15 +205,8 @@ void albaGizmoCrossTranslate::OnEventGizmoComponents(albaEventBase *alba_event)
             {
               double slicedVolumeBounds[6];
 
-              albaVMESlicer *slicer = NULL;
-              slicer = albaVMESlicer::SafeDownCast(m_InputVME);
-
-              albaVMEVolumeGray *slicedVolume = NULL;
-
-							if(slicer)
-								slicedVolume = albaVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
-							else
-								slicedVolume = albaVMEVolumeGray::SafeDownCast(m_InputVME);
+         
+              albaVMEVolumeGray *slicedVolume = albaVMEVolumeGray::SafeDownCast(m_InputVME);
 
               assert(slicedVolume);
 

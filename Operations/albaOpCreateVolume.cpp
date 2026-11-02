@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaOpCreateVolume
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -38,73 +38,81 @@
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpCreateVolume);
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-albaOpCreateVolume::albaOpCreateVolume(const wxString &label) :
-albaOp(label)
+// Constants:
+enum VOLUME_CREATE_ID
+{
+	ID_SPACING = MINID,
+	ID_ORIGIN,
+  ID_VOXEL_NUM,
+	ID_DIMENSIONS,
+	ID_SCALA_VALUE,
+};
+
 //----------------------------------------------------------------------------
+albaOpCreateVolume::albaOpCreateVolume(const wxString &label) :albaOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
   m_Volume  = NULL;
   m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = 1.0;
-  m_Dimensions[0] = m_Dimensions[1] = m_Dimensions[2] = 10.0;
-  m_Density = 0.0;
+  m_VoxelNum[0] = m_VoxelNum[1] = m_VoxelNum[2] = 10;
+  m_Size[0] = m_Size[1] = m_Size[2] = 10.0;
+	m_Origin[0] = m_Origin[1] = m_Origin[2] = 0.0;
+	m_Density = 0.0;
 }
 //----------------------------------------------------------------------------
 albaOpCreateVolume::~albaOpCreateVolume()
-//----------------------------------------------------------------------------
 {
   albaDEL(m_Volume);
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpCreateVolume::Copy()   
-//----------------------------------------------------------------------------
 {
 	return new albaOpCreateVolume(m_Label);
 }
 //----------------------------------------------------------------------------
 bool albaOpCreateVolume::InternalAccept(albaVME*node)
-//----------------------------------------------------------------------------
 {
   return (node && node->IsALBAType(albaVME));
 }
 //----------------------------------------------------------------------------
-// Constants:
-//----------------------------------------------------------------------------
-enum VOLUME_CREATE_ID
-{
-  ID_SPACING = MINID,
-  ID_DIMENSIONS,
-  ID_SCALA_VALUE,
-};
-//----------------------------------------------------------------------------
 void albaOpCreateVolume::OpRun()
-//----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
-	m_Gui->Label("");
-  m_Gui->Vector(ID_SPACING, "xyz spc", m_Spacing, 0.0000000001);
-  m_Gui->Vector(ID_DIMENSIONS, "xyz dim", m_Dimensions, 0.0000000001);
-  m_Gui->Double(ID_SCALA_VALUE, "Density", &m_Density, 0.0);
+  m_Gui->Label("");
+  m_Gui->Vector(ID_ORIGIN, "Origin:", m_Origin);
 
-	//////////////////////////////////////////////////////////////////////////
-	m_Gui->Label("");
-	m_Gui->Divider(1);
+  m_Gui->Label("");
+  m_Gui->Vector(ID_SPACING, "Spacing:", m_Spacing, 0.0000000001);
+  m_Gui->Vector(ID_VOXEL_NUM, "Voxel #:", m_VoxelNum, 1);
+  m_Gui->Vector(ID_DIMENSIONS, "Size:", m_Size);
+  m_Gui->Enable(ID_DIMENSIONS, false);
+
+  m_Gui->Label("");
+  m_Gui->Double(ID_SCALA_VALUE, "Value:", &m_Density, 0.0);
+
+  //////////////////////////////////////////////////////////////////////////
+  m_Gui->Label("");
+  m_Gui->Divider(1);
   m_Gui->OkCancel();
- 	m_Gui->Label("");
+  m_Gui->Label("");
 
   ShowGui();
 }
 //----------------------------------------------------------------------------
 void albaOpCreateVolume::OnEvent( albaEventBase *alba_event )
-//----------------------------------------------------------------------------
 {
   switch (alba_event->GetId())
   {
     case ID_SPACING:
-    case ID_DIMENSIONS:
+    case ID_VOXEL_NUM:
+      for (int i = 0; i < 3; i++)
+        m_Size[i] = m_Spacing[i] * m_VoxelNum[i];
+      m_Gui->Update();
+    break;
+    case ID_ORIGIN:
     case ID_SCALA_VALUE:
     break;
     case wxOK:
@@ -116,9 +124,24 @@ void albaOpCreateVolume::OnEvent( albaEventBase *alba_event )
     break;
   }
 }
+
+//----------------------------------------------------------------------------
+void albaOpCreateVolume::SetVolumeOrigin(double origin[3])
+{
+	m_Origin[0] = origin[0];
+	m_Origin[1] = origin[1];
+	m_Origin[2] = origin[2];
+}
+
+//----------------------------------------------------------------------------
+void albaOpCreateVolume::GetVolumeOrigin(double origin[3])
+{
+	origin[0] = m_Origin[0];
+	origin[1] = m_Origin[1];
+	origin[2] = m_Origin[2];
+}
 //----------------------------------------------------------------------------
 void albaOpCreateVolume::SetVolumeSpacing( double spc[3] )
-//----------------------------------------------------------------------------
 {
   m_Spacing[0] = spc[0];
   m_Spacing[1] = spc[1];
@@ -127,7 +150,6 @@ void albaOpCreateVolume::SetVolumeSpacing( double spc[3] )
 
 //----------------------------------------------------------------------------
 void albaOpCreateVolume::GetVolumeSpacing( double spc[3] )
-//----------------------------------------------------------------------------
 {
   spc[0] = m_Spacing[0];
   spc[1] = m_Spacing[1];
@@ -136,13 +158,9 @@ void albaOpCreateVolume::GetVolumeSpacing( double spc[3] )
 
 //----------------------------------------------------------------------------
 void albaOpCreateVolume::CreateVolume()
-//----------------------------------------------------------------------------
 {
-  int dim[3], num_comp;
-  dim[0] = (int)(m_Dimensions[0] / m_Spacing[0]) + 1;
-  dim[1] = (int)(m_Dimensions[1] / m_Spacing[1]) + 1;
-  dim[2] = (int)(m_Dimensions[2] / m_Spacing[2]) + 1;
-  num_comp = dim[0] * dim[1] * dim[2];
+  int *dim = m_VoxelNum;
+  vtkIdType num_comp = dim[0] * dim[1] * dim[2];
 
   vtkDoubleArray *sca = vtkDoubleArray::New();
   sca->SetNumberOfTuples(num_comp);
@@ -150,8 +168,9 @@ void albaOpCreateVolume::CreateVolume()
 
   vtkALBASmartPointer<vtkImageData> vol;
   vol->SetSpacing(m_Spacing);
-  vol->SetDimensions(dim);
-  vol->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
+  vol->SetOrigin(m_Origin);
+  vol->SetDimensions(m_VoxelNum);
+  vol->SetExtent(0, m_VoxelNum[0]-1, 0, m_VoxelNum[1]-1, 0, m_VoxelNum[2]-1);
   vol->GetPointData()->SetScalars(sca);
   sca->Delete();
 
@@ -163,18 +182,16 @@ void albaOpCreateVolume::CreateVolume()
 
 //----------------------------------------------------------------------------
 void albaOpCreateVolume::SetVolumeDimensions( double dim[3] )
-//----------------------------------------------------------------------------
 {
-  m_Dimensions[0] = dim[0];
-  m_Dimensions[1] = dim[1];
-  m_Dimensions[2] = dim[2];
+  m_VoxelNum[0] = dim[0];
+  m_VoxelNum[1] = dim[1];
+  m_VoxelNum[2] = dim[2];
 }
 
 //----------------------------------------------------------------------------
 void albaOpCreateVolume::GetVolumeDimensions( double dim[3] )
-//----------------------------------------------------------------------------
 {
-  dim[0] = m_Dimensions[0];
-  dim[1] = m_Dimensions[1];
-  dim[2] = m_Dimensions[2];
+  dim[0] = m_VoxelNum[0];
+  dim[1] = m_VoxelNum[1];
+  dim[2] = m_VoxelNum[2];
 }

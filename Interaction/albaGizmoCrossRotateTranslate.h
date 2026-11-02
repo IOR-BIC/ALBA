@@ -47,8 +47,8 @@ class albaGizmoCrossRotate;
 /** 
 
  Gizmo used to perform constrained roto-translation on a given plane.
- Input must be a albaVMESlicer slicing a albaVMEVolumeGray (TO IMPROVE)
- Movement is costrained inside the sliced volume.
+ Input must be albaVMEVolumeGray
+ Movement is costrained inside the volume.
 */
 class ALBA_EXPORT albaGizmoCrossRotateTranslate : albaGizmoInterface
 {

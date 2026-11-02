@@ -45,7 +45,6 @@ using namespace std;
 
 class albaViewVTK;
 class albaVMEVolumeGray;
-class albaVMESlicer;
 class albaMatrix;
 class albaAttachCamera;
 class albaGUI;
@@ -65,7 +64,7 @@ An RX projection can be performed on each axis (currently available for structur
 
 It is possible to export arbitrary volume slices as image files.
 
-@sa albaGizmoCrossRotateTranslate , albaVMESlicer
+@sa albaGizmoCrossRotateTranslate
 
 */
 
@@ -166,11 +165,11 @@ public:
 	/** Gets the slicing matrix of the selected axis */
 	albaMatrix* GetSlicerMatrix(int axis = Z);
 
-	/** Set tags to restore view parameter to the in input VME */
-	void SetRestoreTagToVME(albaVME *vme);
+	/** Set tags to restore view parameter in vme */
+	void StoreViewParamsToVMETags(albaVME *vme);
 
 	/** Restore view parameters from a vme with stored tags*/
-	void RestoreFromVME(albaVME* vme);
+	void RestoreViewsParamsFromVMETags(albaVME* vme);
 
 	albaViewVTK * GetViewArbitrary();
 	albaViewVTK * GetViewSlice(int axis);
