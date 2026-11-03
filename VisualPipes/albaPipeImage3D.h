@@ -52,6 +52,7 @@ public:
 	enum PIPE_IMAGE3D_WIDGET_ID
 	{
 		ID_INTERPOLATION = Superclass::ID_LAST,
+    ID_LUT_CHOOSER,
 	};
 
   /** constructor. */

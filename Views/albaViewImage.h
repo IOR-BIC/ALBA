@@ -48,18 +48,9 @@ public:
   albaTypeMacro(albaViewImage, albaViewVTK);
 
   virtual albaView*  Copy(albaObserver *Listener, bool lightCopyEnabled = false);
-  virtual void			OnEvent(albaEventBase *alba_event);
-
-  virtual void Create();
-
  
-  /** IDs for the view GUI */
-  enum VIEW_SLICE_WIDGET_ID
-  {
-    ID_NONE = Superclass::ID_LAST,
-    ID_LAST
-  };
-	  
+  virtual void Create();
+      
   /** Create the background for the slice. */
   void BorderCreate(double col[3]);
 
@@ -67,8 +58,6 @@ public:
   void BorderDelete();
 
   void VmeShow(albaVME *vme, bool show);
-
-  void VmeDeletePipe(albaVME *vme);
 
 protected:
   virtual albaGUI *CreateGui();

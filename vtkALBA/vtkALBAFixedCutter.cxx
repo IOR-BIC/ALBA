@@ -46,6 +46,21 @@ vtkALBAFixedCutter::~vtkALBAFixedCutter()
 }
 
 //----------------------------------------------------------------------------
+vtkMTimeType vtkALBAFixedCutter::GetMTime()
+{
+	vtkMTimeType mTime = Superclass::GetMTime();
+	vtkMTimeType time;
+
+	if (InputTransform != NULL)
+	{
+		time = InputTransform->GetMTime();
+		mTime = (time > mTime ? time : mTime);
+	}
+
+	return mTime;
+}
+
+//----------------------------------------------------------------------------
 void vtkALBAFixedCutter::SetCutFunction(vtkImplicitFunction *cutFunc)
 {
 	vtkCutter::SetCutFunction(cutFunc);
@@ -75,6 +90,8 @@ int vtkALBAFixedCutter::RequestData( vtkInformation *vtkNotUsed(request), vtkInf
 	}
 
   vtkCutter::RequestData( NULL,  inputVector, outputVector);
+
+	output->GetPointData()->SetNormals(NULL);
 
 	CutFunction = ExternalCutFunc;
 	  

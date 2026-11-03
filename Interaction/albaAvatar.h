@@ -185,12 +185,6 @@ protected:
   /** redefined to remove Cursor from renderer */
   virtual void InternalShutdown();
 
-  /** process event sent before a camera reset */
-  virtual void OnPreResetCamera(albaEventBase *event);
-
-  /** process event sent after a camera reset */
-  virtual void OnPostResetCamera(albaEventBase *event);
-
   /** process event sent when a view has been selected */
   virtual void OnViewSelected(albaEvent *e);
 

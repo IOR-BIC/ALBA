@@ -32,7 +32,7 @@ public:
 	albaGPU3DTextureProviderHelper();
 	~albaGPU3DTextureProviderHelper();
 
-	int InitializeTexture(vtkImageData *volume, vtkImageData *output);
+	int InitializeTexture(vtkImageData *volume);
 
 	void UnregisterTexture();
 
