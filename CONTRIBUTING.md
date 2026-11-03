@@ -23,6 +23,8 @@
 - When the work is ready, merge the branch into `develop` first.
 - Only after tests pass on `develop`, merge the SAME branch into `master`.
   Never merge `develop` into `master` directly.
+- Always merge with `git merge --no-ff`, so the merge commit records the
+  feature branch the changes came from.
 - Direct commits to `master` are allowed only for changes that cannot affect
   code or tests (icons, splash screen, documentation). If more than one such
   commit is needed, create a branch instead, even for non-code changes.
