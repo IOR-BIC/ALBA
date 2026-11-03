@@ -293,9 +293,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 	runner.addTest(albaOpImporterDICFileTest::suite());
 	runner.addTest(albaOpImporterPointCloudTest::suite());
-	runner.addTest(albaOpFilterImageTest::suite()); /* */
-
-runner.addTest(albaOpExporterDicFileTest::suite());
+	runner.addTest(albaOpFilterImageTest::suite()); 
+	runner.addTest(albaOpExporterDicFileTest::suite()); /* */
 	
 
 
