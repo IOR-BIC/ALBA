@@ -61,7 +61,7 @@ albaGPU3DTextureProviderHelper::~albaGPU3DTextureProviderHelper()
 }
 
 //----------------------------------------------------------------------------
-int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume, vtkImageData *output)
+int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume)
 {
 
 	
@@ -91,10 +91,7 @@ int albaGPU3DTextureProviderHelper::InitializeTexture(vtkImageData *volume, vtkI
 
 	//GPU checks
 	int inDType = volume->GetScalarType();
-	int outDType = output->GetScalarType();
-
 	unsigned int inGLDtype = GetGLDataType(inDType);
-	unsigned int outGLDtype = GetGLDataType(outDType);
 
 	int nComps = volume->GetNumberOfScalarComponents();
 	
