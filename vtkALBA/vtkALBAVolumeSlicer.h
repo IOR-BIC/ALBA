@@ -140,17 +140,17 @@ protected:
   This routine is called from ExecuteData to prepare data structures used in further computation.
   Calls appropriate PrepareVolume methods
   NB: if data structures prepared in previous call are still valid, they will be used. */
-  virtual void PrepareVolume(vtkDataSet* input, vtkImageData* output);
+  virtual void PrepareVolume(vtkDataSet* input);
 
   /** Prepares internal data structure for the regular grid data.
   This routine is called from ExecuteData to prepare data structures used in further computation.
   NB: if data structures prepared in previous call are still valid, they will be used. */
-  virtual void PrepareVolume(vtkImageData* input, vtkImageData* output);
+  virtual void PrepareVolume(vtkImageData* input);
 
   /** Prepares internal data structure for the rectilinear grid data.
   This routine is called from ExecuteData to prepare data structures used in further computation.
   NB: if data structures prepared in previous call are still valid, they will be used. */
-  virtual void PrepareVolume(vtkRectilinearGrid* input, vtkImageData* output);
+  virtual void PrepareVolume(vtkRectilinearGrid* input);
 
 protected:  
   /** BES: 15.12.2008 - when using mafOpCrop in mafViewOrthoSlice, the input

@@ -634,7 +634,7 @@ void vtkALBAVolumeSlicer::RequestDataHotFix(vtkInformation *request,	vtkInformat
   vtkDataArray* pScalars = input->GetPointData()->GetScalars();
 
   const void *inputPointer  = pScalars->GetVoidPointer(0);    
-  this->PrepareVolume(input, outputObject);
+  this->PrepareVolume(input);
 	 
   switch (pScalars->GetDataType()) 
   {
@@ -674,7 +674,7 @@ void vtkALBAVolumeSlicer::RequestDataHotFix(vtkInformation *request,	vtkInformat
 //This routine is called from ExecuteInformation to compute coordinates of voxels in the volume
 //and to detect the bounding box - both used in ExecuteData. It also computes normal for the cutting 
 //plane. NB: if input has not changed since the last call, the coordinates are not recalculated. 
-/*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkDataSet* input, vtkImageData* output) 
+/*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkDataSet* input) 
 {
   if (LastPreprocessedInput == input && PreprocessingTime > input->GetMTime() && LastGPUEnabled == GPUEnabled)
     return; //input is the same (and also kind of output) => return now
@@ -686,20 +686,20 @@ void vtkALBAVolumeSlicer::RequestDataHotFix(vtkInformation *request,	vtkInformat
   vtkImageData* imageData = vtkImageData::SafeDownCast(input);  
   vtkRectilinearGrid* gridData = vtkRectilinearGrid::SafeDownCast(input);
   if (imageData != NULL) 
-    PrepareVolume(imageData, output);
+    PrepareVolume(imageData);
   else
-    PrepareVolume(gridData, output);
+    PrepareVolume(gridData);
 
   LastPreprocessedInput = input;
   this->PreprocessingTime.Modified();
 }
 
 //------------------------------------------------------------------------
-/*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkImageData* input, vtkImageData* output)
+/*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkImageData* input)
 {  
 #ifdef _WIN32
   if (GPUEnabled)
-		m_bGPUProcessing = m_TextureHelper->InitializeTexture(input,output);
+		m_bGPUProcessing = m_TextureHelper->InitializeTexture(input);
 
   if (!m_bGPUProcessing)
   {      
@@ -728,7 +728,7 @@ void vtkALBAVolumeSlicer::RequestDataHotFix(vtkInformation *request,	vtkInformat
 
 
 //------------------------------------------------------------------------
-/*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkRectilinearGrid* input, vtkImageData* output)
+/*virtual*/ void vtkALBAVolumeSlicer::PrepareVolume(vtkRectilinearGrid* input)
 {  
   //rectilinear grid
 #ifdef _WIN32
