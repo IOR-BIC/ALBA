@@ -206,8 +206,7 @@ protected:
   vtkPlane												*m_Plane;
   vtkALBAFixedCutter							*m_Cutter;
   vtkALBAPolyDataToSinglePolyLine	*m_PolydataToPolylineFilter;
-  vtkALBAToLinearTransform				*m_VTKTransform;
-	vtkSphereSource									*m_Sphere;
+  vtkSphereSource									*m_Sphere;
 	vtkGlyph3D											*m_Glyph;
 	vtkALBATubeFilter								*m_Tube;
 	vtkOutlineCornerFilter					*m_OutlineBox;

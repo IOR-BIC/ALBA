@@ -178,7 +178,6 @@ void albaPipePolylineSlice::Create(albaSceneNode *n)
  	m_Tube->SetCapping(m_Capping);
  	m_Tube->SetNumberOfSides(m_TubeResolution);
 
-	m_Tube->Update();
 
 	//////////////////////////////////
 	m_Plane = vtkPlane::New();
@@ -246,7 +245,6 @@ albaPipePolylineSlice::~albaPipePolylineSlice()
 
 	vtkDEL(m_Cutter);
 	vtkDEL(m_Plane);
-	vtkDEL(m_VTKTransform);
 	vtkDEL(m_Sphere);
 	vtkDEL(m_Glyph);
 	vtkDEL(m_Tube);
