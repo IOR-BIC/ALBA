@@ -13,11 +13,16 @@ $outFile = Join-Path $logDir "$Name.stdout.tmp"
 $errFile = Join-Path $logDir "$Name.stderr.tmp"
 $logFile = Join-Path $logDir "$Name.log"
 
+# No -Wait: it also waits for detached descendants (e.g. vctip.exe started by
+# the MSVC toolchain), which can keep the script hanging long after the
+# command has finished. Caching the handle keeps ExitCode readable.
 $process = Start-Process -FilePath 'cmd.exe' `
     -ArgumentList '/c', $Command `
-    -NoNewWindow -Wait -PassThru `
+    -NoNewWindow -PassThru `
     -RedirectStandardOutput $outFile `
     -RedirectStandardError $errFile
+$null = $process.Handle
+$process.WaitForExit()
 
 $exitCode = $process.ExitCode
 
