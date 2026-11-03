@@ -34,6 +34,9 @@ while the specified transformation is applied internally so that the cut is corr
 computed according to the cutting plane.
 
 The input transformation can be specified using `SetInputTransform()`.
+
+vtkALBAFixedCutter also removes the normals of the output to maintain the material property when rendered 
+(a black line is drawn elsewere).
 */
 class ALBA_EXPORT vtkALBAFixedCutter : public vtkCutter
 {
@@ -45,6 +48,10 @@ public:
   virtual ~vtkALBAFixedCutter();
   /** create an instance of the object */
   static vtkALBAFixedCutter* New();
+
+	/** Overload standard modified time function. If cut function is modified,
+  then this object is modified as well. */
+	virtual vtkMTimeType GetMTime();
 
   /** Redefine of SetCutFunction in order to store the external cut function instead of CutFunction 
       CutFunction will be set on RequestData */

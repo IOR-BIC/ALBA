@@ -189,32 +189,14 @@ void albaViewImageCompound::OnEvent(albaEventBase *alba_event)
 				}
 			}
 			break;
-		case ID_LUT_CHOOSER:
-			{
-				double *sr;
-				sr = m_ColorLUT->GetRange();
-
-				m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-				CameraUpdate();
-			}
-			break;
-
 		case ID_REVERSE_LUT:
-		{			
 			LutReverse();
-		}
 		break;
-
 		case ID_VIEW_RULER:
-		{
 			ShowRuler(!m_ShowRuler);
-		}
 		break;
-
 		case ID_INTERPOLATE:
-		{
 			ChangeInterpolation();
-		}
 		break;
     default:
       Superclass::OnEvent(alba_event);
@@ -284,10 +266,6 @@ albaGUI* albaViewImageCompound::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = albaView::CreateGui();
 
-	m_Gui->AddGui(((albaViewImage*)m_ChildViewList[ID_VIEW_IMAGE])->GetGui());
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER, "lut", m_ColorLUT);
-	m_LutWidget->Enable(false);
-
 	m_Gui->Divider();
 	m_Gui->FitGui();
 	m_Gui->Update();
@@ -342,11 +320,8 @@ void albaViewImageCompound::VmeShow(albaVME *vme, bool show)
 void albaViewImageCompound::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
-	//if a volume is visualized enable the widgets
-	if(m_Gui)
-		m_Gui->Enable(ID_LUT_CHOOSER, enable);
-
-  m_LutSlider->Enable(enable);
+	if(m_LutSlider)
+		m_LutSlider->Enable(enable);
 
   if (m_GuiView)
   {
@@ -359,7 +334,6 @@ void albaViewImageCompound::EnableWidgets(bool enable)
 void albaViewImageCompound::UpdateWindowing(bool enable)
 //----------------------------------------------------------------------------
 {
-	m_LutWidget->SetLut(m_ColorLUT);
 	EnableWidgets(enable);
 
 	if(enable && m_CurrentImage)
@@ -368,13 +342,11 @@ void albaViewImageCompound::UpdateWindowing(bool enable)
 		m_CurrentImage->GetOutput()->GetVTKData()->GetScalarRange(sr);
 		m_ColorLUT->SetRange(sr);
       
-		m_LutWidget->Enable(true);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 	}
 	else
 	{
-		m_LutWidget->Enable(false);
 		m_LutSlider->SetRange(-100,100);
 		m_LutSlider->SetSubRange(-100,100);
 	}

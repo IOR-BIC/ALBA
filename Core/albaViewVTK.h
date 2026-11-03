@@ -177,9 +177,6 @@ protected:
 
   virtual albaGUI *CreateGui();
 
-  virtual void OnPreResetCamera();
-  virtual void OnPostResetCamera();
-
   /** Return the visual pipe's name.*/
   virtual void GetVisualPipeName(albaVME *node, albaString &pipe_name);
 };

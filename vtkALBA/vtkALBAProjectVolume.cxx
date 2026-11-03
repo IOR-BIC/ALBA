@@ -28,12 +28,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkSMPTools.h"
 
 vtkStandardNewMacro(vtkALBAProjectVolume);
 
 #define AIR_LIMIT -500
 
-#define PROJECT_MEAN (ProjectionModality == VTK_PROJECT_MEAN)
 
 //----------------------------------------------------------------------------
 void vtkALBAProjectVolume::PropagateUpdateExtent(vtkDataObject *output)
@@ -203,98 +203,108 @@ int vtkALBAProjectVolume::RequestData(vtkInformation *request, vtkInformationVec
 
 //----------------------------------------------------------------------------
 template<typename DataType>
-void vtkALBAProjectVolume::ProjectScalars(int * inputDims, DataType * inputScalars, DataType * projScalars)
+void vtkALBAProjectVolume::ProjectScalars(int *inputDims, DataType *inputScalars, DataType *projScalars)
 {
-	vtkIdType x, y, z, idx, newIdx, range[2];
-	vtkIdType sliceSize, jOffset, kOffset;
-	float acc, rangeSize;
+	//Copy the input dimensions to local variables of vtkIdType type to avoid overflow issues when computing the output size
+	vtkIdType dimX = inputDims[0];
+	vtkIdType dimY = inputDims[1];
+	vtkIdType dimZ = inputDims[2];
+	bool projectMean = (ProjectionModality == VTK_PROJECT_MEAN);
 
-	//Set Projection Range
-	if (ProjectSubRange)
+	vtkIdType projectionDim;
+	vtkIdType outputSize;
+
+	switch (ProjectionSide)
 	{
-		range[0] = MAX(ProjectionRange[0], 0);
-		range[1] = MIN(ProjectionRange[1], inputDims[ProjectionSide - 1]);
-		rangeSize = range[1] - range[0];
+	case VTK_PROJECT_FROM_X:
+		projectionDim = dimX;
+		outputSize = dimY * dimZ;
+		break;
+	case VTK_PROJECT_FROM_Y:
+		projectionDim = dimY;
+		outputSize = dimX * dimZ;
+		break;
+	case VTK_PROJECT_FROM_Z:
+		projectionDim = dimZ;
+		outputSize = dimX * dimY;
+		break;
+	default:
+		return;
+	}
+
+	vtkIdType rangeStart;
+	vtkIdType rangeEnd;
+
+	if (this->ProjectSubRange)
+	{
+		rangeStart = MAX(this->ProjectionRange[0], 0);
+		rangeEnd = MIN(this->ProjectionRange[1], projectionDim);
 	}
 	else
 	{
-		range[0] = 0;
-		range[1] = inputDims[ProjectionSide - 1];
-		rangeSize = inputDims[ProjectionSide - 1];
+		rangeStart = 0;
+		rangeEnd = projectionDim;
 	}
 
+	float rangeSize = rangeEnd - rangeStart;
+	vtkIdType sliceSize = dimX * dimY;
 
-	sliceSize = inputDims[0] * inputDims[1];
-	newIdx = 0;
-
-	switch (this->ProjectionSide)
+	// Use vtkSMPTools to parallelize the projection operation
+	// The for loop is split into chunks, and each chunk is processed in parallel by a separate thread 
+	// each thread computes the projection for its assigned chunk of output indices, with a differnte first and last index variable. 
+	vtkSMPTools::For(0, outputSize,[=](vtkIdType first, vtkIdType last)
 	{
-		case VTK_PROJECT_FROM_X:
-			for (z = 0; z < inputDims[2]; z++)
-			{
-				kOffset = z * sliceSize;
-				for (y = 0; y < inputDims[1]; y++)
-				{
-					jOffset = y * inputDims[0];
-					acc = PROJECT_MEAN ? 0 : VTK_FLOAT_MIN;
-					for (x = range[0]; x < range[1]; x++)
-					{
-						idx = x + jOffset + kOffset;
-						if(PROJECT_MEAN)
-							acc += MAX(AIR_LIMIT, inputScalars[idx]);
-						else
-							acc = MAX(acc, inputScalars[idx]);
-					}
-					projScalars[newIdx] = PROJECT_MEAN ? (acc / rangeSize) : acc;
-					newIdx++;
-				}
-			}
-			break;
-		case VTK_PROJECT_FROM_Y:
-			for (z = 0; z < inputDims[2]; z++)
-			{
-				kOffset = z * sliceSize;
-				for (x = 0; x < inputDims[0]; x++)
-				{
-					acc = PROJECT_MEAN ? 0 : VTK_FLOAT_MIN;
-					for (y = range[0]; y < range[1]; y++)
-					{
-						jOffset = y * inputDims[0];
-						idx = x + jOffset + kOffset;
-						if(PROJECT_MEAN)
-							acc += MAX(AIR_LIMIT, inputScalars[idx]);
-						else
-							acc = MAX(acc, inputScalars[idx]);
-					}
-					projScalars[newIdx] = PROJECT_MEAN ? (acc / rangeSize) : acc;
-					newIdx++;
-				}
-			}
-			break;
-		case VTK_PROJECT_FROM_Z:
-			for (y = 0; y < inputDims[1]; y++)
-			{
-				jOffset = y * inputDims[0];
-				for (x = 0; x < inputDims[0]; x++)
-				{
-					acc = PROJECT_MEAN ? 0 : VTK_FLOAT_MIN;
-					for (z = range[0]; z < range[1]; z++)
-					{
-						kOffset = z * sliceSize;
-						idx = x + jOffset + kOffset;
-						if(PROJECT_MEAN)
-							acc += MAX(AIR_LIMIT, inputScalars[idx]);
-						else
-							acc = MAX(acc, inputScalars[idx]);
-					}
-					projScalars[newIdx] = PROJECT_MEAN ? (acc / rangeSize) : acc;
-					newIdx++;
-				}
-			}
-			break;
-	}
-}
+		for (vtkIdType outputIndex = first; outputIndex < last; ++outputIndex)
+		{
+			vtkIdType baseIndex;
+			vtkIdType stride;
 
+			switch (ProjectionSide)
+			{
+			case VTK_PROJECT_FROM_X:
+			{
+				vtkIdType y = outputIndex % dimY;
+				vtkIdType z = outputIndex / dimY;
+				baseIndex = y * dimX + z * sliceSize;
+				stride = 1;
+				break;
+			}
+			case VTK_PROJECT_FROM_Y:
+			{
+				vtkIdType x = outputIndex % dimX;
+				vtkIdType z = outputIndex / dimX;
+				baseIndex = x + z * sliceSize;
+				stride = dimX;
+				break;
+			}
+			case VTK_PROJECT_FROM_Z:
+			{
+				vtkIdType x = outputIndex % dimX;
+				vtkIdType y = outputIndex / dimX;
+				baseIndex = x + y * dimX;
+				stride = sliceSize;
+				break;
+			}
+			default:
+				continue;
+			}
+
+			float acc = projectMean ? 0 : VTK_FLOAT_MIN;
+
+			for (vtkIdType sample = rangeStart; sample < rangeEnd; ++sample)
+			{
+				vtkIdType inputIndex = baseIndex + sample * stride;
+
+				if (projectMean)
+					acc += MAX(AIR_LIMIT, inputScalars[inputIndex]);
+				else
+					acc = MAX(acc, inputScalars[inputIndex]);
+			}
+
+			projScalars[outputIndex] = projectMean ? (acc / rangeSize) : acc;
+		}
+	});
+}
 //----------------------------------------------------------------------------
 void vtkALBAProjectVolume::GenerateOutputFromID(vtkInformation *request, vtkImageData * inputSP, int * projectedDims, vtkDataArray * projScalars)
 {

@@ -534,14 +534,6 @@ int albaAvatar3D::InternalRestore(albaStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-void albaAvatar3D::OnPostResetCamera(albaEventBase *event)
-//------------------------------------------------------------------------------
-{
-  m_CanonicalToWorldTransform->RecomputeAll();
-  Superclass::OnPostResetCamera(event);
-}
-
-//------------------------------------------------------------------------------
 void albaAvatar3D::OnMove3DEvent(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
@@ -712,13 +704,7 @@ void albaAvatar3D::OnEvent(albaEventBase* event)
  
   switch(event->GetId()) 
   {
-    case CAMERA_PRE_RESET:
-      OnPreResetCamera(event);
-    break; 
-    case CAMERA_POST_RESET:
-      OnPostResetCamera(event);
-    break;
-    case VIEW_SELECT:
+   case VIEW_SELECT:
       {
         albaEvent *e=albaEvent::SafeDownCast(event);
         OnViewSelected(e);

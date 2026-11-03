@@ -43,7 +43,11 @@ public:
   virtual ~vtkALBAMeshCutter();
   /** create an instance of the object */
   static vtkALBAMeshCutter* New();
-
+  
+  /** Overload standard modified time function. If cut function is modified,
+  then this object is modified as well. */
+	virtual vtkMTimeType GetMTime();
+	
   /** Redefine of SetPlane in order to store the external Plane instead of SetPlane 
       CutFunction will be set on RequestData */
 	virtual void SetPlane(vtkPlane *plane);

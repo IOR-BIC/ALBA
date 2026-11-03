@@ -17,6 +17,7 @@ SET(PROJECT_SRCS
 	albaViewRXCTTest.h albaViewRXCTTest.cpp
 	albaViewSliceTest.h albaViewSliceTest.cpp
 	albaViewGlobalSliceTest.h albaViewGlobalSliceTest.cpp
+	albaViewGlobalSliceCompoundTest.h albaViewGlobalSliceCompoundTest.cpp
 	albaViewImageTest.h albaViewImageTest.cpp
 	albaViewRXCompoundTest.h albaViewRXCompoundTest.cpp
 	albaView3DTest.h albaView3DTest.cpp

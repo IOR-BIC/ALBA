@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkInformationVector.h"
+#include "vtkSMPTools.h"
 
 vtkStandardNewMacro(vtkALBAVolumeOrthoSlicer);
 
@@ -196,74 +197,87 @@ int vtkALBAVolumeOrthoSlicer::RequestData(vtkInformation *request, vtkInformatio
 	return 1;
 }
 
-//----------------------------------------------------------------------------
 template<typename DataType>
 void vtkALBAVolumeOrthoSlicer::SliceScalars(int *inputDims, DataType *inputScalars, DataType *slicedScalars)
 {
-	vtkIdType x, y, z, idx1, idx2, newIdx, range[2], sliceSize, jOffset1, jOffset2, kOffset1, kOffset2;
+	vtkIdType dimX = inputDims[0];
+	vtkIdType dimY = inputDims[1];
+	vtkIdType dimZ = inputDims[2];
+	int slicingMode = this->SclicingMode;
 	int plane1, plane2;
-	double acc;
 	double ratio1, ratio2;
-	
-	newIdx = 0;
-	sliceSize = (vtkIdType)inputDims[0] * (vtkIdType)inputDims[1];
-	GetSlicingInfo(&plane1, &plane2, &ratio1, &ratio2);
-	
-	switch (this->SclicingMode)
+	vtkIdType sliceSize, outputSize, stride;
+
+	sliceSize = dimX * dimY;
+
+	switch (slicingMode)
 	{
-		case ORTHOSLICER_X_SLICE:
-			for (z = 0; z < inputDims[2]; z++)
-			{
-				kOffset1 = z * sliceSize;
-				for (y = 0; y < inputDims[1]; y++)
-				{
-					jOffset1 = y * inputDims[0];
-					idx1 = plane1 + jOffset1 + kOffset1;
-					idx2 = plane2 + jOffset1 + kOffset1;
-					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
-					slicedScalars[newIdx] = acc;
-					newIdx++;
-				}
-			}
-			break;
-		case ORTHOSLICER_Y_SLICE:
-			jOffset1 = plane1 * inputDims[0];
-			jOffset2 = plane2 * inputDims[0];
-			for (z = 0; z < inputDims[2]; z++)
-			{
-				kOffset1 = z * sliceSize;
-				for (x = 0; x < inputDims[0]; x++)
-				{
-					idx1 = x + jOffset1 + kOffset1;
-					idx2 = x + jOffset2 + kOffset1;
-					acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
-					slicedScalars[newIdx] = acc;
-					newIdx++;
-				}
-			}
-			break;
-		case ORTHOSLICER_Z_SLICE:
-			kOffset1 = plane1 * sliceSize;
-			kOffset2 = plane2 * sliceSize;
-			if (ratio1 == 1)
-				memcpy(slicedScalars, inputScalars + kOffset1,  sizeof(DataType)*inputDims[0] * inputDims[1]);
-			else if(ratio2 ==1)
-				memcpy(slicedScalars, inputScalars + kOffset2, sizeof(DataType)*inputDims[0] * inputDims[1]);
-			else
-				for (y = 0; y < inputDims[1]; y++)
-				{
-					jOffset1 = y * inputDims[0];
-					for (x = 0; x < inputDims[0]; x++)
-					{
-						idx1 = x + jOffset1 + kOffset1;
-						idx2 = x + jOffset1 + kOffset2;
-						acc = inputScalars[idx1]*ratio1 + inputScalars[idx2]*ratio2;
-						slicedScalars[newIdx] = acc;
-						newIdx++;
-					}
-				}
-			break;
+	case ORTHOSLICER_X_SLICE:
+		outputSize = dimY * dimZ;
+		stride = 1;
+		break;
+	case ORTHOSLICER_Y_SLICE:
+		outputSize = dimX * dimZ;
+		stride = dimX;
+		break;
+	case ORTHOSLICER_Z_SLICE:
+		outputSize = dimX * dimY;
+		stride = sliceSize;
+		break;
+	default:
+		return;
 	}
+
+	this->GetSlicingInfo(&plane1, &plane2, &ratio1, &ratio2);
+
+	// Use vtkSMPTools to parallelize the slicing operation
+	// The for loop is split into chunks, and each chunk is processed in parallel by a separate thread 
+	// each thread computes the slicing for its assigned chunk of output indices, with a different first and last index variable. 
+	vtkSMPTools::For(0, outputSize,
+		[=](vtkIdType first, vtkIdType last)
+		{
+			for (vtkIdType outputIndex = first; outputIndex < last; ++outputIndex)
+			{
+				vtkIdType baseIndex;
+
+				switch (slicingMode)
+				{
+				case ORTHOSLICER_X_SLICE:
+				{
+					vtkIdType y = outputIndex % dimY;
+					vtkIdType z = outputIndex / dimY;
+					baseIndex = y * dimX + z * sliceSize;
+					break;
+				}
+				case ORTHOSLICER_Y_SLICE:
+				{
+					vtkIdType x = outputIndex % dimX;
+					vtkIdType z = outputIndex / dimX;
+					baseIndex = x + z * sliceSize;
+					break;
+				}
+				case ORTHOSLICER_Z_SLICE:
+				{
+					vtkIdType x = outputIndex % dimX;
+					vtkIdType y = outputIndex / dimX;
+					baseIndex = x + y * dimX;
+					break;
+				}
+				default:
+					continue;
+				}
+
+				vtkIdType idx1 = baseIndex + plane1 * stride;
+				vtkIdType idx2 = baseIndex + plane2 * stride;
+
+				if (ratio1 == 1)
+					slicedScalars[outputIndex] = inputScalars[idx1];
+				else if (ratio2 == 1)
+					slicedScalars[outputIndex] = inputScalars[idx2];
+				else
+					slicedScalars[outputIndex] = inputScalars[idx1] * ratio1 + inputScalars[idx2] * ratio2;
+			}
+		});
 }
 
 //----------------------------------------------------------------------------
