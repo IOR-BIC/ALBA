@@ -53,4 +53,9 @@ Always use exactly these commands. Never invent, replace, or bypass them.
 
 ## Git
 - Branching policy is in CONTRIBUTING.md — read it before any git operation.
-- Never push to `master` or `develop` without explicit confirmation.
+- Ask for explicit confirmation before every commit: the user reviews the
+  changes before they are committed.
+- After the commit, merges and pushes (feature branches, `develop`, `master`)
+  can be done without asking, following the branching policy.
+- Merge into `master` only after the Jenkins build of `develop` that includes
+  the merged commit has succeeded (job "Alba Develop Tests").
