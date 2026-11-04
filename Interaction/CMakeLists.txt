@@ -79,6 +79,7 @@ SET(PROJECT_SRCS
   albaInteractorPERBrushFeedback.cpp  		albaInteractorPERBrushFeedback.h
   albaInteractorVTKPicker.cpp  											albaInteractorVTKPicker.h
   albaInteractorSelectPoint.cpp  										albaInteractorSelectPoint.h
+  albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
   albaDeviceButtonsPadMouseDialog.cpp	  	albaDeviceButtonsPadMouseDialog.h
   albaGUITransformSliders.cpp  						albaGUITransformSliders.h    

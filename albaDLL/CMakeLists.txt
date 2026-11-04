@@ -355,6 +355,7 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractorPERScalarInformation.cpp  	../Interaction/albaInteractorPERScalarInformation.h
   ../Interaction/albaInteractorPERBrushFeedback.cpp  		../Interaction/albaInteractorPERBrushFeedback.h
   ../Interaction/albaInteractorVTKPicker.cpp  						../Interaction/albaInteractorVTKPicker.h
+  ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaInteractorSelectPoint.cpp  						../Interaction/albaInteractorSelectPoint.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
   ../Interaction/albaDeviceButtonsPadMouseDialog.cpp	  	../Interaction/albaDeviceButtonsPadMouseDialog.h

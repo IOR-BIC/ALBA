@@ -24,6 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include "albaInteractorPERPicker.h"
+#include "albaPickHelper.h"
+#include "vtkALBASmartPointer.h"
 
 #include "albaView.h"
 #include "albaVME.h"
@@ -64,50 +66,13 @@ albaInteractorPERPicker::~albaInteractorPERPicker()
 void albaInteractorPERPicker::OnLeftButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-	if (m_DraggingLeft && !m_MovedAfterMouseDown)
+	// a click without dragging picks a VME (mouse only)
+	albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice*)e->GetSender());
+	if (m_DraggingLeft && !m_MovedAfterMouseDown && mouse)
 	{
-		albaDevice *device = albaDevice::SafeDownCast((albaDevice*)e->GetSender());
-
-		albaView       *v = NULL;
-		albaVME        *picked_vme = NULL;
-		vtkProp3D     *picked_prop = NULL;
-		albaInteractor *picked_bh = NULL;
-		albaMatrix     point_pose;
-		double        pos_2d[2];
-
-		albaDeviceButtonsPadMouse   *mouse = albaDeviceButtonsPadMouse::SafeDownCast(device);
-		albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
-
-		if (tracker)
-		{
-			point_pose = *e->GetMatrix();
-			albaAvatar *avatar = tracker->GetAvatar();
-			if (avatar)
-			{
-				v = avatar->GetView();
-			}
-		}
-		else if (mouse)
-		{
-			e->Get2DPosition(pos_2d);
-			point_pose.Identity();
-			point_pose.SetElement(0, 3, pos_2d[0]);
-			point_pose.SetElement(1, 3, pos_2d[1]);
-			v = mouse->GetView();
-		}
-
-		if (v)
-			v->FindPokedVme(device, point_pose, picked_prop, picked_vme, picked_bh);
-		
-		// Forward the start event to the right behavior
-		if (picked_vme && !picked_vme->IsA("albaVMEGizmo"))
-		{
-			double mouse_pos[2];
-			e->Get2DPosition(mouse_pos);
-
-			//SendPickingInformation(v, NULL, VME_PICKED, &world_pose, false);
-			SendPickingInformation(mouse->GetView(), mouse_pos);
-		}
+		double mouse_pos[2];
+		e->Get2DPosition(mouse_pos);
+		SendPickingInformation(mouse->GetView(), mouse_pos);
 	}
 
 	m_MovedAfterMouseDown = false;
@@ -128,56 +93,20 @@ void albaInteractorPERPicker::OnMove(albaEventInteraction *e)
 void albaInteractorPERPicker::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
-	bool picked_something = false;
-
-	vtkCellPicker *cellPicker;
-	vtkNEW(cellPicker);
-	cellPicker->SetTolerance(0.001);
-	if (v)
+	// gizmos are not picked
+	double pos_picked[3], scalar_value;
+	albaVME *pickedVME;
+	vtkIdType pid;
+	if (albaPickHelper::PickPoint(v, mouse_flag ? mouse_pos : NULL, mouse_flag ? NULL : tracker_pos, pos_picked, pickedVME, pid, scalar_value) && !pickedVME->IsA("albaVMEGizmo"))
 	{
-		if (mouse_flag)
-		{
-			vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
-			vtkRenderer *r = NULL;
-			rc->InitTraversal();
-			while (r = rc->GetNextItem())
-			{
-				if (cellPicker->Pick(mouse_pos[0], mouse_pos[1], 0, r))
-				{
-					picked_something = true;
-					break;
-				}
-			}
-		}
-		else
-			picked_something = v->Pick(*tracker_pos);
-
-		if (picked_something)
-		{
-			vtkPoints *p = vtkPoints::New();
-			double pos_picked[3];
-			cellPicker->GetPickPosition(pos_picked);
-			p->SetNumberOfPoints(1);
-			p->SetPoint(0, pos_picked);
-			double scalar_value = 0;
-			albaVME *pickedVME = v->GetPickedVme();
-
-			if (pickedVME)
-			{
-				vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-				int pid = vtk_data->FindPoint(pos_picked);
-				vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-				if (scalars)
-					scalars->GetTuple(pid, &scalar_value);
-				albaEvent pick_event(this, msg_id, p);
-				pick_event.SetDouble(scalar_value);
-				pick_event.SetArg(pid);
-				pick_event.SetVme(pickedVME);
-				albaEventMacro(pick_event);
-				p->Delete();
-			}
-		}
+		vtkALBASmartPointer<vtkPoints> p;
+		p->SetNumberOfPoints(1);
+		p->SetPoint(0, pos_picked);
+		albaEvent pick_event(this, msg_id, (vtkObject *)p.GetPointer());
+		pick_event.SetDouble(scalar_value);
+		pick_event.SetArg(pid);
+		pick_event.SetVme(pickedVME);
+		albaEventMacro(pick_event);
 	}
-	vtkDEL(cellPicker);
 }
 

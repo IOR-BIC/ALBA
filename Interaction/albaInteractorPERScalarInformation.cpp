@@ -25,6 +25,8 @@
 
 
 #include "albaInteractorPERScalarInformation.h"
+#include "albaPickHelper.h"
+#include "vtkALBASmartPointer.h"
 
 #include "albaView.h"
 #include "albaViewCompound.h"
@@ -117,70 +119,24 @@ void albaInteractorPERScalarInformation::OnEvent(albaEventBase *event)
       double mouse_pos[2];
       albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
       e->Get2DPosition(mouse_pos);
-      bool picked_something = false;
 
-      vtkCellPicker *cellPicker;
-      vtkNEW(cellPicker);
-      cellPicker->SetTolerance(0.001);
       albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(device);
-      albaView *v = mouse->GetView();
-      if (v)
+      double pos_picked[3];
+      albaVME *pickedVME;
+      if (mouse && albaPickHelper::PickCell(mouse->GetView(), mouse_pos[0], mouse_pos[1], pos_picked, &pickedVME) && pickedVME)
       {
-        albaViewCompound *vc = albaViewCompound::SafeDownCast(v);
-        if (vc)
-        {
-          v = vc->GetSubView();
-        }
+        // the picked position can be slightly outside the data bounds because of approximation errors,
+        // so it is clamped into the bounds to find the nearest point
+        double scalar_value;
+        vtkIdType pid = albaPickHelper::GetPointScalar(pickedVME, pos_picked, scalar_value, true);
+        vtkALBASmartPointer<vtkPoints> p;
+        p->SetNumberOfPoints(1);
+        p->SetPoint(0,pos_picked);
+        albaEvent pick_event(this,MOUSE_MOVE,(vtkObject *)p.GetPointer());
+        pick_event.SetDouble(scalar_value);
+        pick_event.SetArg(pid);
+        albaEventMacro(pick_event);
       }
-      if (v)
-      {
-        vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
-        vtkRenderer *r = NULL;
-        rc->InitTraversal();
-        while(r = rc->GetNextItem())
-        {
-          if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
-          {
-            picked_something = true;
-          }
-        }
-        if (picked_something)
-        {
-          vtkPoints *p = vtkPoints::New();
-          double pos_picked[3];
-          cellPicker->GetPickPosition(pos_picked);
-          p->SetNumberOfPoints(1);
-          p->SetPoint(0,pos_picked);
-          v->Pick(mouse_pos[0],mouse_pos[1]);
-          double scalar_value = 0;
-          albaVME *pickedVME = v->GetPickedVme();
-          if(pickedVME)
-          {
-            vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-            //GetPickPosition calulate the picking position with matrix multiplication 
-            //the return value can be affected of some approximation errors, if the value
-            //is outside the bounds FindPoint will return -1;
-            double bounds[6];
-            vtk_data->GetBounds(bounds);
-            if (pos_picked[0]<bounds[0]) pos_picked[0]=bounds[0];
-            if (pos_picked[0]>bounds[1]) pos_picked[0]=bounds[1];
-            if (pos_picked[1]<bounds[2]) pos_picked[1]=bounds[2];
-            if (pos_picked[1]>bounds[3]) pos_picked[1]=bounds[3];
-            if (pos_picked[2]<bounds[4]) pos_picked[2]=bounds[4];
-            if (pos_picked[2]>bounds[5]) pos_picked[2]=bounds[5];
-            int pid = vtk_data->FindPoint(pos_picked);
-            vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-            if (scalars)
-              scalars->GetTuple(pid,&scalar_value);
-            albaEvent pick_event(this,MOUSE_MOVE,p);
-            pick_event.SetDouble(scalar_value);
-            pick_event.SetArg(pid);
-            albaEventMacro(pick_event);
-            p->Delete();
-          }
-        }
-      }
-      vtkDEL(cellPicker);
     }
   }
   // Make the superclass to manage StartInteractionEvent

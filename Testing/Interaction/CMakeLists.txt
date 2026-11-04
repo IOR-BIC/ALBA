@@ -64,6 +64,7 @@ SET(PROJECT_SRCS
 	albaDeviceButtonsPadMouseDialogTest.h albaDeviceButtonsPadMouseDialogTest.cpp
 	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
 	albaInteractorVTKPickerTest.h albaInteractorVTKPickerTest.cpp
+	albaPickHelperTest.h albaPickHelperTest.cpp
 	albaInteractorSelectPointTest.h albaInteractorSelectPointTest.cpp
 	albaInteractorDICOMImporterTest.h albaInteractorDICOMImporterTest.cpp
 	albaInteractor2DDistanceTest.h albaInteractor2DDistanceTest.cpp

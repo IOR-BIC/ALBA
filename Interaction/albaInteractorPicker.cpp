@@ -25,6 +25,7 @@
 
 
 #include "albaInteractorPicker.h"
+#include "albaPickHelper.h"
 #include "albaEvent.h"
 
 #include "albaView.h"
@@ -147,54 +148,17 @@ void albaInteractorPicker::OnButtonUp(albaEventInteraction *e)
 void albaInteractorPicker::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
-  bool picked_something = false;
-
-  vtkCellPicker *cellPicker;
-  vtkNEW(cellPicker);
-  cellPicker->SetTolerance(0.001);
-  if (v)
+  double pos_picked[3], scalar_value;
+  albaVME *pickedVME;
+  vtkIdType pid;
+  if (albaPickHelper::PickPoint(v, mouse_flag ? mouse_pos : NULL, mouse_flag ? NULL : tracker_pos, pos_picked, pickedVME, pid, scalar_value))
   {
-    /*albaViewCompound *vc = albaViewCompound::SafeDownCast(v);
-    if (vc)
-      v = vc->GetSubView();*/ // the code is integrated into the GetRWI method of the albaViewCompound, so it is not necessary!
-    if(mouse_flag)
-    {
-      vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
-      vtkRenderer *r = NULL;
-      rc->InitTraversal();
-      while(r = rc->GetNextItem())
-      {
-        if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
-        {
-          picked_something = true;
-        }
-      }
-    }
-    else
-      picked_something = v->Pick(*tracker_pos);
-    if (picked_something)
-    {
-      vtkPoints *p = vtkPoints::New();
-      double pos_picked[3];
-      cellPicker->GetPickPosition(pos_picked);
-      p->SetNumberOfPoints(1);
-      p->SetPoint(0,pos_picked);
-      double scalar_value = 0;
-      albaVME *pickedVME = v->GetPickedVme();
-      if(pickedVME)
-      {
-        vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-        int pid = vtk_data->FindPoint(pos_picked);
-        vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-        if (scalars)
-          scalars->GetTuple(pid,&scalar_value);
-        albaEvent pick_event(this,msg_id,p);
-        pick_event.SetDouble(scalar_value);
-        pick_event.SetArg(pid);
-        albaEventMacro(pick_event);
-        p->Delete();
-      }
-    }
+    vtkALBASmartPointer<vtkPoints> p;
+    p->SetNumberOfPoints(1);
+    p->SetPoint(0,pos_picked);
+    albaEvent pick_event(this,msg_id,(vtkObject *)p.GetPointer());
+    pick_event.SetDouble(scalar_value);
+    pick_event.SetArg(pid);
+    albaEventMacro(pick_event);
   }
-  vtkDEL(cellPicker);
 }
