@@ -63,9 +63,9 @@ SET(PROJECT_SRCS
 	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
 	albaDeviceButtonsPadMouseDialogTest.h albaDeviceButtonsPadMouseDialogTest.cpp
 	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
-	mmiVTKPickerTest.h mmiVTKPickerTest.cpp
-	mmiSelectPointTest.h mmiSelectPointTest.cpp
-	mmiInfoImageTest.h mmiInfoImageTest.cpp
+	albaInteractorVTKPickerTest.h albaInteractorVTKPickerTest.cpp
+	albaPickHelperTest.h albaPickHelperTest.cpp
+	albaInteractorSelectPointTest.h albaInteractorSelectPointTest.cpp
 	albaInteractorDICOMImporterTest.h albaInteractorDICOMImporterTest.cpp
 	albaInteractor2DDistanceTest.h albaInteractor2DDistanceTest.cpp
 	albaInteractor2DAngleTest.h albaInteractor2DAngleTest.cpp

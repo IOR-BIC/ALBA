@@ -128,11 +128,7 @@ void albaInteractorExtractIsosurface::PickIsoValue(albaDevice *device)
     if (mouse->GetRWI()->GetPicker()->Pick(x,y,0,m_Renderer))
     {
       mouse->GetRWI()->GetPicker()->GetPickPosition(pos_picked);
-      vtkPoints *p = vtkPoints::New();
-      p->SetNumberOfPoints(1);
-      p->SetPoint(0,pos_picked);
-      albaEventMacro(albaEvent(this,VME_PICKED,(vtkObject *)p));
-      p->Delete();
+      SendPickedPointEvent(VME_PICKED, pos_picked);
     }
   }
   else if (m_Renderer == NULL && mouse != NULL)

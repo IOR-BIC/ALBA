@@ -28,7 +28,7 @@
 #include "albaGUIDialog.h"
 #include "albaRWIBase.h"
 #include "albaRWI.h"
-#include "mmiSelectPoint.h"
+#include "albaInteractorSelectPoint.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"

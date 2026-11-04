@@ -113,13 +113,7 @@ void albaInteractorSelectCell::PickCell( albaDevice *device )
     {
       //BES: 29.1.2009 - get the picked coordinates
       cellPicker->GetPickedPositions()->GetPoint(0, pos_picked);
-
-      vtkPoints *pickedPoint = vtkPoints::New();
-      pickedPoint->SetNumberOfPoints(1);
-      pickedPoint->SetPoint(0,pos_picked);
-      albaEventMacro(albaEvent(this,VME_PICKED,(vtkObject *)pickedPoint,cellPicker->GetCellId()));
-      pickedPoint->Delete();
-      
+      SendPickedPointEvent(VME_PICKED, pos_picked, cellPicker->GetCellId());
     }
   
     vtkDEL(cellPicker);
