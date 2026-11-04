@@ -1,6 +1,6 @@
 /*========================================================================= 
   Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: mmiVTKPicker.h,v $ 
+  Module: $RCSfile: albaInteractorVTKPicker.h,v $ 
   Language: C++ 
   Date: $Date: 2012-04-06 08:39:52 $ 
   Version: $Revision: 1.1.2.5 $ 
@@ -11,8 +11,8 @@
   =========================================================================
 */
 
-#ifndef mmiVTKPicker_h__
-#define mmiVTKPicker_h__
+#ifndef albaInteractorVTKPicker_h__
+#define albaInteractorVTKPicker_h__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -26,9 +26,11 @@
 class vtkCellPicker;
 
 /** 
-class name: mmiVTKPicker
+class name: albaInteractorVTKPicker
 Implements mouse move of camera in the scene or perform continuous
 cell picking when using CTRL modifier.
+Unlike albaInteractorSelectPoint and albaInteractorSelectCell, it sends the
+vtkCellPicker itself to the listener and supports dragging the picked point.
 
 If CTRL modifier is pressed a pick is performed, which according to the
 current context leads to various events sent to the listener
@@ -52,11 +54,11 @@ Bool = true
 VtkObj = reference to vtkPoints containing the new position of
 point picked during CTRL + left mouse down  
 */
-class ALBA_EXPORT mmiVTKPicker : public albaInteractorCameraMove
+class ALBA_EXPORT albaInteractorVTKPicker : public albaInteractorCameraMove
 {
 public:
   /** RTTI macro */
-  albaTypeMacro(mmiVTKPicker,albaInteractorCameraMove);
+  albaTypeMacro(albaInteractorVTKPicker,albaInteractorCameraMove);
 
   /** Enables/disables continuous picking */
   inline void SetContinuousPicking(bool bValue) {
@@ -79,16 +81,16 @@ public:
 
 protected:
   /** constructor */
-  mmiVTKPicker() {      
+  albaInteractorVTKPicker() {      
     m_ContinuousPicking = false;
     m_Picker = NULL;
   }
   /** destructor */
-  virtual ~mmiVTKPicker();          
+  virtual ~albaInteractorVTKPicker();          
 
 protected:
   vtkCellPicker* m_Picker;      //<picker to be used for the picking
   bool m_ContinuousPicking;     //<true, if events are sent during mouse move
 };
 
-#endif // mmiVTKPicker_h__
+#endif // albaInteractorVTKPicker_h__

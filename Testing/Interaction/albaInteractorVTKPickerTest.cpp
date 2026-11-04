@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiVTKPickerTest
+ Module: albaInteractorVTKPickerTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -23,28 +23,28 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmiVTKPickerTest.h"
+#include "albaInteractorVTKPickerTest.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
-#include "mmiVTKPicker.h"
+#include "albaInteractorVTKPicker.h"
 
 
-void mmiVTKPickerTest::TestFixture()
+void albaInteractorVTKPickerTest::TestFixture()
 {
 	
 }
 
-void mmiVTKPickerTest::TestConstructorDestructor()
+void albaInteractorVTKPickerTest::TestConstructorDestructor()
 {
-	mmiVTKPicker *picker = mmiVTKPicker::New();
+	albaInteractorVTKPicker *picker = albaInteractorVTKPicker::New();
 
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::TestSetGetContinuousPicking()
+void albaInteractorVTKPickerTest::TestSetGetContinuousPicking()
 {
-	mmiVTKPicker *picker = mmiVTKPicker::New();
+	albaInteractorVTKPicker *picker = albaInteractorVTKPicker::New();
 
 	CPPUNIT_ASSERT(picker->GetContinuousPicking() == false);
 
@@ -57,25 +57,25 @@ void mmiVTKPickerTest::TestSetGetContinuousPicking()
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::TestOnMouseMove()
+void albaInteractorVTKPickerTest::TestOnMouseMove()
 {
-	mmiVTKPicker *picker = mmiVTKPicker::New();
+	albaInteractorVTKPicker *picker = albaInteractorVTKPicker::New();
 	// smoke test
 	picker->OnMouseMove();
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::TestOnLeftButtonDown()
+void albaInteractorVTKPickerTest::TestOnLeftButtonDown()
 {
-	mmiVTKPicker *picker = mmiVTKPicker::New();
+	albaInteractorVTKPicker *picker = albaInteractorVTKPicker::New();
 	// smoke test
 	picker->OnLeftButtonDown(NULL);
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::TestOnLeftButtonUp()
+void albaInteractorVTKPickerTest::TestOnLeftButtonUp()
 {
-	mmiVTKPicker *picker = mmiVTKPicker::New();
+	albaInteractorVTKPicker *picker = albaInteractorVTKPicker::New();
 	// smoke test
 	picker->OnLeftButtonUp();
 	picker->Delete();

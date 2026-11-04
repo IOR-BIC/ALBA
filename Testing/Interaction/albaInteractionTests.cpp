@@ -76,9 +76,8 @@
 #include "albaRefSysTest.h"
 #include "albaServiceLocator.h"
 
-#include "mmiVTKPickerTest.h"
-#include "mmiSelectPointTest.h"
-#include "mmiInfoImageTest.h"
+#include "albaInteractorVTKPickerTest.h"
+#include "albaInteractorSelectPointTest.h"
 #include "albaInteractor2DDistanceTest.h"
 #include "albaInteractor2DAngleTest.h"
 #include "albaInteractor2DIndicatorTest.h"
@@ -185,9 +184,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoPolylineGraphTest::suite());
 	runner.addTest(albaDeviceButtonsPadMouseDialogTest::suite());
 	runner.addTest(albaGUITransformSlidersTest::suite());
-	runner.addTest(mmiVTKPickerTest::suite());
-	runner.addTest(mmiSelectPointTest::suite());
-	runner.addTest(mmiInfoImageTest::suite());
+	runner.addTest(albaInteractorVTKPickerTest::suite());
+	runner.addTest(albaInteractorSelectPointTest::suite());
 	runner.addTest(albaInteractorDICOMImporterTest::suite());
 	runner.addTest(albaInteractor2DDistanceTest::suite());
  	runner.addTest(albaInteractor2DAngleTest::suite());
