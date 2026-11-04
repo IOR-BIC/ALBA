@@ -32,7 +32,6 @@ class albaGUIFloatSlider;
 class albaViewSlice;
 class albaVMEVolume;
 class vtkLookupTable;
-class albaGUILutSwatch;
 class vtkPoints;
 
 //----------------------------------------------------------------------------
@@ -90,8 +89,7 @@ public:
   /** IDs for the GUI */
   enum VIEW_ORTHO_SLICE_WIDGET_ID
   {
-    ID_LUT_CHOOSER = Superclass::ID_LAST,
-    ID_SIDE_ORTHO,
+    ID_SIDE_ORTHO = Superclass::ID_LAST,
 		ID_SNAP,
 		ID_X_SLIDER,
 		ID_Y_SLIDER,
@@ -208,7 +206,6 @@ protected:
   albaVME *m_CurrentVolume; ///< Current visualized volume
   
   albaGUILutSlider *m_LutSlider; ///< Double slider used to change brightness and contrast of the image
-  albaGUILutSwatch *m_LutWidget; ///< LUT widget in view side panel 
   vtkLookupTable *m_ColorLUT;
   albaViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera
