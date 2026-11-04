@@ -1,3 +1,2 @@
-/build-logs/build.log
-/build-logs/configure.log
-/build-logs/test.log
+/build-logs/
+/.claude/settings.local.json

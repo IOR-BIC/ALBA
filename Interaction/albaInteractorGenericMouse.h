@@ -49,6 +49,11 @@ public:
   //----------------------------------------------------------------------------
  
   /**
+  Set the picking already performed by the caller at the button down position:
+  the next OnButtonDownAction will use it instead of picking again */
+  void SetButtonDownPick(bool picked, double pickedPos[3]);
+
+  /**
   Action to be performed on button down event*/
   void OnButtonDownAction(int X, int Y);
 
@@ -203,6 +208,10 @@ protected:
 	vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
 
 	double  m_LastPickPosition[3];
+
+	bool    m_ButtonDownPickSet;        ///< True if the button down picking has been set by the caller
+	bool    m_ButtonDownPicked;         ///< Result of the picking set by the caller
+	double  m_ButtonDownPickPosition[3];///< Position of the picking set by the caller
 
 private:
 

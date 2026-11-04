@@ -59,12 +59,12 @@ void albaCryptTest::TestMafCalculateteChecksumFromFile()
 {
  string inputString = "Hello I'm a string!";
 
- string fileName = "newfile.txt";
+ string fileName = GET_TEST_DATA_DIR() + "\\newfile.txt";
  fstream file( fileName.c_str(), ios::out | ios::binary);
  file << inputString;
  file.close();
 
- assert(wxFileExists(fileName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(fileName.c_str()));
 
  // MD5 from http://md5-hash-online.waraxe.us/ online md5 calculator :P
  string inputStringMD5ToCheck  = "4A8F7A67C7F3A921C707740421003562";
@@ -74,7 +74,7 @@ void albaCryptTest::TestMafCalculateteChecksumFromFile()
 
  CPPUNIT_ASSERT_EQUAL(inputStringMD5ToCheck, outputMD5CheckSum);
 
- assert(wxRemoveFile(fileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(fileName.c_str()));
 
 }
 
@@ -82,14 +82,14 @@ void albaCryptTest::TestMafEncryptMafDecryptFile()
 {
  string stringToEncrypt = "Hello I'm the string to encrypt and decrypt!";
 
- string fileToEncryptName = "inputFileToEncrypt.txt";
+ string fileToEncryptName = GET_TEST_DATA_DIR() + "\\inputFileToEncrypt.txt";
  fstream fileToEncrypt( fileToEncryptName.c_str(), ios::out);
  fileToEncrypt << stringToEncrypt;
  fileToEncrypt.close();
 
- assert(wxFileExists(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(fileToEncryptName.c_str()));
 
- string encryptedFileName = "encryptedFile.txt";
+ string encryptedFileName = GET_TEST_DATA_DIR() + "\\encryptedFile.txt";
 
  string passPhrase = "ImThePassPhrase";
 
@@ -99,7 +99,7 @@ void albaCryptTest::TestMafEncryptMafDecryptFile()
 
  string wrongPassPhrase = "wrongpassphrase";
 
- string decryptedFileName = "decryptedFile.txt";
+ string decryptedFileName = GET_TEST_DATA_DIR() + "\\decryptedFile.txt";
 
  result = albaDecryptFile(encryptedFileName.c_str(),decryptedFileName.c_str(), wrongPassPhrase.c_str());
 
@@ -129,9 +129,9 @@ void albaCryptTest::TestMafEncryptMafDecryptFile()
 
  CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedFileString);
 
- assert(wxRemoveFile(fileToEncryptName.c_str()));
- assert(wxRemoveFile(encryptedFileName.c_str()));
- assert(wxRemoveFile(decryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(encryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(decryptedFileName.c_str()));
 }
 
 
@@ -141,14 +141,14 @@ void albaCryptTest::TestMafDecryptFileInMemory()
 
  string passPhrase = "ImThePassPhrase";
 
- string fileToEncryptName = "inputFileToEncrypt.txt";
+ string fileToEncryptName = GET_TEST_DATA_DIR() + "\\inputFileToEncrypt.txt";
  fstream file( fileToEncryptName.c_str(), ios::out);
  file << stringToEncrypt;
  file.close();
 
- assert(wxFileExists(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(fileToEncryptName.c_str()));
 
- string encryptedFileName = "encryptedFile.txt";
+ string encryptedFileName = GET_TEST_DATA_DIR() + "\\encryptedFile.txt";
 
  bool result = albaEncryptFile(fileToEncryptName.c_str(), encryptedFileName.c_str(), passPhrase.c_str() );
 
@@ -161,46 +161,46 @@ void albaCryptTest::TestMafDecryptFileInMemory()
  CPPUNIT_ASSERT_EQUAL(result, true);
  CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedString);
 
- assert(wxRemoveFile(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(fileToEncryptName.c_str()));
 }
 
 void albaCryptTest::TestMafEncryptFileFromMemory()
 {
  string stringToEncrypt = "Hello I'm the string to encrypt and decrypt!";
- string encryptedFileName = "encryptedFile.txt";
+ string encryptedFileName = GET_TEST_DATA_DIR() + "\\encryptedFile.txt";
  string passPhrase = "ImThePassPhrase";
 
  albaEncryptFileFromMemory(stringToEncrypt.c_str(),stringToEncrypt.length(), encryptedFileName.c_str(), \
  passPhrase.c_str() );
 
- assert(wxFileExists(encryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(encryptedFileName.c_str()));
 
  string decryptedString;
  albaDecryptFileInMemory(encryptedFileName.c_str(), decryptedString, passPhrase.c_str());
 
  CPPUNIT_ASSERT_EQUAL(stringToEncrypt,decryptedString);
 
- assert(wxRemoveFile(encryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(encryptedFileName.c_str()));
 }
 
 void albaCryptTest::TestMafDefaultEncryptFileMafDefaultDecryptFile()
 {
  string stringToEncrypt = "Hello I'm the string to encrypt and decrypt!";
 
- string fileToEncryptName = "inputFileToEncrypt.txt";
+ string fileToEncryptName = GET_TEST_DATA_DIR() + "\\inputFileToEncrypt.txt";
  fstream fileToEncrypt( fileToEncryptName.c_str(), ios::out);
  fileToEncrypt << stringToEncrypt;
  fileToEncrypt.close();
 
- assert(wxFileExists(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(fileToEncryptName.c_str()));
 
- string encryptedFileName = "encryptedFile.txt";
+ string encryptedFileName = GET_TEST_DATA_DIR() + "\\encryptedFile.txt";
 
  bool result = albaDefaultEncryptFile(fileToEncryptName.c_str(), encryptedFileName.c_str());
 
  CPPUNIT_ASSERT(result == true);
 
- string decryptedFileName = "decryptedFile.txt";
+ string decryptedFileName = GET_TEST_DATA_DIR() + "\\decryptedFile.txt";
 
  result = albaDefaultDecryptFile(encryptedFileName.c_str(),decryptedFileName.c_str());
 
@@ -226,9 +226,9 @@ void albaCryptTest::TestMafDefaultEncryptFileMafDefaultDecryptFile()
 
  CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedFileString);
 
- assert(wxRemoveFile(fileToEncryptName.c_str()));
- assert(wxRemoveFile(encryptedFileName.c_str()));
- assert(wxRemoveFile(decryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(encryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(decryptedFileName.c_str()));
 
 }
 
@@ -236,14 +236,14 @@ void albaCryptTest::TestMafDefaultDecryptFileInMemory()
 {
  string stringToEncrypt = "Hello I'm the string to encrypt and decrypt!";
 
- string fileToEncryptName = "inputFileToEncrypt.txt";
+ string fileToEncryptName = GET_TEST_DATA_DIR() + "\\inputFileToEncrypt.txt";
  fstream file( fileToEncryptName.c_str(), ios::out);
  file << stringToEncrypt;
  file.close();
 
- assert(wxFileExists(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(fileToEncryptName.c_str()));
 
- string encryptedFileName = "encryptedFile.txt";
+ string encryptedFileName = GET_TEST_DATA_DIR() + "\\encryptedFile.txt";
 
  bool result = albaDefaultEncryptFile(fileToEncryptName.c_str(), encryptedFileName.c_str());
 
@@ -256,24 +256,24 @@ void albaCryptTest::TestMafDefaultDecryptFileInMemory()
  CPPUNIT_ASSERT_EQUAL(result, true);
  CPPUNIT_ASSERT_EQUAL(stringToEncrypt, decryptedString);
 
- assert(wxRemoveFile(fileToEncryptName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(fileToEncryptName.c_str()));
 }
 
 void albaCryptTest::TestMafDefaultEncryptFileFromMemory()
 {
  string stringToEncrypt = "Hello I'm the string to encrypt and decrypt!";
- string encryptedFileName = "encryptedFile.txt";
+ string encryptedFileName = GET_TEST_DATA_DIR() + "\\encryptedFile.txt";
 
  albaDefaultEncryptFileFromMemory(stringToEncrypt.c_str(),stringToEncrypt.length(), encryptedFileName.c_str());
 
- assert(wxFileExists(encryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxFileExists(encryptedFileName.c_str()));
 
  string decryptedString;
  albaDefaultDecryptFileInMemory(encryptedFileName.c_str(), decryptedString);
 
  CPPUNIT_ASSERT_EQUAL(stringToEncrypt,decryptedString);
 
- assert(wxRemoveFile(encryptedFileName.c_str()));
+ CPPUNIT_ASSERT(wxRemoveFile(encryptedFileName.c_str()));
 
 }
 
