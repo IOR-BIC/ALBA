@@ -20,6 +20,7 @@
 #include "albaAgent.h"
 #include "albaString.h"
 #include "vtkALBASmartPointer.h"
+#include "vtkType.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -186,6 +187,11 @@ protected:
 
   void ComputeDisplayToWorld(double x, double y, double z, double worldPt[4]);
   void ComputeWorldToDisplay(double x, double y, double z, double displayPt[3]);
+
+  /**
+    Send to the listener the event eventId carrying the picked position as a vtkPoints with one point (GetVtkObj),
+    the id of the picked point or cell (GetArg), a scalar value (GetDouble) and the picked VME (GetVme). */
+  void SendPickedPointEvent(int eventId, double pos[3], vtkIdType id = 0, double scalar = 0, albaVME *vme = NULL);
 
 
   /** 

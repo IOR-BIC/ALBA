@@ -354,9 +354,9 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractorSegmentationPicker.cpp  		../Interaction/albaInteractorSegmentationPicker.h 
   ../Interaction/albaInteractorPERScalarInformation.cpp  	../Interaction/albaInteractorPERScalarInformation.h
   ../Interaction/albaInteractorPERBrushFeedback.cpp  		../Interaction/albaInteractorPERBrushFeedback.h
-  ../Interaction/mmiVTKPicker.cpp  						../Interaction/mmiVTKPicker.h
-  ../Interaction/mmiInfoImage.cpp  						../Interaction/mmiInfoImage.h
-  ../Interaction/mmiSelectPoint.cpp  						../Interaction/mmiSelectPoint.h
+  ../Interaction/albaInteractorVTKPicker.cpp  						../Interaction/albaInteractorVTKPicker.h
+  ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
+  ../Interaction/albaInteractorSelectPoint.cpp  						../Interaction/albaInteractorSelectPoint.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
   ../Interaction/albaDeviceButtonsPadMouseDialog.cpp	  	../Interaction/albaDeviceButtonsPadMouseDialog.h
   ../Interaction/albaGUITransformSliders.cpp  				../Interaction/albaGUITransformSliders.h    
