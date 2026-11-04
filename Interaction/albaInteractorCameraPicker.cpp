@@ -137,15 +137,7 @@ void albaInteractorCameraPicker::SendPickingInformation(albaView *v, double *mou
   albaVME *pickedVME;
   vtkIdType pid;
   if (albaPickHelper::PickPoint(v, mouse_flag ? mouse_pos : NULL, mouse_flag ? NULL : tracker_pos, pos_picked, pickedVME, pid, scalar_value))
-  {
-    vtkALBASmartPointer<vtkPoints> p;
-    p->SetNumberOfPoints(1);
-    p->SetPoint(0,pos_picked);
-    albaEvent pick_event(this,msg_id,(vtkObject *)p.GetPointer());
-    pick_event.SetDouble(scalar_value);
-    pick_event.SetArg(pid);
-    albaEventMacro(pick_event);
-  }
+    SendPickedPointEvent(msg_id, pos_picked, pid, scalar_value);
 }
 
 //----------------------------------------------------------------------------

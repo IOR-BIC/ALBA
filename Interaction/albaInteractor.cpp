@@ -37,8 +37,11 @@
 #include "albaView.h"
 //#include "albaViewCompound.h"
 
+#include "albaEvent.h"
+
 #include "vtkRenderer.h"
 #include "vtkProp3D.h"
+#include "vtkPoints.h"
 
 #include <assert.h>
 
@@ -361,6 +364,20 @@ void albaInteractor::ComputeWorldToDisplay(double x, double y, double z, double 
   m_Renderer->SetWorldPoint(x, y, z, 1.0);
   m_Renderer->WorldToDisplay();
   m_Renderer->GetDisplayPoint(displayPt);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor::SendPickedPointEvent(int eventId, double pos[3], vtkIdType id, double scalar, albaVME *vme)
+//----------------------------------------------------------------------------
+{
+  vtkALBASmartPointer<vtkPoints> points;
+  points->SetNumberOfPoints(1);
+  points->SetPoint(0, pos);
+
+  albaEvent pickEvent(this, eventId, (vtkObject *)points.GetPointer(), (long)id);
+  pickEvent.SetDouble(scalar);
+  pickEvent.SetVme(vme);
+  albaEventMacro(pickEvent);
 }
 //----------------------------------------------------------------------------
 /*bool albaInteractor::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)

@@ -127,11 +127,7 @@ void albaInteractorSelectPoint::PickCell( albaDevice *device )
 		if(pointPicker->Pick(x,y,0,m_Renderer))
 		{
       pointPicker->GetPickPosition(pos_picked);
-			vtkPoints *pickedPoint = vtkPoints::New();
-			pickedPoint->SetNumberOfPoints(1);
-			pickedPoint->SetPoint(0,pos_picked);
-			albaEventMacro(albaEvent(this,VME_PICKED,(vtkObject *)pickedPoint,pointPicker->GetPointId()));
-			pickedPoint->Delete();
+			SendPickedPointEvent(VME_PICKED, pos_picked, pointPicker->GetPointId());
 
 			//  wxString msg = "picked something";
 			//  int res = wxMessageBox(msg,"debug info", wxOK, NULL);

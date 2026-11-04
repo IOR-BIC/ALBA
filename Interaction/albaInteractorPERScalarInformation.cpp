@@ -129,13 +129,7 @@ void albaInteractorPERScalarInformation::OnEvent(albaEventBase *event)
         // so it is clamped into the bounds to find the nearest point
         double scalar_value;
         vtkIdType pid = albaPickHelper::GetPointScalar(pickedVME, pos_picked, scalar_value, true);
-        vtkALBASmartPointer<vtkPoints> p;
-        p->SetNumberOfPoints(1);
-        p->SetPoint(0,pos_picked);
-        albaEvent pick_event(this,MOUSE_MOVE,(vtkObject *)p.GetPointer());
-        pick_event.SetDouble(scalar_value);
-        pick_event.SetArg(pid);
-        albaEventMacro(pick_event);
+        SendPickedPointEvent(MOUSE_MOVE, pos_picked, pid, scalar_value);
       }
     }
   }
