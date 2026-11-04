@@ -57,6 +57,34 @@ public:
 albaCxxTypeMacro(albaInteractorDummy);
 
 //----------------------------------------------------------------------------
+class albaInteractorButtonsDummy : public albaInteractor // concrete class using the default button handling
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaInteractorButtonsDummy,albaInteractor);
+};
+
+albaCxxTypeMacro(albaInteractorButtonsDummy);
+
+//----------------------------------------------------------------------------
+class albaInteractorTestListener : public albaObserver // stores the sender of the received button events
+//----------------------------------------------------------------------------
+{
+public:
+  albaInteractorTestListener() {m_ButtonDownSender = m_ButtonUpSender = NULL;};
+  virtual void OnEvent(albaEventBase *e)
+  {
+    if (e->GetId() == albaInteractor::BUTTON_DOWN)
+      m_ButtonDownSender = e->GetSender();
+    else if (e->GetId() == albaInteractor::BUTTON_UP)
+      m_ButtonUpSender = e->GetSender();
+  };
+
+  void *m_ButtonDownSender;
+  void *m_ButtonUpSender;
+};
+
+//----------------------------------------------------------------------------
 void albaInteractorTest::TestFixture()
 //----------------------------------------------------------------------------
 {
@@ -326,4 +354,44 @@ void albaInteractorTest::TestSetGetButtonMode()
   CPPUNIT_ASSERT(interactor->GetButtonMode() == MULTI_BUTTON_MODE);
 
   albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractorTest::TestButtonEventsKeepIncomingEvent()
+//----------------------------------------------------------------------------
+{
+  albaDevice *device;
+  albaNEW(device);
+
+  albaInteractorButtonsDummy *interactor;
+  albaNEW(interactor);
+
+  albaInteractorTestListener listener;
+  interactor->SetListener(&listener);
+
+  // button down: the listener receives BUTTON_DOWN, the incoming event is unchanged
+  albaEventInteraction downEvent(device, interactor->GetStartInteractionEvent());
+  downEvent.SetButton(ALBA_LEFT_BUTTON);
+  downEvent.SetChannel(MCH_INPUT);
+  interactor->OnEvent(&downEvent);
+
+  CPPUNIT_ASSERT(interactor->IsInteracting());
+  CPPUNIT_ASSERT(listener.m_ButtonDownSender == interactor);
+  CPPUNIT_ASSERT(downEvent.GetId() == interactor->GetStartInteractionEvent());
+  CPPUNIT_ASSERT(downEvent.GetSender() == device);
+  CPPUNIT_ASSERT(downEvent.GetChannel() == MCH_INPUT);
+
+  // button up: the listener receives BUTTON_UP, the incoming event is unchanged
+  albaEventInteraction upEvent(device, interactor->GetStopInteractionEvent());
+  upEvent.SetButton(ALBA_LEFT_BUTTON);
+  upEvent.SetChannel(MCH_INPUT);
+  interactor->OnEvent(&upEvent);
+
+  CPPUNIT_ASSERT(!interactor->IsInteracting());
+  CPPUNIT_ASSERT(listener.m_ButtonUpSender == interactor);
+  CPPUNIT_ASSERT(upEvent.GetId() == interactor->GetStopInteractionEvent());
+  CPPUNIT_ASSERT(upEvent.GetSender() == device);
+  CPPUNIT_ASSERT(upEvent.GetChannel() == MCH_INPUT);
+
+  albaDEL(interactor);
+  albaDEL(device);
 }

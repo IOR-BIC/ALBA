@@ -38,6 +38,7 @@ public:
   CPPUNIT_TEST( TestStartStopInteraction );
   CPPUNIT_TEST( TestIsInteracting );
   CPPUNIT_TEST( TestSetGetButtonMode );
+  CPPUNIT_TEST( TestButtonEventsKeepIncomingEvent );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -56,6 +57,7 @@ protected:
   void TestStartStopInteraction();
   void TestIsInteracting();
   void TestSetGetButtonMode();
+  void TestButtonEventsKeepIncomingEvent();
 };
 
 #endif
