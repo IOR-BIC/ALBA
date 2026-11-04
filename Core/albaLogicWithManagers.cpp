@@ -1995,7 +1995,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	// Operation Menu:
 	//------------------------------------------------------------
 
-	Plug(new albaOpCreateVolume("Volume"), _("Create"));
+	Plug(new albaOpCreateVolume(), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
 	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
