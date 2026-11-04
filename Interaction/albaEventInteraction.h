@@ -23,6 +23,12 @@
 
 template class ALBA_EXPORT albaAutoPointer<albaMatrix>;
 
+class albaView;
+class albaDevice;
+class albaVME;
+class albaInteractor;
+class vtkProp3D;
+
 /** Event class to transport a triggering button and a position from pointing devices.
   Evant issue by 2D and 3D tracking devices in correspondace to
   MoveEvent, ButtonDownEvent and ButtonUpevent. 2D devices set the 
@@ -76,23 +82,44 @@ public:
   /** Get the given modifiers value*/
   unsigned long GetModifiers() {return m_Modifiers;}
 
-  /** Deep Copy of the object*/
+  /** Deep Copy of the object (the cached picking is not copied)*/
   virtual void DeepCopy(const albaEventBase *event);
-  
+
+  /**
+    Find the VME picked by the device at the event position on the given view.
+    The picking is performed only the first time, then the result is cached into the event
+    and shared by all the interactors receiving it. Return true if a VME has been picked. */
+  bool FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractor *&pickedBehavior);
+
+  /** Return the position picked by FindPokedVme, meaningful only if a VME has been picked */
+  void GetPickedPosition(double pos[3]);
+
+  /** Discard the cached picking, to be called when the scene or the camera has been changed */
+  void ResetPick();
+
   /** overloaded constructor */
   albaEventInteraction(void *sender=NULL,albaID id=-1,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,albaMatrix *matrix,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,double x,double y,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers),m_Key(0) {}
+  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers),m_Key(0) {ResetPick();}
   virtual ~albaEventInteraction() {}
- 
+
 protected:
+
+  bool            m_PickDone;           ///< True if the picking has been performed for this event
+  bool            m_Picked;             ///< True if the cached picking found a VME
+  albaView       *m_PickView;           ///< View used by the cached picking
+  albaDevice     *m_PickDevice;         ///< Device used by the cached picking
+  vtkProp3D      *m_PickedProp;         ///< Cached picked prop
+  albaVME        *m_PickedVme;          ///< Cached picked VME
+  albaInteractor *m_PickedBehavior;     ///< Cached behavior of the picked VME
+  double          m_PickedPosition[3];  ///< Cached picked position
 
   int           m_Button;     ///< Optional button which triggered the event
   unsigned long m_Modifiers;  ///< Optional modifiers for the button 

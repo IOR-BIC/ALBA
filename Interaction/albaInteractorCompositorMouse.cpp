@@ -236,14 +236,13 @@ void albaInteractorCompositorMouse::InitInteraction(int buttonPressed, albaEvent
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
   albaInteractor *picked_bh   = NULL;
-  albaMatrix     point_pose;
-
-  point_pose.SetElement(0,3,m_MousePose[0]);
-  point_pose.SetElement(1,3,m_MousePose[1]);
 
   albaView *v = mouse->GetView();
   assert(v);
-  v->FindPokedVme(mouse,point_pose,picked_prop,picked_vme,picked_bh);
+  // reuse the picking already performed on this event (e.g. by the PER)
+  bool picked = e->FindPokedVme(v,mouse,picked_prop,picked_vme,picked_bh);
+  double picked_pos[3];
+  e->GetPickedPosition(picked_pos);
 
   // Set the m_Renderer and m_CurrentCamera ivar
   StartInteraction(mouse);
@@ -266,8 +265,9 @@ void albaInteractorCompositorMouse::InitInteraction(int buttonPressed, albaEvent
       m_ActiveMMIGeneric->SetRendererAndView(m_Renderer,m_View);
       m_ActiveMMIGeneric->SetProp(picked_prop);
       m_ActiveMMIGeneric->SetCurrentCamera(m_Renderer->GetActiveCamera());
-      if (m_ActiveMMIGeneric->StartInteraction(mouse)) // force 
+      if (m_ActiveMMIGeneric->StartInteraction(mouse)) // force
       {
+        m_ActiveMMIGeneric->SetButtonDownPick(picked, picked_pos);
         m_ActiveMMIGeneric->OnButtonDownAction(m_MousePose[0], m_MousePose[1]);
       }
     }

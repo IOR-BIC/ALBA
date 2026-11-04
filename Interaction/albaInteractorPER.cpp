@@ -303,15 +303,12 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
   albaInteractor *picked_bh   = NULL;
-  albaMatrix     point_pose;
-  double        pos_2d[2];
 
   albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
   albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
 
   if (tracker)
   {
-    point_pose = *e->GetMatrix();
     albaAvatar *avatar = tracker->GetAvatar();
     if (avatar)
     {
@@ -320,14 +317,11 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
   }
   else if (mouse)
   {
-    e->Get2DPosition(pos_2d);
-    point_pose.Identity();
-    point_pose.SetElement(0,3,pos_2d[0]);
-    point_pose.SetElement(1,3,pos_2d[1]);
     v = mouse->GetView();
   }
 
-  if(v && v->FindPokedVme(device, point_pose, picked_prop, picked_vme, picked_bh))
+  // the picking is cached into the event and shared with the behavior receiving it
+  if(v && e->FindPokedVme(v, device, picked_prop, picked_vme, picked_bh))
   {
     SetPickedVME(device, picked_vme);
     // if a VME is picked its pointer is written in PickedVME
@@ -342,7 +336,7 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
 			if (picked_vme->IsA("albaVMELandmarkCloud"))
 			{
 				double pos[3];
-				v->GetPickedPosition(pos);
+				e->GetPickedPosition(pos);
 				picked_vme = (albaVME *)((albaVMELandmarkCloud *)picked_vme)->GetNearestLandmark(pos, true);
 
 			}
@@ -570,7 +564,7 @@ void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
 
 	  vtkCamera *cam = ren->GetActiveCamera();
 
-    if(view && !view->FindPokedVme(tracker,*point_pose,picked_prop,picked_vme,picked_bh)) 
+    if(view && !e->FindPokedVme(view,tracker,picked_prop,picked_vme,picked_bh))
       return; // no picking no fly to!
 
 
@@ -579,10 +573,10 @@ void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
 	  cam->GetFocalPoint(f0);
 	  double p0[3]; // start camera position
 	  cam->GetPosition(p0);
-    
+
     // find picked position
     double pos[3];
-    view->GetPickedPosition(pos);
+    e->GetPickedPosition(pos);
 	  double foc_motion[3];
     for (i=0; i<3; i++) 
       foc_motion[i] = pos[i] - f0[i];
@@ -612,24 +606,25 @@ void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
 
     }
     cam->OrthogonalizeViewUp();
+    e->ResetPick(); // the camera has been moved
 
     m_FlyToFlag = false;
   }
   else if (mouse)
   {
+    // events without a position (e.g. keyboard ones) pick at the last mouse position
     mouse->GetLastPosition(pose_2d);
-    albaMatrix point_pose;
-    point_pose.SetElement(0,3,pose_2d[0]);
-    point_pose.SetElement(1,3,pose_2d[1]);
+    albaEventInteraction lastPositionEvent(mouse,e->GetId(),pose_2d[0],pose_2d[1]);
+    albaEventInteraction *pick_event = e->GetXYFlag() ? e : &lastPositionEvent;
 
     vtkRenderer *ren = mouse->GetRenderer();
     albaView *view = mouse->GetView();
-    
+
     if(!ren) return; // no renderer no fly to!
 
 	  vtkCamera *cam = ren->GetActiveCamera();
 
-    if(view && !view->FindPokedVme(mouse,point_pose,picked_prop,picked_vme,picked_bh)) 
+    if(view && !pick_event->FindPokedVme(view,mouse,picked_prop,picked_vme,picked_bh))
       return; // no picking no fly to!
 
     int i, j;
@@ -637,10 +632,10 @@ void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
 	  cam->GetFocalPoint(f0);
 	  double p0[3]; // start camera position
 	  cam->GetPosition(p0);
-    
+
     // find picked position
     double pos[3];
-    view->GetPickedPosition(pos);
+    pick_event->GetPickedPosition(pos);
 	  double foc_motion[3];
     for (i=0; i<3; i++) 
       foc_motion[i] = pos[i] - f0[i];
@@ -669,6 +664,7 @@ void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
       InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
     }
     cam->OrthogonalizeViewUp();
+    e->ResetPick(); // the camera has been moved
     m_FlyToFlag = false;
   }
 }
