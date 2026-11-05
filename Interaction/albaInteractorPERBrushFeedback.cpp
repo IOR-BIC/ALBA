@@ -25,6 +25,7 @@
 
 
 #include "albaInteractorPERBrushFeedback.h"
+#include "albaPickHelper.h"
 
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
@@ -135,36 +136,13 @@ void albaInteractorPERBrushFeedback::OnEvent(albaEventBase *event)
     {
       double mouse_pos[2];
       e->Get2DPosition(mouse_pos);
-      bool picked_something = false;
 
-      vtkCellPicker *cellPicker;
-      vtkNEW(cellPicker);
-      cellPicker->SetTolerance(0.001);
       albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(device);
       albaView *v = mouse->GetView();
       if (v)
       {
-        albaViewCompound *vc = albaViewCompound::SafeDownCast(v);
-        if (vc)
-        {
-          v = vc->GetSubView();
-        }
-      }
-      if (v)
-      {
-        vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
-        vtkRenderer *r = NULL;
-        rc->InitTraversal();
-        while(r = rc->GetNextItem())
-        {
-          if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
-          {
-            picked_something = true;
-						break;
-          }
-        }
-				
-				cellPicker->GetPickPosition(m_PickPosition);
+        // the position is sent even if nothing has been picked, (0, 0, 0) in that case
+        bool picked_something = albaPickHelper::PickCell(v, mouse_pos[0], mouse_pos[1], m_PickPosition);
 
 				albaEvent pick_event(this, MOUSE_MOVE);
 				pick_event.SetPointer(m_PickPosition);
@@ -172,7 +150,6 @@ void albaInteractorPERBrushFeedback::OnEvent(albaEventBase *event)
 				pick_event.SetBool(e->GetModifier(ALBA_CTRL_KEY) == true);
 				albaEventMacro(pick_event);
       }
-      vtkDEL(cellPicker);
     }
   }
 

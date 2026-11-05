@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiSelectPointTest
+ Module: albaInteractorSelectPointTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -22,35 +22,35 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmiSelectPointTest.h"
+#include "albaInteractorSelectPointTest.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
-#include "mmiSelectPoint.h"
+#include "albaInteractorSelectPoint.h"
 #include "albaEventInteraction.h"
 
-void mmiSelectPointTest::TestFixture()
+void albaInteractorSelectPointTest::TestFixture()
 {
 	
 }
 
-void mmiSelectPointTest::TestConstructorDestructor()
+void albaInteractorSelectPointTest::TestConstructorDestructor()
 {
-	mmiSelectPoint *selectPoint = mmiSelectPoint::New();
+	albaInteractorSelectPoint *selectPoint = albaInteractorSelectPoint::New();
 	selectPoint->Delete();
 }
 
-void mmiSelectPointTest::TestOnMouseMove()
+void albaInteractorSelectPointTest::TestOnMouseMove()
 {
-  mmiSelectPoint *selectPoint = mmiSelectPoint::New();
+  albaInteractorSelectPoint *selectPoint = albaInteractorSelectPoint::New();
   // smoke test
   selectPoint->OnMouseMove();
   selectPoint->Delete();
 }
 
-void mmiSelectPointTest::TestSetCtrlModifierOnOff()
+void albaInteractorSelectPointTest::TestSetCtrlModifierOnOff()
 {
-	mmiSelectPoint *selectPoint = mmiSelectPoint::New();
+	albaInteractorSelectPoint *selectPoint = albaInteractorSelectPoint::New();
   
   bool ctrlModifierSatus = selectPoint->GetCtrlModifier();
   CPPUNIT_ASSERT(ctrlModifierSatus == true);
@@ -69,9 +69,9 @@ void mmiSelectPointTest::TestSetCtrlModifierOnOff()
 
 }
 
-void mmiSelectPointTest::TestSetGetCtrlModifier()
+void albaInteractorSelectPointTest::TestSetGetCtrlModifier()
 {
-  mmiSelectPoint *selectPoint = mmiSelectPoint::New();
+  albaInteractorSelectPoint *selectPoint = albaInteractorSelectPoint::New();
 
   bool ctrlModifierSatus = selectPoint->GetCtrlModifier();
   CPPUNIT_ASSERT(ctrlModifierSatus == true);
@@ -87,17 +87,17 @@ void mmiSelectPointTest::TestSetGetCtrlModifier()
   selectPoint->Delete();
 }
 
-void mmiSelectPointTest::TestOnLeftButtonDown()
+void albaInteractorSelectPointTest::TestOnLeftButtonDown()
 {
-	mmiSelectPoint *selectPoint = mmiSelectPoint::New();
+	albaInteractorSelectPoint *selectPoint = albaInteractorSelectPoint::New();
   // smoke test
   selectPoint->OnLeftButtonDown(NULL);
 	selectPoint->Delete();
 }
 
-void mmiSelectPointTest::TestOnButtonUp()
+void albaInteractorSelectPointTest::TestOnButtonUp()
 {
-  mmiSelectPoint *selectPoint = mmiSelectPoint::New();
+  albaInteractorSelectPoint *selectPoint = albaInteractorSelectPoint::New();
   // smoke test 
   selectPoint->OnButtonUp(NULL);
   selectPoint->Delete();

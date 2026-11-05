@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiInfoImageTest
- Authors: Roberto Mucci
+ Module: albaViewGlobalSliceCompoundTest
+ Authors: Daniele Giunchi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -14,27 +14,19 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mmiInfoImageTest_H__
-#define __CPP_UNIT_mmiInfoImageTest_H__
+#ifndef __CPP_UNIT_albaViewGlobalSliceCompoundTEST_H__
+#define __CPP_UNIT_albaViewGlobalSliceCompoundTEST_H__
 
 #include "albaTest.h"
 
-class mmiInfoImageTest : public albaTest
+class albaViewGlobalSliceCompoundTest : public albaTest
 {
-  public:
-
-  CPPUNIT_TEST_SUITE( mmiInfoImageTest );
-  CPPUNIT_TEST( TestFixture );
-  CPPUNIT_TEST( TestConstructorDestructor );
-  CPPUNIT_TEST( TestOnEvent );
+  CPPUNIT_TEST_SUITE( albaViewGlobalSliceCompoundTest );
+  CPPUNIT_TEST( CreateDestroyTest );
   CPPUNIT_TEST_SUITE_END();
-  
-  protected:
-    
-	void TestFixture();
-	void TestConstructorDestructor();
-	void TestOnEvent();
 
+  protected:
+    void CreateDestroyTest();
 };
 
 #endif

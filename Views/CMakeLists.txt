@@ -13,6 +13,7 @@ SET(PROJECT_SRCS
   albaViewRXCT.cpp									albaViewRXCT.h
   albaViewSlice.cpp								albaViewSlice.h
   albaViewGlobalSlice.cpp					albaViewGlobalSlice.h
+  albaViewGlobalSliceCompound.cpp	albaViewGlobalSliceCompound.h
   albaViewImage.cpp								albaViewImage.h
   albaViewRXCompound.cpp						albaViewRXCompound.h
   albaView3D.cpp										albaView3D.h

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiVTKPickerTest
+ Module: albaInteractorVTKPickerTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mmiVTKPickerTest_H__
-#define __CPP_UNIT_mmiVTKPickerTest_H__
+#ifndef __CPP_UNIT_albaInteractorVTKPickerTest_H__
+#define __CPP_UNIT_albaInteractorVTKPickerTest_H__
 
 #include "albaTest.h"
 
-class mmiVTKPickerTest : public albaTest
+class albaInteractorVTKPickerTest : public albaTest
 {
   public:
 
-  CPPUNIT_TEST_SUITE( mmiVTKPickerTest );
+  CPPUNIT_TEST_SUITE( albaInteractorVTKPickerTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestSetGetContinuousPicking );

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiSelectPointTest
+ Module: albaInteractorSelectPointTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mmiSelectPointTest_H__
-#define __CPP_UNIT_mmiSelectPointTest_H__
+#ifndef __CPP_UNIT_albaInteractorSelectPointTest_H__
+#define __CPP_UNIT_albaInteractorSelectPointTest_H__
 
 #include "albaTest.h"
 
-class mmiSelectPointTest : public albaTest
+class albaInteractorSelectPointTest : public albaTest
 {
   public:
 
-  CPPUNIT_TEST_SUITE( mmiSelectPointTest );
+  CPPUNIT_TEST_SUITE( albaInteractorSelectPointTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestOnMouseMove );

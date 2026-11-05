@@ -350,13 +350,6 @@ void albaViewVTK::OnEvent(albaEventBase *alba_event)
   {
     switch(e->GetId()) 
     {
-      case CAMERA_PRE_RESET:
-        OnPreResetCamera();
-        albaEventMacro(*alba_event);
-      break;
-      case CAMERA_POST_RESET:
-        OnPostResetCamera();
-        albaEventMacro(*alba_event);
       break;
       case ID_ROLLOUT_ATTACH_CAMERA:
       case ID_ROLLOUT_TEXT_KIT:
@@ -373,14 +366,6 @@ void albaViewVTK::OnEvent(albaEventBase *alba_event)
     //albaEventMacro(*alba_event);
 		Superclass::OnEvent(alba_event);
   }
-}
-//----------------------------------------------------------------------------
-void albaViewVTK::OnPreResetCamera()
-{
-}
-//----------------------------------------------------------------------------
-void albaViewVTK::OnPostResetCamera()
-{
 }
 //----------------------------------------------------------------------------
 void albaViewVTK::SetWindowSize(int w, int h)

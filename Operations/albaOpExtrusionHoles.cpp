@@ -29,7 +29,7 @@
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIValidator.h"
 #include "albaRWI.h"
-#include "mmiSelectPoint.h"
+#include "albaInteractorSelectPoint.h"
 #include "albaVMESurface.h"
 
 #include "vtkALBASmartPointer.h"

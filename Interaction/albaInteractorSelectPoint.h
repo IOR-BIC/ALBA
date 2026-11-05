@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiSelectPoint
+ Module: albaInteractorSelectPoint
  Authors: Matteo Giacomoni , Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __mmiSelectPoint_h
-#define __mmiSelectPoint_h
+#ifndef __albaInteractorSelectPoint_h
+#define __albaInteractorSelectPoint_h
 
 //----------------------------------------------------------------------------
 // Include:
@@ -52,10 +52,10 @@ pointFromEvent->GetPoint(0,pointCoordinates);
 int cellID = e->GetArg();
 
 */
-class ALBA_EXPORT mmiSelectPoint : public albaInteractorCameraMove
+class ALBA_EXPORT albaInteractorSelectPoint : public albaInteractorCameraMove
 {
 public:
-	albaTypeMacro(mmiSelectPoint,albaInteractorCameraMove);
+	albaTypeMacro(albaInteractorSelectPoint,albaInteractorCameraMove);
 
 	/** redefined not to move the camera if something has been picked */
 	virtual void OnMouseMove();
@@ -81,8 +81,8 @@ public:
   bool GetCtrlModifier() {return m_UseCtrlModifier;};
 
 protected:
-	mmiSelectPoint();
-	virtual ~mmiSelectPoint();
+	albaInteractorSelectPoint();
+	virtual ~albaInteractorSelectPoint();
 
 	/** send the picking informations to the listener */
 	void PickCell(albaDevice *device);
@@ -92,8 +92,8 @@ protected:
   bool m_UseCtrlModifier;
 
 private:
-	mmiSelectPoint(const mmiSelectPoint&);  // Not implemented.
-	void operator=(const mmiSelectPoint&);  // Not implemented.
+	albaInteractorSelectPoint(const albaInteractorSelectPoint&);  // Not implemented.
+	void operator=(const albaInteractorSelectPoint&);  // Not implemented.
 	void OnEvent(albaEventBase *event);
 
 };

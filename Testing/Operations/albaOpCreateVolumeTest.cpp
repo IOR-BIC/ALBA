@@ -31,7 +31,7 @@
 
 #include "vtkImageData.h"
 
-#define TEST_RESULT CPPUNIT_ASSERT(result);
+
 
 //----------------------------------------------------------------------------
 void albaOpCreateVolumeTest::TestFixture()
@@ -56,31 +56,24 @@ void albaOpCreateVolumeTest::VolumeParametersTest()
 
   albaOpCreateVolume *op = new albaOpCreateVolume();
   op->SetVolumeDensity(density);
-  result = albaEquals(density, op->GetVolumeDensity());
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(albaEquals(density, op->GetVolumeDensity()));
+  
   double spc[3];
   op->SetVolumeSpacing(spacing);
   op->GetVolumeSpacing(spc);
 
-  result = albaEquals(spacing[0], spc[0]);
-  TEST_RESULT;
-  result = albaEquals(spacing[1], spc[1]);
-  TEST_RESULT;
-  result = albaEquals(spacing[2], spc[2]);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(albaEquals(spacing[0], spc[0]));
+  CPPUNIT_ASSERT(albaEquals(spacing[1], spc[1]));
+  CPPUNIT_ASSERT(albaEquals(spacing[2], spc[2]));
+  
   double dim[3];
   op->SetVolumeDimensions(dimensions);
   op->GetVolumeDimensions(dim);
 
-  result = albaEquals(dimensions[0], dim[0]);
-  TEST_RESULT;
-  result = albaEquals(dimensions[1], dim[1]);
-  TEST_RESULT;
-  result = albaEquals(dimensions[2], dim[2]);
-  TEST_RESULT;
-
+  CPPUNIT_ASSERT(albaEquals(dimensions[0], dim[0]));
+  CPPUNIT_ASSERT(albaEquals(dimensions[1], dim[1]));
+  CPPUNIT_ASSERT(albaEquals(dimensions[2], dim[2]));
+  
   cppDEL(op);
 }
 
@@ -103,29 +96,21 @@ void albaOpCreateVolumeTest::VolumeCreatedTest()
   double spc[3], sr[2], dim[3], b[6];
   sp->GetSpacing(spc);
 
-  result = albaEquals(spacing[0], spc[0]);
-  TEST_RESULT;
-  result = albaEquals(spacing[1], spc[1]);
-  TEST_RESULT;
-  result = albaEquals(spacing[2], spc[2]);
-  TEST_RESULT;
+  CPPUNIT_ASSERT(albaEquals(spacing[0], spc[0]));
+  CPPUNIT_ASSERT(albaEquals(spacing[1], spc[1]));
+  CPPUNIT_ASSERT(albaEquals(spacing[2], spc[2]));
 
   sp->GetScalarRange(sr);
-  result = albaEquals(sr[0], sr[1]);
-  TEST_RESULT;
-  result = albaEquals(sr[0], density);
-  TEST_RESULT;
+  CPPUNIT_ASSERT(albaEquals(sr[0], sr[1]));
+  CPPUNIT_ASSERT(albaEquals(sr[0], density));
   sp->GetBounds(b);
   dim[0] = b[1] - b[0];
   dim[1] = b[3] - b[2];
   dim[2] = b[5] - b[4];
 
-  result = albaEquals(dimensions[0], dim[0]);
-  TEST_RESULT;
-  result = albaEquals(dimensions[1], dim[1]);
-  TEST_RESULT;
-  result = albaEquals(dimensions[2], dim[2]);
-  TEST_RESULT;
+  CPPUNIT_ASSERT(albaEquals((dimensions[0]-1)*spacing[0], dim[0]));
+  CPPUNIT_ASSERT(albaEquals((dimensions[1]-1)*spacing[1], dim[1]));
+  CPPUNIT_ASSERT(albaEquals((dimensions[2]-1)*spacing[2], dim[2]));
 
   cppDEL(op);
 }

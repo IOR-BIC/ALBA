@@ -75,9 +75,6 @@ albaViewVTKCompound::albaViewVTKCompound( wxString label, int num_row, int num_c
 //----------------------------------------------------------------------------
 albaViewVTKCompound::~albaViewVTKCompound()
 {
-	/*m_ColorLUT = NULL;
-	cppDEL(m_LutWidget);
-	cppDEL(m_LutSlider);*/
 }
 
 //----------------------------------------------------------------------------
@@ -106,13 +103,10 @@ albaGUI* albaViewVTKCompound::CreateGui()
   {
      m_Gui->AddGui(((albaViewVTK*)m_ChildViewList[ID_VIEW_VTK])->GetGui());
   }
-	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
-	m_LutWidget->Enable(false);
 	m_Gui->Divider();
 	m_Gui->FitGui();
 	m_Gui->Update();
-
-	return m_Gui;
+  return m_Gui;
 }
 //-------------------------------------------------------------------------
 void albaViewVTKCompound::PackageView()

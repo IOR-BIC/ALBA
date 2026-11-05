@@ -170,7 +170,6 @@ void albaOpCreateVolume::CreateVolume()
   vol->SetSpacing(m_Spacing);
   vol->SetOrigin(m_Origin);
   vol->SetDimensions(m_VoxelNum);
-  vol->SetExtent(0, m_VoxelNum[0]-1, 0, m_VoxelNum[1]-1, 0, m_VoxelNum[2]-1);
   vol->GetPointData()->SetScalars(sca);
   sca->Delete();
 

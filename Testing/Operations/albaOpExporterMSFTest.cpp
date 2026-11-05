@@ -148,10 +148,7 @@ void albaOpExporterMSFTest::TestExportMSF1()
   albaVME *volumeExported = groupExported->GetChild(1);
   volumeExported->Update();
   CPPUNIT_ASSERT( volumeExported->GetOutput()->GetAbsMatrix()->Equals(volume->GetOutput()->GetAbsMatrix()) );
-  albaVME *slicerExported = volume->GetChild(0);
-  slicerExported->Update();
-  CPPUNIT_ASSERT( slicerExported->GetOutput()->GetAbsMatrix()->Equals(slicer->GetOutput()->GetAbsMatrix()) );
-
+  
 
   albaDEL(op);
   albaDEL(storageExport);

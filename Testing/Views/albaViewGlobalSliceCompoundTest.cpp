@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiSelectCellTest
- Authors: Stefano Perticoni
+ Module: albaViewGlobalSliceCompoundTest
+ Authors: Daniele Giunchi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -21,28 +21,20 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+
 #include <cppunit/config/SourcePrefix.h>
+#include "albaViewGlobalSliceCompound.h"
+#include "albaViewGlobalSliceCompoundTest.h"
 
-#include "mmiSelectCellTest.h"
-#include "mmiSelectCell.h"
+#include <iostream>
 
-void mmiSelectCellTest::setUp()
+//-------------------------------------------------------------------------
+void albaViewGlobalSliceCompoundTest::CreateDestroyTest()
+//-------------------------------------------------------------------------
 {
- 
+  albaViewGlobalSliceCompound *gloView = new albaViewGlobalSliceCompound();
+  gloView->PackageView();
+  gloView->Delete();
 }
 
-void mmiSelectCellTest::tearDown()
-{
-
-}
-
-void mmiSelectCellTest::TestFixture()
-{
-
-}
-
-void mmiSelectCellTest::TestConstructor()
-{
-  mmiSelectCell *selectCell = mmiSelectCell::New();
-  selectCell->Delete();
-}
+  

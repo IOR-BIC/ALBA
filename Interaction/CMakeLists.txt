@@ -77,9 +77,9 @@ SET(PROJECT_SRCS
   albaInteractorSegmentationPicker.cpp  	albaInteractorSegmentationPicker.h 
   albaInteractorPERScalarInformation.cpp  albaInteractorPERScalarInformation.h
   albaInteractorPERBrushFeedback.cpp  		albaInteractorPERBrushFeedback.h
-  mmiVTKPicker.cpp  											mmiVTKPicker.h
-  mmiInfoImage.cpp  											mmiInfoImage.h
-  mmiSelectPoint.cpp  										mmiSelectPoint.h
+  albaInteractorVTKPicker.cpp  											albaInteractorVTKPicker.h
+  albaInteractorSelectPoint.cpp  										albaInteractorSelectPoint.h
+  albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
   albaDeviceButtonsPadMouseDialog.cpp	  	albaDeviceButtonsPadMouseDialog.h
   albaGUITransformSliders.cpp  						albaGUITransformSliders.h    

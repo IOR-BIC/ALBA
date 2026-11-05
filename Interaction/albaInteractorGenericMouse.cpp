@@ -69,9 +69,13 @@ albaInteractorGenericMouse::albaInteractorGenericMouse()
    m_MousePointer2DPosition[0] = m_MousePointer2DPosition[1] = 0;
    m_LastMousePointer2DPosition[0] = m_LastMousePointer2DPosition[1] = 0;
    m_ConstrainRefSys = NULL;
+
+   m_ButtonDownPickSet = false;
+   m_ButtonDownPicked = false;
+   m_ButtonDownPickPosition[0] = m_ButtonDownPickPosition[1] = m_ButtonDownPickPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse::~albaInteractorGenericMouse() 
+albaInteractorGenericMouse::~albaInteractorGenericMouse()
 //----------------------------------------------------------------------------
 {
 }
@@ -948,6 +952,17 @@ void albaInteractorGenericMouse::OnMouseMoveAction(int X, int Y)
 }
 
 //----------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetButtonDownPick(bool picked, double pickedPos[3])
+//----------------------------------------------------------------------------
+{
+  m_ButtonDownPickSet = true;
+  m_ButtonDownPicked = picked;
+  m_ButtonDownPickPosition[0] = pickedPos[0];
+  m_ButtonDownPickPosition[1] = pickedPos[1];
+  m_ButtonDownPickPosition[2] = pickedPos[2];
+}
+
+//----------------------------------------------------------------------------
 void albaInteractorGenericMouse::OnButtonDownAction(int X, int Y)
 //----------------------------------------------------------------------------
 {
@@ -960,14 +975,27 @@ void albaInteractorGenericMouse::OnButtonDownAction(int X, int Y)
   m_MousePointer2DPosition[0] = m_LastMousePointer2DPosition[0] = X;
   m_MousePointer2DPosition[1] = m_LastMousePointer2DPosition[1] = Y;
 
-  // perform picking on current renderer
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Device);
-  if (mouse)
+  // use the picking set by the caller, otherwise perform picking on current renderer
+  if (m_ButtonDownPickSet)
   {
-    albaView *v = mouse->GetView();
-    if (v && v->Pick(X,Y))
+    if (m_ButtonDownPicked)
     {
-      v->GetPickedPosition(m_LastPickPosition);
+      m_LastPickPosition[0] = m_ButtonDownPickPosition[0];
+      m_LastPickPosition[1] = m_ButtonDownPickPosition[1];
+      m_LastPickPosition[2] = m_ButtonDownPickPosition[2];
+    }
+    m_ButtonDownPickSet = false;
+  }
+  else
+  {
+    albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Device);
+    if (mouse)
+    {
+      albaView *v = mouse->GetView();
+      if (v && v->Pick(X,Y))
+      {
+        v->GetPickedPosition(m_LastPickPosition);
+      }
     }
   }
   //reset projection accumulator   

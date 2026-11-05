@@ -255,8 +255,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 CAMERA_RESET,
 											 CAMERA_FIT,
 											 CAMERA_FLYTO,
-											 CAMERA_PRE_RESET,
-											 CAMERA_POST_RESET,
 											 CAMERA_MOVED, //Event invoked by albaInteractorCameraMove
 
 																		 // modified by Stefano 21-9-2004 (begin)

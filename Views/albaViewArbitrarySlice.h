@@ -170,7 +170,6 @@ protected:
 	/** Set the GPU according to m_EnableGPU variable*/
 	void SetEnableGPU();
 	
-	void OnLUTChooser();
 	virtual void OnLUTRangeModified();
 
 	albaViewVTK *m_ViewSlice;

@@ -1,6 +1,6 @@
 /*========================================================================= 
   Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: mmiVTKPicker.cpp,v $ 
+  Module: $RCSfile: albaInteractorVTKPicker.cpp,v $ 
   Language: C++ 
   Date: $Date: 2010-11-17 16:19:42 $ 
   Version: $Revision: 1.1.2.5 $ 
@@ -19,7 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmiVTKPicker.h"
+#include "albaInteractorVTKPicker.h"
 #include "albaEventInteraction.h"
 
 #include "vtkALBASmartPointer.h"
@@ -35,16 +35,16 @@
 
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(mmiVTKPicker)
+albaCxxTypeMacro(albaInteractorVTKPicker)
 //------------------------------------------------------------------------------
 
-mmiVTKPicker::~mmiVTKPicker()
+albaInteractorVTKPicker::~albaInteractorVTKPicker()
 {
   vtkDEL(m_Picker);
 }
 
 //----------------------------------------------------------------------------
-void mmiVTKPicker::OnLeftButtonDown(albaEventInteraction *e) 
+void albaInteractorVTKPicker::OnLeftButtonDown(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   // if the event is NULL return
@@ -95,7 +95,7 @@ void mmiVTKPicker::OnLeftButtonDown(albaEventInteraction *e)
   }
 }
 //----------------------------------------------------------------------------
-void mmiVTKPicker::OnLeftButtonUp()
+void albaInteractorVTKPicker::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 {
   if (m_Picker != NULL)
@@ -108,7 +108,7 @@ void mmiVTKPicker::OnLeftButtonUp()
 }
 
 //----------------------------------------------------------------------------
-void mmiVTKPicker::OnMouseMove() 
+void albaInteractorVTKPicker::OnMouseMove() 
 //----------------------------------------------------------------------------
 {  
   // if something has been picked do not move the camera
