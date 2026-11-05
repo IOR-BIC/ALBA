@@ -249,6 +249,10 @@ void albaOpAddLandmark::OpStop(int result)
 	// Reset Landmarks color 
 	SetCloudColor(m_Cloud, m_OldColorCloud[0], m_OldColorCloud[1], m_OldColorCloud[2], m_OldColorCloud[3]);
 
+	// Show Prec Selection
+	if (m_SelectedLandmark)
+		GetLogicManager()->VmeShow(m_SelectedLandmark, true);
+
 	if (result == OP_RUN_OK)
 	{
 		int nLandmarks = m_Cloud->GetNumberOfLandmarks();
@@ -336,6 +340,7 @@ void albaOpAddLandmark::CreateGui()
 
 	const wxString choices[] = { "Show All" };
 	m_GroupComboBox = m_Gui->Combo(ID_SHOW_LANDMARK_GROUP, "", &m_SelectedGroup, 1, choices);
+	m_Gui->Enable(ID_SHOW_LANDMARK_GROUP, false);
 	m_Gui->Divider(2);
 
 	// Setup dictionary
@@ -493,32 +498,8 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
 	  case ID_LANDMARK_REMOVE: RemoveLandmark(); break;
 
 	  case VME_PICKED:
-	  {
-		  double point[3];
-		  bool hasPoint = false;
-		  vtkPoints *pts = vtkPoints::SafeDownCast(e->GetVtkObj());
-		  albaVME *pickedVME = e->GetVme();
-		  if (pts && (pickedVME != m_Cloud) && (pickedVME != m_AuxLandmarkCloud))
-		  {
-			  pts->GetPoint(0, point);
-			  hasPoint = true;
-		  }
+			VmePicked(e);
 
-		  if (hasPoint)
-		  {
-			  if (m_AddModeFlag || (!m_AddModeFlag && m_AddLandmarkFromDef))
-			  {
-				  if (m_SelectedLandmark == NULL)
-					  AddLandmark(point);
-				  else
-					  SetLandmarkPosition(point);
-			  }
-			  else
-			  {
-				  SetLandmarkPosition(point);
-			  }
-		  }
-	  }
 	  break;
 
 	  case wxOK: OpStop(OP_RUN_OK); break;
@@ -529,6 +510,37 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
 		  break;
 	  }
   }
+}
+
+//----------------------------------------------------------------------------
+void albaOpAddLandmark::VmePicked(albaEvent *e)
+{
+	GetLogicManager()->EnableCameraUpdateSkip();
+	double point[3];
+	bool hasPoint = false;
+	vtkPoints *pts = vtkPoints::SafeDownCast(e->GetVtkObj());
+	albaVME *pickedVME = e->GetVme();
+	if (pts && (pickedVME != m_Cloud) && (pickedVME != m_AuxLandmarkCloud))
+	{
+		pts->GetPoint(0, point);
+		hasPoint = true;
+	}
+
+	if (hasPoint)
+	{
+		if (m_AddModeFlag || (!m_AddModeFlag && m_AddLandmarkFromDef))
+		{
+			if (m_SelectedLandmark == NULL)
+				AddLandmark(point);
+			else
+				SetLandmarkPosition(point);
+		}
+		else
+		{
+			SetLandmarkPosition(point);
+		}
+	}
+	GetLogicManager()->DisableCameraUpdateSkip();
 }
 
 //--------------------------------------------------------------------------
@@ -673,6 +685,8 @@ void albaOpAddLandmark::RemoveLandmark()
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 {
+	GetLogicManager()->EnableCameraUpdateSkip();
+
 	if (m_SelectedLandmark)
 	{
 		// Show Prec Selection
@@ -726,6 +740,9 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 		GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
 		UpdateGui();
 	}
+
+	GetLogicManager()->DisableCameraUpdateSkip();
+
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::FindDefinition(albaString &name)
@@ -816,7 +833,22 @@ void albaOpAddLandmark::SelectGroup(int index, int item)
 {
 	if (index >= 0 && index < m_LandmarkGroupVect.size())
 	{
+
+		GetLogicManager()->EnableCameraUpdateSkip();
 		m_SelectedGroup = index;
+		SelectLandmarkByName(m_LandmarkGroupVect[m_SelectedGroup][0]);
+
+		for (int i = 0; i < m_LandmarkGroupVect.size(); i++)
+		{
+			for (int j = 0; j < m_LandmarkGroupVect[i].size(); j++)
+			{
+				albaVMELandmark *lm = m_Cloud->GetLandmark(m_LandmarkGroupVect[i][j]);
+
+				//show the landmark only if is from current group and is not selected 
+				if (lm)
+					GetLogicManager()->VmeShow(lm, i == m_SelectedGroup && j!=0);
+			}
+		}
 
 		if (item >= 0 && item < m_LandmarkGroupVect[m_SelectedGroup].size())
 		{
@@ -826,6 +858,7 @@ void albaOpAddLandmark::SelectGroup(int index, int item)
 		}
 
 		UpdateGui(true);
+		GetLogicManager()->DisableCameraUpdateSkip();
 	}	
 }
 
@@ -849,6 +882,7 @@ void albaOpAddLandmark::LoadDictionary(wxString fileName)
 		//
 		m_DictionaryLoaded = true;
 		SelectGroup(m_GroupsNameVect.size() - 1); // Last Group
+		m_Gui->Enable(ID_SHOW_LANDMARK_GROUP, m_GroupsNameVect.size() > 1);
 		m_AddModeFlag = false;
 
 		UpdateGui(true);
