@@ -27,6 +27,7 @@
 class vtkDoubleArray;
 class vtkALBAFillingHole;
 class albaVMEPointCloud;
+class vtkStaticCleanPolyData;
 
 //----------------------------------------------------------------------------
 // albaOpVOIDensity :
@@ -178,6 +179,7 @@ protected:
 	bool					m_ImagedataVol;
 
 	vtkALBAFillingHole *m_FillHoleFilter;
+	vtkStaticCleanPolyData *m_CleanFilter;
 	int						m_FillHoles;
 	int						m_AddlHolesArea;
 
