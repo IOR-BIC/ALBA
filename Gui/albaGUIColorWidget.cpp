@@ -73,20 +73,6 @@ albaGUIColorWidget::albaGUIColorWidget(wxWindow* parent, wxWindowID id, const wx
 {
 	m_Listener = NULL;
 
-  /*
-  m_HsvSize    = 160;                          //size of the hsv chooser  
-  m_HsvInnerRadius    = m_HsvSize/2 - m_HsvSize/10;         //inner radius of the h cirle 
-  m_HsvOuterRadius    = m_HsvSize/2;                     //outer radius of the h cirle 
-
-  m_AlphaBmpPosition   = wxPoint(3,0);                 //position of the alpha chooser  
-  m_AlphaBmpSize    = wxSize(m_HsvOuterRadius-m_HsvInnerRadius,m_HsvSize); //size of the alpha chooser  
-
-  m_HsvPosition   = wxPoint(m_AlphaBmpPosition.x + m_AlphaBmpSize.GetWidth()+3,0); //position of the hsv chooser  
-  m_SvSize   = m_HsvInnerRadius *1.4;                    //size of the sv chooser  
-  m_SvPosition  = wxPoint((m_HsvSize-m_SvSize)/2,(m_HsvSize-m_SvSize)/2); //position of the sv chooser (within the hsv bmp)
-  m_CursorSize = 5;
-  */
-
   m_HsvSize    = 128;                          //size of the hsv chooser  
   m_HsvOuterRadius    = m_HsvSize/2;                     //outer radius of the h cirle 
   m_HsvInnerRadius    = m_HsvSize/2 - 16;                //inner radius of the h cirle 
@@ -103,66 +89,66 @@ albaGUIColorWidget::albaGUIColorWidget(wxWindow* parent, wxWindowID id, const wx
 
   ///////////////// widgets ///////////////////
   int sh = 14;
-  int w1 = 30;
-  int w2 = 30;
+  int w1 = 42;
+  int w2 = 26;
 
   wxStaticText *lab;
   wxTextCtrl   *text;
 
   int py  =0 ;//2*m_r2+5;
   int px = m_HsvPosition.x + m_HsvSize + 5;
-  lab  = new wxStaticText(this, ID_R, "red:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab  = new wxStaticText(this, ID_R, "Red:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_R, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_R,text,&m_Color.m_Red,0,255) );
 
   py += (sh+3);
-  lab  = new wxStaticText(this, ID_G, "green:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab  = new wxStaticText(this, ID_G, "Green:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_G, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_G,text,&m_Color.m_Green,0,255) );
 
   py += (sh+3);
-  lab  = new wxStaticText(this, ID_B, "blue:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab  = new wxStaticText(this, ID_B, "Blue:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_B, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_B,text,&m_Color.m_Blue,0,255) );
 
   py += (sh+3);
-  lab  = new wxStaticText(this, ID_B, "alpha:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
-  text = new wxTextCtrl  (this, ID_B, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( albaGUIValidator(this,ID_A,text,&m_Color.m_Alpha,0,255) );
+  lab  = new wxStaticText(this, ID_A, "Alpha:", wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT);
+  text = new wxTextCtrl(this, ID_A, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER);
+  text->SetValidator(albaGUIValidator(this,ID_A,text,&m_Color.m_Alpha,0,255) );
 
   w1 = 26;
   py  = 0;//2*m_r2+5;
-  px += (w1+w2+10);
-  lab  = new wxStaticText(this, ID_H, "hue:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  px += (w1+w2+24);
+  lab  = new wxStaticText(this, ID_H, "Hue:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_H, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_H,text,&m_Color.m_Hue,0,360) );
 
   py += (sh+3);
-  lab  = new wxStaticText(this, ID_S, "sat:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab  = new wxStaticText(this, ID_S, "Sat:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_S, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_S,text,&m_Color.m_Saturation,0,255) );
 
   py += (sh+3);
-  lab  = new wxStaticText(this, ID_V, "val:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab  = new wxStaticText(this, ID_V, "Val:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_V, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_V,text,&m_Color.m_Value,0,255) );
 
-  w1 = 30;
+  w1 = 32;
   px = m_HsvPosition.x + m_HsvSize + 5;
   py += 2*(sh+3) + 5;
-  lab   = new wxStaticText(this, -1, "color:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab   = new wxStaticText(this, -1, "Color:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   m_ColorSwatch = new albaGUIColorSwatch(this, -1, wxPoint(px+w1+2,py), wxSize(96,16) );
 
   py += 16;
-  lab   = new wxStaticText(this, -1, "prev:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
+  lab   = new wxStaticText(this, -1, "Prev:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   m_PrevColorSwatch = new albaGUIColorSwatch(this, -1, wxPoint(px+w1+2,py), wxSize(96,16) );
 
   py= m_HsvPosition.y+ m_HsvSize - 20;
   px = px+w1+2;
-  albaGUIButton *b1 = new albaGUIButton(this,ID_COPY,"copy",wxPoint(px,py),wxSize(48,20));  
+  albaGUIButton *b1 = new albaGUIButton(this,ID_COPY,"Copy",wxPoint(px,py),wxSize(48,20));  
 	b1->SetValidator( albaGUIValidator(this,ID_COPY,b1) );
   px += 47;
-  albaGUIButton *b2 = new albaGUIButton(this,ID_PASTE,"paste",wxPoint(px,py), wxSize(48,20));  
+  albaGUIButton *b2 = new albaGUIButton(this,ID_PASTE,"Paste",wxPoint(px,py), wxSize(48,20));  
 	b2->SetValidator( albaGUIValidator(this,ID_PASTE,b2) );
 
 
@@ -195,7 +181,7 @@ void albaGUIColorWidget::OnPaint(wxPaintEvent &event)
   wxMemoryDC mdc;
 
   mdc.SelectObject(m_AlphaBmp);
-  pdc.Blit(m_AlphaBmpPosition.x, m_AlphaBmpPosition.y, m_AlphaBmpSize.GetWidth(), m_AlphaBmpSize.GetHeight(), &mdc, 0,0);
+  pdc.Blit(m_AlphaBmpPosition.x, m_AlphaBmpPosition.y, m_AlphaBmpSize.GetWidth(), m_AlphaBmpSize.GetHeight(), &mdc, 0, 0);
 
   mdc.SelectObject(m_HsvBmp);
   pdc.Blit(m_HsvPosition.x, m_HsvPosition.y, m_HsvSize, m_HsvSize, &mdc, 0,0);
@@ -494,8 +480,6 @@ void albaGUIColorWidget::OnEvent( albaEventBase *event )
     switch(e->GetId())
     {
     case ID_A:
-      OnColorChanged();
-      break;
     case ID_R:
     case ID_G:
     case ID_B:

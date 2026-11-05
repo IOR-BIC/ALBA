@@ -57,7 +57,6 @@ enum LUT_EDITOR_WIDGET_ID
 {
   ID_PRESET = MINID,
   ID_NUMENTRY,
-  ID_VALUE_RANGE,
   ID_LW,
   ID_CW,
   ID_SHADE_ALPHA,
@@ -158,29 +157,13 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
 	
 	sizer->Add(sz,0,wxALL, M); 
 
-	lab = new wxStaticText (this, -1, _("number of entries [1..256]"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	lab = new wxStaticText (this, -1, _("Number of entries [1..256]"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
 	text = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW,LH), wxNO_BORDER  );
 	text->SetValidator( albaGUIValidator(this,ID_NUMENTRY,text,&m_NumEntry,1,256) );
 	sz = new wxBoxSizer(wxHORIZONTAL);
 	sz->Add( lab,  0, wxRIGHT, LM);
 	sz->Add( text, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
-
-	lab = new wxStaticText (this, -1, _("mapped value range"),  dp, wxSize(LW,LH), wxALIGN_RIGHT );
-	text = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW/2-HM,LH), wxNO_BORDER  );
-	text->SetValidator( albaGUIValidator(this,ID_VALUE_RANGE,text,&m_ValueRange[0], -1e200, 1e200, -1 ) ); //SIL: 17-01-06 - removed number of digits -- introduce errors on big numbers
-	text2 = new wxTextCtrl  (this, -1, ""   ,       dp, wxSize(DW/2,LH), wxNO_BORDER);
-	text2->SetValidator( albaGUIValidator(this,ID_VALUE_RANGE,text2,&m_ValueRange[1] ,-1e200, 1e200, -1 ) ); //SIL: 17-01-06 - removed number of digits -- introduce errors on big numbers
-  sz = new wxBoxSizer(wxHORIZONTAL);
-	sz->Add( lab,   0, wxRIGHT, LM);
-	sz->Add( text,  0, wxRIGHT, HM);
-	sz->Add( text2, 0, wxRIGHT, HM);
-	sizer->Add(sz,0,wxALL, M);
-
-  //wxStaticText *labelUserPresets;
-  //labelUserPresets = new wxStaticText (this, -1, _("User Presets"),dp,wxSize(150,-1));
-  //labelUserPresets->SetFont(bold_font);
-  // sizer->Add( labelUserPresets, 0, wxALL, M);
 
   albaGUIButton  *buttonSetUserLUT;
   buttonSetUserLUT = new albaGUIButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(LW,BH) );
@@ -202,7 +185,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   buttonRemoveFromUserLUTS = new albaGUIButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(DW,BH) );
   buttonRemoveFromUserLUTS->SetValidator( albaGUIValidator(this,ID_REMOVE_FROM_ULIB,buttonRemoveFromUserLUTS) );  
 
-  wxStaticText *staticTextSelectUserLut = new wxStaticText (this, -1, _("select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  wxStaticText *staticTextSelectUserLut = new wxStaticText (this, -1, _("Select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
   m_UserPresetCombo = new wxComboBox(this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutNames, wxCB_READONLY);
 
   wxBoxSizer   *selectUserLutsHSizer;
@@ -213,7 +196,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   m_UserPresetCombo->SetValidator( albaGUIValidator(this,ID_USER_PRESET,m_UserPresetCombo,&m_UserPreset) );
   sizer->Add(selectUserLutsHSizer,0,wxRIGHT, HM);
   
-  wxStaticText *staticTextRemoveUserLut = new wxStaticText (this, -1, _("remove selected LUT"), dp, wxSize(LW,BH), wxALIGN_RIGHT );
+  wxStaticText *staticTextRemoveUserLut = new wxStaticText (this, -1, _("Remove selected LUT"), dp, wxSize(LW,BH), wxALIGN_RIGHT );
 
   wxSizer *removeFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
   removeFromUserLutsHSizer->Add( staticTextRemoveUserLut,  1, wxRIGHT, LM);
@@ -239,7 +222,7 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
 
   sizer->Add(m_LutWidget, 0, wxALL, M);
   
-	lab = new wxStaticText(this, -1, _("selected indexes:"), dp, wxSize(FW,LH));
+	lab = new wxStaticText(this, -1, _("Selected indexes:"), dp, wxSize(FW,LH));
 	lab->SetValidator( albaGUIValidator(this,-1,lab,&m_Info) );
   sizer->Add(lab, 0, wxALL, M);
   
@@ -248,11 +231,11 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
 // 	sizer->Add( lab, 0, wxALL, M);
 	sz = new wxBoxSizer(wxHORIZONTAL);
 
-  butt = new albaGUIButton(this, ID_SHADE_RGB, _("shade in rgba space"),dp, wxSize(143,BH) );
+  butt = new albaGUIButton(this, ID_SHADE_RGB, _("Shade in RGBA space"),dp, wxSize(143,BH) );
 	butt->SetValidator( albaGUIValidator(this,ID_SHADE_RGB,butt) );
 	sz->Add( butt, 0, wxRIGHT, 2);
 
-  butt = new albaGUIButton(this, ID_SHADE_HSV, _("shade in hsva space"),dp, wxSize(143,BH) );
+  butt = new albaGUIButton(this, ID_SHADE_HSV, _("Shade in HSVA space"),dp, wxSize(143,BH) );
 	butt->SetValidator( albaGUIValidator(this,ID_SHADE_HSV,butt) );
 	sz->Add( butt, 0);
   sizer->Add(sz,0,wxALL, M);
@@ -268,15 +251,15 @@ albaGUILutEditor::albaGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoin
   if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
   {
 	  sz = new wxBoxSizer(wxHORIZONTAL);
-    butt = new albaGUIButton(this, ID_OK, _("ok"),dp, wxSize(96,BH) );
+    butt = new albaGUIButton(this, ID_OK, _("Ok"),dp, wxSize(96,BH) );
 	  butt->SetValidator( albaGUIValidator(this,ID_OK,butt) );
 	  sz->Add( butt, 0, wxRIGHT, 2);
 
-    butt = new albaGUIButton(this, ID_CANCEL, _("cancel"),dp, wxSize(96,BH) );
+    butt = new albaGUIButton(this, ID_CANCEL, _("Cancel"),dp, wxSize(96,BH) );
 	  butt->SetValidator( albaGUIValidator(this,ID_CANCEL,butt) );
 	  sz->Add( butt, 0, wxRIGHT, 2);
 
-    butt = new albaGUIButton(this, ID_APPLY, _("apply"),dp, wxSize(96,BH) );
+    butt = new albaGUIButton(this, ID_APPLY, _("Apply"),dp, wxSize(96,BH) );
 	  butt->SetValidator( albaGUIValidator(this,ID_APPLY,butt) );
 	  sz->Add( butt, 0);
     sizer->Add(sz,0,wxALL, M);
@@ -413,10 +396,6 @@ void albaGUILutEditor::OnEvent(albaEventBase *alba_event)
       case ID_NUMENTRY:
         m_LutWidget->SetNumEntry(m_NumEntry);
 		  break; 
-      case ID_VALUE_RANGE:
-        UpdateInfo();
-        m_Lut->SetRange(m_ValueRange[0],m_ValueRange[1]);
-      break; 
       case ID_CW:  //color in the color widget has changed
         m_LutWidget->SetSelectionColor(m_ColorWidget->GetColor());
         m_LutSwatch->Refresh();
@@ -537,7 +516,13 @@ void albaGUILutEditor::ShowLutDialog(vtkLookupTable *lut, albaObserver *listener
   led->SetListener(listener);
   led->SetLut(lut);
   dlg.Add(led,1,wxEXPAND);
-  dlg.SetSize(x_init,y_init,-1,-1);
+
+  wxSize editorSize = led->GetSizer()->CalcMin();
+  editorSize.Set(editorSize.GetX() - 25, editorSize.GetY() - 42);
+  led->SetSize(editorSize);
+  dlg.SetClientSize(editorSize);
+  dlg.Layout();
+  dlg.CentreOnScreen();
   dlg.ShowModal();
 }
 
