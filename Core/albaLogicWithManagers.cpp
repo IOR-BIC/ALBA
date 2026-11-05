@@ -1861,6 +1861,8 @@ void albaLogicWithManagers::DisableCameraUpdateSkip()
 {
 	assert(m_SkipCameraUpdate);
 	m_SkipCameraUpdate--;
+	if (m_SkipCameraUpdate == 0)
+		CameraUpdate();
 }
 
 // WIZARD ////////////////////////////////////////////////////////////////////
