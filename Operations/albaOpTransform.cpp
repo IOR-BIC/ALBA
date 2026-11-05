@@ -160,6 +160,8 @@ void albaOpTransform::OpRun()
 {
 	assert(m_Input);
 
+	GetLogicManager()->EnableCameraUpdateSkip();
+
 	GLO_TransformInput = m_Input;
 
 	m_CurrentTime = m_Input->GetTimeStamp();
@@ -216,6 +218,8 @@ void albaOpTransform::OpRun()
 	SetRefSysVME(m_Input->GetRoot());
 	SelectRefSys();
 	UpdateTransformTextEntries();
+
+	GetLogicManager()->DisableCameraUpdateSkip();
 }
 
 //----------------------------------------------------------------------------
@@ -237,11 +241,11 @@ void albaOpTransform::OpStop(int result)
 {
 	if (!m_TestMode)
 	{
+		GetLogicManager()->EnableCameraUpdateSkip();
 		m_GizmoTranslate->Show(false);
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
-
-		GetLogicManager()->CameraUpdate();
+		GetLogicManager()->DisableCameraUpdateSkip();
 	}
 
 	m_TransformVME->ReparentTo(NULL);
