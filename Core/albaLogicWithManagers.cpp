@@ -168,7 +168,6 @@
 #include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreatePolyline.h"
 #include "albaOpCreateSpline.h"
-#include "albaOpCreateSurface.h"
 #include "albaOpCreateSurfaceParametric.h"
 #include "albaOpCreateVolume.h"
 #include "albaOpCreateInfoText.h"
@@ -2013,7 +2012,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateSpline("Spline"), _("Create"));
 	Plug(new albaOpCreateLabeledVolume(), _("Create"));
 	Plug(new albaOpCreateEditSkeleton(), _("Create"));
-	Plug(new albaOpCreateSurface(), _("Create"));
 	Plug(new albaOpCreateWrappedMeter(), _("Create"));
 	Plug(new albaOpComputeWrapping("Computing Wrapping"), _("Create"));
 	Plug(new albaOpFreezeVME(), _("Create"));
