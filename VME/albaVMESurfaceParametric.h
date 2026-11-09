@@ -302,7 +302,6 @@ protected:
   double m_EllipsoidZLenght;
   double m_EllipsoidPhiRes;
   double m_EllipsoidTheRes;
-  int m_EllipsoidOrientationAxis;
 
 	double m_TruncatedConeHeight;
 	double m_TruncatedConeUpperDiameter;

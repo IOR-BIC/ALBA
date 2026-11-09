@@ -472,7 +472,6 @@ wxString  albaIdString(int id)
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
      case VIEW_MAXIMIZE:        s="VIEW_CLICKED"; break; 
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
-     case VIEW_SAVE_IMAGE:      s="VIEW_SAVE_IMAGE"; break; 
 
      case PER_PUSH:             s="PER_PUSH"; break; 
      case PER_POP:              s="PER_POP"; break; 

@@ -382,7 +382,7 @@ void albaViewRXCT::VmeSelect(albaVME *vme, bool select)
 void albaViewRXCT::OnEventRangeModified(albaEventBase *alba_event)
 {
   // is the volume visible?
-  if(((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
+  if(((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->IsVolumeVisible())
   {
     double low, hi;
 

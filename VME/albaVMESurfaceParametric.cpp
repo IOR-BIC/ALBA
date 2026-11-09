@@ -74,51 +74,50 @@ albaVMESurfaceParametric::albaVMESurfaceParametric()
 {
   m_GeometryType = PARAMETRIC_SPHERE;
 	
-  m_SphereRadius = 2.0;
-  m_SpherePhiRes = 10.0;
-  m_SphereTheRes = 10.0;
+  m_SphereRadius = 20.0;
+  m_SpherePhiRes = 10;
+  m_SphereTheRes = 20;
 
-  m_ConeHeight = 5.0;
-  m_ConeRadius = 2.0;
+  m_ConeHeight = 50.0;
+  m_ConeRadius = 20.0;
   m_ConeCapping = 0;
-  m_ConeRes = 20.0;
+  m_ConeRes = 20;
   m_ConeOrientationAxis = ID_X_AXIS;
 
-  m_CylinderHeight = 5.0;
-  m_CylinderRadius = 2.0;
-  m_CylinderRes = 20.0;
+  m_CylinderHeight = 50.0;
+  m_CylinderRadius = 20.0;
+  m_CylinderRes = 20;
   m_CylinderOrientationAxis = ID_Y_AXIS;
 
-  m_CubeXLength = 2.0;
-  m_CubeYLength = 2.0;
-  m_CubeZLength = 2.0;
+  m_CubeXLength = 20.0;
+  m_CubeYLength = 20.0;
+  m_CubeZLength = 20.0;
 
-  m_PlaneXRes = 2.0;
-  m_PlaneYRes = 2.0;
+  m_PlaneXRes = 2;
+  m_PlaneYRes = 2;
   m_PlaneOrigin[0] = m_PlaneOrigin[1] = m_PlaneOrigin[2] = 0;
-  m_PlanePoint1[0] = 2.0;
+  m_PlanePoint1[0] = 20.0;
   m_PlanePoint1[1] = m_PlanePoint1[2] = 0.0;
-  m_PlanePoint2[1] = 3.0;
+  m_PlanePoint2[1] = 30.0;
   m_PlanePoint2[0] = m_PlanePoint2[2] = 0.0;
   
-	m_EllipsoidXLenght = 1.0;
-  m_EllipsoidYLenght = 2.0;
-  m_EllipsoidZLenght = 3.0;
-  m_EllipsoidPhiRes = 10.0;
-  m_EllipsoidTheRes = 10.0;
-  m_EllipsoidOrientationAxis = ID_X_AXIS;
+	m_EllipsoidXLenght = 20.0;
+  m_EllipsoidYLenght = 20.0;
+  m_EllipsoidZLenght = 20.0;
+  m_EllipsoidPhiRes = 20;
+  m_EllipsoidTheRes = 20;
 
-	m_TruncatedConeHeight = 5.0;
-	m_TruncatedConeUpperDiameter = 4.0;
-	m_TruncatedConeLowerDiameter = 3.0;
-	m_TruncatedConeRes = 20.0;
+	m_TruncatedConeHeight = 50.0;
+	m_TruncatedConeUpperDiameter = 40.0;
+	m_TruncatedConeLowerDiameter = 30.0;
+	m_TruncatedConeRes = 20;
 	m_TruncatedConeCapping = 0;
 	m_TruncatedConeOrientationAxis = ID_X_AXIS;
 
-	m_EllipticCylinderHeight = 5.0;
-	m_EllipticCylinderR1 = 5.0;
-	m_EllipticCylinderR2 = 3.0;
-	m_EllipticCylinderRes = 20.0;
+	m_EllipticCylinderHeight = 50.0;
+	m_EllipticCylinderR1 = 50.0;
+	m_EllipticCylinderR2 = 30.0;
+	m_EllipticCylinderRes = 20;
 	m_EllipticCylinderCapping = 0;
 	m_EllipticCylinderOrientationAxis = ID_X_AXIS;
 
@@ -204,7 +203,6 @@ int albaVMESurfaceParametric::DeepCopy(albaVME *a)
     this->m_EllipsoidZLenght = vmeParametricSurface->m_EllipsoidZLenght;
     this->m_EllipsoidPhiRes = vmeParametricSurface->m_EllipsoidPhiRes;
     this->m_EllipsoidTheRes = vmeParametricSurface->m_EllipsoidTheRes;
-    this->m_EllipsoidOrientationAxis = vmeParametricSurface->m_EllipsoidOrientationAxis;
 
 		this->m_TruncatedConeHeight = vmeParametricSurface->m_TruncatedConeHeight;
 		this->m_TruncatedConeUpperDiameter = vmeParametricSurface->m_TruncatedConeUpperDiameter;
@@ -280,7 +278,6 @@ bool albaVMESurfaceParametric::Equals(albaVME *vme)
 			this->m_EllipsoidZLenght == ((albaVMESurfaceParametric *)vme)->m_EllipsoidZLenght &&
 			this->m_EllipsoidPhiRes == ((albaVMESurfaceParametric *)vme)->m_EllipsoidPhiRes &&
 			this->m_EllipsoidTheRes == ((albaVMESurfaceParametric *)vme)->m_EllipsoidTheRes &&
-			this->m_EllipsoidOrientationAxis == ((albaVMESurfaceParametric *)vme)->m_EllipsoidOrientationAxis &&
 
 			this->m_TruncatedConeHeight == ((albaVMESurfaceParametric *)vme)->m_TruncatedConeHeight &&
 			this->m_TruncatedConeUpperDiameter == ((albaVMESurfaceParametric *)vme)->m_TruncatedConeUpperDiameter &&
@@ -550,7 +547,9 @@ int albaVMESurfaceParametric::InternalRestore(albaStorageElement *node)
 //-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateTruncatedCone()
 {
-	int nPoints = m_TruncatedConeRes *2;
+	int nPoints = m_TruncatedConeRes * 2;
+	if (m_TruncatedConeCapping > 0)
+		nPoints *= 2;
 
 	vtkPoints *newPoints;
 	vtkNEW(newPoints);
@@ -559,21 +558,24 @@ void albaVMESurfaceParametric::CreateTruncatedCone()
 
 	double baseHeight = 0;
 	int currentPoint = 0;
+	int ringCount = (m_TruncatedConeCapping > 0) ? 4 : 2;
 
-	//Generating point structure
-	for (int j = 0; j < 2; j++)
+	// Generate the side rings and duplicate them for the caps when needed.
+	for (int j = 0; j < ringCount; j++)
 	{
-		double lowDiameterRatio = ((double)(j)) / (double)(2 - 1);
+		int ring = j % 2;
+		double lowDiameterRatio = (double)ring / (double)(2 - 1);
 		double upDiameterRatio = 1.0 - lowDiameterRatio;
-		double currentRadius = ((lowDiameterRatio*m_TruncatedConeLowerDiameter + upDiameterRatio*m_TruncatedConeUpperDiameter) * 0.5);
-		double currentHeight = baseHeight + (lowDiameterRatio*m_TruncatedConeHeight);
+		double currentRadius = ((lowDiameterRatio * m_TruncatedConeLowerDiameter +
+			upDiameterRatio * m_TruncatedConeUpperDiameter) * 0.5);
+		double currentHeight = baseHeight + (lowDiameterRatio * m_TruncatedConeHeight);
 
 		for (int k = 0; k < m_TruncatedConeRes; k++)
 		{
 			double pointCoord[3];
-			double angle = (double)k / (double)m_TruncatedConeRes*2.0*M_PI;
-			pointCoord[0] = sin(angle)*currentRadius;
-			pointCoord[1] = cos(angle)*currentRadius;
+			double angle = (double)k / (double)m_TruncatedConeRes * 2.0 * M_PI;
+			pointCoord[0] = sin(angle) * currentRadius;
+			pointCoord[1] = cos(angle) * currentRadius;
 			pointCoord[2] = currentHeight;
 
 			newPoints->SetPoint(currentPoint, pointCoord);
@@ -587,71 +589,71 @@ void albaVMESurfaceParametric::CreateTruncatedCone()
 	polyData->SetPoints(newPoints);
 	vtkDEL(newPoints);
 
-	//generate cell structure
-	vtkCellArray * polys;
+	// Generate cell structure.
+	vtkCellArray *polys;
 	vtkNEW(polys);
 
 	for (int ls = 0; ls < (2 - 1); ls++)
 	{
-		//radial steps
+		// Radial steps.
 		for (int rs = 0; rs < (m_TruncatedConeRes - 1); rs++)
 		{
 			polys->InsertNextCell(3);
-			polys->InsertCellPoint(rs + (ls + 1)*m_TruncatedConeRes);
-			polys->InsertCellPoint((rs + 1) + (ls + 1)*m_TruncatedConeRes);
-			polys->InsertCellPoint(rs + ls*m_TruncatedConeRes);
+			polys->InsertCellPoint(rs + (ls + 1) * m_TruncatedConeRes);
+			polys->InsertCellPoint((rs + 1) + (ls + 1) * m_TruncatedConeRes);
+			polys->InsertCellPoint(rs + ls * m_TruncatedConeRes);
 			polys->InsertNextCell(3);
-			polys->InsertCellPoint((rs + 1) + (ls + 1)*m_TruncatedConeRes);
-			polys->InsertCellPoint((rs + 1) + ls*m_TruncatedConeRes);
-			polys->InsertCellPoint(rs + ls*m_TruncatedConeRes);
+			polys->InsertCellPoint((rs + 1) + (ls + 1) * m_TruncatedConeRes);
+			polys->InsertCellPoint((rs + 1) + ls * m_TruncatedConeRes);
+			polys->InsertCellPoint(rs + ls * m_TruncatedConeRes);
 		}
 
-		//connect last->first cell
+		// Connect the last point to the first.
 		polys->InsertNextCell(3);
-		polys->InsertCellPoint((m_TruncatedConeRes - 1) + (ls + 1)*m_TruncatedConeRes);
-		polys->InsertCellPoint(+(ls + 1)*m_TruncatedConeRes);
-		polys->InsertCellPoint((m_TruncatedConeRes - 1) + ls*m_TruncatedConeRes);
+		polys->InsertCellPoint((m_TruncatedConeRes - 1) + (ls + 1) * m_TruncatedConeRes);
+		polys->InsertCellPoint((ls + 1) * m_TruncatedConeRes);
+		polys->InsertCellPoint((m_TruncatedConeRes - 1) + ls * m_TruncatedConeRes);
 		polys->InsertNextCell(3);
-		polys->InsertCellPoint(+(ls + 1)*m_TruncatedConeRes);
-		polys->InsertCellPoint(+ls*m_TruncatedConeRes);
-		polys->InsertCellPoint((m_TruncatedConeRes - 1) + ls*m_TruncatedConeRes);
+		polys->InsertCellPoint((ls + 1) * m_TruncatedConeRes);
+		polys->InsertCellPoint(ls * m_TruncatedConeRes);
+		polys->InsertCellPoint((m_TruncatedConeRes - 1) + ls * m_TruncatedConeRes);
 	}
 
 	if (m_TruncatedConeCapping > 0)
 	{
-		//Starting Cap
+		// Starting cap.
 		polys->InsertNextCell(m_TruncatedConeRes);
 		for (int i = 0; i < m_TruncatedConeRes; i++)
-			polys->InsertCellPoint(i);
+			polys->InsertCellPoint((2 * m_TruncatedConeRes) + i);
 
-		//Ending Cap
+		// Ending cap.
 		polys->InsertNextCell(m_TruncatedConeRes);
-		for (int i = 0; i < m_TruncatedConeRes; i++)
-			polys->InsertCellPoint((nPoints - m_TruncatedConeRes) + i);
+		for (int i = m_EllipticCylinderRes - 1; i >= 0; i--)
+			polys->InsertCellPoint((3 * m_TruncatedConeRes) + i);
 	}
 
 	polyData->SetPolys(polys);
 
-	// Transform
+	// Transform.
 	vtkALBASmartPointer<vtkTransform> t;
 
 	switch (m_TruncatedConeOrientationAxis)
 	{
-	case ID_X_AXIS:
-		//do nothing
-		break;
-	case ID_Y_AXIS:
-		t->RotateX(90);
-		break;
-	case ID_Z_AXIS:
-		t->RotateY(-90);
-		break;
-	default:
-		break;
+		case ID_X_AXIS:
+			// Do nothing.
+			break;
+		case ID_Y_AXIS:
+			t->RotateX(90);
+			break;
+		case ID_Z_AXIS:
+			t->RotateY(-90);
+			break;
+		default:
+			break;
 	}
 
 	t->Update();
-	
+
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
 	ptf->SetInputData(polyData);
@@ -663,8 +665,7 @@ void albaVMESurfaceParametric::CreateTruncatedCone()
 	m_PolyData->DeepCopy(ptf->GetOutput());
 	m_DataPipe->Modified();
 	m_DataPipe->Update();
-}
-//-----------------------------------------------------------------------
+}//-----------------------------------------------------------------------
 void albaVMESurfaceParametric::CreateEllipsoid()
 {
 	vtkALBASmartPointer<vtkSphereSource> surf;
@@ -674,21 +675,6 @@ void albaVMESurfaceParametric::CreateEllipsoid()
 	surf->Update();
 
 	vtkALBASmartPointer<vtkTransform> t;
-
-	switch (m_EllipsoidOrientationAxis)
-	{
-	case ID_X_AXIS:
-		//do nothing
-		break;
-	case ID_Y_AXIS:
-		t->RotateZ(90);
-		break;
-	case ID_Z_AXIS:
-		t->RotateY(-90);
-		break;
-	default:
-		break;
-	}
 
 	t->Scale(m_EllipsoidXLenght / m_EllipsoidYLenght, 1, m_EllipsoidZLenght / m_EllipsoidYLenght);
 	t->Update();
@@ -824,27 +810,35 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 	double angle = 0;
 	int id = 0;
 	int centerX = 0, centerY = 0;
+
 	int nPoints = m_EllipticCylinderRes * 2;
+	if (m_EllipticCylinderCapping)
+		nPoints *= 2;
 
 	vtkPoints *newPoints;
 	vtkNEW(newPoints);
 
 	newPoints->SetNumberOfPoints(nPoints);
 	
-	for (int i=0; i<m_EllipticCylinderRes; i++)
+	for (int j = 0; j < 2; j++)
 	{
-		angle = 2 * vtkMath::Pi() * (i/m_EllipticCylinderRes);
-		newPoints->SetPoint(id, m_EllipticCylinderR1 * cos(angle) + centerX, m_EllipticCylinderR2 * sin(angle) + centerY, -m_EllipticCylinderHeight / 2.0);
-		id++;
-	}
+		//generate points for the bottom and top ellipse
+		for (int i = 0; i < m_EllipticCylinderRes; i++)
+		{
+			angle = 2 * vtkMath::Pi() * (i / m_EllipticCylinderRes);
+			newPoints->SetPoint(id, m_EllipticCylinderR1 * cos(angle) + centerX, m_EllipticCylinderR2 * sin(angle) + centerY, -m_EllipticCylinderHeight / 2.0);
+			id++;
+		}
 
-	for (int i = 0; i < m_EllipticCylinderRes; i++)
-	{
-		angle = 2 * vtkMath::Pi() * (i / m_EllipticCylinderRes);
-		newPoints->SetPoint(id, m_EllipticCylinderR1 * cos(angle) + centerX, m_EllipticCylinderR2 * sin(angle) + centerY, +m_EllipticCylinderHeight / 2.0);
-		id++;
+		for (int i = 0; i < m_EllipticCylinderRes; i++)
+		{
+			angle = 2 * vtkMath::Pi() * (i / m_EllipticCylinderRes);
+			newPoints->SetPoint(id, m_EllipticCylinderR1 * cos(angle) + centerX, m_EllipticCylinderR2 * sin(angle) + centerY, +m_EllipticCylinderHeight / 2.0);
+			id++;
+		}
+		if (!m_EllipticCylinderCapping)
+			break;
 	}
-
 	vtkPolyData *polyData;
 	vtkNEW(polyData);
 
@@ -881,17 +875,20 @@ void albaVMESurfaceParametric::CreateEllipticCylinder()
 		polys->InsertCellPoint(+(ls + 1)*m_EllipticCylinderRes);
 	}
 
-	if (m_EllipticCylinderCapping > 0)
+	if (m_EllipticCylinderCapping)
 	{
+		//p
+		vtkIdType base = m_EllipticCylinderRes * 2;
 		//Starting Cap
 		polys->InsertNextCell(m_EllipticCylinderRes);
-		for (int i = m_EllipticCylinderRes-1; i >=0 ; i--)
-			polys->InsertCellPoint(i);
+		for (int i = 0; i < m_EllipticCylinderRes; i++)
+			polys->InsertCellPoint(base+i);
 
 		//Ending Cap
+		base += m_EllipticCylinderRes;
 		polys->InsertNextCell(m_EllipticCylinderRes);
-		for (int i = 0; i < m_EllipticCylinderRes; i++)
-			polys->InsertCellPoint(m_EllipticCylinderRes + i);
+		for (int i = m_EllipticCylinderRes - 1; i >= 0; i--)
+			polys->InsertCellPoint(base + i);
 	}
 
 	polyData->SetPolys(polys);
@@ -1087,8 +1084,6 @@ void albaVMESurfaceParametric::CreateGuiEllipsoid()
   m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Z Length"), &m_EllipsoidZLenght);
   m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Phi res"), &m_EllipsoidPhiRes);
   m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Theta res"), &m_EllipsoidTheRes);
-  wxString orientationArray[3] = {_("X axis"),_("Y axis"),_("Z axis")};
-  m_GuiEllipsoid->Radio(CHANGE_VALUE_ELLIPSOID,"Orientation", &m_EllipsoidOrientationAxis, 3,orientationArray);
   assert(m_Gui);
   m_Gui->AddGui(m_GuiEllipsoid);
 }

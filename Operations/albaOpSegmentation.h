@@ -53,7 +53,6 @@ class albaVMEImage;
 class albaVMESurface;
 class albaVMEVolumeGray;
 class albaViewSliceSegmentation;
-class albaInteractorSelectPoint;
 class vtkActor;
 class vtkActor2D;
 class vtkLookupTable;

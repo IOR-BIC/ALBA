@@ -155,6 +155,8 @@ public:
 	/** Set the actor picking*/
 	void SetActorPicking(int enable);
 
+	vtkImageData *GetImageData();
+
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice();

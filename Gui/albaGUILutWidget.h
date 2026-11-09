@@ -29,7 +29,7 @@ class albaGUILutWidget: public wxPanel, public albaObserver
 {
 public:
   albaGUILutWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 
-           const wxSize& size = wxSize(300,290), long style = wxTAB_TRAVERSAL /*| wxSUNKEN_BORDER */);
+           const wxSize& size = wxSize(291,291), long style = wxTAB_TRAVERSAL /*| wxSUNKEN_BORDER */);
 
   virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
   void OnEvent( albaEventBase *event );

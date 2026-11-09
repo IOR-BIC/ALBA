@@ -580,3 +580,16 @@ void albaPipeVolumeOrthoSlice::SetActorPicking(int enable)
 	}
 	GetLogicManager()->CameraUpdate();
 }
+
+//----------------------------------------------------------------------------
+vtkImageData *albaPipeVolumeOrthoSlice::GetImageData()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_Slicer[i] != NULL)
+		{
+			m_Slicer[i]->Update();
+			return m_Slicer[i]->GetImageDataOutput();
+		}
+	}
+}

@@ -168,7 +168,6 @@
 #include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreatePolyline.h"
 #include "albaOpCreateSpline.h"
-#include "albaOpCreateSurface.h"
 #include "albaOpCreateSurfaceParametric.h"
 #include "albaOpCreateVolume.h"
 #include "albaOpCreateInfoText.h"
@@ -992,22 +991,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			e->SetBool(m_ViewManager->GetSelectedView() != NULL);
 			e->SetView(m_ViewManager->GetSelectedView());
 			break;
-		case VIEW_SAVE_IMAGE:
-		{
-			albaViewCompound *v = albaViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
-			if (v && e->GetBool())
-			{
-				v->GetRWI()->SaveAllImages(v->GetLabel(), v);
-			}
-			else
-			{
-				albaView *v = m_ViewManager->GetSelectedView();
-				if (v)
-				{
-					v->GetRWI()->SaveImage(v->GetLabel());
-				}
-			}
-		}
 		break;
 		case CAMERA_RESET:
 			CameraReset();
@@ -1451,8 +1434,6 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 	DisableCameraUpdateSkip();
 	
 	albaYield();
-
-	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeModified(albaVME *vme)
@@ -1861,6 +1842,8 @@ void albaLogicWithManagers::DisableCameraUpdateSkip()
 {
 	assert(m_SkipCameraUpdate);
 	m_SkipCameraUpdate--;
+	if (m_SkipCameraUpdate == 0)
+		CameraUpdate();
 }
 
 // WIZARD ////////////////////////////////////////////////////////////////////
@@ -1995,7 +1978,7 @@ void albaLogicWithManagers::PlugStandardOperations()
 	// Operation Menu:
 	//------------------------------------------------------------
 
-	Plug(new albaOpCreateVolume("Volume"), _("Create"));
+	Plug(new albaOpCreateVolume(), _("Create"));
 	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
 	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
 	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
@@ -2011,7 +1994,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateSpline("Spline"), _("Create"));
 	Plug(new albaOpCreateLabeledVolume(), _("Create"));
 	Plug(new albaOpCreateEditSkeleton(), _("Create"));
-	Plug(new albaOpCreateSurface(), _("Create"));
 	Plug(new albaOpCreateWrappedMeter(), _("Create"));
 	Plug(new albaOpComputeWrapping("Computing Wrapping"), _("Create"));
 	Plug(new albaOpFreezeVME(), _("Create"));

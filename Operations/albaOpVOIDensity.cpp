@@ -54,6 +54,7 @@
 #include "vtkGenericCell.h"
 #include "vtkTriangle.h"
 #include "vtkALBAFillingHole.h"
+#include "vtkStaticCleanPolyData.h"
 
 
 //----------------------------------------------------------------------------
@@ -82,6 +83,7 @@ albaOpVOIDensity::albaOpVOIDensity(const wxString &label)
 	m_FillHoles = false;
 	m_AddlHolesArea = true;
 	m_FillHoleFilter = NULL;
+	m_CleanFilter = NULL;
 	m_PointCloud = NULL;
 
 	UpdateStrings();
@@ -95,6 +97,7 @@ albaOpVOIDensity::~albaOpVOIDensity()
 	m_Surface = NULL;
 	vtkDEL(m_VOIScalars);
 	vtkDEL(m_FillHoleFilter);
+	vtkDEL(m_CleanFilter);
 	albaDEL(m_PointCloud);
 	m_VOICoords.clear();
 	m_VOIIds.clear();
@@ -206,9 +209,8 @@ void albaOpVOIDensity::EnableDisableGUI(int surfaceEvalued)
 	m_Gui->Enable(ID_ADD_HOLES_AREA, m_FillHoles);
 
 	if (!surfaceEvalued)
-	{
 		m_NumberOfScalarsString = m_MeanScalarString = m_MedianString = m_SurfaceAreaString = m_MinScalarString = m_MaxScalarString = m_StandardDeviationString = "";
-	}
+	
 	m_Gui->Enable(ID_NUM_SCALARS, surfaceEvalued);
 	m_Gui->Enable(ID_MEAN_SCALAR, surfaceEvalued);
 	m_Gui->Enable(ID_MEDIAN, surfaceEvalued);
@@ -467,9 +469,16 @@ int albaOpVOIDensity::CheckSurface()
 {
 	if (!m_FillHoles)
 	{
-		m_Surface->Update();
+		vtkDEL(m_CleanFilter);
+		vtkNEW(m_CleanFilter);
+
+		m_CleanFilter->SetInputConnection(m_Surface->GetOutput()->GetVTKOutputPort());
+		m_CleanFilter->SetTolerance(0.0);        
+		m_CleanFilter->ToleranceIsAbsoluteOn(); 
+		m_CleanFilter->Update();
+
 		vtkALBASmartPointer<vtkFeatureEdges> FE;
-		FE->SetInputData((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
+		FE->SetInputConnection(m_CleanFilter->GetOutputPort());
 		FE->SetFeatureAngle(30);
 		FE->SetBoundaryEdges(1);
 		FE->SetColoring(0);
@@ -609,31 +618,24 @@ void albaOpVOIDensity::EvaluateSurface()
 	transform = vtkTransform::New();
 	transform->SetMatrix(alignMatrix.GetVTKMatrix());
 
-	vtkPolyData *polydata;
-	m_Surface->Update();
-	polydata = (vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
-
+	vtkAlgorithmOutput *outputPort = m_CleanFilter->GetOutputPort();
+	
 	if (m_FillHoles)
 	{
 		vtkDEL(m_FillHoleFilter);
 		vtkNEW(m_FillHoleFilter);
 
-		m_FillHoleFilter->SetInputData(polydata);
+		m_FillHoleFilter->SetInputConnection(outputPort);
 		m_FillHoleFilter->SetFillAllHole();
 		m_FillHoleFilter->Update();
-		polydata = m_FillHoleFilter->GetOutput();
+		outputPort = m_FillHoleFilter->GetOutputPort();
 	}
 
-	vtkALBASmartPointer<vtkCleanPolyData> cleanPolydata;
-	cleanPolydata->SetTolerance(0.0);
-	cleanPolydata->SetInputData(polydata);
-	cleanPolydata->Update();
 
-	polydata=cleanPolydata->GetOutput();
 
 	vtkALBASmartPointer<vtkTransformPolyDataFilter> TransformDataFilter;
 	TransformDataFilter->SetTransform(transform);
-	TransformDataFilter->SetInputData(polydata);
+	TransformDataFilter->SetInputConnection(outputPort);
 	TransformDataFilter->Update();
 
 	vtkALBASmartPointer<vtkALBAImplicitPolyData> ImplicitSurface;

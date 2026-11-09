@@ -87,7 +87,8 @@ public:
 	~albaOpAddLandmark();
 
 	virtual void OnEvent(albaEventBase *alba_event);
-		
+
+
 	void UpdateGui(bool rebuildDict = false);
 
 	albaTypeMacro(albaOpAddLandmark, albaOp);
@@ -156,6 +157,8 @@ protected:
 	albaString GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *attributeName);
 	
 	static bool LandmarkCloudAccept(albaVME* node) { return(node != NULL && node->IsALBAType(albaVMELandmarkCloud) /*&& node != m_Cloud && node =!m_AuxLandmarkCloud*/); };
+
+	void VmePicked(albaEvent *e);
 
 	void PushUniqueItem(wxString item);
 	void ReplaceItem(wxString oldItem, wxString newItem);
