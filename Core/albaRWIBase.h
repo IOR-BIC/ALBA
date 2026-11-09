@@ -39,6 +39,7 @@ class albaDeviceButtonsPadMouse;
 class vtkImageAppend;
 class vtkPNGWriter;
 class vtkWindowToImageFilter;
+class vtkImageData;
 
 //----------------------------------------------------------------------------
 // Constant:
@@ -116,15 +117,15 @@ public:
   wxBitmap* GetImage(int magnification = 1);
 	/** 
   Save an image of the render window. */
-  void SaveImage(albaString filename = "", int magnification = 1);
-  
-  /** 
-  Save all images of a view compound creating a view for every subview */
-  void SaveImageRecursive(albaString filename = "", albaViewCompound *v = NULL, int magnification = 1);
-  void RecursiveSaving(albaString filename="", albaViewCompound *v=NULL,int magnification=1);
-  /** 
+  void SaveImage(albaString filename = "");
+
+public:
+  void SaveImageFromImageData(albaString &filename, vtkImageData *imageData);
+
+  /**
   Save all images of the compound view. */
-  void SaveAllImages(albaString filename = "", albaViewCompound *v = NULL);
+  void SaveAllImages(albaString filename, albaViewCompound *v);
+
 	/** 
   Return the current used camera */
 	vtkCamera* GetCamera();

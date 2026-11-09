@@ -157,12 +157,12 @@ char ** albaViewArbitrarySlice::GetIcon()
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::PackageView()
 {
-	m_ViewArbitrary = new albaViewVTK("", CAMERA_PERSPECTIVE);
+	m_ViewArbitrary = new albaViewSlice("", CAMERA_PERSPECTIVE);
 	m_ViewArbitrary->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeArbSlice", MUTEX);
 	m_ViewArbitrary->PlugVisualPipe("albaVMELabeledVolume", "albaPipeBox", MUTEX);
 
 	// Create And Plug Slice View
-	m_ViewSlice = new albaViewVTK("", CAMERA_OS_Z);
+	m_ViewSlice = new albaViewSlice("", CAMERA_OS_Z);
 	m_ViewSlice->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeArbSlice", MUTEX);
 	m_ViewSlice->PlugVisualPipe("albaVMESurface", "albaPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("albaVMESurfaceParametric", "albaPipeSurfaceSlice");
@@ -188,7 +188,9 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 		OnReset();
 
 	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(vme, show);
-	m_ChildViewList[SLICE_VIEW]->VmeShow(vme, show);
+
+	if(!vme->IsA("albaVMEGizmo"))
+		m_ChildViewList[SLICE_VIEW]->VmeShow(vme, show);
 
 	if (show)
 	{
@@ -232,7 +234,7 @@ void albaViewArbitrarySlice::VmeShow(albaVME *vme, bool show)
 				m_AttachCamera = new albaAttachCamera(m_Gui, ((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi, this);
 
 				m_AttachCamera->DisableAttachCamera();
-				((albaViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_OS_Z);
+				((albaViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_OS_Z);
 				m_AttachCamera->SetStartingMatrix(m_MatrixReset->GetVTKMatrix());
 				m_SlicingMatrix->DeepCopy(m_MatrixReset);
 				m_AttachCamera->SetAttachedMatrix(m_SlicingMatrix->GetVTKMatrix());
@@ -311,8 +313,7 @@ void albaViewArbitrarySlice::GetSlicingNormal(double * normal)
 void albaViewArbitrarySlice::VmeSelect(albaVME *node, bool select)
 {
 	m_ChildViewList[ARBITRARY_VIEW]->VmeSelect(node, select);
-	m_ChildViewList[SLICE_VIEW]->VmeSelect(node, select);
-
+	
 	if (!m_AllSurface)
 	{
 		albaPipe* nodePipe = m_ChildViewList[SLICE_VIEW]->GetNodePipe(node);
@@ -492,6 +493,7 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 {
+	GetLogicManager()->EnableCameraUpdateSkip();
 	if (m_InputVolume)
 	{
 		if (typeGizmo == GIZMO_TRANSLATE)
@@ -510,7 +512,8 @@ void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 		m_TypeGizmo = typeGizmo;
 		m_Gui->Update();
 	}
-	CameraUpdate();
+	GetLogicManager()->DisableCameraUpdateSkip();
+
 }
 
 //----------------------------------------------------------------------------

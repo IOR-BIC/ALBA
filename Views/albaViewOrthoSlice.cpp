@@ -308,7 +308,7 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 			break;
 			case ID_RANGE_MODIFIED:
 			{
-				if (m_Views[0]->VolumeIsVisible())
+				if (m_Views[0]->IsVolumeVisible())
 				{
 					double low, hi;
 					m_LutSlider->GetSubRange(&low, &hi);
@@ -506,13 +506,13 @@ void albaViewOrthoSlice::PackageView()
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "albaPipeSurfaceSlice",MUTEX);
 			m_Views[v]->PlugVisualPipe("albaVMEPointCloud", "albaPipePointCloudSlice");
 			m_Views[v]->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
-
     }
     else
     {
       m_Views[v]->PlugVisualPipe("albaVMESurface", "albaPipeSurface",MUTEX);
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "albaPipeSurface",MUTEX);
-    }
+			m_Views[v]->DisableSliceExtraction();
+		}
   }
   PlugChildView(m_Views[PERSPECTIVE_VIEW]);
   PlugChildView(m_Views[ZN_VIEW]);

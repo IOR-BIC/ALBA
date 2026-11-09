@@ -146,7 +146,7 @@ public:
   int GetEnableGPU();
 
 	/** Get ImageData */
-	vtkImageData *GetImageData() { return m_Image; };
+	vtkImageData *GetImageData();
 	vtkALBAVolumeSlicer *GetSliceImageData() { return m_ArbSlicer; };
 	vtkTexture *GetTexture() { return m_Texture; };
 
@@ -193,7 +193,6 @@ protected:
 	vtkTransform					*m_NormalTranform;
 	vtkTransformFilter		*m_NormalTranformFilter;
   vtkALBATicksGenerator *m_TicksGenerator;
-	vtkImageData					 *m_Image;
 	vtkTexture						 *m_Texture;
 	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
 

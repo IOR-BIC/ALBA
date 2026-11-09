@@ -35,6 +35,7 @@ const bool DEBUG_MODE = false;
 #include "albaVMEVolume.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMELandmark.h"
+#include "albaVMEGroup.h"
 #include "albaPipeFactory.h"
 #include "albaPipe.h"
 #include "albaRWI.h"
@@ -58,6 +59,8 @@ const bool DEBUG_MODE = false;
 #include "vtkTextProperty.h"
 #include "vtkCamera.h"
 #include "vtkTransform.h"
+#include "vtkImageData.h"
+#include "vtkImageReslice.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewSlice);
@@ -93,6 +96,7 @@ albaViewSlice::albaViewSlice(wxString label /* =  */, int camera_position /* = C
 
 	InitializeSlice(m_Slice);     //to correctly set the normal
   m_SliceInitialized = false;   //reset initialized to false
+  m_SliceExtractionEnabled = true;
 }
 //----------------------------------------------------------------------------
 albaViewSlice::~albaViewSlice()
@@ -111,6 +115,7 @@ albaView *albaViewSlice::Copy(albaObserver *Listener, bool lightCopyEnabled)
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
   v->m_LightCopyEnabled = lightCopyEnabled;
+  v->m_SliceExtractionEnabled = m_SliceExtractionEnabled;
   v->Create();
   return v;
 }
@@ -230,6 +235,69 @@ void albaViewSlice::SetDecimals(int decimals)
 	UpdateText();
 	if(m_Rwi)
 		CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+albaVMEImage *albaViewSlice::ExtractSliceImage()
+{
+  assert(m_CurrentVolume);
+
+  albaVME *volVME = m_CurrentVolume->GetVme();
+  albaVMEGroup *group = albaVMEGroup::SafeDownCast(volVME->FindInTreeByName("Slices"));
+
+	if (group == NULL)
+	{
+		albaNEW(group);
+		group->SetName("Slices");
+		group->ReparentTo(volVME);
+    group->Delete();
+	}
+
+	//////////////////////////////////////////////////////////////////////////	
+	// Create and Save Image
+	albaVMEImage *vmeImage = NULL;
+	albaNEW(vmeImage);
+
+  SetSliceImageDataToVME(vmeImage);
+	vmeImage->SetName(GenerateImageName(group));
+	vmeImage->SetTimeStamp(0);
+	vmeImage->ReparentTo(group);
+
+  vmeImage->Delete();
+
+  return vmeImage;
+}
+
+//----------------------------------------------------------------------------
+void albaViewSlice::SetSliceImageDataToVME(albaVMEImage *vmeImage)
+{
+  double bounds[6];
+  vtkImageData *imageData = NULL;
+  albaPipe *pipeSlice = m_CurrentVolume->GetPipe();
+  assert(pipeSlice);
+
+  if (pipeSlice->IsA("albaPipeVolumeOrthoSlice"))
+    imageData = ((albaPipeVolumeOrthoSlice *)pipeSlice)->GetImageData();
+  else if (pipeSlice->IsA("albaPipeVolumeArbSlice"))
+    imageData = ((albaPipeVolumeArbSlice *)pipeSlice)->GetImageData();
+
+  vmeImage->SetData(imageData, 0);
+}
+
+//----------------------------------------------------------------------------
+wxString albaViewSlice::GenerateImageName(albaVME *slicesGroup)
+{
+	char *baseName = "Slice";
+
+	char imgName[256];
+	int count = 1;
+	do
+	{
+		sprintf(imgName, "%s %d", baseName, count);
+		count++;
+	} while (slicesGroup->FindInTreeByName(imgName) != NULL);
+
+	return imgName;
 }
 
 //----------------------------------------------------------------------------

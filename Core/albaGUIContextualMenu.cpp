@@ -50,7 +50,10 @@
 #include "vtkVRMLExporter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-
+#include "albaViewSlice.h"
+#include "albaViewArbitraryOrthoSlice.h"
+#include "albaViewArbitrarySlice.h"
+#include "albaVMEImage.h"
 //----------------------------------------------------------------------------
 // const
 //----------------------------------------------------------------------------
@@ -67,10 +70,10 @@ enum VIEW_CONTEXTUAL_MENU_ID
     CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW,
 		CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW,
     CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW,
+    CONTEXTUAL_MENU_EXTRACT_SLICE,
 		CONTEXTUAL_MENU_SAVE_AS_IMAGE,
     CONTEXTUAL_MENU_SAVE_ALL_AS_IMAGE,
     CONTEXTUAL_MENU_EXPORT_AS_VRML,
-    //CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW,
 	CONTEXTUAL_VIEW_MENU_STOP
 };
 
@@ -102,6 +105,11 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
 	m_ChildViewActive = child;
 	m_ViewActive      = view;
 
+	albaViewCompound *viewCopound = albaViewCompound::SafeDownCast(m_ViewActive);
+  albaViewSlice *viewSlice = albaViewSlice::SafeDownCast(viewCopound ? viewCopound->GetSubView() : m_ViewActive);
+
+  bool opRunning = GetLogicManager()->IsOperationRunning();
+
 	m_ChildViewActive->SetFocus();
 
 	if(vme_menu)
@@ -110,12 +118,10 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
 		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Transform  \tCtrl+T");
     this->AppendSeparator();
-    this->Append(CONTEXTUAL_MENU_VME_PIPE,"Visual props");
+    this->Append(CONTEXTUAL_MENU_VME_PIPE,"Visual Props");
     this->AppendSeparator();
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
-  albaViewCompound *vc = albaViewCompound::SafeDownCast(m_ViewActive);
-#ifdef WIN32  
 	this->AppendSeparator();
   if (m_ChildViewActive->IsMaximized())
   {
@@ -125,9 +131,9 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
   {
     this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW, "Maximize");
   }
-  if (vc)
+  if (viewCopound)
   {
-    if (vc->IsSubViewMaximized())
+    if (viewCopound->IsSubViewMaximized())
     {
       this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW, "Normal Size SubView");
     }
@@ -136,13 +142,17 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
       this->Append(CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW, "Maximize SubView");
     }
   }
-#endif
-  //this->Append(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW, "External", "Switch view visualization between external/internal", true);
-  //this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->Check(m_ViewActive->IsExternal());
-	this->AppendSeparator();
+
+  if (viewSlice && !opRunning && viewSlice->IsSliceExtractionEnabled() && viewSlice->IsVolumeVisible())
+  {
+    this->AppendSeparator();
+    this->Append(CONTEXTUAL_MENU_EXTRACT_SLICE, "Extract Slice");
+  }
+
+  this->AppendSeparator();
 	this->Append(CONTEXTUAL_MENU_SAVE_AS_IMAGE, _("Save as Image"));
 
-  if (vc)
+  if (viewCopound)
   {
     this->Append(CONTEXTUAL_MENU_SAVE_ALL_AS_IMAGE, _("Save All as Image"));
   }  
@@ -259,24 +269,31 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
       }
     }
     break;
-/*    case CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW:
+    case CONTEXTUAL_MENU_EXTRACT_SLICE:
     {
-      bool ext = !this->FindItem(CONTEXTUAL_MENU_EXTERNAL_INTERNAL_VIEW)->IsChecked();
-      m_ViewActive->ViewExternal(ext);
-      //m_ViewActive->HideGui();
-      albaEventMacro(albaEvent(this,VIEW_CREATED,m_ViewActive));
-      m_ChildViewActive->Destroy();
-      m_ViewActive->m_frame->Show(true);
-      //m_ViewActive->ShowGui();
-      return;
+      albaViewCompound *viewCopound = albaViewCompound::SafeDownCast(m_ViewActive);
+			albaViewSlice *viewSlice = albaViewSlice::SafeDownCast(viewCopound ? viewCopound->GetSubView() : m_ViewActive);
+			albaVMEImage *image = viewSlice->ExtractSliceImage();
+
+			if (viewCopound->IsA("albaViewArbitrarySlice"))
+			{
+				((albaViewArbitrarySlice *)viewCopound)->StoreViewParamsToVMETags(image);
+			}
+			else if (viewCopound->IsA("albaViewArbitraryOrthoSlice"))
+			{
+				((albaViewArbitraryOrthoSlice *)viewCopound)->StoreViewParamsToVMETags(image);
+			}
+		}
+    break;
+    case CONTEXTUAL_MENU_SAVE_AS_IMAGE:
+    {
+      albaView *view = m_ViewActive->IsA("albaViewCompound") ? ((albaViewCompound *)m_ViewActive)->GetSubView() : m_ViewActive;
+      view->GetRWI()->SaveImage(view->GetLabel());
     }
-    break;*/
-		case CONTEXTUAL_MENU_SAVE_AS_IMAGE:
-			albaEventMacro(albaEvent(this, VIEW_SAVE_IMAGE,false));
 		break;
     case CONTEXTUAL_MENU_SAVE_ALL_AS_IMAGE:
-			albaEventMacro(albaEvent(this, VIEW_SAVE_IMAGE,true));
-		break;
+      m_ViewActive->GetRWI()->SaveAllImages(m_ViewActive->GetLabel(),albaViewCompound::SafeDownCast(m_ViewActive));
+			break;
     case CONTEXTUAL_MENU_EXPORT_AS_VRML:
     {
 			albaString file_dir  = albaGetLastUserFolder();
@@ -307,7 +324,6 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 				}
 
 				renwin->AddRenderer(sceneGraph->m_AlwaysVisibleRenderer);
-				
 			}
     }
     break;

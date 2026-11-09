@@ -754,35 +754,10 @@ wxBitmap *albaRWIBase::GetImage(int magnification)
   return bmp;
 }
 //----------------------------------------------------------------------------
-void albaRWIBase::SaveImage(albaString filename, int magnification)
+void albaRWIBase::SaveImage(albaString filename)
 //---------------------------------------------------------------------------
 {
-  wxString path, name, ext;
-  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
-  if (filename.IsEmpty() || ext.IsEmpty())
-  {
-    wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
-    wxString file = "";
-
-    file.Append(filename);
-    file = albaGetSaveFile(file,wildc).ToAscii(); 
-    if(file.IsEmpty()) 
-      return;
-    filename = file;
-  }
-
-  wxString temporary = filename.GetCStr();
-  temporary = temporary.AfterLast('\\').AfterFirst('.');
-
-
-  albaString basename = filename.BaseName();
-  if (basename.IsEmpty())
-  {
-    filename = m_SaveDir << "\\" << filename;
-  }
-  
-  ::wxBeginBusyCursor();
-
+ 
   long pixelXMeterX = 0;
   long pixelXMeterY = 0;
   vtkRenderWindow *rw = this->GetRenderWindow();
@@ -828,409 +803,120 @@ void albaRWIBase::SaveImage(albaString filename, int magnification)
 
   vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
   w2i->SetInput(GetRenderWindow());
-  w2i->SetScale(magnification,magnification);
   w2i->Update();
+  vtkImageData *imageData=w2i->GetOutput();
   
-  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
-  ext.MakeLower();
-  if (ext == "bmp")
-  {
-    vtkALBASmartPointer<vtkBMPWriter> w;
-    w->SetInputConnection(w2i->GetOutputPort());
-    w->SetFileName(filename.GetCStr());
-    w->Write();
-
-    // bitmap header
-    /*
-    offset    size    description
-      0       2       signature, must be 4D42 hex
-      2       4       size of BMP file in bytes (unreliable)
-      6       2       reserved, must be zero
-      8       2       reserved, must be zero
-      10      4       offset to start of image data in bytes
-      14      4       size of BITMAPINFOHEADER structure, must be 40
-      18      4       image width in pixels
-      22      4       image height in pixels
-      26      2       number of planes in the image, must be 1
-      28      2       number of bits per pixel (1, 4, 8, or 24)
-      30      4       compression type (0=none, 1=RLE-8, 2=RLE-4)
-      34      4       size of image data in bytes (including padding)
-    * 38      4       horizontal resolution in pixels per meter (unreliable)
-    * 42      4       vertical resolution in pixels per meter (unreliable)
-      46      4       number of colors in image, or zero
-      50      4       number of important colors, or zero
-
-    * needed values
-    */
-#ifdef WIN32
-    //open file
-    fstream myFile (filename.GetCStr(), ios::in | ios::out | ios::binary);
-    myFile.seekp (38);
-    myFile.write ((char*)&pixelXMeterX, 4);
-    myFile.write ((char*)&pixelXMeterY, 4);
-    myFile.close();
-
-    FILE *fp = albaTryOpenFile(filename.GetCStr(), "rb");
-    if(!fp) return ;
-
-    BITMAPFILEHEADER bmfh={0};
-    BITMAPINFOHEADER bmih={0};
-//    DWORD index;
-//    BYTE ch;
-
-    fread(&bmfh,sizeof(bmfh),1,fp);  //read bitmap file header
-    fread(&bmih,sizeof(bmih),1,fp);  //read bitmap info header 
-    fclose(fp);
-#endif
-  }
-  else if (ext == "jpg")
-  {
-    vtkALBASmartPointer<vtkJPEGWriter> w;
-    w->SetInputConnection(w2i->GetOutputPort());
-    w->SetFileName(filename.GetCStr());
-    w->Write();
-  }
-  else if (ext == "tiff")
-  {
-    vtkALBASmartPointer<vtkTIFFWriter> w;
-    w->SetInputConnection(w2i->GetOutputPort());
-    w->SetFileName(filename.GetCStr());
-    w->Write();
-  }
-  else if (ext == "ps")
-  {
-    vtkALBASmartPointer<vtkPostScriptWriter> w;
-    w->SetInputConnection(w2i->GetOutputPort());
-    w->SetFileName(filename.GetCStr());
-    w->Write();
-  }
-  else if (ext == "png")
-  {
-    vtkALBASmartPointer<vtkPNGWriter> w;
-    w->SetInputConnection(w2i->GetOutputPort());
-    w->SetFileName(filename.GetCStr());
-    w->Write();
-  }
-  else
-  {
-    wxMessageBox(_("Image can not be saved. Not valid file!"), _("Warning"));
-  }
-  ::wxEndBusyCursor();
+  SaveImageFromImageData(filename, imageData);
+  return;
 }
+
 //----------------------------------------------------------------------------
-void albaRWIBase::SaveImageRecursive(albaString filename, albaViewCompound *v,int magnification)
-//----------------------------------------------------------------------------
+void albaRWIBase::SaveImageFromImageData(albaString &filename, vtkImageData *imageData)
 {
-  if(v == NULL) return;
+	wxString path, name, ext;
+	wxFileName::SplitPath(filename.GetCStr(), &path, &name, &ext);
+	if (filename.IsEmpty() || ext.IsEmpty())
+	{
+		wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
+		wxString file = "";
 
-  wxString path, name, ext;
-  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
-  if (filename.IsEmpty() || ext.IsEmpty())
-  {
-    //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
-    wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
-    wxString file = albaString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
-  
-		//albaString file ;
-    if(!wxDirExists(path))
-    {
-      file = m_SaveDir;
-      file +=  "\\";
-      filename = name;
-    }
+		file.Append(filename);
+		file = albaGetSaveFile(file, wildc).ToAscii();
+		if (file.IsEmpty())
+			return;
+		filename = file;
+	}
 
-    file.Append(filename);
-    file = albaGetSaveFile(file,wildc).ToAscii(); 
-    if(file.IsEmpty()) 
-      return;
-    filename = file;
-  }
-  
-  wxString temporary = filename.GetCStr();
-  temporary = temporary.AfterLast('\\').AfterFirst('.');
-
- 
-  albaString basename = filename.BaseName();
-  if (basename.IsEmpty())
-  {
-    filename = m_SaveDir << "\\" << filename;
-  }
+	wxString temporary = filename.GetCStr();
+	temporary = temporary.AfterLast('\\').AfterFirst('.');
 
 
-  RecursiveSaving(filename, v, magnification);
+	albaString basename = filename.BaseName();
+	if (basename.IsEmpty())
+	{
+		filename = m_SaveDir << "\\" << filename;
+	}
+
+	wxBeginBusyCursor();
+
+	wxFileName::SplitPath(filename.GetCStr(), &path, &name, &ext);
+	ext.MakeLower();
+	if (ext == "bmp")
+	{
+		vtkALBASmartPointer<vtkBMPWriter> w;
+		w->SetInputData(imageData);
+		w->SetFileName(filename.GetCStr());
+		w->Write();
+	}
+	else if (ext == "jpg")
+	{
+		vtkALBASmartPointer<vtkJPEGWriter> w;
+		w->SetInputData(imageData);
+		w->SetFileName(filename.GetCStr());
+		w->Write();
+	}
+	else if (ext == "tiff")
+	{
+		vtkALBASmartPointer<vtkTIFFWriter> w;
+		w->SetInputData(imageData);
+		w->SetFileName(filename.GetCStr());
+		w->Write();
+	}
+	else if (ext == "ps")
+	{
+		vtkALBASmartPointer<vtkPostScriptWriter> w;
+		w->SetInputData(imageData);
+		w->SetFileName(filename.GetCStr());
+		w->Write();
+	}
+	else if (ext == "png")
+	{
+		vtkALBASmartPointer<vtkPNGWriter> w;
+		w->SetInputData(imageData);
+		w->SetFileName(filename.GetCStr());
+		w->Write();
+	}
+	else
+	{
+		wxMessageBox(_("Image can not be saved. Not valid file!"), _("Warning"));
+	}
+	::wxEndBusyCursor();
 }
-//----------------------------------------------------------------------------
-void albaRWIBase::RecursiveSaving(albaString filename, albaViewCompound *v,int magnification)
-//----------------------------------------------------------------------------
-{
-  for(int i=0; i< v->GetNumberOfSubView(); i++)
-  {
-    albaView *currentView;
-    currentView = v->GetSubView(i);
-    if(albaViewCompound::SafeDownCast(currentView) != NULL)
-    {
-      wxString subViewString;
-      subViewString.Append(filename);
-      wxString pathName, fileName, extension;
-      wxFileName::SplitPath(subViewString,&pathName,&fileName,&extension);
 
-      subViewString.Clear();
-      subViewString.Append(pathName);
-      subViewString.Append("\\");
-      subViewString.Append(fileName);
-      subViewString.Append("_");
-      subViewString.Append(currentView->GetLabel());
-      subViewString.Append(".");
-      subViewString.Append(extension);
-
-      RecursiveSaving(subViewString, albaViewCompound::SafeDownCast(currentView), magnification);
-    }
-    else
-    {
-      ///////////////////////////////////
-      wxString temp, pathName, fileName, extension;
-      temp.Append(filename);
-      wxFileName::SplitPath(temp,&pathName,&fileName,&extension);
-      fileName.Append(albaString::Format("_%d", i));
-      temp.Clear();
-      temp.Append(pathName);
-      temp.Append("\\");
-      temp.Append(fileName);
-      temp.Append(".");
-      temp.Append(extension);
-
-      ::wxBeginBusyCursor();
-
-      long pixelXMeterX = 0;
-      long pixelXMeterY = 0;
-      vtkRenderWindow *rw = currentView->GetRWI()->GetRenderWindow();
-      if(rw)
-      {
-        vtkRendererCollection *rc = rw->GetRenderers();
-        if(rc)
-        {
-          rc->InitTraversal();
-          vtkRenderer *ren = rc->GetNextItem();
-          if(ren)
-          {
-            //wxMessageBox(albaString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
-            double wp0x[4], wp1x[4];
-            ren->SetDisplayPoint(0,0,0); //x
-            ren->DisplayToWorld();
-            ren->GetWorldPoint(wp0x);
-
-            ren->SetDisplayPoint(10,0,0); //x
-            ren->DisplayToWorld();
-            ren->GetWorldPoint(wp1x);
-
-            double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
-            double meter = 1000; //millimeters
-            pixelXMeterX = meter/pixelSpacingX;
-            //wxMessageBox(albaString::Format("pixelXMeter = %f", meter/pixelSpacingX));
-
-            double wp0y[4], wp1y[4];
-            ren->SetDisplayPoint(0,0,0); //y
-            ren->DisplayToWorld();
-            ren->GetWorldPoint(wp0y);
-
-            ren->SetDisplayPoint(0,10,0); //y
-            ren->DisplayToWorld();
-            ren->GetWorldPoint(wp1y);
-
-            double pixelSpacingY = sqrt(vtkMath::Distance2BetweenPoints(wp1y,wp0y))/10;
-            pixelXMeterY = meter/pixelSpacingY;
-          }
-        }
-
-      }
-      currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOn();
-      vtkALBASmartPointer<vtkWindowToImageFilter> w2i;
-      w2i->SetInput(currentView->GetRWI()->GetRenderWindow());
-      w2i->SetScale(magnification,magnification);
-      w2i->Update();
-      currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOff();
-      
-      extension.MakeLower();
-      if (extension == "bmp")
-      {
-        vtkALBASmartPointer<vtkBMPWriter> w;
-        w->SetInputConnection(w2i->GetOutputPort());
-        w->SetFileName(temp.ToAscii());
-        w->Write();
-
-        // bitmap header
-        /*
-        offset    size    description
-        0       2       signature, must be 4D42 hex
-        2       4       size of BMP file in bytes (unreliable)
-        6       2       reserved, must be zero
-        8       2       reserved, must be zero
-        10      4       offset to start of image data in bytes
-        14      4       size of BITMAPINFOHEADER structure, must be 40
-        18      4       image width in pixels
-        22      4       image height in pixels
-        26      2       number of planes in the image, must be 1
-        28      2       number of bits per pixel (1, 4, 8, or 24)
-        30      4       compression type (0=none, 1=RLE-8, 2=RLE-4)
-        34      4       size of image data in bytes (including padding)
-        * 38      4       horizontal resolution in pixels per meter (unreliable)
-        * 42      4       vertical resolution in pixels per meter (unreliable)
-        46      4       number of colors in image, or zero
-        50      4       number of important colors, or zero
-
-        * needed values
-        */
-#ifdef WIN32
-        //open file
-        fstream myFile (temp.ToAscii(), ios::in | ios::out | ios::binary);
-        myFile.seekp (38);
-        myFile.write ((char*)&pixelXMeterX, 4);
-        myFile.write ((char*)&pixelXMeterY, 4);
-        myFile.close();
-
-        FILE *fp = albaTryOpenFile(temp.ToAscii(), "rb");
-        if(!fp) return ;
-
-        BITMAPFILEHEADER bmfh={0};
-        BITMAPINFOHEADER bmih={0};
-        //    DWORD index;
-        //    BYTE ch;
-
-        fread(&bmfh,sizeof(bmfh),1,fp);  //read bitmap file header
-        fread(&bmih,sizeof(bmih),1,fp);  //read bitmap info header 
-        fclose(fp);
-#endif
-      }
-      else if (extension == "jpg")
-      {
-        vtkALBASmartPointer<vtkJPEGWriter> w;
-        w->SetInputConnection(w2i->GetOutputPort());
-        w->SetFileName(temp.ToAscii());
-        w->Write();
-      }
-      else if (extension == "tiff")
-      {
-        vtkALBASmartPointer<vtkTIFFWriter> w;
-        w->SetInputConnection(w2i->GetOutputPort());
-        w->SetFileName(temp.ToAscii());
-        w->Write();
-      }
-      else if (extension == "ps")
-      {
-        vtkALBASmartPointer<vtkPostScriptWriter> w;
-        w->SetInputConnection(w2i->GetOutputPort());
-        w->SetFileName(temp.ToAscii());
-        w->Write();
-      }
-      else if (extension == "png")
-      {
-        vtkALBASmartPointer<vtkPNGWriter> w;
-        w->SetInputConnection(w2i->GetOutputPort());
-        w->SetFileName(temp.ToAscii());
-        w->Write();
-      }
-      else
-      {
-        wxMessageBox(_("Image can not be saved. Not valid file!"), _("Warning"));
-      }
-      ::wxEndBusyCursor();
-      ///////////////////////////////////
-    }
-    
-
-    
-  }
-}
-//----------------------------------------------------------------------------
 void albaRWIBase::SaveAllImages(albaString filename, albaViewCompound *v)
-//---------------------------------------------------------------------------
 {
-  if(v == NULL) return;
-  wxString path, name, ext;
-  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
-  if (filename.IsEmpty() || ext.IsEmpty())
-  {
-    albaString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp|Image (*.png)|*.png";
-    albaString file;
-    if(!wxDirExists(path))
-    {
-      file = m_SaveDir;
-      file +=  "\\";
-      filename = albaString(name);
-    }
-    file.Append(filename);
-    file = albaGetSaveFile(file,wildc); 
-    if(file.IsEmpty())
-      return;
-    filename = file;
-  }
+	if (v == NULL) return;
 
-  wxString temporary = filename.GetCStr();
-  temporary = temporary.AfterLast('\\').AfterFirst('.');
+	wxBitmap imageBitmap;
+	v->GetImage(imageBitmap);
 
+	if (!imageBitmap.IsOk()) return;
 
-  albaString basename = filename.BaseName();
-  if (basename.IsEmpty())
-  {
-    filename = m_SaveDir << "\\" << filename;
-  }
+	wxImage bitmapImage = imageBitmap.ConvertToImage();
+	if (!bitmapImage.IsOk()) return;
 
-  ::wxBeginBusyCursor();
+	const int width = bitmapImage.GetWidth();
+	const int height = bitmapImage.GetHeight();
+	unsigned char *bitmapData = bitmapImage.GetData();
+	if (bitmapData == NULL) return;
 
-  wxBitmap imageBitmap;
-  v->GetImage(imageBitmap);
+	vtkALBASmartPointer<vtkImageData> imageData;
+	imageData->SetDimensions(width, height, 1);
+	imageData->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
-  wxFileName::SplitPath(filename.GetCStr(),&path,&name,&ext);
-  ext.MakeLower();
-  if (ext == "bmp")
-  {
-    imageBitmap.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_BMP);
-  }
-  else if (ext == "jpg")
-  {
-    wxJPEGHandler *jpegHandler = new wxJPEGHandler();
-    jpegHandler->SetName("JPEGHANDLER");
-    wxImage::AddHandler(jpegHandler);
-    wxImage image = imageBitmap.ConvertToImage();
-    image.SetOption(_("quality"), 100);
-    image.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_JPEG);
-    wxImage::RemoveHandler("JPEGHANDLER");
-  }
-  else if (ext == "png")
-  {
-    /*wxPNGHandler *pngHandler = new wxPNGHandler();
-    pngHandler->SetName("PNGHANDLER");
-    wxImage::AddHandler(pngHandler);
-    wxImage image = imageBitmap.ConvertToImage();
-    image.SetOption(_("quality"), 100);
-    image.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_PNG);
-    wxImage::RemoveHandler("PNGHANDLER");*/
-    
-    std::string fn = filename.GetCStr();
-    fn = fn.substr(0,fn.size()-3);
-    fn.append("bmp");
-    //imageBitmap.SetDepth(24);
-    imageBitmap.SaveFile(fn.c_str(), wxBITMAP_TYPE_BMP);
-    
-    vtkBMPReader *r = vtkBMPReader::New();
-    r->SetFileName(fn.c_str());
-    r->Update();
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			const int sourceIndex = (y * width + x) * 3;
+			unsigned char *pixel = (unsigned char *)imageData->GetScalarPointer(x, height - y - 1, 0);
+			pixel[0] = bitmapData[sourceIndex];
+			pixel[1] = bitmapData[sourceIndex + 1];
+			pixel[2] = bitmapData[sourceIndex + 2];
+		}
+	}
 
-    vtkPNGWriter *w = vtkPNGWriter::New();
-    w->SetInputConnection(r->GetOutputPort());
-    w->SetFileName(filename.GetCStr());
-    w->Write();
-
-    r->Delete();
-    w->Delete();
-
-    wxRemoveFile(fn.c_str());
-  }
-  else
-  {
-    wxMessageBox("Must save with JPG, BMP of PNG extension");
-  }
-  ::wxEndBusyCursor();
+	SaveImageFromImageData(filename, imageData);
 }
 //----------------------------------------------------------------------------
 vtkCamera* albaRWIBase::GetCamera()

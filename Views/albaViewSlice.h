@@ -110,7 +110,8 @@ public:
 
   /** 
   Return true if a there is a volume inside the view.*/
-  bool VolumeIsVisible() {return m_CurrentVolume != NULL;};
+  bool 
+    IsVolumeVisible() {return m_CurrentVolume != NULL;};
 
   /** Create the background for the slice. */
   void BorderCreate(double col[3]);
@@ -159,6 +160,16 @@ public:
 	/** Sets Decimals */
 	void SetDecimals(int decimals);
 
+  
+  bool IsSliceExtractionEnabled() const { return m_SliceExtractionEnabled; }
+  void SetSliceExtractionEnabled(bool val) { m_SliceExtractionEnabled = val; }
+  void EnableSliceExtraction() { m_SliceExtractionEnabled = true; };
+  void DisableSliceExtraction() { m_SliceExtractionEnabled = false; };
+
+
+  albaVMEImage *ExtractSliceImage();
+
+
 protected:
 	
   /* Correction of slice pose when current volume pose matrix is different from identity: 
@@ -171,7 +182,11 @@ protected:
   void SetCameraParallelToDataSetLocalAxis( int axis );
 
 
-	//----------------------------------------------------------------------------
+	void SetSliceImageDataToVME(albaVMEImage *vmeImage);
+
+	wxString GenerateImageName(albaVME *slicesGroup);
+
+
 	virtual void GetVisualPipeName(albaVME *node, albaString &pipe_name);
  
   albaSceneNode    *m_CurrentVolume; ///< Current visualized volume
@@ -196,5 +211,7 @@ protected:
 
 	bool m_TextureInterpolate;
   int m_TrilinearInterpolationOn;
+
+  bool m_SliceExtractionEnabled;
 };
 #endif

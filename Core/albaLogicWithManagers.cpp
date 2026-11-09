@@ -991,22 +991,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			e->SetBool(m_ViewManager->GetSelectedView() != NULL);
 			e->SetView(m_ViewManager->GetSelectedView());
 			break;
-		case VIEW_SAVE_IMAGE:
-		{
-			albaViewCompound *v = albaViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
-			if (v && e->GetBool())
-			{
-				v->GetRWI()->SaveAllImages(v->GetLabel(), v);
-			}
-			else
-			{
-				albaView *v = m_ViewManager->GetSelectedView();
-				if (v)
-				{
-					v->GetRWI()->SaveImage(v->GetLabel());
-				}
-			}
-		}
 		break;
 		case CAMERA_RESET:
 			CameraReset();
@@ -1450,8 +1434,6 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 	DisableCameraUpdateSkip();
 	
 	albaYield();
-
-	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeModified(albaVME *vme)
