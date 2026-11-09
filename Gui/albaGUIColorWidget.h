@@ -29,7 +29,7 @@ class ALBA_EXPORT albaGUIColorWidget: public wxPanel, public albaObserver
 {
 public:
   albaGUIColorWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 
-           const wxSize& size = wxSize(350,135), long style = wxTAB_TRAVERSAL);
+           const wxSize& size = wxSize(300,135), long style = wxTAB_TRAVERSAL);
 
   virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 

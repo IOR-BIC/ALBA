@@ -76,7 +76,6 @@ SET(PROJECT_SRCS
 	albaOpVolumeMirrorTest.h albaOpVolumeMirrorTest.cpp
 	albaOpExporterMetersTest.h albaOpExporterMetersTest.cpp
 	albaOpSubdivideTest.h albaOpSubdivideTest.cpp
-	albaOpCreateSurfaceTest.h albaOpCreateSurfaceTest.cpp
 	albaOpVolumeResampleTest.h albaOpVolumeResampleTest.cpp
 	albaOpSegmentationRegionGrowingConnectedThresholdTest.h albaOpSegmentationRegionGrowingConnectedThresholdTest.cpp
 	albaOpScaleDatasetTest.h albaOpScaleDatasetTest.cpp

@@ -207,7 +207,7 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 			double min, max, low, hi;
 			// LUT SLIDERS
 			// is the volume visible?
-			if (((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
+			if (((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->IsVolumeVisible())
 			{
 
 				// from which lut slider the event is coming?

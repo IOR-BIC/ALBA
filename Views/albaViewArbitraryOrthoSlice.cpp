@@ -161,7 +161,7 @@ void albaViewArbitraryOrthoSlice::PackageView()
 //----------------------------------------------------------------------------
 void albaViewArbitraryOrthoSlice::CreateAndPlugSliceView(int v)
 {
-	m_ViewSlice[v] = new albaViewVTK("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
+	m_ViewSlice[v] = new albaViewSlice("", CAMERA_OS_X + v, true, false, 0, false, m_AxesType);
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEVolumeGray", "albaPipeVolumeArbSlice", MUTEX);
 
 	m_ViewSlice[v]->PlugVisualPipe("albaVMEImage", "albaPipeBox", NON_VISIBLE);
@@ -246,8 +246,6 @@ void albaViewArbitraryOrthoSlice::VmeShow(albaVME *vme, bool show)
 void albaViewArbitraryOrthoSlice::VmeSelect(albaVME *node, bool select)
 {
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeSelect(node, select);
-
-
 
 	if (!m_AllSurface)
 	{

@@ -37,8 +37,11 @@
 #include "albaView.h"
 //#include "albaViewCompound.h"
 
+#include "albaEvent.h"
+
 #include "vtkRenderer.h"
 #include "vtkProp3D.h"
+#include "vtkPoints.h"
 
 #include <assert.h>
 
@@ -234,29 +237,28 @@ int albaInteractor::OnStopInteraction(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 void albaInteractor::OnButtonDown(albaEventInteraction *e)
 //------------------------------------------------------------------------------
-{ 
-  // create a new event copying data from the incoming one
-  albaEventBase *event=e->NewInstance();
-  e->DeepCopy(e);
-  e->SetId(BUTTON_DOWN);
-  e->SetSender(this);
-  e->SetChannel(MCH_UP);
-  
-  InvokeEvent(e);
-  
+{
+  // send a copy of the incoming event: the incoming one is still being dispatched by the device
+  albaEventInteraction event;
+  event.DeepCopy(e);
+  event.SetId(BUTTON_DOWN);
+  event.SetSender(this);
+  event.SetChannel(MCH_UP);
+
+  InvokeEvent(&event);
 }
 //------------------------------------------------------------------------------
 void albaInteractor::OnButtonUp(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
-  // create a new event copying data from the incoming one
-  albaEventBase *event=e->NewInstance();
-  e->DeepCopy(e);
-  e->SetId(BUTTON_UP);
-  e->SetSender(this);
-  e->SetChannel(MCH_UP);
+  // send a copy of the incoming event: the incoming one is still being dispatched by the device
+  albaEventInteraction event;
+  event.DeepCopy(e);
+  event.SetId(BUTTON_UP);
+  event.SetSender(this);
+  event.SetChannel(MCH_UP);
 
-  InvokeEvent(e);
+  InvokeEvent(&event);
 }
 //------------------------------------------------------------------------------
 void albaInteractor::OnEvent(albaEventBase *event)
@@ -362,6 +364,20 @@ void albaInteractor::ComputeWorldToDisplay(double x, double y, double z, double 
   m_Renderer->SetWorldPoint(x, y, z, 1.0);
   m_Renderer->WorldToDisplay();
   m_Renderer->GetDisplayPoint(displayPt);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractor::SendPickedPointEvent(int eventId, double pos[3], vtkIdType id, double scalar, albaVME *vme)
+//----------------------------------------------------------------------------
+{
+  vtkALBASmartPointer<vtkPoints> points;
+  points->SetNumberOfPoints(1);
+  points->SetPoint(0, pos);
+
+  albaEvent pickEvent(this, eventId, (vtkObject *)points.GetPointer(), (long)id);
+  pickEvent.SetDouble(scalar);
+  pickEvent.SetVme(vme);
+  albaEventMacro(pickEvent);
 }
 //----------------------------------------------------------------------------
 /*bool albaInteractor::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)

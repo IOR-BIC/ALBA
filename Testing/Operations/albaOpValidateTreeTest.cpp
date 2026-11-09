@@ -172,7 +172,7 @@ void albaOpValidateTreeTest::TestValidateTree_LinkNotPresent()
   albaVMESurface *external;
   albaNEW(external);
   //set a link not parented inside tree
-  storageImport->GetRoot()->GetChild(0)->GetChild(1)->GetChild(0)->SetLink("test",external);
+  storageImport->GetRoot()->GetChild(0)->GetChild(0)->SetLink("test",external);
 
   albaOpValidateTree *op = new albaOpValidateTree();
   op->TestModeOn();
@@ -207,9 +207,11 @@ void albaOpValidateTreeTest::TestValidateTree_LinkNull()
   storageImport->SetURL(msfFileNameOut.ToAscii());
   CPPUNIT_ASSERT ( storageImport->Restore() == ALBA_OK );
 
- 
-  albaVME::albaLinksMap *linksmap = storageImport->GetRoot()->GetChild(0)->GetChild(1)->GetChild(0)->GetLinks();
-  (*linksmap)["SlicedVME"] = albaVMELink(1000,NULL);
+	storageImport->GetRoot()->GetChild(0)->GetChild(0)->SetLink("testNull", storageImport->GetRoot()->GetChild(0));
+
+
+  albaVME::albaLinksMap *linksmap = storageImport->GetRoot()->GetChild(0)->GetChild(0)->GetLinks();
+  (*linksmap)["testNull"] = albaVMELink(1000,NULL);
   
   
   albaOpValidateTree *op = new albaOpValidateTree();
@@ -293,8 +295,8 @@ void albaOpValidateTreeTest::TestValidateTree_UrlEmpty()
 void albaOpValidateTreeTest::TestValidateTree_ItemNotPresent()
 //---------------------------------------------------------
 {
-  printf("\n This section is not testable due to asserts (and protection of datavector class) inserted after\
-             several incoherence inside tree.\n");
+  //This section is not testable due to asserts (and protection of datavector class) inserted after
+  //several incoherence inside tree.
 }
 //---------------------------------------------------------
 void albaOpValidateTreeTest::TestValidateTree_MaxItemIdPatched()

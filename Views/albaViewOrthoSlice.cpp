@@ -69,7 +69,6 @@ albaViewOrthoSlice::albaViewOrthoSlice(wxString label)
 //----------------------------------------------------------------------------
 {
   m_LutSlider = NULL;
-  m_LutWidget = NULL;
   for (int v=0;v<4;v++)
   {
     m_Views[v] = NULL;
@@ -202,8 +201,7 @@ void albaViewOrthoSlice::VmeShow(albaVME *vme, bool show)
 		else
 		{
 			m_CurrentVolume = NULL;
-			m_LutWidget->SetLut(NULL);
-      RemoveVolumeFromGizmo();
+			RemoveVolumeFromGizmo();
     }
 	}
 	else
@@ -308,24 +306,9 @@ void albaViewOrthoSlice::OnEvent(albaEventBase *alba_event)
 				CameraUpdate();
 			}
 			break;
-			case ID_LUT_CHOOSER:
-			{
-				mmaVolumeMaterial *currentVolumeMaterial = ((albaVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
-				currentVolumeMaterial->UpdateFromTables();
-				for (int i = 0; i < m_NumOfChildView; i++)
-				{
-					albaPipeVolumeOrthoSlice *p = (albaPipeVolumeOrthoSlice *)m_Views[i]->GetNodePipe(m_CurrentVolume);
-					p->SetColorLookupTable(m_ColorLUT);
-				}
-				double *sr;
-				sr = m_ColorLUT->GetRange();
-				m_LutSlider->SetSubRange((long)sr[0], (long)sr[1]);
-				CameraUpdate();
-			}
-			break;
 			case ID_RANGE_MODIFIED:
 			{
-				if (m_Views[0]->VolumeIsVisible())
+				if (m_Views[0]->IsVolumeVisible())
 				{
 					double low, hi;
 					m_LutSlider->GetSubRange(&low, &hi);
@@ -411,8 +394,6 @@ albaGUI* albaViewOrthoSlice::CreateGui()
 
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"Layout",&m_LayoutConfiguration,3,layout_choices);
 	m_Gui->Slider(ID_DECIMALS, "Decimals", &m_Decimals, 0, 8);
-  m_Gui->Divider();
-  m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"Lut",m_ColorLUT);
   m_Gui->Divider(2);
 
 	wxString sidesName[2]{ "Left", "Right" };
@@ -499,7 +480,6 @@ void albaViewOrthoSlice::PlugVisualPipeInPerspective(albaString vme_type, albaSt
 
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::PackageView()
-//----------------------------------------------------------------------------
 {
   int cam_pos[4] = {CAMERA_OS_P, CAMERA_OS_X, CAMERA_OS_Y, CAMERA_OS_Z};
   
@@ -526,13 +506,13 @@ void albaViewOrthoSlice::PackageView()
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "albaPipeSurfaceSlice",MUTEX);
 			m_Views[v]->PlugVisualPipe("albaVMEPointCloud", "albaPipePointCloudSlice");
 			m_Views[v]->PlugVisualPipe("albaVMEProsthesis", "albaPipeSurfaceSlice");
-
     }
     else
     {
       m_Views[v]->PlugVisualPipe("albaVMESurface", "albaPipeSurface",MUTEX);
 			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "albaPipeSurface",MUTEX);
-    }
+			m_Views[v]->DisableSliceExtraction();
+		}
   }
   PlugChildView(m_Views[PERSPECTIVE_VIEW]);
   PlugChildView(m_Views[ZN_VIEW]);
@@ -541,15 +521,10 @@ void albaViewOrthoSlice::PackageView()
 }
 //----------------------------------------------------------------------------
 void albaViewOrthoSlice::EnableWidgets(bool enable)
-//----------------------------------------------------------------------------
 {
   if (m_Gui)
-  {
-    m_Gui->Enable(ID_LUT_CHOOSER,enable);
     m_Gui->Enable(ID_RESET_SLICES, enable);
-  }
   m_LutSlider->Enable(enable);
-
 }
 
 //----------------------------------------------------------------------------
@@ -754,7 +729,6 @@ void albaViewOrthoSlice::CreateOrthoslicesAndGizmos(albaVME *vme)
 	vtkData->GetCenter(m_GizmoHandlePosition);
 	vtkData->GetScalarRange(sr);
 	m_ColorLUT = currentVolumeMaterial->m_ColorLut;
-	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->GetTableRange()[0],(long)currentVolumeMaterial->GetTableRange()[1]);
 	for(int i=0; i<m_NumOfChildView; i++)

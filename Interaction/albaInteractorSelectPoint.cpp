@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: mmiSelectPoint
+ Module: albaInteractorSelectPoint
  Authors: Matteo Giacomoni , Stefano Perticoni
  
  Copyright (c) BIC
@@ -16,7 +16,7 @@
 
 #include "albaDefines.h"
 
-#include "mmiSelectPoint.h"
+#include "albaInteractorSelectPoint.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaInteractor.h"
 #include "albaRWIBase.h"
@@ -35,23 +35,23 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(mmiSelectPoint)
+albaCxxTypeMacro(albaInteractorSelectPoint)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mmiSelectPoint::mmiSelectPoint()
+albaInteractorSelectPoint::albaInteractorSelectPoint()
 //------------------------------------------------------------------------------
 {
 	m_IsPicking = false;
   m_UseCtrlModifier = true;
 }
 //------------------------------------------------------------------------------
-mmiSelectPoint::~mmiSelectPoint()
+albaInteractorSelectPoint::~albaInteractorSelectPoint()
 //------------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnMouseMove() 
+void albaInteractorSelectPoint::OnMouseMove() 
 //----------------------------------------------------------------------------
 {
 	// if something has been picked do not move the camera
@@ -65,7 +65,7 @@ void mmiSelectPoint::OnMouseMove()
 	}
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnLeftButtonDown(albaEventInteraction *e) 
+void albaInteractorSelectPoint::OnLeftButtonDown(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   if (e == NULL)
@@ -95,7 +95,7 @@ void mmiSelectPoint::OnLeftButtonDown(albaEventInteraction *e)
 	}
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnButtonUp(albaEventInteraction *e)
+void albaInteractorSelectPoint::OnButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if (e == NULL)
@@ -109,7 +109,7 @@ void mmiSelectPoint::OnButtonUp(albaEventInteraction *e)
 	Superclass::OnButtonUp(e);
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::PickCell( albaDevice *device )
+void albaInteractorSelectPoint::PickCell( albaDevice *device )
 //----------------------------------------------------------------------------
 {
 	int x = m_LastMousePose[0];
@@ -127,11 +127,7 @@ void mmiSelectPoint::PickCell( albaDevice *device )
 		if(pointPicker->Pick(x,y,0,m_Renderer))
 		{
       pointPicker->GetPickPosition(pos_picked);
-			vtkPoints *pickedPoint = vtkPoints::New();
-			pickedPoint->SetNumberOfPoints(1);
-			pickedPoint->SetPoint(0,pos_picked);
-			albaEventMacro(albaEvent(this,VME_PICKED,(vtkObject *)pickedPoint,pointPicker->GetPointId()));
-			pickedPoint->Delete();
+			SendPickedPointEvent(VME_PICKED, pos_picked, pointPicker->GetPointId());
 
 			//  wxString msg = "picked something";
 			//  int res = wxMessageBox(msg,"debug info", wxOK, NULL);
@@ -142,7 +138,7 @@ void mmiSelectPoint::PickCell( albaDevice *device )
 	}
 }
 //----------------------------------------------------------------------------
-void mmiSelectPoint::OnEvent(albaEventBase *event)
+void albaInteractorSelectPoint::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
 	Superclass::OnEvent(event);

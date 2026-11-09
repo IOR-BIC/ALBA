@@ -32,7 +32,7 @@
 class albaGUIDialog;
 class albaGUIButton;
 class albaRWI;
-class mmiSelectPoint;
+class albaInteractorSelectPoint;
 class albaVMESurface;
 class vtkHoleConnectivity;
 class vtkPolyDataMapper;
@@ -105,7 +105,7 @@ protected:
 	albaGUIDialog							*m_Dialog;
 	albaGUIButton							*m_ButtonOk;
 	albaRWI								*m_Rwi;
-	mmiSelectPoint				*m_Picker;
+	albaInteractorSelectPoint				*m_Picker;
 
 	vtkPolyData						*m_ResultPolydata;
 	vtkPolyData						*m_OriginalPolydata;

@@ -178,7 +178,7 @@ void albaViewRXCompound::OnEvent(albaEventBase *alba_event)
       case ID_RANGE_MODIFIED:
       {
         // is the volume visible?
-        if(((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
+        if(((albaViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->IsVolumeVisible())
         {
           double low, hi;
 

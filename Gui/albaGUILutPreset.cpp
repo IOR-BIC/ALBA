@@ -54,27 +54,27 @@ const int lutPresetNum = 21;
 wxString LutNames[lutPresetNum] = 
 //---------------------------------------------------------------------
 {
-"default",
-"default step",
-"efield",
-"glow",
-"gray",
-"min max",
-"physicsContour",
-"pure red",
-"pure green",
-"pure blue",
-"run 1",
-"run 2",
-"sar",
-"temperature",
-"tensteps",
-"volren Glow",
-"volren Green",
-"volren RGB",
-"volren Two Level",
-"default blue to red",
-"gray reversed"
+"Default",
+"Default step",
+"Efield",
+"Glow",
+"Gray",
+"Min Max",
+"Physics Contour",
+"Pure Red",
+"Pure Green",
+"Pure Blue",
+"Run 1",
+"Run 2",
+"Sar",
+"Temperature",
+"Tensteps",
+"Volren Glow",
+"Volren Green",
+"Volren RGB",
+"Volren Two Level",
+"Default blue to red",
+"Gray reversed"
 };
 
 //---------------------------------------------------------------------

@@ -16,6 +16,7 @@
 
 #include "albaDefines.h"
 #include "albaInteractorSegmentationPicker.h"
+#include "albaPickHelper.h"
 
 #include "albaView.h"
 #include "albaDeviceButtonsPadTracker.h"
@@ -85,37 +86,21 @@ void albaInteractorSegmentationPicker::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 void albaInteractorSegmentationPicker::SendPickingInformation(albaView *v, double *mouse_pos,long modifier, int eventId)
 {
-  bool picked_something = false;
-
-  vtkCellPicker *cellPicker;
-  vtkNEW(cellPicker);
-  cellPicker->SetTolerance(0.001);
-  if (v)
+  // position and VME come from the same picking; m_PickPosition changes only when something is picked
+  albaVME *pickedVME;
+  double pos[3];
+  if (albaPickHelper::PickCell(v, mouse_pos[0], mouse_pos[1], pos, &pickedVME))
   {
-    vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
-    vtkRenderer *r = NULL;
-    rc->InitTraversal();
-    while(r = rc->GetNextItem())
-    {
-      if(cellPicker->Pick(mouse_pos[0],mouse_pos[1],0,r))
-      {
-        picked_something = true;
-				break;
-      }
-    }
-		if (picked_something)
-		{
-			cellPicker->GetPickPosition(m_PickPosition);
-			albaVME *pickedVME = v->GetPickedVme();
-			if (pickedVME)
-			{
-				albaEvent pickEvent(this, eventId, modifier);
-				pickEvent.SetPointer(m_PickPosition);
-				albaEventMacro(pickEvent);
-			}
-		}
+    m_PickPosition[0] = pos[0];
+    m_PickPosition[1] = pos[1];
+    m_PickPosition[2] = pos[2];
   }
-  vtkDEL(cellPicker);
+  if (pickedVME)
+  {
+    albaEvent pickEvent(this, eventId, modifier);
+    pickEvent.SetPointer(m_PickPosition);
+    albaEventMacro(pickEvent);
+  }
 }
 
 //------------------------------------------------------------------------------

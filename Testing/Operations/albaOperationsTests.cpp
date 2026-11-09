@@ -39,7 +39,6 @@
 #include "albaOpCreateRefSysTest.h"
 #include "albaOpCreateSplineTest.h"
 #include "albaOpCreateSurfaceParametricTest.h"
-#include "albaOpCreateSurfaceTest.h"
 #include "albaOpCreateVolumeTest.h"
 #include "albaOpCreateWrappedMeterTest.h"
 #include "albaOpCropDeformableROITest.h"
@@ -257,7 +256,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpVolumeMirrorTest::suite());
 	runner.addTest(albaOpExporterMetersTest::suite());
 	runner.addTest(albaOpSubdivideTest::suite());
-	runner.addTest(albaOpCreateSurfaceTest::suite());
 	runner.addTest(albaOpSegmentationRegionGrowingConnectedThresholdTest::suite());
 	runner.addTest(albaOpScaleDatasetTest::suite());
 	runner.addTest(albaOpCreateLabeledVolumeTest::suite());
@@ -293,9 +291,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 	runner.addTest(albaOpImporterDICFileTest::suite());
 	runner.addTest(albaOpImporterPointCloudTest::suite());
-	runner.addTest(albaOpFilterImageTest::suite()); /* */
-
-runner.addTest(albaOpExporterDicFileTest::suite());
+	runner.addTest(albaOpFilterImageTest::suite()); 
+	runner.addTest(albaOpExporterDicFileTest::suite()); /* */
 	
 
 

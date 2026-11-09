@@ -109,7 +109,6 @@ IF (ALBA_USE_VTK)
 	albaOpSplitSurface.cpp		albaOpSplitSurface.h
 	albaOpInteractiveClipSurface.cpp	albaOpInteractiveClipSurface.h
 	albaOpCreateEditSkeleton.cpp	albaOpCreateEditSkeleton.h
-	albaOpCreateSurface.cpp		albaOpCreateSurface.h
 	albaOpTransform.cpp			albaOpTransform.h
 	albaOpMove.cpp				albaOpMove.h
 	albaOpScaleDataset.cpp		albaOpScaleDataset.h

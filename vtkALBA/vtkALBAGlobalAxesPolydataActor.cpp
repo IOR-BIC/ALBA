@@ -39,6 +39,7 @@ vtkStandardNewMacro(vtkALBAGlobalAxesPolydataActor);
 
 #include "albaConfigure.h"
 #include "wx\filefn.h"
+#include "albaDecl.h"
 //-------------------------------------------------------------------------
 vtkALBAGlobalAxesPolydataActor::vtkALBAGlobalAxesPolydataActor(int type /*=HEAD*/)
 {
@@ -213,10 +214,8 @@ std::string vtkALBAGlobalAxesPolydataActor::GetABSFileName()
 {
 	// search the file .vtk
 	// search in deploy dir (deploy scenario)
-	char buf[256];
-	vtkDirectory::GetCurrentWorkingDirectory(buf, 256);
-	std::string path = buf;
-	path.append("\\..\\Config\\HelperData\\");
+	wxString path = albaGetConfigDirectory();
+	path.append("\\HelperData\\");
 	path.append(FileName);
 
 	bool exists = FileExists(path.c_str());

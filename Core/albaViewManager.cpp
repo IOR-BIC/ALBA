@@ -323,21 +323,14 @@ void albaViewManager::VmeSelect(albaVME *vme)
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void albaViewManager::VmeShow(albaVME *vme, bool show)   
+void albaViewManager::VmeShow(albaVME *vme, bool show)
 {
- if(m_ViewBeingCreated) // Important - test m_ViewBeingCreated first
- {
-   // show the vme in the view that has been created but
-   // is not already inside the views' list (if exists)
-   m_ViewBeingCreated->VmeShow(vme,show);
- }
- else
- {
-	 if(m_SelectedView)
-	 {
-     m_SelectedView->VmeShow(vme,show); // show the vme in the selected view
-	 }
- }
+  // show the vme in the view that has been created but
+  // is not already inside the views' list (if exists)
+  if (m_ViewBeingCreated) // Important - test m_ViewBeingCreated first
+    m_ViewBeingCreated->VmeShow(vme, show);
+  else if (m_SelectedView)
+    m_SelectedView->VmeShow(vme, show); // show the vme in the selected view
 }
 //----------------------------------------------------------------------------
 void albaViewManager::PropertyUpdate(bool fromTag)

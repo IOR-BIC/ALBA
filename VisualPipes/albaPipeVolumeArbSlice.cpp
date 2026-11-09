@@ -76,7 +76,6 @@ albaPipeVolumeArbSlice::albaPipeVolumeArbSlice()
 //----------------------------------------------------------------------------
 { 
   m_ArbSlicer	= NULL;
-  m_Image           = NULL;
   m_Texture		      = NULL;
   m_SliceMapper		  = NULL;
   m_SliceActor      = NULL;
@@ -393,7 +392,6 @@ albaPipeVolumeArbSlice::~albaPipeVolumeArbSlice()
     m_AssemblyUsed->RemovePart(m_SliceActor);
 
   vtkDEL(m_ArbSlicer);
-	vtkDEL(m_Image);
 	vtkDEL(m_Texture);
 	vtkDEL(m_SliceMapper);
 	vtkDEL(m_NormalTranform);
@@ -702,6 +700,13 @@ int albaPipeVolumeArbSlice::GetEnableGPU()
 {
   return m_EnableGPU;
 };
+
+//----------------------------------------------------------------------------
+vtkImageData *albaPipeVolumeArbSlice::GetImageData()
+{
+	m_ArbSlicer->Update();
+	return m_ArbSlicer->GetImageDataOutput();
+}
 
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbSlice::SetEnableSliceViewCorrection(bool val, double factor)

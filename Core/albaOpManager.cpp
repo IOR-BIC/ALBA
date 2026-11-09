@@ -749,7 +749,7 @@ void albaOpManager::RunOpDelete()
 		Notify(OP_RUN_TERMINATED, true);
 
 		ClearUndoStack();
-    albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+    GetLogicManager()->CameraUpdate();
   }
 	else
 		Notify(OP_RUN_TERMINATED, false);

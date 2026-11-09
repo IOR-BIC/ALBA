@@ -212,22 +212,14 @@ void albaSceneGraph::VmeShow(albaVME *vme, bool show)
       }
 		}
     
-		if(!node->GetPipe()) 
-		{
-			m_View->VmeCreatePipe(vme);
-      if (!vme->IsALBAType(albaVMEGizmo))
-      {
-        if(m_View->GetNumberOfVisibleVME() == 1)
-        {
-          m_View->CameraReset();
-        }
-        else
-        {
-          m_View->CameraUpdate();
-        }
-      }
-			VmeSelect(vme,vme == m_SelectedVme);
-		}
+    if (!node->GetPipe())
+    {
+      m_View->VmeCreatePipe(vme);
+      if (!vme->IsALBAType(albaVMEGizmo) && m_View->GetNumberOfVisibleVME() == 1)
+        m_View->CameraReset();
+
+      VmeSelect(vme, vme == m_SelectedVme);
+    }
 	}
 	else //show == false
 	{
