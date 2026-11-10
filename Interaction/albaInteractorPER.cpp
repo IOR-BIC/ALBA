@@ -299,7 +299,6 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
 {
   albaDevice *device = albaDevice::SafeDownCast((albaDevice*)e->GetSender());
 
-  albaView       *v = NULL;
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
   albaInteractor *picked_bh   = NULL;
@@ -307,18 +306,8 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
   albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
   albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
 
-  if (tracker)
-  {
-    albaAvatar *avatar = tracker->GetAvatar();
-    if (avatar)
-    {
-      v = avatar->GetView();
-    }
-  }
-  else if (mouse)
-  {
-    v = mouse->GetView();
-  }
+  // the mouse selected view or the tracker avatar view
+  albaView *v = device ? device->GetView() : NULL;
 
   // the picking is cached into the event and shared with the behavior receiving it
   if(v && e->FindPokedVme(v, device, picked_prop, picked_vme, picked_bh))
@@ -548,123 +537,68 @@ void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
   albaInteractor *picked_bh   = NULL;
-  albaMatrix     *point_pose  = e->GetMatrix();
-  double         pose_2d[2];
 
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast((albaDevice*)e->GetSender());
-  albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice*)e->GetSender());
+  albaDevice *device = (albaDevice*)e->GetSender();
+  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
+  albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
   assert(tracker || mouse);
 
-  if (point_pose && tracker && tracker->GetAvatar())
-  { 
-    vtkRenderer *ren = tracker->GetAvatar()->GetRenderer();
-    albaView *view = tracker->GetAvatar()->GetView();
-    
-    if(!ren) return; // no renderer no fly to!
+  if(tracker && !e->GetMatrix()) return; // no tracker pose no fly to!
 
-	  vtkCamera *cam = ren->GetActiveCamera();
+  // the mouse selected view or the tracker avatar view
+  vtkRenderer *ren = device->GetRenderer();
+  albaView *view = device->GetView();
 
-    if(view && !e->FindPokedVme(view,tracker,picked_prop,picked_vme,picked_bh))
-      return; // no picking no fly to!
+  if(!ren) return; // no renderer no fly to!
 
+  // mouse events without a position (e.g. keyboard ones) pick at the last mouse position
+  double pose_2d[2] = {0, 0};
+  if(mouse) mouse->GetLastPosition(pose_2d);
+  albaEventInteraction lastPositionEvent(mouse,e->GetId(),pose_2d[0],pose_2d[1]);
+  albaEventInteraction *pick_event = (mouse && !e->GetXYFlag()) ? &lastPositionEvent : e;
 
-    int i, j;
-	  double f0[3]; // start focal point
-	  cam->GetFocalPoint(f0);
-	  double p0[3]; // start camera position
-	  cam->GetPosition(p0);
+  vtkCamera *cam = ren->GetActiveCamera();
 
-    // find picked position
-    double pos[3];
-    e->GetPickedPosition(pos);
-	  double foc_motion[3];
-    for (i=0; i<3; i++) 
-      foc_motion[i] = pos[i] - f0[i];
-    double foc_step = vtkMath::Normalize(foc_motion)/numstep;
+  if(view && !pick_event->FindPokedVme(view,device,picked_prop,picked_vme,picked_bh))
+    return; // no picking no fly to!
 
-    if(zoom >  1) zoom = 1;
-    if(zoom < -1) zoom =-1;
-	  double cam_motion[3];
-    for (i=0; i<3; i++) 
-      cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
-    double cam_step = vtkMath::Normalize(cam_motion)/numstep;
-    double f1[3]; // new focal point
-	  double p1[3]; // new camera position
+  int i, j;
+  double f0[3]; // start focal point
+  cam->GetFocalPoint(f0);
+  double p0[3]; // start camera position
+  cam->GetPosition(p0);
 
-	  for (i=0; i<=numstep; i++)
-    {
-      for (j=0; j<3; j++)
-      {
-        f1[j] = f0[j] + foc_motion[j]*i*foc_step;
-        p1[j] = p0[j] + cam_motion[j]*i*cam_step;
-		  }
-		  cam->SetFocalPoint(f1);
-      cam->SetPosition(p1);
-      ren->ResetCameraClippingRange();
-      // render at each cycle
-      InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
+  // find picked position
+  double pos[3];
+  pick_event->GetPickedPosition(pos);
+  double foc_motion[3];
+  for (i=0; i<3; i++) 
+    foc_motion[i] = pos[i] - f0[i];
+  double foc_step = vtkMath::Normalize(foc_motion)/numstep;
 
-    }
-    cam->OrthogonalizeViewUp();
-    e->ResetPick(); // the camera has been moved
+  if(zoom >  1) zoom = 1;
+  if(zoom < -1) zoom =-1;
+  double cam_motion[3];
+  for (i=0; i<3; i++) 
+    cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
+  double cam_step = vtkMath::Normalize(cam_motion)/numstep;
+  double f1[3]; // new focal point
+  double p1[3]; // new camera position
 
-    m_FlyToFlag = false;
-  }
-  else if (mouse)
+  for (i=0; i<=numstep; i++)
   {
-    // events without a position (e.g. keyboard ones) pick at the last mouse position
-    mouse->GetLastPosition(pose_2d);
-    albaEventInteraction lastPositionEvent(mouse,e->GetId(),pose_2d[0],pose_2d[1]);
-    albaEventInteraction *pick_event = e->GetXYFlag() ? e : &lastPositionEvent;
-
-    vtkRenderer *ren = mouse->GetRenderer();
-    albaView *view = mouse->GetView();
-
-    if(!ren) return; // no renderer no fly to!
-
-	  vtkCamera *cam = ren->GetActiveCamera();
-
-    if(view && !pick_event->FindPokedVme(view,mouse,picked_prop,picked_vme,picked_bh))
-      return; // no picking no fly to!
-
-    int i, j;
-	  double f0[3]; // start focal point
-	  cam->GetFocalPoint(f0);
-	  double p0[3]; // start camera position
-	  cam->GetPosition(p0);
-
-    // find picked position
-    double pos[3];
-    pick_event->GetPickedPosition(pos);
-	  double foc_motion[3];
-    for (i=0; i<3; i++) 
-      foc_motion[i] = pos[i] - f0[i];
-    double foc_step = vtkMath::Normalize(foc_motion)/numstep;
-
-    if(zoom >  1) zoom = 1;
-    if(zoom < -1) zoom =-1;
-	  double cam_motion[3];
-    for (i=0; i<3; i++) 
-      cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
-    double cam_step = vtkMath::Normalize(cam_motion)/numstep;
-    double f1[3]; // new focal point
-	  double p1[3]; // new camera position
-
-	  for (i=0; i<=numstep; i++)
+    for (j=0; j<3; j++)
     {
-      for (j=0; j<3; j++)
-      {
-        f1[j] = f0[j] + foc_motion[j]*i*foc_step;
-        p1[j] = p0[j] + cam_motion[j]*i*cam_step;
-      }
-      cam->SetFocalPoint(f1);
-      cam->SetPosition(p1);
-      ren->ResetCameraClippingRange();
-      // render at each cycle
-      InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
+      f1[j] = f0[j] + foc_motion[j]*i*foc_step;
+      p1[j] = p0[j] + cam_motion[j]*i*cam_step;
     }
-    cam->OrthogonalizeViewUp();
-    e->ResetPick(); // the camera has been moved
-    m_FlyToFlag = false;
+    cam->SetFocalPoint(f1);
+    cam->SetPosition(p1);
+    ren->ResetCameraClippingRange();
+    // render at each cycle
+    InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
   }
+  cam->OrthogonalizeViewUp();
+  e->ResetPick(); // the camera has been moved
+  m_FlyToFlag = false;
 }

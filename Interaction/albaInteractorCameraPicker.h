@@ -52,7 +52,11 @@ protected:
   virtual void OnButtonDown   (albaEventInteraction *e);
   virtual void OnButtonUp     (albaEventInteraction *e);
 
-  /** 
+  /** Pick at the position of the device sending the event (the mouse only with CTRL + left button)
+  and send the picking information */
+  void PickFromEvent(albaEventInteraction *e);
+
+  /**
   Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position. */
   void SendPickingInformation(albaView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, albaMatrix *tracker_pos = NULL, bool mouse_flag = true);
 

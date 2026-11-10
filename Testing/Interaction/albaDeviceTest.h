@@ -49,6 +49,7 @@ class albaDeviceTest : public albaTest
   CPPUNIT_TEST(TestGetGui);
   CPPUNIT_TEST(TestUpdateGui);
   CPPUNIT_TEST(TestOnEvent);
+  CPPUNIT_TEST(TestGetViewAndRenderer);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -68,6 +69,7 @@ class albaDeviceTest : public albaTest
   void TestGetGui();
   void TestUpdateGui();
   void TestOnEvent();
+  void TestGetViewAndRenderer();
   
 };
 

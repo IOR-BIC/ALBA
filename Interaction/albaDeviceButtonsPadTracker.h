@@ -141,6 +141,18 @@ public:
   void SetAvatar(albaAvatar *avatar);
   albaAvatar *GetAvatar() {return m_Avatar;}
 
+  /** Return the view of the avatar, NULL if there is no avatar */
+  virtual albaView *GetView();
+
+  /** Return the renderer of the avatar, NULL if there is no avatar */
+  virtual vtkRenderer *GetRenderer();
+
+  /**
+    Convert a tracker pose into the world frame of the avatar view (3D avatars scale it from the
+    canonical frame to the world one, other avatars leave it unchanged).
+    Return false if there is no avatar. */
+  bool TrackerToWorld(albaMatrix &trackerPose, albaMatrix &worldPose);
+
   /** 
     Set the default avatar, i.e. the avatar to be used as default one. An application
     module can set the avatar to a transient one and then restore the default one. 
