@@ -41,6 +41,7 @@ class albaInteractorPERTest : public albaTest
   CPPUNIT_TEST(TestEventPickCache);
   CPPUNIT_TEST(TestButtonDownPicksOnce);
   CPPUNIT_TEST(TestGenericMouseUsesButtonDownPick);
+  CPPUNIT_TEST(TestEventTracing);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -63,6 +64,7 @@ class albaInteractorPERTest : public albaTest
   void TestEventPickCache();
   void TestButtonDownPicksOnce();
   void TestGenericMouseUsesButtonDownPick();
+  void TestEventTracing();
 
 };
 

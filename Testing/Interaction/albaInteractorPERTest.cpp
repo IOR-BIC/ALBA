@@ -429,3 +429,64 @@ void albaInteractorPERTest::TestGenericMouseUsesButtonDownPick()
   mouse->Delete();
   delete view;
 }
+
+void albaInteractorPERTest::TestEventTracing()
+{
+  albaFakePickView *view = new albaFakePickView();
+  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  mouse->SetName("TestMouse");
+  SelectView(mouse, view);
+
+  albaInteractorCompositorMouse *behavior = albaInteractorCompositorMouse::New();
+  albaVMESurface *vme = albaVMESurface::New();
+  vme->SetBehavior(behavior);
+  view->m_FakeVme = vme;
+
+  albaInteractorPER *per = albaInteractorPER::New();
+  CPPUNIT_ASSERT(!albaInteractorPER::GetEventTracing());
+
+  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId());
+  down.SetButton(ALBA_LEFT_BUTTON);
+  down.Set2DPosition(10, 20);
+  down.SetChannel(MCH_INPUT);
+
+  albaEventInteraction up(mouse, albaDeviceButtonsPad::GetButtonUpId());
+  up.SetButton(ALBA_LEFT_BUTTON);
+  up.Set2DPosition(10, 20);
+  up.SetChannel(MCH_INPUT);
+
+  // tracing disabled: nothing is traced
+  per->OnEvent(&down);
+  per->OnEvent(&up);
+  CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).empty());
+
+  // the button down selects the picked VME and starts its behavior
+  albaInteractorPER::SetEventTracing(true);
+  down.ResetPick();
+  per->OnEvent(&down);
+  std::string trace = per->GetLastEventTrace();
+  CPPUNIT_ASSERT(trace.find("device=TestMouse") != std::string::npos);
+  CPPUNIT_ASSERT(trace.find("button=0") != std::string::npos); // ALBA_LEFT_BUTTON
+  CPPUNIT_ASSERT(trace.find("Select, Behavior albaInteractorCompositorMouse") != std::string::npos);
+
+  // the button up goes to the behavior that started the interaction
+  per->OnEvent(&up);
+  trace = per->GetLastEventTrace();
+  CPPUNIT_ASSERT(trace.find("-> Behavior albaInteractorCompositorMouse") != std::string::npos);
+
+  // a move without interaction is not traced
+  albaEventInteraction move(mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+  move.Set2DPosition(15, 25);
+  move.SetChannel(MCH_INPUT);
+  per->OnEvent(&move);
+  CPPUNIT_ASSERT(trace == per->GetLastEventTrace());
+
+  albaInteractorPER::SetEventTracing(false);
+
+  per->Delete();
+  vme->SetBehavior(NULL);
+  vme->Delete();
+  behavior->Delete();
+  mouse->Delete();
+  delete view;
+}

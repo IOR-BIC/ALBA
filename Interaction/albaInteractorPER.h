@@ -18,6 +18,7 @@
 
 #include "albaInteractor.h"
 #include <map>
+#include <string>
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -73,6 +74,14 @@ public:
 
   albaInteractor *GetCameraInteractor() {return m_CameraBehavior;};
 
+  /** Enable/disable the event tracing of all the PERs: each input event is written in the log
+  with the device, the button, the modifiers and who handled it. */
+  static void SetEventTracing(bool enable) {m_EventTracing = enable;}
+  static bool GetEventTracing() {return m_EventTracing;}
+
+  /** Return the last trace written in the log */
+  const char *GetLastEventTrace() {return m_LastEventTrace.c_str();}
+
 protected:
   albaInteractorPER();
   virtual ~albaInteractorPER();
@@ -117,6 +126,16 @@ protected:
 
   /** internally used to return the picked VME for given device */
   albaVME *GetPickedVME(albaDevice *device);
+
+  /** Add who handled the current event to its trace (only when the event tracing is on) */
+  void TraceHandler(const char *handler, albaObject *obj = NULL);
+
+  /** Write the trace of the current event in the log (only when the event tracing is on) */
+  void WriteEventTrace(albaEventBase *event);
+
+  static bool     m_EventTracing;   ///< static until the PER is unique, then it can become a normal member
+  std::string     m_EventTrace;     ///< who handled the current event
+  std::string     m_LastEventTrace; ///< last trace written in the log
 
   bool            m_FlyToFlag;
   bool            m_DraggingLeft; 

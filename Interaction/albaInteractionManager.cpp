@@ -185,6 +185,11 @@ void albaInteractionManager::PushPER(albaInteractorPER *per)
   SetPER(per);
 }
 //----------------------------------------------------------------------------
+void albaInteractionManager::SetEventTracing(bool enable)
+{
+  albaInteractorPER::SetEventTracing(enable);
+}
+//----------------------------------------------------------------------------
 bool albaInteractionManager::PopPER()
 {
   // retrieve and delete last item

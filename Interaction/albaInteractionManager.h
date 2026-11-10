@@ -184,6 +184,10 @@ public:
   /** restore previous PER instance */
   bool PopPER();
 
+  /** Enable/disable the event tracing: each input event routed by a PER is written in the log
+  with the device, the button, the modifiers and who handled it. Disabled by default. */
+  void SetEventTracing(bool enable);
+
   /** return the static event router */
   albaInteractorSER *GetSER() {return m_StaticEventRouter;}
 

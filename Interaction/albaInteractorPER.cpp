@@ -46,8 +46,12 @@
 #include "vtkRenderWindow.h"
 #include "vtkMath.h"
 #include <map>
+#include <sstream>
 #include <assert.h>
 #include "albaVMELandmarkCloud.h"
+#include "mmuIdFactory.h"
+
+bool albaInteractorPER::m_EventTracing = false;
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractorPER)
@@ -226,7 +230,10 @@ void albaInteractorPER::OnLeftButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if(m_FlyToFlag)
-    FlyTo(e); 
+  {
+    TraceHandler("Fly to");
+    FlyTo(e);
+  }
 
   OnButtonDown(e);
 
@@ -279,7 +286,8 @@ void albaInteractorPER::OnRightButtonUp(albaEventInteraction *e)
 
 	if(m_ShowContextMenu && mouse)
 	{
-    albaVME *vme = GetPickedVME(mouse); 
+    TraceHandler("Context menu");
+    albaVME *vme = GetPickedVME(mouse);
     InvokeEvent(this, SHOW_VIEW_CONTEXTUAL_MENU,MCH_UP,vme);
 	}
 
@@ -318,6 +326,7 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
     if (but_down_id == albaDeviceButtonsPadMouse::GetMouseDClickId() && !picked_vme->IsA("albaVMEGizmo"))
     {
       // Send event to inform Logic that a double click event is rised on a VME
+      TraceHandler("Double click");
       InvokeEvent(this,VME_DCLICKED,MCH_UP,picked_vme);
     }
     else if(m_CanSelect && !picked_vme->IsA("albaVMEGizmo"))
@@ -330,6 +339,7 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
 
 			}
       // Send a VME select event to Logic
+      TraceHandler("Select");
       InvokeEvent(this,VME_SELECT,MCH_UP,picked_vme);
     }
   }
@@ -338,19 +348,22 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
   {
     // if a vme with a behavior has been picked... 
     picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
-    picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!) 
+    picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!)
+    TraceHandler("Behavior", picked_bh);
     picked_bh->OnEvent(e); // forward the start event to picked behavior
   }
   // if I don't picked a VME or I picked but I cannot select, move the camera.
   else if (tracker && m_CameraBehavior&&(!m_CameraBehavior->IsInteracting()))
   {
     // if the camera behavior is free...
+    TraceHandler("Camera", m_CameraBehavior);
     m_CameraBehavior->OnEvent(e); // forward to the camera behavior
   }
   // if I don't picked a VME or I picked but I cannot select, move the camera.
   else if (mouse && m_CameraMouseBehavior&&(!m_CameraMouseBehavior->IsInteracting()))
   {
     // if the camera behavior is free...
+    TraceHandler("Camera", m_CameraMouseBehavior);
     m_CameraMouseBehavior->OnEvent(e); // forward to the camera behavior
   }
 }
@@ -481,17 +494,21 @@ void albaInteractorPER::OnEvent(albaEventBase *event)
     albaID id = event->GetId();
     albaDevice *device = (albaDevice *)event->GetSender();
     assert(device);
+    m_EventTrace.clear();
 
 		if (m_CameraBehavior && id == albaDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
 		{
 			m_ShowContextMenu = false;
+			TraceHandler("Camera", m_CameraMouseBehavior);
 			m_CameraMouseBehavior->OnEvent(event);
+			WriteEventTrace(event);
 			return;
 		}
 
     if (id == albaDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
     {
       albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
+      TraceHandler("Keys");
       OnChar(e);
     }
     // find if this device is one of those currently interacting
@@ -510,16 +527,19 @@ void albaInteractorPER::OnEvent(albaEventBase *event)
         albaInteractor *bh = vme->GetBehavior(); //can be NULL
         if (bh)
         {
+          TraceHandler("Behavior", bh);
           bh->OnEvent(event); // forward to VME behavior
         }
       }
       // if no picked behavior...
       if (m_CameraBehavior && m_CameraBehavior->IsInteracting(device))
       {
+        TraceHandler("Camera", m_CameraBehavior);
         m_CameraBehavior->OnEvent(event); // forward to Camera behavior
       }
       else if (m_CameraMouseBehavior && m_CameraMouseBehavior->IsInteracting(device))
       {
+        TraceHandler("Camera", m_CameraMouseBehavior);
         m_CameraMouseBehavior->OnEvent(event); // forward to Camera behavior
       }
     }
@@ -528,6 +548,52 @@ void albaInteractorPER::OnEvent(albaEventBase *event)
   // and StopInteractionEvent: this will make OnStart/StopInteraction()
   // to be called, or eventually the event to be forwarded.
   Superclass::OnEvent(event);
+
+  if (ch == MCH_INPUT)
+    WriteEventTrace(event);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractorPER::TraceHandler(const char *handler, albaObject *obj)
+{
+  if (!m_EventTracing)
+    return;
+
+  if (!m_EventTrace.empty())
+    m_EventTrace += ", ";
+  m_EventTrace += handler;
+  if (obj)
+  {
+    m_EventTrace += " ";
+    m_EventTrace += obj->GetTypeName();
+  }
+}
+
+//----------------------------------------------------------------------------
+void albaInteractorPER::WriteEventTrace(albaEventBase *event)
+{
+  if (!m_EventTracing)
+    return;
+
+  // moves that nobody handled would flood the log
+  albaID id = event->GetId();
+  if (m_EventTrace.empty() && (id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() || id == albaDeviceButtonsPadTracker::GetTracker3DMoveId()))
+    return;
+
+  const char *eventName = mmuIdFactory::GetIdName(id);
+  albaDevice *device = (albaDevice *)event->GetSender();
+  albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
+
+  std::ostringstream trace;
+  trace << GetTypeName() << ": " << (eventName ? eventName : "unknown event") << " (" << id << ")";
+  if (device && device->GetName())
+    trace << " device=" << device->GetName();
+  if (e)
+    trace << " button=" << e->GetButton() << " modifiers=" << e->GetModifiers();
+  trace << " -> " << (m_EventTrace.empty() ? "None" : m_EventTrace);
+
+  m_LastEventTrace = trace.str();
+  albaLogMessage("%s", m_LastEventTrace.c_str());
 }
 
 //----------------------------------------------------------------------------
