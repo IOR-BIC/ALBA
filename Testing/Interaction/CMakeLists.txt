@@ -65,6 +65,7 @@ SET(PROJECT_SRCS
 	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
 	albaInteractorVTKPickerTest.h albaInteractorVTKPickerTest.cpp
 	albaPickHelperTest.h albaPickHelperTest.cpp
+	albaInteractionRoutingTest.h albaInteractionRoutingTest.cpp
 	albaInteractorSelectPointTest.h albaInteractorSelectPointTest.cpp
 	albaInteractorDICOMImporterTest.h albaInteractorDICOMImporterTest.cpp
 )
