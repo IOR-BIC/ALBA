@@ -55,9 +55,6 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
-  albaInteractor2DAngle.cpp  				albaInteractor2DAngle.h
-  albaInteractor2DDistance.cpp  				albaInteractor2DDistance.h
-  albaInteractor2DIndicator.cpp  			albaInteractor2DIndicator.h
   albaInteractor6DOF.cpp  					albaInteractor6DOF.h
   albaInteractor6DOFCameraMove.cpp  			albaInteractor6DOFCameraMove.h
   albaInteractorCameraMove.cpp  				albaInteractorCameraMove.h
@@ -90,7 +87,6 @@ SET(PROJECT_SRCS
   albaGizmoCrossTranslate.cpp  						albaGizmoCrossTranslate.h
   albaGizmoCrossTranslateAxis.cpp  				albaGizmoCrossTranslateAxis.h
   albaGizmoCrossTranslatePlane.cpp  			albaGizmoCrossTranslatePlane.h
-	albaInteractorSlider.cpp								albaInteractorSlider.h
 	
 	albaActor2dStackHelper.cpp							albaActor2dStackHelper.h
 	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h

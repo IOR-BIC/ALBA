@@ -67,10 +67,6 @@ SET(PROJECT_SRCS
 	albaPickHelperTest.h albaPickHelperTest.cpp
 	albaInteractorSelectPointTest.h albaInteractorSelectPointTest.cpp
 	albaInteractorDICOMImporterTest.h albaInteractorDICOMImporterTest.cpp
-	albaInteractor2DDistanceTest.h albaInteractor2DDistanceTest.cpp
-	albaInteractor2DAngleTest.h albaInteractor2DAngleTest.cpp
-	albaInteractor2DIndicatorTest.h albaInteractor2DIndicatorTest.cpp
-	albaInteractorSliderTest.h	albaInteractorSliderTest.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})

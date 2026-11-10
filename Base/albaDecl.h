@@ -300,8 +300,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												SHOW_TREE_CONTEXTUAL_MENU,
 
 
-																												INTERACTOR_ADD,     //modified by Marco. 25-8-2004 bind an interactor to an action 
-																												INTERACTOR_REMOVE,  //modified by Marco. 25-8-2004 unbind an interactor from an action
 
 																												DEVICE_ADD,
 																												DEVICE_REMOVE,

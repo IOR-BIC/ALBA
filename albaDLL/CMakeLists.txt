@@ -332,9 +332,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
-  ../Interaction/albaInteractor2DAngle.cpp  				../Interaction/albaInteractor2DAngle.h
-  ../Interaction/albaInteractor2DDistance.cpp  				../Interaction/albaInteractor2DDistance.h
-  ../Interaction/albaInteractor2DIndicator.cpp  			../Interaction/albaInteractor2DIndicator.h
   ../Interaction/albaInteractor6DOF.cpp  					../Interaction/albaInteractor6DOF.h
   ../Interaction/albaInteractor6DOFCameraMove.cpp  			../Interaction/albaInteractor6DOFCameraMove.h
   ../Interaction/albaInteractorCameraMove.cpp  				../Interaction/albaInteractorCameraMove.h
@@ -367,7 +364,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoCrossTranslate.cpp  				../Interaction/albaGizmoCrossTranslate.h
   ../Interaction/albaGizmoCrossTranslateAxis.cpp  			../Interaction/albaGizmoCrossTranslateAxis.h
   ../Interaction/albaGizmoCrossTranslatePlane.cpp  			../Interaction/albaGizmoCrossTranslatePlane.h
-	../Interaction/albaInteractorSlider.cpp								../Interaction/albaInteractorSlider.h
 )
 
 IF (ALBA_USE_P5_GLOVE)
@@ -776,7 +772,6 @@ IF (ALBA_USE_VTK)
 	../Operations/albaOpImporterExternalFile.cpp	    ../Operations/albaOpImporterExternalFile.h
 	../Operations/albaOpLabelExtractor.cpp	    			../Operations/albaOpLabelExtractor.h
 	../Operations/albaOpOpenExternalFile.cpp	    		../Operations/albaOpOpenExternalFile.h
-	../Operations/albaOp2DMeasure.cpp	    					../Operations/albaOp2DMeasure.h
 	../Operations/albaOpAddLandmark.cpp	    				../Operations/albaOpAddLandmark.h
 	../Operations/albaOpExporterBmp.cpp	    				../Operations/albaOpExporterBmp.h
 	../Operations/albaOpClipSurface.cpp	    				../Operations/albaOpClipSurface.h

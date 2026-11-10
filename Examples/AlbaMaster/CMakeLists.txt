@@ -17,7 +17,6 @@ PROJECT (AlbaMaster)
 
 SET(PROJECT_SRCS 
 	AlbaMaster.cpp					AlbaMaster.h
-	albaOpInteractionOp.cpp	albaOpInteractionOp.h
 	exWizardSample.cpp			exWizardSample.h
 	exAppUtils.cpp					exAppUtils.h
 )

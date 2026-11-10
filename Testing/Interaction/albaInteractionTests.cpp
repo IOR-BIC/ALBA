@@ -79,11 +79,7 @@
 #include "albaInteractorVTKPickerTest.h"
 #include "albaInteractorSelectPointTest.h"
 #include "albaPickHelperTest.h"
-#include "albaInteractor2DDistanceTest.h"
-#include "albaInteractor2DAngleTest.h"
-#include "albaInteractor2DIndicatorTest.h"
 #include "albaInteractorDICOMImporterTest.h"
-#include "albaInteractorSliderTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -189,10 +185,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaInteractorSelectPointTest::suite());
 	runner.addTest(albaPickHelperTest::suite());
 	runner.addTest(albaInteractorDICOMImporterTest::suite());
-	runner.addTest(albaInteractor2DDistanceTest::suite());
- 	runner.addTest(albaInteractor2DAngleTest::suite());
- 	runner.addTest(albaInteractor2DIndicatorTest::suite());
-	runner.addTest(albaInteractorSliderTest::suite());
 
 	runner.run( controller );
 

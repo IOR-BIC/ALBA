@@ -147,7 +147,6 @@
 
 
 // OPERATIONS
-#include "albaOp2DMeasure.h"
 #include "albaOpMeasure2D.h"
 #include "albaOpComputeInertialTensor.h"
 #include "albaOpTransformOld.h"
@@ -242,7 +241,6 @@
 #include "albaOpVOIDensityEditor.h"
 #include "albaOpValidateTree.h"
 #include "albaOpVolumeUnion.h"
-#include "albaOpInteractorSliderSample.h"
 
 
 // VIEWS
@@ -1017,30 +1015,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
-			break;
-		case INTERACTOR_ADD:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				albaInteractor *interactor = albaInteractor::SafeDownCast(e->GetMafObject());
-				assert(interactor);
-				albaString *action_name = e->GetString();
-				m_InteractionManager->BindAction(*action_name, interactor);
-			}
-#endif
-			break;
-		case INTERACTOR_REMOVE:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				albaInteractor *interactor = albaInteractor::SafeDownCast(e->GetMafObject());
-				assert(interactor);
-				albaString *action_name = e->GetString();
-				m_InteractionManager->UnBindAction(*action_name, interactor);
-			}
-#endif
 			break;
 		case PER_PUSH:
 			// currently albaInteraction is strictly dependent on VTK (marco)
@@ -2039,7 +2013,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpTransformAtoB(), "Modify");
 
 	Plug(new albaOpMeasure2D("2D Measure"), "Measure");
-	Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");
 	Plug(new albaOpVOIDensity("VOI Density"), "Measure");
 	Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
@@ -2067,7 +2040,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpVOIDensityEditor(), "TMP to test");
 	Plug(new albaOpValidateTree(), "TMP to test");
 	Plug(new albaOpVolumeUnion(), "TMP to test");
-	Plug(new albaOpInteractorSliderSample(), "TMP to test");
 
 }
 

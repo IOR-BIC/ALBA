@@ -506,8 +506,6 @@ wxString  albaIdString(int id)
      case DEVICE_ADD:           s="DEVICE_ADD"; break; 
      case DEVICE_REMOVE:        s="DEVICE_REMOVE"; break; 
      case DEVICE_GET:           s="DEVICE_GET"; break; 
-     case INTERACTOR_ADD:       s="INTERACTOR_ADD"; break; 
-     case INTERACTOR_REMOVE:    s="INTERACTOR_REMOVE"; break; 
 
      case OP_RUN:	              s="OP_RUN"; break; 
      case OP_RUN_OK:	          s="OP_RUN_OK"; break; 
