@@ -49,16 +49,16 @@ void albaVMESurfaceParametricTest::TestSetData()
 	vtkPolyData *polydata = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
 	CPPUNIT_ASSERT(polydata);
 
-	//default is a sphere with radius 2, phi and theta resolution 10
-	numberOfPolyDataPoints = 82;
+	//default is a sphere with radius 20, phi and theta resolution 25
+	numberOfPolyDataPoints = 577;
   CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
       
-	bounds[0] = -1.96962;
-	bounds[1] = 1.96962;
-	bounds[2] = -1.87322;
-	bounds[3] = 1.87322;
-	bounds[4] = -2;
-	bounds[5] = 2;
+	bounds[0] = -19.84229;
+	bounds[1] = 20.0;
+	bounds[2] = -19.96053;
+	bounds[3] = 19.96053;
+	bounds[4] = -20;
+	bounds[5] = 20;
 
 	polydata->GetBounds(boundsPolyData);
 	CPPUNIT_ASSERT(
@@ -71,19 +71,19 @@ void albaVMESurfaceParametricTest::TestSetData()
 		);
 
 
-	//cone with resolution 20 radius 2 heigth 5
+	//cone with resolution 25 radius 20 heigth 50
 	vmeParametricSurface->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CONE);
 	vmeParametricSurface->Modified();
 	vmeParametricSurface->Update();
-  numberOfPolyDataPoints = 22;
+  numberOfPolyDataPoints = 27;
 	CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
   
-	bounds[0] = -2.5;
-	bounds[1] = 2.5;
-	bounds[2] = -2;
-	bounds[3] = 2;
-	bounds[4] = -2;
-	bounds[5] = 2;
+	bounds[0] = -25.0;
+	bounds[1] = 25.0;
+	bounds[2] = -19.84229;
+	bounds[3] = 20;
+	bounds[4] = -19.96053;
+	bounds[5] = 19.96053;
 
 	polydata->GetBounds(boundsPolyData);
 	CPPUNIT_ASSERT(
@@ -95,19 +95,19 @@ void albaVMESurfaceParametricTest::TestSetData()
 		fabs(boundsPolyData[5] - bounds[5]) < 0.0001 
 		);
 
-	//parallelepiped 2 2 2
+	//parallelepiped 2 2 2, side 10
 	vmeParametricSurface->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CUBE);
 	vmeParametricSurface->Modified();
 	vmeParametricSurface->Update();
 	numberOfPolyDataPoints = 24;
 	CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
 
-	bounds[0] = -1;
-	bounds[1] = 1;
-	bounds[2] = -1;
-	bounds[3] = 1;
-	bounds[4] = -1;
-	bounds[5] = 1;
+	bounds[0] = -10;
+	bounds[1] = 10;
+	bounds[2] = -10;
+	bounds[3] = 10;
+	bounds[4] = -10;
+	bounds[5] = 10;
 
 	polydata->GetBounds(boundsPolyData);
 	CPPUNIT_ASSERT(
@@ -119,19 +119,19 @@ void albaVMESurfaceParametricTest::TestSetData()
 		fabs(boundsPolyData[5] - bounds[5]) < 0.0001 
 		);
 
-	//cylinder with resolution 20 radius 2 heigth 5
+	//cylinder with resolution 25 radius 20 heigth 50
 	vmeParametricSurface->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_CYLINDER);
 	vmeParametricSurface->Modified();
 	vmeParametricSurface->Update();
-	numberOfPolyDataPoints = 80;
+	numberOfPolyDataPoints = 100;
 	CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
 
-	bounds[0] = -2;
-	bounds[1] = 2;
-	bounds[2] = -2.5;
-	bounds[3] = 2.5;
-	bounds[4] = -2;
-	bounds[5] = 2;
+	bounds[0] = -19.84229;
+	bounds[1] = 20.0;
+	bounds[2] = -25.0;
+	bounds[3] = 25.0;
+	bounds[4] = -19.96053;
+	bounds[5] = 19.96053;
 
 	polydata->GetBounds(boundsPolyData);
 	CPPUNIT_ASSERT(
@@ -143,7 +143,7 @@ void albaVMESurfaceParametricTest::TestSetData()
 		fabs(boundsPolyData[5] - bounds[5]) < 0.0001 
 		);
 
-	//plane point1 2,0,0 point2 0,3,0 Xresulution 2 Yresolution 2
+	//plane point1 20,0,0 point2 0,30,0 Xresulution 2 Yresolution 2
 	vmeParametricSurface->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_PLANE);
 	vmeParametricSurface->Modified();
 	vmeParametricSurface->Update();
@@ -151,9 +151,9 @@ void albaVMESurfaceParametricTest::TestSetData()
 	CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
 
 	bounds[0] = 0;
-	bounds[1] = 2;
+	bounds[1] = 20.0;
 	bounds[2] = 0;
-	bounds[3] = 3;
+	bounds[3] = 30.0;
 	bounds[4] = 0;
 	bounds[5] = 0;
 
@@ -167,19 +167,19 @@ void albaVMESurfaceParametricTest::TestSetData()
 		fabs(boundsPolyData[5] - bounds[5]) < 0.0001 
 		);
 
-  //ellipsoide with resolution 20 radius 2 heigth 5
+  //ellipsoide with resolution 25 lengths 15, 20, 25
   vmeParametricSurface->SetGeometryType(albaVMESurfaceParametric::PARAMETRIC_ELLIPSOID);
   vmeParametricSurface->Modified();
   vmeParametricSurface->Update();
-  numberOfPolyDataPoints = 82;
+  numberOfPolyDataPoints = 577;
   CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
 
-  bounds[0] = -0.9848;
-  bounds[1] = 0.9848;
-  bounds[2] = -1.87321;
-  bounds[3] = 1.87321;
-  bounds[4] = -3;
-  bounds[5] = 3;
+  bounds[0] = -14.88172;
+  bounds[1] = 15.0;
+  bounds[2] = -19.96053;
+  bounds[3] = 19.96053;
+  bounds[4] = -25;
+  bounds[5] = 25;
 
   polydata->GetBounds(boundsPolyData);
   CPPUNIT_ASSERT(
