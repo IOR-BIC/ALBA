@@ -28,7 +28,22 @@
 #include "albaEventInteraction.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaDevice.h"
+#include "albaDeviceButtonsPadTracker.h"
 #include "albaGUI.h"
+#include "albaView.h"
+#include "albaEvent.h"
+#include "albaMatrix.h"
+
+//----------------------------------------------------------------------------
+class albaDeviceTestView : public albaView // minimal concrete view for test
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaDeviceTestView, albaView);
+  virtual void SetBackgroundColor(wxColor color) {};
+};
+
+albaCxxTypeMacro(albaDeviceTestView);
 
 //----------------------------------------------------------------------------
 void albaDeviceTest::TestFixture()
@@ -209,4 +224,38 @@ void albaDeviceTest::TestOnEvent()
 
   dummyDevice->OnEvent(&dummyMouse2DMoveEvent);
   dummyDevice->Delete();
+}
+//----------------------------------------------------------------------------
+void albaDeviceTest::TestGetViewAndRenderer()
+//----------------------------------------------------------------------------
+{
+  // a generic device has neither a view nor a renderer
+  albaDevice *device;
+  albaNEW(device);
+  CPPUNIT_ASSERT(device->GetView() == NULL);
+  CPPUNIT_ASSERT(device->GetRenderer() == NULL);
+  albaDEL(device);
+
+  // the mouse returns its selected view also through the albaDevice interface
+  albaDeviceButtonsPadMouse *mouse;
+  albaNEW(mouse);
+  albaDevice *mouseDevice = mouse;
+  CPPUNIT_ASSERT(mouseDevice->GetView() == NULL);
+  albaDeviceTestView *view = new albaDeviceTestView();
+  albaEvent selectEvent(NULL, VIEW_SELECT, (albaView *)view);
+  mouse->OnEvent(&selectEvent);
+  CPPUNIT_ASSERT(mouseDevice->GetView() == view);
+  CPPUNIT_ASSERT(mouseDevice->GetRenderer() == NULL); // no render window selected
+  albaDEL(mouse);
+  delete view;
+
+  // a tracker without avatar has neither a view nor a renderer, and cannot map a pose to the world
+  albaDeviceButtonsPadTracker *tracker;
+  albaNEW(tracker);
+  albaDevice *trackerDevice = tracker;
+  CPPUNIT_ASSERT(trackerDevice->GetView() == NULL);
+  CPPUNIT_ASSERT(trackerDevice->GetRenderer() == NULL);
+  albaMatrix trackerPose, worldPose;
+  CPPUNIT_ASSERT(!tracker->TrackerToWorld(trackerPose, worldPose));
+  albaDEL(tracker);
 }

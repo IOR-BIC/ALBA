@@ -71,10 +71,10 @@ public:
   void GetLastPosition(double pos[2]) {pos[0]=m_LastPosition[0];pos[1]=m_LastPosition[1];}
 
   /** Return the renderer of the selected view. */
-  vtkRenderer *GetRenderer();
+  virtual vtkRenderer *GetRenderer();
 
   /** Return the selected view. */
-  albaView *GetView();
+  virtual albaView *GetView();
 
   /** Return the Interactor. */
   vtkRenderWindowInteractor *GetInteractor();

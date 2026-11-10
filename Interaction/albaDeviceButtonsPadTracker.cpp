@@ -214,6 +214,35 @@ void albaDeviceButtonsPadTracker::SetAvatar(albaAvatar *avatar)
 }
 
 //------------------------------------------------------------------------------
+albaView *albaDeviceButtonsPadTracker::GetView()
+//------------------------------------------------------------------------------
+{
+  return m_Avatar ? m_Avatar->GetView() : NULL;
+}
+
+//------------------------------------------------------------------------------
+vtkRenderer *albaDeviceButtonsPadTracker::GetRenderer()
+//------------------------------------------------------------------------------
+{
+  return m_Avatar ? m_Avatar->GetRenderer() : NULL;
+}
+
+//------------------------------------------------------------------------------
+bool albaDeviceButtonsPadTracker::TrackerToWorld(albaMatrix &trackerPose, albaMatrix &worldPose)
+//------------------------------------------------------------------------------
+{
+  if (!m_Avatar)
+    return false;
+
+  albaAvatar3D *avatar3D = albaAvatar3D::SafeDownCast(m_Avatar.GetPointer());
+  if (avatar3D)
+    avatar3D->TrackerToWorld(trackerPose, worldPose, albaAvatar3D::CANONICAL_TO_WORLD_SCALE);
+  else
+    worldPose = trackerPose;
+  return true;
+}
+
+//------------------------------------------------------------------------------
 void albaDeviceButtonsPadTracker::SetDefaultAvatar(albaAvatar *avatar)
 //------------------------------------------------------------------------------
 {

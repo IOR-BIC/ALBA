@@ -44,6 +44,9 @@ protected:
   virtual void OnButtonDown   (albaEventInteraction *e);
   virtual void OnButtonUp     (albaEventInteraction *e);
 
+  /** Pick at the position of the device sending the event and send the picking information */
+  void PickFromEvent(albaEventInteraction *e);
+
   bool m_ContinuousPickingFlag;
 
   /** 
