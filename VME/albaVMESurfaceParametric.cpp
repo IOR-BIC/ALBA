@@ -75,18 +75,18 @@ albaVMESurfaceParametric::albaVMESurfaceParametric()
   m_GeometryType = PARAMETRIC_SPHERE;
 	
   m_SphereRadius = 20.0;
-  m_SpherePhiRes = 10;
-  m_SphereTheRes = 20;
+  m_SpherePhiRes = 25;
+  m_SphereTheRes = 25;
 
   m_ConeHeight = 50.0;
   m_ConeRadius = 20.0;
   m_ConeCapping = 0;
-  m_ConeRes = 20;
+  m_ConeRes = 25;
   m_ConeOrientationAxis = ID_X_AXIS;
 
   m_CylinderHeight = 50.0;
   m_CylinderRadius = 20.0;
-  m_CylinderRes = 20;
+  m_CylinderRes = 25;
   m_CylinderOrientationAxis = ID_Y_AXIS;
 
   m_CubeXLength = 20.0;
@@ -101,23 +101,23 @@ albaVMESurfaceParametric::albaVMESurfaceParametric()
   m_PlanePoint2[1] = 30.0;
   m_PlanePoint2[0] = m_PlanePoint2[2] = 0.0;
   
-	m_EllipsoidXLenght = 20.0;
+	m_EllipsoidXLenght = 15.0;
   m_EllipsoidYLenght = 20.0;
-  m_EllipsoidZLenght = 20.0;
-  m_EllipsoidPhiRes = 20;
-  m_EllipsoidTheRes = 20;
+  m_EllipsoidZLenght = 25.0;
+  m_EllipsoidPhiRes = 25;
+  m_EllipsoidTheRes = 25;
 
 	m_TruncatedConeHeight = 50.0;
 	m_TruncatedConeUpperDiameter = 40.0;
 	m_TruncatedConeLowerDiameter = 30.0;
-	m_TruncatedConeRes = 20;
+	m_TruncatedConeRes = 25;
 	m_TruncatedConeCapping = 0;
 	m_TruncatedConeOrientationAxis = ID_X_AXIS;
 
 	m_EllipticCylinderHeight = 50.0;
 	m_EllipticCylinderR1 = 50.0;
 	m_EllipticCylinderR2 = 30.0;
-	m_EllipticCylinderRes = 20;
+	m_EllipticCylinderRes = 25;
 	m_EllipticCylinderCapping = 0;
 	m_EllipticCylinderOrientationAxis = ID_X_AXIS;
 
