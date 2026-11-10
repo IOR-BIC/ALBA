@@ -178,7 +178,6 @@
 #include "albaOpEditMetadata.h"
 #include "albaOpEditNormals.h"
 #include "albaOpExtractIsosurface.h"
-#include "albaOpExtractImageFromArbitraryView.h"
 #include "albaOpExtrusionHoles.h"
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
@@ -1988,7 +1987,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
 	Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
-	Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));
 	Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
 	Plug(new albaOpCreateSpline("Spline"), _("Create"));
