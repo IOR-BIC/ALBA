@@ -51,6 +51,7 @@ SET(PROJECT_SRCS
   albaInteractionFactory.cpp  				albaInteractionFactory.h
   albaInteractionManager.cpp  				albaInteractionManager.h
   albaInteractor.cpp  						albaInteractor.h
+  albaInteractionAgent.cpp  						albaInteractionAgent.h
   albaRefSys.cpp  							albaRefSys.h  
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h

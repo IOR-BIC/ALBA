@@ -328,6 +328,7 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractor.cpp  						../Interaction/albaInteractor.h
+  ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
