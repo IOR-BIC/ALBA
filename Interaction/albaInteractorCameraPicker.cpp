@@ -65,66 +65,36 @@ void albaInteractorCameraPicker::OnButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   Superclass::OnButtonDown(e);
+  PickFromEvent(e);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractorCameraPicker::OnButtonUp(albaEventInteraction *e)
+//----------------------------------------------------------------------------
+{
+  Superclass::OnButtonUp(e);
+  if (m_ContinuousPickingFlag)
+    PickFromEvent(e);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractorCameraPicker::PickFromEvent(albaEventInteraction *e)
+//----------------------------------------------------------------------------
+{
   if (albaDeviceButtonsPadTracker *tracker=albaDeviceButtonsPadTracker::SafeDownCast((albaDevice *)e->GetSender()))
-  { // is it a tracker?
-    albaMatrix *tracker_pose = e->GetMatrix();
-    // extract device avatar's renderer, no avatar == no picking
-    albaAvatar *avatar = tracker->GetAvatar();
-    if (avatar)
-    {
-      // compute pose in the world frame
-      albaMatrix world_pose;
-      albaAvatar3D *avatar3D=albaAvatar3D::SafeDownCast(avatar);
-      if (avatar3D)
-        avatar3D->TrackerToWorld(*tracker_pose,world_pose,albaAvatar3D::CANONICAL_TO_WORLD_SCALE);
-      else
-        world_pose = *tracker_pose;
-      SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
-    }
+  {
+    // the tracker picks along its pose in the world frame, no avatar == no picking
+    albaMatrix world_pose;
+    if (tracker->TrackerToWorld(*e->GetMatrix(), world_pose))
+      SendPickingInformation(tracker->GetView(),NULL,VME_PICKED,&world_pose,false);
   }
   else if (albaDeviceButtonsPadMouse *mouse=albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()))
-  { 
+  {
     if (e->GetModifier(ALBA_CTRL_KEY) && e->GetButton() == ALBA_LEFT_BUTTON)
     {
 	    double mouse_pos[2];
 	    e->Get2DPosition(mouse_pos);
 	    SendPickingInformation(mouse->GetView(), mouse_pos);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaInteractorCameraPicker::OnButtonUp(albaEventInteraction *e) 
-//----------------------------------------------------------------------------
-{
-  Superclass::OnButtonUp(e);
-  if (m_ContinuousPickingFlag)
-  {
-    if (albaDeviceButtonsPadTracker *tracker=albaDeviceButtonsPadTracker::SafeDownCast((albaDevice *)e->GetSender()))
-    { // is it a tracker?
-      albaMatrix *tracker_pose = e->GetMatrix();
-      // extract device avatar's renderer, no avatar == no picking
-      albaAvatar *avatar = tracker->GetAvatar();
-      if (avatar)
-      {
-        // compute pose in the world frame
-        albaMatrix world_pose;
-        albaAvatar3D *avatar3D=albaAvatar3D::SafeDownCast(avatar);
-        if (avatar3D)
-          avatar3D->TrackerToWorld(*tracker_pose,world_pose,albaAvatar3D::CANONICAL_TO_WORLD_SCALE);
-        else
-          world_pose = *tracker_pose;
-        SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
-      }
-    }
-    else if (albaDeviceButtonsPadMouse *mouse=albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()))
-    { 
-      if (e->GetModifier(ALBA_CTRL_KEY) && e->GetButton() == ALBA_LEFT_BUTTON)
-      {
-        double mouse_pos[2];
-        e->Get2DPosition(mouse_pos);
-        SendPickingInformation(mouse->GetView(), mouse_pos);
-      }
     }
   }
 }

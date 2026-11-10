@@ -23,6 +23,8 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class albaGUI;
+class albaView;
+class vtkRenderer;
 
 /** 
   This abstract class manages function calls coming from devices and 
@@ -122,6 +124,12 @@ public:
   
   /** process events sent to the device */
   virtual void OnEvent(albaEventBase *event);
+
+  /** Return the view the device is interacting with, NULL if none */
+  virtual albaView *GetView() {return NULL;}
+
+  /** Return the renderer the device is interacting with, NULL if none */
+  virtual vtkRenderer *GetRenderer() {return NULL;}
 
 protected:
   albaDevice();
