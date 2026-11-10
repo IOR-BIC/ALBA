@@ -207,9 +207,7 @@ void albaVMEWrappedMeterTest::TestWithGenericLandmark()
   double l1[3], l2[3]; 
   cloud->GetLandmark(0)->GetPoint(l1);
 	cloud->GetLandmark(1)->GetPoint(l2);
-  printf("\n%.2f %.2f %.2f\n", l1[0] , l1[1], l1[2]);
-	printf("\n%.2f %.2f %.2f\n", l2[0] , l2[1], l2[2]);
-	
+  
 	CPPUNIT_ASSERT(wrappedMeter->GetDistance() >= 8.33 &&
 		             wrappedMeter->GetDistance() <= 8.34    );
 
@@ -256,9 +254,7 @@ void albaVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	wrappedMeter->SetMeterLink("EndVME1",cloud->GetLandmark(1));
 
 	wrappedMeter->SetMeterLink(cloud->GetLandmark(2)->GetName(),cloud->GetLandmark(2));
-	//wrappedMeter->PushIdVector(cloud->GetId()); // for landmark middlepoint is memorized as sequence of cloud id and interal id of the landmark
-	//wrappedMeter->PushIdVector(2); //this is for the vector syncronized with the gui widget, that is not used in gui test
-
+	
 
 	wrappedMeter->ReparentTo(storage->GetRoot());
 	wrappedMeter->Modified();
@@ -268,18 +264,7 @@ void albaVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	cloud->GetLandmark(0)->GetPoint(l1);
 	cloud->GetLandmark(1)->GetPoint(l2);
 	cloud->GetLandmark(2)->GetPoint(lm);
-
-	/*printf("\n%.2f %.2f %.2f\n", l1[0] , l1[1], l1[2]);
-	printf("\n%.2f %.2f %.2f\n", lm[0] , lm[1], lm[2]);
-	printf("\n%.2f %.2f %.2f\n", l2[0] , l2[1], l2[2]);*/
-
-	//printf("\n%.2f\n", wrappedMeter->GetDistance());
-
-	//double distance;
-	//distance = sqrt(vtkMath::Distance2BetweenPoints(l1,lm)) + sqrt(vtkMath::Distance2BetweenPoints(lm,l2));
-
-	//printf("\n%.2f\n", distance);
-
+		
 	CPPUNIT_ASSERT(wrappedMeter->GetDistance() < 23.09 &&
 		             wrappedMeter->GetDistance() > 23.08);
 
@@ -344,12 +329,9 @@ void albaVMEWrappedMeterTest::TestWrappedGeometry()
   wrappedMeter->Modified();
   wrappedMeter->Update();
 
-
-  printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
-  CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 21.5 && wrappedMeter->GetDistance() < 21.6);
-	//CPPUNIT_ASSERT(wrappedMeter->GetDistance() == 20);
-
-  CPPUNIT_ASSERT(wrappedMeter->GetWrappedGeometryTangent1()[0] - wrappedMeter->GetWrappedGeometryTangent2()[0] < 0.001 && //x is opposite
+  CPPUNIT_ASSERT(wrappedMeter->GetDistance() == 20);
+	
+  CPPUNIT_ASSERT(fabs(wrappedMeter->GetWrappedGeometryTangent1()[0] - wrappedMeter->GetWrappedGeometryTangent2()[0]) < 0.001 && //x is opposite
                  fabs(wrappedMeter->GetWrappedGeometryTangent1()[1]- wrappedMeter->GetWrappedGeometryTangent2()[1]) < 0.001 &&
                  fabs(wrappedMeter->GetWrappedGeometryTangent1()[2]- wrappedMeter->GetWrappedGeometryTangent2()[2]) < 0.001);
 
@@ -371,15 +353,11 @@ void albaVMEWrappedMeterTest::TestWrappedGeometry()
   wrappedMeter2->Update();
 
 
-  printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
-  
+  CPPUNIT_ASSERT(wrappedMeter2->GetDistance() == 20.0);
 
-  printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
-  CPPUNIT_ASSERT(wrappedMeter2->GetDistance() > 20.0);
-
-  CPPUNIT_ASSERT(wrappedMeter2->GetWrappedGeometryTangent1()[0] - wrappedMeter2->GetWrappedGeometryTangent2()[0] < 0.001 && //x is opposite
-    fabs(wrappedMeter2->GetWrappedGeometryTangent1()[1]- wrappedMeter2->GetWrappedGeometryTangent2()[1]) < 0.001 &&
-    fabs(wrappedMeter2->GetWrappedGeometryTangent1()[2]- wrappedMeter2->GetWrappedGeometryTangent2()[2]) < 0.001);
+  CPPUNIT_ASSERT(fabs(wrappedMeter2->GetWrappedGeometryTangent1()[0] - wrappedMeter2->GetWrappedGeometryTangent2()[0]) < 0.001 && //x is opposite
+								 fabs(wrappedMeter2->GetWrappedGeometryTangent1()[1] - wrappedMeter2->GetWrappedGeometryTangent2()[1]) < 0.001 &&
+								 fabs(wrappedMeter2->GetWrappedGeometryTangent1()[2] - wrappedMeter2->GetWrappedGeometryTangent2()[2]) < 0.001);
 
 
   wrappedMeter->ReparentTo(NULL);
