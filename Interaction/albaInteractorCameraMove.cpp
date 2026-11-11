@@ -262,7 +262,6 @@ void albaInteractorCameraMove::Rotate()
   if (m_AutoResetClippingRange) 
 		ResetClippingRange();
 
-	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 
@@ -338,7 +337,6 @@ void albaInteractorCameraMove::Spin()
   if (m_AutoResetClippingRange) 
 		ResetClippingRange();
 
-	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -385,7 +383,6 @@ void albaInteractorCameraMove::Pan()
   if (m_AutoResetClippingRange)  
 		ResetClippingRange();
 
-	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -408,7 +405,6 @@ void albaInteractorCameraMove::Dolly()
   if (m_AutoResetClippingRange)  
 		ResetClippingRange();
 
-	InvokeEvent(this, CAMERA_MOVED,MCH_UP,m_CurrentCamera);
 	m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -619,6 +615,5 @@ void albaInteractorCameraMove::OnMouseWheel(albaEventInteraction *e)
 	if (m_AutoResetClippingRange)
 		ResetClippingRange();
 
-	InvokeEvent(this, CAMERA_MOVED, MCH_UP, m_CurrentCamera);
 	m_Renderer->GetRenderWindow()->Render();
 }

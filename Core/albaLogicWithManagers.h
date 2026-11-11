@@ -272,6 +272,12 @@ public:
 
 	void UnRegisterForKeyEvents(albaObserver *listener) override;
 
+	/** Push a tool on the tool stack of the positional event router */
+	void PushTool(albaInteractionTool *tool) override;
+
+	/** Remove a tool from the tool stack of the positional event router */
+	void PopTool(albaInteractionTool *tool) override;
+
 
 	bool IsTimeVaringEnabled() override;
 

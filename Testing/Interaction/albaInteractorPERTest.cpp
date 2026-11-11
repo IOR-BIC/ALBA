@@ -35,6 +35,8 @@
 #include "albaInteractorCompositorMouse.h"
 #include "albaInteractorGenericMouse.h"
 #include "albaTransform.h"
+#include "albaInteractionTool.h"
+#include "albaCameraTool.h"
 #include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
@@ -103,6 +105,46 @@ public:
   int    m_MouseDownCount;
   double m_PickedPosition[3];
 };
+
+//----------------------------------------------------------------------------
+class albaPERTestTool : public albaInteractionTool // counts the calls and uses the events as configured
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaPERTestTool, albaInteractionTool);
+
+  albaPERTestTool()
+  {
+    m_UseLeft = m_UseRight = m_UseMove = m_UseWheel = false;
+    m_LeftDown = m_LeftUp = m_RightDown = m_RightUp = m_Drag = m_Move = m_Wheel = m_Push = m_Pop = 0;
+  };
+
+  virtual bool OnLeftButtonDown(albaEventInteraction *e) {m_LeftDown++; return m_UseLeft;};
+  virtual bool OnLeftButtonUp(albaEventInteraction *e) {m_LeftUp++; return true;};
+  virtual bool OnRightButtonDown(albaEventInteraction *e) {m_RightDown++; return m_UseRight;};
+  virtual bool OnRightButtonUp(albaEventInteraction *e) {m_RightUp++; return true;};
+  virtual bool OnDrag(albaEventInteraction *e) {m_Drag++; return true;};
+  virtual bool OnMove(albaEventInteraction *e) {m_Move++; return m_UseMove;};
+  virtual bool OnWheel(albaEventInteraction *e) {m_Wheel++; return m_UseWheel;};
+  virtual void OnPush() {m_Push++;};
+  virtual void OnPop() {m_Pop++;};
+
+  bool m_UseLeft, m_UseRight, m_UseMove, m_UseWheel;
+  int m_LeftDown, m_LeftUp, m_RightDown, m_RightUp, m_Drag, m_Move, m_Wheel, m_Push, m_Pop;
+};
+
+albaCxxTypeMacro(albaPERTestTool);
+
+//----------------------------------------------------------------------------
+static void SendToPER(albaInteractorPER *per, albaDeviceButtonsPadMouse *mouse, albaID id, int button = ALBA_LEFT_BUTTON)
+//----------------------------------------------------------------------------
+{
+  albaEventInteraction e(mouse, id);
+  e.SetButton(button);
+  e.Set2DPosition(10, 20);
+  e.SetChannel(MCH_INPUT);
+  per->OnEvent(&e);
+}
 
 //----------------------------------------------------------------------------
 static void SelectView(albaDeviceButtonsPadMouse *mouse, albaView *view)
@@ -274,24 +316,17 @@ void albaInteractorPERTest::TestSetModeToMultiButton()
 }
 
 
-void albaInteractorPERTest::TestGetCameraMouseInteractor()
+void albaInteractorPERTest::TestGetCameraTool()
 {
   albaInteractorPER *mip = albaInteractorPER::New();
-  CPPUNIT_ASSERT(mip);
 
-  albaInteractor *interactor = mip->GetCameraMouseInteractor();
-  CPPUNIT_ASSERT(interactor->GetDevice() == NULL);
+  albaCameraTool *camera = mip->GetCameraTool();
+  CPPUNIT_ASSERT(camera != NULL);
+  CPPUNIT_ASSERT(camera->GetMouseTool() != NULL);
+  CPPUNIT_ASSERT(camera->GetTrackerTool() != NULL);
 
-  mip->Delete();
-}
-
-void albaInteractorPERTest::TestGetCameraInteractor()
-{
-  albaInteractorPER *mip = albaInteractorPER::New();
-  CPPUNIT_ASSERT(mip);
-
-  albaInteractor *interactor = mip->GetCameraInteractor();
-  CPPUNIT_ASSERT(interactor->GetDevice() == NULL);
+  // the camera tool is not part of the tool stack
+  CPPUNIT_ASSERT(mip->GetNumberOfTools() == 0);
 
   mip->Delete();
 }
@@ -489,4 +524,158 @@ void albaInteractorPERTest::TestEventTracing()
   behavior->Delete();
   mouse->Delete();
   delete view;
+}
+
+void albaInteractorPERTest::TestPushPopTool()
+{
+  albaInteractorPER *per = albaInteractorPER::New();
+  albaPERTestTool *bottom;
+  albaNEW(bottom);
+  albaPERTestTool *top;
+  albaNEW(top);
+
+  per->PushTool(bottom);
+  per->PushTool(top);
+  CPPUNIT_ASSERT(per->GetNumberOfTools() == 2);
+  CPPUNIT_ASSERT(bottom->m_Push == 1 && top->m_Push == 1);
+
+  // a tool is pushed only once, NULL is ignored
+  per->PushTool(bottom);
+  per->PushTool(NULL);
+  CPPUNIT_ASSERT(per->GetNumberOfTools() == 2);
+  CPPUNIT_ASSERT(bottom->m_Push == 1);
+
+  // a tool can be popped from any position
+  per->PopTool(bottom);
+  CPPUNIT_ASSERT(per->GetNumberOfTools() == 1);
+  CPPUNIT_ASSERT(bottom->m_Pop == 1);
+  per->PopTool(bottom);
+  CPPUNIT_ASSERT(bottom->m_Pop == 1);
+
+  // the PER pops the remaining tools when deleted
+  per->Delete();
+  CPPUNIT_ASSERT(top->m_Pop == 1);
+
+  albaDEL(top);
+  albaDEL(bottom);
+}
+
+void albaInteractorPERTest::TestToolInteraction()
+{
+  albaFakePickView *view = new albaFakePickView();
+  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  SelectView(mouse, view);
+
+  albaInteractorCompositorMouse *behavior = albaInteractorCompositorMouse::New();
+  albaVMESurface *vme = albaVMESurface::New();
+  vme->SetBehavior(behavior);
+  view->m_FakeVme = vme;
+
+  albaInteractorPER *per = albaInteractorPER::New();
+  albaPERTestTool *tool;
+  albaNEW(tool);
+  per->PushTool(tool);
+  albaInteractorPER::SetEventTracing(true);
+
+  // the tool uses the left button down: it interacts with the mouse until the left button is released
+  tool->m_UseLeft = true;
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId());
+  CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("-> Tool albaPERTestTool") != std::string::npos);
+  SendToPER(per, mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+  CPPUNIT_ASSERT(!behavior->IsInteracting());
+
+  // the other buttons pressed in the meantime go to the same tool, and do not end the interaction
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_RIGHT_BUTTON);
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId(), ALBA_RIGHT_BUTTON);
+  CPPUNIT_ASSERT(tool->m_RightDown == 1 && tool->m_RightUp == 1);
+  SendToPER(per, mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+  CPPUNIT_ASSERT(tool->m_Drag == 2);
+
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId());
+  CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_LeftUp == 1);
+  CPPUNIT_ASSERT(view->m_PickCount == 0);
+  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+
+  // the tool does not use the left button: the picked VME behavior gets down, drag and up
+  tool->m_UseLeft = false;
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId());
+  CPPUNIT_ASSERT(behavior->IsInteracting());
+  SendToPER(per, mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId());
+  CPPUNIT_ASSERT(!behavior->IsInteracting());
+  CPPUNIT_ASSERT(tool->m_LeftDown == 2 && tool->m_Drag == 2 && tool->m_LeftUp == 1);
+  CPPUNIT_ASSERT(view->m_PickCount == 1);
+
+  // a button the tool does not handle goes to the default behavior: the middle button picks
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_MIDDLE_BUTTON);
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId(), ALBA_MIDDLE_BUTTON);
+  CPPUNIT_ASSERT(view->m_PickCount == 2);
+
+  // popping a tool while it interacts with a device gives the device back to the default behavior
+  tool->m_UseLeft = true;
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId());
+  per->PopTool(tool);
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId());
+  CPPUNIT_ASSERT(tool->m_LeftUp == 1);
+
+  albaInteractorPER::SetEventTracing(false);
+  per->Delete();
+  albaDEL(tool);
+  vme->SetBehavior(NULL);
+  vme->Delete();
+  behavior->Delete();
+  mouse->Delete();
+  delete view;
+}
+
+void albaInteractorPERTest::TestToolOrder()
+{
+  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaInteractorPER *per = albaInteractorPER::New();
+  albaPERTestTool *bottom;
+  albaNEW(bottom);
+  albaPERTestTool *top;
+  albaNEW(top);
+  per->PushTool(bottom);
+  per->PushTool(top);
+
+  // the top tool comes first
+  top->m_UseLeft = bottom->m_UseLeft = true;
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId());
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId());
+  CPPUNIT_ASSERT(top->m_LeftDown == 1 && top->m_LeftUp == 1);
+  CPPUNIT_ASSERT(bottom->m_LeftDown == 0);
+
+  // what the top tool does not use goes to the tool below
+  top->m_UseLeft = false;
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId());
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId());
+  CPPUNIT_ASSERT(top->m_LeftDown == 2 && top->m_LeftUp == 1);
+  CPPUNIT_ASSERT(bottom->m_LeftDown == 1 && bottom->m_LeftUp == 1);
+
+  // each button is offered separately: the right button goes to the tool handling it
+  top->m_UseRight = true;
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_RIGHT_BUTTON);
+  SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId(), ALBA_RIGHT_BUTTON);
+  CPPUNIT_ASSERT(top->m_RightDown == 1 && top->m_RightUp == 1);
+  CPPUNIT_ASSERT(bottom->m_RightDown == 0);
+
+  // moves without buttons and wheel follow the same order
+  bottom->m_UseMove = true;
+  SendToPER(per, mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+  CPPUNIT_ASSERT(top->m_Move == 1 && bottom->m_Move == 1);
+  CPPUNIT_ASSERT(top->m_Drag == 0 && bottom->m_Drag == 0);
+
+  top->m_UseWheel = true;
+  double rotation = 120;
+  albaEventInteraction wheel(mouse, albaDeviceButtonsPadMouse::GetWheelId());
+  wheel.SetData(&rotation);
+  wheel.SetChannel(MCH_INPUT);
+  per->OnEvent(&wheel);
+  CPPUNIT_ASSERT(top->m_Wheel == 1 && bottom->m_Wheel == 0);
+
+  per->Delete();
+  albaDEL(top);
+  albaDEL(bottom);
+  mouse->Delete();
 }

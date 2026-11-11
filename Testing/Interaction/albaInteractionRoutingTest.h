@@ -46,6 +46,8 @@ public:
 
   CPPUNIT_TEST_SUITE( albaInteractionRoutingTest );
   CPPUNIT_TEST( TestCameraDragAndWheel );
+  CPPUNIT_TEST( TestCameraButtons );
+  CPPUNIT_TEST( TestCameraTrackerTool );
   CPPUNIT_TEST( TestPERPickerClick );
   CPPUNIT_TEST( Test2DMeasureAddWithoutModifiers );
   CPPUNIT_TEST( Test2DMeasureModifiersMoveCamera );
@@ -60,6 +62,8 @@ protected:
   virtual void AfterTest();
 
   void TestCameraDragAndWheel();
+  void TestCameraButtons();
+  void TestCameraTrackerTool();
   void TestPERPickerClick();
   void Test2DMeasureAddWithoutModifiers();
   void Test2DMeasureModifiersMoveCamera();
@@ -68,7 +72,10 @@ protected:
   void TestEllipseCtrlRotates();
 
   /** Send a mouse event to the mouse device as the render window interactor does */
-  void SendMouse(albaID id, double x, double y, int button = 0, int modifier = -1);
+  void SendMouse(albaID id, double x, double y, int button = 0, int modifier = -1, int modifier2 = -1);
+
+  /** Press a button at (400, 300), drag to (x, y) and release it */
+  void Drag(int button, double x, double y, int modifier = -1, int modifier2 = -1);
 
   /** Send a wheel rotation to the mouse device */
   void SendWheel(double x, double y, double rotation);

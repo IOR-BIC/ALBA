@@ -19,6 +19,7 @@
 #include "albaInteractor.h"
 #include <map>
 #include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -26,6 +27,8 @@
 class albaVME;
 class myPIMPL;
 class vtkCamera;
+class albaInteractionTool;
+class albaCameraTool;
 
 /** Class implementing routing of events based on picking.
   This class routes events from input devices depending on picking information.
@@ -70,9 +73,18 @@ public:
   void SetModeToSingleButton() {m_Mode=SINGLE_BUTTON;}
   void SetModeToMultiButton() {m_Mode=MULTI_BUTTON;}
 
-  albaInteractor *GetCameraMouseInteractor() {return m_CameraMouseBehavior;};
+  /** Return the tool moving the camera, always at the bottom of the tool stack */
+  albaCameraTool *GetCameraTool() {return m_CameraTool;}
 
-  albaInteractor *GetCameraInteractor() {return m_CameraBehavior;};
+  /** Push a tool on top of the tool stack: it receives the events before the tools
+  below it and before the default behavior. The PER keeps a reference to the tool. */
+  void PushTool(albaInteractionTool *tool);
+
+  /** Remove a tool from the tool stack, wherever it is */
+  void PopTool(albaInteractionTool *tool);
+
+  /** Return the number of tools pushed on the stack (the camera tool is not counted) */
+  int GetNumberOfTools() {return m_Tools.size();}
 
   /** Enable/disable the event tracing of all the PERs: each input event is written in the log
   with the device, the button, the modifiers and who handled it. */
@@ -144,8 +156,25 @@ protected:
 
   int             m_Mode;
   int             m_FirstTime;
-  albaInteractor*  m_CameraBehavior; ///< the camera interactor
-  albaInteractor*  m_CameraMouseBehavior; ///< the mouse camera interactor
+  /** Offer the event to the tools, from the top of the stack; return true if a tool used it */
+  bool DispatchToTools(albaEventInteraction *e, albaDevice *device);
+
+  /** Call the button down method of the tool for the button of the event */
+  static bool ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** Call the button up method of the tool for the button of the event */
+  static bool ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** The tool interacting with a device and the button that started the interaction */
+  struct ToolInteraction
+  {
+    albaInteractionTool *Tool;
+    int Button;
+  };
+
+  albaCameraTool *m_CameraTool; ///< tool moving the camera, at the bottom of the stack
+  std::vector<albaInteractionTool *> m_Tools; ///< the tool stack, the top is the last one
+  std::map<albaID, ToolInteraction> m_ToolInteractions; ///< the tool interacting with each device, until the starting button is released
 
   class DeviceItem
   {

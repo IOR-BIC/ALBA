@@ -36,12 +36,14 @@ class albaInteractorPERTest : public albaTest
   CPPUNIT_TEST(TestSetGetMode);
   CPPUNIT_TEST(TestSetModeToSingleButton);
   CPPUNIT_TEST(TestSetModeToMultiButton);
-  CPPUNIT_TEST(TestGetCameraMouseInteractor);
-  CPPUNIT_TEST(TestGetCameraInteractor);
+  CPPUNIT_TEST(TestGetCameraTool);
   CPPUNIT_TEST(TestEventPickCache);
   CPPUNIT_TEST(TestButtonDownPicksOnce);
   CPPUNIT_TEST(TestGenericMouseUsesButtonDownPick);
   CPPUNIT_TEST(TestEventTracing);
+  CPPUNIT_TEST(TestPushPopTool);
+  CPPUNIT_TEST(TestToolInteraction);
+  CPPUNIT_TEST(TestToolOrder);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -59,12 +61,14 @@ class albaInteractorPERTest : public albaTest
   void TestSetGetMode();
   void TestSetModeToSingleButton();
   void TestSetModeToMultiButton();
-  void TestGetCameraMouseInteractor();
-  void TestGetCameraInteractor();
+  void TestGetCameraTool();
   void TestEventPickCache();
   void TestButtonDownPicksOnce();
   void TestGenericMouseUsesButtonDownPick();
   void TestEventTracing();
+  void TestPushPopTool();
+  void TestToolInteraction();
+  void TestToolOrder();
 
 };
 

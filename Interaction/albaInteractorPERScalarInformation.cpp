@@ -104,15 +104,7 @@ void albaInteractorPERScalarInformation::OnEvent(albaEventBase *event)
           bh->OnEvent(event); // forward to VME behavior
         }
       }
-      // if no picked behavior...
-      if (m_CameraBehavior && m_CameraBehavior->IsInteracting(device))
-      {
-        m_CameraBehavior->OnEvent(event); // forward to Camera behavior
-      }
-      else if (m_CameraMouseBehavior && m_CameraMouseBehavior->IsInteracting(device))
-      {
-        m_CameraMouseBehavior->OnEvent(event); // forward to Camera behavior
-      }
+      // the camera is moved by the superclass
     }
     else
     {

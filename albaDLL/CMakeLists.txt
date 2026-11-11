@@ -329,6 +329,10 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractor.cpp  						../Interaction/albaInteractor.h
   ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h
+  ../Interaction/albaInteractionTool.cpp  						../Interaction/albaInteractionTool.h
+  ../Interaction/albaCameraTool.cpp  						../Interaction/albaCameraTool.h
+  ../Interaction/albaCameraMouseTool.cpp  						../Interaction/albaCameraMouseTool.h
+  ../Interaction/albaCameraTrackerTool.cpp  						../Interaction/albaCameraTrackerTool.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h

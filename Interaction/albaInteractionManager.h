@@ -52,6 +52,7 @@ class vtkXMLDataElement;
 class vtkXMLDataParser;
 class albaInteractorSER;
 class albaInteractorPER;
+class albaInteractionTool;
 class albaVME;
 class albaGUIDialog;
 class albaGUI;
@@ -183,6 +184,12 @@ public:
   
   /** restore previous PER instance */
   bool PopPER();
+
+  /** Push a tool on the tool stack of the PER: it receives the events before the default interaction */
+  void PushTool(albaInteractionTool *tool);
+
+  /** Remove a tool from the tool stack of the PER */
+  void PopTool(albaInteractionTool *tool);
 
   /** Enable/disable the event tracing: each input event routed by a PER is written in the log
   with the device, the button, the modifiers and who handled it. Disabled by default. */

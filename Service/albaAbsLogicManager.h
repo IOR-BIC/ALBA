@@ -26,6 +26,7 @@ class albaOpManager;
 class albaViewManager;
 class albaProsthesesDBManager;
 class albaObserver;
+class albaInteractionTool;
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -80,6 +81,12 @@ public:
 	virtual void RegisterForKeyEvents(albaObserver *listener) = 0;
 	/** Unregister the listener for key events */
 	virtual void UnRegisterForKeyEvents(albaObserver *listener) = 0;
+
+	//Interaction
+	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */
+	virtual void PushTool(albaInteractionTool *tool) = 0;
+	/** Remove a tool from the tool stack of the positional event router */
+	virtual void PopTool(albaInteractionTool *tool) = 0;
 	
 	//Managers
 	/** Get the Operation Manager */

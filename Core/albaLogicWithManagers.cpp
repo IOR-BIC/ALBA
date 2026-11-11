@@ -2172,6 +2172,24 @@ void albaLogicWithManagers::UnRegisterForKeyEvents(albaObserver *listener)
 }
 
 //----------------------------------------------------------------------------
+void albaLogicWithManagers::PushTool(albaInteractionTool *tool)
+{
+#ifdef ALBA_USE_VTK
+	if (m_InteractionManager)
+		m_InteractionManager->PushTool(tool);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::PopTool(albaInteractionTool *tool)
+{
+#ifdef ALBA_USE_VTK
+	if (m_InteractionManager)
+		m_InteractionManager->PopTool(tool);
+#endif
+}
+
+//----------------------------------------------------------------------------
 bool albaLogicWithManagers::IsTimeVaringEnabled()
 {
 	return m_PlugTimebar;

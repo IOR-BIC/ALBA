@@ -161,15 +161,7 @@ void albaInteractionManager::SetPER(albaInteractorPER *per)
     m_PositionalEventRouter->SetListener(NULL);
   }
 
-	//move camera observers from current per to new per
-	std::vector <albaObserver *> obVect;
-	m_PositionalEventRouter->GetCameraMouseInteractor()->GetObservers(MCH_UP, obVect);
-	m_PositionalEventRouter->GetCameraMouseInteractor()->RemoveAllObservers();
-
   m_PositionalEventRouter = per;
-
-	for (int i = 0; i < obVect.size(); i++)
-		m_PositionalEventRouter->GetCameraMouseInteractor()->AddObserver(obVect[i]);
 
   // bind new PER
   m_PositionalEventRouter->SetName("PositionalEventRouter");
@@ -183,6 +175,16 @@ void albaInteractionManager::PushPER(albaInteractorPER *per)
   albaInteractorPER *old_per=GetPER();
   m_PERList.push_back(old_per);
   SetPER(per);
+}
+//----------------------------------------------------------------------------
+void albaInteractionManager::PushTool(albaInteractionTool *tool)
+{
+  m_PositionalEventRouter->PushTool(tool);
+}
+//----------------------------------------------------------------------------
+void albaInteractionManager::PopTool(albaInteractionTool *tool)
+{
+  m_PositionalEventRouter->PopTool(tool);
 }
 //----------------------------------------------------------------------------
 void albaInteractionManager::SetEventTracing(bool enable)
