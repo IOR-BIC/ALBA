@@ -187,6 +187,11 @@ void albaInteractionManager::PopTool(albaInteractionTool *tool)
   m_PositionalEventRouter->PopTool(tool);
 }
 //----------------------------------------------------------------------------
+void albaInteractionManager::OnKey(int keyCode, bool pressed)
+{
+  m_PositionalEventRouter->DispatchKey(keyCode, pressed);
+}
+//----------------------------------------------------------------------------
 void albaInteractionManager::SetEventTracing(bool enable)
 {
   albaInteractorPER::SetEventTracing(enable);

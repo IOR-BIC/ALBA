@@ -41,9 +41,6 @@ public:
 	albaTypeMacro(albaInteractor2DMeasure_Ellipse, albaInteractor2DMeasure);
 
 	// MEASURE
-	/** Enable/Disable Measure Interactor*/
-	virtual void Enable(bool enable = true);
-
 	/** Add Measure*/
 	virtual void AddMeasure(double *point1, double *point2);
 	/** Edit Measure*/
@@ -70,7 +67,8 @@ public:
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 
-	virtual void OnEvent(albaEventBase *event);
+	/** CTRL switches from editing to rotating the ellipse, without moving the mouse */
+	virtual bool OnKey(int keyCode, bool pressed);
 
 	/** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
 	bool IsPointInsideMeasure(double *point, int measureIndex=-1);

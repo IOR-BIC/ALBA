@@ -111,14 +111,14 @@ void albaOpCreatePolyline::OpRun()
 	if (view)
 	{
 		// Init Point Interactor
-		m_PointInteractor = albaInteractor2DMeasure_Point::New();
+		albaNEW(m_PointInteractor);
 		m_PointInteractor->SetListener(this);
 		m_PointInteractor->Enable(false);
 		m_PointInteractor->SetRendererByView(view);
 		m_PointInteractor->SetColorText(1, 0, 0);
 		m_PointInteractor->ShowText(false);
 
-		albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_PointInteractor));
+		GetLogicManager()->PushTool(m_PointInteractor);
 		m_PointInteractor->Enable(true);
 		m_PointInteractor->SetListener(this);
 
@@ -166,7 +166,7 @@ void albaOpCreatePolyline::OpStop(int result)
 	if (m_PointInteractor)
 	{
 		// Remove ExtraInteractor
-		albaEventMacro(albaEvent(this, PER_POP));
+		GetLogicManager()->PopTool(m_PointInteractor);
 
 		m_PointInteractor->RemoveAllMeasures();
 		albaDEL(m_PointInteractor);

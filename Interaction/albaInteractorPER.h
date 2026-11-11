@@ -83,6 +83,9 @@ public:
   /** Remove a tool from the tool stack, wherever it is */
   void PopTool(albaInteractionTool *tool);
 
+  /** Offer a key pressed or released to the tools, from the top of the stack; return true if a tool used it */
+  bool DispatchKey(int keyCode, bool pressed);
+
   /** Return the number of tools pushed on the stack (the camera tool is not counted) */
   int GetNumberOfTools() {return m_Tools.size();}
 

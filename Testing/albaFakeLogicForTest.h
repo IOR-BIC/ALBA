@@ -110,10 +110,6 @@ public:
 
 	void SetCitationPaper(char *link) override;
 
-	void RegisterForKeyEvents(albaObserver *listener) override;
-
-	void UnRegisterForKeyEvents(albaObserver *listener) override;
-
 	/** Store the pushed tool: no PER is involved */
 	void PushTool(albaInteractionTool *tool) override;
 

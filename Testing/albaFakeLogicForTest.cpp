@@ -195,18 +195,6 @@ void albaFakeLogicForTest::SetCitationPaper(char *link)
 }
 
 //----------------------------------------------------------------------------
-void albaFakeLogicForTest::RegisterForKeyEvents(albaObserver *listener)
-{
-	return;
-}
-
-//----------------------------------------------------------------------------
-void albaFakeLogicForTest::UnRegisterForKeyEvents(albaObserver *listener)
-{
-	return;
-}
-
-//----------------------------------------------------------------------------
 void albaFakeLogicForTest::PushTool(albaInteractionTool *tool)
 {
 	if (!IsToolPushed(tool))

@@ -124,11 +124,6 @@ void albaInteractor2DMeasure_Line::MoveMeasure(int index, double * point)
 	// Text
 	UpdateTextActor(tmp_pos1, tmp_pos2);
 
-	//called on mouse up  
-	if (!m_DraggingLeft)
-	{
-		m_ActorAdded = false;
-	}
 
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 	Render();

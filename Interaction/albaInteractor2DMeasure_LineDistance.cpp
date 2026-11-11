@@ -131,11 +131,6 @@ void albaInteractor2DMeasure_LineDistance::MoveMeasure(int index, double * point
 		UpdateLineActors(linePoint1, linePoint2);
 	}
 
-	//called on mouse up  
-	if (!m_DraggingLeft)
-	{
-		m_ActorAdded = false;
-	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// Update Measure

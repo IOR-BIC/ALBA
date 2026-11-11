@@ -76,12 +76,6 @@ public:
 	/** Expand the VME on the Tree  */
 	virtual void ExpandVME(albaVME *vme) = 0;
 
-	//Key Events
-	/** Register the listener for keydown and keyrelease events */
-	virtual void RegisterForKeyEvents(albaObserver *listener) = 0;
-	/** Unregister the listener for key events */
-	virtual void UnRegisterForKeyEvents(albaObserver *listener) = 0;
-
 	//Interaction
 	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */
 	virtual void PushTool(albaInteractionTool *tool) = 0;

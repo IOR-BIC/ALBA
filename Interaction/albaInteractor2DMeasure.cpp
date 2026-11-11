@@ -74,7 +74,6 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 	m_MaxMeasures = -1; // -1 = Infinite
 	m_CurrMeasure = -1;
 
-	m_DraggingLeft = false;
 	m_ShiftPressed = false;
 	m_AltPressed = false;
 	m_EndMeasure = false;
@@ -211,148 +210,132 @@ void albaInteractor2DMeasure::SetUpdateDistance(double dist)
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
+bool albaInteractor2DMeasure::IsMouseEvent(albaEventInteraction *e)
 {
+	return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) != NULL;
+}
+//----------------------------------------------------------------------------
+bool albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
+{
+	if (!m_IsEnabled || !IsMouseEvent(e))
+		return false;
+
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
 	InitRenderer(e);
-
 	m_CurrentRenderer = m_Renderer;
 
+	// with SHIFT, or with CTRL while adding a measure, the button is left to the PER for the whole interaction;
+	// in a perspective view the measure does not work, so the button moves the camera
 	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY) ? 1 : 0;
 	m_AltPressed = e->GetModifier(ALBA_ALT_KEY) ? 1 : 0;
+	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
+	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE) || !m_ParallelView)
+		return false;
+
 	m_ButtonDownInside = m_IsInBound;
 
-	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
- 	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
+	double pos_2d[2], pointCoord[3];
+	e->Get2DPosition(pos_2d);
+	ScreenToWorld(pos_2d, pointCoord);
+
+	albaEventMacro(albaEvent(this, ID_MEASURE_STARTED));
+
+	switch (m_Action)
 	{
-		Superclass::OnLeftButtonDown(e);
+	case ACTION_ADD_MEASURE:
+		DrawNewMeasure(pointCoord);
+		break;
+	case ACTION_EDIT_MEASURE:
+		EditMeasure(m_CurrMeasure, pointCoord);
+		break;
+	case ACTION_ROTATE_MEASURE:
+		SetAction(ACTION_ROTATING_MEASURE);
+		RotateMeasure(m_CurrMeasure, pointCoord);
+		break;
+	case ACTION_MOVE_MEASURE:
+		m_StartMousePosition[X] = pointCoord[X];
+		m_StartMousePosition[Y] = pointCoord[Y];
+		m_StartMousePosition[Z] = pointCoord[Z];
+		MoveMeasure(m_CurrMeasure, m_StartMousePosition);
+		break;
 	}
-	else if (m_ParallelView && m_IsEnabled)// && m_IsInBound)
-	{
-		OnButtonDown(e);
-		
-		albaVME *picked_vme = GetPickedVME(m_Mouse);
-		if (picked_vme && picked_vme->IsA("albaVMEGizmo"))
-		{
-			return;
-		}
-
-		m_DraggingLeft = true;
-
-		double pos_2d[2], pointCoord[3];
-		e->Get2DPosition(pos_2d);
-		ScreenToWorld(pos_2d, pointCoord);
-
-		albaEventMacro(albaEvent(this, ID_MEASURE_STARTED));
-
-		switch (m_Action)
-		{
-		case ACTION_ADD_MEASURE:
-		{
-			DrawNewMeasure(pointCoord);
-		}
-		break;
-		case ACTION_EDIT_MEASURE:
-		{
-			EditMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
-		case ACTION_ROTATE_MEASURE:
-		{
-			SetAction(ACTION_ROTATING_MEASURE);
-			RotateMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
-		case ACTION_MOVE_MEASURE:
-		{
-			m_StartMousePosition[X] = pointCoord[X];
-			m_StartMousePosition[Y] = pointCoord[Y];
-			m_StartMousePosition[Z] = pointCoord[Z];
-
-			MoveMeasure(m_CurrMeasure, m_StartMousePosition);
-		}
-		break;
-		}
-	}
+	return true;
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
+bool albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 {
-	if (!m_IsEnabled) return;
+	if (m_CurrentRenderer != m_Renderer)
+		return true;
 
-	if (m_CurrentRenderer != m_Renderer) return;
+	double pos_2d[2];
+	double pointCoord[4];
+	e->Get2DPosition(pos_2d);
+	ScreenToWorld(pos_2d, pointCoord);
 
-	m_DraggingLeft = false;
-	OnButtonUp(e);
-
-	albaVME *picked_vme = GetPickedVME(m_Mouse);
-	if (picked_vme && picked_vme->IsA("albaVMEGizmo"))
+	switch (m_Action)
 	{
-		return;
+	case ACTION_ADD_MEASURE:
+		DrawNewMeasure(pointCoord);
+		break;
+	case ACTION_EDIT_MEASURE:
+		EditMeasure(m_CurrMeasure, pointCoord);
+		break;
+	case ACTION_MOVE_MEASURE:
+		MoveMeasure(m_CurrMeasure, pointCoord);
+		break;
+	case ACTION_ROTATING_MEASURE:
+		RotateMeasure(m_CurrMeasure, pointCoord);
+		SetAction(ACTION_NONE); //Setting action to none in order to set the right action on FindAndHighlight
+		break;
 	}
 
-	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
- 	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
-	{
-		Superclass::OnLeftButtonUp(e);
-	}
-	else if(m_ParallelView)// && m_IsInBound && m_ButtonDownInside)
-	{
-		double pos_2d[2];
-		double pointCoord[4];
-		e->Get2DPosition(pos_2d);
-		ScreenToWorld(pos_2d, pointCoord);
+	m_EndMeasure = true;
+	m_MovingMeasure = false;
 
+	FindAndHighlight(pointCoord);
+
+	albaEventMacro(albaEvent(this, ID_MEASURE_FINISHED));
+	return true;
+}
+//----------------------------------------------------------------------------
+bool albaInteractor2DMeasure::OnDrag(albaEventInteraction *e)
+{
+	InitRenderer(e);
+
+	double pos_2d[2];
+	e->Get2DPosition(pos_2d);
+	double pointCoord[3];
+	ScreenToWorld(pos_2d, pointCoord);
+
+	if (m_IsInBound != IsInBound(pointCoord) && m_Renderer)
+		m_Renderer->GetRenderWindow()->Render();
+
+	if (m_CurrentRenderer == m_Renderer)
+	{
 		switch (m_Action)
 		{
 		case ACTION_ADD_MEASURE:
-		{
 			DrawNewMeasure(pointCoord);
-		}
-		break;
+			break;
 		case ACTION_EDIT_MEASURE:
-		{
 			EditMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
+			break;
 		case ACTION_MOVE_MEASURE:
-		{
 			MoveMeasure(m_CurrMeasure, pointCoord);
-		}
-		break;
-			case ACTION_ROTATING_MEASURE:
-			{
-				RotateMeasure(m_CurrMeasure, pointCoord);
-				SetAction(ACTION_NONE); //Setting action to none in order to set the right action on FindAndHighlight
-			}
+			break;
+		case ACTION_ROTATING_MEASURE:
+			RotateMeasure(m_CurrMeasure, pointCoord);
 			break;
 		}
-
-		m_EndMeasure = true;
-		m_MovingMeasure = false;
-
-		FindAndHighlight(pointCoord);
-
-		albaEventMacro(albaEvent(this, ID_MEASURE_FINISHED));
 	}
+	return true;
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::OnRightButtonUp(albaEventInteraction *e)
+bool albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 {
-	if (m_ShiftPressed)
-	{
-		Superclass::OnRightButtonUp(e);
-	}
-	else if(m_CurrMeasure >= 0)
-	{
-		albaEventMacro(albaEvent(this, ID_MEASURE_RCLICK));
-	}
-}
-//----------------------------------------------------------------------------
-void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
-{
-	if (!m_IsEnabled) return;
+	if (!m_IsEnabled || !IsMouseEvent(e))
+		return false;
 
 	InitRenderer(e);
 
@@ -368,69 +351,17 @@ void albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
 	{
 		FindAndHighlight(pointCoord);
-		Superclass::OnMove(e);
-	}
-	else if(m_ParallelView)
-	{
-		
-		if (m_IsInBound != IsInBound(pointCoord))
-		{
-			if (m_Renderer)
-				m_Renderer->GetRenderWindow()->Render();
-		}
-
-		if (!m_DraggingLeft)
-		{
-			FindAndHighlight(pointCoord);
-		}
-		else if (m_CurrentRenderer == m_Renderer)
-		{
-			switch (m_Action)
-			{
-			case ACTION_ADD_MEASURE:
-			{
-				DrawNewMeasure(pointCoord);
-			}
-			break;
-			case ACTION_EDIT_MEASURE:
-			{
-				EditMeasure(m_CurrMeasure, pointCoord);
-			}
-			break;
-			case ACTION_MOVE_MEASURE:
-			{
-				MoveMeasure(m_CurrMeasure, pointCoord);
-			}
-			break;
-			case ACTION_ROTATING_MEASURE:
-			{
-				RotateMeasure(m_CurrMeasure, pointCoord);
-			}
-			break;
-			}
-		}
-	}
-}
-//----------------------------------------------------------------------------
-void albaInteractor2DMeasure::OnEvent(albaEventBase *event)
-{
-	if (!m_IsEnabled) return;
-
-	if (event->GetChannel() == MCH_INPUT)
-	{
-		albaID id = event->GetId();
-
-		if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
-		{
-			albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
-
-			OnMove(e);
-			if (m_Action != ACTION_ADD_MEASURE)
-				return;
-		}
+		return false;
 	}
 
-	Superclass::OnEvent(event);
+	if (!m_ParallelView)
+		return false;
+
+	if (m_IsInBound != IsInBound(pointCoord) && m_Renderer)
+		m_Renderer->GetRenderWindow()->Render();
+
+	FindAndHighlight(pointCoord);
+	return true;
 }
 
 /// MEASURE //////////////////////////////////////////////////////////////////

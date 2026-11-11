@@ -22,7 +22,7 @@ PURPOSE. See the above copyright notice for more information.
 /*#include "appGeometry.h"*/
 
 #include "albaEvent.h"
-#include "albaInteractorPER.h"
+#include "albaInteractionTool.h"
 #include "albaActor2dStackHelper.h"
 #include "albaGeometryUtils.h"
 #include "albaServiceClient.h"
@@ -51,11 +51,14 @@ class vtkTextActor;
 // #define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
 
 // Class Name: albaInteractor2DMeasure
-class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractorPER, public albaServiceClient
+/** Base class of the tools drawing 2D measures in parallel views.
+  The left button adds, edits, moves or rotates the measures; with SHIFT, or with CTRL
+  while adding a measure, the button is left to the PER. The other buttons are not used. */
+class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractionTool, public albaServiceClient
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasure, albaInteractorPER);
+	albaTypeMacro(albaInteractor2DMeasure, albaInteractionTool);
 
 	enum MEASURE_INTERACTIONS
 	{
@@ -65,7 +68,6 @@ public:
 		ID_MEASURE_CHANGED,
 		ID_MEASURE_MOVED,
 		ID_MEASURE_SELECTED,
-		ID_MEASURE_RCLICK,
 	};
 
 	enum MEASURE_ACTIONS
@@ -87,8 +89,12 @@ public:
 		POINT_4,
 	};
 
-	virtual void OnEvent(albaEventBase *event);
-	
+	/// TOOL EVENTS
+	virtual bool OnLeftButtonDown(albaEventInteraction *e);
+	virtual bool OnLeftButtonUp(albaEventInteraction *e);
+	virtual bool OnDrag(albaEventInteraction *e);
+	virtual bool OnMove(albaEventInteraction *e);
+
 	/// MEASURE
 	/** Add Measure*/
 	virtual void AddMeasure(double *point1, double *point2 = NULL);
@@ -215,11 +221,8 @@ protected:
 
 	void InitRenderer(albaEventInteraction *e);
 
-	/// Mouse Events
-	virtual void OnLeftButtonDown(albaEventInteraction *e);
-	virtual void OnLeftButtonUp(albaEventInteraction *e);
-	virtual void OnRightButtonUp(albaEventInteraction *e);
-	virtual void OnMove(albaEventInteraction *e);
+	/** Return true if the event comes from the mouse: the measures work only with the mouse */
+	bool IsMouseEvent(albaEventInteraction *e);
 		
 	/** Draw New Measure*/
 	virtual void DrawNewMeasure(double * wp) {};
@@ -308,7 +311,6 @@ protected:
 	int m_CurrMeasure;
 
 	long m_AddMeasurePhase_Counter;
-	bool m_ActorAdded;
 
 	double m_MeasureValue;
 	int m_LastEditing;

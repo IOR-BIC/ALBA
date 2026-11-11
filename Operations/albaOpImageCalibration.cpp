@@ -102,15 +102,15 @@ void albaOpImageCalibration::OpRun()
 	if (inputImage != NULL)
 		inputImage->GetSpacing(m_InputSpacing);
 
-	m_DistanceInteractor = albaInteractor2DMeasure_Distance::New();
-	m_CenterPointInteractor = albaInteractor2DMeasure_CenterPoint::New();
+	albaNEW(m_DistanceInteractor);
+	albaNEW(m_CenterPointInteractor);
 
 	m_DistanceInteractor->SetMaxMeasures(1);
 	m_CenterPointInteractor->SetMaxMeasures(1);
 
 
 	m_ActiveInteractor = m_DistanceInteractor;
-	albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_ActiveInteractor));
+	GetLogicManager()->PushTool(m_ActiveInteractor);
 	m_ActiveInteractor->SetListener(this);
 
 	CreateGui();
@@ -193,9 +193,9 @@ void albaOpImageCalibration::SetActiveInteractor()
 
 	m_ActiveInteractor->Show(false);
 
-	albaEventMacro(albaEvent(this, PER_POP));
+	GetLogicManager()->PopTool(m_ActiveInteractor);
 	m_ActiveInteractor = nextInteractor;
-	albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_ActiveInteractor));
+	GetLogicManager()->PushTool(m_ActiveInteractor);
 	m_ActiveInteractor->SetListener(this);
 	m_ActiveInteractor->Show(true);
 
@@ -277,7 +277,7 @@ void albaOpImageCalibration::OpStop(int result)
 		HideGui();
 
 	if (m_ActiveInteractor != NULL)
-		albaEventMacro(albaEvent(this, PER_POP));
+		GetLogicManager()->PopTool(m_ActiveInteractor);
 
 	albaDEL(m_DistanceInteractor);
 	albaDEL(m_CenterPointInteractor);

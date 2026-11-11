@@ -140,11 +140,6 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 	// Circle
 	UpdateCircleActor(tmp_posA, tmp_posB, tmp_posO);
 
-	//called on mouse up  
-	if (!m_DraggingLeft)
-	{
-		m_ActorAdded = false;
-	}
 
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 	Render();

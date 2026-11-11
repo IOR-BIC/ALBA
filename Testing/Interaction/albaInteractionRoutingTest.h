@@ -25,6 +25,8 @@ class wxFrame;
 class albaRWIBase;
 class albaDeviceButtonsPadMouse;
 class albaRoutingTestView;
+class albaInteractorPER;
+class albaInteractionTool;
 
 /** Records the ids of the events received */
 class albaRoutingTestListener : public albaObserver
@@ -51,8 +53,9 @@ public:
   CPPUNIT_TEST( TestPERPickerClick );
   CPPUNIT_TEST( Test2DMeasureAddWithoutModifiers );
   CPPUNIT_TEST( Test2DMeasureModifiersMoveCamera );
-  CPPUNIT_TEST( Test2DMeasureRightClick );
+  CPPUNIT_TEST( Test2DMeasureRightButton );
   CPPUNIT_TEST( Test2DMeasureMoveHighlights );
+  CPPUNIT_TEST( Test2DMeasurePerspectiveView );
   CPPUNIT_TEST( TestEllipseCtrlRotates );
   CPPUNIT_TEST_SUITE_END();
 
@@ -67,8 +70,9 @@ protected:
   void TestPERPickerClick();
   void Test2DMeasureAddWithoutModifiers();
   void Test2DMeasureModifiersMoveCamera();
-  void Test2DMeasureRightClick();
+  void Test2DMeasureRightButton();
   void Test2DMeasureMoveHighlights();
+  void Test2DMeasurePerspectiveView();
   void TestEllipseCtrlRotates();
 
   /** Send a mouse event to the mouse device as the render window interactor does */
@@ -79,6 +83,12 @@ protected:
 
   /** Send a wheel rotation to the mouse device */
   void SendWheel(double x, double y, double rotation);
+
+  /** Return a PER observing the mouse, with the tool pushed and m_Listener as listener */
+  albaInteractorPER *NewPERWithTool(albaInteractionTool *tool);
+
+  /** Detach the PER from the mouse and delete it */
+  void DeletePER(albaInteractorPER *per);
 
   /** Use a parallel camera and disable the spin, as the 2D views do */
   void Set2DCamera();

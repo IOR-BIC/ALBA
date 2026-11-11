@@ -114,6 +114,17 @@ void albaInteractorPER::PopTool(albaInteractionTool *tool)
 }
 
 //------------------------------------------------------------------------------
+bool albaInteractorPER::DispatchKey(int keyCode, bool pressed)
+{
+  // a tool can push or pop tools while handling an event: iterate on a copy
+  std::vector<albaInteractionTool *> tools = m_Tools;
+  for (int i = tools.size() - 1; i >= 0; i--)
+    if (tools[i]->OnKey(keyCode, pressed))
+      return true;
+  return false;
+}
+
+//------------------------------------------------------------------------------
 bool albaInteractorPER::ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e)
 {
   switch (e->GetButton())

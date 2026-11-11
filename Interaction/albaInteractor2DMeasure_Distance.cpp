@@ -121,11 +121,6 @@ void albaInteractor2DMeasure_Distance::MoveMeasure(int index, double * point)
 	// Points
 	UpdateLineTickActor(tmp_pos1, tmp_pos2);
 
-	//called on mouse up  
-	if (!m_DraggingLeft)
-	{
-		m_ActorAdded = false;
-	}
 
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 	Render();

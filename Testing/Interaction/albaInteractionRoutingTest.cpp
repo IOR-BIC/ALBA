@@ -79,8 +79,6 @@ public:
 
   albaRecording2DMeasure() {m_DrawCount = m_HighlightCount = 0;};
 
-  void SetCurrentMeasure(int index) {m_CurrMeasure = index;};
-
   int m_DrawCount;
   int m_HighlightCount;
 
@@ -379,12 +377,30 @@ void albaInteractionRoutingTest::TestPERPickerClick()
 }
 
 //----------------------------------------------------------------------------
+albaInteractorPER *albaInteractionRoutingTest::NewPERWithTool(albaInteractionTool *tool)
+{
+  albaInteractorPER *per = albaInteractorPER::New();
+  per->SetListener(&m_Listener);
+  m_Mouse->AddObserver(per, MCH_INPUT);
+  per->PushTool(tool);
+  return per;
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::DeletePER(albaInteractorPER *per)
+{
+  m_Mouse->RemoveObserver(per);
+  per->Delete();
+}
+
+//----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Test2DMeasureAddWithoutModifiers()
 {
   Set2DCamera();
-  albaRecording2DMeasure *measure = albaRecording2DMeasure::New();
+  albaRecording2DMeasure *measure;
+  albaNEW(measure);
   measure->SetListener(&m_Listener);
-  m_Mouse->AddObserver(measure, MCH_INPUT);
+  albaInteractorPER *per = NewPERWithTool(measure);
   measure->SetAction(albaInteractor2DMeasure::ACTION_ADD_MEASURE);
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
@@ -392,13 +408,12 @@ void albaInteractionRoutingTest::Test2DMeasureAddWithoutModifiers()
   camera->GetPosition(startPosition);
   double startScale = camera->GetParallelScale();
 
-  // press, drag and release draw the new measure and do not move the camera
+  // button down, drag and button up draw the new measure once each and do not move the camera
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON);
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 420, 310);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 420, 310, ALBA_LEFT_BUTTON);
 
-  // the move is drawn twice: OnEvent calls OnMove and then the PER, which is interacting, calls it again
-  CPPUNIT_ASSERT(measure->m_DrawCount == 4);
+  CPPUNIT_ASSERT(measure->m_DrawCount == 3);
   CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_STARTED) == 1);
   CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_FINISHED) == 1);
 
@@ -406,23 +421,24 @@ void albaInteractionRoutingTest::Test2DMeasureAddWithoutModifiers()
   CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) < 1e-6);
   CPPUNIT_ASSERT(camera->GetParallelScale() == startScale);
 
-  m_Mouse->RemoveObserver(measure);
-  measure->Delete();
+  DeletePER(per);
+  albaDEL(measure);
 }
 
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
 {
   Set2DCamera();
-  albaRecording2DMeasure *measure = albaRecording2DMeasure::New();
+  albaRecording2DMeasure *measure;
+  albaNEW(measure);
   measure->SetListener(&m_Listener);
-  m_Mouse->AddObserver(measure, MCH_INPUT);
+  albaInteractorPER *per = NewPERWithTool(measure);
   albaInteractorPER::SetEventTracing(true);
 
-  // SHIFT leaves press, drag and release to the camera
+  // SHIFT leaves button down, drag and button up to the camera
   measure->SetAction(albaInteractor2DMeasure::ACTION_ADD_MEASURE);
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
-  CPPUNIT_ASSERT(Contains(measure->GetLastEventTrace(), "-> Camera albaCameraMouseTool"));
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaCameraMouseTool"));
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 420, 310, 0, ALBA_SHIFT_KEY);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
@@ -431,66 +447,72 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
 
   // CTRL does the same while adding a measure
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
-  CPPUNIT_ASSERT(Contains(measure->GetLastEventTrace(), "-> Camera albaCameraMouseTool"));
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaCameraMouseTool"));
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 420, 310, 0, ALBA_CTRL_KEY);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 420, 310, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
   CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_STARTED) == 0);
 
-  // with no action CTRL is ignored: the measure handles the press
+  // with no action CTRL is ignored: the measure handles the button down
   measure->SetAction(albaInteractor2DMeasure::ACTION_NONE);
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Tool albaRecording2DMeasure"));
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_STARTED) == 1);
   CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_FINISHED) == 1);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
 
-  m_Mouse->RemoveObserver(measure);
-  measure->Delete();
+  // the choice is made at the button down: SHIFT pressed during the drag does not move the camera
+  measure->SetAction(albaInteractor2DMeasure::ACTION_ADD_MEASURE);
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startScale = camera->GetParallelScale();
+  SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 420, 310, 0, ALBA_SHIFT_KEY);
+  SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  CPPUNIT_ASSERT(measure->m_DrawCount == 3);
+  CPPUNIT_ASSERT(camera->GetParallelScale() == startScale);
+
+  DeletePER(per);
+  albaDEL(measure);
 }
 
 //----------------------------------------------------------------------------
-void albaInteractionRoutingTest::Test2DMeasureRightClick()
+void albaInteractionRoutingTest::Test2DMeasureRightButton()
 {
   Set2DCamera();
-  albaRecording2DMeasure *measure = albaRecording2DMeasure::New();
+  albaRecording2DMeasure *measure;
+  albaNEW(measure);
   measure->SetListener(&m_Listener);
-  m_Mouse->AddObserver(measure, MCH_INPUT);
+  albaInteractorPER *per = NewPERWithTool(measure);
 
-  // no current measure: the right click does nothing, not even the context menu
-  measure->SetCurrentMeasure(-1);
+  // the measures do not use the right button: the right click shows the context menu of the view
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_RIGHT_BUTTON);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 300, ALBA_RIGHT_BUTTON);
-  CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_RCLICK) == 0);
-  CPPUNIT_ASSERT(m_Listener.Count(SHOW_VIEW_CONTEXTUAL_MENU) == 0);
-
-  // with a current measure the right click is sent to the operation
-  measure->SetCurrentMeasure(0);
-  SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_RIGHT_BUTTON);
-  SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 300, ALBA_RIGHT_BUTTON);
-  CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_RCLICK) == 1);
-  CPPUNIT_ASSERT(m_Listener.Count(SHOW_VIEW_CONTEXTUAL_MENU) == 0);
-
-  // after a move with SHIFT the right click shows the context menu of the view
-  m_Listener.Clear();
-  measure->SetCurrentMeasure(-1);
-  SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 400, 300, 0, ALBA_SHIFT_KEY);
-  SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_RIGHT_BUTTON, ALBA_SHIFT_KEY);
-  SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 300, ALBA_RIGHT_BUTTON, ALBA_SHIFT_KEY);
   CPPUNIT_ASSERT(m_Listener.Count(SHOW_VIEW_CONTEXTUAL_MENU) == 1);
-  CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_RCLICK) == 0);
 
-  m_Mouse->RemoveObserver(measure);
-  measure->Delete();
+  // and the drags of the right button zoom the camera, without the context menu
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startScale = camera->GetParallelScale();
+  m_Listener.Clear();
+  SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_RIGHT_BUTTON);
+  SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 400, 340, ALBA_RIGHT_BUTTON);
+  SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 340, ALBA_RIGHT_BUTTON);
+  CPPUNIT_ASSERT(camera->GetParallelScale() != startScale);
+  CPPUNIT_ASSERT(m_Listener.Count(SHOW_VIEW_CONTEXTUAL_MENU) == 0);
+  CPPUNIT_ASSERT(measure->m_DrawCount == 0);
+
+  DeletePER(per);
+  albaDEL(measure);
 }
 
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Test2DMeasureMoveHighlights()
 {
   Set2DCamera();
-  albaRecording2DMeasure *measure = albaRecording2DMeasure::New();
+  albaRecording2DMeasure *measure;
+  albaNEW(measure);
   measure->SetListener(&m_Listener);
-  m_Mouse->AddObserver(measure, MCH_INPUT);
+  albaInteractorPER *per = NewPERWithTool(measure);
 
   // a move without buttons highlights the measure under the cursor
   measure->SetAction(albaInteractor2DMeasure::ACTION_NONE);
@@ -504,17 +526,45 @@ void albaInteractionRoutingTest::Test2DMeasureMoveHighlights()
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 430, 300);
   CPPUNIT_ASSERT(measure->m_HighlightCount == 2);
 
-  m_Mouse->RemoveObserver(measure);
-  measure->Delete();
+  DeletePER(per);
+  albaDEL(measure);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::Test2DMeasurePerspectiveView()
+{
+  // in a perspective view the measure does not work: the left button rotates the camera
+  albaRecording2DMeasure *measure;
+  albaNEW(measure);
+  measure->SetListener(&m_Listener);
+  albaInteractorPER *per = NewPERWithTool(measure);
+  measure->SetAction(albaInteractor2DMeasure::ACTION_ADD_MEASURE);
+
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startPosition[3], position[3];
+  camera->GetPosition(startPosition);
+
+  SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 450, 320);
+  SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 450, 320, ALBA_LEFT_BUTTON);
+
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
+  CPPUNIT_ASSERT(measure->m_DrawCount == 0);
+  CPPUNIT_ASSERT(m_Listener.Count(albaInteractor2DMeasure::ID_MEASURE_STARTED) == 0);
+
+  DeletePER(per);
+  albaDEL(measure);
 }
 
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::TestEllipseCtrlRotates()
 {
   Set2DCamera();
-  albaRoutingTestEllipse *ellipse = albaRoutingTestEllipse::New();
+  albaRoutingTestEllipse *ellipse;
+  albaNEW(ellipse);
   ellipse->SetListener(&m_Listener);
-  m_Mouse->AddObserver(ellipse, MCH_INPUT);
+  albaInteractorPER *per = NewPERWithTool(ellipse);
 
   // draw an ellipse
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 300, 300);
@@ -529,20 +579,17 @@ void albaInteractionRoutingTest::TestEllipseCtrlRotates()
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == albaInteractor2DMeasure::ACTION_EDIT_MEASURE);
 
   // pressing CTRL, without moving the mouse, switches to rotation
-  albaEvent ctrlDown(this, KEY_PRESSED, (long)WXK_CONTROL);
-  ellipse->OnEvent(&ctrlDown);
+  CPPUNIT_ASSERT(per->DispatchKey(WXK_CONTROL, true));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == albaInteractor2DMeasure::ACTION_ROTATE_MEASURE);
 
-  // other keys are ignored
-  albaEvent otherKey(this, KEY_PRESSED, (long)'A');
-  ellipse->OnEvent(&otherKey);
+  // other keys are not used
+  CPPUNIT_ASSERT(!per->DispatchKey('A', true));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == albaInteractor2DMeasure::ACTION_ROTATE_MEASURE);
 
   // releasing CTRL goes back to editing
-  albaEvent ctrlUp(this, KEY_RELEASED, (long)WXK_CONTROL);
-  ellipse->OnEvent(&ctrlUp);
+  CPPUNIT_ASSERT(per->DispatchKey(WXK_CONTROL, false));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == albaInteractor2DMeasure::ACTION_EDIT_MEASURE);
 
-  m_Mouse->RemoveObserver(ellipse);
-  ellipse->Delete();
+  DeletePER(per);
+  albaDEL(ellipse);
 }
