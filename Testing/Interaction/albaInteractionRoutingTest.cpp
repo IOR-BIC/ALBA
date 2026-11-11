@@ -332,29 +332,48 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   m_Renderer->ResetCamera();
   m_RenderWindow->Render();
 
-  albaInteractorPERPicker *picker = albaInteractorPERPicker::New();
+  albaInteractorPER *per = albaInteractorPER::New();
+  m_Mouse->AddObserver(per, MCH_INPUT);
+  albaInteractorPERPicker *picker;
+  albaNEW(picker);
   picker->SetListener(&m_Listener);
-  m_Mouse->AddObserver(picker, MCH_INPUT);
+  per->PushTool(picker);
 
-  // a click without dragging picks the VME
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startPosition[3], position[3];
+  camera->GetPosition(startPosition);
+
+  // a click without dragging picks the VME and does not move the camera
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 300, ALBA_LEFT_BUTTON);
   CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) < 1e-6);
 
-  // a drag does not pick
+  // a drag does not pick: the picker does not use it, so it rotates the camera
   m_Listener.Clear();
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON);
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 420, 300);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 420, 300, ALBA_LEFT_BUTTON);
   CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
+  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse));
 
   // a click on the background does not pick
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 5, 5, ALBA_LEFT_BUTTON);
   SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 5, 5, ALBA_LEFT_BUTTON);
   CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
 
-  m_Mouse->RemoveObserver(picker);
-  picker->Delete();
+  // with SHIFT the click is left to the PER
+  SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  SendMouse(albaDeviceButtonsPad::GetButtonUpId(), 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+
+  per->PopTool(picker);
+  m_Mouse->RemoveObserver(per);
+  per->Delete();
+  albaDEL(picker);
   m_Renderer->RemoveAllViewProps();
   albaDEL(vme);
 }

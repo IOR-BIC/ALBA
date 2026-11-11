@@ -165,6 +165,9 @@ protected:
   /** Call the button up method of the tool for the button of the event */
   static bool ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e);
 
+  /** Return true if the button down picks a VME with a behavior: the behavior comes before the tools */
+  bool PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device);
+
   /** The tool interacting with a device and the button that started the interaction */
   struct ToolInteraction
   {

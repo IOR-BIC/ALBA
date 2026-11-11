@@ -138,6 +138,18 @@ bool albaInteractorPER::ToolButtonUp(albaInteractionTool *tool, albaEventInterac
 }
 
 //------------------------------------------------------------------------------
+bool albaInteractorPER::PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device)
+{
+  albaView *view = device->GetView();
+  vtkProp3D *pickedProp = NULL;
+  albaVME *pickedVme = NULL;
+  albaInteractor *pickedBehavior = NULL;
+
+  // the picking is cached into the event: the default behavior reuses it
+  return view && e->FindPokedVme(view, device, pickedProp, pickedVme, pickedBehavior) && pickedBehavior != NULL;
+}
+
+//------------------------------------------------------------------------------
 bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *device)
 {
   albaID id = e->GetId();
@@ -149,16 +161,18 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
 
   if (id == m_StartInteractionEvent)
   {
-    // the other buttons of a device interacting with a tool go to the same tool
+    // the other buttons of a device interacting with a tool go to the same tool, and to the camera
     if (interactingTool)
     {
       TraceHandler("Tool", interactingTool);
       ToolButtonDown(interactingTool, e);
+      ToolButtonDown(m_CameraTool, e);
       return true;
     }
 
-    // a device already interacting with the default behavior stays there
-    if (IsInteracting(device))
+    // a device already interacting with the default behavior stays there,
+    // and a VME with a behavior, e.g. a gizmo, comes before the tools
+    if (IsInteracting(device) || tools.empty() || PickedVmeHasBehavior(e, device))
       return false;
 
     for (int i = tools.size() - 1; i >= 0; i--)
@@ -170,6 +184,9 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
           ToolInteraction newInteraction = {tools[i], e->GetButton()};
           m_ToolInteractions[device->GetID()] = newInteraction;
         }
+
+        // the camera gets the button down too: it moves only with the drags the tool does not use
+        ToolButtonDown(m_CameraTool, e);
         return true;
       }
     return false;
@@ -178,7 +195,15 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
   if (id == m_StopInteractionEvent)
   {
     if (interactingTool == NULL)
+    {
+      // a camera started with a tool that has been popped meanwhile
+      if (!IsInteracting(device) && m_CameraTool->GetInteractingTool(device))
+      {
+        ToolButtonUp(m_CameraTool, e);
+        return true;
+      }
       return false;
+    }
 
     // the interaction ends when the button that started it is released
     if (e->GetButton() == interaction->second.Button)
@@ -186,6 +211,7 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
 
     TraceHandler("Tool", interactingTool);
     ToolButtonUp(interactingTool, e);
+    ToolButtonUp(m_CameraTool, e);
     return true;
   }
 
@@ -194,7 +220,12 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
     if (interactingTool)
     {
       TraceHandler("Tool", interactingTool);
-      interactingTool->OnDrag(e);
+      if (!interactingTool->OnDrag(e))
+      {
+        // the drags the tool does not use move the camera
+        TraceHandler("Camera", m_CameraTool->GetInteractingTool(device));
+        m_CameraTool->OnDrag(e);
+      }
       return true;
     }
 

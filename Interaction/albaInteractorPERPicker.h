@@ -13,44 +13,39 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #ifndef __albaInteractorPERPicker_h
 #define __albaInteractorPERPicker_h
 
-#include "albaInteractorPER.h"
+#include "albaInteractionTool.h"
 
-//----------------------------------------------------------------------------
-// forward declarations
-//----------------------------------------------------------------------------
-class albaVME;
-class vtkCamera;
-
-class ALBA_EXPORT albaInteractorPERPicker : public albaInteractorPER
+/** Tool picking a point with a click of the left button.
+  A click without dragging sends VME_PICKED to the listener with the picked point
+  (gizmos are not picked); the drags are not used, so they move the camera.
+  The button down with SHIFT is not used. A VME with a behavior, e.g. a gizmo,
+  comes before the tools, so it keeps working while the picker is active. */
+class ALBA_EXPORT albaInteractorPERPicker : public albaInteractionTool
 {
 public: 
-  albaTypeMacro(albaInteractorPERPicker,albaInteractorPER);
-	
-protected:
-  albaInteractorPERPicker();
-  virtual ~albaInteractorPERPicker();
-  
-  /** 
-    Perform a pick on start of interaction to find if the user pointed
-    an object in the scene, and in case forward all the following 
-    events to its behavior. if the user pointed to the background
-    forward events to the camera interactor.*/
-  virtual void OnLeftButtonUp(albaEventInteraction *e);
+  albaTypeMacro(albaInteractorPERPicker, albaInteractionTool);
 
-	virtual void OnMove(albaEventInteraction *e);
-    
-	void SendPickingInformation(albaView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, albaMatrix *tracker_pos = NULL, bool mouse_flag = true);
+  virtual bool OnLeftButtonDown(albaEventInteraction *e);
+
+  /** The drags move the camera, and the button up after a drag does not pick */
+  virtual bool OnDrag(albaEventInteraction *e) {m_Dragged = true; return false;}
+
+  /** A click without dragging picks the point */
+  virtual bool OnLeftButtonUp(albaEventInteraction *e);
+
+protected:
+  albaInteractorPERPicker() {m_Dragged = false;}
+  virtual ~albaInteractorPERPicker() {}
+
+  bool m_Dragged; ///< true if the mouse moved after the button down
 
 private:
   albaInteractorPERPicker(const albaInteractorPERPicker&);  // Not implemented.
   void operator=(const albaInteractorPERPicker&);  // Not implemented.
-
-	bool m_MovedAfterMouseDown;
-  /** test friend */
-  friend class albaInteractorPERPickerTest;
 };
 
 #endif 

@@ -75,6 +75,8 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 	m_CurrMeasure = -1;
 
 	m_DraggingLeft = false;
+	m_ShiftPressed = false;
+	m_AltPressed = false;
 	m_EndMeasure = false;
 
 	m_AddMeasureEnable = true;

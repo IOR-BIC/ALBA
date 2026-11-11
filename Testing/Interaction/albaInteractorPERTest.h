@@ -44,6 +44,8 @@ class albaInteractorPERTest : public albaTest
   CPPUNIT_TEST(TestPushPopTool);
   CPPUNIT_TEST(TestToolInteraction);
   CPPUNIT_TEST(TestToolOrder);
+  CPPUNIT_TEST(TestBehaviorBeforeTools);
+  CPPUNIT_TEST(TestToolGivesDragToCamera);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -69,6 +71,8 @@ class albaInteractorPERTest : public albaTest
   void TestPushPopTool();
   void TestToolInteraction();
   void TestToolOrder();
+  void TestBehaviorBeforeTools();
+  void TestToolGivesDragToCamera();
 
 };
 

@@ -25,79 +25,36 @@
 
 #include "albaInteractorPERPicker.h"
 #include "albaPickHelper.h"
-#include "vtkALBASmartPointer.h"
-
-#include "albaView.h"
-#include "albaVME.h"
-#include "albaObject.h"
-#include "albaMatrix.h"
 #include "albaDeviceButtonsPadMouse.h"
-#include "albaDeviceButtonsPadTracker.h"
-#include "albaAvatar.h"
 #include "albaEventInteraction.h"
-#include "albaRWIBase.h"
-
-#include "vtkPoints.h"
-#include "vtkPointData.h"
-#include "vtkDataSet.h"
-#include "vtkIntArray.h"
-#include "vtkDataSetAttributes.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderWindow.h"
-#include "vtkRendererCollection.h"
-#include "vtkCellPicker.h"
+#include "albaVME.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractorPERPicker)
-//------------------------------------------------------------------------------
-albaInteractorPERPicker::albaInteractorPERPicker() :
-	albaInteractorPER()
-//------------------------------------------------------------------------------
-{
-	m_MovedAfterMouseDown = false;
-}
-
-//------------------------------------------------------------------------------
-albaInteractorPERPicker::~albaInteractorPERPicker()
-//------------------------------------------------------------------------------
-{}
 
 //----------------------------------------------------------------------------
-void albaInteractorPERPicker::OnLeftButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
+bool albaInteractorPERPicker::OnLeftButtonDown(albaEventInteraction *e)
 {
-	// a click without dragging picks a VME (mouse only)
-	albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice*)e->GetSender());
-	if (m_DraggingLeft && !m_MovedAfterMouseDown && mouse)
-	{
-		double mouse_pos[2];
-		e->Get2DPosition(mouse_pos);
-		SendPickingInformation(mouse->GetView(), mouse_pos);
-	}
-
-	m_MovedAfterMouseDown = false;
-
-	Superclass::OnButtonUp(e);
-
+  // only the mouse picks, and SHIFT leaves the button to the PER
+  m_Dragged = false;
+  return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) && !e->GetModifier(ALBA_SHIFT_KEY);
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPERPicker::OnMove(albaEventInteraction *e)
+bool albaInteractorPERPicker::OnLeftButtonUp(albaEventInteraction *e)
 {
-	if (m_DraggingLeft)
-		m_MovedAfterMouseDown = true;
-	Superclass::OnMove(e);
-}
+  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
+  if (mouse == NULL)
+    return false;
+  if (m_Dragged)
+    return true;
 
-//----------------------------------------------------------------------------
-void albaInteractorPERPicker::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
-//----------------------------------------------------------------------------
-{
-	// gizmos are not picked
-	double pos_picked[3], scalar_value;
-	albaVME *pickedVME;
-	vtkIdType pid;
-	if (albaPickHelper::PickPoint(v, mouse_flag ? mouse_pos : NULL, mouse_flag ? NULL : tracker_pos, pos_picked, pickedVME, pid, scalar_value) && !pickedVME->IsA("albaVMEGizmo"))
-		SendPickedPointEvent(msg_id, pos_picked, pid, scalar_value, pickedVME);
+  // gizmos are not picked
+  double mousePos[2], pickedPos[3], scalar;
+  albaVME *pickedVme;
+  vtkIdType pointId;
+  e->Get2DPosition(mousePos);
+  if (albaPickHelper::PickPoint(mouse->GetView(), mousePos, NULL, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
+    SendPickedPointEvent(VME_PICKED, pickedPos, pointId, scalar, pickedVme);
+  return true;
 }
-

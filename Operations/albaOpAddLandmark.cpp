@@ -196,10 +196,9 @@ void albaOpAddLandmark::OpRun()
 		GetLogicManager()->VmeShow(m_PickedVme, true);
 
 		// Customize m_PickedVme behavior
-		m_LandmarkPicker = albaInteractorPERPicker::New();
-
-		albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)(m_LandmarkPicker)));
+		albaNEW(m_LandmarkPicker);
 		m_LandmarkPicker->SetListener(this);
+		GetLogicManager()->PushTool(m_LandmarkPicker);
 	}
 
 	// Save old color
@@ -273,7 +272,7 @@ void albaOpAddLandmark::OpStop(int result)
 		OpUndo();
 	}
 
-	albaEventMacro(albaEvent(this, PER_POP));
+	GetLogicManager()->PopTool(m_LandmarkPicker);
 	albaDEL(m_LandmarkPicker);
 
 	cppDEL(m_LandmarkGuiDict);
