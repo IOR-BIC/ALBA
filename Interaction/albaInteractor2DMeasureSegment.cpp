@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_Segment.cpp
+Module:    albaInteractor2DMeasureSegment.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure_Segment.h"
+#include "albaInteractor2DMeasureSegment.h"
 #include "albaInteractor2DMeasure.h"
 
 #include "albaTagArray.h"
@@ -30,10 +30,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkViewport.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure_Segment)
+albaCxxTypeMacro(albaInteractor2DMeasureSegment)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Segment::albaInteractor2DMeasure_Segment() : albaInteractor2DMeasure_Distance()
+albaInteractor2DMeasureSegment::albaInteractor2DMeasureSegment() : albaInteractor2DMeasureDistance()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -50,12 +50,12 @@ albaInteractor2DMeasure_Segment::albaInteractor2DMeasure_Segment() : albaInterac
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Segment::~albaInteractor2DMeasure_Segment(){}
+albaInteractor2DMeasureSegment::~albaInteractor2DMeasureSegment(){}
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
+void albaInteractor2DMeasureSegment::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -145,7 +145,7 @@ void albaInteractor2DMeasure_Segment::EditMeasure(int index, double *point)
 
 /// LOAD/SAVE ////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureSegment::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureSegmentPoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureSegmentPoint2"))
 	{
@@ -183,7 +183,7 @@ bool albaInteractor2DMeasure_Segment::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Segment::Save(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureSegment::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nLines = GetMeasureCount();

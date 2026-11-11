@@ -31,8 +31,8 @@ PURPOSE. See the above copyright notice for more information.
 class albaEvent;
 class albaVMEImage;
 class albaVMEVolumeRGB;
-class albaInteractor2DMeasure_Point;
-class albaInteractor2DMeasure_Distance;
+class albaInteractor2DMeasurePoint;
+class albaInteractor2DMeasureDistance;
 
 // Class Name: albaOpMeasure2D
 class ALBA_EXPORT albaOpMeasure2D: public albaOp

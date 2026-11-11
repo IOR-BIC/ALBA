@@ -96,20 +96,20 @@ SET(PROJECT_SRCS
 	albaActor2dStackHelper.cpp							albaActor2dStackHelper.h
 	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h
 	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h
-	albaInteractor2DMeasure_Angle.cpp				albaInteractor2DMeasure_Angle.h
-	albaInteractor2DMeasure_AngleLine.cpp		albaInteractor2DMeasure_AngleLine.h
-	albaInteractor2DMeasure_CenterPoint.cpp	albaInteractor2DMeasure_CenterPoint.h
-	albaInteractor2DMeasure_Distance.cpp 		albaInteractor2DMeasure_Distance.h
-	albaInteractor2DMeasure_Line.cpp				albaInteractor2DMeasure_Line.h
-	albaInteractor2DMeasure_LineDistance.cpp	albaInteractor2DMeasure_LineDistance.h
-	albaInteractor2DMeasure_MidPoint.cpp		albaInteractor2DMeasure_MidPoint.h
-	albaInteractor2DMeasure_Point.cpp 			albaInteractor2DMeasure_Point.h
-	albaInteractor2DMeasure_Segment.cpp			albaInteractor2DMeasure_Segment.h
-	albaInteractor2DMeasure_Template.cpp		albaInteractor2DMeasure_Template.h
+	albaInteractor2DMeasureAngle.cpp				albaInteractor2DMeasureAngle.h
+	albaInteractor2DMeasureAngleLine.cpp		albaInteractor2DMeasureAngleLine.h
+	albaInteractor2DMeasureCenterPoint.cpp	albaInteractor2DMeasureCenterPoint.h
+	albaInteractor2DMeasureDistance.cpp 		albaInteractor2DMeasureDistance.h
+	albaInteractor2DMeasureLine.cpp				albaInteractor2DMeasureLine.h
+	albaInteractor2DMeasureLineDistance.cpp	albaInteractor2DMeasureLineDistance.h
+	albaInteractor2DMeasureMidPoint.cpp		albaInteractor2DMeasureMidPoint.h
+	albaInteractor2DMeasurePoint.cpp 			albaInteractor2DMeasurePoint.h
+	albaInteractor2DMeasureSegment.cpp			albaInteractor2DMeasureSegment.h
+	albaInteractor2DMeasureTemplate.cpp		albaInteractor2DMeasureTemplate.h
 	
 	albaInteractorCompositorMouseFloatVME.cpp albaInteractorCompositorMouseFloatVME.h
 	albaInteractorGenericMouseFloatVME.cpp	albaInteractorGenericMouseFloatVME.h
-	albaInteractor2DMeasure_Ellipse.cpp albaInteractor2DMeasure_Ellipse.h
+	albaInteractor2DMeasureEllipse.cpp albaInteractor2DMeasureEllipse.h
 )
 
 IF (ALBA_USE_P5_GLOVE)

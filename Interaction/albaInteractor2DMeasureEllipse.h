@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_LineDistance.h
+Module:    albaInteractor2DMeasureEllipse.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
-Authors:   Gianluigi Crimi
+Authors:   Gianliugi Crimi
 ==========================================================================
 Copyright (c) BIC-IOR 2021 (https://github.com/IOR-BIC)
 
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasure_LineDistance_h
-#define __albaInteractor2DMeasure_LineDistance_h
+#ifndef __albaInteractor2DMeasureEllipse_h
+#define __albaInteractor2DMeasureEllipse_h
 
 //----------------------------------------------------------------------------
 // Include :
@@ -24,82 +24,95 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
+class vtkActor;
+class vtkActor2D;
+class vtkDataSetMapper;
+class vtkDiskSource;
 class vtkLineSource;
 class vtkPolyDataMapper2D;
-class vtkActor2D;
+class vtkTransform;
+class vtkTransformPolyDataFilter;
 
-// Class Name: albaInteractor2DMeasure_LineDistance
-class ALBA_EXPORT albaInteractor2DMeasure_LineDistance : public albaInteractor2DMeasure
+// Class Name: albaInteractor2DMeasureEllipse
+class ALBA_EXPORT albaInteractor2DMeasureEllipse : public albaInteractor2DMeasure
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasure_LineDistance, albaInteractor2DMeasure);
+	albaTypeMacro(albaInteractor2DMeasureEllipse, albaInteractor2DMeasure);
 
 	// MEASURE
 	/** Add Measure*/
 	virtual void AddMeasure(double *point1, double *point2);
 	/** Edit Measure*/
 	virtual void EditMeasure(int index, double *point);
+	/** Rotate Measure*/
+	virtual void RotateMeasure(int index, double *point);;
+
 	/** Delete the Measure*/
 	virtual void RemoveMeasure(int index);
 	/** Select a Measure*/
 	virtual void SelectMeasure(int index);
 
-	virtual void SetPointSize(double size);
-	virtual void SetLineWidth(double width);
-
 	virtual void Show(bool show);
 
-	void SetLineExtensionLength(double length) { m_LineExtensionLength = length; };
-	void SetLineStipplePattern(int lp) { m_LineStipplePattern = lp; };
+	virtual void SetPointSize(double size);
+	void SetCenterPointSize(double size);
+	virtual void SetLineWidth(double width);
 
-	/** Get measure line extremity points*/
-	void GetMeasureLinePoints(int index, double *point1, double *point2);
+	/** Get measure extremity points*/
+	void GetMeasurePoints(int index, double *point1, double *point2);
 
+	void GetCenter(int index, double *center);
+	
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 
-	double GetDistance(int idx);
+	/** CTRL switches from editing to rotating the ellipse, without moving the mouse */
+	virtual bool OnKey(int keyCode, bool pressed);
+
+	/** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
+	bool IsPointInsideMeasure(double *point, int measureIndex=-1);
+
+	/** Gets mesure bounds*/
+	void GetMeasureBounds(double bounds[6], int measureIndex=-1);
+
+	/** Gets measure perimeter*/
+	double GetMeasurePerimeter(int measureIndex=-1);
+
+
 protected:
 
-	albaInteractor2DMeasure_LineDistance();
-	virtual ~albaInteractor2DMeasure_LineDistance();
+	albaInteractor2DMeasureEllipse();
+	virtual ~albaInteractor2DMeasureEllipse();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
 	void DrawNewMeasure(double * wp);
 
-	void UpdateMeasure(int index, double measure);
-
 	// RENDERING
-	virtual void UpdateLineActors(double * point1, double * point2);
 	virtual void UpdatePointsActor(double * point1, double * point2);
+	void UpdateEllipseActor(double * point1, double * point2);
 	void UpdateTextActor(double * point1, double * point2);
 
 	//UTILS
 	virtual void FindAndHighlight(double * point);
 
-	// Persistent line
-	std::vector<albaActor2dStackHelper *> m_LineStackVector;	// Main Line 
-	std::vector<albaActor2dStackHelper *> m_LineStackVectorB; // Second Line
-	std::vector<albaActor2dStackHelper *> m_LineStackVectorPerp; // Perpendicular Line
 	
 	// Persistent Points
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorL;
 	std::vector<albaActor2dStackHelper *> m_PointsStackVectorR;
+	std::vector<albaActor2dStackHelper *> m_PointsStackVectorC;
 
-	std::vector<bool> m_SecondLineAdded;
-	std::vector<double> m_Distances;
+	// Persistent Circle
+	std::vector<albaActor2dStackHelper *> m_EllipseStackVector;
 
-	double m_LineExtensionLength;
-	int m_LineStipplePattern;
-
-	bool m_MoveLineB;
-	bool m_AddModeCompleted;
+	double m_CenterPointSize;
+	double m_LastPoint[3];
+	bool m_CTRLPressed;
 
 private:
-	albaInteractor2DMeasure_LineDistance(const albaInteractor2DMeasure_LineDistance&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasure_LineDistance&);  // Not implemented.
-	friend class albaInteractor2DMeasure_LineDistanceTest;
+	albaInteractor2DMeasureEllipse(const albaInteractor2DMeasureEllipse&);   // Not implemented.
+	void operator=(const albaInteractor2DMeasureEllipse&);  // Not implemented.
+	friend class albaInteractor2DMeasureEllipseTest;
 };
 #endif

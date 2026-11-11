@@ -24,7 +24,7 @@
 #include "albaEvent.h"
 #include "albaGUI.h"
 #include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasure_Point.h"
+#include "albaInteractor2DMeasurePoint.h"
 #include "albaLogicWithManagers.h"
 #include "albaVMEPolyline.h"
 #include "albaView.h"

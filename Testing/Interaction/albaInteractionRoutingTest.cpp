@@ -30,7 +30,7 @@
 #include "albaEvent.h"
 #include "albaEventInteraction.h"
 #include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasure_Ellipse.h"
+#include "albaInteractor2DMeasureEllipse.h"
 #include "albaInteractorPER.h"
 #include "albaInteractorPERPicker.h"
 #include "albaCameraTool.h"
@@ -90,11 +90,11 @@ protected:
 albaCxxTypeMacro(albaRecording2DMeasure);
 
 //----------------------------------------------------------------------------
-class albaRoutingTestEllipse : public albaInteractor2DMeasure_Ellipse // exposes the current action
+class albaRoutingTestEllipse : public albaInteractor2DMeasureEllipse // exposes the current action
 //----------------------------------------------------------------------------
 {
 public:
-  albaTypeMacro(albaRoutingTestEllipse, albaInteractor2DMeasure_Ellipse);
+  albaTypeMacro(albaRoutingTestEllipse, albaInteractor2DMeasureEllipse);
 
   int GetCurrentAction() {return GetAction();};
 };

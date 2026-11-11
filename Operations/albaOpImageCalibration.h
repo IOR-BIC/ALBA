@@ -23,8 +23,8 @@
 //----------------------------------------------------------------------------
 // forward reference
 class albaInteractor2DMeasure;
-class albaInteractor2DMeasure_Distance;
-class albaInteractor2DMeasure_CenterPoint;
+class albaInteractor2DMeasureDistance;
+class albaInteractor2DMeasureCenterPoint;
 
 class ALBA_EXPORT albaOpImageCalibration : public albaOp
 {
@@ -76,8 +76,8 @@ protected:
 	double m_InputSpacing[3];
 	double m_NewSpacing[3];
 
-	albaInteractor2DMeasure_Distance *m_DistanceInteractor;
-	albaInteractor2DMeasure_CenterPoint *m_CenterPointInteractor;
+	albaInteractor2DMeasureDistance *m_DistanceInteractor;
+	albaInteractor2DMeasureCenterPoint *m_CenterPointInteractor;
 	albaInteractor2DMeasure *m_ActiveInteractor;
 };
 

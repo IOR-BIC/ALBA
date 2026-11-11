@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_Angle.cpp
+Module:    albaInteractor2DMeasureAngle.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure_Angle.h"
+#include "albaInteractor2DMeasureAngle.h"
 #include "albaInteractor2DMeasure.h"
 
 #include "albaTagArray.h"
@@ -32,10 +32,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointSource.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure_Angle)
+albaCxxTypeMacro(albaInteractor2DMeasureAngle)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Angle::albaInteractor2DMeasure_Angle() : albaInteractor2DMeasure()
+albaInteractor2DMeasureAngle::albaInteractor2DMeasureAngle() : albaInteractor2DMeasure()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -62,7 +62,7 @@ albaInteractor2DMeasure_Angle::albaInteractor2DMeasure_Angle() : albaInteractor2
 	m_ColorAux = { 0.0, 1.0, 0.0, 0.5 };
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Angle::~albaInteractor2DMeasure_Angle()
+albaInteractor2DMeasureAngle::~albaInteractor2DMeasureAngle()
 {
 	// Lines
 	for (int i = 0; i < m_PointsStackVectorOri.size(); i++)
@@ -80,7 +80,7 @@ albaInteractor2DMeasure_Angle::~albaInteractor2DMeasure_Angle()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::DrawNewMeasure(double * wp)
+void albaInteractor2DMeasureAngle::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp, wp);
 
@@ -89,7 +89,7 @@ void albaInteractor2DMeasure_Angle::DrawNewMeasure(double * wp)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
+void albaInteractor2DMeasureAngle::MoveMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -145,7 +145,7 @@ void albaInteractor2DMeasure_Angle::MoveMeasure(int index, double *point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::EditMeasure(int index, double *point)
+void albaInteractor2DMeasureAngle::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -207,7 +207,7 @@ void albaInteractor2DMeasure_Angle::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
+void albaInteractor2DMeasureAngle::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -314,7 +314,7 @@ void albaInteractor2DMeasure_Angle::FindAndHighlight(double * point)
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::UpdateMeasure(int index, double measure)
+void albaInteractor2DMeasureAngle::UpdateMeasure(int index, double measure)
 {
 	double angleDegree =  vtkMath::DegreesFromRadians(measure);
 	angleDegree = abs((angleDegree <= 180.0) ? angleDegree : 360.0 - angleDegree);
@@ -326,7 +326,7 @@ void albaInteractor2DMeasure_Angle::UpdateMeasure(int index, double measure)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::UpdatePointsActor(double * point1, double * point2, double * point3)
+void albaInteractor2DMeasureAngle::UpdatePointsActor(double * point1, double * point2, double * point3)
 {
 	//Point O (origin)
 	vtkPointSource* pointSourceO = (vtkPointSource*)m_PointsStackVectorOri[m_CurrMeasure]->GetSourceAlgorithm();
@@ -344,7 +344,7 @@ void albaInteractor2DMeasure_Angle::UpdatePointsActor(double * point1, double * 
 	pointSourceB->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::UpdateLineActors(double * point1, double * point2, double * point3)
+void albaInteractor2DMeasureAngle::UpdateLineActors(double * point1, double * point2, double * point3)
 {
 	vtkLineSource* lineSourceOA = (vtkLineSource*)m_LineStackVectorOA[m_CurrMeasure]->GetSourceAlgorithm();
 	vtkLineSource* lineSourceOB = (vtkLineSource*)m_LineStackVectorOB[m_CurrMeasure]->GetSourceAlgorithm();
@@ -358,7 +358,7 @@ void albaInteractor2DMeasure_Angle::UpdateLineActors(double * point1, double * p
 	lineSourceOB->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * point2, double * ori)
+void albaInteractor2DMeasureAngle::UpdateCircleActor(double * point1, double * point2, double * ori)
 {
 	double radius = MIN(DistanceBetweenPoints(point1, ori), DistanceBetweenPoints(point2, ori)) * 0.8;
 
@@ -389,7 +389,7 @@ void albaInteractor2DMeasure_Angle::UpdateCircleActor(double * point1, double * 
 		circleSource->SetAngleRange(angle2, angle1 + vtkMath::Pi() * 2);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::UpdateTextActor(double * point1, double * point2)
+void albaInteractor2DMeasureAngle::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
 	GetMidPoint(text_pos, point1, point2);
@@ -402,7 +402,7 @@ void albaInteractor2DMeasure_Angle::UpdateTextActor(double * point1, double * po
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, double *point3)
+void albaInteractor2DMeasureAngle::AddMeasure(double *point1, double *point2, double *point3)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -525,7 +525,7 @@ void albaInteractor2DMeasure_Angle::AddMeasure(double *point1, double *point2, d
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::RemoveMeasure(int index)
+void albaInteractor2DMeasureAngle::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -562,7 +562,7 @@ void albaInteractor2DMeasure_Angle::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::SelectMeasure(int index)
+void albaInteractor2DMeasureAngle::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -600,7 +600,7 @@ void albaInteractor2DMeasure_Angle::SelectMeasure(int index)
 
 /// SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::SetPointSize(double size)
+void albaInteractor2DMeasureAngle::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -613,7 +613,7 @@ void albaInteractor2DMeasure_Angle::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::SetLineWidth(double width)
+void albaInteractor2DMeasureAngle::SetLineWidth(double width)
 {
 	m_LineWidth = width;
 
@@ -627,7 +627,7 @@ void albaInteractor2DMeasure_Angle::SetLineWidth(double width)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::Show(bool show)
+void albaInteractor2DMeasureAngle::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -645,7 +645,7 @@ void albaInteractor2DMeasure_Angle::Show(bool show)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::GetMeasureLinePoints(int index, double *point1, double *point2, double *point3)
+void albaInteractor2DMeasureAngle::GetMeasureLinePoints(int index, double *point1, double *point2, double *point3)
 {
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -660,7 +660,7 @@ void albaInteractor2DMeasure_Angle::GetMeasureLinePoints(int index, double *poin
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Angle::GetCenter(int index, double *center)
+void albaInteractor2DMeasureAngle::GetCenter(int index, double *center)
 {
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -672,7 +672,7 @@ void albaInteractor2DMeasure_Angle::GetCenter(int index, double *center)
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Angle::Load(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureAngle::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureAnglePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureAnglePoint1"))
 	{
@@ -723,7 +723,7 @@ bool albaInteractor2DMeasure_Angle::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Angle::Save(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureAngle::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nAngles = GetMeasureCount();
@@ -810,7 +810,7 @@ bool albaInteractor2DMeasure_Angle::Save(albaVME *input, wxString tag)
 }
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure_Angle::GetMeasureAngle(int idx)
+double albaInteractor2DMeasureAngle::GetMeasureAngle(int idx)
 {
 	if (idx >= 0 && idx < m_Angles.size())
 		return fabs(m_Angles[idx]);

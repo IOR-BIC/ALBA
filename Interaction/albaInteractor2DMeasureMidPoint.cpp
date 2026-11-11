@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_MidPoint.cpp
+Module:    albaInteractor2DMeasureMidPoint.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure_MidPoint.h"
+#include "albaInteractor2DMeasureMidPoint.h"
 #include "albaInteractor2DMeasure.h"
 
 #include "albaTagArray.h"
@@ -31,10 +31,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkViewport.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure_MidPoint)
+albaCxxTypeMacro(albaInteractor2DMeasureMidPoint)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_MidPoint::albaInteractor2DMeasure_MidPoint() : albaInteractor2DMeasure()
+albaInteractor2DMeasureMidPoint::albaInteractor2DMeasureMidPoint() : albaInteractor2DMeasure()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -53,7 +53,7 @@ albaInteractor2DMeasure_MidPoint::albaInteractor2DMeasure_MidPoint() : albaInter
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_MidPoint::~albaInteractor2DMeasure_MidPoint()
+albaInteractor2DMeasureMidPoint::~albaInteractor2DMeasureMidPoint()
 {
 	// Lines and Points
 	for (int i = 0; i < m_LineStackVector.size(); i++)
@@ -67,14 +67,14 @@ albaInteractor2DMeasure_MidPoint::~albaInteractor2DMeasure_MidPoint()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::DrawNewMeasure(double * wp)
+void albaInteractor2DMeasureMidPoint::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp);
 	//Call FindAndHighLight to start the edit phase
 	FindAndHighlight(wp);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::MoveMeasure(int index, double * point)
+void albaInteractor2DMeasureMidPoint::MoveMeasure(int index, double * point)
 {
 	if (index < 0)
 		return;
@@ -126,7 +126,7 @@ void albaInteractor2DMeasure_MidPoint::MoveMeasure(int index, double * point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::EditMeasure(int index, double *point)
+void albaInteractor2DMeasureMidPoint::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -176,7 +176,7 @@ void albaInteractor2DMeasure_MidPoint::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::FindAndHighlight(double * point)
+void albaInteractor2DMeasureMidPoint::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -242,7 +242,7 @@ void albaInteractor2DMeasure_MidPoint::FindAndHighlight(double * point)
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::UpdatePointsActor(double * point1, double * point2)
+void albaInteractor2DMeasureMidPoint::UpdatePointsActor(double * point1, double * point2)
 {
 	// Left
 	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
@@ -255,7 +255,7 @@ void albaInteractor2DMeasure_MidPoint::UpdatePointsActor(double * point1, double
 	pointSourceR->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::UpdateLineActors(double * point1, double * point2)
+void albaInteractor2DMeasureMidPoint::UpdateLineActors(double * point1, double * point2)
 {
 	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	lineSource->SetPoint1(point1);
@@ -263,7 +263,7 @@ void albaInteractor2DMeasure_MidPoint::UpdateLineActors(double * point1, double 
 	lineSource->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::UpdateMidPointActor(double * point1, double * point2)
+void albaInteractor2DMeasureMidPoint::UpdateMidPointActor(double * point1, double * point2)
 {
 	double midPoint[3];
 	GetMidPoint(midPoint, point1, point2);
@@ -273,7 +273,7 @@ void albaInteractor2DMeasure_MidPoint::UpdateMidPointActor(double * point1, doub
 	pointSource->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::UpdateTextActor(double * point1, double * point2)
+void albaInteractor2DMeasureMidPoint::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
 	GetMidPoint(text_pos, point1, point2);
@@ -286,7 +286,7 @@ void albaInteractor2DMeasure_MidPoint::UpdateTextActor(double * point1, double *
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::AddMeasure(double *point1, double *point2)
+void albaInteractor2DMeasureMidPoint::AddMeasure(double *point1, double *point2)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -361,7 +361,7 @@ void albaInteractor2DMeasure_MidPoint::AddMeasure(double *point1, double *point2
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::RemoveMeasure(int index)
+void albaInteractor2DMeasureMidPoint::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -387,7 +387,7 @@ void albaInteractor2DMeasure_MidPoint::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::SelectMeasure(int index)
+void albaInteractor2DMeasureMidPoint::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -420,7 +420,7 @@ void albaInteractor2DMeasure_MidPoint::SelectMeasure(int index)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::Show(bool show)
+void albaInteractor2DMeasureMidPoint::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -437,7 +437,7 @@ void albaInteractor2DMeasure_MidPoint::Show(bool show)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::SetPointSize(double size)
+void albaInteractor2DMeasureMidPoint::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -450,7 +450,7 @@ void albaInteractor2DMeasure_MidPoint::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::SetMidPointSize(double size)
+void albaInteractor2DMeasureMidPoint::SetMidPointSize(double size)
 {
 	m_MidPointSize = size;
 
@@ -462,7 +462,7 @@ void albaInteractor2DMeasure_MidPoint::SetMidPointSize(double size)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::SetLineWidth(double width)
+void albaInteractor2DMeasureMidPoint::SetLineWidth(double width)
 {
 	m_LineWidth = width;
 
@@ -475,7 +475,7 @@ void albaInteractor2DMeasure_MidPoint::SetLineWidth(double width)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::GetMeasureLinePoints(int index, double *point1, double *point2)
+void albaInteractor2DMeasureMidPoint::GetMeasureLinePoints(int index, double *point1, double *point2)
 {
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -487,7 +487,7 @@ void albaInteractor2DMeasure_MidPoint::GetMeasureLinePoints(int index, double *p
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_MidPoint::GetMeasureMidPoint(int index, double *point)
+void albaInteractor2DMeasureMidPoint::GetMeasureMidPoint(int index, double *point)
 {
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -499,7 +499,7 @@ void albaInteractor2DMeasure_MidPoint::GetMeasureMidPoint(int index, double *poi
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_MidPoint::Load(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureMidPoint::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureMidPoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureMidPoint2"))
 	{
@@ -537,7 +537,7 @@ bool albaInteractor2DMeasure_MidPoint::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_MidPoint::Save(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureMidPoint::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nLines = GetMeasureCount();

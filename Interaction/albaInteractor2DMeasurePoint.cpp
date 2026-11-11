@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_Point.cpp
+Module:    albaInteractor2DMeasurePoint.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure_Point.h"
+#include "albaInteractor2DMeasurePoint.h"
 #include "albaInteractor2DMeasure.h"
 
 #include "albaTagArray.h"
@@ -28,10 +28,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkRenderer.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure_Point)
+albaCxxTypeMacro(albaInteractor2DMeasurePoint)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Point::albaInteractor2DMeasure_Point() : albaInteractor2DMeasure()
+albaInteractor2DMeasurePoint::albaInteractor2DMeasurePoint() : albaInteractor2DMeasure()
 {
 	m_ShowText = false;
 	m_TextSide = -2;
@@ -47,7 +47,7 @@ albaInteractor2DMeasure_Point::albaInteractor2DMeasure_Point() : albaInteractor2
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Point::~albaInteractor2DMeasure_Point()
+albaInteractor2DMeasurePoint::~albaInteractor2DMeasurePoint()
 {
 	// Points
 	for (int i = 0; i < m_PointsStackVector.size(); i++)
@@ -58,19 +58,19 @@ albaInteractor2DMeasure_Point::~albaInteractor2DMeasure_Point()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::DrawNewMeasure(double *wp)
+void albaInteractor2DMeasurePoint::DrawNewMeasure(double *wp)
 {
 	AddMeasure(wp);
 	//Call FindAndHighLight to start the edit phase
 	FindAndHighlight(wp);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::MoveMeasure(int index, double *point)
+void albaInteractor2DMeasurePoint::MoveMeasure(int index, double *point)
 {
 	EditMeasure(index, point);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::EditMeasure(int index, double *point)
+void albaInteractor2DMeasurePoint::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -101,7 +101,7 @@ void albaInteractor2DMeasure_Point::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
+void albaInteractor2DMeasurePoint::FindAndHighlight(double *point)
 {
 	if (m_CurrMeasure < 0 && m_AddMeasureEnable)
 		SetAction(ACTION_ADD_MEASURE);
@@ -147,7 +147,7 @@ void albaInteractor2DMeasure_Point::FindAndHighlight(double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::ReDrawAll()
+void albaInteractor2DMeasurePoint::ReDrawAll()
 {
 	double point[3];
 
@@ -163,14 +163,14 @@ void albaInteractor2DMeasure_Point::ReDrawAll()
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::UpdatePointsActor(double * point, double * point2)
+void albaInteractor2DMeasurePoint::UpdatePointsActor(double * point, double * point2)
 {
 	vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSource->SetCenter(point);
 	pointSource->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::UpdateTextActor(int index, double *point)
+void albaInteractor2DMeasurePoint::UpdateTextActor(int index, double *point)
 {
 	double text_pos[3]{ point[X], point[Y], point[Z] };
 
@@ -181,7 +181,7 @@ void albaInteractor2DMeasure_Point::UpdateTextActor(int index, double *point)
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::AddMeasure(double *point)
+void albaInteractor2DMeasurePoint::AddMeasure(double *point)
 {
 	Superclass::AddMeasure(point);
 
@@ -216,7 +216,7 @@ void albaInteractor2DMeasure_Point::AddMeasure(double *point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::RemoveMeasure(int index)
+void albaInteractor2DMeasurePoint::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -233,7 +233,7 @@ void albaInteractor2DMeasure_Point::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::SelectMeasure(int index)
+void albaInteractor2DMeasurePoint::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -261,7 +261,7 @@ void albaInteractor2DMeasure_Point::SelectMeasure(int index)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::SetPointSize(double size)
+void albaInteractor2DMeasurePoint::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -273,7 +273,7 @@ void albaInteractor2DMeasure_Point::SetPointSize(double size)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::Show(bool show)
+void albaInteractor2DMeasurePoint::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -286,7 +286,7 @@ void albaInteractor2DMeasure_Point::Show(bool show)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::GetMeasurePoint(int index, double *point)
+void albaInteractor2DMeasurePoint::GetMeasurePoint(int index, double *point)
 {
 	// Return point value
 	if (index >= 0 && index < GetMeasureCount())
@@ -298,7 +298,7 @@ void albaInteractor2DMeasure_Point::GetMeasurePoint(int index, double *point)
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
+bool albaInteractor2DMeasurePoint::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasurePoint"))
 	{
@@ -331,7 +331,7 @@ bool albaInteractor2DMeasure_Point::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Point::Save(albaVME *input, wxString tag)
+bool albaInteractor2DMeasurePoint::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nPoints = GetMeasureCount();
@@ -384,7 +384,7 @@ bool albaInteractor2DMeasure_Point::Save(albaVME *input, wxString tag)
 
 /// CONSTRAINTS
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *lineP2)
+void albaInteractor2DMeasurePoint::LockPointOnLine(double *lineP1, double *lineP2)
 {
 	m_EditConstraint = LOCK_ON_LINE;
 
@@ -410,7 +410,7 @@ void albaInteractor2DMeasure_Point::LockPointOnLine(double *lineP1, double *line
 	m_CurrMeasure = measure;
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_Point::GetPointOnLine(double *point)
+void albaInteractor2DMeasurePoint::GetPointOnLine(double *point)
 {
 	double dist1 = DistanceBetweenPoints(m_ConstrLineP1, point);
 	double dist2 = DistancePointToLine(point, m_ConstrLineP1, m_ConstrLineP2);

@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_CenterPoint.cpp
+Module:    albaInteractor2DMeasureCenterPoint.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure_CenterPoint.h"
+#include "albaInteractor2DMeasureCenterPoint.h"
 #include "albaInteractor2DMeasure.h"
 
 #include "albaTagArray.h"
@@ -40,10 +40,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkViewport.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure_CenterPoint)
+albaCxxTypeMacro(albaInteractor2DMeasureCenterPoint)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_CenterPoint::albaInteractor2DMeasure_CenterPoint() : albaInteractor2DMeasure()
+albaInteractor2DMeasureCenterPoint::albaInteractor2DMeasureCenterPoint() : albaInteractor2DMeasure()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -61,7 +61,7 @@ albaInteractor2DMeasure_CenterPoint::albaInteractor2DMeasure_CenterPoint() : alb
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_CenterPoint::~albaInteractor2DMeasure_CenterPoint()
+albaInteractor2DMeasureCenterPoint::~albaInteractor2DMeasureCenterPoint()
 {
 	// Lines and Points
 	for (int i = 0; i < m_LineStackVector.size(); i++)
@@ -76,14 +76,14 @@ albaInteractor2DMeasure_CenterPoint::~albaInteractor2DMeasure_CenterPoint()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::DrawNewMeasure(double * wp)
+void albaInteractor2DMeasureCenterPoint::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp);
 	//Call FindAndHighLight to start the edit phase
 	FindAndHighlight(wp);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
+void albaInteractor2DMeasureCenterPoint::MoveMeasure(int index, double * point)
 {
 	if (index < 0)
 		return;
@@ -137,7 +137,7 @@ void albaInteractor2DMeasure_CenterPoint::MoveMeasure(int index, double * point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
+void albaInteractor2DMeasureCenterPoint::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -189,7 +189,7 @@ void albaInteractor2DMeasure_CenterPoint::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
+void albaInteractor2DMeasureCenterPoint::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -267,7 +267,7 @@ void albaInteractor2DMeasure_CenterPoint::FindAndHighlight(double * point)
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::UpdatePointsActor(double * point1, double * point2)
+void albaInteractor2DMeasureCenterPoint::UpdatePointsActor(double * point1, double * point2)
 {
 	// Left
 	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
@@ -288,7 +288,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdatePointsActor(double * point1, dou
 	pointSourceC->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::UpdateLineActors(double * point1, double * point2)
+void albaInteractor2DMeasureCenterPoint::UpdateLineActors(double * point1, double * point2)
 {
 	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	lineSource->SetPoint1(point1);
@@ -296,7 +296,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdateLineActors(double * point1, doub
 	lineSource->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::UpdateCircleActor(double * point1, double * point2)
+void albaInteractor2DMeasureCenterPoint::UpdateCircleActor(double * point1, double * point2)
 {
 	double radius = DistanceBetweenPoints(point1, point2) / 2;
 
@@ -309,7 +309,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdateCircleActor(double * point1, dou
 	circleSource->SetCenter(midPoint);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::UpdateTextActor(double * point1, double * point2)
+void albaInteractor2DMeasureCenterPoint::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
 	GetMidPoint(text_pos, point1, point2);
@@ -321,7 +321,7 @@ void albaInteractor2DMeasure_CenterPoint::UpdateTextActor(double * point1, doubl
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *point2)
+void albaInteractor2DMeasureCenterPoint::AddMeasure(double *point1, double *point2)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -408,7 +408,7 @@ void albaInteractor2DMeasure_CenterPoint::AddMeasure(double *point1, double *poi
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::RemoveMeasure(int index)
+void albaInteractor2DMeasureCenterPoint::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -438,7 +438,7 @@ void albaInteractor2DMeasure_CenterPoint::RemoveMeasure(int index)
 	}	
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::SelectMeasure(int index)
+void albaInteractor2DMeasureCenterPoint::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -473,7 +473,7 @@ void albaInteractor2DMeasure_CenterPoint::SelectMeasure(int index)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::Show(bool show)
+void albaInteractor2DMeasureCenterPoint::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -490,7 +490,7 @@ void albaInteractor2DMeasure_CenterPoint::Show(bool show)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::SetPointSize(double size)
+void albaInteractor2DMeasureCenterPoint::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -503,7 +503,7 @@ void albaInteractor2DMeasure_CenterPoint::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::SetCenterPointSize(double size)
+void albaInteractor2DMeasureCenterPoint::SetCenterPointSize(double size)
 {
 	m_CenterPointSize = size;
 
@@ -514,7 +514,7 @@ void albaInteractor2DMeasure_CenterPoint::SetCenterPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::SetLineWidth(double width)
+void albaInteractor2DMeasureCenterPoint::SetLineWidth(double width)
 {
 	m_LineWidth = width;
 
@@ -528,7 +528,7 @@ void albaInteractor2DMeasure_CenterPoint::SetLineWidth(double width)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::GetMeasureLinePoints(int index, double *point1, double *point2)
+void albaInteractor2DMeasureCenterPoint::GetMeasureLinePoints(int index, double *point1, double *point2)
 {
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -540,7 +540,7 @@ void albaInteractor2DMeasure_CenterPoint::GetMeasureLinePoints(int index, double
 }
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure_CenterPoint::GetCircleRadius(int index)
+double albaInteractor2DMeasureCenterPoint::GetCircleRadius(int index)
 {
 	double point1[3], point2[3];
 	// Return line points values
@@ -557,7 +557,7 @@ double albaInteractor2DMeasure_CenterPoint::GetCircleRadius(int index)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_CenterPoint::GetCenter(int index, double *center)
+void albaInteractor2DMeasureCenterPoint::GetCenter(int index, double *center)
 {
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -569,7 +569,7 @@ void albaInteractor2DMeasure_CenterPoint::GetCenter(int index, double *center)
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_CenterPoint::Load(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureCenterPoint::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureCenterPoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureCenterPoint2"))
 	{
@@ -607,7 +607,7 @@ bool albaInteractor2DMeasure_CenterPoint::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_CenterPoint::Save(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureCenterPoint::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nCenters = GetMeasureCount();

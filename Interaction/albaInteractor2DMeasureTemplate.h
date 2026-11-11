@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_Template.h
+Module:    albaInteractor2DMeasureTemplate.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -37,12 +37,12 @@ class vtkTransform;
 class vtkTransformPolyDataFilter;
 class albaVMEImage;
 
-// Class Name: albaInteractor2DMeasure_Template
-class ALBA_EXPORT albaInteractor2DMeasure_Template : public albaInteractor2DMeasure
+// Class Name: albaInteractor2DMeasureTemplate
+class ALBA_EXPORT albaInteractor2DMeasureTemplate : public albaInteractor2DMeasure
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasure_Template, albaInteractor2DMeasure);
+	albaTypeMacro(albaInteractor2DMeasureTemplate, albaInteractor2DMeasure);
 
 	// MEASURE
 	/** Add Measure*/
@@ -89,8 +89,8 @@ public:
 
 protected:
 
-	albaInteractor2DMeasure_Template();
-	virtual ~albaInteractor2DMeasure_Template();
+	albaInteractor2DMeasureTemplate();
+	virtual ~albaInteractor2DMeasureTemplate();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
@@ -122,8 +122,8 @@ protected:
 	wxString m_ConfigDir;
 
 private:
-	albaInteractor2DMeasure_Template(const albaInteractor2DMeasure_Template&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasure_Template&);  // Not implemented.
+	albaInteractor2DMeasureTemplate(const albaInteractor2DMeasureTemplate&);   // Not implemented.
+	void operator=(const albaInteractor2DMeasureTemplate&);  // Not implemented.
 	friend class appInteractor2DMeasure_TemplateTest;
 };
 #endif

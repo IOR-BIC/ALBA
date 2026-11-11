@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_Ellipse.cpp
+Module:    albaInteractor2DMeasureEllipse.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure_Ellipse.h"
+#include "albaInteractor2DMeasureEllipse.h"
 #include "albaInteractor2DMeasure.h"
 
 #include "albaTagArray.h"
@@ -41,10 +41,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure_Ellipse)
+albaCxxTypeMacro(albaInteractor2DMeasureEllipse)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Ellipse::albaInteractor2DMeasure_Ellipse() : albaInteractor2DMeasure()
+albaInteractor2DMeasureEllipse::albaInteractor2DMeasureEllipse() : albaInteractor2DMeasure()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -65,7 +65,7 @@ albaInteractor2DMeasure_Ellipse::albaInteractor2DMeasure_Ellipse() : albaInterac
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure_Ellipse::~albaInteractor2DMeasure_Ellipse()
+albaInteractor2DMeasureEllipse::~albaInteractor2DMeasureEllipse()
 {
 	// Lines and Points
 	for (int i = 0; i < m_EllipseStackVector.size(); i++)
@@ -79,14 +79,14 @@ albaInteractor2DMeasure_Ellipse::~albaInteractor2DMeasure_Ellipse()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::DrawNewMeasure(double * wp)
+void albaInteractor2DMeasureEllipse::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp);
 	//Call FindAndHighLight to start the edit phase
 	FindAndHighlight(wp);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::MoveMeasure(int index, double * point)
+void albaInteractor2DMeasureEllipse::MoveMeasure(int index, double * point)
 {
 	if (index < 0)
 		return;
@@ -137,7 +137,7 @@ void albaInteractor2DMeasure_Ellipse::MoveMeasure(int index, double * point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::EditMeasure(int index, double *point)
+void albaInteractor2DMeasureEllipse::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -186,7 +186,7 @@ void albaInteractor2DMeasure_Ellipse::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
+void albaInteractor2DMeasureEllipse::RotateMeasure(int index, double *point)
 {
 	albaVect3d center, p1, p2, currPoint, v1, v2;
 
@@ -252,7 +252,7 @@ void albaInteractor2DMeasure_Ellipse::RotateMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
+void albaInteractor2DMeasureEllipse::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -328,7 +328,7 @@ void albaInteractor2DMeasure_Ellipse::FindAndHighlight(double * point)
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double * point2)
+void albaInteractor2DMeasureEllipse::UpdatePointsActor(double * point1, double * point2)
 {
 	// Left
 	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
@@ -350,7 +350,7 @@ void albaInteractor2DMeasure_Ellipse::UpdatePointsActor(double * point1, double 
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double * point2)
+void albaInteractor2DMeasureEllipse::UpdateEllipseActor(double * point1, double * point2)
 {
 
 	int A, B, C;
@@ -399,7 +399,7 @@ void albaInteractor2DMeasure_Ellipse::UpdateEllipseActor(double * point1, double
 	ellipseSource->SetCenter(midPoint);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::UpdateTextActor(double * point1, double * point2)
+void albaInteractor2DMeasureEllipse::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
 	GetMidPoint(text_pos, point1, point2);
@@ -411,7 +411,7 @@ void albaInteractor2DMeasure_Ellipse::UpdateTextActor(double * point1, double * 
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
+void albaInteractor2DMeasureEllipse::AddMeasure(double *point1, double *point2)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -489,7 +489,7 @@ void albaInteractor2DMeasure_Ellipse::AddMeasure(double *point1, double *point2)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::RemoveMeasure(int index)
+void albaInteractor2DMeasureEllipse::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -515,7 +515,7 @@ void albaInteractor2DMeasure_Ellipse::RemoveMeasure(int index)
 	}	
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::SelectMeasure(int index)
+void albaInteractor2DMeasureEllipse::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -548,7 +548,7 @@ void albaInteractor2DMeasure_Ellipse::SelectMeasure(int index)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::Show(bool show)
+void albaInteractor2DMeasureEllipse::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -564,7 +564,7 @@ void albaInteractor2DMeasure_Ellipse::Show(bool show)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::SetPointSize(double size)
+void albaInteractor2DMeasureEllipse::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -577,7 +577,7 @@ void albaInteractor2DMeasure_Ellipse::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::SetCenterPointSize(double size)
+void albaInteractor2DMeasureEllipse::SetCenterPointSize(double size)
 {
 	m_CenterPointSize = size;
 
@@ -588,7 +588,7 @@ void albaInteractor2DMeasure_Ellipse::SetCenterPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::SetLineWidth(double width)
+void albaInteractor2DMeasureEllipse::SetLineWidth(double width)
 {
 	m_LineWidth = width;
 
@@ -600,7 +600,7 @@ void albaInteractor2DMeasure_Ellipse::SetLineWidth(double width)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::GetMeasurePoints(int index, double *point1, double *point2)
+void albaInteractor2DMeasureEllipse::GetMeasurePoints(int index, double *point1, double *point2)
 {
 	vtkPointSource *pointSourceL = (vtkPointSource *)m_PointsStackVectorL[index]->GetSourceAlgorithm();
 	pointSourceL->GetCenter(point1);
@@ -611,7 +611,7 @@ void albaInteractor2DMeasure_Ellipse::GetMeasurePoints(int index, double *point1
 /// UTILS ///////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::GetCenter(int index, double *center)
+void albaInteractor2DMeasureEllipse::GetCenter(int index, double *center)
 {
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -623,7 +623,7 @@ void albaInteractor2DMeasure_Ellipse::GetCenter(int index, double *center)
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Ellipse::Load(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureEllipse::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureCenterPoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureCenterPoint2"))
 	{
@@ -663,7 +663,7 @@ bool albaInteractor2DMeasure_Ellipse::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Ellipse::Save(albaVME *input, wxString tag)
+bool albaInteractor2DMeasureEllipse::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nCenters = GetMeasureCount();
@@ -727,7 +727,7 @@ bool albaInteractor2DMeasure_Ellipse::Save(albaVME *input, wxString tag)
 }
 
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Ellipse::OnKey(int keyCode, bool pressed)
+bool albaInteractor2DMeasureEllipse::OnKey(int keyCode, bool pressed)
 {
 	if (!m_IsEnabled || keyCode != WXK_CONTROL)
 		return false;
@@ -738,7 +738,7 @@ bool albaInteractor2DMeasure_Ellipse::OnKey(int keyCode, bool pressed)
 }
 
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure_Ellipse::IsPointInsideMeasure(double *point, int measureIndex)
+bool albaInteractor2DMeasureEllipse::IsPointInsideMeasure(double *point, int measureIndex)
 {
 	if(measureIndex < 0)
 		measureIndex = m_CurrMeasure;
@@ -747,7 +747,7 @@ bool albaInteractor2DMeasure_Ellipse::IsPointInsideMeasure(double *point, int me
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure_Ellipse::GetMeasureBounds(double bounds[6], int measureIndex)
+void albaInteractor2DMeasureEllipse::GetMeasureBounds(double bounds[6], int measureIndex)
 {
 	if (measureIndex < 0)
 		measureIndex = m_CurrMeasure;
@@ -756,7 +756,7 @@ void albaInteractor2DMeasure_Ellipse::GetMeasureBounds(double bounds[6], int mea
 }
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure_Ellipse::GetMeasurePerimeter(int measureIndex/*=-1*/)
+double albaInteractor2DMeasureEllipse::GetMeasurePerimeter(int measureIndex/*=-1*/)
 {
 	if (measureIndex < 0)
 		measureIndex = m_CurrMeasure;

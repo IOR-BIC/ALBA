@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure_Line.h
+Module:    albaInteractor2DMeasureLine.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasure_Line_h
-#define __albaInteractor2DMeasure_Line_h
+#ifndef __albaInteractor2DMeasureLine_h
+#define __albaInteractor2DMeasureLine_h
 
 //----------------------------------------------------------------------------
 // Include :
@@ -28,12 +28,12 @@ class vtkLineSource;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 
-// Class Name: albaInteractor2DMeasure_Line
-class ALBA_EXPORT albaInteractor2DMeasure_Line : public albaInteractor2DMeasure
+// Class Name: albaInteractor2DMeasureLine
+class ALBA_EXPORT albaInteractor2DMeasureLine : public albaInteractor2DMeasure
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasure_Line, albaInteractor2DMeasure);
+	albaTypeMacro(albaInteractor2DMeasureLine, albaInteractor2DMeasure);
 
 	// MEASURE
 	/** Add Measure*/
@@ -61,8 +61,8 @@ public:
 
 protected:
 
-	albaInteractor2DMeasure_Line();
-	virtual ~albaInteractor2DMeasure_Line();
+	albaInteractor2DMeasureLine();
+	virtual ~albaInteractor2DMeasureLine();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
@@ -90,8 +90,8 @@ protected:
 	int m_LineStipplePattern;
 
 private:
-	albaInteractor2DMeasure_Line(const albaInteractor2DMeasure_Line&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasure_Line&);  // Not implemented.
-	friend class albaInteractor2DMeasure_LineTest;
+	albaInteractor2DMeasureLine(const albaInteractor2DMeasureLine&);   // Not implemented.
+	void operator=(const albaInteractor2DMeasureLine&);  // Not implemented.
+	friend class albaInteractor2DMeasureLineTest;
 };
 #endif
