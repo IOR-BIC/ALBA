@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPER
+ Module: albaPositionalEventRouter
  Authors: Marco Petrone
  
  Copyright (c) BIC
@@ -24,12 +24,12 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaInteractorPER.h"
+#include "albaPositionalEventRouter.h"
 
 #include "albaView.h"
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 #include "albaAvatar3D.h"
 #include "albaCameraTool.h"
 #include "albaCameraMouseTool.h"
@@ -54,9 +54,9 @@
 #include "mmuIdFactory.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractorPER)
+albaCxxTypeMacro(albaPositionalEventRouter)
 //------------------------------------------------------------------------------
-albaInteractorPER::albaInteractorPER()
+albaPositionalEventRouter::albaPositionalEventRouter()
 //------------------------------------------------------------------------------
 {
   m_DraggingLeft    = false; 
@@ -72,7 +72,7 @@ albaInteractorPER::albaInteractorPER()
 }
 
 //------------------------------------------------------------------------------
-albaInteractorPER::~albaInteractorPER()
+albaPositionalEventRouter::~albaPositionalEventRouter()
 //------------------------------------------------------------------------------
 {
   while (!m_Tools.empty())
@@ -82,7 +82,7 @@ albaInteractorPER::~albaInteractorPER()
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorPER::PushTool(albaInteractionTool *tool)
+void albaPositionalEventRouter::PushTool(albaInteractionTool *tool)
 {
   if (tool == NULL || std::find(m_Tools.begin(), m_Tools.end(), tool) != m_Tools.end())
     return;
@@ -93,7 +93,7 @@ void albaInteractorPER::PushTool(albaInteractionTool *tool)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorPER::PopTool(albaInteractionTool *tool)
+void albaPositionalEventRouter::PopTool(albaInteractionTool *tool)
 {
   std::vector<albaInteractionTool *>::iterator iter = std::find(m_Tools.begin(), m_Tools.end(), tool);
   if (iter == m_Tools.end())
@@ -114,7 +114,7 @@ void albaInteractorPER::PopTool(albaInteractionTool *tool)
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractorPER::DispatchKey(int keyCode, bool pressed)
+bool albaPositionalEventRouter::DispatchKey(int keyCode, bool pressed)
 {
   // a tool can push or pop tools while handling an event: iterate on a copy
   std::vector<albaInteractionTool *> tools = m_Tools;
@@ -125,7 +125,7 @@ bool albaInteractorPER::DispatchKey(int keyCode, bool pressed)
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractorPER::ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e)
+bool albaPositionalEventRouter::ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e)
 {
   switch (e->GetButton())
   {
@@ -137,7 +137,7 @@ bool albaInteractorPER::ToolButtonDown(albaInteractionTool *tool, albaEventInter
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractorPER::ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e)
+bool albaPositionalEventRouter::ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e)
 {
   switch (e->GetButton())
   {
@@ -149,19 +149,19 @@ bool albaInteractorPER::ToolButtonUp(albaInteractionTool *tool, albaEventInterac
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractorPER::PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device)
+bool albaPositionalEventRouter::PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device)
 {
   albaView *view = device->GetView();
   vtkProp3D *pickedProp = NULL;
   albaVME *pickedVme = NULL;
-  albaInteractor *pickedBehavior = NULL;
+  albaInteractionBehavior *pickedBehavior = NULL;
 
   // the picking is cached into the event: the default behavior reuses it
   return view && e->FindPokedVme(view, device, pickedProp, pickedVme, pickedBehavior) && pickedBehavior != NULL;
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *device)
+bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDevice *device)
 {
   albaID id = e->GetId();
   std::map<albaID, ToolInteraction>::iterator interaction = m_ToolInteractions.find(device->GetID());
@@ -267,7 +267,7 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
 }
 
 //----------------------------------------------------------------------------
-bool albaInteractorPER::IsInteracting(albaDevice *device, int button)
+bool albaPositionalEventRouter::IsInteracting(albaDevice *device, int button)
 //----------------------------------------------------------------------------
 {
   std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
@@ -289,7 +289,7 @@ bool albaInteractorPER::IsInteracting(albaDevice *device, int button)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::InsertDevice(albaDevice *device,int button)
+void albaPositionalEventRouter::InsertDevice(albaDevice *device,int button)
 //----------------------------------------------------------------------------
 {
   if (m_Mode == SINGLE_BUTTON)
@@ -317,7 +317,7 @@ void albaInteractorPER::InsertDevice(albaDevice *device,int button)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::RemoveDevice(albaDevice *device)
+void albaPositionalEventRouter::RemoveDevice(albaDevice *device)
 //----------------------------------------------------------------------------
 {
   std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
@@ -345,7 +345,7 @@ void albaInteractorPER::RemoveDevice(albaDevice *device)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::SetPickedVME(albaDevice *device,albaVME *vme)
+void albaPositionalEventRouter::SetPickedVME(albaDevice *device,albaVME *vme)
 //----------------------------------------------------------------------------
 {
   if (device)
@@ -362,7 +362,7 @@ void albaInteractorPER::SetPickedVME(albaDevice *device,albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
-albaVME *albaInteractorPER::GetPickedVME(albaDevice *device)
+albaVME *albaPositionalEventRouter::GetPickedVME(albaDevice *device)
 //----------------------------------------------------------------------------
 {
   if (device)
@@ -378,7 +378,7 @@ albaVME *albaInteractorPER::GetPickedVME(albaDevice *device)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnChar(albaEventInteraction *e) 
+void albaPositionalEventRouter::OnChar(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   switch (e->GetKey()) 
@@ -411,7 +411,7 @@ void albaInteractorPER::OnChar(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnLeftButtonDown(albaEventInteraction *e)
+void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if(m_FlyToFlag)
@@ -427,13 +427,13 @@ void albaInteractorPER::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnMiddleButtonDown(albaEventInteraction *e)
+void albaPositionalEventRouter::OnMiddleButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   OnButtonDown(e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnRightButtonDown(albaEventInteraction *e)
+void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
 	if(m_FlyToFlag)
@@ -445,7 +445,7 @@ void albaInteractorPER::OnRightButtonDown(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnLeftButtonUp(albaEventInteraction *e)
+void albaPositionalEventRouter::OnLeftButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   //if(m_FlyToFlag)
@@ -454,13 +454,13 @@ void albaInteractorPER::OnLeftButtonUp(albaEventInteraction *e)
   OnButtonUp(e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnMiddleButtonUp(albaEventInteraction *e)
+void albaPositionalEventRouter::OnMiddleButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   OnButtonUp(e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnRightButtonUp(albaEventInteraction *e)
+void albaPositionalEventRouter::OnRightButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
 	//if(m_FlyToFlag)
@@ -480,21 +480,21 @@ void albaInteractorPER::OnRightButtonUp(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnMove(albaEventInteraction *e) 
+void albaPositionalEventRouter::OnMove(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
 	m_ShowContextMenu = false;
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
+void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   albaDevice *device = albaDevice::SafeDownCast((albaDevice*)e->GetSender());
 
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
-  albaInteractor *picked_bh   = NULL;
+  albaInteractionBehavior *picked_bh   = NULL;
 
   // the mouse selected view or the tracker avatar view
   albaView *v = device ? device->GetView() : NULL;
@@ -542,14 +542,14 @@ void albaInteractorPER::OnButtonDown(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::OnButtonUp(albaEventInteraction *e) 
+void albaPositionalEventRouter::OnButtonUp(albaEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
   m_DraggingLeft = false;
 }
 
 //------------------------------------------------------------------------------
-int albaInteractorPER::StartInteraction(albaDevice *device, int button)
+int albaPositionalEventRouter::StartInteraction(albaDevice *device, int button)
 //------------------------------------------------------------------------------
 {
   // Check if already interacting with the same device: it could happen the user
@@ -572,7 +572,7 @@ int albaInteractorPER::StartInteraction(albaDevice *device, int button)
 }
 
 //------------------------------------------------------------------------------
-int albaInteractorPER::StopInteraction(albaDevice *device, int button)
+int albaPositionalEventRouter::StopInteraction(albaDevice *device, int button)
 //------------------------------------------------------------------------------
 {
   if (m_Mode == SINGLE_BUTTON)
@@ -596,7 +596,7 @@ int albaInteractorPER::StopInteraction(albaDevice *device, int button)
 }
 
 //------------------------------------------------------------------------------
-int albaInteractorPER::OnStartInteraction(albaEventInteraction *e)
+int albaPositionalEventRouter::OnStartInteraction(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   albaDevice *device = albaDevice::SafeDownCast((albaDevice *)e->GetSender());
@@ -626,7 +626,7 @@ int albaInteractorPER::OnStartInteraction(albaEventInteraction *e)
   return 0;
 }
 //------------------------------------------------------------------------------
-int albaInteractorPER::OnStopInteraction(albaEventInteraction *e)
+int albaPositionalEventRouter::OnStopInteraction(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   albaDevice *device = albaDevice::SafeDownCast((albaDevice *)e->GetSender());
@@ -657,7 +657,7 @@ int albaInteractorPER::OnStopInteraction(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorPER::OnEvent(albaEventBase *event)
+void albaPositionalEventRouter::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   albaID ch = event->GetChannel();
@@ -705,7 +705,7 @@ void albaInteractorPER::OnEvent(albaEventBase *event)
       albaVME *vme = GetPickedVME(device);
       if(vme)
       {
-        albaInteractor *bh = vme->GetBehavior(); //can be NULL
+        albaInteractionBehavior *bh = vme->GetBehavior(); //can be NULL
         if (bh)
         {
           TraceHandler("Behavior", bh);
@@ -737,7 +737,7 @@ void albaInteractorPER::OnEvent(albaEventBase *event)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::TraceHandler(const char *handler, albaObject *obj)
+void albaPositionalEventRouter::TraceHandler(const char *handler, albaObject *obj)
 {
   if (!m_EventTracing)
     return;
@@ -753,7 +753,7 @@ void albaInteractorPER::TraceHandler(const char *handler, albaObject *obj)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::WriteEventTrace(albaEventBase *event)
+void albaPositionalEventRouter::WriteEventTrace(albaEventBase *event)
 {
   if (!m_EventTracing)
     return;
@@ -780,12 +780,12 @@ void albaInteractorPER::WriteEventTrace(albaEventBase *event)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPER::FlyTo(albaEventInteraction *e,int numstep, double zoom)
+void albaPositionalEventRouter::FlyTo(albaEventInteraction *e,int numstep, double zoom)
 //----------------------------------------------------------------------------
 {
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
-  albaInteractor *picked_bh   = NULL;
+  albaInteractionBehavior *picked_bh   = NULL;
 
   albaDevice *device = (albaDevice*)e->GetSender();
   albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);

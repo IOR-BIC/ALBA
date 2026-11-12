@@ -27,9 +27,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaInteractorGenericMouse;
-class albaInteractorGenericMouse;
-class albaInteractorCompositorMouse;
+class albaGenericMouseBehavior;
+class albaGenericMouseBehavior;
+class albaCompositorMouseBehavior;
 class albaVMEGizmo;
 class albaMatrix;
 class albaVME;
@@ -114,7 +114,7 @@ public:
 
   /**
   Get the gizmo interactor*/
-  albaInteractorGenericMouse *GetInteractor();
+  albaGenericMouseBehavior *GetInteractor();
 
   /** Superclass override */
   void SetMediator(albaObserver *mediator);
@@ -173,10 +173,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  albaInteractorCompositorMouse *m_IsaComp;
+  albaCompositorMouseBehavior *m_IsaComp;
 
   /** isa generic*/
-  albaInteractorGenericMouse *m_IsaGen;
+  albaGenericMouseBehavior *m_IsaGen;
 
   /** Gizmo color setting facilities for gizmo segments;*/
   void SetColor(double col[3]);

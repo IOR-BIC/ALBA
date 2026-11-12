@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorGenericMouse
+ Module: albaGenericMouseBehavior
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "albaDecl.h"
 #include "albaDevice.h"
@@ -44,15 +44,10 @@
 #include "vtkCellData.h"
 #include "mmuIdFactory.h"
 
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-ALBA_ID_IMP(albaInteractorGenericMouse::MOVE_EVENT);
-
-albaCxxTypeMacro(albaInteractorGenericMouse);
+albaCxxTypeMacro(albaGenericMouseBehavior);
 
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse::albaInteractorGenericMouse() 
+albaGenericMouseBehavior::albaGenericMouseBehavior() 
 //----------------------------------------------------------------------------
 {
   m_TranslationFlag       = true;
@@ -97,7 +92,7 @@ albaInteractorGenericMouse::albaInteractorGenericMouse()
    m_ButtonDownPickPosition[0] = m_ButtonDownPickPosition[1] = m_ButtonDownPickPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse::~albaInteractorGenericMouse()
+albaGenericMouseBehavior::~albaGenericMouseBehavior()
 //----------------------------------------------------------------------------
 {
   albaDEL(m_ResultTransform);
@@ -109,7 +104,7 @@ albaInteractorGenericMouse::~albaInteractorGenericMouse()
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetResultTransform(albaTransform *result)
+void albaGenericMouseBehavior::SetResultTransform(albaTransform *result)
 //------------------------------------------------------------------------------
 {
   if (result!=m_ResultTransform)
@@ -120,7 +115,7 @@ void albaInteractorGenericMouse::SetResultTransform(albaTransform *result)
   }
 }
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetResultMatrix(albaMatrix *result)
+void albaGenericMouseBehavior::SetResultMatrix(albaMatrix *result)
 //------------------------------------------------------------------------------
 {
   albaSmartPointer<albaTransform> trans; // create a transform on the fly
@@ -129,41 +124,41 @@ void albaInteractorGenericMouse::SetResultMatrix(albaMatrix *result)
 }
 
 //------------------------------------------------------------------------------
-albaMatrix *albaInteractorGenericMouse::GetResultMatrix()
+albaMatrix *albaGenericMouseBehavior::GetResultMatrix()
 //------------------------------------------------------------------------------
 { 
   return (m_ResultTransform?m_ResultTransform->GetMatrixPointer():NULL);
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetTargetRefSys(albaRefSys &ref_sys)
+void albaGenericMouseBehavior::SetTargetRefSys(albaRefSys &ref_sys)
 //------------------------------------------------------------------------------
 {
   *m_TargetRefSys=ref_sys;
 }
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetTargetRefSys(albaRefSys *ref_sys)
+void albaGenericMouseBehavior::SetTargetRefSys(albaRefSys *ref_sys)
 //------------------------------------------------------------------------------
 {
   m_TargetRefSys->DeepCopy(ref_sys);
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetPivotRefSys(albaRefSys *pivot_frame )
+void albaGenericMouseBehavior::SetPivotRefSys(albaRefSys *pivot_frame )
 //------------------------------------------------------------------------------
 {
   m_PivotRefSys->DeepCopy(pivot_frame);
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetPivotRefSys(albaRefSys &pivot_frame )
+void albaGenericMouseBehavior::SetPivotRefSys(albaRefSys &pivot_frame )
 //------------------------------------------------------------------------------
 {
   *m_PivotRefSys=pivot_frame;
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetRendererAndView(vtkRenderer *ren, albaView *view)
+void albaGenericMouseBehavior::SetRendererAndView(vtkRenderer *ren, albaView *view)
 //------------------------------------------------------------------------------
 {
   m_TranslationConstraint->GetRefSys()->SetRenderer(ren);  
@@ -174,28 +169,28 @@ void albaInteractorGenericMouse::SetRendererAndView(vtkRenderer *ren, albaView *
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetTranslationConstraint(albaInteractorConstraint *constrain)
+void albaGenericMouseBehavior::SetTranslationConstraint(albaInteractorConstraint *constrain)
 //------------------------------------------------------------------------------
 {
   *m_TranslationConstraint=*constrain;
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetRotationConstraint(albaInteractorConstraint *constrain)
+void albaGenericMouseBehavior::SetRotationConstraint(albaInteractorConstraint *constrain)
 //------------------------------------------------------------------------------
 {
   *m_RotationConstraint=*constrain;
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetScaleConstraint(albaInteractorConstraint *constrain)
+void albaGenericMouseBehavior::SetScaleConstraint(albaInteractorConstraint *constrain)
 //------------------------------------------------------------------------------
 {
   *m_ScaleConstraint=*constrain;
 }
  
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetVME(albaVME *vme)
+void albaGenericMouseBehavior::SetVME(albaVME *vme)
 //------------------------------------------------------------------------------
 {
   Superclass::SetVME(vme);
@@ -206,35 +201,35 @@ void albaInteractorGenericMouse::SetVME(albaVME *vme)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableTranslation(bool enable)
+void albaGenericMouseBehavior::EnableTranslation(bool enable)
 //------------------------------------------------------------------------------
 {
   EnableTranslationInternal(enable);
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableRotation(bool enable)
+void albaGenericMouseBehavior::EnableRotation(bool enable)
 //------------------------------------------------------------------------------
 {
   EnableRotationInternal(enable);
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableScaling(bool enable)
+void albaGenericMouseBehavior::EnableScaling(bool enable)
 // ------------------------------------------------------------------------------
 {
   EnableScalingInternal(enable);
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableUniformScaling(bool enable)
+void albaGenericMouseBehavior::EnableUniformScaling(bool enable)
 //------------------------------------------------------------------------------
 {
   EnableUniformScalingInternal(enable);
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::Translate(double *p1, double *p2)
+void albaGenericMouseBehavior::Translate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   albaMatrix matr;     // create matrix to send
@@ -642,7 +637,7 @@ void albaInteractorGenericMouse::Translate(double *p1, double *p2)
 
 }
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::Rotate(double *p1, double *p2, double *viewup)
+void albaGenericMouseBehavior::Rotate(double *p1, double *p2, double *viewup)
 //----------------------------------------------------------------------------
 {
   // set the constraint refsys to rotation constraint
@@ -862,7 +857,7 @@ void albaInteractorGenericMouse::Rotate(double *p1, double *p2, double *viewup)
 
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::Scale(double *p1, double *p2, double *viewup)
+void albaGenericMouseBehavior::Scale(double *p1, double *p2, double *viewup)
 //----------------------------------------------------------------------------
 {
   // NOT YET IMPLEMENTED
@@ -882,7 +877,7 @@ void albaInteractorGenericMouse::Scale(double *p1, double *p2, double *viewup)
 }
 
 //----------------------------------------------------------------------------
-int albaInteractorGenericMouse::BinarySearch(double pos, vtkDoubleArray *array, int& result_point_status)
+int albaGenericMouseBehavior::BinarySearch(double pos, vtkDoubleArray *array, int& result_point_status)
 //----------------------------------------------------------------------------
 {
   assert(array);
@@ -928,7 +923,7 @@ int albaInteractorGenericMouse::BinarySearch(double pos, vtkDoubleArray *array, 
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::ConcatenateToResultMatrix(const albaMatrix &matrix)
+void albaGenericMouseBehavior::ConcatenateToResultMatrix(const albaMatrix &matrix)
 //----------------------------------------------------------------------------
 {
   if (GetResultMatrix()) 
@@ -950,7 +945,7 @@ void albaInteractorGenericMouse::ConcatenateToResultMatrix(const albaMatrix &mat
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::SendTransformMatrix(double *vector, int mouseAction)
+void albaGenericMouseBehavior::SendTransformMatrix(double *vector, int mouseAction)
 //----------------------------------------------------------------------------
 {
   albaMatrix mat;
@@ -959,7 +954,7 @@ void albaInteractorGenericMouse::SendTransformMatrix(double *vector, int mouseAc
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::SendTransformMatrix(double *versor, double translation, int mouseAction)
+void albaGenericMouseBehavior::SendTransformMatrix(double *versor, double translation, int mouseAction)
 //----------------------------------------------------------------------------
 {
   double tempVec[3] = {
@@ -972,7 +967,7 @@ void albaInteractorGenericMouse::SendTransformMatrix(double *versor, double tran
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::SendTransformMatrix(const albaMatrix &matrix, int mouseAction, double rotationAngle)
+void albaGenericMouseBehavior::SendTransformMatrix(const albaMatrix &matrix, int mouseAction, double rotationAngle)
 //----------------------------------------------------------------------------
 { 
   // matrix registering the pick position in world coordinates at MOUSE_DOWN
@@ -1042,7 +1037,7 @@ void albaInteractorGenericMouse::SendTransformMatrix(const albaMatrix &matrix, i
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::OnMouseMoveAction(int X, int Y)
+void albaGenericMouseBehavior::OnMouseMoveAction(int X, int Y)
 //----------------------------------------------------------------------------
 {
   // picked X and Y in screen coordinates
@@ -1105,7 +1100,7 @@ void albaInteractorGenericMouse::OnMouseMoveAction(int X, int Y)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::SetButtonDownPick(bool picked, double pickedPos[3])
+void albaGenericMouseBehavior::SetButtonDownPick(bool picked, double pickedPos[3])
 //----------------------------------------------------------------------------
 {
   m_ButtonDownPickSet = true;
@@ -1116,7 +1111,7 @@ void albaInteractorGenericMouse::SetButtonDownPick(bool picked, double pickedPos
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::OnButtonDownAction(int X, int Y)
+void albaGenericMouseBehavior::OnButtonDownAction(int X, int Y)
 //----------------------------------------------------------------------------
 {
   // debug
@@ -1229,7 +1224,7 @@ void albaInteractorGenericMouse::OnButtonDownAction(int X, int Y)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::OnButtonUpAction()
+void albaGenericMouseBehavior::OnButtonUpAction()
 //----------------------------------------------------------------------------
 {
   // reset projection accumulator
@@ -1245,7 +1240,7 @@ void albaInteractorGenericMouse::OnButtonUpAction()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::TrackballRotate()
+void albaGenericMouseBehavior::TrackballRotate()
 //----------------------------------------------------------------------------
 {   
    albaTransform transform;
@@ -1293,7 +1288,7 @@ void albaInteractorGenericMouse::TrackballRotate()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::TrackballTranslate()
+void albaGenericMouseBehavior::TrackballTranslate()
 //----------------------------------------------------------------------------
 {  
   // Use initial center as the origin from which to pan
@@ -1319,7 +1314,7 @@ void albaInteractorGenericMouse::TrackballTranslate()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::TrackballRoll()
+void albaGenericMouseBehavior::TrackballRoll()
 //----------------------------------------------------------------------------
 {
    // get the rotation refsys
@@ -1377,7 +1372,7 @@ void albaInteractorGenericMouse::TrackballRoll()
    SendTransformMatrix(t.GetMatrix());
 }
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::NormalOnSurface()
+void albaGenericMouseBehavior::NormalOnSurface()
 //----------------------------------------------------------------------------
 {
 	/*if (m_Renderer == NULL || m_Prop == NULL ) return;
@@ -1556,7 +1551,7 @@ void albaInteractorGenericMouse::NormalOnSurface()
 
 }
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouse::SnapOnSurface()
+void albaGenericMouseBehavior::SnapOnSurface()
 //----------------------------------------------------------------------------
 {
   if (m_Renderer == NULL || m_Prop == NULL ) return;
@@ -1616,7 +1611,7 @@ void albaInteractorGenericMouse::SnapOnSurface()
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableTranslationInternal(bool enable)
+void albaGenericMouseBehavior::EnableTranslationInternal(bool enable)
 //------------------------------------------------------------------------------
 {
   m_TranslationFlag = enable;
@@ -1624,7 +1619,7 @@ void albaInteractorGenericMouse::EnableTranslationInternal(bool enable)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableRotationInternal(bool enable)
+void albaGenericMouseBehavior::EnableRotationInternal(bool enable)
 //------------------------------------------------------------------------------
 {
   m_RotationFlag = enable;
@@ -1632,7 +1627,7 @@ void albaInteractorGenericMouse::EnableRotationInternal(bool enable)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableScalingInternal(bool enable)
+void albaGenericMouseBehavior::EnableScalingInternal(bool enable)
 //------------------------------------------------------------------------------
 {
   m_ScalingFlag = enable;
@@ -1640,7 +1635,7 @@ void albaInteractorGenericMouse::EnableScalingInternal(bool enable)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorGenericMouse::EnableUniformScalingInternal(bool enable)
+void albaGenericMouseBehavior::EnableUniformScalingInternal(bool enable)
 //------------------------------------------------------------------------------
 {
   m_UniformScalingFlag = enable;

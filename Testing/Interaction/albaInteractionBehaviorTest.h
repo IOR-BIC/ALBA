@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorTest
+ Module: albaInteractionBehaviorTest
  Authors: Alberto Losi
  
  Copyright (c) BIC
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaInteractorTest_H__
-#define __CPP_UNIT_albaInteractorTest_H__
+#ifndef __CPP_UNIT_albaInteractionBehaviorTest_H__
+#define __CPP_UNIT_albaInteractionBehaviorTest_H__
 
 #include "albaTest.h"
 
-class albaInteractorTest : public albaTest
+class albaInteractionBehaviorTest : public albaTest
 {
 public:
 
-  CPPUNIT_TEST_SUITE( albaInteractorTest );
+  CPPUNIT_TEST_SUITE( albaInteractionBehaviorTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestSetGetRenderer );

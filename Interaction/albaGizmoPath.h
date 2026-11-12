@@ -19,12 +19,12 @@
 
 #include "albaGizmoInterface.h"
 #include "albaMatrix.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 class albaVME;
 class albaVMEGizmo;
 class vtkPoints;
@@ -56,7 +56,7 @@ public:
     ID_RIGTH_TEXT_SIDE,
   };
 
-  enum SentPoseID {ABS_POSE = albaInteractorGenericMouse::MOUSE_UP+1};
+  enum SentPoseID {ABS_POSE = albaGenericMouseBehavior::MOUSE_UP+1};
 
   /** Set position along constraint polyline*/
   void SetCurvilinearAbscissa(double s);
@@ -126,8 +126,8 @@ protected:
 
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmoPath;
-  albaInteractorCompositorMouse *m_GizmoInteractor;
-  albaInteractorGenericMouse    *m_LeftMouseInteractor;
+  albaCompositorMouseBehavior *m_GizmoInteractor;
+  albaGenericMouseBehavior    *m_LeftMouseInteractor;
   albaGUI             *m_GizmoGui;
 
 

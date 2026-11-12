@@ -7,7 +7,7 @@ albaEvent
 albaFactory
 albaGUI
 albaGUISettings
-albaInteractor
+albaInteractionBehavior
 albaItemData
 albaLogic
 albaManager

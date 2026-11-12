@@ -22,9 +22,9 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 
 #include "albaDecl.h"
-#include "albaGUITransformMouseFloatVME.h"
-#include "albaInteractorGenericMouseFloatVME.h"
-#include "albaInteractorCompositorMouseFloatVME.h"
+#include "albaGUITransformMouseFree.h"
+#include "albaGenericMouseFreeTransformBehavior.h"
+#include "albaCompositorMouseFreeTransformBehavior.h"
 
 #include "albaViewCompound.h"
 #include "albaDeviceButtonsPadMouse.h"
@@ -33,24 +33,24 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaRefSys.h"
 
 //----------------------------------------------------------------------------
-albaGUITransformMouseFloatVME::albaGUITransformMouseFloatVME(albaVME *input, albaObserver *listener): albaGUITransformMouse(input, listener)
+albaGUITransformMouseFree::albaGUITransformMouseFree(albaVME *input, albaObserver *listener): albaGUITransformMouse(input, listener)
 {
 	UpdateISA();
 }
 //----------------------------------------------------------------------------
-albaGUITransformMouseFloatVME::~albaGUITransformMouseFloatVME() 
+albaGUITransformMouseFree::~albaGUITransformMouseFree() 
 { 
 }
 
 //----------------------------------------------------------------------------
-void albaGUITransformMouseFloatVME::UpdateISA()
+void albaGUITransformMouseFree::UpdateISA()
 {
 	//Delete the compositor created in the base class
 	DetachInteractorFromVme();
 	albaDEL(m_IsaCompositor);
 		
 	// Create the isa compositor:
-	m_IsaCompositor = albaInteractorCompositorMouseFloatVME::New();
+	m_IsaCompositor = albaCompositorMouseFreeTransformBehavior::New();
 
 	albaMatrix *absMatrix;
 	absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
@@ -108,7 +108,7 @@ void albaGUITransformMouseFloatVME::UpdateISA()
 }
 
 //----------------------------------------------------------------------------
-bool albaGUITransformMouseFloatVME::IsSliceView(albaView *v)
+bool albaGUITransformMouseFree::IsSliceView(albaView *v)
 {
   if (albaViewCompound::SafeDownCast(v))
 	{
@@ -124,7 +124,7 @@ bool albaGUITransformMouseFloatVME::IsSliceView(albaView *v)
 }
 
 //----------------------------------------------------------------------------
-void albaGUITransformMouseFloatVME::OnEvent(albaEventBase *alba_event)
+void albaGUITransformMouseFree::OnEvent(albaEventBase *alba_event)
 {
   switch(alba_event->GetId())
   {
@@ -176,7 +176,7 @@ void albaGUITransformMouseFloatVME::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-albaInteractorGenericMouseFloatVME* albaGUITransformMouseFloatVME::CreateBehavior(MMI_ACTIVATOR activator)
+albaGenericMouseFreeTransformBehavior* albaGUITransformMouseFree::CreateBehavior(MMI_ACTIVATOR activator)
 {
-	return (albaInteractorGenericMouseFloatVME*)m_IsaCompositor->CreateBehavior(activator);
+	return (albaGenericMouseFreeTransformBehavior*)m_IsaCompositor->CreateBehavior(activator);
 }

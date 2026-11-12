@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaEvent.h"
 #include "albaAbsMatrixPipe.h"
 #include "albaAttachCamera.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"

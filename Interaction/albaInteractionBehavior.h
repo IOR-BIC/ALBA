@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractor
+ Module: albaInteractionBehavior
  Authors: Marco Petrone
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaInteractor_h
-#define __albaInteractor_h
+#ifndef __albaInteractionBehavior_h
+#define __albaInteractionBehavior_h
 
 #include "albaInteractionAgent.h"
 #include "albaString.h"
@@ -58,11 +58,11 @@ class vtkProp3D;
   Interactors usually send output events through the DefaultChannel, and also through the m_listener by wrapping
   the event inside a MFL_EVENT_ID event (event can be retrieved with albaEvent::GetVtkObject().
 */
-class ALBA_EXPORT albaInteractor : public albaInteractionAgent
+class ALBA_EXPORT albaInteractionBehavior : public albaInteractionAgent
 {
 public:
-  albaInteractor();
-  virtual ~albaInteractor();
+  albaInteractionBehavior();
+  virtual ~albaInteractionBehavior();
 
   //------------------------------------------------------------------------------
   // Events
@@ -72,7 +72,7 @@ public:
   ALBA_ID_DEC(BUTTON_DOWN);         ///< Issued when a button is pressed
   ALBA_ID_DEC(BUTTON_UP);           ///< Issued when a button is released
 
-  albaAbstractTypeMacro(albaInteractor,albaInteractionAgent);
+  albaAbstractTypeMacro(albaInteractionBehavior,albaInteractionAgent);
 
   /** Return the current input device. */
   albaDevice *GetDevice() {return m_Device;}
@@ -183,7 +183,7 @@ protected:
     Find the pocked VME at button down. As argument the function needs
     the device which performed the action, and provides as result pointers
     to piked prop, vme and its behavior if it exists. */
-//  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior);
+//  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior);
 
 
   albaDevice     *m_Device;
@@ -206,8 +206,8 @@ protected:
   bool m_TestMode;///< Flag used with cppunitTest
 
 private:
-  albaInteractor(const albaInteractor&);  // Not implemented.
-  void operator=(const albaInteractor&);  // Not implemented.
+  albaInteractionBehavior(const albaInteractionBehavior&);  // Not implemented.
+  void operator=(const albaInteractionBehavior&);  // Not implemented.
 };
 
 #endif 

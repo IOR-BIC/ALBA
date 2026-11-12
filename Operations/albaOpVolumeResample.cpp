@@ -44,7 +44,7 @@
 
 #include "albaTransform.h"
 #include "albaTransformFrame.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkALBAVolumeResample.h"

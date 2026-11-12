@@ -6,7 +6,7 @@ albaDevice
 albaPipe
 albaGUI
 albaGizmo
-albaInteractor
+albaInteractionBehavior
 albaAvatar
 albaEvent
 albaAgent

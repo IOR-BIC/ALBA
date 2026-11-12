@@ -41,7 +41,7 @@
 #include "albaObserver.h"
 #include "albaTransform.h"
 
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPoints.h"
@@ -191,7 +191,7 @@ void albaGizmoRotateTest::TestGetInteractor()
 
   for (int axis = albaInteractorConstraint::AXIS::X; axis < albaInteractorConstraint::AXIS::NUM_AXES; axis++) 
   { 
-    albaInteractorGenericMouse *interactor = gizmoRotate->GetInteractor(axis);
+    albaGenericMouseBehavior *interactor = gizmoRotate->GetInteractor(axis);
     
     // using test friend
     CPPUNIT_ASSERT(interactor == gizmoRotate->m_GRCircle[axis]->GetInteractor());

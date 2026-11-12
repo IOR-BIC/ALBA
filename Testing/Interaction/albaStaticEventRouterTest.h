@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorSERTest
+ Module: albaStaticEventRouterTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,17 +14,17 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaInteractorSERTest_H__
-#define __CPP_UNIT_albaInteractorSERTest_H__
+#ifndef __CPP_UNIT_albaStaticEventRouterTest_H__
+#define __CPP_UNIT_albaStaticEventRouterTest_H__
 
 #include "albaTest.h"
 
-class albaInteractorSERTest : public albaTest
+class albaStaticEventRouterTest : public albaTest
 {
 public:
   
 
-  CPPUNIT_TEST_SUITE( albaInteractorSERTest );
+  CPPUNIT_TEST_SUITE( albaStaticEventRouterTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestBindDeviceToAction );

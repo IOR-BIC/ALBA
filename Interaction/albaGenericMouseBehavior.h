@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorGenericMouse
+ Module: albaGenericMouseBehavior
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,13 +14,13 @@
 
 =========================================================================*/
 
-#ifndef __albaInteractorGenericMouse_h
-#define __albaInteractorGenericMouse_h
+#ifndef __albaGenericMouseBehavior_h
+#define __albaGenericMouseBehavior_h
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 #include "albaInteractorConstraint.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class vtkCamera;
 class vtkDoubleArray;
 
 /** Constrained interaction with mouse device.
-  Use albaInteractorCompositorMouse in order to associate instances of this class
+  Use albaCompositorMouseBehavior in order to associate instances of this class
   to mouse buttons with keys modifiers.
 
   Among the other features we have: translation constrains, like projection on an axis or plane,
@@ -56,14 +56,12 @@ class vtkDoubleArray;
   matrix to the ResultMatrix.
 
   @sa
-  - mmoTransformGeneric for examples on how to use this class with albaInteractorCompositorMouse
+  - mmoTransformGeneric for examples on how to use this class with albaCompositorMouseBehavior
 */
-class ALBA_EXPORT albaInteractorGenericMouse : public albaInteractor
+class ALBA_EXPORT albaGenericMouseBehavior : public albaInteractionBehavior
 {
 public:
-  albaTypeMacro(albaInteractorGenericMouse, albaInteractor);
-
-  ALBA_ID_DEC(MOVE_EVENT); ///< Issued when a move action has been performed
+  albaTypeMacro(albaGenericMouseBehavior, albaInteractionBehavior);
 
   /**
     Get the Target ref sys, i.e. the object hosting the output matrix 
@@ -235,8 +233,8 @@ public:
 
 protected:
 
-  albaInteractorGenericMouse();
-  ~albaInteractorGenericMouse();
+  albaGenericMouseBehavior();
+  ~albaGenericMouseBehavior();
 
   /** Only one flag can be true: the mouse can only translate, rotate or scale during a single move */
   void EnableTranslationInternal(bool enable);
@@ -361,8 +359,8 @@ protected:
 
 private:
 
-  albaInteractorGenericMouse(const albaInteractorGenericMouse&);  // Not implemented.
-  void operator=(const albaInteractorGenericMouse&);   // Not implemented.
+  albaGenericMouseBehavior(const albaGenericMouseBehavior&);  // Not implemented.
+  void operator=(const albaGenericMouseBehavior&);   // Not implemented.
 	        
   // Projection Accumulator; accumulates projections of the motion
   // vector along mouse move events 

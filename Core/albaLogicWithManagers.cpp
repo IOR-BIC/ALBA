@@ -42,11 +42,11 @@
   
   #include "albaInteractionManager.h"
   #include "albaInteractionFactory.h"
-  #include "albaInteractor.h"
+  #include "albaInteractionBehavior.h"
   #include "albaDeviceManager.h"
   #include "albaAction.h"
   #include "albaDeviceButtonsPadMouse.h"
-  #include "albaInteractorPER.h"
+  #include "albaPositionalEventRouter.h"
   #include "albaGUITreeContextualMenu.h"
   #include "albaGUIContextualMenu.h"
   #include "vtkCamera.h"

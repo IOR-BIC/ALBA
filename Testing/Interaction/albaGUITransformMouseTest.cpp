@@ -28,8 +28,8 @@
 #include "albaRefSys.h"
 #include "albaVMEGroup.h"
 #include "albaGUIFrame.h"
-#include "albaInteractorGenericMouse.h"
-#include "albaInteractorCompositorMouse.h"
+#include "albaGenericMouseBehavior.h"
+#include "albaCompositorMouseBehavior.h"
 #include "wx/module.h"
 
 //----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void albaGUITransformMouseTest::TestCreateBehavior()
   albaSmartPointer<albaVMEGroup> group;
   albaGUITransformMouse *gui = new albaGUITransformMouse(group,NULL,true);
 
-  albaInteractorGenericMouse *mouse = NULL;
+  albaGenericMouseBehavior *mouse = NULL;
   mouse = gui->CreateBehavior(MOUSE_LEFT);
   CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_LEFT_BUTTON );
 

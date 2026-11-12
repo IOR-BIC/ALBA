@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaGizmoBoundingBox.h"
 #include "albaGizmoHandle.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaGizmoHandle.h"
 
 #include "albaMatrix.h"
@@ -127,7 +127,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
         long arg = e->GetArg();
 
         // if a gizmo has been picked highlight the gizmo and register the active component
-        if (arg == albaInteractorGenericMouse::MOUSE_DOWN)
+        if (arg == albaGenericMouseBehavior::MOUSE_DOWN)
         {
           m_Accumulator = 0.;
           if (sender == m_GHandle[0])
@@ -161,7 +161,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
             m_ActiveGizmoComponent = 5;
           }
         }
-        else if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+        else if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
         {     
           if (this->m_Modality == G_LOCAL)
           {
@@ -331,7 +331,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
             // not yet implemented...
           }
         }
-        else if (arg == albaInteractorGenericMouse::MOUSE_UP)
+        else if (arg == albaGenericMouseBehavior::MOUSE_UP)
         {
         }
 				GetLogicManager()->CameraUpdate();

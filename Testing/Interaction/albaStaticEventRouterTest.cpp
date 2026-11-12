@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorSERTest
+ Module: albaStaticEventRouterTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -23,30 +23,30 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "albaInteractorSERTest.h"
-#include "albaInteractorSER.h"
+#include "albaStaticEventRouterTest.h"
+#include "albaStaticEventRouter.h"
 #include "albaSmartPointer.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaAction.h"
 
 //----------------------------------------------------------------------------
-void albaInteractorSERTest::TestFixture()
+void albaStaticEventRouterTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void albaInteractorSERTest::TestConstructorDestructor()
+void albaStaticEventRouterTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
   interactor->Delete();
 
-  albaSmartPointer<albaInteractorSER> interactorSmartPointer;
+  albaSmartPointer<albaStaticEventRouter> interactorSmartPointer;
 }
 
-void albaInteractorSERTest::TestBindDeviceToAction()
+void albaStaticEventRouterTest::TestBindDeviceToAction()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction = albaAction::New();
@@ -70,9 +70,9 @@ void albaInteractorSERTest::TestBindDeviceToAction()
   interactor->Delete();
 }
 
-void albaInteractorSERTest::TestUnBindDeviceFromAction()
+void albaStaticEventRouterTest::TestUnBindDeviceFromAction()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction = albaAction::New();
@@ -98,9 +98,9 @@ void albaInteractorSERTest::TestUnBindDeviceFromAction()
   interactor->Delete();
 }
 
-void albaInteractorSERTest::TestUnBindDeviceFromAllActions()
+void albaStaticEventRouterTest::TestUnBindDeviceFromAllActions()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction1 = albaAction::New();
@@ -132,9 +132,9 @@ void albaInteractorSERTest::TestUnBindDeviceFromAllActions()
   interactor->Delete();
 }
 
-void albaInteractorSERTest::TestGetDeviceBindings()
+void albaStaticEventRouterTest::TestGetDeviceBindings()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction = albaAction::New();
@@ -161,9 +161,9 @@ void albaInteractorSERTest::TestGetDeviceBindings()
 }
 
 
-void albaInteractorSERTest::TestAddAction()
+void albaStaticEventRouterTest::TestAddAction()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction = albaAction::New();
@@ -183,9 +183,9 @@ void albaInteractorSERTest::TestAddAction()
 }
 
 
-void albaInteractorSERTest::TestGetAction()
+void albaStaticEventRouterTest::TestGetAction()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction = albaAction::New();
@@ -207,9 +207,9 @@ void albaInteractorSERTest::TestGetAction()
   // dummyAction->Delete();
 }
 
-void albaInteractorSERTest::TestGetActions()
+void albaStaticEventRouterTest::TestGetActions()
 {
-  albaInteractorSER *interactor = albaInteractorSER::New();
+  albaStaticEventRouter *interactor = albaStaticEventRouter::New();
 
   albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
   albaAction *dummyAction1 = albaAction::New();

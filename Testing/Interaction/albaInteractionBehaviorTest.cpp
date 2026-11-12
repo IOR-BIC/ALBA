@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorTest
+ Module: albaInteractionBehaviorTest
  Authors: Alberto Losi
  
  Copyright (c) BIC
@@ -23,9 +23,9 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "albaInteractorTest.h"
+#include "albaInteractionBehaviorTest.h"
 #include "albaObject.h"
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 #include "vtkRenderer.h"
 #include "albaDevice.h"
 #include "albaEventInteraction.h"
@@ -41,42 +41,42 @@ enum MODALITIES_ID
   MULTI_BUTTON_MODE,
 };
 //----------------------------------------------------------------------------
-class albaInteractorDummy : public albaInteractor // concrete class for test
+class albaInteractionBehaviorDummy : public albaInteractionBehavior // concrete class for test
 //----------------------------------------------------------------------------
 {
 public:
-  albaInteractorDummy(){Superclass;};
-  ~albaInteractorDummy(){Superclass;};
+  albaInteractionBehaviorDummy(){Superclass;};
+  ~albaInteractionBehaviorDummy(){Superclass;};
 
   void OnButtonDown(albaEventInteraction *e){};
   void OnButtonUp(albaEventInteraction *e){};
 
-  albaTypeMacro(albaInteractorDummy,albaInteractor);
+  albaTypeMacro(albaInteractionBehaviorDummy,albaInteractionBehavior);
 };
 
-albaCxxTypeMacro(albaInteractorDummy);
+albaCxxTypeMacro(albaInteractionBehaviorDummy);
 
 //----------------------------------------------------------------------------
-class albaInteractorButtonsDummy : public albaInteractor // concrete class using the default button handling
+class albaInteractionBehaviorButtonsDummy : public albaInteractionBehavior // concrete class using the default button handling
 //----------------------------------------------------------------------------
 {
 public:
-  albaTypeMacro(albaInteractorButtonsDummy,albaInteractor);
+  albaTypeMacro(albaInteractionBehaviorButtonsDummy,albaInteractionBehavior);
 };
 
-albaCxxTypeMacro(albaInteractorButtonsDummy);
+albaCxxTypeMacro(albaInteractionBehaviorButtonsDummy);
 
 //----------------------------------------------------------------------------
-class albaInteractorTestListener : public albaObserver // stores the sender of the received button events
+class albaInteractionBehaviorTestListener : public albaObserver // stores the sender of the received button events
 //----------------------------------------------------------------------------
 {
 public:
-  albaInteractorTestListener() {m_ButtonDownSender = m_ButtonUpSender = NULL;};
+  albaInteractionBehaviorTestListener() {m_ButtonDownSender = m_ButtonUpSender = NULL;};
   virtual void OnEvent(albaEventBase *e)
   {
-    if (e->GetId() == albaInteractor::BUTTON_DOWN)
+    if (e->GetId() == albaInteractionBehavior::BUTTON_DOWN)
       m_ButtonDownSender = e->GetSender();
-    else if (e->GetId() == albaInteractor::BUTTON_UP)
+    else if (e->GetId() == albaInteractionBehavior::BUTTON_UP)
       m_ButtonUpSender = e->GetSender();
   };
 
@@ -85,26 +85,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestFixture()
+void albaInteractionBehaviorTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestConstructorDestructor()
+void albaInteractionBehaviorTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor = albaInteractorDummy::New();
+  albaInteractionBehaviorDummy *interactor = albaInteractionBehaviorDummy::New();
 
   cppDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetRenderer()
+void albaInteractionBehaviorTest::TestSetGetRenderer()
 //----------------------------------------------------------------------------
 {
   vtkRenderer *renderer;
   vtkNEW(renderer);
 
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   // renderer and view start empty (they belong to albaInteractionAgent)
@@ -120,13 +120,13 @@ void albaInteractorTest::TestSetGetRenderer()
 
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetDevice()
+void albaInteractionBehaviorTest::TestSetGetDevice()
 //----------------------------------------------------------------------------
 {
   albaDevice *device;
   albaNEW(device);
 
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   interactor->SetDevice(device);
@@ -136,10 +136,10 @@ void albaInteractorTest::TestSetGetDevice()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetIgnoreTriggerEvents()
+void albaInteractionBehaviorTest::TestSetGetIgnoreTriggerEvents()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   interactor->SetIgnoreTriggerEvents(true);
@@ -157,10 +157,10 @@ void albaInteractorTest::TestSetGetIgnoreTriggerEvents()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetStartInteractionEvent()
+void albaInteractionBehaviorTest::TestSetGetStartInteractionEvent()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   albaID dummyInteractionEvent = START_INTERACTION_EVENT;
@@ -171,10 +171,10 @@ void albaInteractorTest::TestSetGetStartInteractionEvent()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetStopInteractionEvent()
+void albaInteractionBehaviorTest::TestSetGetStopInteractionEvent()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   albaID dummyInteractionEvent = STOP_INTERACTION_EVENT;
@@ -185,10 +185,10 @@ void albaInteractorTest::TestSetGetStopInteractionEvent()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetStartButton()
+void albaInteractionBehaviorTest::TestSetGetStartButton()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   int button = 0;
@@ -199,10 +199,10 @@ void albaInteractorTest::TestSetGetStartButton()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetModifiers()
+void albaInteractionBehaviorTest::TestSetGetModifiers()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   int modifiers = 1;
@@ -213,10 +213,10 @@ void albaInteractorTest::TestSetGetModifiers()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestGetCurrentButton()
+void albaInteractionBehaviorTest::TestGetCurrentButton()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   albaDevice *device;
@@ -245,10 +245,10 @@ void albaInteractorTest::TestGetCurrentButton()
   albaDEL(device);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestGetCurrentModifier()
+void albaInteractionBehaviorTest::TestGetCurrentModifier()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   albaDevice *device;
@@ -279,10 +279,10 @@ void albaInteractorTest::TestGetCurrentModifier()
   albaDEL(device);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestStartStopInteraction()
+void albaInteractionBehaviorTest::TestStartStopInteraction()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   albaDevice *device;
@@ -301,10 +301,10 @@ void albaInteractorTest::TestStartStopInteraction()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestIsInteracting()
+void albaInteractionBehaviorTest::TestIsInteracting()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   albaDevice *device;
@@ -336,10 +336,10 @@ void albaInteractorTest::TestIsInteracting()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestSetGetButtonMode()
+void albaInteractionBehaviorTest::TestSetGetButtonMode()
 //----------------------------------------------------------------------------
 {
-  albaInteractorDummy *interactor;
+  albaInteractionBehaviorDummy *interactor;
   albaNEW(interactor);
 
   interactor->SetButtonMode(SINGLE_BUTTON_MODE);
@@ -361,16 +361,16 @@ void albaInteractorTest::TestSetGetButtonMode()
   albaDEL(interactor);
 }
 //----------------------------------------------------------------------------
-void albaInteractorTest::TestButtonEventsKeepIncomingEvent()
+void albaInteractionBehaviorTest::TestButtonEventsKeepIncomingEvent()
 //----------------------------------------------------------------------------
 {
   albaDevice *device;
   albaNEW(device);
 
-  albaInteractorButtonsDummy *interactor;
+  albaInteractionBehaviorButtonsDummy *interactor;
   albaNEW(interactor);
 
-  albaInteractorTestListener listener;
+  albaInteractionBehaviorTestListener listener;
   interactor->SetListener(&listener);
 
   // button down: the listener receives BUTTON_DOWN, the incoming event is unchanged

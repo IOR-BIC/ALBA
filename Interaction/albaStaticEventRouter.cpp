@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorSER
+ Module: albaStaticEventRouter
  Authors: Marco Petrone
  
  Copyright (c) BIC
@@ -14,29 +14,29 @@
 
 =========================================================================*/
 
-#include "albaInteractorSER.h"
+#include "albaStaticEventRouter.h"
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaStorageElement.h"
 
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractorSER)
+albaCxxTypeMacro(albaStaticEventRouter)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-albaInteractorSER::albaInteractorSER()
+albaStaticEventRouter::albaStaticEventRouter()
 //------------------------------------------------------------------------------
 {
 }
 
 //------------------------------------------------------------------------------
-albaInteractorSER::~albaInteractorSER()
+albaStaticEventRouter::~albaStaticEventRouter()
 //------------------------------------------------------------------------------
 {
 }
 //------------------------------------------------------------------------------
-int albaInteractorSER::InternalStore(albaStorageElement *node)
+int albaStaticEventRouter::InternalStore(albaStorageElement *node)
 //------------------------------------------------------------------------------
 {
   for (mmuActionsMap::iterator it=m_Actions.begin();it!=m_Actions.end();it++)
@@ -49,7 +49,7 @@ int albaInteractorSER::InternalStore(albaStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-int albaInteractorSER::InternalRestore(albaStorageElement *node)
+int albaStaticEventRouter::InternalRestore(albaStorageElement *node)
 //------------------------------------------------------------------------------
 {
   albaStorageElement::ChildrenVector children=node->GetChildren();
@@ -76,7 +76,7 @@ int albaInteractorSER::InternalRestore(albaStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-albaAction *albaInteractorSER::GetAction(const char *name)
+albaAction *albaStaticEventRouter::GetAction(const char *name)
 //------------------------------------------------------------------------------
 {
   mmuActionsMap::iterator it=m_Actions.find(name);
@@ -84,7 +84,7 @@ albaAction *albaInteractorSER::GetAction(const char *name)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorSER::GetActions(std::vector<albaAction *> &actions)
+void albaStaticEventRouter::GetActions(std::vector<albaAction *> &actions)
 //------------------------------------------------------------------------------
 {
   actions.clear();
@@ -97,7 +97,7 @@ void albaInteractorSER::GetActions(std::vector<albaAction *> &actions)
 }
 
 //------------------------------------------------------------------------------
-albaAction *albaInteractorSER::AddAction(const char *name, float priority, int type)
+albaAction *albaStaticEventRouter::AddAction(const char *name, float priority, int type)
 //------------------------------------------------------------------------------
 {
   if (albaAction *old_action=GetAction(name))
@@ -112,7 +112,7 @@ albaAction *albaInteractorSER::AddAction(const char *name, float priority, int t
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorSER::AddAction(albaAction *action, float priority)
+void albaStaticEventRouter::AddAction(albaAction *action, float priority)
 //------------------------------------------------------------------------------
 {
   assert(action);
@@ -122,7 +122,7 @@ void albaInteractorSER::AddAction(albaAction *action, float priority)
   action->AddObserver(this);
 }
 //------------------------------------------------------------------------------
-void albaInteractorSER::BindDeviceToAction(albaDevice *device,albaAction *action)
+void albaStaticEventRouter::BindDeviceToAction(albaDevice *device,albaAction *action)
 //------------------------------------------------------------------------------
 {
   assert(device);
@@ -130,13 +130,13 @@ void albaInteractorSER::BindDeviceToAction(albaDevice *device,albaAction *action
   action->BindDevice(device);
 }
 //------------------------------------------------------------------------------
-void albaInteractorSER::BindDeviceToAction(albaDevice *device,const char *action_name)
+void albaStaticEventRouter::BindDeviceToAction(albaDevice *device,const char *action_name)
 //------------------------------------------------------------------------------
 {
   BindDeviceToAction(device,GetAction(action_name));
 }
 //------------------------------------------------------------------------------
-void albaInteractorSER::UnBindDeviceFromAction(albaDevice *device,albaAction *action)
+void albaStaticEventRouter::UnBindDeviceFromAction(albaDevice *device,albaAction *action)
 //------------------------------------------------------------------------------
 {
   assert(device);
@@ -144,14 +144,14 @@ void albaInteractorSER::UnBindDeviceFromAction(albaDevice *device,albaAction *ac
   action->UnBindDevice(device);
 }
 //------------------------------------------------------------------------------
-void albaInteractorSER::UnBindDeviceFromAction(albaDevice *device,const char *action_name)
+void albaStaticEventRouter::UnBindDeviceFromAction(albaDevice *device,const char *action_name)
 //------------------------------------------------------------------------------
 {
   UnBindDeviceFromAction(device,GetAction(action_name));
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorSER::UnBindDeviceFromAllActions(albaDevice *device)
+void albaStaticEventRouter::UnBindDeviceFromAllActions(albaDevice *device)
 //------------------------------------------------------------------------------
 {
   assert(device);
@@ -165,7 +165,7 @@ void albaInteractorSER::UnBindDeviceFromAllActions(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorSER::GetDeviceBindings(albaDevice *device,std::vector<albaAction *> &actions)
+void albaStaticEventRouter::GetDeviceBindings(albaDevice *device,std::vector<albaAction *> &actions)
 //------------------------------------------------------------------------------
 {
   assert(device);

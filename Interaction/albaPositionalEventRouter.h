@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPER
+ Module: albaPositionalEventRouter
  Authors: Marco Petrone, originally by Silvano Imboden
  
  Copyright (c) BIC
@@ -13,8 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __albaInteractorPER_h
-#define __albaInteractorPER_h
+#ifndef __albaPositionalEventRouter_h
+#define __albaPositionalEventRouter_h
 
 #include "albaInteractionAgent.h"
 #include <map>
@@ -27,7 +27,7 @@
 class albaVME;
 class albaDevice;
 class albaEventInteraction;
-class albaInteractor;
+class albaInteractionBehavior;
 class myPIMPL;
 class vtkCamera;
 class albaInteractionTool;
@@ -43,10 +43,10 @@ class albaCameraTool;
   - create interactor for CameraBehavior
   - manage sending events to logic (VME_SELECT, CAMERA_FIT  the 
 */
-class ALBA_EXPORT albaInteractorPER : public albaInteractionAgent
+class ALBA_EXPORT albaPositionalEventRouter : public albaInteractionAgent
 {
 public:
-  albaTypeMacro(albaInteractorPER,albaInteractionAgent);
+  albaTypeMacro(albaPositionalEventRouter,albaInteractionAgent);
 
   virtual void EnableSelect(bool enable) {m_CanSelect = enable;};
 
@@ -101,8 +101,8 @@ public:
   const char *GetLastEventTrace() {return m_LastEventTrace.c_str();}
 
 protected:
-  albaInteractorPER();
-  virtual ~albaInteractorPER();
+  albaPositionalEventRouter();
+  virtual ~albaPositionalEventRouter();
   
   /** Start the default interaction on a button down, with the three buttons */
   virtual int OnStartInteraction(albaEventInteraction *e);
@@ -136,8 +136,8 @@ protected:
   void RemoveDevice(albaDevice *device);
 
   /** internally used to set which behavior was picked by device */
-  void SetCurrentBehavior(albaDevice *device,albaInteractor *inter);
-  albaInteractor *GetCurrentBehavior(albaDevice *device);
+  void SetCurrentBehavior(albaDevice *device,albaInteractionBehavior *inter);
+  albaInteractionBehavior *GetCurrentBehavior(albaDevice *device);
 
   /** internally used to set VME picked by device at button down */
   void SetPickedVME(albaDevice *device,albaVME *vme);
@@ -196,11 +196,11 @@ protected:
   albaVME *m_VME; ///< the VME selected in the tree, used as picked VME when no device is given
   
 private:
-  albaInteractorPER(const albaInteractorPER&);  // Not implemented.
-  void operator=(const albaInteractorPER&);  // Not implemented.
+  albaPositionalEventRouter(const albaPositionalEventRouter&);  // Not implemented.
+  void operator=(const albaPositionalEventRouter&);  // Not implemented.
 
   /** test friend */
-  friend class albaInteractorPERTest;
+  friend class albaPositionalEventRouterTest;
 };
 
 #endif 

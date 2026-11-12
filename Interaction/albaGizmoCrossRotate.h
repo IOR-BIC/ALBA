@@ -41,7 +41,7 @@
 //----------------------------------------------------------------------------
 class albaGizmoCrossRotateAxis;
 class albaGizmoCrossRotateFan;
-class albaInteractorGenericMouse;
+class albaGenericMouseBehavior;
 class albaMatrix;
 
 //----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ public:
 
   /**
   Get the Interactor asscociated to each axis*/
-  albaInteractorGenericMouse *GetInteractor(int axis);
+  albaGenericMouseBehavior *GetInteractor(int axis);
 
   //----------------------------------------------------------------------------
   // RefSys

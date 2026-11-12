@@ -38,20 +38,20 @@ SET(PROJECT_SRCS
 	albaDeviceManagerTest.h albaDeviceManagerTest.cpp
 	albaInteractionFactoryTest.h albaInteractionFactoryTest.cpp
 	albaGUITransformTextEntriesTest.h albaGUITransformTextEntriesTest.cpp
-	albaInteractorCompositorMouseTest.h albaInteractorCompositorMouseTest.cpp
+	albaCompositorMouseBehaviorTest.h albaCompositorMouseBehaviorTest.cpp
 	albaActionTest.h albaActionTest.cpp
 	albaGUISaveRestorePoseTest.h albaGUISaveRestorePoseTest.cpp
 	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp
 	albaAgentThreadedTest.h albaAgentThreadedTest.cpp
-	albaInteractorPERTest.h albaInteractorPERTest.cpp
+	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp
 	albaDeviceTest.h albaDeviceTest.cpp
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
 	albaGizmoScaleTest.h albaGizmoScaleTest.cpp
 	#albaDeviceClientALBATest.h albaDeviceClientALBATest.cpp
 	albaExtractIsosurfaceToolTest.h albaExtractIsosurfaceToolTest.cpp
-	albaInteractorTest.h albaInteractorTest.cpp
+	albaInteractionBehaviorTest.h albaInteractionBehaviorTest.cpp
 	albaAvatarTest.h albaAvatarTest.cpp 
-	albaInteractorSERTest.h albaInteractorSERTest.cpp
+	albaStaticEventRouterTest.h albaStaticEventRouterTest.cpp
 	albaGUIGizmoInterfaceTest.h albaGUIGizmoInterfaceTest.cpp
 	albaGUITransformInterfaceTest.h albaGUITransformInterfaceTest.cpp
 	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp

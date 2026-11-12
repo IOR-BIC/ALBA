@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA
- Module: albaInteractorCompositorMouseFloatVME
+ Module: albaCompositorMouseFreeTransformBehavior
  Authors: Nicola Vanella
  
  Copyright (c) B3C
@@ -14,25 +14,25 @@
 
 =========================================================================*/
 
-#ifndef __albaInteractorCompositorMouseFloatVME_h
-#define __albaInteractorCompositorMouseFloatVME_h
+#ifndef __albaCompositorMouseFreeTransformBehavior_h
+#define __albaCompositorMouseFreeTransformBehavior_h
 
-#include "albaInteractorCompositorMouse.h"
+#include "albaCompositorMouseBehavior.h"
 
 //----------------------------------------------------------------------------
 //forward ref
 //----------------------------------------------------------------------------
-class albaInteractorGenericMouseFloatVME;
+class albaGenericMouseFreeTransformBehavior;
 
 //----------------------------------------------------------------------------
-/** Class name: albaInteractorCompositorMouseFloatVME
-This class derived from albaInteractorCompositorMouse customize its OnEvent method: in some cases,
+/** Class name: albaCompositorMouseFreeTransformBehavior
+This class derived from albaCompositorMouseBehavior customize its OnEvent method: in some cases,
 depending on current view and its camera position, rotational transformation axis are VME axis.
 */
-class ALBA_EXPORT albaInteractorCompositorMouseFloatVME : public albaInteractorCompositorMouse
+class ALBA_EXPORT albaCompositorMouseFreeTransformBehavior : public albaCompositorMouseBehavior
 {
 public:
-  albaTypeMacro(albaInteractorCompositorMouseFloatVME, albaInteractorCompositorMouse);
+  albaTypeMacro(albaCompositorMouseFreeTransformBehavior, albaCompositorMouseBehavior);
 
   /**  Process events coming from the mouse */
   virtual void OnEvent(albaEventBase *event);
@@ -44,10 +44,10 @@ public:
 	void OnButtonUp(albaEventInteraction *e);
 	
 	/**  Create a behavior given the activator*/
-	albaInteractorGenericMouse *CreateBehavior(MMI_ACTIVATOR activator);
+	albaGenericMouseBehavior *CreateBehavior(MMI_ACTIVATOR activator);
 	  
 protected:
-	typedef std::map<int, albaAutoPointer<albaInteractorGenericMouseFloatVME> > mmuActivatorArbitraryMap;
+	typedef std::map<int, albaAutoPointer<albaGenericMouseFreeTransformBehavior> > mmuActivatorArbitraryMap;
 	mmuActivatorArbitraryMap m_ActivatorInteractorMap;
 
 private:

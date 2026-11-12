@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractor
+ Module: albaInteractionBehavior
  Authors: Marco Petrone
  
  Copyright (c) BIC
@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 
 //#include "albaDeviceButtonsPad.h"
 #include "albaDeviceButtonsPadTracker.h"
@@ -48,17 +48,17 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-ALBA_ID_IMP(albaInteractor::INTERACTION_STARTED);
-ALBA_ID_IMP(albaInteractor::INTERACTION_STOPPED);
-ALBA_ID_IMP(albaInteractor::BUTTON_DOWN);
-ALBA_ID_IMP(albaInteractor::BUTTON_UP);
+ALBA_ID_IMP(albaInteractionBehavior::INTERACTION_STARTED);
+ALBA_ID_IMP(albaInteractionBehavior::INTERACTION_STOPPED);
+ALBA_ID_IMP(albaInteractionBehavior::BUTTON_DOWN);
+ALBA_ID_IMP(albaInteractionBehavior::BUTTON_UP);
 
 //------------------------------------------------------------------------------
-albaCxxAbstractTypeMacro(albaInteractor);
+albaCxxAbstractTypeMacro(albaInteractionBehavior);
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-albaInteractor::albaInteractor()
+albaInteractionBehavior::albaInteractionBehavior()
 //------------------------------------------------------------------------------
 {
   m_Device              = NULL;
@@ -81,14 +81,14 @@ albaInteractor::albaInteractor()
 }
 
 //------------------------------------------------------------------------------
-albaInteractor::~albaInteractor()
+albaInteractionBehavior::~albaInteractionBehavior()
 //------------------------------------------------------------------------------
 {
 	m_Device = NULL;
 }
 
 //------------------------------------------------------------------------------
-void albaInteractor::SetDevice(albaDevice *device)
+void albaInteractionBehavior::SetDevice(albaDevice *device)
 //------------------------------------------------------------------------------
 {
   if (m_Device)
@@ -103,35 +103,35 @@ void albaInteractor::SetDevice(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractor::SetVME(albaVME *vme)
+void albaInteractionBehavior::SetVME(albaVME *vme)
 //------------------------------------------------------------------------------
 {
   m_VME=vme;
 }
 
 //------------------------------------------------------------------------------
-void albaInteractor::SetProp(vtkProp3D *prop)
+void albaInteractionBehavior::SetProp(vtkProp3D *prop)
 //------------------------------------------------------------------------------
 {
   m_Prop=prop;
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractor::IsInteracting() 
+bool albaInteractionBehavior::IsInteracting() 
 //------------------------------------------------------------------------------
 {
   return m_InteractionFlag!=0;
 }
 
 //------------------------------------------------------------------------------
-bool albaInteractor::IsInteracting(albaDevice *device)
+bool albaInteractionBehavior::IsInteracting(albaDevice *device)
 //------------------------------------------------------------------------------
 {
   return ((m_InteractionFlag!=0)&&(m_Device==device));
 }
 
 //------------------------------------------------------------------------------
-int albaInteractor::StartInteraction(albaDevice *device)
+int albaInteractionBehavior::StartInteraction(albaDevice *device)
 //------------------------------------------------------------------------------
 {
   // if not already interacting start the interaction
@@ -167,7 +167,7 @@ int albaInteractor::StartInteraction(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-int albaInteractor::StopInteraction(albaDevice *device)
+int albaInteractionBehavior::StopInteraction(albaDevice *device)
 //------------------------------------------------------------------------------
 {
   // check if the interaction was ongoing and if
@@ -200,7 +200,7 @@ int albaInteractor::StopInteraction(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-int albaInteractor::OnStartInteraction(albaEventInteraction *e)
+int albaInteractionBehavior::OnStartInteraction(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   albaDevice *device=albaDevice::SafeDownCast((albaDevice *)e->GetSender());
@@ -213,7 +213,7 @@ int albaInteractor::OnStartInteraction(albaEventInteraction *e)
   return true;  
 }
 //------------------------------------------------------------------------------
-int albaInteractor::OnStopInteraction(albaEventInteraction *e)
+int albaInteractionBehavior::OnStopInteraction(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   albaDevice *device=albaDevice::SafeDownCast((albaDevice *)e->GetSender());
@@ -227,7 +227,7 @@ int albaInteractor::OnStopInteraction(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractor::OnButtonDown(albaEventInteraction *e)
+void albaInteractionBehavior::OnButtonDown(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   // send a copy of the incoming event: the incoming one is still being dispatched by the device
@@ -240,7 +240,7 @@ void albaInteractor::OnButtonDown(albaEventInteraction *e)
   InvokeEvent(&event);
 }
 //------------------------------------------------------------------------------
-void albaInteractor::OnButtonUp(albaEventInteraction *e)
+void albaInteractionBehavior::OnButtonUp(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   // send a copy of the incoming event: the incoming one is still being dispatched by the device
@@ -253,7 +253,7 @@ void albaInteractor::OnButtonUp(albaEventInteraction *e)
   InvokeEvent(&event);
 }
 //------------------------------------------------------------------------------
-void albaInteractor::OnEvent(albaEventBase *event)
+void albaInteractionBehavior::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
@@ -328,7 +328,7 @@ void albaInteractor::OnEvent(albaEventBase *event)
 }
 
 //----------------------------------------------------------------------------
-/*bool albaInteractor::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)
+/*bool albaInteractionBehavior::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
 //----------------------------------------------------------------------------
 {
   albaView *v = NULL;

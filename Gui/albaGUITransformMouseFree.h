@@ -21,8 +21,8 @@ PURPOSE. See the above copyright notice for more information.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#ifndef __albaGUITransformMouseFloatVME_H__
-#define __albaGUITransformMouseFloatVME_H__
+#ifndef __albaGUITransformMouseFree_H__
+#define __albaGUITransformMouseFree_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -36,27 +36,27 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 class albaVME;
 class albaView;
-class albaInteractorGenericMouseFloatVME;
-class albaInteractorCompositorMouseFloatVME;
+class albaGenericMouseFreeTransformBehavior;
+class albaCompositorMouseFreeTransformBehavior;
 
 //----------------------------------------------------------------------------
-/** Class name: albaGUITransformMouseFloatVME
+/** Class name: albaGUITransformMouseFree
 This class derived from albaGUITransformMouse customize its OnEvent method: in some cases, 
 depending on current view and its camera position, rotational transformation axis are VME axis.
 */
 
-class ALBA_EXPORT albaGUITransformMouseFloatVME : public albaGUITransformMouse
+class ALBA_EXPORT albaGUITransformMouseFree : public albaGUITransformMouse
 {
 public:
-  albaGUITransformMouseFloatVME(albaVME *input, albaObserver *listener = NULL);
-  ~albaGUITransformMouseFloatVME(); 
+  albaGUITransformMouseFree(albaVME *input, albaObserver *listener = NULL);
+  ~albaGUITransformMouseFree(); 
 
 	void UpdateISA();
 
 	/** Override superclass */
   void OnEvent(albaEventBase *alba_event);
 
-	albaInteractorGenericMouseFloatVME* CreateBehavior(MMI_ACTIVATOR activator);
+	albaGenericMouseFreeTransformBehavior* CreateBehavior(MMI_ACTIVATOR activator);
 
 protected:
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPERTest
+ Module: albaPositionalEventRouterTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaInteractorPERTest_H__
-#define __CPP_UNIT_albaInteractorPERTest_H__
+#ifndef __CPP_UNIT_albaPositionalEventRouterTest_H__
+#define __CPP_UNIT_albaPositionalEventRouterTest_H__
 
 #include "albaTest.h"
 
-class albaInteractorPERTest : public albaTest
+class albaPositionalEventRouterTest : public albaTest
 {
   public:
 
-  CPPUNIT_TEST_SUITE( albaInteractorPERTest );
+  CPPUNIT_TEST_SUITE( albaPositionalEventRouterTest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
   CPPUNIT_TEST(TestEnableSelect);

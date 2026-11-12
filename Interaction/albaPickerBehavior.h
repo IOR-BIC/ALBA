@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPicker
+ Module: albaPickerBehavior
  Authors: Marco Petrone, originally by Silvano Imboden
  
  Copyright (c) BIC
@@ -13,10 +13,10 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __albaInteractorPicker_h
-#define __albaInteractorPicker_h
+#ifndef __albaPickerBehavior_h
+#define __albaPickerBehavior_h
 
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -24,10 +24,10 @@
 class albaObserver;
 
 /** interactor implementing a picking operation */
-class ALBA_EXPORT albaInteractorPicker : public albaInteractor
+class ALBA_EXPORT albaPickerBehavior : public albaInteractionBehavior
 {
 public:
-  albaTypeMacro(albaInteractorPicker,albaInteractor);
+  albaTypeMacro(albaPickerBehavior,albaInteractionBehavior);
 
   /** Redefined to send picking events if continuous picking is enabled */
   virtual void OnEvent(albaEventBase *event);
@@ -38,8 +38,8 @@ public:
   bool IsContinuousPicking(){return m_ContinuousPickingFlag;};
 
 protected:
-  albaInteractorPicker();
-  virtual ~albaInteractorPicker();
+  albaPickerBehavior();
+  virtual ~albaPickerBehavior();
   
   virtual void OnButtonDown   (albaEventInteraction *e);
   virtual void OnButtonUp     (albaEventInteraction *e);
@@ -54,8 +54,8 @@ protected:
   void SendPickingInformation(albaView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, albaMatrix *tracker_pos = NULL, bool mouse_flag = true);
   
 private:
-  albaInteractorPicker(const albaInteractorPicker&);  // Not implemented.
-  void operator=(const albaInteractorPicker&);  // Not implemented.
+  albaPickerBehavior(const albaPickerBehavior&);  // Not implemented.
+  void operator=(const albaPickerBehavior&);  // Not implemented.
 };
 
 #endif 

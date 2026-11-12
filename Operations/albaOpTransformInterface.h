@@ -30,9 +30,9 @@
 class albaGizmoTranslate;
 class albaGizmoRotate;
 class albaGUITransformMouse;
-class albaInteractor;
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaInteractionBehavior;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 class albaVME;
 class albaVME;
 

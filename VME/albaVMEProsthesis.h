@@ -30,8 +30,8 @@ class vtkTransform;
 class vtkTransformPolyDataFilter;
 class albaProDBCompGroup;
 class albaProDBProsthesis;
-class albaGUITransformMouseFloatVME;
-class albaInteractorGenericMouseFloatVME;
+class albaGUITransformMouseFree;
+class albaGenericMouseFreeTransformBehavior;
 class albaVMESurface;
 
 /** albaVMEProsthesis - 
@@ -156,8 +156,8 @@ protected:
 	albaProDBProsthesis *m_Prosthesis;
 	albaString m_ProsthesisName;
 
-	albaGUITransformMouseFloatVME *m_InteractorTransformFloatVME;
-	albaInteractorGenericMouseFloatVME *m_InteractorGenericMouseFloatVME;
+	albaGUITransformMouseFree *m_TransformMouseFree;
+	albaGenericMouseFreeTransformBehavior *m_GenericMouseFreeTransform;
 
 	albaVMESurface *m_RotCenterVME;
 

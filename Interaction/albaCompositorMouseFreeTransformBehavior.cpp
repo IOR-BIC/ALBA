@@ -22,8 +22,8 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaInteractorCompositorMouseFloatVME.h"
-#include "albaInteractorGenericMouseFloatVME.h"
+#include "albaCompositorMouseFreeTransformBehavior.h"
+#include "albaGenericMouseFreeTransformBehavior.h"
 
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaEventInteraction.h"
@@ -33,13 +33,13 @@
 #include "vtkRenderer.h"
 
 
-albaCxxTypeMacro(albaInteractorCompositorMouseFloatVME);
+albaCxxTypeMacro(albaCompositorMouseFreeTransformBehavior);
 
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse *albaInteractorCompositorMouseFloatVME::CreateBehavior(MMI_ACTIVATOR activator)
+albaGenericMouseBehavior *albaCompositorMouseFreeTransformBehavior::CreateBehavior(MMI_ACTIVATOR activator)
 {
   // create the generic behavior and populate the map
-  albaInteractorGenericMouseFloatVME *pISAG = albaInteractorGenericMouseFloatVME::New();
+  albaGenericMouseFreeTransformBehavior *pISAG = albaGenericMouseFreeTransformBehavior::New();
   
 	m_ActivatorInteractorMap[activator] = pISAG;
   switch (activator)
@@ -84,7 +84,7 @@ albaInteractorGenericMouse *albaInteractorCompositorMouseFloatVME::CreateBehavio
 
 
 //------------------------------------------------------------------------------
-void albaInteractorCompositorMouseFloatVME::OnEvent(albaEventBase *event)
+void albaCompositorMouseFreeTransformBehavior::OnEvent(albaEventBase *event)
 {  
 	assert(event);
 	assert(event->GetSender());
@@ -128,7 +128,7 @@ void albaInteractorCompositorMouseFloatVME::OnEvent(albaEventBase *event)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorCompositorMouseFloatVME::InitInteraction(int buttonPressed, albaEventInteraction *e)
+void albaCompositorMouseFreeTransformBehavior::InitInteraction(int buttonPressed, albaEventInteraction *e)
 {
 	double pos[2];
 	e->Get2DPosition(pos);
@@ -142,7 +142,7 @@ void albaInteractorCompositorMouseFloatVME::InitInteraction(int buttonPressed, a
 	// get info from picked vme
 	albaVME        *picked_vme = NULL;
 	vtkProp3D     *picked_prop = NULL;
-	albaInteractor *picked_bh = NULL;
+	albaInteractionBehavior *picked_bh = NULL;
 
 	albaView *v = mouse->GetView();
 	assert(v);
@@ -187,7 +187,7 @@ void albaInteractorCompositorMouseFloatVME::InitInteraction(int buttonPressed, a
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouseFloatVME::OnButtonDown(albaEventInteraction *e)
+void albaCompositorMouseFreeTransformBehavior::OnButtonDown(albaEventInteraction *e)
 {
 	// if in multi button mode and already interacting simply forward the event...
 	if (m_ActiveMMIGeneric && m_ButtonMode == MULTI_BUTTON_MODE)
@@ -219,7 +219,7 @@ void albaInteractorCompositorMouseFloatVME::OnButtonDown(albaEventInteraction *e
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouseFloatVME::OnButtonUp(albaEventInteraction *e)
+void albaCompositorMouseFreeTransformBehavior::OnButtonUp(albaEventInteraction *e)
 {
 	m_ButtonPressed = e->GetButton();
 	if (m_CurrentButton >= 0 && m_ButtonPressed != m_CurrentButton)

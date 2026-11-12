@@ -37,8 +37,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "wx/listctrl.h"
-#include "albaGUITransformMouseFloatVME.h"
-#include "albaInteractorGenericMouseFloatVME.h"
+#include "albaGUITransformMouseFree.h"
+#include "albaGenericMouseFreeTransformBehavior.h"
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
@@ -57,8 +57,8 @@ albaVMEProsthesis::albaVMEProsthesis()
 
 	m_ContentGui = NULL;
 	m_GroupGui = NULL;
-	m_InteractorTransformFloatVME = NULL;
-  m_InteractorGenericMouseFloatVME = NULL;
+	m_TransformMouseFree = NULL;
+  m_GenericMouseFreeTransform = NULL;
 
 	m_RotCenterVME = NULL;
 	m_LockOnOpRun = true;
@@ -80,12 +80,12 @@ char** albaVMEProsthesis::GetIcon()
 int albaVMEProsthesis::InternalInitialize()
 {
 
-	if (m_InteractorTransformFloatVME == NULL)
+	if (m_TransformMouseFree == NULL)
 	{
-		m_InteractorTransformFloatVME = new albaGUITransformMouseFloatVME(this, this);
-		m_InteractorGenericMouseFloatVME = m_InteractorTransformFloatVME->CreateBehavior(MOUSE_LEFT_SHIFT);
-		m_InteractorGenericMouseFloatVME->SetListener(this);
-		m_InteractorGenericMouseFloatVME->SetVME(this);
+		m_TransformMouseFree = new albaGUITransformMouseFree(this, this);
+		m_GenericMouseFreeTransform = m_TransformMouseFree->CreateBehavior(MOUSE_LEFT_SHIFT);
+		m_GenericMouseFreeTransform->SetListener(this);
+		m_GenericMouseFreeTransform->SetVME(this);
 	}
 
 	if (Superclass::InternalInitialize() == ALBA_OK)
@@ -442,7 +442,7 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
 	
-	if (arg == albaInteractorGenericMouse::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
+	if (arg == albaGenericMouseBehavior::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events
@@ -491,7 +491,7 @@ void albaVMEProsthesis::SetRotCenterVME(albaVME *rotCenter)
 
 	m_RotCenterVME=albaVMESurface::SafeDownCast(rotCenter);
 
-	m_InteractorTransformFloatVME->SetRefSys(m_RotCenterVME);
+	m_TransformMouseFree->SetRefSys(m_RotCenterVME);
 
 	SetLink("ROT_REFSYS", rotCenter);
 }
@@ -605,7 +605,7 @@ void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
 //----------------------------------------------------------------------------
 void albaVMEProsthesis::Set2dModality(bool mod2d)
 {
-	albaInteractorGenericMouseFloatVME* isaRotate = albaInteractorGenericMouseFloatVME::SafeDownCast(m_InteractorTransformFloatVME->GetIsaRotate());
+	albaGenericMouseFreeTransformBehavior* isaRotate = albaGenericMouseFreeTransformBehavior::SafeDownCast(m_TransformMouseFree->GetIsaRotate());
 	isaRotate->Set2DModality(mod2d);
 }
 

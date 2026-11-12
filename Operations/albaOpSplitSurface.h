@@ -30,8 +30,8 @@
 //----------------------------------------------------------------------------
 class albaEvent;
 
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 class albaVMESurface;
 class albaVMEGizmo;
 class albaGizmoTranslate;
@@ -146,9 +146,9 @@ protected:
 	vtkALBAClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
-  albaInteractorCompositorMouse *m_IsaCompositor;
-  albaInteractorGenericMouse    *m_IsaTranslate;
-  albaInteractorGenericMouse    *m_IsaRotate;
+  albaCompositorMouseBehavior *m_IsaCompositor;
+  albaGenericMouseBehavior    *m_IsaTranslate;
+  albaGenericMouseBehavior    *m_IsaRotate;
 
   vtkPolyData *m_OldSurface;
 	vtkPolyData *m_ResultPolyData;

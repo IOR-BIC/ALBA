@@ -61,13 +61,13 @@
 #include "albaGizmoTranslatePlaneTest.h"
 #include "albaGizmoTranslateTest.h"
 #include "albaInteractionFactoryTest.h"
-#include "albaInteractorCompositorMouseTest.h"
+#include "albaCompositorMouseBehaviorTest.h"
 #include "albaInteractorConstraintTest.h"
 #include "albaExtractIsosurfaceToolTest.h"
-#include "albaInteractorPERTest.h"
-#include "albaInteractorSERTest.h"
+#include "albaPositionalEventRouterTest.h"
+#include "albaStaticEventRouterTest.h"
 #include "albaSelectCellToolTest.h"
-#include "albaInteractorTest.h"
+#include "albaInteractionBehaviorTest.h"
 #include "albaRefSysTest.h"
 #include "albaServiceLocator.h"
 
@@ -153,19 +153,19 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDeviceManagerTest::suite());
 	runner.addTest(albaInteractionFactoryTest::suite());
 	runner.addTest(albaGUITransformTextEntriesTest::suite());
-	runner.addTest(albaInteractorCompositorMouseTest::suite());
+	runner.addTest(albaCompositorMouseBehaviorTest::suite());
 	runner.addTest(albaActionTest::suite());
 	runner.addTest(albaGUISaveRestorePoseTest::suite());
 	runner.addTest(albaAgentEventQueueTest::suite());
 	runner.addTest(albaAgentThreadedTest::suite());
-	runner.addTest(albaInteractorPERTest::suite());
+	runner.addTest(albaPositionalEventRouterTest::suite());
 	runner.addTest(albaDeviceTest::suite());
 	runner.addTest(albaGizmoScaleAxisTest::suite());
 	runner.addTest(albaGizmoScaleTest::suite());
 	runner.addTest(albaExtractIsosurfaceToolTest::suite());
-	runner.addTest(albaInteractorTest::suite());
+	runner.addTest(albaInteractionBehaviorTest::suite());
 	runner.addTest(albaAvatarTest::suite());
-	runner.addTest(albaInteractorSERTest::suite());
+	runner.addTest(albaStaticEventRouterTest::suite());
 	runner.addTest(albaGUIGizmoInterfaceTest::suite());
 	runner.addTest(albaGUITransformInterfaceTest::suite());
 	runner.addTest(albaAvatar3DConeTest::suite());

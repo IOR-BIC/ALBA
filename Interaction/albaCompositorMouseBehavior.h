@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorCompositorMouse
+ Module: albaCompositorMouseBehavior
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,12 +14,12 @@
 
 =========================================================================*/
 
-#ifndef __albaInteractorCompositorMouse_h
-#define __albaInteractorCompositorMouse_h
+#ifndef __albaCompositorMouseBehavior_h
+#define __albaCompositorMouseBehavior_h
 
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 #include "albaEvent.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaTransform.h"
 #include "albaMatrix.h"
 #include "albaSmartPointer.h"
@@ -62,27 +62,27 @@ enum MOUSE_BUTTON
     MOUSE_RIGHT_PRESSED, 
 };
 
-/** Associates instances of albaInteractorGenericMouse to mouse buttons and ctrl/shift keys combinations.
+/** Associates instances of albaGenericMouseBehavior to mouse buttons and ctrl/shift keys combinations.
   
-  Associates instances of albaInteractorGenericMouse to mouse buttons and ctrl/shift keys combinations.
+  Associates instances of albaGenericMouseBehavior to mouse buttons and ctrl/shift keys combinations.
   For example:
 
   // Create the compositor:
-  behaviorCompositor = albaInteractorCompositorMouse::New();
+  behaviorCompositor = albaCompositorMouseBehavior::New();
 
   mouseLeftBhavior = behaviorCompositor->CreateBehavior(MOUSE_LEFT);
   mouseMiddleShiftBehavior = behaviorCompositor->CreateBehavior(MOUSE_MIDDLE_SHIFT);
   ...
 
   @sa
-  - albaInteractorGenericMouse since albaInteractorCompositorMouse is working in pair with this class
+  - albaGenericMouseBehavior since albaCompositorMouseBehavior is working in pair with this class
   - albaGUITransformMouse component used by albaOpTransformOld
   
 */
-class ALBA_EXPORT albaInteractorCompositorMouse : public albaInteractor
+class ALBA_EXPORT albaCompositorMouseBehavior : public albaInteractionBehavior
 {
 public:
-  albaTypeMacro(albaInteractorCompositorMouse, albaInteractor);
+  albaTypeMacro(albaCompositorMouseBehavior, albaInteractionBehavior);
 
   /** Start the interaction with the selected object; set m_CurrentCamera and Renderer ivar */
   virtual int StartInteraction(albaDeviceButtonsPadMouse *mouse);
@@ -92,16 +92,16 @@ public:
 
   /**
   Create a behavior given the activator*/
-  virtual albaInteractorGenericMouse *CreateBehavior(MMI_ACTIVATOR activator);
+  virtual albaGenericMouseBehavior *CreateBehavior(MMI_ACTIVATOR activator);
 
   /**
   Get a behavior given the activator*/
-  albaInteractorGenericMouse *GetBehavior(MMI_ACTIVATOR activator);
+  albaGenericMouseBehavior *GetBehavior(MMI_ACTIVATOR activator);
   
 protected:
 
-  albaInteractorCompositorMouse();
-  ~albaInteractorCompositorMouse();
+  albaCompositorMouseBehavior();
+  ~albaCompositorMouseBehavior();
 
   virtual void OnButtonDown(albaEventInteraction *e);
   
@@ -116,7 +116,7 @@ protected:
   void OnRightButtonDown  (albaEventInteraction *e);
   void OnRightButtonUp    (albaEventInteraction *e);
 
-  typedef std::map<int, albaAutoPointer<albaInteractorGenericMouse> > mmuActivatorMap;
+  typedef std::map<int, albaAutoPointer<albaGenericMouseBehavior> > mmuActivatorMap;
 
   /**
                     ActivatorMap
@@ -142,12 +142,12 @@ protected:
   int MouseToActivator(int mouseButton, int shift, int ctrl);
 
   // the active behavior
-  albaInteractorGenericMouse *m_ActiveMMIGeneric;
+  albaGenericMouseBehavior *m_ActiveMMIGeneric;
 
 private:
 
-  albaInteractorCompositorMouse(const albaInteractorCompositorMouse&);  // Not implemented.
-  void operator=(const albaInteractorCompositorMouse&);   // Not implemented.
+  albaCompositorMouseBehavior(const albaCompositorMouseBehavior&);  // Not implemented.
+  void operator=(const albaCompositorMouseBehavior&);   // Not implemented.
 
   int m_MousePose[2];
   int m_LastMousePose[2];
@@ -156,7 +156,7 @@ private:
   vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
   
   /** friend test class */
-  friend class albaInteractorCompositorMouseTest;
+  friend class albaCompositorMouseBehaviorTest;
 
 };
 #endif

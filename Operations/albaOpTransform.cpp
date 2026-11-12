@@ -35,7 +35,7 @@
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaSmartPointer.h"
 #include "albaTransform.h"
 #include "albaTransformFrame.h"
@@ -659,12 +659,12 @@ void albaOpTransform::OnEventTransformGizmo(albaEventBase *alba_event)
 	if (m_ActiveGizmo != SCAL_GIZMO)
 		PostMultiplyMatrix(e->GetMatrix());
 
-	if (!m_UpdateAfterRelease || arg == albaInteractorGenericMouse::MOUSE_UP)
+	if (!m_UpdateAfterRelease || arg == albaGenericMouseBehavior::MOUSE_UP)
 	{
 		m_Input->SetAbsMatrix(*m_TransformVME->GetOutput()->GetAbsMatrix());
 	}
 
-	if (arg == albaInteractorGenericMouse::MOUSE_UP)
+	if (arg == albaGenericMouseBehavior::MOUSE_UP)
 	{
 		UpdateReferenceSystem();
 	}

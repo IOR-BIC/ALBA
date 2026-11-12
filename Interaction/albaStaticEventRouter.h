@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorSER
+ Module: albaStaticEventRouter
  Authors: Marco Petrone
  
  Copyright (c) BIC
@@ -13,8 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __albaInteractorSER_h
-#define __albaInteractorSER_h
+#ifndef __albaStaticEventRouter_h
+#define __albaStaticEventRouter_h
 
 #include "albaAgent.h"
 #include "albaAction.h"
@@ -39,10 +39,10 @@ class albaString;
   @todo
   - to implement a type safe static binding mechanims
    */
-class ALBA_EXPORT albaInteractorSER : public albaAgent, public albaStorable
+class ALBA_EXPORT albaStaticEventRouter : public albaAgent, public albaStorable
 {
 public: 
-  albaTypeMacro(albaInteractorSER,albaAgent);
+  albaTypeMacro(albaStaticEventRouter,albaAgent);
 
    /** Un/Bind a device to an action */
   void BindDeviceToAction(albaDevice *device,albaAction *action);
@@ -75,14 +75,14 @@ protected:
   virtual int InternalStore(albaStorageElement *node);
   virtual int InternalRestore(albaStorageElement *node);
 
-  albaInteractorSER();
-  virtual ~albaInteractorSER();
+  albaStaticEventRouter();
+  virtual ~albaStaticEventRouter();
 
   mmuActionsMap  m_Actions; ///< takes a list of the active actions
 
 private:
-  albaInteractorSER(const albaInteractorSER&);  // Not implemented.
-  void operator=(const albaInteractorSER&);  // Not implemented.
+  albaStaticEventRouter(const albaStaticEventRouter&);  // Not implemented.
+  void operator=(const albaStaticEventRouter&);  // Not implemented.
 };
 
 #endif 

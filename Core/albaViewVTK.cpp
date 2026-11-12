@@ -36,7 +36,7 @@
 #include "albaTextKit.h"
 #include "albaAnimate.h"
 
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 #include "albaAvatar.h"
 #include "albaAvatar3D.h"
 #include "albaDeviceButtonsPadTracker.h"
@@ -373,7 +373,7 @@ void albaViewVTK::SetWindowSize(int w, int h)
 	GetRenderWindow()->SetSize(w,h);
 }
 //----------------------------------------------------------------------------
-bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)
+bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
 {
   albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
   albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);

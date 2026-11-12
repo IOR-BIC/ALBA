@@ -32,8 +32,8 @@ class vtkPlane;
 class vtkGlyph3D;
 class vtkPlaneSource;
 class albaVMEGizmo;
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
@@ -100,9 +100,9 @@ protected:
 	albaVMEGizmo			*m_ImplicitPlaneGizmo;
 	bool						m_PlaneCreated;
 
-	albaInteractorCompositorMouse *m_IsaCompositor;
-	albaInteractorGenericMouse    *m_IsaTranslate;
-	albaInteractorGenericMouse    *m_IsaRotate;
+	albaCompositorMouseBehavior *m_IsaCompositor;
+	albaGenericMouseBehavior    *m_IsaTranslate;
+	albaGenericMouseBehavior    *m_IsaRotate;
 
 	albaVMESurface *m_SecondOperatorVME;
 	albaVMESurface *m_FirstOperatorVME;

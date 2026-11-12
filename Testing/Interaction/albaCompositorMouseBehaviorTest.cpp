@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorCompositorMouseTest
+ Module: albaCompositorMouseBehaviorTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -23,28 +23,28 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "albaInteractorCompositorMouseTest.h"
-#include "albaInteractorCompositorMouse.h"
+#include "albaCompositorMouseBehaviorTest.h"
+#include "albaCompositorMouseBehavior.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaEventInteraction.h"
 
 
-void albaInteractorCompositorMouseTest::TestFixture()
+void albaCompositorMouseBehaviorTest::TestFixture()
 {
 
 }
 
-void albaInteractorCompositorMouseTest::TestConstructorDestructor()
+void albaCompositorMouseBehaviorTest::TestConstructorDestructor()
 {
-  albaInteractorCompositorMouse *compositorMouse = NULL;
-  compositorMouse = albaInteractorCompositorMouse::New();
+  albaCompositorMouseBehavior *compositorMouse = NULL;
+  compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
   compositorMouse->Delete(); 
 }
 
-void albaInteractorCompositorMouseTest::TestStartInteraction()
+void albaCompositorMouseBehaviorTest::TestStartInteraction()
 {
-  albaInteractorCompositorMouse *compositorMouse = albaInteractorCompositorMouse::New();
+  albaCompositorMouseBehavior *compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
   
   albaDeviceButtonsPadMouse *dummyMouse = albaDeviceButtonsPadMouse::New();
@@ -58,10 +58,10 @@ void albaInteractorCompositorMouseTest::TestStartInteraction()
   dummyMouse->Delete();
 }
 
-void albaInteractorCompositorMouseTest::TestOnEvent()
+void albaCompositorMouseBehaviorTest::TestOnEvent()
 {
-  albaInteractorCompositorMouse *compositorMouse = NULL;
-  compositorMouse = albaInteractorCompositorMouse::New();
+  albaCompositorMouseBehavior *compositorMouse = NULL;
+  compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
   
   CPPUNIT_ASSERT(compositorMouse->m_MousePose[0] == 0  && 
@@ -100,13 +100,13 @@ void albaInteractorCompositorMouseTest::TestOnEvent()
   compositorMouse->Delete(); 
 }
 
-void albaInteractorCompositorMouseTest::TestCreateBehavior()
+void albaCompositorMouseBehaviorTest::TestCreateBehavior()
 {
-  albaInteractorCompositorMouse *compositorMouse = NULL;
-  compositorMouse = albaInteractorCompositorMouse::New();
+  albaCompositorMouseBehavior *compositorMouse = NULL;
+  compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
 
-  albaInteractorGenericMouse *mouseBehavior = NULL;
+  albaGenericMouseBehavior *mouseBehavior = NULL;
   mouseBehavior = compositorMouse->GetBehavior(MOUSE_LEFT);
   CPPUNIT_ASSERT(mouseBehavior == NULL);
     
@@ -119,26 +119,26 @@ void albaInteractorCompositorMouseTest::TestCreateBehavior()
   compositorMouse->Delete(); 
 }
 
-void albaInteractorCompositorMouseTest::TestGetBehavior()
+void albaCompositorMouseBehaviorTest::TestGetBehavior()
 {
-  albaInteractorCompositorMouse *compositorMouse = NULL;
-  compositorMouse = albaInteractorCompositorMouse::New();
+  albaCompositorMouseBehavior *compositorMouse = NULL;
+  compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
 
-  albaInteractorGenericMouse *getNotYetCreatedMouseBehavior = NULL;
+  albaGenericMouseBehavior *getNotYetCreatedMouseBehavior = NULL;
   getNotYetCreatedMouseBehavior = compositorMouse->GetBehavior(MOUSE_MIDDLE);
   CPPUNIT_ASSERT(getNotYetCreatedMouseBehavior == NULL);
 
-  albaInteractorGenericMouse *createdMouseMiddleBehavior = NULL;
+  albaGenericMouseBehavior *createdMouseMiddleBehavior = NULL;
   createdMouseMiddleBehavior = compositorMouse->CreateBehavior(MOUSE_MIDDLE);
   CPPUNIT_ASSERT(createdMouseMiddleBehavior != NULL);
   
-  albaInteractorGenericMouse *getMouseMiddleBehavior = NULL;
+  albaGenericMouseBehavior *getMouseMiddleBehavior = NULL;
   getMouseMiddleBehavior = compositorMouse->GetBehavior(MOUSE_MIDDLE);
   CPPUNIT_ASSERT(getMouseMiddleBehavior != NULL);
   CPPUNIT_ASSERT(getMouseMiddleBehavior == createdMouseMiddleBehavior);
   
-  albaInteractorGenericMouse *getMouseMiddleCtrlBehavior = NULL;
+  albaGenericMouseBehavior *getMouseMiddleCtrlBehavior = NULL;
   getMouseMiddleCtrlBehavior = compositorMouse->GetBehavior(MOUSE_MIDDLE_CONTROL);
   CPPUNIT_ASSERT(getMouseMiddleCtrlBehavior == NULL);
 

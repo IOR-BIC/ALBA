@@ -45,7 +45,7 @@
 //----------------------------------------------------------------------------
 class albaMatrix;
 class albaTransform;
-class albaInteractor;
+class albaInteractionBehavior;
 class albaVMEIterator;
 class albaTagArray;
 class albaGUI;
@@ -656,11 +656,11 @@ public:
   /** 
     return the interactor assigned as a behavior to this VME. This is the 
     interactor to which events coming from input devices are sent when 
-    user pick this VME. Responsible of this routing is the PER (@sa albaInteractorPER) */
-  albaInteractor *GetBehavior() {return m_Behavior;}
+    user pick this VME. Responsible of this routing is the PER (@sa albaPositionalEventRouter) */
+  albaInteractionBehavior *GetBehavior() {return m_Behavior;}
 
   /** set the interactor representing the behavior of this VME. @sa GetBehavior() */
-  void SetBehavior(albaInteractor *bh) {m_Behavior=bh;};
+  void SetBehavior(albaInteractionBehavior *bh) {m_Behavior=bh;};
   
   /** Turn On m_TestMode flag. 
   The m_TestMode flag is used to exclude the execution of GUI components that conflicts with test machine.*/
@@ -777,7 +777,7 @@ protected:
   albaTimeStamp    m_CurrentTime;  ///< the time parameter for generation of the output
   int             m_Crypting;     ///< enable flag for this VME
   
-  albaInteractor*  m_Behavior;     ///< the interactor representing the behavior of this VME
+  albaInteractionBehavior*  m_Behavior;     ///< the interactor representing the behavior of this VME
 
   int             m_VisualMode; ///< Store the visual mode to allow the visual pipe to choose the right visual pipe to render the VME
 

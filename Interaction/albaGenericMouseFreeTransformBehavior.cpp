@@ -10,7 +10,7 @@ Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "albaInteractorGenericMouseFloatVME.h"
+#include "albaGenericMouseFreeTransformBehavior.h"
 
 #include "albaDecl.h"
 #include "albaDevice.h"
@@ -24,20 +24,20 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 
-albaCxxTypeMacro(albaInteractorGenericMouseFloatVME);
+albaCxxTypeMacro(albaGenericMouseFreeTransformBehavior);
 
 // ----------------------------------------------------------------------------
-albaInteractorGenericMouseFloatVME::albaInteractorGenericMouseFloatVME() 
+albaGenericMouseFreeTransformBehavior::albaGenericMouseFreeTransformBehavior() 
 {
 	m_Modality2D = false;
 }
 
 // ----------------------------------------------------------------------------
-albaInteractorGenericMouseFloatVME::~albaInteractorGenericMouseFloatVME() 
+albaGenericMouseFreeTransformBehavior::~albaGenericMouseFreeTransformBehavior() 
 { }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouseFloatVME::TrackballRotate()
+void albaGenericMouseFreeTransformBehavior::TrackballRotate()
 {
 
 	if (m_Modality2D)
@@ -113,7 +113,7 @@ void albaInteractorGenericMouseFloatVME::TrackballRotate()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorGenericMouseFloatVME::TrackballRoll()
+void albaGenericMouseFreeTransformBehavior::TrackballRoll()
 {
    // get the rotation refsys
    m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();  

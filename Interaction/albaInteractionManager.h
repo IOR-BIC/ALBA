@@ -33,7 +33,7 @@
 class albaEventBase;
 class albaEvent;
 class albaAction;
-class albaInteractor;
+class albaInteractionBehavior;
 #ifdef ALBA_EXPORTS
 #include "albaAvatar.h"
 #else
@@ -50,8 +50,8 @@ class albaView;
 class mflXMLWriter;
 class vtkXMLDataElement;
 class vtkXMLDataParser;
-class albaInteractorSER;
-class albaInteractorPER;
+class albaStaticEventRouter;
+class albaPositionalEventRouter;
 class albaInteractionTool;
 class albaVME;
 class albaGUIDialog;
@@ -76,7 +76,7 @@ EXPORT_STL_VECTOR(ALBA_EXPORT, albaAvatar *);
   picked VME is delegated to PER (positional event router) object, and low level 
   routing from devices to actions is delegated to the SER (static event router) 
   object.
-  @sa albaDeviceManager albaInteractorPER albaInteractorSER 
+  @sa albaDeviceManager albaPositionalEventRouter albaStaticEventRouter 
   
   @todo
   - check the renderer to be RenFront
@@ -163,7 +163,7 @@ public:
 
 
   /** return the positional event router */
-  albaInteractorPER *GetPER() {return m_PositionalEventRouter;}
+  albaPositionalEventRouter *GetPER() {return m_PositionalEventRouter;}
 
   /** Push a tool on the tool stack of the PER: it receives the events before the default interaction */
   void PushTool(albaInteractionTool *tool);
@@ -179,7 +179,7 @@ public:
   void SetEventTracing(bool enable);
 
   /** return the static event router */
-  albaInteractorSER *GetSER() {return m_StaticEventRouter;}
+  albaStaticEventRouter *GetSER() {return m_StaticEventRouter;}
 
   /** Set the FlyTo mode for the selected view. */
   void CameraFlyToMode();
@@ -209,7 +209,7 @@ public:
   //bool ShowModal(); //SIL. 07-jun-2006 : 
   albaGUI* GetGui();  //SIL. 07-jun-2006 : 
 
-  albaInteractorSER *GetStaticEventRouter() {return m_StaticEventRouter;}
+  albaStaticEventRouter *GetStaticEventRouter() {return m_StaticEventRouter;}
 
 protected:
   /** This is called by Store() to store information of this object.  */
@@ -245,8 +245,8 @@ protected:
   albaString			          m_SettingFileName;
   
   albaDeviceManager*       m_DeviceManager; 
-  albaInteractorPER*                 m_PositionalEventRouter;
-  albaInteractorSER*                 m_StaticEventRouter;
+  albaPositionalEventRouter*                 m_PositionalEventRouter;
+  albaStaticEventRouter*                 m_StaticEventRouter;
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
 

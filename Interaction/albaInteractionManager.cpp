@@ -44,8 +44,8 @@
 #include "albaViewVTK.h"
 #include "albaRWIBase.h"
 
-#include "albaInteractorPER.h"
-#include "albaInteractorSER.h"
+#include "albaPositionalEventRouter.h"
+#include "albaStaticEventRouter.h"
 
 #include "albaEventBase.h"
 
@@ -757,10 +757,10 @@ void albaInteractionManager::UpdateBindings()
     /* Fill in actions' list */
     m_ActionsList->Clear();
     
-    const albaInteractorSER::mmuActionsMap *actions=GetSER()->GetActions();
+    const albaStaticEventRouter::mmuActionsMap *actions=GetSER()->GetActions();
 
     int i=0;
-    for (albaInteractorSER::mmuActionsMap::const_iterator it=actions->begin();it!=actions->end();it++)
+    for (albaStaticEventRouter::mmuActionsMap::const_iterator it=actions->begin();it!=actions->end();it++)
     {
       albaAction *action = it->second;
       bool found=false;

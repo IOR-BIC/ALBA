@@ -26,13 +26,13 @@
 
 #include "albaGizmoTranslate.h"
 #include "albaDecl.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaGizmoTranslateAxis.h"
 #include "albaGizmoTranslatePlane.h"
 #include "albaGUIGizmoTranslate.h"
 #include "albaSmartPointer.h"
 
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"
@@ -148,7 +148,7 @@ void albaGizmoTranslate::OnEventGizmoComponents(albaEventBase *alba_event)
       {
         // if a gizmo has been picked register the active component; the sender is the component
         // to be activated
-        if (arg == albaInteractorGenericMouse::MOUSE_DOWN)
+        if (arg == albaGenericMouseBehavior::MOUSE_DOWN)
         {
           if (sender == m_GTAxis[X])
           {
@@ -183,7 +183,7 @@ void albaGizmoTranslate::OnEventGizmoComponents(albaEventBase *alba_event)
           // Store pivot position
           m_PivotPose->DeepCopy(m_GTAxis[m_ActiveGizmoComponent]->GetAbsPose());
         }
-        else if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+        else if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
         {     
           // matrix holding abs pose after mouse move event
           albaSmartPointer<albaMatrix> newAbsMatr;
@@ -244,7 +244,7 @@ void albaGizmoTranslate::OnEventGizmoComponents(albaEventBase *alba_event)
           // update only gui with gizmo abs position
           if (m_BuildGUI) m_GuiGizmoTranslate->SetAbsPosition(newAbsMatr);
         }
-        else if (arg == albaInteractorGenericMouse::MOUSE_UP)
+        else if (arg == albaGenericMouseBehavior::MOUSE_UP)
         {
           if (this->m_Modality == G_GLOBAL)
           {
@@ -436,7 +436,7 @@ void albaGizmoTranslate::SendTransformMatrixFromGui(albaEventBase *alba_event)
     // update gizmo abs pose
     this->SetAbsPose(newAbsPose, m_InputVME->GetTimeStamp());
     // send transfrom to postmultiply to the listener. Events is sent as a transform event
-    SendTransformMatrix(M, ID_TRANSFORM, albaInteractorGenericMouse::MOUSE_MOVE);
+    SendTransformMatrix(M, ID_TRANSFORM, albaGenericMouseBehavior::MOUSE_MOVE);
   }
 }
 //----------------------------------------------------------------------------  

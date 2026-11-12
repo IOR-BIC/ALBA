@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorCompositorMouseTest
+ Module: albaCompositorMouseBehaviorTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,16 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaInteractorCompositorMouseTest_H__
-#define __CPP_UNIT_albaInteractorCompositorMouseTest_H__
+#ifndef __CPP_UNIT_albaCompositorMouseBehaviorTest_H__
+#define __CPP_UNIT_albaCompositorMouseBehaviorTest_H__
 
 #include "albaTest.h"
 
-class albaInteractorCompositorMouseTest : public albaTest
+class albaCompositorMouseBehaviorTest : public albaTest
 {
   public:
 
-  CPPUNIT_TEST_SUITE( albaInteractorCompositorMouseTest );
+  CPPUNIT_TEST_SUITE( albaCompositorMouseBehaviorTest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
   CPPUNIT_TEST(TestStartInteraction);

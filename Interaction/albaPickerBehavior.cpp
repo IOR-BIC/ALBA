@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPicker
+ Module: albaPickerBehavior
  Authors: Marco Petrone
  
  Copyright (c) BIC
@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaInteractorPicker.h"
+#include "albaPickerBehavior.h"
 #include "albaPickHelper.h"
 #include "albaEvent.h"
 
@@ -55,22 +55,22 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractorPicker)
+albaCxxTypeMacro(albaPickerBehavior)
 //------------------------------------------------------------------------------
-albaInteractorPicker::albaInteractorPicker()
+albaPickerBehavior::albaPickerBehavior()
 //------------------------------------------------------------------------------
 {
   m_ContinuousPickingFlag = false;
 }
 
 //------------------------------------------------------------------------------
-albaInteractorPicker::~albaInteractorPicker()
+albaPickerBehavior::~albaPickerBehavior()
 //------------------------------------------------------------------------------
 {
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorPicker::OnEvent(albaEventBase *event)
+void albaPickerBehavior::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   Superclass::OnEvent(event);
@@ -85,14 +85,14 @@ void albaInteractorPicker::OnEvent(albaEventBase *event)
   }
 }
 //----------------------------------------------------------------------------
-void albaInteractorPicker::OnButtonDown(albaEventInteraction *e)
+void albaPickerBehavior::OnButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   PickFromEvent(e);
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPicker::OnButtonUp(albaEventInteraction *e)
+void albaPickerBehavior::OnButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if (m_ContinuousPickingFlag)
@@ -100,7 +100,7 @@ void albaInteractorPicker::OnButtonUp(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorPicker::PickFromEvent(albaEventInteraction *e)
+void albaPickerBehavior::PickFromEvent(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if (albaDeviceButtonsPadTracker *tracker=albaDeviceButtonsPadTracker::SafeDownCast((albaDevice *)e->GetSender()))
@@ -118,7 +118,7 @@ void albaInteractorPicker::PickFromEvent(albaEventInteraction *e)
   }
 }
 //----------------------------------------------------------------------------
-void albaInteractorPicker::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
+void albaPickerBehavior::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
   double pos_picked[3], scalar_value;

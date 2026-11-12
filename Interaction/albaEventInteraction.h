@@ -26,7 +26,7 @@ template class ALBA_EXPORT albaAutoPointer<albaMatrix>;
 class albaView;
 class albaDevice;
 class albaVME;
-class albaInteractor;
+class albaInteractionBehavior;
 class vtkProp3D;
 
 /** Event class to transport a triggering button and a position from pointing devices.
@@ -89,7 +89,7 @@ public:
     Find the VME picked by the device at the event position on the given view.
     The picking is performed only the first time, then the result is cached into the event
     and shared by all the interactors receiving it. Return true if a VME has been picked. */
-  bool FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractor *&pickedBehavior);
+  bool FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior);
 
   /** Return the position picked by FindPokedVme, meaningful only if a VME has been picked */
   void GetPickedPosition(double pos[3]);
@@ -118,7 +118,7 @@ protected:
   albaDevice     *m_PickDevice;         ///< Device used by the cached picking
   vtkProp3D      *m_PickedProp;         ///< Cached picked prop
   albaVME        *m_PickedVme;          ///< Cached picked VME
-  albaInteractor *m_PickedBehavior;     ///< Cached behavior of the picked VME
+  albaInteractionBehavior *m_PickedBehavior;     ///< Cached behavior of the picked VME
   double          m_PickedPosition[3];  ///< Cached picked position
 
   int           m_Button;     ///< Optional button which triggered the event

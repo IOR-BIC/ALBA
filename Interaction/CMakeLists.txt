@@ -49,7 +49,7 @@ SET(PROJECT_SRCS
   albaGUITransformTextEntries.cpp  			albaGUITransformTextEntries.h
   albaInteractionFactory.cpp  				albaInteractionFactory.h
   albaInteractionManager.cpp  				albaInteractionManager.h
-  albaInteractor.cpp  						albaInteractor.h
+  albaInteractionBehavior.cpp  						albaInteractionBehavior.h
   albaInteractionAgent.cpp  						albaInteractionAgent.h
   albaInteractionTool.cpp  						albaInteractionTool.h
   albaCameraTool.cpp  						albaCameraTool.h
@@ -67,12 +67,12 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
-  albaInteractorCompositorMouse.cpp  		albaInteractorCompositorMouse.h
+  albaCompositorMouseBehavior.cpp  		albaCompositorMouseBehavior.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
-  albaInteractorGenericMouse.cpp  			albaInteractorGenericMouse.h
-  albaInteractorPER.cpp  					albaInteractorPER.h
-  albaInteractorPicker.cpp  					albaInteractorPicker.h
-  albaInteractorSER.cpp  									albaInteractorSER.h  ######################
+  albaGenericMouseBehavior.cpp  			albaGenericMouseBehavior.h
+  albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
+  albaPickerBehavior.cpp  					albaPickerBehavior.h
+  albaStaticEventRouter.cpp  									albaStaticEventRouter.h  ######################
   albaPickerTool.cpp  						albaPickerTool.h
   albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
@@ -98,8 +98,8 @@ SET(PROJECT_SRCS
 	alba2DMeasureSegmentTool.cpp			alba2DMeasureSegmentTool.h
 	alba2DMeasureTemplateTool.cpp		alba2DMeasureTemplateTool.h
 	
-	albaInteractorCompositorMouseFloatVME.cpp albaInteractorCompositorMouseFloatVME.h
-	albaInteractorGenericMouseFloatVME.cpp	albaInteractorGenericMouseFloatVME.h
+	albaCompositorMouseFreeTransformBehavior.cpp albaCompositorMouseFreeTransformBehavior.h
+	albaGenericMouseFreeTransformBehavior.cpp	albaGenericMouseFreeTransformBehavior.h
 	alba2DMeasureEllipseTool.cpp alba2DMeasureEllipseTool.h
 )
 

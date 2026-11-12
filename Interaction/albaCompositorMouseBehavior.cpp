@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorCompositorMouse
+ Module: albaCompositorMouseBehavior
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -23,7 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaInteractorCompositorMouse.h"
+#include "albaCompositorMouseBehavior.h"
 
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaDecl.h"
@@ -42,10 +42,10 @@
 
 using namespace std;
 
-albaCxxTypeMacro(albaInteractorCompositorMouse);
+albaCxxTypeMacro(albaCompositorMouseBehavior);
 
 //----------------------------------------------------------------------------
-albaInteractorCompositorMouse::albaInteractorCompositorMouse() 
+albaCompositorMouseBehavior::albaCompositorMouseBehavior() 
 //----------------------------------------------------------------------------
 {
   m_StartButton = -1;
@@ -55,7 +55,7 @@ albaInteractorCompositorMouse::albaInteractorCompositorMouse()
   m_CurrentCamera = NULL;
 }
 //----------------------------------------------------------------------------
-albaInteractorCompositorMouse::~albaInteractorCompositorMouse() 
+albaCompositorMouseBehavior::~albaCompositorMouseBehavior() 
 //----------------------------------------------------------------------------
 {
 	// traverse the map and destroy all the behaviors
@@ -65,7 +65,7 @@ albaInteractorCompositorMouse::~albaInteractorCompositorMouse()
 }
 
 //------------------------------------------------------------------------------
-int albaInteractorCompositorMouse::StartInteraction(albaDeviceButtonsPadMouse *mouse)
+int albaCompositorMouseBehavior::StartInteraction(albaDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   // fill this object m_Renderer ivar and get the camera
@@ -80,11 +80,11 @@ int albaInteractorCompositorMouse::StartInteraction(albaDeviceButtonsPadMouse *m
 }
 
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse *albaInteractorCompositorMouse::CreateBehavior(MMI_ACTIVATOR activator)
+albaGenericMouseBehavior *albaCompositorMouseBehavior::CreateBehavior(MMI_ACTIVATOR activator)
 //----------------------------------------------------------------------------
 {
   // create the generic behavior and populate the map
-  albaInteractorGenericMouse *pISAG = albaInteractorGenericMouse::New();
+  albaGenericMouseBehavior *pISAG = albaGenericMouseBehavior::New();
   
   m_ActivatorMap[activator] = pISAG;
   switch (activator)
@@ -128,7 +128,7 @@ albaInteractorGenericMouse *albaInteractorCompositorMouse::CreateBehavior(MMI_AC
 }
 
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse *albaInteractorCompositorMouse::GetBehavior(MMI_ACTIVATOR activator)
+albaGenericMouseBehavior *albaCompositorMouseBehavior::GetBehavior(MMI_ACTIVATOR activator)
 //----------------------------------------------------------------------------
 {
   // return pointer to the behavior given the map key
@@ -136,25 +136,25 @@ albaInteractorGenericMouse *albaInteractorCompositorMouse::GetBehavior(MMI_ACTIV
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnMiddleButtonDown(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnMiddleButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
 	InitInteraction(MOUSE_MIDDLE_PRESSED, e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnMiddleButtonUp(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnMiddleButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   OnLeftButtonUp(e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnLeftButtonDown(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnLeftButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
  	InitInteraction(MOUSE_LEFT_PRESSED, e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnLeftButtonUp(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnLeftButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
 
@@ -169,20 +169,20 @@ void albaInteractorCompositorMouse::OnLeftButtonUp(albaEventInteraction *e)
   }
 }
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnRightButtonDown(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnRightButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
  	InitInteraction(MOUSE_RIGHT_PRESSED, e);
 }
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnRightButtonUp(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnRightButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   OnLeftButtonUp(e);
 }
 
 //----------------------------------------------------------------------------
-int albaInteractorCompositorMouse::MouseToActivator(int mouseButton, int shift, int ctrl)
+int albaCompositorMouseBehavior::MouseToActivator(int mouseButton, int shift, int ctrl)
 //----------------------------------------------------------------------------
 {
   if (mouseButton == MOUSE_LEFT_PRESSED)
@@ -220,7 +220,7 @@ int albaInteractorCompositorMouse::MouseToActivator(int mouseButton, int shift, 
 }
    
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::InitInteraction(int buttonPressed, albaEventInteraction *e)
+void albaCompositorMouseBehavior::InitInteraction(int buttonPressed, albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   double pos[2];
@@ -235,7 +235,7 @@ void albaInteractorCompositorMouse::InitInteraction(int buttonPressed, albaEvent
   // get info from picked vme
   albaVME        *picked_vme  = NULL;
   vtkProp3D     *picked_prop = NULL;
-  albaInteractor *picked_bh   = NULL;
+  albaInteractionBehavior *picked_bh   = NULL;
 
   albaView *v = mouse->GetView();
   assert(v);
@@ -281,7 +281,7 @@ void albaInteractorCompositorMouse::InitInteraction(int buttonPressed, albaEvent
 
 
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnButtonDown(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   // if in multi button mode and already interacting simply forward the event...
@@ -315,7 +315,7 @@ void albaInteractorCompositorMouse::OnButtonDown(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnButtonUp(albaEventInteraction *e)
+void albaCompositorMouseBehavior::OnButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   m_ButtonPressed = e->GetButton();
@@ -342,7 +342,7 @@ void albaInteractorCompositorMouse::OnButtonUp(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void albaInteractorCompositorMouse::OnEvent(albaEventBase *event)
+void albaCompositorMouseBehavior::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);

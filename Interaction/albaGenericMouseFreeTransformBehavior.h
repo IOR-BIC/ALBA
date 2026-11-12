@@ -10,13 +10,13 @@ Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __albaInteractorGenericMouseFloatVME_h
-#define __albaInteractorGenericMouseFloatVME_h
+#ifndef __albaGenericMouseFreeTransformBehavior_h
+#define __albaGenericMouseFreeTransformBehavior_h
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 //----------------------------------------------------------------------------
 //forward ref
@@ -24,10 +24,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class albaDeviceButtonsPadMouse;
 
 
-class ALBA_EXPORT albaInteractorGenericMouseFloatVME : public albaInteractorGenericMouse
+class ALBA_EXPORT albaGenericMouseFreeTransformBehavior : public albaGenericMouseBehavior
 {
 public:
-  albaTypeMacro(albaInteractorGenericMouseFloatVME, albaInteractorGenericMouse);
+  albaTypeMacro(albaGenericMouseFreeTransformBehavior, albaGenericMouseBehavior);
   
   /** Set the current camera */
   //virtual void SetCurrentCamera(vtkCamera *camera) {m_CurrentCamera=camera;}
@@ -36,8 +36,8 @@ public:
 
 protected:
 
-  albaInteractorGenericMouseFloatVME();
-  ~albaInteractorGenericMouseFloatVME();
+  albaGenericMouseFreeTransformBehavior();
+  ~albaGenericMouseFreeTransformBehavior();
 
   //----------------------------------------------------------------------------
   // trackball interaction style stuff 

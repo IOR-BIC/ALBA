@@ -26,8 +26,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaInteractorGenericMouse;
-class albaInteractorCompositorMouse;
+class albaGenericMouseBehavior;
+class albaCompositorMouseBehavior;
 
 class albaVMEGizmo;
 class albaMatrix;
@@ -151,10 +151,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  albaInteractorCompositorMouse *m_IsaComp[2];
+  albaCompositorMouseBehavior *m_IsaComp[2];
 
   /** isa generic*/
-  albaInteractorGenericMouse *m_IsaGen[2];
+  albaGenericMouseBehavior *m_IsaGen[2];
 
   /** Gizmo color setting facilities; part can be CYLINDER or CUBE*/
   void SetColor(int part, double col[3]);

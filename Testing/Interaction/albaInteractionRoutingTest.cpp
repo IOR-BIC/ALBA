@@ -31,7 +31,7 @@
 #include "albaEventInteraction.h"
 #include "alba2DMeasureTool.h"
 #include "alba2DMeasureEllipseTool.h"
-#include "albaInteractorPER.h"
+#include "albaPositionalEventRouter.h"
 #include "albaPickerTool.h"
 #include "albaCameraTool.h"
 #include "albaCameraMouseTool.h"
@@ -188,7 +188,7 @@ void albaInteractionRoutingTest::Set2DCamera()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::TestCameraDragAndWheel()
 {
-  albaInteractorPER *per = albaInteractorPER::New();
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   m_Mouse->AddObserver(per, MCH_INPUT);
   per->SetEventTracing(true);
 
@@ -226,7 +226,7 @@ void albaInteractionRoutingTest::Drag(int button, double x, double y, int modifi
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::TestCameraButtons()
 {
-  albaInteractorPER *per = albaInteractorPER::New();
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   m_Mouse->AddObserver(per, MCH_INPUT);
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   double focalPoint[3], newFocalPoint[3], viewUp[3], newViewUp[3], distance;
@@ -327,7 +327,7 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   m_Renderer->ResetCamera();
   m_RenderWindow->Render();
 
-  albaInteractorPER *per = albaInteractorPER::New();
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   m_Mouse->AddObserver(per, MCH_INPUT);
   albaPickerTool *picker;
   albaNEW(picker);
@@ -374,9 +374,9 @@ void albaInteractionRoutingTest::TestPERPickerClick()
 }
 
 //----------------------------------------------------------------------------
-albaInteractorPER *albaInteractionRoutingTest::NewPERWithTool(albaInteractionTool *tool)
+albaPositionalEventRouter *albaInteractionRoutingTest::NewPERWithTool(albaInteractionTool *tool)
 {
-  albaInteractorPER *per = albaInteractorPER::New();
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   per->SetListener(&m_Listener);
   m_Mouse->AddObserver(per, MCH_INPUT);
   per->PushTool(tool);
@@ -384,7 +384,7 @@ albaInteractorPER *albaInteractionRoutingTest::NewPERWithTool(albaInteractionToo
 }
 
 //----------------------------------------------------------------------------
-void albaInteractionRoutingTest::DeletePER(albaInteractorPER *per)
+void albaInteractionRoutingTest::DeletePER(albaPositionalEventRouter *per)
 {
   m_Mouse->RemoveObserver(per);
   per->Delete();
@@ -397,7 +397,7 @@ void albaInteractionRoutingTest::Test2DMeasureAddWithoutModifiers()
   albaRecording2DMeasure *measure;
   albaNEW(measure);
   measure->SetListener(&m_Listener);
-  albaInteractorPER *per = NewPERWithTool(measure);
+  albaPositionalEventRouter *per = NewPERWithTool(measure);
   measure->SetAction(alba2DMeasureTool::ACTION_ADD_MEASURE);
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
@@ -429,7 +429,7 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
   albaRecording2DMeasure *measure;
   albaNEW(measure);
   measure->SetListener(&m_Listener);
-  albaInteractorPER *per = NewPERWithTool(measure);
+  albaPositionalEventRouter *per = NewPERWithTool(measure);
   per->SetEventTracing(true);
 
   // SHIFT leaves button down, drag and button up to the camera
@@ -480,7 +480,7 @@ void albaInteractionRoutingTest::Test2DMeasureRightButton()
   albaRecording2DMeasure *measure;
   albaNEW(measure);
   measure->SetListener(&m_Listener);
-  albaInteractorPER *per = NewPERWithTool(measure);
+  albaPositionalEventRouter *per = NewPERWithTool(measure);
 
   // the measures do not use the right button: the right click shows the context menu of the view
   SendMouse(albaDeviceButtonsPad::GetButtonDownId(), 400, 300, ALBA_RIGHT_BUTTON);
@@ -509,7 +509,7 @@ void albaInteractionRoutingTest::Test2DMeasureMoveHighlights()
   albaRecording2DMeasure *measure;
   albaNEW(measure);
   measure->SetListener(&m_Listener);
-  albaInteractorPER *per = NewPERWithTool(measure);
+  albaPositionalEventRouter *per = NewPERWithTool(measure);
 
   // a move without buttons highlights the measure under the cursor
   measure->SetAction(alba2DMeasureTool::ACTION_NONE);
@@ -534,7 +534,7 @@ void albaInteractionRoutingTest::Test2DMeasurePerspectiveView()
   albaRecording2DMeasure *measure;
   albaNEW(measure);
   measure->SetListener(&m_Listener);
-  albaInteractorPER *per = NewPERWithTool(measure);
+  albaPositionalEventRouter *per = NewPERWithTool(measure);
   measure->SetAction(alba2DMeasureTool::ACTION_ADD_MEASURE);
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
@@ -561,7 +561,7 @@ void albaInteractionRoutingTest::TestEllipseCtrlRotates()
   albaRoutingTestEllipse *ellipse;
   albaNEW(ellipse);
   ellipse->SetListener(&m_Listener);
-  albaInteractorPER *per = NewPERWithTool(ellipse);
+  albaPositionalEventRouter *per = NewPERWithTool(ellipse);
 
   // draw an ellipse
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 300, 300);
