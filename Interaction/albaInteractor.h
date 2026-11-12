@@ -17,7 +17,7 @@
 #ifndef __albaInteractor_h
 #define __albaInteractor_h
 
-#include "albaAgent.h"
+#include "albaInteractionAgent.h"
 #include "albaString.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkType.h"
@@ -58,7 +58,7 @@ class vtkProp3D;
   Interactors usually send output events through the DefaultChannel, and also through the m_listener by wrapping
   the event inside a MFL_EVENT_ID event (event can be retrieved with albaEvent::GetVtkObject().
 */
-class ALBA_EXPORT albaInteractor : public albaAgent
+class ALBA_EXPORT albaInteractor : public albaInteractionAgent
 {
 public:
   albaInteractor();
@@ -72,14 +72,7 @@ public:
   ALBA_ID_DEC(BUTTON_DOWN);         ///< Issued when a button is pressed
   ALBA_ID_DEC(BUTTON_UP);           ///< Issued when a button is released
 
-  albaAbstractTypeMacro(albaInteractor,albaAgent);
-
-  /**  
-    Set/Get the renderer this interactor is attached to. This methods is redefined
-    in subclasses to perform specialized actions when the renderer is changed */
-  virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);
-  vtkRenderer *GetRenderer() {return m_Renderer;}
-	albaView *GetView() {return m_View;}
+  albaAbstractTypeMacro(albaInteractor,albaInteractionAgent);
 
   /** Return the current input device. */
   albaDevice *GetDevice() {return m_Device;}
@@ -185,14 +178,6 @@ protected:
   virtual void OnButtonDown       (albaEventInteraction *e);
   virtual void OnButtonUp         (albaEventInteraction *e);
 
-  void ComputeDisplayToWorld(double x, double y, double z, double worldPt[4]);
-  void ComputeWorldToDisplay(double x, double y, double z, double displayPt[3]);
-
-  /**
-    Send to the listener the event eventId carrying the picked position as a vtkPoints with one point (GetVtkObj),
-    the id of the picked point or cell (GetArg), a scalar value (GetDouble) and the picked VME (GetVme). */
-  void SendPickedPointEvent(int eventId, double pos[3], vtkIdType id = 0, double scalar = 0, albaVME *vme = NULL);
-
 
   /** 
     Find the pocked VME at button down. As argument the function needs
@@ -216,9 +201,6 @@ protected:
   int           m_ButtonsCounter;       ///< Take count of the number of button pressed.
 
   albaVME       *m_VME;                  ///< the object being interacted (optional)
-	albaView			*m_View;								 ///< the view this interactor is working on
-
-  vtkALBASmartPointer<vtkRenderer> m_Renderer; ///< the renderer this interactor is working on
 	vtkALBASmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
 
   bool m_TestMode;///< Flag used with cppunitTest

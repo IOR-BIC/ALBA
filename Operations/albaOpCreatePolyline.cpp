@@ -23,8 +23,8 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaGUI.h"
-#include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasure_Point.h"
+#include "alba2DMeasureTool.h"
+#include "alba2DMeasurePointTool.h"
 #include "albaLogicWithManagers.h"
 #include "albaVMEPolyline.h"
 #include "albaView.h"
@@ -111,14 +111,14 @@ void albaOpCreatePolyline::OpRun()
 	if (view)
 	{
 		// Init Point Interactor
-		m_PointInteractor = albaInteractor2DMeasure_Point::New();
+		albaNEW(m_PointInteractor);
 		m_PointInteractor->SetListener(this);
 		m_PointInteractor->Enable(false);
 		m_PointInteractor->SetRendererByView(view);
 		m_PointInteractor->SetColorText(1, 0, 0);
 		m_PointInteractor->ShowText(false);
 
-		albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_PointInteractor));
+		GetLogicManager()->PushTool(m_PointInteractor);
 		m_PointInteractor->Enable(true);
 		m_PointInteractor->SetListener(this);
 
@@ -166,7 +166,7 @@ void albaOpCreatePolyline::OpStop(int result)
 	if (m_PointInteractor)
 	{
 		// Remove ExtraInteractor
-		albaEventMacro(albaEvent(this, PER_POP));
+		GetLogicManager()->PopTool(m_PointInteractor);
 
 		m_PointInteractor->RemoveAllMeasures();
 		albaDEL(m_PointInteractor);
@@ -203,10 +203,10 @@ void albaOpCreatePolyline::OnEvent(albaEventBase *alba_event)
 			if (!m_IsLoading)
 				switch (e->GetId())
 				{
-				case albaInteractor2DMeasure::ID_MEASURE_SELECTED: break;
-				case albaInteractor2DMeasure::ID_MEASURE_ADDED: break;
-				case albaInteractor2DMeasure::ID_MEASURE_CHANGED: break;
-				case albaInteractor2DMeasure::ID_MEASURE_FINISHED:
+				case alba2DMeasureTool::ID_MEASURE_SELECTED: break;
+				case alba2DMeasureTool::ID_MEASURE_ADDED: break;
+				case alba2DMeasureTool::ID_MEASURE_CHANGED: break;
+				case alba2DMeasureTool::ID_MEASURE_FINISHED:
 				{
 					if (m_PointInteractor && m_PointInteractor->GetMeasureCount() > 2)
 					{

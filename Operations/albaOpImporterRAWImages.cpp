@@ -36,12 +36,12 @@
 #include "albaRWI.h"
 #include "albaGUIDialogPreview.h"
 #include "albaDeviceButtonsPadMouse.h"
-#include "albaInteractorDICOMImporter.h"
 #include "albaTagArray.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
 #include "albaVME.h"
 
+#include "vtkALBASmartPointer.h"
 #include "vtkRenderer.h"
 #include "vtkImageReader.h"
 #include "vtkImageImport.h"
@@ -123,7 +123,6 @@ albaOpImporterRAWImages::albaOpImporterRAWImages(wxString label) : albaOp(label)
   m_LookupTable	 = NULL;
   m_Texture		   = NULL;
   m_Plane = NULL;
-  m_DicomInteractor = NULL;
 
   m_GizmoStatus = GIZMO_NOT_EXIST;
   m_SideToBeDragged = 0;
@@ -227,12 +226,6 @@ void albaOpImporterRAWImages::CreatePipeline()
   m_GizmoActor->SetMapper(polyDataMapper);
   ////// 
 
-  if(!this->m_TestMode)
-  {
-    albaNEW(m_DicomInteractor);
-    m_DicomInteractor->SetListener(this);
-    m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
-  }
 }
 //----------------------------------------------------------------------------
 void albaOpImporterRAWImages::CreateGui()
@@ -382,9 +375,6 @@ void albaOpImporterRAWImages::OpRun()
 void albaOpImporterRAWImages::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  if(m_DicomInteractor)
-    m_Mouse->RemoveObserver(m_DicomInteractor);
-
   //cleanup +++++++++++++++++++++++++++++++++
   if(!this->m_TestMode)
   {
@@ -401,7 +391,6 @@ void albaOpImporterRAWImages::OpStop(int result)
   vtkDEL(m_Plane);
   vtkDEL(m_Mapper);
   vtkDEL(m_Texture);
-  albaDEL(m_DicomInteractor);
   vtkDEL(m_Actor);
   vtkDEL(m_GizmoPlane);
   vtkDEL(m_GizmoActor);

@@ -30,7 +30,7 @@
 class albaGUIButton;
 class albaGUIDialog;
 class albaRWI;
-class albaInteractorSelectPoint;
+class albaSelectPointTool;
 class vtkFeatureEdges;
 class vtkHoleConnectivity;
 class vtkPolyDataMapper;
@@ -111,7 +111,7 @@ protected:
 
 	albaGUIDialog						*m_Dialog;
 	albaRWI									*m_Rwi;
-	albaInteractorSelectPoint					*m_Picker;
+	albaSelectPointTool					*m_Picker;
 
 	vtkFeatureEdges					*m_ExctractFreeEdges;
 	vtkHoleConnectivity			*m_ExctractHole;

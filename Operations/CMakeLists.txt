@@ -17,7 +17,6 @@ IF (ALBA_USE_VTK)
 	albaOpImporterExternalFile.cpp	    albaOpImporterExternalFile.h
 	albaOpLabelExtractor.cpp	    			albaOpLabelExtractor.h
 	albaOpOpenExternalFile.cpp	    		albaOpOpenExternalFile.h
-	albaOp2DMeasure.cpp	    					albaOp2DMeasure.h
 	albaOpMeasure2D.cpp	    					albaOpMeasure2D.h
 	albaOpAddLandmark.cpp	    				albaOpAddLandmark.h
 	albaOpExporterImages.cpp	    				albaOpExporterImages.h
@@ -148,7 +147,6 @@ IF (ALBA_USE_VTK)
 	
 	albaOpESPCalibration.cpp		albaOpESPCalibration.h
 	
-	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
 	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
 	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
 	albaOpCreateProsthesis.cpp		albaOpCreateProsthesis.h
@@ -159,7 +157,6 @@ IF (ALBA_USE_VTK)
 	
 	albaOpCreatePolyline.cpp	albaOpCreatePolyline.h
 	
-	albaOpInteractorSliderSample.cpp albaOpInteractorSliderSample.h
 	albaOpShowHistory.cpp	albaOpShowHistory.h
 	albaOpNearestLandmark.cpp  albaOpNearestLandmark.h
 	albaOpImporterScancoImageIO.cpp albaOpImporterScancoImageIO.h

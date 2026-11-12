@@ -108,8 +108,6 @@ albaOpMove::~albaOpMove()
 bool albaOpMove::InternalAccept(albaVME* vme)
 //----------------------------------------------------------------------------
 {
-	/*albaEvent e(this,VIEW_SELECTED);
-	albaEventMacro(e);*/
 	return ( (vme!=NULL && vme->IsALBAType(albaVME) && !vme->IsA("albaVMERoot") && !vme->IsA("albaVMEExternalData") && !vme->IsA("albaVMERefSys")) || 
 					 (vme!=NULL && vme->IsALBAType(albaVMERefSys) && albaVMERefSys::SafeDownCast(vme)->IsMovable()) );
 }
@@ -246,20 +244,17 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
       {
         m_GuiTransformMouse->EnableWidgets(false);
 
-        albaEvent e(this,VIEW_SELECTED);
-        albaEventMacro(e);
-
         if (m_ActiveGizmo == TR_GIZMO)
         {
           m_GizmoRotate->Show(false);
           m_GizmoTranslate->SetRefSys(m_RefSysVME);
-          m_GizmoTranslate->Show(true && e.GetBool());
+          m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
         }
         else if (m_ActiveGizmo == ROT_GIZMO)
         {
           m_GizmoTranslate->Show(false);
           m_GizmoRotate->SetRefSys(m_RefSysVME);
-          m_GizmoRotate->Show(true && e.GetBool());
+          m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
         }
       }
 			GetLogicManager()->CameraUpdate();
@@ -268,20 +263,17 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
     
     case ID_CHOOSE_GIZMO_COMBO:
     {
-      albaEvent e(this,VIEW_SELECTED);
-      albaEventMacro(e);
-
       if (m_ActiveGizmo == TR_GIZMO)
       {
         m_GizmoRotate->Show(false);
         m_GizmoTranslate->SetRefSys(m_RefSysVME);
-        m_GizmoTranslate->Show(true && e.GetBool());
+        m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
       }
       else if (m_ActiveGizmo == ROT_GIZMO)
       {
         m_GizmoTranslate->Show(false);
         m_GizmoRotate->SetRefSys(m_RefSysVME);
-        m_GizmoRotate->Show(true && e.GetBool());
+        m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
       }
       else if (m_ActiveGizmo == SCAL_GIZMO)
       {

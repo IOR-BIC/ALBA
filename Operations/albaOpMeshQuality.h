@@ -30,7 +30,6 @@
 class vtkMeshQuality;
 class albaGUIDialog;
 class albaRWI;
-class albaInteractorCameraMove;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkScalarBarActor;
@@ -73,7 +72,6 @@ protected:
 
 	albaGUIDialog								*m_Dialog;
 	albaRWI									*m_Rwi;
-	albaInteractorCameraMove						*m_Picker;
 	vtkPolyDataMapper				*m_Mapper;
 	vtkActor								*m_Actor;
 	vtkScalarBarActor				*m_BarActor;

@@ -291,7 +291,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaAgentEventQueue.cpp  					../Interaction/albaAgentEventQueue.h
   ../Interaction/albaAgentThreaded.cpp  					../Interaction/albaAgentThreaded.h
   ../Interaction/albaAvatar.cpp  							../Interaction/albaAvatar.h
-  ../Interaction/albaAvatar2D.cpp  							../Interaction/albaAvatar2D.h
   ../Interaction/albaAvatar3D.cpp  							../Interaction/albaAvatar3D.h
   ../Interaction/albaAvatar3DCone.cpp  						../Interaction/albaAvatar3DCone.h
   ../Interaction/albaCameraTransform.cpp  					../Interaction/albaCameraTransform.h
@@ -328,37 +327,36 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractor.cpp  						../Interaction/albaInteractor.h
+  ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h
+  ../Interaction/albaInteractionTool.cpp  						../Interaction/albaInteractionTool.h
+  ../Interaction/albaCameraTool.cpp  						../Interaction/albaCameraTool.h
+  ../Interaction/albaCameraMouseTool.cpp  						../Interaction/albaCameraMouseTool.h
+  ../Interaction/albaSegmentationTool.cpp  					../Interaction/albaSegmentationTool.h
+  ../Interaction/albaSegmentationThresholdTool.cpp  					../Interaction/albaSegmentationThresholdTool.h
+  ../Interaction/albaSegmentationEditTool.cpp  					../Interaction/albaSegmentationEditTool.h
+  ../Interaction/albaSelectCellTool.cpp  					../Interaction/albaSelectCellTool.h
+  ../Interaction/albaSelectPointTool.cpp  					../Interaction/albaSelectPointTool.h
+  ../Interaction/albaVTKPickerTool.cpp  					../Interaction/albaVTKPickerTool.h
+  ../Interaction/albaExtractIsosurfaceTool.cpp  					../Interaction/albaExtractIsosurfaceTool.h
+  ../Interaction/albaDICOMImporterTool.cpp  					../Interaction/albaDICOMImporterTool.h
+  ../Interaction/albaCameraTrackerTool.cpp  						../Interaction/albaCameraTrackerTool.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
-  ../Interaction/albaInteractor2DAngle.cpp  				../Interaction/albaInteractor2DAngle.h
-  ../Interaction/albaInteractor2DDistance.cpp  				../Interaction/albaInteractor2DDistance.h
-  ../Interaction/albaInteractor2DIndicator.cpp  			../Interaction/albaInteractor2DIndicator.h
   ../Interaction/albaInteractor6DOF.cpp  					../Interaction/albaInteractor6DOF.h
   ../Interaction/albaInteractor6DOFCameraMove.cpp  			../Interaction/albaInteractor6DOFCameraMove.h
-  ../Interaction/albaInteractorCameraMove.cpp  				../Interaction/albaInteractorCameraMove.h
   ../Interaction/albaInteractorCompositorMouse.cpp  		../Interaction/albaInteractorCompositorMouse.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
-  ../Interaction/albaInteractorExtractIsosurface.cpp  		../Interaction/albaInteractorExtractIsosurface.h
   ../Interaction/albaInteractorGeneric6DOF.cpp  			../Interaction/albaInteractorGeneric6DOF.h
   ../Interaction/albaInteractorGenericInterface.cpp  		../Interaction/albaInteractorGenericInterface.h
   ../Interaction/albaInteractorGenericMouse.cpp  			../Interaction/albaInteractorGenericMouse.h
   ../Interaction/albaInteractorPER.cpp  					../Interaction/albaInteractorPER.h
   ../Interaction/albaInteractorPicker.cpp  					../Interaction/albaInteractorPicker.h
-  ../Interaction/albaInteractorSelectCell.cpp  				../Interaction/albaInteractorSelectCell.h
   ../Interaction/albaInteractorSER.cpp  					../Interaction/albaInteractorSER.h  ######################
-  ../Interaction/albaInteractorCameraPicker.cpp  					../Interaction/albaInteractorCameraPicker.h
-  ../Interaction/albaInteractorPERPicker.cpp  				../Interaction/albaInteractorPERPicker.h
-  ../Interaction/albaInteractorDICOMImporter.h  			../Interaction/albaInteractorDICOMImporter.cpp  
-  ../Interaction/albaInteractorSegmentationPicker.cpp  		../Interaction/albaInteractorSegmentationPicker.h 
-  ../Interaction/albaInteractorPERScalarInformation.cpp  	../Interaction/albaInteractorPERScalarInformation.h
-  ../Interaction/albaInteractorPERBrushFeedback.cpp  		../Interaction/albaInteractorPERBrushFeedback.h
-  ../Interaction/albaInteractorVTKPicker.cpp  						../Interaction/albaInteractorVTKPicker.h
+  ../Interaction/albaPickerTool.cpp  				../Interaction/albaPickerTool.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
-  ../Interaction/albaInteractorSelectPoint.cpp  						../Interaction/albaInteractorSelectPoint.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
-  ../Interaction/albaDeviceButtonsPadMouseDialog.cpp	  	../Interaction/albaDeviceButtonsPadMouseDialog.h
   ../Interaction/albaGUITransformSliders.cpp  				../Interaction/albaGUITransformSliders.h    
   ../Interaction/albaGizmoCrossRotateTranslate.cpp  		../Interaction/albaGizmoCrossRotateTranslate.h	  
   ../Interaction/albaGizmoCrossRotate.cpp  					../Interaction/albaGizmoCrossRotate.h
@@ -367,7 +365,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoCrossTranslate.cpp  				../Interaction/albaGizmoCrossTranslate.h
   ../Interaction/albaGizmoCrossTranslateAxis.cpp  			../Interaction/albaGizmoCrossTranslateAxis.h
   ../Interaction/albaGizmoCrossTranslatePlane.cpp  			../Interaction/albaGizmoCrossTranslatePlane.h
-	../Interaction/albaInteractorSlider.cpp								../Interaction/albaInteractorSlider.h
 )
 
 IF (ALBA_USE_P5_GLOVE)
@@ -776,7 +773,6 @@ IF (ALBA_USE_VTK)
 	../Operations/albaOpImporterExternalFile.cpp	    ../Operations/albaOpImporterExternalFile.h
 	../Operations/albaOpLabelExtractor.cpp	    			../Operations/albaOpLabelExtractor.h
 	../Operations/albaOpOpenExternalFile.cpp	    		../Operations/albaOpOpenExternalFile.h
-	../Operations/albaOp2DMeasure.cpp	    					../Operations/albaOp2DMeasure.h
 	../Operations/albaOpAddLandmark.cpp	    				../Operations/albaOpAddLandmark.h
 	../Operations/albaOpExporterBmp.cpp	    				../Operations/albaOpExporterBmp.h
 	../Operations/albaOpClipSurface.cpp	    				../Operations/albaOpClipSurface.h

@@ -242,8 +242,7 @@ void albaDeviceTest::TestGetViewAndRenderer()
   albaDevice *mouseDevice = mouse;
   CPPUNIT_ASSERT(mouseDevice->GetView() == NULL);
   albaDeviceTestView *view = new albaDeviceTestView();
-  albaEvent selectEvent(NULL, VIEW_SELECT, (albaView *)view);
-  mouse->OnEvent(&selectEvent);
+  mouse->SetView(view);
   CPPUNIT_ASSERT(mouseDevice->GetView() == view);
   CPPUNIT_ASSERT(mouseDevice->GetRenderer() == NULL); // no render window selected
   albaDEL(mouse);

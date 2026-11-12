@@ -133,14 +133,6 @@ albaInteractionManager::albaInteractionManager()
 //------------------------------------------------------------------------------
 albaInteractionManager::~albaInteractionManager()
 {
-  while(!m_PERList.empty())
-  {
-    albaInteractorPER *old_per=*(m_PERList.rbegin());
-    m_PERList.pop_back();
-    assert(old_per);
-    SetPER(old_per);
-  }
-
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
@@ -148,58 +140,25 @@ albaInteractionManager::~albaInteractionManager()
   albaDEL(m_PositionalEventRouter);
 }
 
-//------------------------------------------------------------------------------
-void albaInteractionManager::SetPER(albaInteractorPER *per)
-{
-  albaAction *pointing_action = m_StaticEventRouter->GetAction("PointAndManipulate");
-  assert(pointing_action);
-
-  // unbind old PER
-  if (m_PositionalEventRouter)
-  {
-    pointing_action->UnBindInteractor(m_PositionalEventRouter);
-    m_PositionalEventRouter->SetListener(NULL);
-  }
-
-	//move camera observers from current per to new per
-	std::vector <albaObserver *> obVect;
-	m_PositionalEventRouter->GetCameraMouseInteractor()->GetObservers(MCH_UP, obVect);
-	m_PositionalEventRouter->GetCameraMouseInteractor()->RemoveAllObservers();
-
-  m_PositionalEventRouter = per;
-
-	for (int i = 0; i < obVect.size(); i++)
-		m_PositionalEventRouter->GetCameraMouseInteractor()->AddObserver(obVect[i]);
-
-  // bind new PER
-  m_PositionalEventRouter->SetName("PositionalEventRouter");
-  pointing_action->BindInteractor(m_PositionalEventRouter);
-  m_PositionalEventRouter->SetListener(this);
-}
-
 //----------------------------------------------------------------------------
-void albaInteractionManager::PushPER(albaInteractorPER *per)
+void albaInteractionManager::PushTool(albaInteractionTool *tool)
 {
-  albaInteractorPER *old_per=GetPER();
-  m_PERList.push_back(old_per);
-  SetPER(per);
+  m_PositionalEventRouter->PushTool(tool);
 }
 //----------------------------------------------------------------------------
-bool albaInteractionManager::PopPER()
+void albaInteractionManager::PopTool(albaInteractionTool *tool)
 {
-  // retrieve and delete last item
-  albaInteractorPER *old_per=*(m_PERList.rbegin());
-  m_PERList.pop_back(); 
-
-  assert(old_per); // should always be != NULL
-
-  if (old_per) // if not NULL
-  {
-    SetPER(old_per);
-    return true;
-  }
-  
-  return false;
+  m_PositionalEventRouter->PopTool(tool);
+}
+//----------------------------------------------------------------------------
+bool albaInteractionManager::OnKey(int keyCode, bool pressed)
+{
+  return m_PositionalEventRouter->DispatchKey(keyCode, pressed);
+}
+//----------------------------------------------------------------------------
+void albaInteractionManager::SetEventTracing(bool enable)
+{
+  m_PositionalEventRouter->SetEventTracing(enable);
 }
 
 //----------------------------------------------------------------------------
@@ -316,8 +275,17 @@ albaAvatar *albaInteractionManager::GetAvatar(const char *name)
 //------------------------------------------------------------------------------
 void albaInteractionManager::ViewSelected(albaView *view)
 {
-  albaEvent e(this,VIEW_SELECT,view);
-  OnViewSelected(&e);
+  albaViewVTK *viewVTK = albaViewVTK::SafeDownCast(view);
+  m_SelectedView = viewVTK;
+
+  vtkRenderer *ren = viewVTK ? viewVTK->GetFrontRenderer() : NULL;
+  SetCurrentRenderer(ren);
+
+  // the avatars and the mouse work on the selected view
+  for (mmuAvatarsMap::iterator it = m_Avatars.begin(); it != m_Avatars.end(); it++)
+    it->second->SetRendererAndView(ren, view);
+
+  GetMouseDevice()->SetView(view);
 }
 
 
@@ -355,59 +323,6 @@ void albaInteractionManager::CameraUpdate(albaView *view)
       m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
     }
   }
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::OnViewSelected(albaEvent *event)
-{  
-  albaView *v = event->GetView();
-	albaViewVTK *view = albaViewVTK::SafeDownCast(v); 
-  m_SelectedView = view;
-
-  if (view)
-  {
-    vtkRenderer *ren = view->GetFrontRenderer();
-    SetCurrentRenderer(ren);
-    event->SetData(ren); // add the renderer to the event to be sent to avatars
-  }
-  else
-  {
-    SetCurrentRenderer(NULL);
-
-  }
-
-  // propagate event to all avatars...
-  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
-  {
-    //it->second->OnEvent(&albaEventBase(this,VIEW_SELECT));    
-    it->second->OnEvent(event);
-  }
-
-  // propagate VIEW_SELECTED event to the mouse device too...
-  GetMouseDevice()->OnEvent(event);
-  
-  // TODO: force a render to the view here....
-
-  /*
-  // TODO: remove call to Render() and substitute with sending a CameraUpdate event.
-  // Force a rendering of the old render window 
-  // to update the display after removing the avatars
-  if (old_rw&&!old_rw->GetNeverRendered())
-  {
-    old_rw->Render();
-    old_rw->UnRegister(NULL);
-  }
-  
-  // retrieve new render window
-  vtkRenderWindow *rw=(m_CurrentRenderer)?m_CurrentRenderer->GetRenderWindow():NULL;
-  
-  // TODO: remove call to Render() and substitute with sending a CameraUpdate event.
-  // Force a rendering of the new render window
-  // to update the display after adding the avatars
-  if (rw&&!rw->GetNeverRendered())
-    rw->Render();
-
-  */
 }
 
 //------------------------------------------------------------------------------
@@ -704,12 +619,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
     // event raised by PER to advise of VME selection or double click on a VME
     albaEventMacro(albaEvent(event->GetSender(), id, (albaVME *)event->GetData()));
   }
-  else if (id == VIEW_SELECT)
-  {
-    albaEvent *e = albaEvent::SafeDownCast(event);
-    assert(event);
-    OnViewSelected(e);
-  }  
   else if (id == albaDeviceManager::DISPATCH_START)
   {
     OnStartDispatching();    

@@ -52,6 +52,7 @@ class vtkXMLDataElement;
 class vtkXMLDataParser;
 class albaInteractorSER;
 class albaInteractorPER;
+class albaInteractionTool;
 class albaVME;
 class albaGUIDialog;
 class albaGUI;
@@ -64,7 +65,6 @@ class albaGUINamedPanel;
 #include "albaDllMacros.h"
 EXPORT_STL_MAP(ALBA_EXPORT,albaString,albaAutoPointer<albaAvatar>);
 EXPORT_STL_VECTOR(ALBA_EXPORT, albaAvatar *);
-EXPORT_STL_LIST(ALBA_EXPORT,albaAutoPointer<albaInteractorPER>);
 #endif
 
 
@@ -175,14 +175,18 @@ public:
   /** return the positional event router */
   albaInteractorPER *GetPER() {return m_PositionalEventRouter;}
 
-  /** used to override the default PER. To be called before initializations */
-  void SetPER(albaInteractorPER *per);
+  /** Push a tool on the tool stack of the PER: it receives the events before the default interaction */
+  void PushTool(albaInteractionTool *tool);
 
-  /** set a new PER and keep the old one in a list */
-  void PushPER(albaInteractorPER *per);
-  
-  /** restore previous PER instance */
-  bool PopPER();
+  /** Remove a tool from the tool stack of the PER */
+  void PopTool(albaInteractionTool *tool);
+
+  /** Send a key pressed or released to the tools of the PER; return true if a tool used it */
+  bool OnKey(int keyCode, bool pressed);
+
+  /** Enable/disable the event tracing: each input event routed by the PER is written in the log
+  with the device, the button, the modifiers and who handled it. Disabled by default. */
+  void SetEventTracing(bool enable);
 
   /** return the static event router */
   albaInteractorSER *GetSER() {return m_StaticEventRouter;}
@@ -227,7 +231,6 @@ protected:
   virtual void OnStartDispatching();
   virtual void OnEndDispatching();
   virtual void OnCameraUpdate(albaEventBase *e);
-  virtual void OnViewSelected(albaEvent *event);
   virtual void OnDeviceAdded(albaEventBase *event);
   virtual void OnDeviceRemoving(albaEventBase *event);
   virtual void OnDeviceNameChanged(albaEventBase *event);
@@ -256,7 +259,6 @@ protected:
   albaInteractorSER*                 m_StaticEventRouter;
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
-  std::list<albaInteractorPER *>  m_PERList; ///< the interactor devoted to Positional Event Routing
 
   std::set<albaView *>                 m_CameraUpdateRequests; ///< requests for Camera update of single views
   

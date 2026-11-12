@@ -22,7 +22,7 @@
 class albaVMEPolyline;
 class albaGUI;
 class albaEvent;
-class albaInteractor2DMeasure_Point;
+class alba2DMeasurePointTool;
 
 //----------------------------------------------------------------------------
 // Class Name: albaOpCreatePolyline
@@ -64,7 +64,7 @@ protected:
 
 	void CreatePolyline();
 
-	albaInteractor2DMeasure_Point* m_PointInteractor;
+	alba2DMeasurePointTool* m_PointInteractor;
 	albaVMEPolyline *m_Polyline;
 
 	albaString m_PolylineName;

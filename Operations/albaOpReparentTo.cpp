@@ -117,9 +117,8 @@ void albaOpReparentTo::OpDo()
 {
 	m_OldParent = m_Input->GetParent();
 
-	albaEvent e(this, VIEW_SELECTED);
-	albaEventMacro(e);
-	int showed = e.GetView() && e.GetView()->IsVmeShowed(m_Input);
+	albaView *view = GetLogicManager()->GetSelectedView();
+	int showed = view && view->IsVmeShowed(m_Input);
 	
 	int reparentOK=ReparentTo(m_Input, m_TargetVme, m_OldParent);
 

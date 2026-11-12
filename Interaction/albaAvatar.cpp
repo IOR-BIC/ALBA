@@ -19,6 +19,7 @@
 
 // interactors & devices
 #include "albaDeviceButtonsPadTracker.h"
+#include "albaDevice.h"
 
 // gui
 #include "albaGUI.h"
@@ -64,6 +65,7 @@ albaAvatar::albaAvatar()
 //------------------------------------------------------------------------------
 {
   m_View                  = NULL;
+  m_Device                = NULL;
   m_Cursor3DHideCounter   = 0;
   m_Cursor2DHideCounter   = 0;
   m_Mode                  = MODE_3D;
@@ -119,6 +121,18 @@ albaDeviceButtonsPadTracker *albaAvatar::GetTracker()
 //------------------------------------------------------------------------------
 {
   return albaDeviceButtonsPadTracker::SafeDownCast(GetDevice());
+}
+//------------------------------------------------------------------------------
+void albaAvatar::SetDevice(albaDevice *device)
+//------------------------------------------------------------------------------
+{
+  if (m_Device)
+    m_Device->RemoveObserver(this);
+
+  m_Device = device; // avoid cross reference counting
+
+  if (m_Device)
+    m_Device->AddObserver(this, MCH_INPUT);
 }
 //------------------------------------------------------------------------------
 void albaAvatar::SetTracker(albaDeviceButtonsPadTracker *tracker)
@@ -315,22 +329,9 @@ int albaAvatar::InternalRestore(albaStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-void albaAvatar::OnViewSelected(albaEvent *e)
-//------------------------------------------------------------------------------
-{
-  SetRendererAndView((vtkRenderer *)e->GetData(), e->GetView());
-}
-//------------------------------------------------------------------------------
 void albaAvatar::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
 
-  albaID id=event->GetId();
-  
-  if (id==VIEW_SELECT)
-  {
-    albaEvent *e=albaEvent::SafeDownCast(event);
-    OnViewSelected(e);
-  }
 }

@@ -29,7 +29,7 @@
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIValidator.h"
 #include "albaRWI.h"
-#include "albaInteractorSelectPoint.h"
+#include "albaSelectPointTool.h"
 #include "albaVMESurface.h"
 
 #include "vtkALBASmartPointer.h"
@@ -404,7 +404,7 @@ void albaOpExtrusionHoles::OpStop(int result)
 void albaOpExtrusionHoles::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Mouse->RemoveObserver(m_Picker);
+	GetLogicManager()->PopTool(m_Picker);
 
 	if(m_SurfaceActor)
 		m_Rwi->m_RenFront->RemoveActor(m_SurfaceActor);
@@ -446,7 +446,8 @@ void albaOpExtrusionHoles::CreateOpDialog()
 
 	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
-	m_Mouse->AddObserver(m_Picker, MCH_INPUT);
+	m_Picker->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+	GetLogicManager()->PushTool(m_Picker);
 
 	wxPoint p = wxDefaultPosition;
 

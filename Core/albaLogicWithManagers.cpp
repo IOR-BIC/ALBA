@@ -147,7 +147,6 @@
 
 
 // OPERATIONS
-#include "albaOp2DMeasure.h"
 #include "albaOpMeasure2D.h"
 #include "albaOpComputeInertialTensor.h"
 #include "albaOpTransformOld.h"
@@ -178,7 +177,6 @@
 #include "albaOpEditMetadata.h"
 #include "albaOpEditNormals.h"
 #include "albaOpExtractIsosurface.h"
-#include "albaOpExtractImageFromArbitraryView.h"
 #include "albaOpExtrusionHoles.h"
 #include "albaOpFillHoles.h"
 #include "albaOpFilterSurface.h"
@@ -243,7 +241,6 @@
 #include "albaOpVOIDensityEditor.h"
 #include "albaOpValidateTree.h"
 #include "albaOpVolumeUnion.h"
-#include "albaOpInteractorSliderSample.h"
 
 
 // VIEWS
@@ -350,7 +347,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SelectedLandmark = NULL;
 	m_FatalExptionOccurred = false;
 
-	m_EventFilterFunc = NULL;
+	m_SelectedView = NULL;
 
 	m_SkipCameraUpdate = false;
 
@@ -960,6 +957,9 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			if (m_PlugControlPanel)
 				this->m_SideBar->ViewDeleted(e->GetView());
 
+			if (e->GetView() == m_SelectedView)
+				m_SelectedView = NULL;
+
 #ifdef ALBA_USE_VTK
 			// currently albaInteraction is strictly dependent on VTK (marco)
 			if (m_InteractionManager)
@@ -973,23 +973,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			m_OpManager->RefreshMenu();
 		}
 		break;
-		case VIEW_SELECT:
-		{
-			ViewSelect();
-			if (m_OpManager)
-			{
-				albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-				if (c != NULL)
-					c->SetAllowCloseWindow(!m_OpManager->Running());
-			}
-			EnableMenuAndToolbar();
-		}
-		break;
 		case VIEW_MAXIMIZE:
-			break;
-		case VIEW_SELECTED:
-			e->SetBool(m_ViewManager->GetSelectedView() != NULL);
-			e->SetView(m_ViewManager->GetSelectedView());
 			break;
 		break;
 		case CAMERA_RESET:
@@ -1018,51 +1002,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
-			break;
-		case INTERACTOR_ADD:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				albaInteractor *interactor = albaInteractor::SafeDownCast(e->GetMafObject());
-				assert(interactor);
-				albaString *action_name = e->GetString();
-				m_InteractionManager->BindAction(*action_name, interactor);
-			}
-#endif
-			break;
-		case INTERACTOR_REMOVE:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				albaInteractor *interactor = albaInteractor::SafeDownCast(e->GetMafObject());
-				assert(interactor);
-				albaString *action_name = e->GetString();
-				m_InteractionManager->UnBindAction(*action_name, interactor);
-			}
-#endif
-			break;
-		case PER_PUSH:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				albaInteractorPER *per = albaInteractorPER::SafeDownCast(e->GetMafObject());
-				assert(per);
-				m_InteractionManager->PushPER(per);
-			}
-#endif
-			break;
-		case PER_POP:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager) m_InteractionManager->PopPER();
-#endif
-			break;
-		case GET_CURRENT_PER:
-			if (m_InteractionManager)
-				e->SetMafObject(m_InteractionManager->GetPER());
 			break;
 		case DEVICE_ADD:
 			m_InteractionManager->AddDeviceToTree((albaDevice *)e->GetMafObject());
@@ -1783,27 +1722,30 @@ void albaLogicWithManagers::ViewCreated(albaView *v)
 	}
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ViewSelect()
+void albaLogicWithManagers::SelectView(albaView *view)
 {
-	if (m_ViewManager)
-	{
-		albaView *view = m_ViewManager->GetSelectedView();
-		if (m_SideBar)	m_SideBar->ViewSelect(view);
+	m_SelectedView = view;
 
-		// currently albaInteraction is strictly dependent on VTK (marco)
+	if (m_SideBar)
+		m_SideBar->ViewSelect(view);
+
+	// currently albaInteraction is strictly dependent on VTK (marco)
 #ifdef ALBA_USE_VTK
-		if (m_InteractionManager)
-		{
-			m_InteractionManager->ViewSelected(view);
-		}
+	if (m_InteractionManager)
+		m_InteractionManager->ViewSelected(view);
 #endif
 
-		if (m_OpManager && !m_OpManager->Running())
-		{
-			// needed to update all the operations that will be enabled on View Creation
+	if (m_OpManager)
+	{
+		// needed to update all the operations that will be enabled on View Creation
+		if (!m_OpManager->Running())
 			m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
-		}
+
+		albaGUIMDIChild *c = m_Win ? (albaGUIMDIChild *)m_Win->GetActiveChild() : NULL;
+		if (c != NULL)
+			c->SetAllowCloseWindow(!m_OpManager->Running());
 	}
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ViewContextualMenu(bool vme_menu)
@@ -1988,7 +1930,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
 	Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
 	Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
-	Plug(new albaOpExtractImageFromArbitraryView("Extract Image from Arbitrary View"), _("Create"));
 	Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));
 	Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
 	Plug(new albaOpCreateSpline("Spline"), _("Create"));
@@ -2041,7 +1982,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpTransformAtoB(), "Modify");
 
 	Plug(new albaOpMeasure2D("2D Measure"), "Measure");
-	Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");
 	Plug(new albaOpVOIDensity("VOI Density"), "Measure");
 	Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
@@ -2069,7 +2009,6 @@ void albaLogicWithManagers::PlugStandardOperations()
 	Plug(new albaOpVOIDensityEditor(), "TMP to test");
 	Plug(new albaOpValidateTree(), "TMP to test");
 	Plug(new albaOpVolumeUnion(), "TMP to test");
-	Plug(new albaOpInteractorSliderSample(), "TMP to test");
 
 }
 
@@ -2188,17 +2127,21 @@ void albaLogicWithManagers::SetAlbaBuildNum(char* buildNum)
 }
 
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::RegisterForKeyEvents(albaObserver *listener)
+void albaLogicWithManagers::PushTool(albaInteractionTool *tool)
 {
-	m_KeyEventListeners.push_back(listener);
+#ifdef ALBA_USE_VTK
+	if (m_InteractionManager)
+		m_InteractionManager->PushTool(tool);
+#endif
 }
 
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::UnRegisterForKeyEvents(albaObserver *listener)
+void albaLogicWithManagers::PopTool(albaInteractionTool *tool)
 {
-  std::vector<albaObserver *>::iterator it = std::find(m_KeyEventListeners.begin(), m_KeyEventListeners.end(), listener);
-	if (it != m_KeyEventListeners.end())
-		m_KeyEventListeners.erase(it);
+#ifdef ALBA_USE_VTK
+	if (m_InteractionManager)
+		m_InteractionManager->PopTool(tool);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -2861,26 +2804,12 @@ void albaLogicWithManagers::HandleException()
 //----------------------------------------------------------------------------
 int albaLogicWithManagers::AppEventFilter(wxEvent& event)
 {
-	if (m_EventFilterFunc)
-		return (*m_EventFilterFunc)(event);
-
-	if (m_KeyEventListeners.size() > 0 && (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP))
-	{
-		albaEvent keyEvent;
-
-		if (event.GetEventType() == wxEVT_KEY_DOWN)
-			keyEvent.SetId(KEY_PRESSED);
-		else
-			keyEvent.SetId(KEY_RELEASED);
-		keyEvent.SetArg(((wxKeyEvent &)event).GetKeyCode());
-		keyEvent.SetSender(this);
-
-		for (std::vector<albaObserver *>::iterator it = m_KeyEventListeners.begin(); it != m_KeyEventListeners.end(); ++it)
-		{
-			albaObserver *listener = *it;
-			listener->OnEvent(&keyEvent);
-		}
-	}
+	// the keys go to the interaction tools: a key used by a tool is not processed further
+#ifdef ALBA_USE_VTK
+	if (m_InteractionManager && (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP))
+		if (m_InteractionManager->OnKey(((wxKeyEvent &)event).GetKeyCode(), event.GetEventType() == wxEVT_KEY_DOWN))
+			return 1;
+#endif
 
 	return -1;
 }

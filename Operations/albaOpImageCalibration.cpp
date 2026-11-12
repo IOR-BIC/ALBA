@@ -28,9 +28,9 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaGUI.h"
-#include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasure_Distance.h"
-#include "albaInteractor2DMeasure_CenterPoint.h"
+#include "alba2DMeasureTool.h"
+#include "alba2DMeasureDistanceTool.h"
+#include "alba2DMeasureCenterPointTool.h"
 #include "albaLogicWithManagers.h"
 #include "albaVMEImage.h"
 #include "albaView.h"
@@ -102,15 +102,15 @@ void albaOpImageCalibration::OpRun()
 	if (inputImage != NULL)
 		inputImage->GetSpacing(m_InputSpacing);
 
-	m_DistanceInteractor = albaInteractor2DMeasure_Distance::New();
-	m_CenterPointInteractor = albaInteractor2DMeasure_CenterPoint::New();
+	albaNEW(m_DistanceInteractor);
+	albaNEW(m_CenterPointInteractor);
 
 	m_DistanceInteractor->SetMaxMeasures(1);
 	m_CenterPointInteractor->SetMaxMeasures(1);
 
 
 	m_ActiveInteractor = m_DistanceInteractor;
-	albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_ActiveInteractor));
+	GetLogicManager()->PushTool(m_ActiveInteractor);
 	m_ActiveInteractor->SetListener(this);
 
 	CreateGui();
@@ -187,15 +187,15 @@ void albaOpImageCalibration::SetActiveInteractor()
 	if (m_SelectedIterator != CIRCLE)
 		m_DistanceInteractor->SetConstraint(m_SelectedIterator);
 	
-	albaInteractor2DMeasure *nextInteractor = (m_SelectedIterator == CIRCLE) ? (albaInteractor2DMeasure *)m_CenterPointInteractor : m_DistanceInteractor;
+	alba2DMeasureTool *nextInteractor = (m_SelectedIterator == CIRCLE) ? (alba2DMeasureTool *)m_CenterPointInteractor : m_DistanceInteractor;
 	if (nextInteractor == m_ActiveInteractor)
 		return;
 
 	m_ActiveInteractor->Show(false);
 
-	albaEventMacro(albaEvent(this, PER_POP));
+	GetLogicManager()->PopTool(m_ActiveInteractor);
 	m_ActiveInteractor = nextInteractor;
-	albaEventMacro(albaEvent(this, PER_PUSH, (albaObject *)m_ActiveInteractor));
+	GetLogicManager()->PushTool(m_ActiveInteractor);
 	m_ActiveInteractor->SetListener(this);
 	m_ActiveInteractor->Show(true);
 
@@ -237,7 +237,7 @@ void albaOpImageCalibration::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == albaInteractor2DMeasure::ID_MEASURE_CHANGED)
+	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == alba2DMeasureTool::ID_MEASURE_CHANGED)
 	{
 		UpdateGui();
 	}
@@ -277,7 +277,7 @@ void albaOpImageCalibration::OpStop(int result)
 		HideGui();
 
 	if (m_ActiveInteractor != NULL)
-		albaEventMacro(albaEvent(this, PER_POP));
+		GetLogicManager()->PopTool(m_ActiveInteractor);
 
 	albaDEL(m_DistanceInteractor);
 	albaDEL(m_CenterPointInteractor);

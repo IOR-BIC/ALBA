@@ -107,6 +107,11 @@ void albaInteractorTest::TestSetGetRenderer()
   albaInteractorDummy *interactor;
   albaNEW(interactor);
 
+  // renderer and view start empty (they belong to albaInteractionAgent)
+  CPPUNIT_ASSERT(interactor->GetRenderer() == NULL);
+  CPPUNIT_ASSERT(interactor->GetView() == NULL);
+  CPPUNIT_ASSERT(interactor->IsA("albaInteractionAgent"));
+
   interactor->SetRendererAndView(renderer,NULL);
   CPPUNIT_ASSERT(interactor->GetRenderer() == renderer);
 

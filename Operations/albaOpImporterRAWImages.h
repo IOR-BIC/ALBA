@@ -43,7 +43,6 @@ class albaRWI;
 class vtkWindowLevelLookupTable;
 class albaGUIDialogPreview;
 class vtkTexture;
-class albaInteractorDICOMImporter;
 class albaString;
 class albaVMEVolumeGray;
 class albaVMEVolumeRGB;
@@ -210,7 +209,6 @@ protected:
   albaGUIDialogPreview	*m_Dialog;
   albaGUI* m_GuiSlider;
 
-  albaInteractorDICOMImporter *m_DicomInteractor;
 
   albaVMEVolumeGray  *m_VolumeGray;
   albaVMEVolumeRGB   *m_VolumeRGB;

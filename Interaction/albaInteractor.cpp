@@ -61,7 +61,6 @@ albaCxxAbstractTypeMacro(albaInteractor);
 albaInteractor::albaInteractor()
 //------------------------------------------------------------------------------
 {
-  m_Renderer            = NULL;
   m_Device              = NULL;
   m_VME                 = NULL;
   m_Prop                = NULL;
@@ -103,13 +102,6 @@ void albaInteractor::SetDevice(albaDevice *device)
   m_DeviceIsSet=(device!=NULL);
 }
 
-//------------------------------------------------------------------------------
-void albaInteractor::SetRendererAndView(vtkRenderer *ren, albaView *view)
-//------------------------------------------------------------------------------
-{
-  m_Renderer = ren;
-	m_View = view;
-}
 //------------------------------------------------------------------------------
 void albaInteractor::SetVME(albaVME *vme)
 //------------------------------------------------------------------------------
@@ -335,50 +327,6 @@ void albaInteractor::OnEvent(albaEventBase *event)
   }
 }
 
-//----------------------------------------------------------------------------
-void albaInteractor::ComputeDisplayToWorld(double x, double y, double z, double worldPt[4])
-//----------------------------------------------------------------------------
-{
-  if ( !m_Renderer ) 
-    return;
-  
-  m_Renderer->SetDisplayPoint(x, y, z);
-  m_Renderer->DisplayToWorld();
-  m_Renderer->GetWorldPoint(worldPt);
-  if (worldPt[3])
-  {
-    worldPt[0] /= worldPt[3];
-    worldPt[1] /= worldPt[3];
-    worldPt[2] /= worldPt[3];
-    worldPt[3] = 1.0;
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaInteractor::ComputeWorldToDisplay(double x, double y, double z, double displayPt[3])
-//----------------------------------------------------------------------------
-{
-  if ( !m_Renderer ) 
-    return;
-  
-  m_Renderer->SetWorldPoint(x, y, z, 1.0);
-  m_Renderer->WorldToDisplay();
-  m_Renderer->GetDisplayPoint(displayPt);
-}
-
-//----------------------------------------------------------------------------
-void albaInteractor::SendPickedPointEvent(int eventId, double pos[3], vtkIdType id, double scalar, albaVME *vme)
-//----------------------------------------------------------------------------
-{
-  vtkALBASmartPointer<vtkPoints> points;
-  points->SetNumberOfPoints(1);
-  points->SetPoint(0, pos);
-
-  albaEvent pickEvent(this, eventId, (vtkObject *)points.GetPointer(), (long)id);
-  pickEvent.SetDouble(scalar);
-  pickEvent.SetVme(vme);
-  albaEventMacro(pickEvent);
-}
 //----------------------------------------------------------------------------
 /*bool albaInteractor::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)
 //----------------------------------------------------------------------------

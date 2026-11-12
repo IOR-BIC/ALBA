@@ -215,13 +215,9 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VIEW_CREATED,  // from albaViewManager to Logic
 											 VIEW_DELETE,   // from albaGUIMDIChild to albaViewManager
 											 VIEW_SELECT,   // from albaGUIMDIChild and albaGUIViewPanel to albaViewManager
-											 VIEW_SELECTED, // used to ask to logic if there is a view selected and get a pointer to it
 											 VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
 											 VIEW_MAXIMIZE, // from albaGUI to albaGUICrossSplitter
 											 VIEW_RESIZE,   // from anyone that want to block the view's size.
-											 PER_PUSH,       // from an Operation to albaInteractionManager
-											 PER_POP,        // from an Operation to albaInteractionManager
-											 GET_CURRENT_PER,
 
 											 CAMERA_FRONT,  // constant used in albaRWIxxx to initialize Camera pos
 											 CAMERA_BACK,
@@ -254,7 +250,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 CAMERA_RESET,
 											 CAMERA_FIT,
 											 CAMERA_FLYTO,
-											 CAMERA_MOVED, //Event invoked by albaInteractorCameraMove
 
 																		 // modified by Stefano 21-9-2004 (begin)
 																		 CAMERA_RXFEM_XNEG, //(to be moved elsewhere Marco)
@@ -300,8 +295,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												SHOW_TREE_CONTEXTUAL_MENU,
 
 
-																												INTERACTOR_ADD,     //modified by Marco. 25-8-2004 bind an interactor to an action 
-																												INTERACTOR_REMOVE,  //modified by Marco. 25-8-2004 unbind an interactor from an action
 
 																												DEVICE_ADD,
 																												DEVICE_REMOVE,
@@ -417,8 +410,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 									MINID,
 									MAXID = MINID + MAXWIDGET,
 
-																													KEY_PRESSED,  ///< used to send a key press event to the listener
-																													KEY_RELEASED, ///< used to send a key release event to the listener
 
 									ID_GUI_UPDATE,
 

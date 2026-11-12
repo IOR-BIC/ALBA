@@ -36,7 +36,7 @@
 
 #include "albaVME.h"
 #include "albaVMESurface.h"
-#include "albaInteractorSelectCell.h"
+#include "albaSelectCellTool.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -72,7 +72,7 @@ albaOp(label)
 	m_Dialog = NULL;
 	m_Rwi = NULL;
 
-	m_SelectCellInteractor  = NULL;
+	m_SelectCellTool  = NULL;
 
 	m_CellFilter = NULL;
 
@@ -231,10 +231,11 @@ void albaOpFlipNormals::CreateOpDialog()
 	m_Rwi->m_RenFront->ResetCamera(polydata->GetBounds());
 	m_Rwi->m_RenFront->ResetCameraClippingRange(bounds);
 
-	albaNEW(m_SelectCellInteractor);
+	albaNEW(m_SelectCellTool);
 
-	m_SelectCellInteractor->SetListener(this);
-	m_Mouse->AddObserver(m_SelectCellInteractor, MCH_INPUT);
+	m_SelectCellTool->SetListener(this);
+	m_SelectCellTool->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+	GetLogicManager()->PushTool(m_SelectCellTool);
 
 	wxPoint p = wxDefaultPosition;
 
@@ -363,9 +364,9 @@ void albaOpFlipNormals::CreateNormalsPipe()
 void albaOpFlipNormals::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Mouse->RemoveObserver(m_SelectCellInteractor);
+	GetLogicManager()->PopTool(m_SelectCellTool);
 
-	albaDEL(m_SelectCellInteractor);
+	albaDEL(m_SelectCellTool);
 
 	vtkDEL(m_PolydataMapper);
 	vtkDEL(m_PolydataActor);

@@ -13,7 +13,7 @@ SET(PROJECT_SRCS
 	albaInteractionTests.h albaInteractionTests.cpp
 	albaGizmoPathTest.h albaGizmoPathTest.cpp
 	albaGizmoPathRulerTest.h albaGizmoPathRulerTest.cpp
-	albaInteractorSelectCellTest.h albaInteractorSelectCellTest.cpp
+	albaSelectCellToolTest.h albaSelectCellToolTest.cpp
 	albaGizmoTranslateAxisTest.h albaGizmoTranslateAxisTest.cpp
 	albaGizmoTranslatePlaneTest.h albaGizmoTranslatePlaneTest.cpp
 	albaGizmoBoundingBoxTest.h albaGizmoBoundingBoxTest.cpp
@@ -48,10 +48,9 @@ SET(PROJECT_SRCS
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
 	albaGizmoScaleTest.h albaGizmoScaleTest.cpp
 	#albaDeviceClientALBATest.h albaDeviceClientALBATest.cpp
-	albaInteractorExtractIsosurfaceTest.h albaInteractorExtractIsosurfaceTest.cpp
+	albaExtractIsosurfaceToolTest.h albaExtractIsosurfaceToolTest.cpp
 	albaInteractorTest.h albaInteractorTest.cpp
 	albaInteractor6DOFCameraMoveTest.h albaInteractor6DOFCameraMoveTest.cpp
-	albaAvatar2DTest.h albaAvatar2DTest.cpp
 	albaAvatarTest.h albaAvatarTest.cpp 
 	albaInteractorSERTest.h albaInteractorSERTest.cpp
 	albaInteractor6DOFTest.h albaInteractor6DOFTest.cpp
@@ -61,16 +60,12 @@ SET(PROJECT_SRCS
 	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
 	albaGUITransformMouseTest.h albaGUITransformMouseTest.cpp
 	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
-	albaDeviceButtonsPadMouseDialogTest.h albaDeviceButtonsPadMouseDialogTest.cpp
 	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
-	albaInteractorVTKPickerTest.h albaInteractorVTKPickerTest.cpp
+	albaVTKPickerToolTest.h albaVTKPickerToolTest.cpp
 	albaPickHelperTest.h albaPickHelperTest.cpp
-	albaInteractorSelectPointTest.h albaInteractorSelectPointTest.cpp
-	albaInteractorDICOMImporterTest.h albaInteractorDICOMImporterTest.cpp
-	albaInteractor2DDistanceTest.h albaInteractor2DDistanceTest.cpp
-	albaInteractor2DAngleTest.h albaInteractor2DAngleTest.cpp
-	albaInteractor2DIndicatorTest.h albaInteractor2DIndicatorTest.cpp
-	albaInteractorSliderTest.h	albaInteractorSliderTest.cpp
+	albaInteractionRoutingTest.h albaInteractionRoutingTest.cpp
+	albaSelectPointToolTest.h albaSelectPointToolTest.cpp
+	albaDICOMImporterToolTest.h albaDICOMImporterToolTest.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS})

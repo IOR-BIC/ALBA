@@ -99,17 +99,12 @@ albaOp *albaOpVolumeUnion::Copy()
 bool albaOpVolumeUnion::InternalAccept(albaVME* node)
 //----------------------------------------------------------------------------
 {
-	albaEvent e(this,VIEW_SELECTED);
-	albaEventMacro(e);
 	return (node && node->IsA("albaVMEVolumeGray"));
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeUnion::OpRun()   
 ////----------------------------------------------------------------------------
 {
-    albaEvent e(this,VIEW_SELECTED);
-    albaEventMacro(e);
-
 	m_FirstVMEVolume = albaVMEVolume::SafeDownCast(m_Input);
 	m_FirstVMEVolume->Update();
 
