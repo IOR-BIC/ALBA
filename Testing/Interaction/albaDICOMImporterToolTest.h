@@ -1,9 +1,9 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorSelectCellTest
- Authors: Stefano Perticoni
- 
+ Module: albaDICOMImporterToolTest
+ Authors: Paolo Quadrani, Gianluigi Crimi
+
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
 
@@ -14,25 +14,22 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaInteractorSelectCellTest_H__
-#define __CPP_UNIT_albaInteractorSelectCellTest_H__
+#ifndef __CPP_UNIT_albaDICOMImporterToolTest_H__
+#define __CPP_UNIT_albaDICOMImporterToolTest_H__
 
 #include "albaTest.h"
 
-class albaInteractorSelectCellTest : public albaTest
+class albaDICOMImporterToolTest : public albaTest
 {
-  public:
-  
-    CPPUNIT_TEST_SUITE( albaInteractorSelectCellTest );
-    CPPUNIT_TEST( TestFixture );
-    CPPUNIT_TEST( TestConstructor );
-    CPPUNIT_TEST_SUITE_END();
+public:
+  CPPUNIT_TEST_SUITE(albaDICOMImporterToolTest);
+  CPPUNIT_TEST(TestConstructorDestructor);
+  CPPUNIT_TEST(TestEventsWithoutRenderer);
+  CPPUNIT_TEST_SUITE_END();
 
-  protected:
-
-    void TestFixture();
-    void TestConstructor();
-      
+protected:
+  void TestConstructorDestructor();
+  void TestEventsWithoutRenderer();
 };
 
 #endif

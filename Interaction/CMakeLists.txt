@@ -57,6 +57,11 @@ SET(PROJECT_SRCS
   albaSegmentationTool.cpp  					albaSegmentationTool.h
   albaSegmentationThresholdTool.cpp  					albaSegmentationThresholdTool.h
   albaSegmentationEditTool.cpp  					albaSegmentationEditTool.h
+  albaSelectCellTool.cpp  					albaSelectCellTool.h
+  albaSelectPointTool.cpp  					albaSelectPointTool.h
+  albaVTKPickerTool.cpp  					albaVTKPickerTool.h
+  albaExtractIsosurfaceTool.cpp  					albaExtractIsosurfaceTool.h
+  albaDICOMImporterTool.cpp  					albaDICOMImporterTool.h
   albaCameraTrackerTool.cpp  						albaCameraTrackerTool.h
   albaRefSys.cpp  							albaRefSys.h  
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
@@ -64,22 +69,15 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
   albaInteractor6DOF.cpp  					albaInteractor6DOF.h
   albaInteractor6DOFCameraMove.cpp  			albaInteractor6DOFCameraMove.h
-  albaInteractorCameraMove.cpp  				albaInteractorCameraMove.h
   albaInteractorCompositorMouse.cpp  		albaInteractorCompositorMouse.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
-  albaInteractorExtractIsosurface.cpp  		albaInteractorExtractIsosurface.h
   albaInteractorGeneric6DOF.cpp  			albaInteractorGeneric6DOF.h
   albaInteractorGenericInterface.cpp  		albaInteractorGenericInterface.h
   albaInteractorGenericMouse.cpp  			albaInteractorGenericMouse.h
   albaInteractorPER.cpp  					albaInteractorPER.h
   albaInteractorPicker.cpp  					albaInteractorPicker.h
-  albaInteractorSelectCell.cpp  					albaInteractorSelectCell.h
   albaInteractorSER.cpp  									albaInteractorSER.h  ######################
-  albaInteractorCameraPicker.cpp  				albaInteractorCameraPicker.h
   albaPickerTool.cpp  						albaPickerTool.h
-  albaInteractorDICOMImporter.h  					albaInteractorDICOMImporter.cpp  
-  albaInteractorVTKPicker.cpp  											albaInteractorVTKPicker.h
-  albaInteractorSelectPoint.cpp  										albaInteractorSelectPoint.h
   albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
   albaGUITransformSliders.cpp  						albaGUITransformSliders.h    

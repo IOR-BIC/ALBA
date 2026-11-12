@@ -65,6 +65,10 @@ protected:
   albaInteractionTool() {}
   virtual ~albaInteractionTool() {}
 
+  /** Return the renderer under the mouse when the event comes from the render window of the tool renderer
+    (set with SetRendererAndView), NULL otherwise: the tool works only on its render window */
+  vtkRenderer *GetEventRenderer(albaEventInteraction *e);
+
 private:
   albaInteractionTool(const albaInteractionTool&);  // Not implemented.
   void operator=(const albaInteractionTool&);  // Not implemented.

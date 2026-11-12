@@ -35,7 +35,6 @@
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
 #include "albaGUICheckListBox.h"
-#include "albaInteractorExtractIsosurface.h"
 #include "albaRWIBase.h"
 #include "albaRWI.h"
 #include "albaGUIFloatSlider.h"

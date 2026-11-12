@@ -36,7 +36,7 @@
 
 #include "albaVME.h"
 #include "albaVMESurface.h"
-#include "albaInteractorSelectCell.h"
+#include "albaSelectCellTool.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -74,7 +74,7 @@ albaOp(label)
 	m_Dialog = NULL;
 	m_Rwi = NULL;
 
-	m_SelectCellInteractor  = NULL;
+	m_SelectCellTool  = NULL;
 
 	m_CellFilter = NULL;
 
@@ -99,7 +99,7 @@ albaOp(label)
 
   m_RemoveSelectedCells = NULL;
   m_RemoveUnSelectedCells = NULL;
-  m_SelectCellInteractor = NULL;
+  m_SelectCellTool = NULL;
   m_VisitedCells = NULL;
   
   	// only one region with ID 0
@@ -119,7 +119,7 @@ albaOpSmoothSurfaceCells::~albaOpSmoothSurfaceCells()
   vtkDEL(m_RemoveSelectedCells);
   vtkDEL(m_RemoveUnSelectedCells);
   vtkDEL(m_CellFilter);
-  albaDEL(m_SelectCellInteractor);
+  albaDEL(m_SelectCellTool);
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpSmoothSurfaceCells::Copy()
@@ -240,10 +240,11 @@ void albaOpSmoothSurfaceCells::CreateOpDialog()
 	m_Rwi->m_RenFront->ResetCamera(polydata->GetBounds());
 	m_Rwi->m_RenFront->ResetCameraClippingRange(bounds);
 
-	albaNEW(m_SelectCellInteractor);
+	albaNEW(m_SelectCellTool);
 
-	m_SelectCellInteractor->SetListener(this);
-	m_Mouse->AddObserver(m_SelectCellInteractor, MCH_INPUT);
+	m_SelectCellTool->SetListener(this);
+	m_SelectCellTool->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+	GetLogicManager()->PushTool(m_SelectCellTool);
 
 	wxPoint p = wxDefaultPosition;
 
@@ -385,9 +386,9 @@ void albaOpSmoothSurfaceCells::CreateSurfacePipeline()
 void albaOpSmoothSurfaceCells::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Mouse->RemoveObserver(m_SelectCellInteractor);
+	GetLogicManager()->PopTool(m_SelectCellTool);
 
-	albaDEL(m_SelectCellInteractor);
+	albaDEL(m_SelectCellTool);
 
 	vtkDEL(m_PolydataMapper);
 	vtkDEL(m_PolydataActor);

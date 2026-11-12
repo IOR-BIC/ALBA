@@ -36,7 +36,6 @@
 #include "albaGUIValidator.h"
 #include "albaInteractionFactory.h"
 #include "albaInteractor.h"
-#include "albaInteractorCameraMove.h"
 #include "albaInteractorCompositorMouse.h"
 #include "albaInteractorGenericMouse.h"
 #include "albaInteractorPER.h"

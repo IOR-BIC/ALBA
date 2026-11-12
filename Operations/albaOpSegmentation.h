@@ -34,7 +34,6 @@ class albaGUIFloatSlider;
 class albaGUILutHistogramSwatch;
 class albaGUILutSlider;
 class albaGUIRollOut;
-class albaInteractorCameraMove;
 class albaInteractorGenericMouse;
 class albaInteractorPER;
 class albaInteractorPicker;

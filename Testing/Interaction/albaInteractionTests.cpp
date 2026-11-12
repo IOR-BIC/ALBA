@@ -65,20 +65,20 @@
 #include "albaInteractor6DOFTest.h"
 #include "albaInteractorCompositorMouseTest.h"
 #include "albaInteractorConstraintTest.h"
-#include "albaInteractorExtractIsosurfaceTest.h"
+#include "albaExtractIsosurfaceToolTest.h"
 #include "albaInteractorGeneric6DOFTest.h"
 #include "albaInteractorPERTest.h"
 #include "albaInteractorSERTest.h"
-#include "albaInteractorSelectCellTest.h"
+#include "albaSelectCellToolTest.h"
 #include "albaInteractorTest.h"
 #include "albaRefSysTest.h"
 #include "albaServiceLocator.h"
 
-#include "albaInteractorVTKPickerTest.h"
-#include "albaInteractorSelectPointTest.h"
+#include "albaVTKPickerToolTest.h"
+#include "albaSelectPointToolTest.h"
 #include "albaPickHelperTest.h"
 #include "albaInteractionRoutingTest.h"
-#include "albaInteractorDICOMImporterTest.h"
+#include "albaDICOMImporterToolTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -132,7 +132,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoRotateFanTest::suite()); 
 	runner.addTest(albaGizmoPathTest::suite());
 	runner.addTest(albaGizmoPathRulerTest::suite());
-	runner.addTest(albaInteractorSelectCellTest::suite());
+	runner.addTest(albaSelectCellToolTest::suite());
 	runner.addTest(albaGizmoTranslateAxisTest::suite());
 	runner.addTest(albaGizmoTranslatePlaneTest::suite());
 	runner.addTest(albaGizmoBoundingBoxTest::suite());
@@ -165,7 +165,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDeviceTest::suite());
 	runner.addTest(albaGizmoScaleAxisTest::suite());
 	runner.addTest(albaGizmoScaleTest::suite());
-	runner.addTest(albaInteractorExtractIsosurfaceTest::suite());
+	runner.addTest(albaExtractIsosurfaceToolTest::suite());
 	runner.addTest(albaInteractorTest::suite());
 	runner.addTest(albaInteractor6DOFCameraMoveTest::suite());
 	runner.addTest(albaAvatarTest::suite());
@@ -178,11 +178,11 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGUITransformMouseTest::suite());
 	runner.addTest(albaGizmoPolylineGraphTest::suite());
 	runner.addTest(albaGUITransformSlidersTest::suite());
-	runner.addTest(albaInteractorVTKPickerTest::suite());
-	runner.addTest(albaInteractorSelectPointTest::suite());
+	runner.addTest(albaVTKPickerToolTest::suite());
+	runner.addTest(albaSelectPointToolTest::suite());
 	runner.addTest(albaPickHelperTest::suite());
 	runner.addTest(albaInteractionRoutingTest::suite());
-	runner.addTest(albaInteractorDICOMImporterTest::suite());
+	runner.addTest(albaDICOMImporterToolTest::suite());
 
 	runner.run( controller );
 

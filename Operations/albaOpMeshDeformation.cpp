@@ -614,7 +614,8 @@ void albaOpMeshDeformation::CreateOpDialog()
   //create the picker
   albaNEW(m_Picker);
   m_Picker->SetListener(this);
-  m_Mouse->AddObserver(m_Picker, MCH_INPUT);
+  m_Picker->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+  GetLogicManager()->PushTool(m_Picker);
 
   //and initialize the renderer window
   double bounds[6];	
@@ -631,7 +632,7 @@ void albaOpMeshDeformation::CreateOpDialog()
 void albaOpMeshDeformation::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-  m_Mouse->RemoveObserver(m_Picker);
+  GetLogicManager()->PopTool(m_Picker);
   albaDEL(m_Picker);
 
   //remove all actors
