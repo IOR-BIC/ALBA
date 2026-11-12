@@ -54,6 +54,9 @@ SET(PROJECT_SRCS
   albaInteractionTool.cpp  						albaInteractionTool.h
   albaCameraTool.cpp  						albaCameraTool.h
   albaCameraMouseTool.cpp  						albaCameraMouseTool.h
+  albaSegmentationTool.cpp  					albaSegmentationTool.h
+  albaSegmentationThresholdTool.cpp  					albaSegmentationThresholdTool.h
+  albaSegmentationEditTool.cpp  					albaSegmentationEditTool.h
   albaCameraTrackerTool.cpp  						albaCameraTrackerTool.h
   albaRefSys.cpp  							albaRefSys.h  
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
@@ -75,14 +78,10 @@ SET(PROJECT_SRCS
   albaInteractorCameraPicker.cpp  				albaInteractorCameraPicker.h
   albaInteractorPERPicker.cpp  						albaInteractorPERPicker.h
   albaInteractorDICOMImporter.h  					albaInteractorDICOMImporter.cpp  
-  albaInteractorSegmentationPicker.cpp  	albaInteractorSegmentationPicker.h 
-  albaInteractorPERScalarInformation.cpp  albaInteractorPERScalarInformation.h
-  albaInteractorPERBrushFeedback.cpp  		albaInteractorPERBrushFeedback.h
   albaInteractorVTKPicker.cpp  											albaInteractorVTKPicker.h
   albaInteractorSelectPoint.cpp  										albaInteractorSelectPoint.h
   albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
-  albaDeviceButtonsPadMouseDialog.cpp	  	albaDeviceButtonsPadMouseDialog.h
   albaGUITransformSliders.cpp  						albaGUITransformSliders.h    
   albaGizmoCrossRotateTranslate.cpp  			albaGizmoCrossRotateTranslate.h	  
   albaGizmoCrossRotate.cpp  							albaGizmoCrossRotate.h

@@ -191,8 +191,8 @@ public:
   /** Remove a tool from the tool stack of the PER */
   void PopTool(albaInteractionTool *tool);
 
-  /** Send a key pressed or released to the tools of the PER */
-  void OnKey(int keyCode, bool pressed);
+  /** Send a key pressed or released to the tools of the PER; return true if a tool used it */
+  bool OnKey(int keyCode, bool pressed);
 
   /** Enable/disable the event tracing: each input event routed by a PER is written in the log
   with the device, the button, the modifiers and who handled it. Disabled by default. */

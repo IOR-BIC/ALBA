@@ -60,7 +60,6 @@ SET(PROJECT_SRCS
 	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
 	albaGUITransformMouseTest.h albaGUITransformMouseTest.cpp
 	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
-	albaDeviceButtonsPadMouseDialogTest.h albaDeviceButtonsPadMouseDialogTest.cpp
 	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
 	albaInteractorVTKPickerTest.h albaInteractorVTKPickerTest.cpp
 	albaPickHelperTest.h albaPickHelperTest.cpp

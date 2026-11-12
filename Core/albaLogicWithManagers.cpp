@@ -347,7 +347,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SelectedLandmark = NULL;
 	m_FatalExptionOccurred = false;
 
-	m_EventFilterFunc = NULL;
 	m_SelectedView = NULL;
 
 	m_SkipCameraUpdate = false;
@@ -2826,13 +2825,11 @@ void albaLogicWithManagers::HandleException()
 //----------------------------------------------------------------------------
 int albaLogicWithManagers::AppEventFilter(wxEvent& event)
 {
-	if (m_EventFilterFunc)
-		return (*m_EventFilterFunc)(event);
-
-	// the keys go to the interaction tools
+	// the keys go to the interaction tools: a key used by a tool is not processed further
 #ifdef ALBA_USE_VTK
 	if (m_InteractionManager && (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP))
-		m_InteractionManager->OnKey(((wxKeyEvent &)event).GetKeyCode(), event.GetEventType() == wxEVT_KEY_DOWN);
+		if (m_InteractionManager->OnKey(((wxKeyEvent &)event).GetKeyCode(), event.GetEventType() == wxEVT_KEY_DOWN))
+			return 1;
 #endif
 
 	return -1;

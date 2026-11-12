@@ -22,9 +22,6 @@
 
 #include "albaAbsLogicManager.h"
 #include "albaAbsMatrixPipe.h"
-#include "albaAction.h"
-#include "albaDeviceButtonsPadMouseDialog.h"
-#include "albaDeviceManager.h"
 #include "albaGUI.h"
 #include "albaGUIButton.h"
 #include "albaGUIDialog.h"
@@ -43,19 +40,15 @@
 #include "albaInteractorCompositorMouse.h"
 #include "albaInteractorGenericMouse.h"
 #include "albaInteractorPER.h"
-#include "albaInteractorPERBrushFeedback.h"
-#include "albaInteractorPERScalarInformation.h"
 #include "albaInteractorPicker.h"
-#include "albaInteractorSER.h"
-#include "albaInteractorSegmentationPicker.h"
-#include "albaLogicWithManagers.h"
+#include "albaSegmentationEditTool.h"
+#include "albaSegmentationThresholdTool.h"
 #include "albaMatrix.h"
 #include "albaOpManager.h"
 #include "albaOpVolumeResample.h"
 #include "albaPics.h"
 #include "albaPipeVolumeOrthoSlice.h"
 #include "albaRWI.h"
-#include "albaServiceLocator.h"
 #include "albaTagArray.h"
 #include "albaTagItem.h"
 #include "albaTransformFrame.h"
@@ -163,8 +156,8 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_OldVolumeParent = NULL;
   m_OutputSurface      =NULL;
 
-  m_SER = NULL;
-  m_DeviceManager = NULL;
+  m_ThresholdTool = NULL;
+  m_EditTool = NULL;
 	
 	m_AppendingOpGui = NULL;
 
@@ -183,9 +176,8 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_BrushSize = 1;
 
   m_BrushSizeSlider = NULL;
-  m_SegmentationPicker = NULL;
+  m_OldSelectedView = NULL;
 	 
-  m_EditPER = NULL;
  
 	//////////////////////////////////////////////////////////////////////////
   //Automatic initializations
@@ -199,7 +191,6 @@ albaOpSegmentation::albaOpSegmentation(const wxString &label, int disableInit) :
   m_AutomaticSliceTextMapper = NULL;
   m_AutomaticScalarTextActor = NULL;
   m_AutomaticScalarTextMapper = NULL;
-  m_InitPER = NULL;
   m_InitModality = GLOBAL_INIT;
 
   //////////////////////////////////////////////////////////////////////////
@@ -332,9 +323,6 @@ void albaOpSegmentation::OpStop(int result)
     }
   }
 
-	// Restore old EventFilterFunc
-	((albaLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(m_OldEventFunc);
-
   albaEventMacro(albaEvent(this,result));
 }
 
@@ -374,10 +362,6 @@ void albaOpSegmentation::Init()
 		OnChangeInitModality();
 	
 	UpdateSliceLabel();
-
-	// Save prev EventFilterFunc and Set Current Function
-	m_OldEventFunc = ((albaLogicWithManagers*)GetLogicManager())->GetEventFilterFunc();
-	((albaLogicWithManagers*)GetLogicManager())->SetEventFilterFunc(&albaOpSegmentation::OpSegmentationEventFilter);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::InitSegmentationVolume()
@@ -431,60 +415,24 @@ void albaOpSegmentation::InitSegmentationVolume()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::InitializeInteractors()
 {
-	//Create the device manager
-	albaNEW(m_DeviceManager);
-	m_DeviceManager->SetListener(this);
-	m_DeviceManager->SetName("DialogDeviceManager");
-	m_DeviceManager->Initialize();
-
-	//Create the static event router and connect it
-	albaNEW(m_SER);
-	m_SER->SetName("StaticEventRouter");
-	m_SER->SetListener(this);
-
-	//Create a Mouse device
-	albaPlugDevice<albaDeviceButtonsPadMouseDialog>("Mouse");
-	m_DialogMouse = (albaDeviceButtonsPadMouseDialog *)m_DeviceManager->AddDevice("albaDeviceButtonsPadMouseDialog", false); // add as persistent device
-	assert(m_DialogMouse);
-	m_DialogMouse->SetName("DialogMouse");
-
-	//Define the action for pointing and manipulating
-	albaAction *pntAction = m_SER->AddAction("pntAction", -10);
-
-	//create the positional event router
-	albaNEW(m_EditPER);
-	m_EditPER->SetName("m_EditingPER");
-	m_EditPER->SetListener(this);
-
 	assert(m_View);
 	m_View->SetCanSpin(false);
-	m_EditPER->SetRendererAndView(m_View->GetFrontRenderer(),m_View);
 
-	albaNEW(m_SegmentationPicker);
+	// the main mouse works on the view of the dialog: its events reach the PER of the interaction manager
+	m_View->GetRWI()->SetMouse(m_Mouse);
+	m_View->SetMouse(m_Mouse);
+	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	GetLogicManager()->SelectView(m_View);
 
-	m_SegmentationPicker->SetRendererAndView(m_View->GetFrontRenderer(),m_View);
-	m_SegmentationPicker->SetListener(this);
+	albaNEW(m_ThresholdTool);
+	m_ThresholdTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_ThresholdTool->SetListener(this);
 
-	m_View->GetRWI()->SetMouse(m_DialogMouse);
-	m_View->SetMouse(m_DialogMouse);
-	m_OldBehavior = m_Volume->GetBehavior();
-	m_DialogMouse->SetView(m_View);
+	albaNEW(m_EditTool);
+	m_EditTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_EditTool->SetListener(this);
 
-	m_Volume->SetBehavior(m_SegmentationPicker);
-
-	m_SER->AddAction("pntEditingAction");
-	pntAction = m_SER->GetAction("pntEditingAction");
-	m_EditPER->AddObserver(m_SegmentationPicker);
-
-	m_SER->AddAction("pntEditingAction");
-	pntAction = m_SER->GetAction("pntEditingAction");
-
-	albaNEW(m_InitPER);
-	pntAction = m_SER->AddAction("pntActionAutomatic", -10);
-	pntAction->BindDevice(m_DialogMouse);
-	pntAction->BindInteractor(m_InitPER);
-	m_InitPER->SetListener(this);
-	m_InitPER->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	GetLogicManager()->PushTool(m_ThresholdTool);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::InitVolumeDimensions()
@@ -1036,9 +984,16 @@ void albaOpSegmentation::EnableSizerContent(wxSizer* sizer, bool enable)
 //----------------------------------------------------------------------------
 void albaOpSegmentation::DeleteOpDialog()
 {
-	albaDEL(m_SegmentationPicker);
+	// the tools are removed and the previous view selected again before the view is deleted
+	if (m_ThresholdTool)
+	{
+		GetLogicManager()->PopTool(m_ThresholdTool);
+		GetLogicManager()->PopTool(m_EditTool);
+		GetLogicManager()->SelectView(m_OldSelectedView);
+	}
+	albaDEL(m_ThresholdTool);
+	albaDEL(m_EditTool);
 
-	m_Volume->SetBehavior(m_OldBehavior);
 	m_Volume->Update();
 	m_View->VmeSegmentationShow(m_SegmentationVolume, false);
 	m_View->VmeRemove(m_SegmentationVolume);
@@ -1088,15 +1043,6 @@ void albaOpSegmentation::DeleteOpDialog()
 	cppDEL(m_GuiDialog);
 	cppDEL(m_Dialog);
 
-	albaDEL(m_SegmentationPicker);
-
-	if (m_DeviceManager)
-		m_DeviceManager->Shutdown();
-
-	albaDEL(m_DeviceManager);
-	albaDEL(m_InitPER);
-	albaDEL(m_EditPER);
-	albaDEL(m_SER);
 }
 
 // UPDATE ////////////////////////////////////////////////////////////////////
@@ -1174,6 +1120,8 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			OnInitEvent(e);
 		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
 			OnEditSegmentationEvent(e);
+		else if (e->GetId() == albaSegmentationTool::KEY_PRESSED || e->GetId() == albaSegmentationTool::KEY_RELEASED)
+			OnKeyEvent(e);
 		//SWITCH
 		else switch (e->GetId())
 		{
@@ -1221,13 +1169,13 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 		{
 			m_View->GetRWI()->SetFocus();
 			
-			if (e->GetSender() == m_InitPER)
+			if (e->GetSender() == m_ThresholdTool)
 			{
 				m_AutomaticMouseThreshold = e->GetDouble();
 				albaString text = albaString::Format("Scalar = %.3f", m_AutomaticMouseThreshold);
 				m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
 			}
-			else if (e->GetSender() == m_EditPER)
+			else if (e->GetSender() == m_EditTool)
 			{
 					if (m_ManualSegmentationTools == DRAW_EDIT) 
 					{
@@ -1399,10 +1347,8 @@ void albaOpSegmentation::OnEditStep()
 	
 	m_View->CameraUpdate();
 
-	m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
-	m_SER->GetAction("pntActionAutomatic")->UnBindInteractor(m_InitPER);
-	m_SER->GetAction("pntEditingAction")->BindInteractor(m_EditPER);
-	m_SER->GetAction("pntEditingAction")->BindDevice(m_DialogMouse);
+	GetLogicManager()->PopTool(m_ThresholdTool);
+	GetLogicManager()->PushTool(m_EditTool);
 
 	m_AutomaticScalarTextMapper->SetInput("");
 
@@ -2050,10 +1996,8 @@ void albaOpSegmentation::OnEditStepExit()
 	SetCursor(CUR_DEFAULT);
 
   // Logic stuff
-  m_SER->GetAction("pntEditingAction")->UnBindInteractor(m_EditPER);
-  m_SER->GetAction("pntEditingAction")->UnBindDevice(m_DialogMouse);
-  m_SER->GetAction("pntActionAutomatic")->BindDevice(m_DialogMouse);
-  m_SER->GetAction("pntActionAutomatic")->BindInteractor(m_InitPER);
+  GetLogicManager()->PopTool(m_EditTool);
+  GetLogicManager()->PushTool(m_ThresholdTool);
    
   m_SnippetsLabel->SetLabel( _(""));
 }
@@ -2319,35 +2263,6 @@ void albaOpSegmentation::ClearManualUndoList()
 
 
 //----------------------------------------------------------------------------
-int albaOpSegmentation::OpSegmentationEventFilter(wxEvent& event)
-{	
-	int keyCode = ((wxKeyEvent&)event).GetKeyCode();
-
-	bool controlKeyDown = ((wxKeyEvent&)event).ControlDown();
-	bool altKeyDown= ((wxKeyEvent&)event).AltDown();
-	bool shiftKeyDown = ((wxKeyEvent&)event).ShiftDown();
-
-	albaAbsLogicManager *logic = albaServiceLocator::GetLogicManager();
-	albaOp *op = logic->GetOpManager()->GetRunningOperation();
-
-	//////////////////////////////////////////////////////////////////////////
-	// Press Button
-	if (event.GetEventType() == wxEVT_KEY_DOWN)
-	{
-		return ((albaOpSegmentation*)op)->PressKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// Release Button
-	if (event.GetEventType() == wxEVT_KEY_UP)
-	{
-		return ((albaOpSegmentation*)op)->ReleaseKey(keyCode, controlKeyDown, altKeyDown, shiftKeyDown);
-	}
-
-	return -1;
-}
-
-//----------------------------------------------------------------------------
 void albaOpSegmentation::SetSlicingIndexes(int planeindex, int sliceIndex)
 {
 
@@ -2411,6 +2326,22 @@ int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 	else SetCursor(CUR_DEFAULT);
 
 	return result;
+}
+
+//----------------------------------------------------------------------------
+void albaOpSegmentation::OnKeyEvent(albaEvent *e)
+{
+	albaSegmentationTool *tool = (albaSegmentationTool *)e->GetSender();
+	bool ctrl = tool->GetCtrlDown();
+	bool alt = tool->GetAltDown();
+	bool shift = tool->GetShiftDown();
+
+	int result;
+	if (e->GetId() == albaSegmentationTool::KEY_PRESSED)
+		result = PressKey(e->GetArg(), ctrl, alt, shift);
+	else
+		result = ReleaseKey(e->GetArg(), ctrl, alt, shift);
+	e->SetBool(result == 1);
 }
 
 //----------------------------------------------------------------------------

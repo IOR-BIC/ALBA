@@ -27,7 +27,6 @@
 #include "albaAgentThreadedTest.h"
 #include "albaAvatar3DConeTest.h"
 #include "albaAvatarTest.h"
-#include "albaDeviceButtonsPadMouseDialogTest.h"
 #include "albaDeviceClientALBATest.h"
 #include "albaDeviceManagerTest.h"
 #include "albaDeviceSetTest.h"
@@ -178,7 +177,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaAvatar3DConeTest::suite());
 	runner.addTest(albaGUITransformMouseTest::suite());
 	runner.addTest(albaGizmoPolylineGraphTest::suite());
-	runner.addTest(albaDeviceButtonsPadMouseDialogTest::suite());
 	runner.addTest(albaGUITransformSlidersTest::suite());
 	runner.addTest(albaInteractorVTKPickerTest::suite());
 	runner.addTest(albaInteractorSelectPointTest::suite());

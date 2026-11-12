@@ -331,6 +331,9 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractionTool.cpp  						../Interaction/albaInteractionTool.h
   ../Interaction/albaCameraTool.cpp  						../Interaction/albaCameraTool.h
   ../Interaction/albaCameraMouseTool.cpp  						../Interaction/albaCameraMouseTool.h
+  ../Interaction/albaSegmentationTool.cpp  					../Interaction/albaSegmentationTool.h
+  ../Interaction/albaSegmentationThresholdTool.cpp  					../Interaction/albaSegmentationThresholdTool.h
+  ../Interaction/albaSegmentationEditTool.cpp  					../Interaction/albaSegmentationEditTool.h
   ../Interaction/albaCameraTrackerTool.cpp  						../Interaction/albaCameraTrackerTool.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
@@ -352,14 +355,10 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractorCameraPicker.cpp  					../Interaction/albaInteractorCameraPicker.h
   ../Interaction/albaInteractorPERPicker.cpp  				../Interaction/albaInteractorPERPicker.h
   ../Interaction/albaInteractorDICOMImporter.h  			../Interaction/albaInteractorDICOMImporter.cpp  
-  ../Interaction/albaInteractorSegmentationPicker.cpp  		../Interaction/albaInteractorSegmentationPicker.h 
-  ../Interaction/albaInteractorPERScalarInformation.cpp  	../Interaction/albaInteractorPERScalarInformation.h
-  ../Interaction/albaInteractorPERBrushFeedback.cpp  		../Interaction/albaInteractorPERBrushFeedback.h
   ../Interaction/albaInteractorVTKPicker.cpp  						../Interaction/albaInteractorVTKPicker.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaInteractorSelectPoint.cpp  						../Interaction/albaInteractorSelectPoint.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
-  ../Interaction/albaDeviceButtonsPadMouseDialog.cpp	  	../Interaction/albaDeviceButtonsPadMouseDialog.h
   ../Interaction/albaGUITransformSliders.cpp  				../Interaction/albaGUITransformSliders.h    
   ../Interaction/albaGizmoCrossRotateTranslate.cpp  		../Interaction/albaGizmoCrossRotateTranslate.h	  
   ../Interaction/albaGizmoCrossRotate.cpp  					../Interaction/albaGizmoCrossRotate.h

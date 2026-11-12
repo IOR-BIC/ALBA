@@ -56,7 +56,6 @@ class albaSnapshotManager;
 class mmaApplicationLayout;
 class albaProsthesesDBManager;
 
-typedef int(*eventfilterFunc)(wxEvent& event);
 
 //----------------------------------------------------------------------------
 // albaLogicWithManagers :
@@ -221,10 +220,6 @@ public:
 	virtual albaViewManager *GetViewManager() { return m_ViewManager; }
 
 	virtual void PrintImage(albaVMEImage *img);
-
-	eventfilterFunc GetEventFilterFunc() const { return m_EventFilterFunc; }
-
-	void SetEventFilterFunc(eventfilterFunc val) { m_EventFilterFunc = val;}
 
 	/** Get  application layout*/
 	mmaApplicationLayout* GetLayout() { return m_AppLayout; };
@@ -477,7 +472,6 @@ protected:
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
 
-	eventfilterFunc m_EventFilterFunc;
 	albaView *m_SelectedView; ///< the view selected with SelectView
 
 	albaGUISettingsDialog	*m_SettingsDialog;
