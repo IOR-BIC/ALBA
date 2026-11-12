@@ -16,7 +16,7 @@
 #ifndef __albaInteractorSER_h
 #define __albaInteractorSER_h
 
-#include "albaInteractor.h"
+#include "albaAgent.h"
 #include "albaAction.h"
 #include "albaStorable.h"
 #include <map>
@@ -39,10 +39,10 @@ class albaString;
   @todo
   - to implement a type safe static binding mechanims
    */
-class ALBA_EXPORT albaInteractorSER : public albaInteractor, public albaStorable
+class ALBA_EXPORT albaInteractorSER : public albaAgent, public albaStorable
 {
 public: 
-  albaTypeMacro(albaInteractorSER,albaInteractor);
+  albaTypeMacro(albaInteractorSER,albaAgent);
 
    /** Un/Bind a device to an action */
   void BindDeviceToAction(albaDevice *device,albaAction *action);
