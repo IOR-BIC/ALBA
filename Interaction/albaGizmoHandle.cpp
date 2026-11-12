@@ -32,7 +32,7 @@
 
 // isa stuff
 #include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericInterface.h"
+#include "albaInteractorGenericMouse.h"
 
 // vme stuff
 #include "albaVME.h"

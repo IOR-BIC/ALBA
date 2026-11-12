@@ -44,7 +44,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaInteractorGenericInterface;
+class albaInteractorGenericMouse;
 class albaInteractorGenericMouse;
 class albaInteractorCompositorMouse;
 class albaVMEGizmo;
@@ -147,7 +147,7 @@ public:
 
   /**
   Get the gizmo interactor*/
-  albaInteractorGenericInterface *GetInteractor();
+  albaInteractorGenericMouse *GetInteractor();
 
   /** Gizmo color setting facilities for gizmo segments;*/
   void SetColor(double col[3]);

@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaInteractorGenericInterface;
+class albaInteractorGenericMouse;
 class albaInteractorGenericMouse;
 class albaInteractorCompositorMouse;
 class albaVMEGizmo;
@@ -114,7 +114,7 @@ public:
 
   /**
   Get the gizmo interactor*/
-  albaInteractorGenericInterface *GetInteractor();
+  albaInteractorGenericMouse *GetInteractor();
 
   /** Superclass override */
   void SetMediator(albaObserver *mediator);

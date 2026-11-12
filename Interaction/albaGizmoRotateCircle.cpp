@@ -348,7 +348,7 @@ void albaGizmoRotateCircle::SetInput(albaVME *vme)
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-albaInteractorGenericInterface *albaGizmoRotateCircle::GetInteractor()
+albaInteractorGenericMouse *albaGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
   return m_IsaGen;

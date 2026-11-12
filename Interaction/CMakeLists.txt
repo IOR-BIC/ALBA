@@ -69,7 +69,6 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
   albaInteractorCompositorMouse.cpp  		albaInteractorCompositorMouse.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
-  albaInteractorGenericInterface.cpp  		albaInteractorGenericInterface.h
   albaInteractorGenericMouse.cpp  			albaInteractorGenericMouse.h
   albaInteractorPER.cpp  					albaInteractorPER.h
   albaInteractorPicker.cpp  					albaInteractorPicker.h

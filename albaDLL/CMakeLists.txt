@@ -346,7 +346,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
   ../Interaction/albaInteractorCompositorMouse.cpp  		../Interaction/albaInteractorCompositorMouse.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
-  ../Interaction/albaInteractorGenericInterface.cpp  		../Interaction/albaInteractorGenericInterface.h
   ../Interaction/albaInteractorGenericMouse.cpp  			../Interaction/albaInteractorGenericMouse.h
   ../Interaction/albaInteractorPER.cpp  					../Interaction/albaInteractorPER.h
   ../Interaction/albaInteractorPicker.cpp  					../Interaction/albaInteractorPicker.h

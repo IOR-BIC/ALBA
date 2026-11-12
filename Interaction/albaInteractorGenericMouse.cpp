@@ -42,6 +42,12 @@
 #include "vtkPolyDataNormals.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "mmuIdFactory.h"
+
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+ALBA_ID_IMP(albaInteractorGenericMouse::MOVE_EVENT);
 
 albaCxxTypeMacro(albaInteractorGenericMouse);
 
@@ -49,6 +55,22 @@ albaCxxTypeMacro(albaInteractorGenericMouse);
 albaInteractorGenericMouse::albaInteractorGenericMouse() 
 //----------------------------------------------------------------------------
 {
+  m_TranslationFlag       = true;
+  m_RotationFlag          = true;
+  m_ScalingFlag           = true;
+  m_UniformScalingFlag    = true;
+  m_SurfaceSnap           = false;
+	m_SurfaceNormal         = false;
+  m_ResultTransform       = NULL;
+  m_TargetRefSys          = new albaRefSys;
+  m_TranslationConstraint = new albaInteractorConstraint;
+  m_RotationConstraint    = new albaInteractorConstraint;
+  m_ScaleConstraint       = new albaInteractorConstraint;
+  m_PivotRefSys           = new albaRefSys;
+  m_RotationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
+  m_TranslationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
+  m_PivotRefSys->SetTypeToLocal(); // the VME is set later !!!
+
    m_ResultMatrixConcatenation = true;
 
    SetResultMatrixConcatenationSemanticToPostMultiply();
@@ -78,6 +100,137 @@ albaInteractorGenericMouse::albaInteractorGenericMouse()
 albaInteractorGenericMouse::~albaInteractorGenericMouse()
 //----------------------------------------------------------------------------
 {
+  albaDEL(m_ResultTransform);
+  delete m_TargetRefSys; m_TargetRefSys = NULL;
+  delete m_PivotRefSys; m_PivotRefSys = NULL;
+  delete m_TranslationConstraint; m_TranslationConstraint = NULL;
+  delete m_RotationConstraint; m_RotationConstraint = NULL;
+  delete m_ScaleConstraint; m_ScaleConstraint = NULL;
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetResultTransform(albaTransform *result)
+//------------------------------------------------------------------------------
+{
+  if (result!=m_ResultTransform)
+  {
+    albaDEL(m_ResultTransform);
+    m_ResultTransform=result;
+    m_ResultTransform->Register(this);
+  }
+}
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetResultMatrix(albaMatrix *result)
+//------------------------------------------------------------------------------
+{
+  albaSmartPointer<albaTransform> trans; // create a transform on the fly
+  trans->SetMatrixPointer(result); // make it reference the result matrix
+  SetResultTransform(trans);
+}
+
+//------------------------------------------------------------------------------
+albaMatrix *albaInteractorGenericMouse::GetResultMatrix()
+//------------------------------------------------------------------------------
+{ 
+  return (m_ResultTransform?m_ResultTransform->GetMatrixPointer():NULL);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetTargetRefSys(albaRefSys &ref_sys)
+//------------------------------------------------------------------------------
+{
+  *m_TargetRefSys=ref_sys;
+}
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetTargetRefSys(albaRefSys *ref_sys)
+//------------------------------------------------------------------------------
+{
+  m_TargetRefSys->DeepCopy(ref_sys);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetPivotRefSys(albaRefSys *pivot_frame )
+//------------------------------------------------------------------------------
+{
+  m_PivotRefSys->DeepCopy(pivot_frame);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetPivotRefSys(albaRefSys &pivot_frame )
+//------------------------------------------------------------------------------
+{
+  *m_PivotRefSys=pivot_frame;
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetRendererAndView(vtkRenderer *ren, albaView *view)
+//------------------------------------------------------------------------------
+{
+  m_TranslationConstraint->GetRefSys()->SetRenderer(ren);  
+  m_RotationConstraint->GetRefSys()->SetRenderer(ren);  
+  m_ScaleConstraint->GetRefSys()->SetRenderer(ren);  
+  m_PivotRefSys->SetRenderer(ren);
+  Superclass::SetRendererAndView(ren,view);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetTranslationConstraint(albaInteractorConstraint *constrain)
+//------------------------------------------------------------------------------
+{
+  *m_TranslationConstraint=*constrain;
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetRotationConstraint(albaInteractorConstraint *constrain)
+//------------------------------------------------------------------------------
+{
+  *m_RotationConstraint=*constrain;
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetScaleConstraint(albaInteractorConstraint *constrain)
+//------------------------------------------------------------------------------
+{
+  *m_ScaleConstraint=*constrain;
+}
+ 
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::SetVME(albaVME *vme)
+//------------------------------------------------------------------------------
+{
+  Superclass::SetVME(vme);
+  m_RotationConstraint->GetRefSys()->SetVME(vme);
+  m_TranslationConstraint->GetRefSys()->SetVME(vme);
+  m_ScaleConstraint->GetRefSys()->SetVME(vme);
+  m_PivotRefSys->SetVME(vme);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::EnableTranslation(bool enable)
+//------------------------------------------------------------------------------
+{
+  EnableTranslationInternal(enable);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::EnableRotation(bool enable)
+//------------------------------------------------------------------------------
+{
+  EnableRotationInternal(enable);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::EnableScaling(bool enable)
+// ------------------------------------------------------------------------------
+{
+  EnableScalingInternal(enable);
+}
+
+//------------------------------------------------------------------------------
+void albaInteractorGenericMouse::EnableUniformScaling(bool enable)
+//------------------------------------------------------------------------------
+{
+  EnableUniformScalingInternal(enable);
 }
 
 //----------------------------------------------------------------------------

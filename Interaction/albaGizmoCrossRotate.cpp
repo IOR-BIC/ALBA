@@ -300,7 +300,7 @@ void albaGizmoCrossRotate::SetInput(albaVME *input)
 }
 
 //----------------------------------------------------------------------------  
-albaInteractorGenericInterface *albaGizmoCrossRotate::GetInteractor(int axis)
+albaInteractorGenericMouse *albaGizmoCrossRotate::GetInteractor(int axis)
 //----------------------------------------------------------------------------  
 {
 	return m_GizmoCrossRotateAxisNS->GetInteractor();

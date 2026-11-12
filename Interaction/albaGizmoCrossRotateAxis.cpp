@@ -421,7 +421,7 @@ void albaGizmoCrossRotateAxis::SetInput(albaVME *vme)
 	SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-albaInteractorGenericInterface *albaGizmoCrossRotateAxis::GetInteractor()
+albaInteractorGenericMouse *albaGizmoCrossRotateAxis::GetInteractor()
 //----------------------------------------------------------------------------
 {
 	return m_IsaGen;
