@@ -107,16 +107,6 @@ public:
   /** Define a new action router.*/
   albaAction *AddAction(const char *name, float priority = 0.0);
 
-  /** 
-    Bind an agent to the specified action. 
-    If the action is not present return -1 */
-  int BindAction(const char *action,albaInteractor *agent);
-
-  /** 
-    Unbind an agent from the specified action. 
-    If the action is not present return -1 */
-  int UnBindAction(const char *action,albaInteractor *agent);
-
   /** Define a new avatar */
   void AddAvatar(albaAvatar *avatar);
 

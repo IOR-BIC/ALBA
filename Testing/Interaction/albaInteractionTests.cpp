@@ -61,12 +61,9 @@
 #include "albaGizmoTranslatePlaneTest.h"
 #include "albaGizmoTranslateTest.h"
 #include "albaInteractionFactoryTest.h"
-#include "albaInteractor6DOFCameraMoveTest.h"
-#include "albaInteractor6DOFTest.h"
 #include "albaInteractorCompositorMouseTest.h"
 #include "albaInteractorConstraintTest.h"
 #include "albaExtractIsosurfaceToolTest.h"
-#include "albaInteractorGeneric6DOFTest.h"
 #include "albaInteractorPERTest.h"
 #include "albaInteractorSERTest.h"
 #include "albaSelectCellToolTest.h"
@@ -167,11 +164,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoScaleTest::suite());
 	runner.addTest(albaExtractIsosurfaceToolTest::suite());
 	runner.addTest(albaInteractorTest::suite());
-	runner.addTest(albaInteractor6DOFCameraMoveTest::suite());
 	runner.addTest(albaAvatarTest::suite());
 	runner.addTest(albaInteractorSERTest::suite());
-	runner.addTest(albaInteractor6DOFTest::suite());
-	runner.addTest(albaInteractorGeneric6DOFTest::suite());
 	runner.addTest(albaGUIGizmoInterfaceTest::suite());
 	runner.addTest(albaGUITransformInterfaceTest::suite());
 	runner.addTest(albaAvatar3DConeTest::suite());

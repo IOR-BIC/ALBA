@@ -160,63 +160,6 @@ void albaInteractorSERTest::TestGetDeviceBindings()
   interactor->Delete();
 }
 
-void albaInteractorSERTest::TestBindAction()
-{
-  albaInteractorSER *interactor = albaInteractorSER::New();
-
-  albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
-  albaAction *dummyAction = albaAction::New();
-  dummyAction->SetName("dummyAction");
-
-  interactor->AddAction(dummyAction);
-  interactor->BindAction("dummyAction", interactor);
-
-  albaAction *getAction = NULL;
-
-  getAction =interactor->GetAction("dummyAction");
-  CPPUNIT_ASSERT(getAction != NULL);
-  CPPUNIT_ASSERT(albaString(getAction->GetName()).Equals("dummyAction"));
-  
-  dummyDevice->Delete();
-
-  interactor->Delete();
-
-  // deleting the interactor will delete the action (?)
-  // dummyAction->Delete();
-}
-
-void albaInteractorSERTest::TestUnBindAction()
-{
-  albaInteractorSER *interactor = albaInteractorSER::New();
-
-  albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
-  albaAction *dummyAction = albaAction::New();
-  dummyAction->SetName("dummyAction");
-
-  std::vector<albaAction *> bindings;
-
-  interactor->AddAction(dummyAction);
-  interactor->GetDeviceBindings(dummyDevice, bindings);
-  CPPUNIT_ASSERT(bindings.size() == 0);
-    
-  interactor->BindAction("dummyAction", interactor);
-  dummyAction->BindDevice(dummyDevice);
-
-  interactor->GetDeviceBindings(dummyDevice, bindings);
-
-  CPPUNIT_ASSERT(bindings.size() == 1);
-
-  interactor->UnBindAction("dummyAction", interactor);
-  interactor->GetDeviceBindings(dummyDevice, bindings);
-  CPPUNIT_ASSERT(bindings.size() == 1);
-
-  interactor->Delete();
-
-  // deleting the interactor will delete the action and the device (?)
-  // dummyAction->Delete();
-  // dummyDevice->Delete();
-
-}
 
 void albaInteractorSERTest::TestAddAction()
 {

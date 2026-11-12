@@ -31,8 +31,6 @@ public:
   CPPUNIT_TEST( TestUnBindDeviceFromAction );
   CPPUNIT_TEST( TestUnBindDeviceFromAllActions);
   CPPUNIT_TEST( TestGetDeviceBindings);
-  CPPUNIT_TEST( TestBindAction);
-  CPPUNIT_TEST( TestUnBindAction);
   CPPUNIT_TEST( TestAddAction);
   CPPUNIT_TEST( TestGetAction);
   CPPUNIT_TEST( TestGetActions);
@@ -46,8 +44,6 @@ protected:
   void TestUnBindDeviceFromAction();
   void TestUnBindDeviceFromAllActions();
   void TestGetDeviceBindings();
-  void TestBindAction();
-  void TestUnBindAction();
   void TestAddAction();
   void TestGetAction();
   void TestGetActions();

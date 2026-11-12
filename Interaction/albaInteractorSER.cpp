@@ -95,33 +95,6 @@ void albaInteractorSER::GetActions(std::vector<albaAction *> &actions)
     actions[i]=it->second;
   }
 }
-//------------------------------------------------------------------------------
-int albaInteractorSER::BindAction(const char *action,albaInteractor *agent)
-//------------------------------------------------------------------------------
-{
-  albaAction *a=GetAction(action);
-  if (a)
-  {
-    a->BindInteractor(agent);
-    return 0;
-  }
-  
-  return -1;
-}
-
-//------------------------------------------------------------------------------
-int albaInteractorSER::UnBindAction(const char *action,albaInteractor *agent)
-//------------------------------------------------------------------------------
-{
-  albaAction *a=GetAction(action);
-  if (a)
-  {
-    a->UnBindInteractor(agent);
-    return 0;
-  }
-
-  return -1;
-}
 
 //------------------------------------------------------------------------------
 albaAction *albaInteractorSER::AddAction(const char *name, float priority, int type)

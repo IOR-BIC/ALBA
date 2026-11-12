@@ -50,11 +50,8 @@ SET(PROJECT_SRCS
 	#albaDeviceClientALBATest.h albaDeviceClientALBATest.cpp
 	albaExtractIsosurfaceToolTest.h albaExtractIsosurfaceToolTest.cpp
 	albaInteractorTest.h albaInteractorTest.cpp
-	albaInteractor6DOFCameraMoveTest.h albaInteractor6DOFCameraMoveTest.cpp
 	albaAvatarTest.h albaAvatarTest.cpp 
 	albaInteractorSERTest.h albaInteractorSERTest.cpp
-	albaInteractor6DOFTest.h albaInteractor6DOFTest.cpp
-	albaInteractorGeneric6DOFTest.h albaInteractorGeneric6DOFTest.cpp
 	albaGUIGizmoInterfaceTest.h albaGUIGizmoInterfaceTest.cpp
 	albaGUITransformInterfaceTest.h albaGUITransformInterfaceTest.cpp
 	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp

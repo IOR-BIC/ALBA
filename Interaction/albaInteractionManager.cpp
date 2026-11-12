@@ -193,18 +193,6 @@ albaDeviceButtonsPadMouse *albaInteractionManager::GetMouseDevice()
 }
 
 //------------------------------------------------------------------------------
-int albaInteractionManager::BindAction(const char *action,albaInteractor *agent)
-{
-  return m_StaticEventRouter->BindAction(action,agent);
-}
-
-//------------------------------------------------------------------------------
-int albaInteractionManager::UnBindAction(const char *action,albaInteractor *agent)
-{
-  return m_StaticEventRouter->UnBindAction(action,agent);
-}
-
-//------------------------------------------------------------------------------
 albaAction *albaInteractionManager::AddAction(const char *name, float priority)
 {
   return m_StaticEventRouter->AddAction(name,priority);
