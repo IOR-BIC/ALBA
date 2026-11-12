@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPERPicker
+ Module: albaPickerTool
  Authors: Nicola Vanella
  
  Copyright (c) BIC
@@ -23,17 +23,17 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaInteractorPERPicker.h"
+#include "albaPickerTool.h"
 #include "albaPickHelper.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaEventInteraction.h"
 #include "albaVME.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractorPERPicker)
+albaCxxTypeMacro(albaPickerTool)
 
 //----------------------------------------------------------------------------
-bool albaInteractorPERPicker::OnLeftButtonDown(albaEventInteraction *e)
+bool albaPickerTool::OnLeftButtonDown(albaEventInteraction *e)
 {
   // only the mouse picks, and SHIFT leaves the button to the PER
   m_Dragged = false;
@@ -41,7 +41,7 @@ bool albaInteractorPERPicker::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-bool albaInteractorPERPicker::OnLeftButtonUp(albaEventInteraction *e)
+bool albaPickerTool::OnLeftButtonUp(albaEventInteraction *e)
 {
   albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
   if (mouse == NULL)

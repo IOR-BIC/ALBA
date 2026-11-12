@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure.cpp
+Module:    alba2DMeasureTool.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,7 +13,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 
 #include "albaDecl.h"
 #include "albaDeviceButtonsPadMouse.h"
@@ -42,10 +42,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasure)
+albaCxxTypeMacro(alba2DMeasureTool)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure::albaInteractor2DMeasure()
+alba2DMeasureTool::alba2DMeasureTool()
 {
 	m_Coordinate = vtkCoordinate::New();
 	m_Coordinate->SetCoordinateSystemToWorld();
@@ -100,7 +100,7 @@ albaInteractor2DMeasure::albaInteractor2DMeasure()
 	SetColorText(1.0, 0.0, 0.0, 0.3);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasure::~albaInteractor2DMeasure()
+alba2DMeasureTool::~alba2DMeasureTool()
 {
 	SetAction(ACTION_NONE);
 
@@ -115,7 +115,7 @@ albaInteractor2DMeasure::~albaInteractor2DMeasure()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
+void alba2DMeasureTool::InitRenderer(albaEventInteraction *e)
 {
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
@@ -189,7 +189,7 @@ void albaInteractor2DMeasure::InitRenderer(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::Render()
+void alba2DMeasureTool::Render()
 {
 	for (int i = 0; i < m_AllRenderersVector.size(); i++)
 	{
@@ -202,7 +202,7 @@ void albaInteractor2DMeasure::Render()
 
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetUpdateDistance(double dist)
+void alba2DMeasureTool::SetUpdateDistance(double dist)
 {
 	m_PointUpdateDist = dist;
 	m_PointUpdateDist2 = (dist * dist);
@@ -210,12 +210,12 @@ void albaInteractor2DMeasure::SetUpdateDistance(double dist)
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::IsMouseEvent(albaEventInteraction *e)
+bool alba2DMeasureTool::IsMouseEvent(albaEventInteraction *e)
 {
 	return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) != NULL;
 }
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
+bool alba2DMeasureTool::OnLeftButtonDown(albaEventInteraction *e)
 {
 	if (!m_IsEnabled || !IsMouseEvent(e))
 		return false;
@@ -263,7 +263,7 @@ bool albaInteractor2DMeasure::OnLeftButtonDown(albaEventInteraction *e)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
+bool alba2DMeasureTool::OnLeftButtonUp(albaEventInteraction *e)
 {
 	if (m_CurrentRenderer != m_Renderer)
 		return true;
@@ -299,7 +299,7 @@ bool albaInteractor2DMeasure::OnLeftButtonUp(albaEventInteraction *e)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::OnDrag(albaEventInteraction *e)
+bool alba2DMeasureTool::OnDrag(albaEventInteraction *e)
 {
 	InitRenderer(e);
 
@@ -332,7 +332,7 @@ bool albaInteractor2DMeasure::OnDrag(albaEventInteraction *e)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
+bool alba2DMeasureTool::OnMove(albaEventInteraction *e)
 {
 	if (!m_IsEnabled || !IsMouseEvent(e))
 		return false;
@@ -366,7 +366,7 @@ bool albaInteractor2DMeasure::OnMove(albaEventInteraction *e)
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::AddMeasure(double *point1, double *point2 /*= NULL*/)
+void alba2DMeasureTool::AddMeasure(double *point1, double *point2 /*= NULL*/)
 {
 	if (point1 == NULL) return;
 
@@ -396,7 +396,7 @@ void albaInteractor2DMeasure::AddMeasure(double *point1, double *point2 /*= NULL
 	UpdateTextActor(m_TextActorVector.size() - 1, point1);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::RemoveMeasure(int index)
+void alba2DMeasureTool::RemoveMeasure(int index)
 {
 	if (index >= 0 && index < GetMeasureCount() && m_Measure2DVector[index].Renderer)
 	{
@@ -412,14 +412,14 @@ void albaInteractor2DMeasure::RemoveMeasure(int index)
 	}
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure::RemoveAllMeasures()
+void alba2DMeasureTool::RemoveAllMeasures()
 {
 	int nMeasures = GetMeasureCount();
 	for (int i = nMeasures; i >= 0; i--)
 		RemoveMeasure(i);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SelectMeasure(int index)
+void alba2DMeasureTool::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && index < m_Measure2DVector.size())
 	{
@@ -435,7 +435,7 @@ void albaInteractor2DMeasure::SelectMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::ActivateMeasure(int index, bool activate)
+void alba2DMeasureTool::ActivateMeasure(int index, bool activate)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
 		m_Measure2DVector[index].Active = activate;
@@ -449,7 +449,7 @@ void albaInteractor2DMeasure::ActivateMeasure(int index, bool activate)
 
 /// GET-SET /////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-double albaInteractor2DMeasure::GetMeasureValue(int index)
+double alba2DMeasureTool::GetMeasureValue(int index)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
 		return m_Measure2DVector[index].Value;
@@ -457,7 +457,7 @@ double albaInteractor2DMeasure::GetMeasureValue(int index)
 	return 0.0;
 }
 //---------------------------------------------------------------------------
-albaString albaInteractor2DMeasure::GetMeasureText(int index)
+albaString alba2DMeasureTool::GetMeasureText(int index)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
 		return m_Measure2DVector[index].Text;
@@ -465,7 +465,7 @@ albaString albaInteractor2DMeasure::GetMeasureText(int index)
 	return "No Measure";
 }
 //---------------------------------------------------------------------------
-albaString albaInteractor2DMeasure::GetMeasureLabel(int index)
+albaString alba2DMeasureTool::GetMeasureLabel(int index)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
 		return m_Measure2DVector[index].Label;
@@ -473,7 +473,7 @@ albaString albaInteractor2DMeasure::GetMeasureLabel(int index)
 	return "No Label";
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetMeasureLabel(int index, albaString text)
+void alba2DMeasureTool::SetMeasureLabel(int index, albaString text)
 {
 	if (index >= 0 && index < m_Measure2DVector.size())
 	{
@@ -484,7 +484,7 @@ void albaInteractor2DMeasure::SetMeasureLabel(int index, albaString text)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::iSetColor(int color, double r, double g, double b, double a)
+void alba2DMeasureTool::iSetColor(int color, double r, double g, double b, double a)
 {
 	m_Colors[color].R = r;
 	m_Colors[color].G = g;
@@ -493,7 +493,7 @@ void albaInteractor2DMeasure::iSetColor(int color, double r, double g, double b,
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::ShowText(bool show)
+void alba2DMeasureTool::ShowText(bool show)
 {
 	m_ShowText = show;
 	for (int i = 0; i < m_TextActorVector.size(); i++)
@@ -502,7 +502,7 @@ void albaInteractor2DMeasure::ShowText(bool show)
 	Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::ShowText(int measure, bool show)
+void alba2DMeasureTool::ShowText(int measure, bool show)
 {
 	Color color = m_Colors[COLOR_TEXT];
 
@@ -513,7 +513,7 @@ void albaInteractor2DMeasure::ShowText(int measure, bool show)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
+void alba2DMeasureTool::SetAction(MEASURE_ACTIONS action)
 {
 	if (m_Action == action)
 		return;
@@ -554,14 +554,14 @@ void albaInteractor2DMeasure::SetAction(MEASURE_ACTIONS action)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetColor(vtkActor2D *actor, Color *color)
+void alba2DMeasureTool::SetColor(vtkActor2D *actor, Color *color)
 {
 	actor->GetProperty()->SetColor(color->R, color->G, color->B);
 	actor->GetProperty()->SetOpacity(color->Alpha);
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::SetRendererByView(albaView * view)
+void alba2DMeasureTool::SetRendererByView(albaView * view)
 {
 	m_View = view;
 
@@ -611,7 +611,7 @@ void albaInteractor2DMeasure::SetRendererByView(albaView * view)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::UpdateTextActor(int index, double *text_pos)
+void alba2DMeasureTool::UpdateTextActor(int index, double *text_pos)
 {
 	if (index > -1)
 	{
@@ -634,7 +634,7 @@ void albaInteractor2DMeasure::UpdateTextActor(int index, double *text_pos)
 
 // UTILS /////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::IsInBound(double *pos)
+bool alba2DMeasureTool::IsInBound(double *pos)
 {
 	double bounds[6];
 	m_Renderer->ComputeVisiblePropBounds(bounds);
@@ -653,7 +653,7 @@ bool albaInteractor2DMeasure::IsInBound(double *pos)
 	return m_IsInBound;
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
+void alba2DMeasureTool::ScreenToWorld(double screen[2], double world[3])
 {
 	double wp[4];
 
@@ -676,7 +676,7 @@ void albaInteractor2DMeasure::ScreenToWorld(double screen[2], double world[3])
 }
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure::PixelSizeInWorld()
+double alba2DMeasureTool::PixelSizeInWorld()
 {
 	double p1[2] = { 0,0 };
 	double p2[2] = { 0,1 };
@@ -689,7 +689,7 @@ double albaInteractor2DMeasure::PixelSizeInWorld()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])
+void alba2DMeasureTool::WorldToScreen(double world[3], double screen[2])
 {
 	double scr[3];
 
@@ -704,7 +704,7 @@ void albaInteractor2DMeasure::WorldToScreen(double world[3], double screen[2])
 }
 
 //----------------------------------------------------------------------------
-vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
+vtkPointSource * alba2DMeasureTool::GetNewPointSource()
 {
 	vtkPointSource *ps = vtkPointSource::New();
 	ps->SetNumberOfPoints(1);
@@ -715,42 +715,42 @@ vtkPointSource * albaInteractor2DMeasure::GetNewPointSource()
 
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure::DistanceBetweenPoints(double *point1, double *point2)
+double alba2DMeasureTool::DistanceBetweenPoints(double *point1, double *point2)
 {
 	return albaGeometryUtils::DistanceBetweenPoints(point1, point2);
 }
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure::DistancePointToLine(double * point, double * lineP1, double * lineP2)
+double alba2DMeasureTool::DistancePointToLine(double * point, double * lineP1, double * lineP2)
 {
 	return albaGeometryUtils::DistancePointToLine(point, lineP1, lineP2, m_CurrPlane);
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasure::GetMidPoint(double(&midPoint)[3], double *point1, double *point2)
+void alba2DMeasureTool::GetMidPoint(double(&midPoint)[3], double *point1, double *point2)
 {
 	albaGeometryUtils::GetMidPoint(midPoint, point1, point2);
 }
 //----------------------------------------------------------------------------
-bool albaInteractor2DMeasure::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
+bool alba2DMeasureTool::FindPointOnLine(double(&point)[3], double *linePoint1, double *linePoint2, double distance)
 {
 	return albaGeometryUtils::FindPointOnLine(point, linePoint1, linePoint2, distance, m_CurrPlane);
 }
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasure::GetAngle(double* point1, double* point2, double* origin)
+double alba2DMeasureTool::GetAngle(double* point1, double* point2, double* origin)
 {
 	return albaGeometryUtils::GetAngle(point1, point2, origin, m_CurrPlane);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::RotatePoint(double *point, double *origin, double angle)
+void alba2DMeasureTool::RotatePoint(double *point, double *origin, double angle)
 {
 	albaGeometryUtils::RotatePoint(point, origin, angle, m_CurrPlane);
 }
 //----------------------------------------------------------------------------
-int albaInteractor2DMeasure::PointUpDownLine(double *point, double *lp1, double *lp2)
+int alba2DMeasureTool::PointUpDownLine(double *point, double *lp1, double *lp2)
 {
 	return albaGeometryUtils::PointUpDownLine(point, lp1, lp2, m_CurrPlane);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasure::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
+void alba2DMeasureTool::GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance)
 {
 	albaGeometryUtils::GetParallelLine(point1, point2, linePoint1, linePoint2, distance, m_CurrPlane);
 }

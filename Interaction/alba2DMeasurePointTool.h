@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:	 ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasurePoint.h
+Module:    alba2DMeasurePointTool.h
 Language:  C++
 Date:      $Date: 2019-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,25 +13,25 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasurePoint_h
-#define __albaInteractor2DMeasurePoint_h
+#ifndef __alba2DMeasurePointTool_h
+#define __alba2DMeasurePointTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
 class vtkPolyDataMapper2D;
 
-// Class Name: albaInteractor2DMeasurePoint
-class ALBA_EXPORT albaInteractor2DMeasurePoint : public albaInteractor2DMeasure
+// Class Name: alba2DMeasurePointTool
+class ALBA_EXPORT alba2DMeasurePointTool : public alba2DMeasureTool
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasurePoint, albaInteractor2DMeasure);
+	albaTypeMacro(alba2DMeasurePointTool, alba2DMeasureTool);
 	
 	// MEASURE
 	/** Add Measure*/
@@ -68,8 +68,8 @@ protected:
 // 		LOCK_IN_CIRCLE,
 	};
 
-	albaInteractor2DMeasurePoint();
-	virtual ~albaInteractor2DMeasurePoint();
+	alba2DMeasurePointTool();
+	virtual ~alba2DMeasurePointTool();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
@@ -93,8 +93,8 @@ protected:
 	double m_ConstrLineP2[3];
 
 private:
-	albaInteractor2DMeasurePoint(const albaInteractor2DMeasurePoint&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasurePoint&);  // Not implemented.
-	friend class albaInteractor2DMeasurePointTest;
+	alba2DMeasurePointTool(const alba2DMeasurePointTool&);   // Not implemented.
+	void operator=(const alba2DMeasurePointTool&);  // Not implemented.
+	friend class alba2DMeasurePointToolTest;
 };
 #endif

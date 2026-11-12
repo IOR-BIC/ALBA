@@ -1,6 +1,6 @@
 /*=========================================================================
-Program:	 ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureDistance.h
+Program:   ALBA (Agile Library for Biomedical Applications)
+Module:    alba2DMeasureMidPointTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,13 +13,13 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasureDistance_h
-#define __albaInteractor2DMeasureDistance_h
+#ifndef __alba2DMeasureMidPointTool_h
+#define __alba2DMeasureMidPointTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -28,18 +28,12 @@ class vtkLineSource;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 
-// Class Name: albaInteractor2DMeasureDistance
-class ALBA_EXPORT albaInteractor2DMeasureDistance : public albaInteractor2DMeasure
+// Class Name: alba2DMeasureMidPointTool
+class ALBA_EXPORT alba2DMeasureMidPointTool : public alba2DMeasureTool
 {
 public:
-	enum MEASURE_CONSTRAINTS
-	{
-		NO_CONSTRAINT = 0,
-		HORIZONTAL_CONSTRAINT,
-		VERTICAL_CONSTRAINT,
-	};
 
-	albaTypeMacro(albaInteractor2DMeasureDistance, albaInteractor2DMeasure);
+	albaTypeMacro(alba2DMeasureMidPointTool, alba2DMeasureTool);
 
 	// MEASURE
 	/** Add Measure*/
@@ -51,59 +45,52 @@ public:
 	/** Select a Measure*/
 	virtual void SelectMeasure(int index);
 
-	virtual void SetMinDistance(double minDistance);
-
-	virtual void SetLineWidth(double width);
-	virtual void SetLineTickWidth(double width);
-	virtual void SetLineTickLenght(double lenght);
-
 	virtual void Show(bool show);
+
+	virtual void SetPointSize(double size);
+	void SetMidPointSize(double size);
+	virtual void SetLineWidth(double width);
 
 	/** Get measure line extremity points*/
 	void GetMeasureLinePoints(int index, double *point1, double *point2);
 
-	/** Get the i-th Distance*/
-	double GetDistance(int index);
-
+	/** Get measure line extremity points*/
+	void GetMeasureMidPoint(int index, double *point);
+	
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 
-	/** Getter for GetConstraint */
-	int GetConstraint() const { return m_Constraint; }
-
-	/** Setter for SetConstraint */
-	void SetConstraint(int val) { m_Constraint = val; }
 protected:
 
-	albaInteractor2DMeasureDistance();
-	virtual ~albaInteractor2DMeasureDistance();
+	alba2DMeasureMidPointTool();
+	virtual ~alba2DMeasureMidPointTool();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
 	void DrawNewMeasure(double * wp);
-	
+
 	// RENDERING
 	virtual void UpdateLineActors(double * point1, double * point2);
-	virtual void UpdateLineTickActor(double * point1, double * point2);
+	virtual void UpdatePointsActor(double * point1, double * point2);
+	void UpdateMidPointActor(double * point1, double * point2);
 	void UpdateTextActor(double * point1, double * point2);
-
+	
 	//UTILS
 	virtual void FindAndHighlight(double * point);
-	
+
 	// Persistent line
 	std::vector<albaActor2dStackHelper *> m_LineStackVector;
-	std::vector<albaActor2dStackHelper *> m_TickStackVectorL;
-	std::vector<albaActor2dStackHelper *> m_TickStackVectorR;
 
-	double m_MinDistance;
-	double m_LineTickWidth;
-	double m_TickLenght;
+	// Persistent Points
+	std::vector<albaActor2dStackHelper *> m_PointsStackVectorL;
+	std::vector<albaActor2dStackHelper *> m_PointsStackVectorR;
+	std::vector<albaActor2dStackHelper *> m_MidPointsStackVector;
 
-	int m_Constraint;
+	double m_MidPointSize;
 
 private:
-	albaInteractor2DMeasureDistance(const albaInteractor2DMeasureDistance&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasureDistance&);  // Not implemented.
-	friend class albaInteractor2DMeasureDistanceTest;
+	alba2DMeasureMidPointTool(const alba2DMeasureMidPointTool&);   // Not implemented.
+	void operator=(const alba2DMeasureMidPointTool&);  // Not implemented.
+	friend class alba2DMeasureMidPointToolTest;
 };
 #endif

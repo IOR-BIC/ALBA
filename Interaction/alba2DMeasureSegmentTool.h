@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureSegment.h
+Module:    alba2DMeasureSegmentTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,14 +13,14 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasureSegment_h
-#define __albaInteractor2DMeasureSegment_h
+#ifndef __alba2DMeasureSegmentTool_h
+#define __alba2DMeasureSegmentTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasureDistance.h"
+#include "alba2DMeasureTool.h"
+#include "alba2DMeasureDistanceTool.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -29,12 +29,12 @@ class vtkLineSource;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 
-// Class Name: albaInteractor2DMeasureSegment
-class ALBA_EXPORT albaInteractor2DMeasureSegment : public albaInteractor2DMeasureDistance
+// Class Name: alba2DMeasureSegmentTool
+class ALBA_EXPORT alba2DMeasureSegmentTool : public alba2DMeasureDistanceTool
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasureSegment, albaInteractor2DMeasureDistance);
+	albaTypeMacro(alba2DMeasureSegmentTool, alba2DMeasureDistanceTool);
 
 	// MEASURE
 
@@ -48,12 +48,12 @@ public:
 
 protected:
 
-	albaInteractor2DMeasureSegment();
-	virtual ~albaInteractor2DMeasureSegment();
+	alba2DMeasureSegmentTool();
+	virtual ~alba2DMeasureSegmentTool();
 	
 private:
-	albaInteractor2DMeasureSegment(const albaInteractor2DMeasureSegment&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasureSegment&);  // Not implemented.
-	friend class albaInteractor2DMeasureSegmentTest;
+	alba2DMeasureSegmentTool(const alba2DMeasureSegmentTool&);   // Not implemented.
+	void operator=(const alba2DMeasureSegmentTool&);  // Not implemented.
+	friend class alba2DMeasureSegmentToolTest;
 };
 #endif

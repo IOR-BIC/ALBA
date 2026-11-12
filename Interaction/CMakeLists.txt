@@ -76,7 +76,7 @@ SET(PROJECT_SRCS
   albaInteractorSelectCell.cpp  					albaInteractorSelectCell.h
   albaInteractorSER.cpp  									albaInteractorSER.h  ######################
   albaInteractorCameraPicker.cpp  				albaInteractorCameraPicker.h
-  albaInteractorPERPicker.cpp  						albaInteractorPERPicker.h
+  albaPickerTool.cpp  						albaPickerTool.h
   albaInteractorDICOMImporter.h  					albaInteractorDICOMImporter.cpp  
   albaInteractorVTKPicker.cpp  											albaInteractorVTKPicker.h
   albaInteractorSelectPoint.cpp  										albaInteractorSelectPoint.h
@@ -92,22 +92,21 @@ SET(PROJECT_SRCS
   albaGizmoCrossTranslatePlane.cpp  			albaGizmoCrossTranslatePlane.h
 	
 	albaActor2dStackHelper.cpp							albaActor2dStackHelper.h
-	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h
-	albaInteractor2DMeasure.cpp							albaInteractor2DMeasure.h
-	albaInteractor2DMeasureAngle.cpp				albaInteractor2DMeasureAngle.h
-	albaInteractor2DMeasureAngleLine.cpp		albaInteractor2DMeasureAngleLine.h
-	albaInteractor2DMeasureCenterPoint.cpp	albaInteractor2DMeasureCenterPoint.h
-	albaInteractor2DMeasureDistance.cpp 		albaInteractor2DMeasureDistance.h
-	albaInteractor2DMeasureLine.cpp				albaInteractor2DMeasureLine.h
-	albaInteractor2DMeasureLineDistance.cpp	albaInteractor2DMeasureLineDistance.h
-	albaInteractor2DMeasureMidPoint.cpp		albaInteractor2DMeasureMidPoint.h
-	albaInteractor2DMeasurePoint.cpp 			albaInteractor2DMeasurePoint.h
-	albaInteractor2DMeasureSegment.cpp			albaInteractor2DMeasureSegment.h
-	albaInteractor2DMeasureTemplate.cpp		albaInteractor2DMeasureTemplate.h
+	alba2DMeasureTool.cpp							alba2DMeasureTool.h
+	alba2DMeasureAngleTool.cpp				alba2DMeasureAngleTool.h
+	alba2DMeasureAngleLineTool.cpp		alba2DMeasureAngleLineTool.h
+	alba2DMeasureCenterPointTool.cpp	alba2DMeasureCenterPointTool.h
+	alba2DMeasureDistanceTool.cpp 		alba2DMeasureDistanceTool.h
+	alba2DMeasureLineTool.cpp				alba2DMeasureLineTool.h
+	alba2DMeasureLineDistanceTool.cpp	alba2DMeasureLineDistanceTool.h
+	alba2DMeasureMidPointTool.cpp		alba2DMeasureMidPointTool.h
+	alba2DMeasurePointTool.cpp 			alba2DMeasurePointTool.h
+	alba2DMeasureSegmentTool.cpp			alba2DMeasureSegmentTool.h
+	alba2DMeasureTemplateTool.cpp		alba2DMeasureTemplateTool.h
 	
 	albaInteractorCompositorMouseFloatVME.cpp albaInteractorCompositorMouseFloatVME.h
 	albaInteractorGenericMouseFloatVME.cpp	albaInteractorGenericMouseFloatVME.h
-	albaInteractor2DMeasureEllipse.cpp albaInteractor2DMeasureEllipse.h
+	alba2DMeasureEllipseTool.cpp alba2DMeasureEllipseTool.h
 )
 
 IF (ALBA_USE_P5_GLOVE)

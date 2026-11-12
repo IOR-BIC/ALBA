@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureTemplate.h
+Module:    alba2DMeasureTemplateTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,13 +13,13 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __appInteractor2DMeasure_Template_h
-#define __appInteractor2DMeasure_Template_h
+#ifndef __alba2DMeasureTemplateTool_h
+#define __alba2DMeasureTemplateTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 #include "vtkActor.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -37,12 +37,12 @@ class vtkTransform;
 class vtkTransformPolyDataFilter;
 class albaVMEImage;
 
-// Class Name: albaInteractor2DMeasureTemplate
-class ALBA_EXPORT albaInteractor2DMeasureTemplate : public albaInteractor2DMeasure
+// Class Name: alba2DMeasureTemplateTool
+class ALBA_EXPORT alba2DMeasureTemplateTool : public alba2DMeasureTool
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasureTemplate, albaInteractor2DMeasure);
+	albaTypeMacro(alba2DMeasureTemplateTool, alba2DMeasureTool);
 
 	// MEASURE
 	/** Add Measure*/
@@ -89,8 +89,8 @@ public:
 
 protected:
 
-	albaInteractor2DMeasureTemplate();
-	virtual ~albaInteractor2DMeasureTemplate();
+	alba2DMeasureTemplateTool();
+	virtual ~alba2DMeasureTemplateTool();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
@@ -122,8 +122,8 @@ protected:
 	wxString m_ConfigDir;
 
 private:
-	albaInteractor2DMeasureTemplate(const albaInteractor2DMeasureTemplate&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasureTemplate&);  // Not implemented.
-	friend class appInteractor2DMeasure_TemplateTest;
+	alba2DMeasureTemplateTool(const alba2DMeasureTemplateTool&);   // Not implemented.
+	void operator=(const alba2DMeasureTemplateTool&);  // Not implemented.
+	friend class alba2DMeasureTemplateToolTest;
 };
 #endif

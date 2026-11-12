@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureLineDistance.h
+Module:    alba2DMeasureLineDistanceTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,13 +13,13 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasureLineDistance_h
-#define __albaInteractor2DMeasureLineDistance_h
+#ifndef __alba2DMeasureLineDistanceTool_h
+#define __alba2DMeasureLineDistanceTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -28,12 +28,12 @@ class vtkLineSource;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 
-// Class Name: albaInteractor2DMeasureLineDistance
-class ALBA_EXPORT albaInteractor2DMeasureLineDistance : public albaInteractor2DMeasure
+// Class Name: alba2DMeasureLineDistanceTool
+class ALBA_EXPORT alba2DMeasureLineDistanceTool : public alba2DMeasureTool
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasureLineDistance, albaInteractor2DMeasure);
+	albaTypeMacro(alba2DMeasureLineDistanceTool, alba2DMeasureTool);
 
 	// MEASURE
 	/** Add Measure*/
@@ -62,8 +62,8 @@ public:
 	double GetDistance(int idx);
 protected:
 
-	albaInteractor2DMeasureLineDistance();
-	virtual ~albaInteractor2DMeasureLineDistance();
+	alba2DMeasureLineDistanceTool();
+	virtual ~alba2DMeasureLineDistanceTool();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
@@ -98,8 +98,8 @@ protected:
 	bool m_AddModeCompleted;
 
 private:
-	albaInteractor2DMeasureLineDistance(const albaInteractor2DMeasureLineDistance&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasureLineDistance&);  // Not implemented.
-	friend class albaInteractor2DMeasureLineDistanceTest;
+	alba2DMeasureLineDistanceTool(const alba2DMeasureLineDistanceTool&);   // Not implemented.
+	void operator=(const alba2DMeasureLineDistanceTool&);  // Not implemented.
+	friend class alba2DMeasureLineDistanceToolTest;
 };
 #endif

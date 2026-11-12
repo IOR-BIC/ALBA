@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureAngle.h
+Module:    alba2DMeasureLineTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
-Authors:   Nicola Vanella
+Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) BIC-IOR 2021 (https://github.com/IOR-BIC)
 
@@ -13,13 +13,13 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasureAngle_h
-#define __albaInteractor2DMeasureAngle_h
+#ifndef __alba2DMeasureLineTool_h
+#define __alba2DMeasureLineTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -28,16 +28,16 @@ class vtkLineSource;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
 
-// Class Name: albaInteractor2DMeasureAngle
-class ALBA_EXPORT albaInteractor2DMeasureAngle : public albaInteractor2DMeasure
+// Class Name: alba2DMeasureLineTool
+class ALBA_EXPORT alba2DMeasureLineTool : public alba2DMeasureTool
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasureAngle, albaInteractor2DMeasure);
+	albaTypeMacro(alba2DMeasureLineTool, alba2DMeasureTool);
 
 	// MEASURE
 	/** Add Measure*/
-	virtual void AddMeasure(double *point1, double *point2, double *point3);
+	virtual void AddMeasure(double *point1, double *point2);
 	/** Edit Measure*/
 	virtual void EditMeasure(int index, double *point);
 	/** Delete the Measure*/
@@ -54,61 +54,44 @@ public:
 	void SetLineStipplePattern(int lp) { m_LineStipplePattern = lp; };
 
 	/** Get measure line extremity points*/
-	void GetMeasureLinePoints(int index, double *point1, double *point2, double * point3);
-	void GetCenter(int index, double *center);
+	void GetMeasureLinePoints(int index, double *point1, double *point2);
 
 	bool Load(albaVME *input, wxString tag);
 	bool Save(albaVME *input, wxString tag);
 
-	double GetMeasureAngle(int idx);
-
 protected:
 
-	albaInteractor2DMeasureAngle();
-	virtual ~albaInteractor2DMeasureAngle();
+	alba2DMeasureLineTool();
+	virtual ~alba2DMeasureLineTool();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
 	void DrawNewMeasure(double * wp);
 	
-	void UpdateMeasure(int index, double measure);
-
 	// RENDERING
-	virtual void UpdateLineActors(double * point1, double * point2, double * point3);
-	virtual void UpdatePointsActor(double * point1, double * point2, double * point3);
-	void UpdateCircleActor(double * point1, double * point2, double * ori);
+	virtual void UpdateLineActors(double * point1, double * point2);
+	virtual void UpdatePointsActor(double * point1, double * point2);
+	void UpdateLR(vtkLineSource *line, vtkLineSource *lineL, vtkLineSource *lineR);
 	void UpdateTextActor(double * point1, double * point2);
 	
-	// UTILS
+	//UTILS
 	virtual void FindAndHighlight(double * point);
 
-	// Persistent Points
-	std::vector<albaActor2dStackHelper *> m_PointsStackVectorOri;
-	std::vector<albaActor2dStackHelper *> m_PointsStackVectorA;
-	std::vector<albaActor2dStackHelper *> m_PointsStackVectorB;
-
 	// Persistent line
-	std::vector<albaActor2dStackHelper *> m_LineStackVectorOA;	// First Line 
-	std::vector<albaActor2dStackHelper *> m_LineStackVectorOB; // Second Line
+	std::vector<albaActor2dStackHelper *> m_LineStackVector;
+	std::vector<albaActor2dStackHelper *> m_LineStackVectorL;	// Persistent line
+	std::vector<albaActor2dStackHelper *> m_LineStackVectorR;
 
-	// Persistent Circle
-	std::vector<albaActor2dStackHelper *> m_CircleStackVector;
-
-	std::vector<bool> m_SecondLineAdded;
-	std::vector<double> m_Angles;
+	// Persistent Points
+	std::vector<albaActor2dStackHelper *> m_PointsStackVectorL;
+	std::vector<albaActor2dStackHelper *> m_PointsStackVectorR;
 
 	double m_LineExtensionLength;
 	int m_LineStipplePattern;
 
-	bool m_MoveLineB;
-	double m_OldLineP3[3];
-	bool m_AddModeCompleted;
-
-	Color m_ColorAux;
-
 private:
-	albaInteractor2DMeasureAngle(const albaInteractor2DMeasureAngle&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasureAngle&);  // Not implemented.
-	friend class albaInteractor2DMeasureAngleTest;
+	alba2DMeasureLineTool(const alba2DMeasureLineTool&);   // Not implemented.
+	void operator=(const alba2DMeasureLineTool&);  // Not implemented.
+	friend class alba2DMeasureLineToolTest;
 };
 #endif

@@ -23,8 +23,8 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaGUI.h"
-#include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasurePoint.h"
+#include "alba2DMeasureTool.h"
+#include "alba2DMeasurePointTool.h"
 #include "albaLogicWithManagers.h"
 #include "albaVMEPolyline.h"
 #include "albaView.h"
@@ -203,10 +203,10 @@ void albaOpCreatePolyline::OnEvent(albaEventBase *alba_event)
 			if (!m_IsLoading)
 				switch (e->GetId())
 				{
-				case albaInteractor2DMeasure::ID_MEASURE_SELECTED: break;
-				case albaInteractor2DMeasure::ID_MEASURE_ADDED: break;
-				case albaInteractor2DMeasure::ID_MEASURE_CHANGED: break;
-				case albaInteractor2DMeasure::ID_MEASURE_FINISHED:
+				case alba2DMeasureTool::ID_MEASURE_SELECTED: break;
+				case alba2DMeasureTool::ID_MEASURE_ADDED: break;
+				case alba2DMeasureTool::ID_MEASURE_CHANGED: break;
+				case alba2DMeasureTool::ID_MEASURE_FINISHED:
 				{
 					if (m_PointInteractor && m_PointInteractor->GetMeasureCount() > 2)
 					{

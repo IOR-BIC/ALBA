@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasure.h
+Module:    alba2DMeasureTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasure_h
-#define __albaInteractor2DMeasure_h
+#ifndef __alba2DMeasureTool_h
+#define __alba2DMeasureTool_h
 
 //----------------------------------------------------------------------------
 // Include :
@@ -50,15 +50,15 @@ class vtkTextActor;
 // #define POINT_UPDATE_DISTANCE 4
 // #define POINT_UPDATE_DISTANCE_2 (POINT_UPDATE_DISTANCE * POINT_UPDATE_DISTANCE)
 
-// Class Name: albaInteractor2DMeasure
+// Class Name: alba2DMeasureTool
 /** Base class of the tools drawing 2D measures in parallel views.
   The left button adds, edits, moves or rotates the measures; with SHIFT, or with CTRL
   while adding a measure, the button is left to the PER. The other buttons are not used. */
-class ALBA_EXPORT albaInteractor2DMeasure : public albaInteractionTool, public albaServiceClient
+class ALBA_EXPORT alba2DMeasureTool : public albaInteractionTool, public albaServiceClient
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasure, albaInteractionTool);
+	albaTypeMacro(alba2DMeasureTool, albaInteractionTool);
 
 	enum MEASURE_INTERACTIONS
 	{
@@ -216,8 +216,8 @@ protected:
 	enum AXIS { X, Y, Z, };
 	enum Colors { COLOR_DEFAULT, COLOR_EDIT, COLOR_SELECTION, COLOR_DISABLE, COLOR_TEXT };
 	
-	albaInteractor2DMeasure();
-	virtual ~albaInteractor2DMeasure();
+	alba2DMeasureTool();
+	virtual ~alba2DMeasureTool();
 
 	void InitRenderer(albaEventInteraction *e);
 
@@ -336,9 +336,9 @@ private:
 
 	MEASURE_ACTIONS m_Action; // Measure Action
 	
-	albaInteractor2DMeasure(const albaInteractor2DMeasure&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasure&);  // Not implemented.
-	friend class albaInteractor2DMeasureTest;
+	alba2DMeasureTool(const alba2DMeasureTool&);   // Not implemented.
+	void operator=(const alba2DMeasureTool&);  // Not implemented.
+	friend class alba2DMeasureToolTest;
 };
 
 #endif

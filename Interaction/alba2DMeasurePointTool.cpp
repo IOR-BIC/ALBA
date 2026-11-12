@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasurePoint.cpp
+Module:    alba2DMeasurePointTool.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasurePoint.h"
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasurePointTool.h"
+#include "alba2DMeasureTool.h"
 
 #include "albaTagArray.h"
 #include "albaVME.h"
@@ -28,10 +28,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkRenderer.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasurePoint)
+albaCxxTypeMacro(alba2DMeasurePointTool)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasurePoint::albaInteractor2DMeasurePoint() : albaInteractor2DMeasure()
+alba2DMeasurePointTool::alba2DMeasurePointTool() : alba2DMeasureTool()
 {
 	m_ShowText = false;
 	m_TextSide = -2;
@@ -47,7 +47,7 @@ albaInteractor2DMeasurePoint::albaInteractor2DMeasurePoint() : albaInteractor2DM
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasurePoint::~albaInteractor2DMeasurePoint()
+alba2DMeasurePointTool::~alba2DMeasurePointTool()
 {
 	// Points
 	for (int i = 0; i < m_PointsStackVector.size(); i++)
@@ -58,19 +58,19 @@ albaInteractor2DMeasurePoint::~albaInteractor2DMeasurePoint()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::DrawNewMeasure(double *wp)
+void alba2DMeasurePointTool::DrawNewMeasure(double *wp)
 {
 	AddMeasure(wp);
 	//Call FindAndHighLight to start the edit phase
 	FindAndHighlight(wp);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::MoveMeasure(int index, double *point)
+void alba2DMeasurePointTool::MoveMeasure(int index, double *point)
 {
 	EditMeasure(index, point);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::EditMeasure(int index, double *point)
+void alba2DMeasurePointTool::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -101,7 +101,7 @@ void albaInteractor2DMeasurePoint::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::FindAndHighlight(double *point)
+void alba2DMeasurePointTool::FindAndHighlight(double *point)
 {
 	if (m_CurrMeasure < 0 && m_AddMeasureEnable)
 		SetAction(ACTION_ADD_MEASURE);
@@ -147,7 +147,7 @@ void albaInteractor2DMeasurePoint::FindAndHighlight(double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::ReDrawAll()
+void alba2DMeasurePointTool::ReDrawAll()
 {
 	double point[3];
 
@@ -163,14 +163,14 @@ void albaInteractor2DMeasurePoint::ReDrawAll()
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::UpdatePointsActor(double * point, double * point2)
+void alba2DMeasurePointTool::UpdatePointsActor(double * point, double * point2)
 {
 	vtkPointSource* pointSource = (vtkPointSource*)m_PointsStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	pointSource->SetCenter(point);
 	pointSource->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::UpdateTextActor(int index, double *point)
+void alba2DMeasurePointTool::UpdateTextActor(int index, double *point)
 {
 	double text_pos[3]{ point[X], point[Y], point[Z] };
 
@@ -181,7 +181,7 @@ void albaInteractor2DMeasurePoint::UpdateTextActor(int index, double *point)
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::AddMeasure(double *point)
+void alba2DMeasurePointTool::AddMeasure(double *point)
 {
 	Superclass::AddMeasure(point);
 
@@ -216,7 +216,7 @@ void albaInteractor2DMeasurePoint::AddMeasure(double *point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::RemoveMeasure(int index)
+void alba2DMeasurePointTool::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -233,7 +233,7 @@ void albaInteractor2DMeasurePoint::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::SelectMeasure(int index)
+void alba2DMeasurePointTool::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -261,7 +261,7 @@ void albaInteractor2DMeasurePoint::SelectMeasure(int index)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::SetPointSize(double size)
+void alba2DMeasurePointTool::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -273,7 +273,7 @@ void albaInteractor2DMeasurePoint::SetPointSize(double size)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::Show(bool show)
+void alba2DMeasurePointTool::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -286,7 +286,7 @@ void albaInteractor2DMeasurePoint::Show(bool show)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::GetMeasurePoint(int index, double *point)
+void alba2DMeasurePointTool::GetMeasurePoint(int index, double *point)
 {
 	// Return point value
 	if (index >= 0 && index < GetMeasureCount())
@@ -298,7 +298,7 @@ void albaInteractor2DMeasurePoint::GetMeasurePoint(int index, double *point)
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasurePoint::Load(albaVME *input, wxString tag)
+bool alba2DMeasurePointTool::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasurePoint"))
 	{
@@ -331,7 +331,7 @@ bool albaInteractor2DMeasurePoint::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasurePoint::Save(albaVME *input, wxString tag)
+bool alba2DMeasurePointTool::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nPoints = GetMeasureCount();
@@ -384,7 +384,7 @@ bool albaInteractor2DMeasurePoint::Save(albaVME *input, wxString tag)
 
 /// CONSTRAINTS
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::LockPointOnLine(double *lineP1, double *lineP2)
+void alba2DMeasurePointTool::LockPointOnLine(double *lineP1, double *lineP2)
 {
 	m_EditConstraint = LOCK_ON_LINE;
 
@@ -410,7 +410,7 @@ void albaInteractor2DMeasurePoint::LockPointOnLine(double *lineP1, double *lineP
 	m_CurrMeasure = measure;
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasurePoint::GetPointOnLine(double *point)
+void alba2DMeasurePointTool::GetPointOnLine(double *point)
 {
 	double dist1 = DistanceBetweenPoints(m_ConstrLineP1, point);
 	double dist2 = DistancePointToLine(point, m_ConstrLineP1, m_ConstrLineP2);

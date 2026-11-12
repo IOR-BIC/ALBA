@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureLineDistance.cpp
+Module:    alba2DMeasureLineDistanceTool.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasureLineDistance.h"
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureLineDistanceTool.h"
+#include "alba2DMeasureTool.h"
 
 #include "albaTagArray.h"
 #include "albaVME.h"
@@ -32,10 +32,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVect3d.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasureLineDistance)
+albaCxxTypeMacro(alba2DMeasureLineDistanceTool)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasureLineDistance::albaInteractor2DMeasureLineDistance() : albaInteractor2DMeasure()
+alba2DMeasureLineDistanceTool::alba2DMeasureLineDistanceTool() : alba2DMeasureTool()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -56,7 +56,7 @@ albaInteractor2DMeasureLineDistance::albaInteractor2DMeasureLineDistance() : alb
 	SetColorText(color.R, color.G, color.B, 0.5);
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasureLineDistance::~albaInteractor2DMeasureLineDistance()
+alba2DMeasureLineDistanceTool::~alba2DMeasureLineDistanceTool()
 {
 	// Lines
 	for (int i = 0; i < m_LineStackVector.size(); i++)
@@ -71,7 +71,7 @@ albaInteractor2DMeasureLineDistance::~albaInteractor2DMeasureLineDistance()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::DrawNewMeasure(double * wp)
+void alba2DMeasureLineDistanceTool::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp);
 
@@ -80,7 +80,7 @@ void albaInteractor2DMeasureLineDistance::DrawNewMeasure(double * wp)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::MoveMeasure(int index, double * point)
+void alba2DMeasureLineDistanceTool::MoveMeasure(int index, double * point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -141,7 +141,7 @@ void albaInteractor2DMeasureLineDistance::MoveMeasure(int index, double * point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::EditMeasure(int index, double *point)
+void alba2DMeasureLineDistanceTool::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -189,7 +189,7 @@ void albaInteractor2DMeasureLineDistance::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::FindAndHighlight(double * point)
+void alba2DMeasureLineDistanceTool::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -282,7 +282,7 @@ void albaInteractor2DMeasureLineDistance::FindAndHighlight(double * point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::UpdateMeasure(int index, double measure)
+void alba2DMeasureLineDistanceTool::UpdateMeasure(int index, double measure)
 {
 	albaString text;
 	text.Printf("%.2f mm", measure);
@@ -292,7 +292,7 @@ void albaInteractor2DMeasureLineDistance::UpdateMeasure(int index, double measur
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::UpdatePointsActor(double * point1, double * point2)
+void alba2DMeasureLineDistanceTool::UpdatePointsActor(double * point1, double * point2)
 {
 	//left
 	vtkPointSource* pointSourceL = (vtkPointSource*)m_PointsStackVectorL[m_CurrMeasure]->GetSourceAlgorithm();
@@ -305,7 +305,7 @@ void albaInteractor2DMeasureLineDistance::UpdatePointsActor(double * point1, dou
 	pointSourceR->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::UpdateLineActors(double * point1, double * point2)
+void alba2DMeasureLineDistanceTool::UpdateLineActors(double * point1, double * point2)
 {
 	double p1[3], p2[3], lBp1[3], lBp2[3], delta;
 	vtkLineSource* lineSource = (vtkLineSource*)m_LineStackVector[m_CurrMeasure]->GetSourceAlgorithm();
@@ -344,7 +344,7 @@ void albaInteractor2DMeasureLineDistance::UpdateLineActors(double * point1, doub
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::UpdateTextActor(double * point1, double * point2)
+void alba2DMeasureLineDistanceTool::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
 	GetMidPoint(text_pos, point1, point2);
@@ -358,7 +358,7 @@ void albaInteractor2DMeasureLineDistance::UpdateTextActor(double * point1, doubl
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::AddMeasure(double *point1, double *point2)
+void alba2DMeasureLineDistanceTool::AddMeasure(double *point1, double *point2)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -479,7 +479,7 @@ void albaInteractor2DMeasureLineDistance::AddMeasure(double *point1, double *poi
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::RemoveMeasure(int index)
+void alba2DMeasureLineDistanceTool::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -512,7 +512,7 @@ void albaInteractor2DMeasureLineDistance::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::SelectMeasure(int index)
+void alba2DMeasureLineDistanceTool::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -548,7 +548,7 @@ void albaInteractor2DMeasureLineDistance::SelectMeasure(int index)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::SetPointSize(double size)
+void alba2DMeasureLineDistanceTool::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -560,7 +560,7 @@ void albaInteractor2DMeasureLineDistance::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::SetLineWidth(double width)
+void alba2DMeasureLineDistanceTool::SetLineWidth(double width)
 {
 	m_LineWidth = width;
 
@@ -574,7 +574,7 @@ void albaInteractor2DMeasureLineDistance::SetLineWidth(double width)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::Show(bool show)
+void alba2DMeasureLineDistanceTool::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -593,7 +593,7 @@ void albaInteractor2DMeasureLineDistance::Show(bool show)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureLineDistance::GetMeasureLinePoints(int index, double *point1, double *point2)
+void alba2DMeasureLineDistanceTool::GetMeasureLinePoints(int index, double *point1, double *point2)
 {
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -607,7 +607,7 @@ void albaInteractor2DMeasureLineDistance::GetMeasureLinePoints(int index, double
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasureLineDistance::Load(albaVME *input, wxString tag)
+bool alba2DMeasureLineDistanceTool::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureLineDistancePoint1"))
 	{
@@ -653,7 +653,7 @@ bool albaInteractor2DMeasureLineDistance::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasureLineDistance::Save(albaVME *input, wxString tag)
+bool alba2DMeasureLineDistanceTool::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nLines = GetMeasureCount();
@@ -728,7 +728,7 @@ bool albaInteractor2DMeasureLineDistance::Save(albaVME *input, wxString tag)
 }
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasureLineDistance::GetDistance(int idx)
+double alba2DMeasureLineDistanceTool::GetDistance(int idx)
 {
 	if (idx >= 0 && idx < m_Distances.size())
 		return fabs(m_Distances[idx]);

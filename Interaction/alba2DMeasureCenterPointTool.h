@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureCenterPoint.h
+Module:    alba2DMeasureCenterPointTool.h
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,13 +13,13 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#ifndef __albaInteractor2DMeasureCenterPoint_h
-#define __albaInteractor2DMeasureCenterPoint_h
+#ifndef __alba2DMeasureCenterPointTool_h
+#define __alba2DMeasureCenterPointTool_h
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTool.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -33,12 +33,12 @@ class vtkPolyDataMapper2D;
 class vtkTransform;
 class vtkTransformPolyDataFilter;
 
-// Class Name: albaInteractor2DMeasureCenterPoint
-class ALBA_EXPORT albaInteractor2DMeasureCenterPoint : public albaInteractor2DMeasure
+// Class Name: alba2DMeasureCenterPointTool
+class ALBA_EXPORT alba2DMeasureCenterPointTool : public alba2DMeasureTool
 {
 public:
 
-	albaTypeMacro(albaInteractor2DMeasureCenterPoint, albaInteractor2DMeasure);
+	albaTypeMacro(alba2DMeasureCenterPointTool, alba2DMeasureTool);
 
 	// MEASURE
 	/** Add Measure*/
@@ -68,8 +68,8 @@ public:
 
 protected:
 
-	albaInteractor2DMeasureCenterPoint();
-	virtual ~albaInteractor2DMeasureCenterPoint();
+	alba2DMeasureCenterPointTool();
+	virtual ~alba2DMeasureCenterPointTool();
 
 	// Draw Measure
 	void MoveMeasure(int index, double * point);
@@ -98,8 +98,8 @@ protected:
 	double m_CenterPointSize;
 
 private:
-	albaInteractor2DMeasureCenterPoint(const albaInteractor2DMeasureCenterPoint&);   // Not implemented.
-	void operator=(const albaInteractor2DMeasureCenterPoint&);  // Not implemented.
-	friend class albaInteractor2DMeasureCenterPointTest;
+	alba2DMeasureCenterPointTool(const alba2DMeasureCenterPointTool&);   // Not implemented.
+	void operator=(const alba2DMeasureCenterPointTool&);  // Not implemented.
+	friend class alba2DMeasureCenterPointToolTest;
 };
 #endif

@@ -28,9 +28,9 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaGUI.h"
-#include "albaInteractor2DMeasure.h"
-#include "albaInteractor2DMeasureDistance.h"
-#include "albaInteractor2DMeasureCenterPoint.h"
+#include "alba2DMeasureTool.h"
+#include "alba2DMeasureDistanceTool.h"
+#include "alba2DMeasureCenterPointTool.h"
 #include "albaLogicWithManagers.h"
 #include "albaVMEImage.h"
 #include "albaView.h"
@@ -187,7 +187,7 @@ void albaOpImageCalibration::SetActiveInteractor()
 	if (m_SelectedIterator != CIRCLE)
 		m_DistanceInteractor->SetConstraint(m_SelectedIterator);
 	
-	albaInteractor2DMeasure *nextInteractor = (m_SelectedIterator == CIRCLE) ? (albaInteractor2DMeasure *)m_CenterPointInteractor : m_DistanceInteractor;
+	alba2DMeasureTool *nextInteractor = (m_SelectedIterator == CIRCLE) ? (alba2DMeasureTool *)m_CenterPointInteractor : m_DistanceInteractor;
 	if (nextInteractor == m_ActiveInteractor)
 		return;
 
@@ -237,7 +237,7 @@ void albaOpImageCalibration::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == albaInteractor2DMeasure::ID_MEASURE_CHANGED)
+	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == alba2DMeasureTool::ID_MEASURE_CHANGED)
 	{
 		UpdateGui();
 	}

@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureAngleLine.cpp
+Module:    alba2DMeasureAngleLineTool.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasureAngleLine.h"
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureAngleLineTool.h"
+#include "alba2DMeasureTool.h"
 
 #include "albaTagArray.h"
 #include "albaVME.h"
@@ -34,10 +34,10 @@ PURPOSE. See the above copyright notice for more information.
 /*#include "appGeometry.h"*/
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasureAngleLine)
+albaCxxTypeMacro(alba2DMeasureAngleLineTool)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasureAngleLine::albaInteractor2DMeasureAngleLine() : albaInteractor2DMeasure()
+alba2DMeasureAngleLineTool::alba2DMeasureAngleLineTool() : alba2DMeasureTool()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -63,7 +63,7 @@ albaInteractor2DMeasureAngleLine::albaInteractor2DMeasureAngleLine() : albaInter
 	m_ColorAux.Alpha = 0.5;
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasureAngleLine::~albaInteractor2DMeasureAngleLine()
+alba2DMeasureAngleLineTool::~alba2DMeasureAngleLineTool()
 {
 	// Lines
 	for (int i = 0; i < m_PointsStackVectorA.size(); i++)
@@ -84,7 +84,7 @@ albaInteractor2DMeasureAngleLine::~albaInteractor2DMeasureAngleLine()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::DrawNewMeasure(double * wp)
+void alba2DMeasureAngleLineTool::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp, wp, wp);
 
@@ -93,7 +93,7 @@ void albaInteractor2DMeasureAngleLine::DrawNewMeasure(double * wp)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::MoveMeasure(int index, double *point)
+void alba2DMeasureAngleLineTool::MoveMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -169,7 +169,7 @@ void albaInteractor2DMeasureAngleLine::MoveMeasure(int index, double *point)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::EditMeasure(int index, double *point)
+void alba2DMeasureAngleLineTool::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -249,7 +249,7 @@ void albaInteractor2DMeasureAngleLine::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::EditMeasure(int index, double *point1, double *point2, double *point3, double *point4)
+void alba2DMeasureAngleLineTool::EditMeasure(int index, double *point1, double *point2, double *point3, double *point4)
 {
 		if (index < 0 || index >= GetMeasureCount())
 			return;
@@ -281,7 +281,7 @@ void albaInteractor2DMeasureAngleLine::EditMeasure(int index, double *point1, do
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::FindAndHighlight(double * point)
+void alba2DMeasureAngleLineTool::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -405,7 +405,7 @@ void albaInteractor2DMeasureAngleLine::FindAndHighlight(double * point)
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::UpdateMeasure(int index, double measure)
+void alba2DMeasureAngleLineTool::UpdateMeasure(int index, double measure)
 {
 	double angleDegree = vtkMath::DegreesFromRadians(measure);
 	angleDegree = abs((angleDegree <= 180.0) ? angleDegree : 360.0 - angleDegree);
@@ -417,7 +417,7 @@ void albaInteractor2DMeasureAngleLine::UpdateMeasure(int index, double measure)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::UpdatePointsActor(double * point1, double * point2, double * point3, double * point4)
+void alba2DMeasureAngleLineTool::UpdatePointsActor(double * point1, double * point2, double * point3, double * point4)
 {
 	//Point A
 	vtkPointSource* pointSourceA = (vtkPointSource*)m_PointsStackVectorA[m_CurrMeasure]->GetSourceAlgorithm();
@@ -440,7 +440,7 @@ void albaInteractor2DMeasureAngleLine::UpdatePointsActor(double * point1, double
 	pointSourceD->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::UpdateLineActors(double * point1, double * point2, double * point3, double * point4)
+void alba2DMeasureAngleLineTool::UpdateLineActors(double * point1, double * point2, double * point3, double * point4)
 {
 	vtkLineSource* lineSourceAB = (vtkLineSource*)m_LineStackVectorAB[m_CurrMeasure]->GetSourceAlgorithm();
 	vtkLineSource* lineSourceCD = (vtkLineSource*)m_LineStackVectorCD[m_CurrMeasure]->GetSourceAlgorithm();
@@ -454,7 +454,7 @@ void albaInteractor2DMeasureAngleLine::UpdateLineActors(double * point1, double 
 	lineSourceCD->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::UpdateCircleActor(double * point, double angle, double radius)
+void alba2DMeasureAngleLineTool::UpdateCircleActor(double * point, double angle, double radius)
 {
 	vtkALBACircleSource *circleSource = (vtkALBACircleSource *)m_CircleStackVector[m_CurrMeasure]->GetSourceAlgorithm();
 	circleSource->SetPlane(m_CurrPlane);
@@ -471,7 +471,7 @@ void albaInteractor2DMeasureAngleLine::UpdateCircleActor(double * point, double 
 	circleSource->SetAngleRange(0, vtkMath::RadiansFromDegrees(angle));
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::UpdateTextActor(double * point1, double * point2)
+void alba2DMeasureAngleLineTool::UpdateTextActor(double * point1, double * point2)
 {
 	double text_pos[3];
 	GetMidPoint(text_pos, point1, point2);
@@ -484,7 +484,7 @@ void albaInteractor2DMeasureAngleLine::UpdateTextActor(double * point1, double *
 
 
 //----------------------------------------------------------------------------
-albaString albaInteractor2DMeasureAngleLine::GetMeasureText(int index)
+albaString alba2DMeasureAngleLineTool::GetMeasureText(int index)
 {
 	albaString str;
 	if (index >= 0 && index < m_Angles.size())
@@ -496,7 +496,7 @@ albaString albaInteractor2DMeasureAngleLine::GetMeasureText(int index)
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::AddMeasure(double *point1, double *point2, double *point3, double * point4)
+void alba2DMeasureAngleLineTool::AddMeasure(double *point1, double *point2, double *point3, double * point4)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -648,7 +648,7 @@ void albaInteractor2DMeasureAngleLine::AddMeasure(double *point1, double *point2
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::RemoveMeasure(int index)
+void alba2DMeasureAngleLineTool::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -688,7 +688,7 @@ void albaInteractor2DMeasureAngleLine::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::SelectMeasure(int index)
+void alba2DMeasureAngleLineTool::SelectMeasure(int index)
 {
 	if (index != m_CurrMeasure && GetMeasureCount() > 0)
 	{
@@ -728,7 +728,7 @@ void albaInteractor2DMeasureAngleLine::SelectMeasure(int index)
 
 /// SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::SetPointSize(double size)
+void alba2DMeasureAngleLineTool::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -742,7 +742,7 @@ void albaInteractor2DMeasureAngleLine::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::SetLineWidth(double width)
+void alba2DMeasureAngleLineTool::SetLineWidth(double width)
 {
 	m_LineWidth = width;
 
@@ -756,7 +756,7 @@ void albaInteractor2DMeasureAngleLine::SetLineWidth(double width)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::Show(bool show)
+void alba2DMeasureAngleLineTool::Show(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -778,7 +778,7 @@ void albaInteractor2DMeasureAngleLine::Show(bool show)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::GetMeasureLinePoints(int index, double *point1, double *point2, double *point3, double *point4)
+void alba2DMeasureAngleLineTool::GetMeasureLinePoints(int index, double *point1, double *point2, double *point3, double *point4)
 {
 	// Return line points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -795,7 +795,7 @@ void albaInteractor2DMeasureAngleLine::GetMeasureLinePoints(int index, double *p
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureAngleLine::GetCenter(int index, double *center)
+void alba2DMeasureAngleLineTool::GetCenter(int index, double *center)
 {
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -807,7 +807,7 @@ void albaInteractor2DMeasureAngleLine::GetCenter(int index, double *center)
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasureAngleLine::Load(albaVME *input, wxString tag)
+bool alba2DMeasureAngleLineTool::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureAngleLinePoint1") && input->GetTagArray()->IsTagPresent(tag + "MeasureAngleLinePoint1"))
 	{
@@ -865,7 +865,7 @@ bool albaInteractor2DMeasureAngleLine::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasureAngleLine::Save(albaVME *input, wxString tag)
+bool alba2DMeasureAngleLineTool::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nAngles = GetMeasureCount();
@@ -964,7 +964,7 @@ bool albaInteractor2DMeasureAngleLine::Save(albaVME *input, wxString tag)
 }
 
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasureAngleLine::GetMeasureAngle(int idx)
+double alba2DMeasureAngleLineTool::GetMeasureAngle(int idx)
 {
 	if (idx >= 0 && idx < m_Angles.size())
 		return fabs(m_Angles[idx]);
@@ -972,7 +972,7 @@ double albaInteractor2DMeasureAngleLine::GetMeasureAngle(int idx)
 		return 0;
 }
 //----------------------------------------------------------------------------
-double albaInteractor2DMeasureAngleLine::CalculateAngle(double * point1, double * point2, double * point3, double * point4)
+double alba2DMeasureAngleLineTool::CalculateAngle(double * point1, double * point2, double * point3, double * point4)
 {
 	// Translate Second Line
 	double diff[3] = { point3[X] - point2[X], point3[Y] - point2[Y], point3[Z] - point2[Z] };

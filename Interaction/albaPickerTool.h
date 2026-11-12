@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorPERPicker
+ Module: albaPickerTool
  Authors: Nicola Vanella
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaInteractorPERPicker_h
-#define __albaInteractorPERPicker_h
+#ifndef __albaPickerTool_h
+#define __albaPickerTool_h
 
 #include "albaInteractionTool.h"
 
@@ -24,10 +24,10 @@
   (gizmos are not picked); the drags are not used, so they move the camera.
   The button down with SHIFT is not used. A VME with a behavior, e.g. a gizmo,
   comes before the tools, so it keeps working while the picker is active. */
-class ALBA_EXPORT albaInteractorPERPicker : public albaInteractionTool
+class ALBA_EXPORT albaPickerTool : public albaInteractionTool
 {
 public: 
-  albaTypeMacro(albaInteractorPERPicker, albaInteractionTool);
+  albaTypeMacro(albaPickerTool, albaInteractionTool);
 
   virtual bool OnLeftButtonDown(albaEventInteraction *e);
 
@@ -38,14 +38,14 @@ public:
   virtual bool OnLeftButtonUp(albaEventInteraction *e);
 
 protected:
-  albaInteractorPERPicker() {m_Dragged = false;}
-  virtual ~albaInteractorPERPicker() {}
+  albaPickerTool() {m_Dragged = false;}
+  virtual ~albaPickerTool() {}
 
   bool m_Dragged; ///< true if the mouse moved after the button down
 
 private:
-  albaInteractorPERPicker(const albaInteractorPERPicker&);  // Not implemented.
-  void operator=(const albaInteractorPERPicker&);  // Not implemented.
+  albaPickerTool(const albaPickerTool&);  // Not implemented.
+  void operator=(const albaPickerTool&);  // Not implemented.
 };
 
 #endif 

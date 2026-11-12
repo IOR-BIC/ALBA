@@ -1,6 +1,6 @@
 ﻿/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
-Module:    albaInteractor2DMeasureTemplate.cpp
+Module:    alba2DMeasureTemplateTool.cpp
 Language:  C++
 Date:      $Date: 2021-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $
@@ -13,8 +13,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
-#include "albaInteractor2DMeasureTemplate.h"
-#include "albaInteractor2DMeasure.h"
+#include "alba2DMeasureTemplateTool.h"
+#include "alba2DMeasureTool.h"
 
 #include "albaGUILutPreset.h"
 #include "albaTagArray.h"
@@ -51,10 +51,10 @@ PURPOSE. See the above copyright notice for more information.
 #include "defines.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaInteractor2DMeasureTemplate)
+albaCxxTypeMacro(alba2DMeasureTemplateTool)
 
 //----------------------------------------------------------------------------
-albaInteractor2DMeasureTemplate::albaInteractor2DMeasureTemplate() : albaInteractor2DMeasure()
+alba2DMeasureTemplateTool::alba2DMeasureTemplateTool() : alba2DMeasureTool()
 {
 	m_ShowText = false;
 	m_TextSide = 1;
@@ -81,7 +81,7 @@ albaInteractor2DMeasureTemplate::albaInteractor2DMeasureTemplate() : albaInterac
 	m_Angle = 0.0;
 }
 //----------------------------------------------------------------------------
-albaInteractor2DMeasureTemplate::~albaInteractor2DMeasureTemplate()
+alba2DMeasureTemplateTool::~alba2DMeasureTemplateTool()
 {
 	// Points and Textures
 	for (int i = 0; i < m_PointsStackVectorUL.size(); i++)
@@ -103,20 +103,20 @@ albaInteractor2DMeasureTemplate::~albaInteractor2DMeasureTemplate()
 
 /// RENDERING ////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::DrawNewMeasure(double * wp)
+void alba2DMeasureTemplateTool::DrawNewMeasure(double * wp)
 {
 	AddMeasure(wp, wp, wp, wp);
 	//Call FindAndHighLight to start the edit phase
 	FindAndHighlight(wp);
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::MoveMeasure(int index, double * point)
+void alba2DMeasureTemplateTool::MoveMeasure(int index, double * point)
 {
 	albaEventMacro(albaEvent(this, ID_MEASURE_CHANGED, m_MeasureValue));
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::EditMeasure(int index, double *point)
+void alba2DMeasureTemplateTool::EditMeasure(int index, double *point)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -167,7 +167,7 @@ void albaInteractor2DMeasureTemplate::EditMeasure(int index, double *point)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::FindAndHighlight(double * point)
+void alba2DMeasureTemplateTool::FindAndHighlight(double * point)
 {
 	if (m_CurrMeasure < 0)
 		SetAction(ACTION_ADD_MEASURE);
@@ -237,7 +237,7 @@ void albaInteractor2DMeasureTemplate::FindAndHighlight(double * point)
 
 /// UPDATE ///////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::UpdatePointsActor(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
+void alba2DMeasureTemplateTool::UpdatePointsActor(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	// Up Left
 	vtkPointSource* pointSourceUL = (vtkPointSource*)m_PointsStackVectorUL[m_CurrMeasure]->GetSourceAlgorithm();
@@ -268,7 +268,7 @@ void albaInteractor2DMeasureTemplate::UpdatePointsActor(double * pointUL, double
 	pointSourceC->Update();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::UpdateTexureActor(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
+void alba2DMeasureTemplateTool::UpdateTexureActor(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	double pointC[3];
 	GetCenter(m_CurrMeasure, pointC);
@@ -289,7 +289,7 @@ void albaInteractor2DMeasureTemplate::UpdateTexureActor(double * pointUL, double
 
 /// MEASURE //////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::AddMeasure(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
+void alba2DMeasureTemplateTool::AddMeasure(double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -455,7 +455,7 @@ void albaInteractor2DMeasureTemplate::AddMeasure(double * pointUL, double * poin
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::EditPoints(int index, double * pointUL, double * pointUR, double * pointDR, double * pointDL)
+void alba2DMeasureTemplateTool::EditPoints(int index, double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	if (index < 0 || index >= GetMeasureCount())
 		return;
@@ -476,7 +476,7 @@ void albaInteractor2DMeasureTemplate::EditPoints(int index, double * pointUL, do
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::EditTextureCoord(int index, double * pointUL, double * pointUR, double * pointDR, double * pointDL)
+void alba2DMeasureTemplateTool::EditTextureCoord(int index, double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	// Texture Coordinates
 	vtkFloatArray *textureCoordinates;
@@ -505,7 +505,7 @@ void albaInteractor2DMeasureTemplate::EditTextureCoord(int index, double * point
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::RemoveMeasure(int index)
+void alba2DMeasureTemplateTool::RemoveMeasure(int index)
 {
 	if (m_Renderer && index < GetMeasureCount())
 	{
@@ -547,7 +547,7 @@ void albaInteractor2DMeasureTemplate::RemoveMeasure(int index)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::SelectMeasure(int index)
+void alba2DMeasureTemplateTool::SelectMeasure(int index)
 {
 	if (index != GetMeasureCount() > 0)
 	{
@@ -581,7 +581,7 @@ void albaInteractor2DMeasureTemplate::SelectMeasure(int index)
 
 // SET/GET
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::SetPointSize(double size)
+void alba2DMeasureTemplateTool::SetPointSize(double size)
 {
 	m_PointSize = size;
 
@@ -596,7 +596,7 @@ void albaInteractor2DMeasureTemplate::SetPointSize(double size)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::SetTexture(vtkImageData *imageData)
+void alba2DMeasureTemplateTool::SetTexture(vtkImageData *imageData)
 {
 	// Apply the texture
 	vtkTexture *texture;
@@ -619,7 +619,7 @@ void albaInteractor2DMeasureTemplate::SetTexture(vtkImageData *imageData)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::SetTextureOpacity(double opacity)
+void alba2DMeasureTemplateTool::SetTextureOpacity(double opacity)
 {
 	m_TexturedQuadVector[0]->GetProperty()->SetOpacity(opacity);
 
@@ -627,7 +627,7 @@ void albaInteractor2DMeasureTemplate::SetTextureOpacity(double opacity)
 	Render();
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::SetTextureColor(double r,double g, double b)
+void alba2DMeasureTemplateTool::SetTextureColor(double r,double g, double b)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -637,7 +637,7 @@ void albaInteractor2DMeasureTemplate::SetTextureColor(double r,double g, double 
 } 
 
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::GetMeasurePoints(int index, double * pointUL, double * pointUR, double * pointDR, double * pointDL)
+void alba2DMeasureTemplateTool::GetMeasurePoints(int index, double * pointUL, double * pointUR, double * pointDR, double * pointDL)
 {
 	// Return points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -660,7 +660,7 @@ void albaInteractor2DMeasureTemplate::GetMeasurePoints(int index, double * point
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::GetCenter(int index, double *center)
+void alba2DMeasureTemplateTool::GetCenter(int index, double *center)
 {
 	// Return center points values
 	if (index >= 0 && index < GetMeasureCount())
@@ -682,13 +682,13 @@ void albaInteractor2DMeasureTemplate::GetCenter(int index, double *center)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::Show(bool show)
+void alba2DMeasureTemplateTool::Show(bool show)
 {
 	//ShowPoints(show);
 	ShowTexture(show);
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::ShowPoints(bool show)
+void alba2DMeasureTemplateTool::ShowPoints(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -701,7 +701,7 @@ void albaInteractor2DMeasureTemplate::ShowPoints(bool show)
 	Render();
 }
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::ShowTexture(bool show)
+void alba2DMeasureTemplateTool::ShowTexture(bool show)
 {
 	for (int i = 0; i < GetMeasureCount(); i++)
 	{
@@ -714,7 +714,7 @@ void albaInteractor2DMeasureTemplate::ShowTexture(bool show)
 
 /// UTILS ///////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::Rotate(double angle, double *origin)
+void alba2DMeasureTemplateTool::Rotate(double angle, double *origin)
 {
 	if (GetMeasureCount() > 0)
 	{
@@ -741,7 +741,7 @@ void albaInteractor2DMeasureTemplate::Rotate(double angle, double *origin)
 }
 
 //---------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::CropImage(albaVMEImage *vmeImage)
+void alba2DMeasureTemplateTool::CropImage(albaVMEImage *vmeImage)
 {
 	if (vmeImage)
 	{
@@ -753,7 +753,7 @@ void albaInteractor2DMeasureTemplate::CropImage(albaVMEImage *vmeImage)
 	}
 }
 //----------------------------------------------------------------------------
-void albaInteractor2DMeasureTemplate::CropImage(albaVMEImage *vmeImage, double *bounds)
+void alba2DMeasureTemplateTool::CropImage(albaVMEImage *vmeImage, double *bounds)
 {
 	if (vmeImage)
 	{
@@ -880,7 +880,7 @@ void albaInteractor2DMeasureTemplate::CropImage(albaVMEImage *vmeImage, double *
 
 /// LOAD/SAVE ///////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasureTemplate::Load(albaVME *input, wxString tag)
+bool alba2DMeasureTemplateTool::Load(albaVME *input, wxString tag)
 {
 	if (input->GetTagArray()->IsTagPresent(tag + "MeasureTemplatePoint1") 
 		&& input->GetTagArray()->IsTagPresent(tag + "MeasureTemplatePoint2")
@@ -929,7 +929,7 @@ bool albaInteractor2DMeasureTemplate::Load(albaVME *input, wxString tag)
 	return false;
 }
 //---------------------------------------------------------------------------
-bool albaInteractor2DMeasureTemplate::Save(albaVME *input, wxString tag)
+bool alba2DMeasureTemplateTool::Save(albaVME *input, wxString tag)
 {
 	bool result = false;
 	int nTemplates = GetMeasureCount();
@@ -1017,7 +1017,7 @@ bool albaInteractor2DMeasureTemplate::Save(albaVME *input, wxString tag)
 }
 
 //---------------------------------------------------------------------------
-wxString albaInteractor2DMeasureTemplate::GetConfigDirectory()
+wxString alba2DMeasureTemplateTool::GetConfigDirectory()
 {
 	//getting the Config directory
 	wxString config_dir = albaGetApplicationDirectory().ToAscii();

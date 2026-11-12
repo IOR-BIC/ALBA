@@ -353,7 +353,7 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractorSelectCell.cpp  				../Interaction/albaInteractorSelectCell.h
   ../Interaction/albaInteractorSER.cpp  					../Interaction/albaInteractorSER.h  ######################
   ../Interaction/albaInteractorCameraPicker.cpp  					../Interaction/albaInteractorCameraPicker.h
-  ../Interaction/albaInteractorPERPicker.cpp  				../Interaction/albaInteractorPERPicker.h
+  ../Interaction/albaPickerTool.cpp  				../Interaction/albaPickerTool.h
   ../Interaction/albaInteractorDICOMImporter.h  			../Interaction/albaInteractorDICOMImporter.cpp  
   ../Interaction/albaInteractorVTKPicker.cpp  						../Interaction/albaInteractorVTKPicker.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
