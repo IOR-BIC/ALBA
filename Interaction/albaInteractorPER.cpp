@@ -52,8 +52,6 @@
 #include "albaVMELandmarkCloud.h"
 #include "mmuIdFactory.h"
 
-bool albaInteractorPER::m_EventTracing = false;
-
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractorPER)
 //------------------------------------------------------------------------------
@@ -63,6 +61,7 @@ albaInteractorPER::albaInteractorPER()
   m_DraggingLeft    = false; 
   m_CanSelect       = true; 
   m_FlyToFlag       = false;
+  m_EventTracing    = false;
   m_StartButton     = -1;
 
   SetModeToSingleButton();

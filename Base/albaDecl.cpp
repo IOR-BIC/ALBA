@@ -472,8 +472,6 @@ wxString  albaIdString(int id)
      case VIEW_MAXIMIZE:        s="VIEW_CLICKED"; break; 
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
 
-     case PER_PUSH:             s="PER_PUSH"; break; 
-     case PER_POP:              s="PER_POP"; break; 
      case CAMERA_FRONT:	        s="CAMERA_FRONT"; break; 
      case CAMERA_BACK:	        s="CAMERA_BACK"; break; 
      case CAMERA_LEFT:	        s="CAMERA_LEFT"; break; 

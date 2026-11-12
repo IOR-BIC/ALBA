@@ -218,9 +218,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
 											 VIEW_MAXIMIZE, // from albaGUI to albaGUICrossSplitter
 											 VIEW_RESIZE,   // from anyone that want to block the view's size.
-											 PER_PUSH,       // from an Operation to albaInteractionManager
-											 PER_POP,        // from an Operation to albaInteractionManager
-											 GET_CURRENT_PER,
 
 											 CAMERA_FRONT,  // constant used in albaRWIxxx to initialize Camera pos
 											 CAMERA_BACK,

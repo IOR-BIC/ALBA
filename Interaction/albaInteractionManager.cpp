@@ -133,14 +133,6 @@ albaInteractionManager::albaInteractionManager()
 //------------------------------------------------------------------------------
 albaInteractionManager::~albaInteractionManager()
 {
-  while(!m_PERList.empty())
-  {
-    albaInteractorPER *old_per=*(m_PERList.rbegin());
-    m_PERList.pop_back();
-    assert(old_per);
-    SetPER(old_per);
-  }
-
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
@@ -148,34 +140,6 @@ albaInteractionManager::~albaInteractionManager()
   albaDEL(m_PositionalEventRouter);
 }
 
-//------------------------------------------------------------------------------
-void albaInteractionManager::SetPER(albaInteractorPER *per)
-{
-  albaAction *pointing_action = m_StaticEventRouter->GetAction("PointAndManipulate");
-  assert(pointing_action);
-
-  // unbind old PER
-  if (m_PositionalEventRouter)
-  {
-    pointing_action->UnBindInteractor(m_PositionalEventRouter);
-    m_PositionalEventRouter->SetListener(NULL);
-  }
-
-  m_PositionalEventRouter = per;
-
-  // bind new PER
-  m_PositionalEventRouter->SetName("PositionalEventRouter");
-  pointing_action->BindInteractor(m_PositionalEventRouter);
-  m_PositionalEventRouter->SetListener(this);
-}
-
-//----------------------------------------------------------------------------
-void albaInteractionManager::PushPER(albaInteractorPER *per)
-{
-  albaInteractorPER *old_per=GetPER();
-  m_PERList.push_back(old_per);
-  SetPER(per);
-}
 //----------------------------------------------------------------------------
 void albaInteractionManager::PushTool(albaInteractionTool *tool)
 {
@@ -194,24 +158,7 @@ bool albaInteractionManager::OnKey(int keyCode, bool pressed)
 //----------------------------------------------------------------------------
 void albaInteractionManager::SetEventTracing(bool enable)
 {
-  albaInteractorPER::SetEventTracing(enable);
-}
-//----------------------------------------------------------------------------
-bool albaInteractionManager::PopPER()
-{
-  // retrieve and delete last item
-  albaInteractorPER *old_per=*(m_PERList.rbegin());
-  m_PERList.pop_back(); 
-
-  assert(old_per); // should always be != NULL
-
-  if (old_per) // if not NULL
-  {
-    SetPER(old_per);
-    return true;
-  }
-  
-  return false;
+  m_PositionalEventRouter->SetEventTracing(enable);
 }
 
 //----------------------------------------------------------------------------

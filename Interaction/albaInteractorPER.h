@@ -89,10 +89,10 @@ public:
   /** Return the number of tools pushed on the stack (the camera tool is not counted) */
   int GetNumberOfTools() {return m_Tools.size();}
 
-  /** Enable/disable the event tracing of all the PERs: each input event is written in the log
+  /** Enable/disable the event tracing: each input event is written in the log
   with the device, the button, the modifiers and who handled it. */
-  static void SetEventTracing(bool enable) {m_EventTracing = enable;}
-  static bool GetEventTracing() {return m_EventTracing;}
+  void SetEventTracing(bool enable) {m_EventTracing = enable;}
+  bool GetEventTracing() {return m_EventTracing;}
 
   /** Return the last trace written in the log */
   const char *GetLastEventTrace() {return m_LastEventTrace.c_str();}
@@ -148,7 +148,7 @@ protected:
   /** Write the trace of the current event in the log (only when the event tracing is on) */
   void WriteEventTrace(albaEventBase *event);
 
-  static bool     m_EventTracing;   ///< static until the PER is unique, then it can become a normal member
+  bool            m_EventTracing;   ///< true if the events are traced in the log
   std::string     m_EventTrace;     ///< who handled the current event
   std::string     m_LastEventTrace; ///< last trace written in the log
 

@@ -1003,27 +1003,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
 			break;
-		case PER_PUSH:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager)
-			{
-				albaInteractorPER *per = albaInteractorPER::SafeDownCast(e->GetMafObject());
-				assert(per);
-				m_InteractionManager->PushPER(per);
-			}
-#endif
-			break;
-		case PER_POP:
-			// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-			if (m_InteractionManager) m_InteractionManager->PopPER();
-#endif
-			break;
-		case GET_CURRENT_PER:
-			if (m_InteractionManager)
-				e->SetMafObject(m_InteractionManager->GetPER());
-			break;
 		case DEVICE_ADD:
 			m_InteractionManager->AddDeviceToTree((albaDevice *)e->GetMafObject());
 			break;

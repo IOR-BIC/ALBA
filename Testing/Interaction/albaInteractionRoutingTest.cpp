@@ -145,8 +145,6 @@ void albaInteractionRoutingTest::BeforeTest()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::AfterTest()
 {
-  albaInteractorPER::SetEventTracing(false);
-
   m_Mouse->Delete();
   delete m_View;
 
@@ -192,7 +190,7 @@ void albaInteractionRoutingTest::TestCameraDragAndWheel()
 {
   albaInteractorPER *per = albaInteractorPER::New();
   m_Mouse->AddObserver(per, MCH_INPUT);
-  albaInteractorPER::SetEventTracing(true);
+  per->SetEventTracing(true);
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   double startPosition[3], position[3];
@@ -432,7 +430,7 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
   albaNEW(measure);
   measure->SetListener(&m_Listener);
   albaInteractorPER *per = NewPERWithTool(measure);
-  albaInteractorPER::SetEventTracing(true);
+  per->SetEventTracing(true);
 
   // SHIFT leaves button down, drag and button up to the camera
   measure->SetAction(albaInteractor2DMeasure::ACTION_ADD_MEASURE);

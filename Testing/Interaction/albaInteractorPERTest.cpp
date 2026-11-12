@@ -478,7 +478,7 @@ void albaInteractorPERTest::TestEventTracing()
   view->m_FakeVme = vme;
 
   albaInteractorPER *per = albaInteractorPER::New();
-  CPPUNIT_ASSERT(!albaInteractorPER::GetEventTracing());
+  CPPUNIT_ASSERT(!per->GetEventTracing());
 
   albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId());
   down.SetButton(ALBA_LEFT_BUTTON);
@@ -496,7 +496,7 @@ void albaInteractorPERTest::TestEventTracing()
   CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).empty());
 
   // the button down selects the picked VME and starts its behavior
-  albaInteractorPER::SetEventTracing(true);
+  per->SetEventTracing(true);
   down.ResetPick();
   per->OnEvent(&down);
   std::string trace = per->GetLastEventTrace();
@@ -516,7 +516,7 @@ void albaInteractorPERTest::TestEventTracing()
   per->OnEvent(&move);
   CPPUNIT_ASSERT(trace == per->GetLastEventTrace());
 
-  albaInteractorPER::SetEventTracing(false);
+  per->SetEventTracing(false);
 
   per->Delete();
   vme->SetBehavior(NULL);
@@ -570,7 +570,7 @@ void albaInteractorPERTest::TestToolInteraction()
   albaPERTestTool *tool;
   albaNEW(tool);
   per->PushTool(tool);
-  albaInteractorPER::SetEventTracing(true);
+  per->SetEventTracing(true);
 
   // the tool uses the left button down: it interacts with the mouse until the left button is released
   tool->m_UseLeft = true;
@@ -613,7 +613,7 @@ void albaInteractorPERTest::TestToolInteraction()
   CPPUNIT_ASSERT(tool->m_LeftUp == 1);
   CPPUNIT_ASSERT(!per->GetCameraTool()->GetInteractingTool(mouse));
 
-  albaInteractorPER::SetEventTracing(false);
+  per->SetEventTracing(false);
   per->Delete();
   albaDEL(tool);
   mouse->Delete();
@@ -732,10 +732,10 @@ void albaInteractorPERTest::TestToolGivesDragToCamera()
   SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonDownId());
   CPPUNIT_ASSERT(camera->GetInteractingTool(mouse) != NULL);
   CPPUNIT_ASSERT(!per->IsInteracting(mouse));
-  albaInteractorPER::SetEventTracing(true);
+  per->SetEventTracing(true);
   SendToPER(per, mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
   CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("Tool albaPERTestTool, Camera albaCameraMouseTool") != std::string::npos);
-  albaInteractorPER::SetEventTracing(false);
+  per->SetEventTracing(false);
 
   // the button up goes to the tool and ends the camera motion
   SendToPER(per, mouse, albaDeviceButtonsPad::GetButtonUpId());
