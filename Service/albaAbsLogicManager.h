@@ -24,6 +24,7 @@ class albaVME;
 class albaVMEImage;
 class albaOpManager;
 class albaViewManager;
+class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
 class albaInteractionTool;
@@ -75,6 +76,12 @@ public:
 
 	/** Expand the VME on the Tree  */
 	virtual void ExpandVME(albaVME *vme) = 0;
+
+	//Views
+	/** Select a view: the side bar, the interaction and the operations work on it */
+	virtual void SelectView(albaView *view) = 0;
+	/** Return the selected view, NULL if none */
+	virtual albaView *GetSelectedView() = 0;
 
 	//Interaction
 	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */

@@ -50,8 +50,6 @@ public:
   /** RTTI macro */
   albaTypeMacro(albaDeviceButtonsPadMouseDialog,albaDeviceButtonsPadMouse); 
 
-  /** Set the selected view. */
-  void SetView(albaView *view);
 
 protected:
   /** constructor. */

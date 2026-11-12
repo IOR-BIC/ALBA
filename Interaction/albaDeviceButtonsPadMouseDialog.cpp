@@ -36,9 +36,4 @@ albaDeviceButtonsPadMouseDialog::~albaDeviceButtonsPadMouseDialog()
 //------------------------------------------------------------------------------
 {
 }
-//------------------------------------------------------------------------------
-void albaDeviceButtonsPadMouseDialog::SetView(albaView *view)
-//------------------------------------------------------------------------------
-{
-  this->m_SelectedView=view;
-}
+

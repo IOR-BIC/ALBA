@@ -315,22 +315,9 @@ int albaAvatar::InternalRestore(albaStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-void albaAvatar::OnViewSelected(albaEvent *e)
-//------------------------------------------------------------------------------
-{
-  SetRendererAndView((vtkRenderer *)e->GetData(), e->GetView());
-}
-//------------------------------------------------------------------------------
 void albaAvatar::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
 
-  albaID id=event->GetId();
-  
-  if (id==VIEW_SELECT)
-  {
-    albaEvent *e=albaEvent::SafeDownCast(event);
-    OnViewSelected(e);
-  }
 }

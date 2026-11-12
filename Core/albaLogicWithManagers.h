@@ -267,6 +267,12 @@ public:
 	/** Set the link to the citation Paper */
 	void SetCitationPaper(char *link) { m_CitationPaper = link; }
 
+	/** Select a view: the side bar, the interaction and the operations work on it */
+	void SelectView(albaView *view) override;
+
+	/** Return the selected view, NULL if none */
+	albaView *GetSelectedView() override { return m_SelectedView; }
+
 	/** Push a tool on the tool stack of the positional event router */
 	void PushTool(albaInteractionTool *tool) override;
 
@@ -403,8 +409,6 @@ protected:
 	virtual void ViewCreate(int viewId);
 	/** A new View has Been Created - Logic must create the View Frame */
 	virtual void ViewCreated(albaView *v);
-	/** Select a view and update the display list for the tree. */
-	virtual void ViewSelect();
 
 	virtual void CameraUpdate();
 
@@ -474,6 +478,7 @@ protected:
 	bool m_UseSnapshotManager;
 
 	eventfilterFunc m_EventFilterFunc;
+	albaView *m_SelectedView; ///< the view selected with SelectView
 
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;

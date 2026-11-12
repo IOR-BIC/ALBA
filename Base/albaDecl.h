@@ -215,7 +215,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VIEW_CREATED,  // from albaViewManager to Logic
 											 VIEW_DELETE,   // from albaGUIMDIChild to albaViewManager
 											 VIEW_SELECT,   // from albaGUIMDIChild and albaGUIViewPanel to albaViewManager
-											 VIEW_SELECTED, // used to ask to logic if there is a view selected and get a pointer to it
 											 VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
 											 VIEW_MAXIMIZE, // from albaGUI to albaGUICrossSplitter
 											 VIEW_RESIZE,   // from anyone that want to block the view's size.

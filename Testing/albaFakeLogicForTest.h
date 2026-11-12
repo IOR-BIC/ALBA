@@ -110,6 +110,12 @@ public:
 
 	void SetCitationPaper(char *link) override;
 
+	/** Store the selected view */
+	void SelectView(albaView *view) override { m_SelectedView = view; };
+
+	/** Return the selected view */
+	albaView *GetSelectedView() override { return m_SelectedView; };
+
 	/** Store the pushed tool: no PER is involved */
 	void PushTool(albaInteractionTool *tool) override;
 
@@ -125,5 +131,6 @@ protected:
 	
 	std::vector<calls> m_Calls;
 	std::vector<albaInteractionTool *> m_PushedTools;
+	albaView *m_SelectedView = NULL;
 };
 #endif

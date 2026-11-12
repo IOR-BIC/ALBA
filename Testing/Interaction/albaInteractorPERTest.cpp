@@ -151,8 +151,7 @@ static void SendToPER(albaInteractorPER *per, albaDeviceButtonsPadMouse *mouse, 
 static void SelectView(albaDeviceButtonsPadMouse *mouse, albaView *view)
 //----------------------------------------------------------------------------
 {
-  albaEvent e(NULL, VIEW_SELECT, view);
-  mouse->OnEvent(&e);
+  mouse->SetView(view);
 }
 
 

@@ -185,8 +185,6 @@ protected:
   /** redefined to remove Cursor from renderer */
   virtual void InternalShutdown();
 
-  /** process event sent when a view has been selected */
-  virtual void OnViewSelected(albaEvent *e);
 
   vtkALBASmartPointer<vtkProp3D>   m_Actor3D;  ///< 3D representation of the avatar
   vtkALBASmartPointer<vtkActor2D>  m_Actor2D;  ///< 2D representation of the avatar

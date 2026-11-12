@@ -63,11 +63,4 @@ void albaAvatar2D::OnEvent(albaEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
-
-  // ChangeView event
-	if (event->GetId() == VIEW_SELECT)
-	{
-		albaEvent *e = albaEvent::SafeDownCast(event);
-		SetRendererAndView((vtkRenderer *)e->GetData(), e->GetView());
-	}
 }

@@ -348,6 +348,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_FatalExptionOccurred = false;
 
 	m_EventFilterFunc = NULL;
+	m_SelectedView = NULL;
 
 	m_SkipCameraUpdate = false;
 
@@ -957,6 +958,9 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			if (m_PlugControlPanel)
 				this->m_SideBar->ViewDeleted(e->GetView());
 
+			if (e->GetView() == m_SelectedView)
+				m_SelectedView = NULL;
+
 #ifdef ALBA_USE_VTK
 			// currently albaInteraction is strictly dependent on VTK (marco)
 			if (m_InteractionManager)
@@ -970,23 +974,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			m_OpManager->RefreshMenu();
 		}
 		break;
-		case VIEW_SELECT:
-		{
-			ViewSelect();
-			if (m_OpManager)
-			{
-				albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-				if (c != NULL)
-					c->SetAllowCloseWindow(!m_OpManager->Running());
-			}
-			EnableMenuAndToolbar();
-		}
-		break;
 		case VIEW_MAXIMIZE:
-			break;
-		case VIEW_SELECTED:
-			e->SetBool(m_ViewManager->GetSelectedView() != NULL);
-			e->SetView(m_ViewManager->GetSelectedView());
 			break;
 		break;
 		case CAMERA_RESET:
@@ -1756,27 +1744,30 @@ void albaLogicWithManagers::ViewCreated(albaView *v)
 	}
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ViewSelect()
+void albaLogicWithManagers::SelectView(albaView *view)
 {
-	if (m_ViewManager)
-	{
-		albaView *view = m_ViewManager->GetSelectedView();
-		if (m_SideBar)	m_SideBar->ViewSelect(view);
+	m_SelectedView = view;
 
-		// currently albaInteraction is strictly dependent on VTK (marco)
+	if (m_SideBar)
+		m_SideBar->ViewSelect(view);
+
+	// currently albaInteraction is strictly dependent on VTK (marco)
 #ifdef ALBA_USE_VTK
-		if (m_InteractionManager)
-		{
-			m_InteractionManager->ViewSelected(view);
-		}
+	if (m_InteractionManager)
+		m_InteractionManager->ViewSelected(view);
 #endif
 
-		if (m_OpManager && !m_OpManager->Running())
-		{
-			// needed to update all the operations that will be enabled on View Creation
+	if (m_OpManager)
+	{
+		// needed to update all the operations that will be enabled on View Creation
+		if (!m_OpManager->Running())
 			m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
-		}
+
+		albaGUIMDIChild *c = m_Win ? (albaGUIMDIChild *)m_Win->GetActiveChild() : NULL;
+		if (c != NULL)
+			c->SetAllowCloseWindow(!m_OpManager->Running());
 	}
+	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::ViewContextualMenu(bool vme_menu)

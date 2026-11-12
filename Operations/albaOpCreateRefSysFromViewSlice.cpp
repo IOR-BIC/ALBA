@@ -67,12 +67,9 @@ bool albaOpCreateRefSysFromViewSlice::InternalAccept(albaVME*node)
 {
 	bool hasView = false;
 
-	albaEvent e(this, VIEW_SELECTED);
-	albaEventMacro(e);
-	if (e.GetBool())
-	{	
-		hasView = e.GetView()->IsA("albaViewArbitraryOrthoSlice") || e.GetView()->IsA("albaViewArbitrarySlice");
-	}
+	albaView *view = GetLogicManager()->GetSelectedView();
+	if (view)
+		hasView = view->IsA("albaViewArbitraryOrthoSlice") || view->IsA("albaViewArbitrarySlice");
 
 	return (hasView && node && node->IsALBAType(albaVME));
 }

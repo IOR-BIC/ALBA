@@ -61,12 +61,8 @@ void albaAvatar2DTest::TestOnEvent()
   vtkRenderer *dummyRenderer = vtkRenderer::New();
   vtkRenderer *dummyRendererBackup = dummyRenderer;
 
-  albaEvent dummyEventHandledByTestedClass;
-  dummyEventHandledByTestedClass.SetSender(this);
-  dummyEventHandledByTestedClass.SetId(VIEW_SELECT);
-  dummyEventHandledByTestedClass.SetData(dummyRenderer);
-  
-  avatar->OnEvent(&dummyEventHandledByTestedClass);
+  // the view is selected with a method, no more with VIEW_SELECT
+  avatar->SetRendererAndView(dummyRenderer, NULL);
 
   CPPUNIT_ASSERT(avatar->GetRenderer() == dummyRenderer);
   avatar->Delete();

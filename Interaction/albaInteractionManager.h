@@ -241,7 +241,6 @@ protected:
   virtual void OnStartDispatching();
   virtual void OnEndDispatching();
   virtual void OnCameraUpdate(albaEventBase *e);
-  virtual void OnViewSelected(albaEvent *event);
   virtual void OnDeviceAdded(albaEventBase *event);
   virtual void OnDeviceRemoving(albaEventBase *event);
   virtual void OnDeviceNameChanged(albaEventBase *event);

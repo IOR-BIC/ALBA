@@ -328,8 +328,17 @@ albaAvatar *albaInteractionManager::GetAvatar(const char *name)
 //------------------------------------------------------------------------------
 void albaInteractionManager::ViewSelected(albaView *view)
 {
-  albaEvent e(this,VIEW_SELECT,view);
-  OnViewSelected(&e);
+  albaViewVTK *viewVTK = albaViewVTK::SafeDownCast(view);
+  m_SelectedView = viewVTK;
+
+  vtkRenderer *ren = viewVTK ? viewVTK->GetFrontRenderer() : NULL;
+  SetCurrentRenderer(ren);
+
+  // the avatars and the mouse work on the selected view
+  for (mmuAvatarsMap::iterator it = m_Avatars.begin(); it != m_Avatars.end(); it++)
+    it->second->SetRendererAndView(ren, view);
+
+  GetMouseDevice()->SetView(view);
 }
 
 
@@ -367,59 +376,6 @@ void albaInteractionManager::CameraUpdate(albaView *view)
       m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
     }
   }
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::OnViewSelected(albaEvent *event)
-{  
-  albaView *v = event->GetView();
-	albaViewVTK *view = albaViewVTK::SafeDownCast(v); 
-  m_SelectedView = view;
-
-  if (view)
-  {
-    vtkRenderer *ren = view->GetFrontRenderer();
-    SetCurrentRenderer(ren);
-    event->SetData(ren); // add the renderer to the event to be sent to avatars
-  }
-  else
-  {
-    SetCurrentRenderer(NULL);
-
-  }
-
-  // propagate event to all avatars...
-  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++)
-  {
-    //it->second->OnEvent(&albaEventBase(this,VIEW_SELECT));    
-    it->second->OnEvent(event);
-  }
-
-  // propagate VIEW_SELECTED event to the mouse device too...
-  GetMouseDevice()->OnEvent(event);
-  
-  // TODO: force a render to the view here....
-
-  /*
-  // TODO: remove call to Render() and substitute with sending a CameraUpdate event.
-  // Force a rendering of the old render window 
-  // to update the display after removing the avatars
-  if (old_rw&&!old_rw->GetNeverRendered())
-  {
-    old_rw->Render();
-    old_rw->UnRegister(NULL);
-  }
-  
-  // retrieve new render window
-  vtkRenderWindow *rw=(m_CurrentRenderer)?m_CurrentRenderer->GetRenderWindow():NULL;
-  
-  // TODO: remove call to Render() and substitute with sending a CameraUpdate event.
-  // Force a rendering of the new render window
-  // to update the display after adding the avatars
-  if (rw&&!rw->GetNeverRendered())
-    rw->Render();
-
-  */
 }
 
 //------------------------------------------------------------------------------
@@ -716,12 +672,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
     // event raised by PER to advise of VME selection or double click on a VME
     albaEventMacro(albaEvent(event->GetSender(), id, (albaVME *)event->GetData()));
   }
-  else if (id == VIEW_SELECT)
-  {
-    albaEvent *e = albaEvent::SafeDownCast(event);
-    assert(event);
-    OnViewSelected(e);
-  }  
   else if (id == albaDeviceManager::DISPATCH_START)
   {
     OnStartDispatching();    

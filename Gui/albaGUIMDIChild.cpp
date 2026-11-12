@@ -76,9 +76,8 @@ albaGUIMDIChild::~albaGUIMDIChild()
 void albaGUIMDIChild::OnSelect(wxCommandEvent &event) 
 //----------------------------------------------------------------------------
 {
-  Activate(); // allow activation with the RMouse too
-	wxWindow *rwi = (wxWindow*)event.GetEventObject();
-  albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,rwi));
+  // the activation selects the view (see OnActivate); it also allows activation with the right button
+  Activate();
 }
 //----------------------------------------------------------------------------
 void albaGUIMDIChild::OnSize(wxSizeEvent &event)
@@ -133,7 +132,6 @@ void albaGUIMDIChild::OnActivate(wxActivateEvent& event)
   if( event.GetActive() && m_View && !m_Quitting )
   {
     albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
-    Layout();
   }
 }
 //----------------------------------------------------------------------------

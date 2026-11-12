@@ -137,8 +137,7 @@ void albaInteractionRoutingTest::BeforeTest()
   m_View->m_TestRwi = m_Rwi;
 
   m_Mouse = albaDeviceButtonsPadMouse::New();
-  albaEvent e(NULL, VIEW_SELECT, m_View);
-  m_Mouse->OnEvent(&e);
+  m_Mouse->SetView(m_View);
 
   m_Listener.Clear();
 }
