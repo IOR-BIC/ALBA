@@ -51,7 +51,6 @@ SET(PROJECT_SRCS
 	albaInteractorExtractIsosurfaceTest.h albaInteractorExtractIsosurfaceTest.cpp
 	albaInteractorTest.h albaInteractorTest.cpp
 	albaInteractor6DOFCameraMoveTest.h albaInteractor6DOFCameraMoveTest.cpp
-	albaAvatar2DTest.h albaAvatar2DTest.cpp
 	albaAvatarTest.h albaAvatarTest.cpp 
 	albaInteractorSERTest.h albaInteractorSERTest.cpp
 	albaInteractor6DOFTest.h albaInteractor6DOFTest.cpp

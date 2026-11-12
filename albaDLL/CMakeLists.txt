@@ -291,7 +291,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaAgentEventQueue.cpp  					../Interaction/albaAgentEventQueue.h
   ../Interaction/albaAgentThreaded.cpp  					../Interaction/albaAgentThreaded.h
   ../Interaction/albaAvatar.cpp  							../Interaction/albaAvatar.h
-  ../Interaction/albaAvatar2D.cpp  							../Interaction/albaAvatar2D.h
   ../Interaction/albaAvatar3D.cpp  							../Interaction/albaAvatar3D.h
   ../Interaction/albaAvatar3DCone.cpp  						../Interaction/albaAvatar3DCone.h
   ../Interaction/albaCameraTransform.cpp  					../Interaction/albaCameraTransform.h

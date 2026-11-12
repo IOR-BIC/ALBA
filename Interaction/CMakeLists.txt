@@ -14,7 +14,6 @@ SET(PROJECT_SRCS
   albaAgentEventQueue.cpp  					albaAgentEventQueue.h
   albaAgentThreaded.cpp  					albaAgentThreaded.h
   albaAvatar.cpp  							albaAvatar.h
-  albaAvatar2D.cpp  							albaAvatar2D.h
   albaAvatar3D.cpp  							albaAvatar3D.h
   albaAvatar3DCone.cpp  						albaAvatar3DCone.h
   albaCameraTransform.cpp  					albaCameraTransform.h

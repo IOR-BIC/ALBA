@@ -25,7 +25,6 @@
 #include "albaAgentEventQueueTest.h"
 #include "albaAgentTest.h"
 #include "albaAgentThreadedTest.h"
-#include "albaAvatar2DTest.h"
 #include "albaAvatar3DConeTest.h"
 #include "albaAvatarTest.h"
 #include "albaDeviceButtonsPadMouseDialogTest.h"
@@ -170,7 +169,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaInteractorExtractIsosurfaceTest::suite());
 	runner.addTest(albaInteractorTest::suite());
 	runner.addTest(albaInteractor6DOFCameraMoveTest::suite());
-	runner.addTest(albaAvatar2DTest::suite());
 	runner.addTest(albaAvatarTest::suite());
 	runner.addTest(albaInteractorSERTest::suite());
 	runner.addTest(albaInteractor6DOFTest::suite());

@@ -29,6 +29,7 @@ class albaTransform;
 class albaCameraTransform;
 class albaView;
 class albaEventBase;
+class albaEventInteraction;
 class vtkALBARayCast3DPicker;
 class vtkTextMapper;
 class vtkActor2D;

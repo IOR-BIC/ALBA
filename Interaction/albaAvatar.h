@@ -17,7 +17,7 @@
 #ifndef __albaAvatar_h
 #define __albaAvatar_h
 
-#include "albaInteractor.h"
+#include "albaInteractionAgent.h"
 #include "albaStorable.h"
 
 //----------------------------------------------------------------------------
@@ -28,6 +28,7 @@ class albaGUI;
 class albaEvent;
 class albaEventBase;
 class albaMatrix;
+class albaDevice;
 class albaDeviceButtonsPadTracker;
 class albaView;
 class vtkProp3D;
@@ -41,10 +42,10 @@ class vtkAbstractPropPicker;
   movements, and thus representing their presence in the virtual world.
   Specialized classes must set the Avatar variable with a vtkProp3D,
   this class will take care of adding it to the current renderer, moving,
-  hiding and showing it at the right time. The Avatar moves according to an
-  interactor, which must also be set by subclasses.
+  hiding and showing it at the right time. The Avatar moves according to the
+  device it observes, which must also be set by subclasses.
  */
-class ALBA_EXPORT albaAvatar : public albaInteractor, public albaStorable
+class ALBA_EXPORT albaAvatar : public albaInteractionAgent, public albaStorable
 {
 public:
   /** @ingroup Events
@@ -64,7 +65,7 @@ public:
 
   enum AvatarModality {MODE_2D=0, MODE_3D};
 
-  albaAbstractTypeMacro(albaAvatar,albaInteractor);
+  albaAbstractTypeMacro(albaAvatar,albaInteractionAgent);
 
   /**  
     Set the renderer this avatar is attached to. When the rederer is
@@ -123,8 +124,14 @@ public:
   virtual int Pick(albaMatrix &pose) {return false;}
   virtual int Pick(double X, double Y) {return false;}  
 
-  /**  Process events coming from tracker */
+  /** Process events coming from tracker: the base avatar does not forward them (see albaAgent::OnEvent) */
   virtual void OnEvent(albaEventBase *event);
+
+  /** Return the device the avatar follows */
+  albaDevice *GetDevice() {return m_Device;}
+
+  /** Set the device the avatar follows: the avatar observes its input channel */
+  void SetDevice(albaDevice *device);
 
   /** 
     Return settings object for this Avatar, and if not yet allocated 
@@ -189,6 +196,7 @@ protected:
   vtkALBASmartPointer<vtkProp3D>   m_Actor3D;  ///< 3D representation of the avatar
   vtkALBASmartPointer<vtkActor2D>  m_Actor2D;  ///< 2D representation of the avatar
 
+  albaDevice*        m_Device; ///< the device the avatar follows
   albaGUI*           m_Gui;  ///< the settings Gui
   int               m_Mode; ///< Avatar modality, either 2D or 3D         
 
