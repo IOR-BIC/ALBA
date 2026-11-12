@@ -16,7 +16,7 @@
 #ifndef __albaInteractorPER_h
 #define __albaInteractorPER_h
 
-#include "albaInteractor.h"
+#include "albaInteractionAgent.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -25,6 +25,9 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class albaVME;
+class albaDevice;
+class albaEventInteraction;
+class albaInteractor;
 class myPIMPL;
 class vtkCamera;
 class albaInteractionTool;
@@ -40,10 +43,10 @@ class albaCameraTool;
   - create interactor for CameraBehavior
   - manage sending events to logic (VME_SELECT, CAMERA_FIT  the 
 */
-class ALBA_EXPORT albaInteractorPER : public albaInteractor
+class ALBA_EXPORT albaInteractorPER : public albaInteractionAgent
 {
-public: 
-  albaTypeMacro(albaInteractorPER,albaInteractor);
+public:
+  albaTypeMacro(albaInteractorPER,albaInteractionAgent);
 
   virtual void EnableSelect(bool enable) {m_CanSelect = enable;};
 
@@ -56,15 +59,15 @@ public:
    interaction has been started by a specific button. */
   bool IsInteracting(albaDevice *device, int button=-1);
 
-  /** Redefined to support multiple input devices */
+  /** Start the default interaction of a device with a button */
   virtual int StartInteraction(albaDevice *device, int button);
-  
-  /** Redefined to support multiple input devices */
+
+  /** Stop the default interaction of a device with a button */
   virtual int StopInteraction(albaDevice *device, int button);
 
   virtual void OnEvent(albaEventBase *event);
 
-  void OnVmeSelected(albaVME *vme){ SetPickedVME(GetDevice(),vme); }
+  void OnVmeSelected(albaVME *vme){ m_VME = vme; }
 
   enum modalities {SINGLE_BUTTON=0,MULTI_BUTTON};
 
@@ -101,9 +104,9 @@ protected:
   albaInteractorPER();
   virtual ~albaInteractorPER();
   
-  /** redefined to support the three buttons */  
+  /** Start the default interaction on a button down, with the three buttons */
   virtual int OnStartInteraction(albaEventInteraction *e);
-  /** redefined to support the three buttons */
+  /** Stop the default interaction on a button up, with the three buttons */
   virtual int OnStopInteraction(albaEventInteraction *e);
 
   /** 
@@ -190,6 +193,7 @@ protected:
   };
   
   std::map<albaID,DeviceItem> m_Devices; ///< Stores the list of devices currently interacting
+  albaVME *m_VME; ///< the VME selected in the tree, used as picked VME when no device is given
   
 private:
   albaInteractorPER(const albaInteractorPER&);  // Not implemented.

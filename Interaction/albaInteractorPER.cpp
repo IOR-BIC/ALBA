@@ -29,6 +29,7 @@
 #include "albaView.h"
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
+#include "albaInteractor.h"
 #include "albaAvatar3D.h"
 #include "albaCameraTool.h"
 #include "albaCameraMouseTool.h"
@@ -62,7 +63,7 @@ albaInteractorPER::albaInteractorPER()
   m_CanSelect       = true; 
   m_FlyToFlag       = false;
   m_EventTracing    = false;
-  m_StartButton     = -1;
+  m_VME             = NULL;
 
   SetModeToSingleButton();
   m_FirstTime = 0;
@@ -169,7 +170,7 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
   // a tool can push or pop tools while handling an event: iterate on a copy
   std::vector<albaInteractionTool *> tools = m_Tools;
 
-  if (id == m_StartInteractionEvent)
+  if (id == albaDeviceButtonsPad::GetButtonDownId())
   {
     // the other buttons of a device interacting with a tool go to the same tool, and to the camera
     if (interactingTool)
@@ -202,7 +203,7 @@ bool albaInteractorPER::DispatchToTools(albaEventInteraction *e, albaDevice *dev
     return false;
   }
 
-  if (id == m_StopInteractionEvent)
+  if (id == albaDeviceButtonsPad::GetButtonUpId())
   {
     if (interactingTool == NULL)
     {
@@ -356,7 +357,7 @@ void albaInteractorPER::SetPickedVME(albaDevice *device,albaVME *vme)
   }
   else
   {
-    SetVME(vme);
+    m_VME = vme;
   }
 }
 
@@ -718,18 +719,21 @@ void albaInteractorPER::OnEvent(albaEventBase *event)
         TraceHandler("Camera", camera);
         if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
           m_CameraTool->OnDrag(ei);
-        else if (id == m_StopInteractionEvent)
+        else if (id == albaDeviceButtonsPad::GetButtonUpId())
           ToolButtonUp(m_CameraTool, ei);
       }
     }
-  }
-  // Make the superclass to manage StartInteractionEvent
-  // and StopInteractionEvent: this will make OnStart/StopInteraction()
-  // to be called, or eventually the event to be forwarded.
-  Superclass::OnEvent(event);
 
-  if (ch == MCH_INPUT)
+    // start and stop the default interaction
+    if (id == albaDeviceButtonsPad::GetButtonDownId() || id == albaDeviceButtonsPadMouse::GetMouseDClickId())
+      OnStartInteraction(ei);
+    else if (id == albaDeviceButtonsPad::GetButtonUpId())
+      OnStopInteraction(ei);
+
     WriteEventTrace(event);
+  }
+  else
+    Superclass::OnEvent(event); // the events of the other channels are forwarded
 }
 
 //----------------------------------------------------------------------------
