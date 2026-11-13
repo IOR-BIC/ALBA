@@ -36,11 +36,15 @@ class albaPipeWrappedMeterTest : public albaTest
 	CPPUNIT_TEST_SUITE( albaPipeWrappedMeterTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
 	CPPUNIT_TEST( TestPipeExecution );
+	CPPUNIT_TEST( TestTwoPipesOnSameVME );
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
 	void TestPipeExecution();
+
+	/** Show the same wrapped meter with two pipes in two renderers (as two views do) and move the end point between renders */
+	void TestTwoPipesOnSameVME();
 
   /** Select The Actor that will be controlled*/
   vtkProp *SelectActorToControl(vtkPropCollection* propList, int index);

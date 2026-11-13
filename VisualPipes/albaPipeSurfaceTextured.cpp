@@ -392,10 +392,13 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 			{
 				m_Actor->SetTexture(NULL);
 			}
-			m_Gui->Enable(ID_CHOOSE_TEXTURE, m_UseTexture != 0);
-			m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_UseTexture != 0);
-			m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
-			GetLogicManager()->CameraUpdate();
+      if (m_Gui)
+      {
+        m_Gui->Enable(ID_CHOOSE_TEXTURE, m_UseTexture != 0);
+        m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_UseTexture != 0);
+        m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
+      }
+      GetLogicManager()->CameraUpdate();
 			break;
 		case ID_CHOOSE_TEXTURE:
 		{

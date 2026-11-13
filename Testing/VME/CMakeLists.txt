@@ -64,7 +64,6 @@ SET(PROJECT_SRCS
 	albaVMEPointCloudTest.cpp albaVMEPointCloudTest.h
 	albaVMEOutputWrappedMeterTest.h albaVMEOutputWrappedMeterTest.cpp
 	albaVMEPolylineGraphTest.h albaVMEPolylineGraphTest.cpp
-	albaVMEOutputComputeWrappingTest.h albaVMEOutputComputeWrappingTest.cpp
 	albaPolylineGraphVertexTest.h albaPolylineGraphVertexTest.cpp
 	albaPolylineGraphEdgeTest.h albaPolylineGraphEdgeTest.cpp
 	albaPolylineGraphBranchTest.h albaPolylineGraphBranchTest.cpp

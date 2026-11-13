@@ -25,12 +25,13 @@
 #include "albaFakeLogicForTest.h"
 #include "albaGeometryEditorPolylineGraphTest.h"
 #include "albaOpAddLandmarkTest.h"
+#include "albaOpNearestLandmarkTest.h"
+#include "albaOpPolylineFromLandmarkCloudTest.h"
 #include "albaOpApplyTrajectoryTest.h"
 #include "albaOpBooleanSurfaceTest.h"
 #include "albaOpClassicICPRegistrationTest.h"
 #include "albaOpCleanSurfaceTest.h"
 #include "albaOpComputeInertialTensorTest.h"
-#include "albaOpComputeWrappingTest.h"
 #include "albaOpConnectivitySurfaceTest.h"
 #include "albaOpCreateEditSkeletonTest.h"
 #include "albaOpCreateGroupTest.h"
@@ -58,7 +59,6 @@
 #include "albaOpExporterRAWTest.h"
 #include "albaOpExporterSTLTest.h"
 #include "albaOpExporterVTKTest.h"
-#include "albaOpExporterWrappedMeterTest.h"
 #include "albaOpExtractGeometryTest.h"
 #include "albaOpExtractIsosurfaceTest.h"
 #include "albaOpExtrusionHolesTest.h"
@@ -218,6 +218,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpCreateVolumeTest::suite());
 	runner.addTest(albaOpVOIDensityEditorTestTest::suite());
 	runner.addTest(albaOpAddLandmarkTest::suite());
+	runner.addTest(albaOpNearestLandmarkTest::suite());
+	runner.addTest(albaOpPolylineFromLandmarkCloudTest::suite());
 	runner.addTest(albaOpApplyTrajectoryTest::suite());
 	runner.addTest(albaOpExtractIsosurfaceTest::suite());
  	runner.addTest(albaOpExporterMSFTest::suite());
@@ -246,7 +248,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpVolumeMeasureTest::suite());
 	runner.addTest(albaOpImporterRAWImagesTest::suite());
 	runner.addTest(albaOpExtrusionHolesTest::suite());
-	runner.addTest(albaOpExporterWrappedMeterTest::suite());
 	runner.addTest(albaOpFreezeVMETest::suite());
 	runner.addTest(albaOpLabelizeSurfaceTest::suite());
 	runner.addTest(albaOpCleanSurfaceTest::suite());
@@ -259,7 +260,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpSegmentationRegionGrowingConnectedThresholdTest::suite());
 	runner.addTest(albaOpScaleDatasetTest::suite());
 	runner.addTest(albaOpCreateLabeledVolumeTest::suite());
-	runner.addTest(albaOpComputeWrappingTest::suite());
 	runner.addTest(albaOpComputeInertialTensorTest::suite()); 
 	runner.addTest(albaOpSplitSurfaceTest::suite());
 	runner.addTest(albaOpMML3Test::suite());

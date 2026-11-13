@@ -26,7 +26,6 @@
 #include "albaOpExtractGeometry.h"
 
 #include "albaVMEVolumeGray.h"
-#include "albaVMEComputeWrapping.h"
 #include "vtkALBASmartPointer.h"
 #include "albaSmartPointer.h"
 

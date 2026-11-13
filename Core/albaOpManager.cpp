@@ -218,6 +218,18 @@ void albaOpManager::FillSettingDialog(albaGUISettingsDialog *settingDialog)
   }
 }
 //----------------------------------------------------------------------------
+// Return the direct submenu of menu with the given label, NULL if not present.
+// wxMenu::FindItem(label) is not used because it also searches inside the submenus and can return
+// an operation item with the same label of the submenu (e.g. the "Segmentation" operation inside the "Segmentation" menu)
+static wxMenu *FindSubMenu(wxMenu *menu, wxString label)
+{
+	wxMenuItemList &items = menu->GetMenuItems();
+	for (wxMenuItemList::iterator it = items.begin(); it != items.end(); ++it)
+		if ((*it)->IsSubMenu() && (*it)->GetItemLabelText() == label)
+			return (*it)->GetSubMenu();
+	return NULL;
+}
+//----------------------------------------------------------------------------
 void albaOpManager::FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations)
 {
   int submenu_id = 1;
@@ -238,19 +250,12 @@ void albaOpManager::FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations
       while ( path_tkz.HasMoreTokens() )
       {
         op_path = path_tkz.GetNextToken();
-        int item = path_menu->FindItem(_(op_path));
-        if (item != wxNOT_FOUND)
+        // Each token of the path is a submenu of the previous one
+        if (sub_menu)
+          path_menu = sub_menu;
+        sub_menu = FindSubMenu(path_menu, _(op_path));
+        if (sub_menu == NULL)
         {
-          wxMenuItem *menu_item = path_menu->FindItem(item);
-          if (menu_item)
-            sub_menu = menu_item->GetSubMenu();
-        }
-        else
-        {
-          if (sub_menu)
-          {
-            path_menu = sub_menu;
-          }
           sub_menu = new wxMenu;
           path_menu->Append(submenu_id++,_(op_path),sub_menu);
         }

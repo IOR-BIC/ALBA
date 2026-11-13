@@ -50,7 +50,14 @@ albaOpNearestLandmark::~albaOpNearestLandmark()
 //----------------------------------------------------------------------------
 bool albaOpNearestLandmark::InternalAccept(albaVME *node)
 {
-	return node->IsA("albaVMELandmark");
+	// When the input is not a landmark, OpRun asks to choose one
+	return true;
+}
+
+//----------------------------------------------------------------------------
+bool albaOpNearestLandmark::LandmarkAccept(albaVME* node)
+{
+	return(node && node->IsA("albaVMELandmark"));
 }
 
 //----------------------------------------------------------------------------
@@ -68,20 +75,39 @@ albaOp* albaOpNearestLandmark::Copy()
 //----------------------------------------------------------------------------
 void albaOpNearestLandmark::OpRun()
 {
+	// If the selected VME is not a landmark, ask for one first
+	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(m_Input);
+	if (lm == NULL)
+	{
+		albaString lmTitle = albaString("Select a landmark:");
+		albaEvent lmEvent(this, VME_CHOOSE);
+		lmEvent.SetString(&lmTitle);
+		lmEvent.SetPointer(&LandmarkAccept);
+		albaEventMacro(lmEvent);
+		lm = albaVMELandmark::SafeDownCast(lmEvent.GetVme());
+
+		if (lm == NULL)
+		{
+			OpStop(OP_RUN_CANCEL);
+			return;
+		}
+	}
+
 	albaString title = albaString("Select a surface:");
 	albaEvent e(this, VME_CHOOSE);
 	e.SetString(&title);
 	e.SetPointer(&SurfaceAccept);
 	albaEventMacro(e);
 	albaVME *surface = (albaVME *)e.GetVme();
-	
+
 	if (surface == NULL)
+	{
 		OpStop(OP_RUN_CANCEL);
-	
+		return;
+	}
+
 	surface->GetOutput()->Update();
 
-	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(m_Input);
-	
 
 	vtkALBASmartPointer <vtkTransform> tra;
 	tra->SetMatrix(surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
@@ -100,7 +126,7 @@ void albaOpNearestLandmark::OpRun()
 }
 
 //----------------------------------------------------------------------------
-albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface)
+albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface, const char *name)
 {
 	vtkALBASmartPointer <vtkCellLocator> cellLocator;
 	cellLocator->SetDataSet(poly);
@@ -117,8 +143,17 @@ albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * po
 
 	albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(lm->GetParent());
 
-	albaString lmName;
-	lmName.Printf("Closest %s on %s", lm->GetName(), surface->GetName());
+	albaString baseName;
+	if (name)
+		baseName = name;
+	else
+		baseName.Printf("Closest %s on %s", lm->GetName(), surface->GetName());
+
+	// AppendAbsoluteLandmark updates an existing landmark with the same name (e.g. two surfaces with the same name):
+	// add a progressive number until the name is unique, so a new landmark is always created
+	albaString lmName = baseName;
+	for (int i = 2; lmc->GetLandmarkIndex(lmName.GetCStr()) >= 0; i++)
+		lmName.Printf("%s (%d)", baseName.GetCStr(), i);
 
 	lmc->AppendAbsoluteLandmark(closestPoint, lmName.GetCStr());
 

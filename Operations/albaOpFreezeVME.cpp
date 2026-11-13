@@ -50,7 +50,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
-#include "albaVMEComputeWrapping.H"
 
 
 
@@ -260,30 +259,6 @@ void albaOpFreezeVME::OpRun()
 					}
 				}
 				else if(albaVMEWrappedMeter *wrappedMeter = albaVMEWrappedMeter::SafeDownCast(m_Input))
-				{
-					mmaMaterial *material = wrappedMeter->GetMaterial();
-
-					albaSmartPointer<albaVMEPolyline> newPolyline;
-					newPolyline->SetName(wrappedMeter->GetName());
-					newPolyline->SetData(polyData,wrappedMeter->GetTimeStamp());
-					newPolyline->Update();
-
-					if(material)
-					{
-						newPolyline->GetMaterial()->DeepCopy(material);
-						newPolyline->GetMaterial()->UpdateProp();
-					}
-
-					newPolyline->SetMatrix(*wrappedMeter->GetOutput()->GetMatrix());
-					m_Output=newPolyline;
-					if (m_Output)
-					{
-						m_Output->ReparentTo(m_Input->GetParent());
-						if(!m_TestMode)
-							OpStop(OP_RUN_OK);
-					}
-				}
-				else if(albaVMEComputeWrapping *wrappedMeter = albaVMEComputeWrapping::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = wrappedMeter->GetMaterial();
 

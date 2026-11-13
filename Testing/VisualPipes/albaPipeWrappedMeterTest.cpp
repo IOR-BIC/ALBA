@@ -47,6 +47,9 @@
 #include "vtkALBASmartPointer.h"
 
 #include "vtkSphereSource.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkCaptionActor2D.h"
+#include "vtkALBATubeFilter.h"
 
 // render window stuff
 #include "vtkRenderWindowInteractor.h"
@@ -135,9 +138,37 @@ void albaPipeWrappedMeterTest::TestPipeExecution()
   vectorActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(vectorActor != NULL);
 
-  m_Renderer->ResetCamera(); 
+  m_Renderer->ResetCamera();
   m_RenderWindow->Render();
   COMPARE_IMAGES("TestPipeExecution", 0);
+
+	// Tube representation
+	meter->SetMeterRepresentationToTube();
+	meter->SetMeterRadius(0.2);
+	pipeMeter->m_Tube->SetRadius(meter->GetMeterRadius());
+	sceneNode->UpdateProperty();
+	m_RenderWindow->Render();
+	COMPARE_IMAGES("TestPipeExecution", 1);
+
+	// Tube with capping
+	meter->SetMeterCappingOn();
+	pipeMeter->m_Tube->SetCapping(meter->GetMeterCapping());
+	sceneNode->UpdateProperty();
+	m_RenderWindow->Render();
+	COMPARE_IMAGES("TestPipeExecution", 2);
+
+	// Color from the distance range (distance is 5, in the middle of the range)
+	meter->SetMeterColorModeToRangeColor();
+	meter->SetDistanceRange(0, 10);
+	sceneNode->UpdateProperty();
+	m_RenderWindow->Render();
+	COMPARE_IMAGES("TestPipeExecution", 3);
+
+	// Back to line representation, still colored by range
+	meter->SetMeterRepresentationToLine();
+	sceneNode->UpdateProperty();
+	m_RenderWindow->Render();
+	COMPARE_IMAGES("TestPipeExecution", 4);
 
   vtkDEL(actorList);
 
@@ -150,6 +181,99 @@ void albaPipeWrappedMeterTest::TestPipeExecution()
   albaDEL(vmeParametricSurfaceEND1);
 
   albaDEL(storage);
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWrappedMeterTest::TestTwoPipesOnSameVME()
+{
+	albaVMEStorage *storage = albaVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	storage->GetRoot()->Initialize();
+
+	albaVMESurfaceParametric *vmeStart;
+	albaNEW(vmeStart);
+	vmeStart->ReparentTo(storage->GetRoot());
+	vmeStart->Update();
+
+	albaVMESurfaceParametric *vmeEnd;
+	albaNEW(vmeEnd);
+	vmeEnd->ReparentTo(storage->GetRoot());
+	vmeEnd->Update();
+
+	albaMatrix matrix;
+	matrix.SetElement(0, 3, 4);
+	matrix.SetElement(1, 3, 3);
+	vmeEnd->SetAbsMatrix(matrix);
+
+	albaSmartPointer<albaVMEWrappedMeter> meter;
+	meter->SetMeterLink("StartVME", vmeStart);
+	meter->SetMeterLink("EndVME1", vmeEnd);
+	meter->ReparentTo(storage->GetRoot());
+	meter->SetMeterRepresentationToTube();
+	meter->Modified();
+	meter->Update();
+
+	// Two renderers in the same window, like two views (or a compound view) showing the same VME
+	vtkRenderer *renderer2 = vtkRenderer::New();
+	m_Renderer->SetViewport(0, 0, 0.5, 1);
+	renderer2->SetViewport(0.5, 0, 1, 1);
+	m_RenderWindow->AddRenderer(renderer2);
+
+	vtkRenderer *renderers[2] = { m_Renderer, renderer2 };
+	albaSceneNode *sceneNodes[2];
+	albaPipeWrappedMeter *pipes[2];
+
+	for (int p = 0; p < 2; p++)
+	{
+		sceneNodes[p] = new albaSceneNode(NULL, NULL, meter, renderers[p]);
+		pipes[p] = new albaPipeWrappedMeter;
+		pipes[p]->Create(sceneNodes[p]);
+
+		vtkPropCollection *actorList = vtkPropCollection::New();
+		pipes[p]->GetAssemblyFront()->GetActors(actorList);
+		actorList->InitTraversal();
+		for (vtkProp *actor = actorList->GetNextProp(); actor; actor = actorList->GetNextProp())
+			renderers[p]->AddActor(actor);
+		vtkDEL(actorList);
+
+		renderers[p]->ResetCamera();
+	}
+
+	m_RenderWindow->Render();
+
+	// Moving the end point updates the meter while both pipes observe it
+	for (int i = 1; i <= 5; i++)
+	{
+		matrix.SetElement(0, 3, 4 + i);
+		matrix.SetElement(2, 3, i);
+		vmeEnd->SetAbsMatrix(matrix);
+		meter->Modified();
+		meter->Update();
+		m_RenderWindow->Render();
+
+		for (int p = 0; p < 2; p++)
+		{
+			CPPUNIT_ASSERT(pipes[p]->m_DataMapper->GetInput() != NULL);
+			CPPUNIT_ASSERT(pipes[p]->m_DataMapper->GetInput()->GetNumberOfPoints() > 0);
+		}
+		CPPUNIT_ASSERT(strcmp(pipes[0]->m_Caption->GetCaption(), pipes[1]->m_Caption->GetCaption()) == 0);
+	}
+
+	// Deleting the scene nodes deletes the pipes
+	delete sceneNodes[0];
+	delete sceneNodes[1];
+	m_RenderWindow->Render();
+
+	m_RenderWindow->RemoveRenderer(renderer2);
+	vtkDEL(renderer2);
+
+	meter->ReparentTo(NULL);
+	vmeStart->ReparentTo(NULL);
+	vmeEnd->ReparentTo(NULL);
+	albaDEL(vmeStart);
+	albaDEL(vmeEnd);
+
+	albaDEL(storage);
 }
 
 //----------------------------------------------------------------------------

@@ -46,6 +46,7 @@ IF (ALBA_USE_VTK)
   ${PROJECT_SRCS}
   albaAxes.cpp  					albaAxes.h
   albaLogicWithManagers.cpp  	albaLogicWithManagers.h
+  albaLogicStandardPlugs.cpp  	albaLogicStandardPlugs.h
   albaPipe.cpp  					albaPipe.h
   albaPipeBox.cpp  				albaPipeBox.h
   albaPipeFactory.cpp  			albaPipeFactory.h

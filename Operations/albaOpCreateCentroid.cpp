@@ -85,7 +85,7 @@ void albaOpCreateCentroid::OpRun()
 	centroid /= nPoints;
 
 	albaString lmName;
-	lmName.Printf("Centroid of %s", m_Input->GetName());
+	lmName.Printf("%s Centroid", m_Input->GetName());
 
 	albaVMELandmarkCloud *lmc;
 	albaNEW(lmc);
@@ -96,7 +96,9 @@ void albaOpCreateCentroid::OpRun()
 	GetLogicManager()->VmeShow(lmc->GetLastChild(), true);
 	
 	albaVMELandmark * lm = lmc->GetLandmark(lmc->GetNumberOfLandmarks() - 1);
-	albaOpNearestLandmark::CreateClosestPoint(tranPoly, lm, m_Input);
+	albaString closestName;
+	closestName.Printf("%s Centroid on surface", m_Input->GetName());
+	albaOpNearestLandmark::CreateClosestPoint(tranPoly, lm, m_Input, closestName.GetCStr());
 	GetLogicManager()->VmeShow(lmc->GetLastChild(), true);
 
 

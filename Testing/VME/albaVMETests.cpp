@@ -50,7 +50,6 @@
 #include "albaVMEMapsTest.h"
 #include "albaVMEMeshTest.h"
 #include "albaVMEMeterTest.h"
-#include "albaVMEOutputComputeWrappingTest.h"
 #include "albaVMEOutputImageTest.h"
 #include "albaVMEOutputLandmarkCloudTest.h"
 #include "albaVMEOutputMeshTest.h"
@@ -176,7 +175,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEMapsTest::suite());
 	runner.addTest(albaVMEOutputWrappedMeterTest::suite());
 	runner.addTest(albaVMEPolylineGraphTest::suite());
-	runner.addTest(albaVMEOutputComputeWrappingTest::suite());
 	runner.addTest(albaPolylineGraphVertexTest::suite());
 	runner.addTest(albaPolylineGraphEdgeTest::suite());
 	runner.addTest(albaPolylineGraphBranchTest::suite());
