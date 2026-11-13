@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaLogicWithManagers
- Authors: Silvano Imboden, Paolo Quadrani
+ Authors: Silvano Imboden, Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -232,10 +232,10 @@ public:
 	// Inherited via albaAbsLogicManager
 	virtual albaProsthesesDBManager * GetProsthesesDBManager();
 
-	/** Plugs a list of standard operations, importer and exporters included */
+	/** Plugs a list of standard operations, importer and exporters included (see albaLogicStandardPlugs) */
 	void PlugStandardOperations();
 
-	/** Plugs a list of standard operations, importer and exporters included */
+	/** Plugs a list of standard views (see albaLogicStandardPlugs) */
 	void PlugStandardViews();
 
 	/** Returns AboutImage */
