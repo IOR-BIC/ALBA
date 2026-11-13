@@ -255,14 +255,10 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));
 	logic->Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
 	logic->Plug(new albaOpCreateSpline("Spline"), _("Create"));
-	logic->Plug(new albaOpCreateLabeledVolume(), _("Create"));
 	logic->Plug(new albaOpCreateEditSkeleton(), _("Create"));
 	logic->Plug(new albaOpCreateWrappedMeter(), _("Create"));
 	logic->Plug(new albaOpComputeWrapping("Computing Wrapping"), _("Create"));
 	logic->Plug(new albaOpFreezeVME(), _("Create"));
-	logic->Plug(new albaOpSegmentationRegionGrowingConnectedThreshold(), _("Create"));
-	logic->Plug(new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Create"));
-	logic->Plug(new albaOpSegmentation(), _("Create"));
 	logic->Plug(new albaOpNearestLandmark(), _("Create"));
 	logic->Plug(new albaOpCreateCentroid(), _("Create"));
 
@@ -312,6 +308,12 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpComputeHausdorffDistance(), "Measure");
 	logic->Plug(new albaOpMeasureAxisRotations(), "Measure");
 
+	logic->Plug(new albaOpSegmentation(), _("Segmentation"));
+	logic->Plug(new albaOpSegmentationRegionGrowingConnectedThreshold(), _("Segmentation"));
+	logic->Plug(new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Segmentation"));
+	logic->Plug(new albaOpCreateLabeledVolume(), _("Segmentation"));
+	logic->Plug(new albaOpLabelExtractor(), _("Segmentation"));
+
 	logic->Plug(new albaOpIterativeRegistration(), _("Register"));
 	logic->Plug(new albaOpRegisterClusters("Clusters"), _("Register"));
 	logic->Plug(new albaOpClassicICPRegistration("Surface"), _("Register"));
@@ -325,7 +327,6 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpDecomposeTimeVarVME(), "TMP to test");
 	logic->Plug(new albaOpExtractGeometry(), "TMP to test");
 	logic->Plug(new albaOpGarbageCollectMSFDir(), "TMP to test");
-	logic->Plug(new albaOpLabelExtractor(), "TMP to test");
 	logic->Plug(new albaOpInteractionDebugger(), "TMP to test");
 	logic->Plug(new albaOpOpenExternalFile(), "TMP to test");
 	logic->Plug(new albaOpScalarToSurface(), "TMP to test");
