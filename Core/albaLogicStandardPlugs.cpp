@@ -93,6 +93,7 @@
 #include "albaOpCreateRefSys.h"
 #include "albaOpCreateRefSysFromViewSlice.h"
 #include "albaOpCreatePolyline.h"
+#include "albaOpPolylineFromLandmarkCloud.h"
 #include "albaOpCreateSpline.h"
 #include "albaOpCreateSurfaceParametric.h"
 #include "albaOpCreateVolume.h"
@@ -251,6 +252,7 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
 	logic->Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));
 	logic->Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
+	logic->Plug(new albaOpPolylineFromLandmarkCloud(), _("Create"));
 	logic->Plug(new albaOpCreateSpline("Spline"), _("Create"));
 	logic->Plug(new albaOpCreateEditSkeleton(), _("Create"));
 	logic->Plug(new albaOpCreateWrappedMeter(), _("Create"));

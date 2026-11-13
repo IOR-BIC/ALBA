@@ -161,6 +161,7 @@ IF (ALBA_USE_VTK)
 	albaOpNearestLandmark.cpp  albaOpNearestLandmark.h
 	albaOpImporterScancoImageIO.cpp albaOpImporterScancoImageIO.h
 	albaOpCreateCentroid.cpp albaOpCreateCentroid.h
+	albaOpPolylineFromLandmarkCloud.cpp albaOpPolylineFromLandmarkCloud.h
 	albaOpMeshScarlarsImporter.cpp albaOpMeshScarlarsImporter.h
 	albaOpMeasureAxisRotations.cpp albaOpMeasureAxisRotations.cpp
 	albaOpTransformAtoB.cpp	albaOpTransformAtoB.h

@@ -39,6 +39,7 @@ SET(PROJECT_SRCS
 	albaOpVOIDensityEditorTestTest.h albaOpVOIDensityEditorTestTest.cpp
 	albaOpAddLandmarkTest.h albaOpAddLandmarkTest.cpp
 	albaOpNearestLandmarkTest.h albaOpNearestLandmarkTest.cpp
+	albaOpPolylineFromLandmarkCloudTest.h albaOpPolylineFromLandmarkCloudTest.cpp
 	albaOpApplyTrajectoryTest.h albaOpApplyTrajectoryTest.cpp
 	albaOpExtractIsosurfaceTest.h albaOpExtractIsosurfaceTest.cpp
 	albaOpExporterMSFTest.h albaOpExporterMSFTest.cpp
