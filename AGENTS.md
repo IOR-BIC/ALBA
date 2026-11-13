@@ -24,6 +24,9 @@ Always use exactly these commands. Never invent, replace, or bypass them.
   changed): `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1 -CompileLibraries`,
   then the build.
 - Test: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/test.ps1`
+  Optional parameters: `-Configuration Debug` (default `Release`) and
+  `-Suite <name>[,<name>]` to run only some suites, by CTest name
+  (`albaVisualPipesTests`) or short name (`VisualPipes`, `vtkALBA`).
 
 ### Execution rules
 - These scripts are long-running (configure and build can take well over 10
