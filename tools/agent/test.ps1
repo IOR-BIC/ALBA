@@ -18,7 +18,8 @@ if ($Suite.Count -eq 0)
 }
 else
 {
-    $names = foreach ($s in $Suite)
+    # With -File a comma separated list arrives as a single string: split it here
+    $names = foreach ($s in ($Suite -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }))
     {
         $n = $s
         if ($n -notmatch 'Tests$')
