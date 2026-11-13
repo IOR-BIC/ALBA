@@ -359,9 +359,12 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 				{
 					SetThickness(m_Border);
 
-					m_MaterialButton->UpdateMaterialIcon();
-					m_MaterialButton->GetGui()->Update();
-					m_Gui->Update();
+					if (m_MaterialButton)
+					{
+						m_MaterialButton->UpdateMaterialIcon();
+						m_MaterialButton->GetGui()->Update();
+						m_Gui->Update();
+					}
 				}
 				break;
 			case VME_CHOOSE_MATERIAL:
