@@ -15,17 +15,13 @@
       "PowerShell(git log *)",
       "PowerShell(git add *)",
       "PowerShell(git checkout -b feature/*)",
-      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/*)"
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/*)",
+      "Bash(git *)",
+      "PowerShell(git *)"
     ],
     "ask": [
-      "Bash(git commit *)",
-      "Bash(git merge *)",
-      "Bash(git push *)",
       "Bash(git reset *)",
       "Bash(git rebase *)",
-      "PowerShell(git commit *)",
-      "PowerShell(git merge *)",
-      "PowerShell(git push *)",
       "PowerShell(git reset *)",
       "PowerShell(git rebase *)"
     ]

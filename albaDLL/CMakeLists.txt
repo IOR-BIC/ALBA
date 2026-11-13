@@ -593,8 +593,6 @@ SET(VME_SRCS
   ../VME/albaVMEOutputWrappedMeter.cpp  			../VME/albaVMEOutputWrappedMeter.h
   ../VME/albaVMESurfaceEditor.cpp  					../VME/albaVMESurfaceEditor.h
   ../VME/albaVMEOutputSurfaceEditor.cpp  			../VME/albaVMEOutputSurfaceEditor.h  
-  ../VME/albaVMEComputeWrapping.cpp  				../VME/albaVMEComputeWrapping.h
-  ../VME/albaVMEOutputComputeWrapping.cpp  			../VME/albaVMEOutputComputeWrapping.h   
   ../VME/albaVMESegmentationVolume.cpp  			../VME/albaVMESegmentationVolume.h
   ../VME/albaAttributeSegmentationVolume.cpp  		../VME/albaAttributeSegmentationVolume.h
 	../VME/albaDataPipeCustomSegmentationVolume.cpp  	../VME/albaDataPipeCustomSegmentationVolume.h
@@ -703,7 +701,6 @@ SET(VISUAL_PIPES_SRCS
   ../VisualPipes/albaPipeSurfaceEditor.cpp  				../VisualPipes/albaPipeSurfaceEditor.h
   ../VisualPipes/albaVisualPipeSlicerSlice.cpp  			../VisualPipes/albaVisualPipeSlicerSlice.h  
   ../VisualPipes/albaVisualPipePolylineGraph.cpp  			../VisualPipes/albaVisualPipePolylineGraph.h
-  ../VisualPipes/albaPipeComputeWrapping.cpp  				../VisualPipes/albaPipeComputeWrapping.h
   ../VisualPipes/albaPipeVectorField.cpp  					../VisualPipes/albaPipeVectorField.h
   ../VisualPipes/albaPipeVectorFieldMapWithArrows.cpp  		../VisualPipes/albaPipeVectorFieldMapWithArrows.h
   ../VisualPipes/albaPipeVectorFieldGlyphs.cpp  			../VisualPipes/albaPipeVectorFieldGlyphs.h
@@ -879,9 +876,7 @@ IF (ALBA_USE_VTK)
 
 	../Operations/albaOpExtractGeometry.cpp  ../Operations/albaOpExtractGeometry.h  
 	../Operations/albaOpCreateWrappedMeter.cpp	../Operations/albaOpCreateWrappedMeter.h  
-	../Operations/albaOpComputeWrapping.cpp	../Operations/albaOpComputeWrapping.h    
 	../Operations/albaOpComputeInertialTensor.cpp	../Operations/albaOpComputeInertialTensor.h    
-	../Operations/albaOpExporterWrappedMeter.cpp	../Operations/albaOpExporterWrappedMeter.h
 	../Operations/albaOpLabelizeSurface.cpp  ../Operations/albaOpLabelizeSurface.h
 	../Operations/albaOpFreezeVME.cpp  ../Operations/albaOpFreezeVME.h
   

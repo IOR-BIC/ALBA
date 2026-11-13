@@ -87,6 +87,19 @@ void albaWizardManager::WizardAdd( albaWizard *wizard, wxString menuPath /*= ""*
 }
 
 //----------------------------------------------------------------------------
+// Return the direct submenu of menu with the given label, NULL if not present.
+// wxMenu::FindItem(label) is not used because it also searches inside the submenus and can return
+// a wizard item with the same label of the submenu
+static wxMenu *FindSubMenu(wxMenu *menu, wxString label)
+{
+	wxMenuItemList &items = menu->GetMenuItems();
+	for (wxMenuItemList::iterator it = items.begin(); it != items.end(); ++it)
+		if ((*it)->IsSubMenu() && (*it)->GetItemLabelText() == label)
+			return (*it)->GetSubMenu();
+	return NULL;
+}
+
+//----------------------------------------------------------------------------
 void albaWizardManager::FillMenu( wxMenu* wizardMenu )
 //----------------------------------------------------------------------------
 {
@@ -99,31 +112,23 @@ void albaWizardManager::FillMenu( wxMenu* wizardMenu )
     if (wizard->GetMenuPath() != "")
     {
       wxMenu *sub_menu = NULL;
-      
+      // Local copy: the parameter must stay the root menu for the next wizards
+      wxMenu *path_menu = wizardMenu;
+
       wxString wizardPath = "";
       //divide path in sub token
       wxStringTokenizer path_tkz(wizard->GetMenuPath(), "/");
       while ( path_tkz.HasMoreTokens() )
       {
-        //search inside the menu for the token
+        //search the token among the submenus of the previous level, create it if missing
         wizardPath = path_tkz.GetNextToken();
-        int item = wizardMenu->FindItem(_(wizardPath));
-        if (item != wxNOT_FOUND)
+        if (sub_menu)
+          path_menu = sub_menu;
+        sub_menu = FindSubMenu(path_menu, _(wizardPath));
+        if (sub_menu == NULL)
         {
-          //if the submenu is found select it
-          wxMenuItem *menu_item = wizardMenu->FindItem(item);
-          if (menu_item)
-            sub_menu = menu_item->GetSubMenu();
-        }
-        else
-        {
-          //else create a new submenu
-          if (sub_menu)
-          {
-            wizardMenu = sub_menu;
-          }
           sub_menu = new wxMenu;
-          wizardMenu->Append(submenu_id++,_(wizardPath),sub_menu);
+          path_menu->Append(submenu_id++,_(wizardPath),sub_menu);
         }
       }
 

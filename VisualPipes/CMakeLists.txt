@@ -22,7 +22,6 @@ SET(PROJECT_SRCS
   albaPipeWrappedMeter.cpp  					albaPipeWrappedMeter.h
   albaPipeSurfaceEditor.cpp  				albaPipeSurfaceEditor.h
   albaVisualPipePolylineGraph.cpp  			albaVisualPipePolylineGraph.h
-  albaPipeComputeWrapping.cpp  				albaPipeComputeWrapping.h
   albaPipeVectorField.cpp  					albaPipeVectorField.h
   albaPipeVectorFieldMapWithArrows.cpp  		albaPipeVectorFieldMapWithArrows.h
   albaPipeVectorFieldGlyphs.cpp  			albaPipeVectorFieldGlyphs.h

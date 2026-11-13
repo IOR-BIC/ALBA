@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaOpComputeWrapping
+ Module: albaWizardWaitOp
  Authors: Gianluigi Crimi
  
  Copyright (c) BIC

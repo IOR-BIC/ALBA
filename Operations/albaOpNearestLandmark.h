@@ -35,7 +35,7 @@ class ALBA_EXPORT albaOpNearestLandmark : public albaOp
 {
 public:
 	/** Constructor. */
-	albaOpNearestLandmark(wxString label = "Create Closest Landmark");
+	albaOpNearestLandmark(wxString label = "Closest Landmark on Surface");
 
 	/** Destructor. */
 	~albaOpNearestLandmark();
@@ -49,8 +49,9 @@ public:
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
-	/** Create The closest Point*/
-	static albaVMELandmarkCloud *CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface);
+	/** Create the point of poly closest to lm, as a new landmark in the cloud of lm.
+	name is the name of the new landmark, default "Closest <lm> on <surface>"; a progressive number is added if it already exists. */
+	static albaVMELandmarkCloud *CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface, const char *name = NULL);
 	
 	/** Execute the operation. */
 	/*virtual*/ void OpDo();
@@ -61,9 +62,12 @@ public:
 	/**accept for surfaces and surface parametric*/
 	static bool SurfaceAccept(albaVME* node);
 
+	/** Accept for landmarks, used when the input is not a landmark */
+	static bool LandmarkAccept(albaVME* node);
+
 protected:
 
-	/** Return true for the acceptable vme type. */
+	/** Always true: if the input is not a landmark, OpRun asks to choose one. */
 	/*virtual*/ bool InternalAccept(albaVME *node);
 
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */

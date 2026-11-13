@@ -216,7 +216,8 @@ albaPipeWrappedMeter::~albaPipeWrappedMeter()
   vtkDEL(m_SelectionMapper);
   vtkDEL(m_SelectionProperty);
   vtkDEL(m_SelectionActor);
-	//@@@ if(m_use_axes) wxDEL(m_axes);  
+  cppDEL(m_MaterialButton);
+	//@@@ if(m_use_axes) wxDEL(m_axes);
 }
 //----------------------------------------------------------------------------
 albaGUI *albaPipeWrappedMeter::CreateGui()
@@ -330,15 +331,13 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
   if (!m_Caption)
     return;
   
-	vtkAlgorithmOutput *port = m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKOutputPort();
-	
-  if (m_WrappedMeterVME->GetMeterRepresentation() == albaVMEWrappedMeter::LINE_REPRESENTATION)
-    m_DataMapper->SetInputConnection(port);
-  else
-  {
-    m_Tube->Update();
-    m_DataMapper->SetInputConnection(m_Tube->GetOutputPort());
-  }
+  // No forced Update() in this method: it is also called while a view is rendering the VME output,
+  // re-executing that pipeline from here corrupts it when the VME is shown in more than one view.
+  vtkAlgorithmOutput *dataPort = m_WrappedMeterVME->GetWrappedMeterOutput()->GetVTKOutputPort();
+  if (m_WrappedMeterVME->GetMeterRepresentation() != albaVMEWrappedMeter::LINE_REPRESENTATION)
+    dataPort = m_Tube->GetOutputPort();
+  if (m_DataMapper->GetInputConnection(0, 0) != dataPort)
+    m_DataMapper->SetInputConnection(dataPort);
 
   double distance_value = m_WrappedMeterVME->GetDistance();
  // if(m_WrappedMeterVME->GetMeterMode() == albaVMEWrappedMeter::LINE_ANGLE) distance_value = m_WrappedMeterVME->GetAngle();
@@ -379,9 +378,7 @@ void albaPipeWrappedMeter::UpdateProperty(bool fromTag)
   }
   m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
 
-  GetGui()->Update();
-
-  m_SelectionBox->SetInputConnection(port); 
-  m_SelectionBox->Update();
-
+  // Do not create the GUI here: every pipe of every view would build its own
+  if (m_Gui)
+    m_Gui->Update();
 }

@@ -2,7 +2,7 @@
 
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaLogicWithManagers
- Authors: Silvano Imboden, Paolo Quadrani
+ Authors: Silvano Imboden, Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
@@ -97,176 +97,11 @@
 #include "albaProsthesesDBManager.h"
 #include "albaCursor.h"
 
-//IMPORTERS
-#include "albaOpImporterAnsysCDBFile.h"
-#include "albaOpImporterAnsysInputFile.h"
-#ifdef ALBA_USE_GDCM
-#include "albaGUIDicomSettings.h"
-#include "albaOpImporterDicom.h"
-#endif
-#include "albaOpImporterImage.h"
-#include "albaOpImporterLandmark.h"
-#include "albaOpImporterMSF.h"
-#include "albaOpImporterMSF1x.h"
-#include "albaOpImporterMesh.h"
-#include "albaOpImporterRAWImages.h"
-#include "albaOpImporterRAWVolume.h"
-#include "albaOpImporterSTL.h"
-#include "albaOpImporterPLY.h"
-#include "albaOpImporterVRML.h"
-#include "albaOpImporterVTK.h"
-#include "albaOpImporterMetaImage.h"
-#include "albaOpImporterVTKXML.h"
-#include "albaOpImporterAbaqusFile.h"
-#include "albaOpMeshScarlarsImporter.h"
-#include "albaOpImporterDicFile.h"
-#include "albaOpImporterPointCloud.h"
-#include "albaOpImporterScancoImageIO.h"
-
-//EXPORTERS
-#include "albaOpExporterAnsysCDBFile.h"
-#include "albaOpExporterAnsysInputFile.h"
-#include "albaOpExporterImages.h"
-#ifdef ALBA_USE_GDCM
-#include "albaOpExporterDicom.h"
-#endif 
-#include "albaOpExporterLandmark.h"
-#include "albaOpExporterMSF.h"
-#include "albaOpExporterMesh.h"
-#include "albaOpExporterMeters.h"
-#include "albaOpExporterRAW.h"
-#include "albaOpExporterSTL.h"
-#include "albaOpExporterPLY.h"
-#include "albaOpExporterVTK.h"
-#include "albaOpExporterVTKXML.h"
-#include "albaOpExporterMetaImage.h"
-#include "albaOpExporterWrappedMeter.h"
-#include "albaOpExporterAbaqusFile.h"
-#include "albaOpExporterPointCloud.h"
-#include "albaOpExporterDicFile.h"
-
-
-// OPERATIONS
-#include "albaOpMeasure2D.h"
-#include "albaOpComputeInertialTensor.h"
-#include "albaOpTransformOld.h"
-#include "albaOpAddLandmark.h"
-#include "albaOpBooleanSurface.h"
-#include "albaOpClassicICPRegistration.h"
-#include "albaOpCleanSurface.h"
-#include "albaOpClipSurface.h"
-#include "albaOpComputeWrapping.h"
-#include "albaOpConnectivitySurface.h"
-#include "albaOpCreateAverageLandmark.h"
-#include "albaOpCreateAveragePlane.h"
-#include "albaOpCreateEditSkeleton.h"
-#include "albaOpCreateGroup.h"
-#include "albaOpCreateLabeledVolume.h"
-#include "albaOpCreateMeter.h"
-#include "albaOpCreateRefSys.h"
-#include "albaOpCreateRefSysFromViewSlice.h"
-#include "albaOpCreatePolyline.h"
-#include "albaOpCreateSpline.h"
-#include "albaOpCreateSurfaceParametric.h"
-#include "albaOpCreateVolume.h"
-#include "albaOpCreateInfoText.h"
-#include "albaOpCreateWrappedMeter.h"
-#include "albaOpCrop.h"
-#include "albaOpCropDeformableROI.h"
-#include "albaOpDecimateSurface.h"
-#include "albaOpEditMetadata.h"
-#include "albaOpEditNormals.h"
-#include "albaOpExtractIsosurface.h"
-#include "albaOpExtrusionHoles.h"
-#include "albaOpFillHoles.h"
-#include "albaOpFilterSurface.h"
-#include "albaOpFilterVolume.h"
-#include "albaOpFilterImage.h"
-#include "albaOpFlipNormals.h"
-#include "albaOpFreezeVME.h"
-#include "albaOpInteractiveClipSurface.h"
-#include "albaOpIterativeRegistration.h"
-#include "albaOpLabelizeSurface.h"
-#include "albaOpMML.h"
-#include "albaOpMML3.h"
-#include "albaOpMakeVMETimevarying.h"
-#include "albaOpMeshDeformation.h"
-#include "albaOpMeshQuality.h"
-#include "albaOpMove.h"
-#include "albaOpRegisterClusters.h"
-#include "albaOpRemoveCells.h"
-#include "albaOpScaleDataset.h"
-#include "albaOpSegmentation.h"
-#include "albaOpSegmentationRegionGrowingConnectedThreshold.h"
-#include "albaOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
-#include "albaOpSmoothSurface.h"
-#include "albaOpSmoothSurfaceCells.h"
-#include "albaOpSplitSurface.h"
-#include "albaOpSubdivide.h"
-#include "albaOpSurfaceMirror.h"
-#include "albaOpTransform.h"
-#include "albaOpTriangulateSurface.h"
-#include "albaOpVOIDensity.h"
-#include "albaOpVolumeMeasure.h"
-#include "albaOpVolumeMirror.h"
-#include "albaOpVolumeResample.h"
-#include "albaOpESPCalibration.h"
-#include "albaOpComputeHausdorffDistance.h"
-#include "albaOpCreateCentroid.h"
-#include "albaOpTransformAtoB.h"
-#include "albaOpImageCalibration.h"
-
-//TMP
-#include "albaOpImporterExternalFile.h"
-#include "albaOpApplyTrajectory.h"
-#include "albaOpCreateProsthesis.h"
-#include "albaOpDecomposeTimeVarVME.h"
-#include "albaOpExtractGeometry.h"
-#include "albaOpGarbageCollectMSFDir.h"
-#include "albaOpLabelExtractor.h"
-#include "albaOpInteractionDebugger.h"
-#include "albaOpMML3ContourWidget.h"
-#include "albaOpMML3GlobalRegistration.h"
-#include "albaOpMML3ModelView.h"
-#include "albaOpMML3ModelView2DPipe.h"
-#include "albaOpMML3ModelView3DPipe.h"
-#include "albaOpMML3NonUniformSlicePipe.h"
-#include "albaOpMML3ParameterView.h"
-#include "albaOpMMLContourWidget.h"
-#include "albaOpMMLModelView.h"
-#include "albaOpMMLParameterView.h"
-#include "albaOpMatrixVectorMath.h"
-#include "albaOpOpenExternalFile.h"
-#include "albaOpScalarToSurface.h"
-#include "albaOpVOIDensityEditor.h"
-#include "albaOpValidateTree.h"
-#include "albaOpVolumeUnion.h"
-
+#include "albaLogicStandardPlugs.h"
 
 // VIEWS
-#include "albaView3D.h"
-#include "albaViewArbitraryOrthoSlice.h"
-#include "albaViewArbitrarySlice.h"
 #include "albaViewCompound.h"
-#include "albaViewCompoundWindowing.h"
-#include "albaViewGlobalSliceCompound.h"
-#include "albaViewImage.h"
-#include "albaViewImageCompound.h"
-#include "albaViewOrthoSlice.h"
-#include "albaViewPlot.h"
-#include "albaViewRX.h"
-#include "albaViewRXCT.h"
-#include "albaViewRXCompound.h"
-#include "albaViewSlice.h"
-#include "albaViewSliceBlend.h"
-#include "albaViewSliceBlendRX.h"
-#include "albaViewSliceOnCurve.h"
-#include "albaViewSliceOnCurveCompound.h"
 #include "albaViewVTK.h"
-#include "albaViewVTKCompound.h"
-#include "albaViewVirtualRX.h"
-#include "albaOpNearestLandmark.h"
-#include "albaOpMeasureAxisRotations.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -1494,7 +1329,7 @@ void albaLogicWithManagers::VmeDoubleClicked(albaEvent &e)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)
 {
-
+	EnableCameraUpdateSkip();
 	if (vme != NULL && m_OpManager && m_OpManager->GetSelectedVme()!=vme)
 	{
 		m_OpManager->OpSelect(vme);
@@ -1507,6 +1342,7 @@ void albaLogicWithManagers::VmeSelect(albaVME *vme)
 
 		EnableMenuAndToolbar();
 	}
+	DisableCameraUpdateSkip();
 }
 
 //----------------------------------------------------------------------------
@@ -1858,231 +1694,12 @@ albaProsthesesDBManager * albaLogicWithManagers::GetProsthesesDBManager()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::PlugStandardOperations()
 {
-	//------------------------------------------------------------
-	// Importer Menu:
-	//------------------------------------------------------------
-
-	Plug(new albaOpImporterImage("Images"));
-	Plug(new albaOpImporterRAWVolume("RAW Volume"));
-	Plug(new albaOpImporterRAWImages("RAW Images"));
-	Plug(new albaOpImporterSTL("STL"));
-	Plug(new albaOpImporterPLY("PLY"));
-	Plug(new albaOpImporterVRML("VRML"));
-	Plug(new albaOpImporterVTK("VTK"));
-	Plug(new albaOpImporterVTKXML("VTK xml"));
-	Plug(new albaOpImporterMetaImage());
-	Plug(new albaOpImporterMSF("ALBA"));
-	Plug(new albaOpImporterMSF1x("MSF 1.x"));
-	Plug(new albaOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
-	Plug(new albaOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
-	Plug(new albaOpImporterAbaqusFile("Abaqus File"), "Finite Element");
-	Plug(new albaOpImporterMesh("Generic Mesh"), "Finite Element");
-	Plug(new albaOpMeshScarlarsImporter("Mesh Scalars from Lis files"), ("Finite Element"));
-
-#ifdef ALBA_USE_GDCM
-	albaGUIDicomSettings *dicomSettings = new albaGUIDicomSettings(NULL, "DICOM");
-	Plug(new albaOpImporterDicom("DICOM"), "", true, dicomSettings);
-#endif
-	Plug(new albaOpImporterLandmark("Landmark"));
-
-	Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
-	Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
-	Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
-	Plug(new albaOpImporterExternalFile());
-
-
-	//------------------------------------------------------------
-	// Exporter Menu:
-	//------------------------------------------------------------
-
-	Plug(new albaOpExporterMSF());
-	Plug(new albaOpExporterSTL("STL"));
-	Plug(new albaOpExporterPLY("PLY"));
-	Plug(new albaOpExporterVTK("VTK"));
-	Plug(new albaOpExporterVTKXML("VTK xml"));
-	Plug(new albaOpExporterMetaImage());
-#ifdef ALBA_USE_GDCM
-	Plug(new albaOpExporterDicom("Dicom"), "", true, dicomSettings);
-#endif
-	Plug(new albaOpExporterRAW("Raw"));
-	Plug(new albaOpExporterImages("Images"));
-	Plug(new albaOpExporterLandmark("Landmark"));
-	Plug(new albaOpExporterPointCloud());
-	Plug(new albaOpExporterWrappedMeter());
-	Plug(new albaOpExporterMeters());
-	Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
-	Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
-	Plug(new albaOpExporterAbaqusFile("Abaqus File"), "Finite Element");
-	Plug(new albaOpExporterMesh("Generic Mesh"), "Finite Element");
-	Plug(new albaOpExporterDicFile("Digital Image Correlation (DIC)"));
-
-	//------------------------------------------------------------
-	// Operation Menu:
-	//------------------------------------------------------------
-
-	Plug(new albaOpCreateVolume(), _("Create"));
-	Plug(new albaOpAddLandmark("Add Landmark  \tCtrl+A"), _("Create"));
-	Plug(new albaOpCreateAverageLandmark("Create Average Landmark"), _("Create"));
-	Plug(new albaOpCreateAveragePlane("Create Average Plane"), _("Create"));
-	Plug(new albaOpCreateGroup("Group"), _("Create"));
-	Plug(new albaOpCreateMeter("Meter"), _("Create"));
-	Plug(new albaOpCreateRefSys("RefSys"), _("Create"));
-	Plug(new albaOpCreateInfoText("Info Text"), _("Create"));
-	Plug(new albaOpCreateRefSysFromViewSlice("RefSys from View Slice"), _("Create"));
-	Plug(new albaOpExtractIsosurface("Extract Isosurface"), _("Create"));
-	Plug(new albaOpCreateSurfaceParametric("Parametric Surface"), _("Create"));
-	Plug(new albaOpCreatePolyline("Polyline"), _("Create"));
-	Plug(new albaOpCreateSpline("Spline"), _("Create"));
-	Plug(new albaOpCreateLabeledVolume(), _("Create"));
-	Plug(new albaOpCreateEditSkeleton(), _("Create"));
-	Plug(new albaOpCreateWrappedMeter(), _("Create"));
-	Plug(new albaOpComputeWrapping("Computing Wrapping"), _("Create"));
-	Plug(new albaOpFreezeVME(), _("Create"));
-	Plug(new albaOpSegmentationRegionGrowingConnectedThreshold(), _("Create"));
-	Plug(new albaOpSegmentationRegionGrowingLocalAndGlobalThreshold(), _("Create"));
-	Plug(new albaOpSegmentation(), _("Create"));
-	Plug(new albaOpNearestLandmark(), _("Create"));
-	Plug(new albaOpCreateCentroid(), _("Create"));
-
-
-	Plug(new albaOpClipSurface("Clip Surface"), _("Modify"));
-	Plug(new albaOpFilterSurface("Filter Surface"), _("Modify"));
-	Plug(new albaOpFilterVolume("Filter Volume"), _("Modify"));
-	Plug(new albaOpFilterImage("Filter Image"), _("Modify"));
-	Plug(new albaOpDecimateSurface("Decimate Surface"), _("Modify"));
-	Plug(new albaOpConnectivitySurface("Connectivity Surface"), _("Modify"));
-	Plug(new albaOpEditNormals("Edit Normals"), _("Modify"));
-	Plug(new albaOpEditMetadata("Metadata Editor"), _("Modify"));
-	Plug(new albaOpTransformOld("Transform"), _("Modify"));
-	Plug(new albaOpVolumeResample("Resample Volume"), _("Modify"));
-	Plug(new albaOpCrop("Crop Volume"), _("Modify"));
-	Plug(new albaOpBooleanSurface("Boolean Surface"), _("Modify"));
-	Plug(new albaOpMML("MML"), _("Modify"));
-	Plug(new albaOpMML3("MML 3"), _("Modify"));
-	Plug(new albaOpCropDeformableROI("Crop ROI"), _("Modify"));
-	Plug(new albaOpFlipNormals("Flip Normals"), _("Modify"));
-	Plug(new albaOpRemoveCells("Remove Cells"), _("Modify"));
-	Plug(new albaOpExtrusionHoles(), _("Modify"));
-	Plug(new albaOpTransform(), _("Modify"));
-	Plug(new albaOpScaleDataset("Scale Dataset"), _("Modify"));
-	Plug(new albaOpMove("Move"), _("Modify"));
-	Plug(new albaOpSplitSurface(), _("Modify"));
-	Plug(new albaOpInteractiveClipSurface(), _("Modify"));
-	Plug(new albaOpLabelizeSurface(), _("Modify"));
-	Plug(new albaOpSmoothSurface(), _("Modify"));
-	Plug(new albaOpCleanSurface(), _("Modify"));
-	Plug(new albaOpTriangulateSurface(), _("Modify"));
-	Plug(new albaOpSurfaceMirror(), _("Modify"));
-	Plug(new albaOpVolumeMirror(), _("Modify"));
-	Plug(new albaOpSubdivide(), _("Modify"));
-	Plug(new albaOpFillHoles(), _("Modify"));
-	Plug(new albaOpMeshDeformation(), _("Modify"));
-	Plug(new albaOpMakeVMETimevarying(), _("Modify"));
-	Plug(new albaOpSmoothSurfaceCells(), _("Modify"));
-	Plug(new albaOpTransformAtoB(), "Modify");
-
-	Plug(new albaOpMeasure2D("2D Measure"), "Measure");
-	Plug(new albaOpVOIDensity("VOI Density"), "Measure");
-	Plug(new albaOpVolumeMeasure("Volume"), "Measure");
-	Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
-	Plug(new albaOpComputeInertialTensor(), "Measure");
-	Plug(new albaOpComputeHausdorffDistance(), "Measure");
-	Plug(new albaOpMeasureAxisRotations(), "Measure");
-
-	Plug(new albaOpIterativeRegistration(), _("Register"));
-	Plug(new albaOpRegisterClusters("Clusters"), _("Register"));
-	Plug(new albaOpClassicICPRegistration("Surface"), _("Register"));
-
-	Plug(new albaOpESPCalibration("Calibrate ESP Phantom"), _("Calibration"));
-	Plug(new albaOpImageCalibration(), _("Calibration"));
-
-
-	Plug(new albaOpApplyTrajectory(), "TMP to test");
-	Plug(new albaOpCreateProsthesis(), "TMP to test");
-	Plug(new albaOpDecomposeTimeVarVME(), "TMP to test");
-	Plug(new albaOpExtractGeometry(), "TMP to test");
-	Plug(new albaOpGarbageCollectMSFDir(), "TMP to test");
-	Plug(new albaOpLabelExtractor(), "TMP to test");
-	Plug(new albaOpInteractionDebugger(), "TMP to test");
-	Plug(new albaOpOpenExternalFile(), "TMP to test");
-	Plug(new albaOpScalarToSurface(), "TMP to test");
-	Plug(new albaOpVOIDensityEditor(), "TMP to test");
-	Plug(new albaOpValidateTree(), "TMP to test");
-	Plug(new albaOpVolumeUnion(), "TMP to test");
-
+	albaLogicStandardPlugs::PlugStandardOperations(this);
 }
-
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::PlugStandardViews()
 {
-	//------------------------------------------------------------
-	// View Menu:
-	//------------------------------------------------------------
-
-	//View VTK
-	Plug(new albaViewVTK("Surface"));
-
-	
-	//View Isosurface
-	albaViewVTK *viso = new albaViewVTK("Isosurface");
-	viso->PlugVisualPipe("albaVMEVolumeGray", "albaPipeIsosurface", MUTEX);
-	Plug(viso);
-
-	//View Orthoslice
-	albaViewOrthoSlice *vortho = new albaViewOrthoSlice("Orthoslice");
-	vortho->PackageView();
-	Plug(vortho);
-
-	//View Arbitrary Slice
-	albaViewArbitrarySlice *varbitrary = new albaViewArbitrarySlice("Arbitrary Slice");
-	varbitrary->PackageView();
-	Plug(varbitrary);
-
-	//View Arbitrary Orthoslice
-	albaViewArbitraryOrthoSlice *varbitraryortho = new albaViewArbitraryOrthoSlice("Arbitrary Orthoslice", albaAxes::BODY);
-	varbitraryortho->PackageView();
-	Plug(varbitraryortho);
-
-	//View Global Slice Compound
-	albaViewGlobalSliceCompound *vglobal = new albaViewGlobalSliceCompound("Global Slice");
-	vglobal->PackageView();
-	Plug(vglobal);
-
-	//View Slice Blend RX
-	albaViewSliceBlendRX *vSliceBlendRX = new albaViewSliceBlendRX("Slice Blend RX");
-	vSliceBlendRX->PackageView();
-	Plug(vSliceBlendRX);
-
-	//View Slice On Curve Compound
-	albaViewSliceOnCurveCompound *vsliceoncurveC = new albaViewSliceOnCurveCompound("Slice On Curve");
-	vsliceoncurveC->PackageView();
-	Plug(vsliceoncurveC);
-
-	//View virtual RX
-	albaViewVirtualRX *vvrx = new albaViewVirtualRX("Virtual RX");
-	vvrx->PackageView();
-	Plug(vvrx);
-
-	//View RXCT
-	albaViewRXCT *vrxct = new albaViewRXCT("RX-CT");
-	vrxct->PackageView();
-	Plug(vrxct);
-
-
-
-	//View Image Compound
-	albaViewImageCompound *vimageC = new albaViewImageCompound("Image");
-	vimageC->PackageView();
-	Plug(vimageC);
-
-
-	//View 3D
-	Plug(new albaView3D("3D"));
-
-	//View RayCast
-	albaViewVTK *vRayCast = new albaViewVTK("3D Volume Rendering");
-	vRayCast->PlugVisualPipe("albaVMEVolumeGray", "albaPipeRayCast", MUTEX);
-	Plug(vRayCast);
+	albaLogicStandardPlugs::PlugStandardViews(this);
 }
 
 //----------------------------------------------------------------------------
