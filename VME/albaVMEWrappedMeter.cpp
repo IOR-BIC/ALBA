@@ -124,7 +124,7 @@ albaVMEWrappedMeter::~albaVMEWrappedMeter()
 
 	for(int i=0; i< m_MiddlePointList.size(); i++)
 	{
-		if(m_MiddlePointList[i]) delete m_MiddlePointList[i];
+		if(m_MiddlePointList[i]) delete[] m_MiddlePointList[i];
 	}
 	m_MiddlePointList.clear();
 
@@ -1190,9 +1190,14 @@ void albaVMEWrappedMeter::InternalUpdateManual()
 
 		for(int i=0; i< m_MiddlePointList.size(); i++)
 		{
-			if(m_MiddlePointList[i]) delete m_MiddlePointList[i];
+			if(m_MiddlePointList[i]) delete[] m_MiddlePointList[i];
 		}
 		m_MiddlePointList.clear();
+
+		// The line sources of the previous update are no more connected to m_Goniometer
+		for (int i = 0; i < m_LineSourceList.size(); i++)
+			vtkDEL(m_LineSourceList[i]);
+		m_LineSourceList.clear();
 
     std::vector<double *> localMiddlePointList;
 
@@ -1348,9 +1353,9 @@ void albaVMEWrappedMeter::InternalUpdateManual()
 
     
 
-    for(int i=0; i< m_MiddlePointList.size(); i++)
+    for(int i=0; i< localMiddlePointList.size(); i++)
     {
-      if(localMiddlePointList[i]) delete localMiddlePointList[i];
+      if(localMiddlePointList[i]) delete[] localMiddlePointList[i];
     }
     localMiddlePointList.clear();
   }
