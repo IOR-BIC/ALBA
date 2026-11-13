@@ -33,8 +33,6 @@ SET(PROJECT_SRCS
   albaVMEOutputWrappedMeter.cpp  			albaVMEOutputWrappedMeter.h
   albaVMESurfaceEditor.cpp  				albaVMESurfaceEditor.h
   albaVMEOutputSurfaceEditor.cpp  			albaVMEOutputSurfaceEditor.h  
-  albaVMEComputeWrapping.cpp  				albaVMEComputeWrapping.h
-  albaVMEOutputComputeWrapping.cpp  		albaVMEOutputComputeWrapping.h   
   albaVMEPointCloud.cpp 					albaVMEPointCloud.h
   albaVMEProsthesis.cpp                 	albaVMEProsthesis.h
 )

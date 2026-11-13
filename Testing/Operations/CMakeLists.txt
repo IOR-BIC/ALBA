@@ -67,7 +67,6 @@ SET(PROJECT_SRCS
 	albaOpVolumeMeasureTest.h albaOpVolumeMeasureTest.cpp
 	albaOpImporterRAWImagesTest.h albaOpImporterRAWImagesTest.cpp
 	albaOpExtrusionHolesTest.h albaOpExtrusionHolesTest.cpp
-	albaOpExporterWrappedMeterTest.h albaOpExporterWrappedMeterTest.cpp
 	albaOpFreezeVMETest.h albaOpFreezeVMETest.cpp
 	albaOpLabelizeSurfaceTest.h albaOpLabelizeSurfaceTest.cpp
 	albaOpCleanSurfaceTest.h albaOpCleanSurfaceTest.cpp
@@ -81,7 +80,6 @@ SET(PROJECT_SRCS
 	albaOpSegmentationRegionGrowingConnectedThresholdTest.h albaOpSegmentationRegionGrowingConnectedThresholdTest.cpp
 	albaOpScaleDatasetTest.h albaOpScaleDatasetTest.cpp
 	albaOpCreateLabeledVolumeTest.h albaOpCreateLabeledVolumeTest.cpp
-	albaOpComputeWrappingTest.h albaOpComputeWrappingTest.cpp
 	albaOpComputeInertialTensorTest.h albaOpComputeInertialTensorTest.cpp
 	albaOpSplitSurfaceTest.h albaOpSplitSurfaceTest.cpp
 	albaOpMML3Test.h albaOpMML3Test.cpp

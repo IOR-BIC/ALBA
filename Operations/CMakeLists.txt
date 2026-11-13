@@ -120,9 +120,7 @@ IF (ALBA_USE_VTK)
 
 	albaOpExtractGeometry.cpp  albaOpExtractGeometry.h  
 	albaOpCreateWrappedMeter.cpp	albaOpCreateWrappedMeter.h  
-	albaOpComputeWrapping.cpp	albaOpComputeWrapping.h    
 	albaOpComputeInertialTensor.cpp	albaOpComputeInertialTensor.h    
-	albaOpExporterWrappedMeter.cpp	albaOpExporterWrappedMeter.h
 	albaOpLabelizeSurface.cpp  albaOpLabelizeSurface.h
 	albaOpFreezeVME.cpp  albaOpFreezeVME.h
   

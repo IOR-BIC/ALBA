@@ -69,7 +69,6 @@
 #include "albaOpExporterVTK.h"
 #include "albaOpExporterVTKXML.h"
 #include "albaOpExporterMetaImage.h"
-#include "albaOpExporterWrappedMeter.h"
 #include "albaOpExporterAbaqusFile.h"
 #include "albaOpExporterPointCloud.h"
 #include "albaOpExporterDicFile.h"
@@ -84,7 +83,6 @@
 #include "albaOpClassicICPRegistration.h"
 #include "albaOpCleanSurface.h"
 #include "albaOpClipSurface.h"
-#include "albaOpComputeWrapping.h"
 #include "albaOpConnectivitySurface.h"
 #include "albaOpCreateAverageLandmark.h"
 #include "albaOpCreateAveragePlane.h"
@@ -230,7 +228,6 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpExporterImages("Images"));
 	logic->Plug(new albaOpExporterLandmark("Landmark"));
 	logic->Plug(new albaOpExporterPointCloud());
-	logic->Plug(new albaOpExporterWrappedMeter());
 	logic->Plug(new albaOpExporterMeters());
 	logic->Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	logic->Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
@@ -257,7 +254,6 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpCreateSpline("Spline"), _("Create"));
 	logic->Plug(new albaOpCreateEditSkeleton(), _("Create"));
 	logic->Plug(new albaOpCreateWrappedMeter(), _("Create"));
-	logic->Plug(new albaOpComputeWrapping("Computing Wrapping"), _("Create"));
 	logic->Plug(new albaOpFreezeVME(), _("Create"));
 	logic->Plug(new albaOpNearestLandmark(), _("Create"));
 	logic->Plug(new albaOpCreateCentroid(), _("Create"));
