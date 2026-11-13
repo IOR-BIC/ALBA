@@ -61,9 +61,12 @@ public:
 	/**accept for surfaces and surface parametric*/
 	static bool SurfaceAccept(albaVME* node);
 
+	/** Accept for landmarks, used when the input is not a landmark */
+	static bool LandmarkAccept(albaVME* node);
+
 protected:
 
-	/** Return true for the acceptable vme type. */
+	/** Always true: if the input is not a landmark, OpRun asks to choose one. */
 	/*virtual*/ bool InternalAccept(albaVME *node);
 
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
