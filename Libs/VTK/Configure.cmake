@@ -51,7 +51,24 @@ IF (VTK_SOURCE_PATH)
   SET (VTK_USE_PATENTED 1)
   SET (VTK_USE_HYBRID 1)
   SET (VTK_RENDERING_BACKEND "OpenGL")
-	
+
+  # VTK modules used by ALBA: their dependencies are enabled automatically, all other modules are left out
+  SET (VTK_ALBA_MODULES
+    CommonComputationalGeometry CommonCore CommonDataModel CommonExecutionModel CommonMath CommonMisc CommonSystem CommonTransforms
+    FiltersCore FiltersExtraction FiltersGeneral FiltersGeometry FiltersModeling FiltersSources FiltersTexture
+    IOExport IOGeometry IOImage IOImport IOLegacy IOPLY IOXML
+    ImagingColor ImagingCore ImagingGeneral ImagingHybrid ImagingMath ImagingMorphological ImagingSources ImagingStatistics
+    InteractionStyle InteractionWidgets
+    RenderingAnnotation RenderingCore RenderingFreeType RenderingLOD RenderingLabel RenderingOpenGL2 RenderingVolume RenderingVolumeOpenGL2
+  )
+  SET (VTK_MODULE_ARGS)
+  FOREACH (group Imaging MPI Qt Rendering StandAlone Views Web)
+    LIST (APPEND VTK_MODULE_ARGS -DVTK_GROUP_ENABLE_${group}:STRING=DONT_WANT)
+  ENDFOREACH (group)
+  FOREACH (module ${VTK_ALBA_MODULES})
+    LIST (APPEND VTK_MODULE_ARGS -DVTK_MODULE_ENABLE_VTK_${module}:STRING=YES)
+  ENDFOREACH (module)
+
   SET (VTK_BINARY_PATH "${VTK_BINARY_DIR}/Build" )
   OPTION (VTK_FORCE_CONFIGURE "Weither to force configuration of VTK" FALSE)
     
@@ -67,7 +84,17 @@ IF (VTK_SOURCE_PATH)
   ELSE(NOT VTK_BUILD_SHARED_LIBS EQUAL ${ALBA_BUILD_ALBADLL})
   	SET(VTK_FORCE_CONFIGURE FALSE)
   ENDIF(NOT VTK_BUILD_SHARED_LIBS EQUAL ${ALBA_BUILD_ALBADLL})
-  
+
+  # reconfigure VTK when the module selection changes
+  SET (VTK_MODULES_FILE "${VTK_BINARY_DIR}/VTKModules.txt")
+  SET (VTK_CONFIGURED_MODULES "")
+  IF (EXISTS ${VTK_MODULES_FILE})
+    FILE (READ ${VTK_MODULES_FILE} VTK_CONFIGURED_MODULES)
+  ENDIF (EXISTS ${VTK_MODULES_FILE})
+  IF (NOT "${VTK_CONFIGURED_MODULES}" STREQUAL "${VTK_MODULE_ARGS}")
+    SET (VTK_FORCE_CONFIGURE TRUE)
+  ENDIF (NOT "${VTK_CONFIGURED_MODULES}" STREQUAL "${VTK_MODULE_ARGS}")
+
   IF (VTK_FORCE_CONFIGURE OR NOT EXISTS ${VTK_BINARY_DIR}/build.cmake)
     # Configuring the VTK library    
     FILE(MAKE_DIRECTORY "${VTK_BINARY_PATH}")
@@ -93,6 +120,7 @@ IF (VTK_SOURCE_PATH)
     -DBUILD_EXAMPLES:BOOL=OFF
     -DVTK_RENDERING_BACKEND:STRING="${VTK_RENDERING_BACKEND}"
     -DBUILD_SHARED_LIBS=${ALBA_BUILD_ALBADLL}
+    ${VTK_MODULE_ARGS}
      OUTPUT_VARIABLE CMAKE_OUTPUT RETURN_VALUE CMAKE_RETURN)
     
     # write configure log file
@@ -103,6 +131,7 @@ IF (VTK_SOURCE_PATH)
       MESSAGE("CMake configure returned value = " ${CMAKE_RETURN})
       MESSAGE(FATAL_ERROR "${SUBPROJECT_NAME} configure error, cmake output = " ${CMAKE_OUTPUT})     
     ELSE (CMAKE_RETURN)
+      FILE (WRITE ${VTK_MODULES_FILE} "${VTK_MODULE_ARGS}")
       # load VTK build command from cmake's cache
       LOAD_CACHE(${VTK_BINARY_PATH} READ_WITH_PREFIX VTK_ MAKECOMMAND)
       
