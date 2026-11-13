@@ -382,17 +382,10 @@ bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp
 
   if (tracker)
   {
-    albaAvatar *avatar = tracker->GetAvatar();
+    // no avatar == no picking
     albaMatrix world_pose;
-    if (avatar)
-    {
-      albaAvatar3D *avatar3D = albaAvatar3D::SafeDownCast(avatar);
-      if (avatar3D)
-        avatar3D->TrackerToWorld(point_pose,world_pose,albaAvatar3D::CANONICAL_TO_WORLD_SCALE);
-      else
-        world_pose = point_pose;
+    if (tracker->TrackerToWorld(point_pose, world_pose))
       picked_something = Pick(world_pose);
-    }
   }
   else if (mouse)
   { 

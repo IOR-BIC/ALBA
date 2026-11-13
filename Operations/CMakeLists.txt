@@ -148,7 +148,6 @@ IF (ALBA_USE_VTK)
 	
 	albaOpESPCalibration.cpp		albaOpESPCalibration.h
 	
-	albaOpExtractImageFromArbitraryView.cpp		albaOpExtractImageFromArbitraryView.h
 	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
 	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
 	albaOpCreateProsthesis.cpp		albaOpCreateProsthesis.h

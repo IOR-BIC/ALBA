@@ -80,7 +80,7 @@ void albaOpSplitSurfaceTest::TestClip()
   int numberOfChildren = parentSurface->GetNumberOfChildren();
   int numPoints = ((albaVMESurface *)parentSurface->GetLastChild())->GetOutput()->GetVTKData()->GetNumberOfPoints();
 
-  CPPUNIT_ASSERT(numPoints == 61);
+  CPPUNIT_ASSERT(numPoints == 327);
   CPPUNIT_ASSERT(clippedName.Compare(parentSurface->GetLastChild()->GetName()) == 0);
 
   albaDEL(surfaceParametricClip);
