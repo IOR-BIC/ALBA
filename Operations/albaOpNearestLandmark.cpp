@@ -126,7 +126,7 @@ void albaOpNearestLandmark::OpRun()
 }
 
 //----------------------------------------------------------------------------
-albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface)
+albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface, const char *name)
 {
 	vtkALBASmartPointer <vtkCellLocator> cellLocator;
 	cellLocator->SetDataSet(poly);
@@ -143,13 +143,17 @@ albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * po
 
 	albaVMELandmarkCloud *lmc = albaVMELandmarkCloud::SafeDownCast(lm->GetParent());
 
-	albaString lmName;
-	lmName.Printf("Closest %s on %s", lm->GetName(), surface->GetName());
+	albaString baseName;
+	if (name)
+		baseName = name;
+	else
+		baseName.Printf("Closest %s on %s", lm->GetName(), surface->GetName());
 
 	// AppendAbsoluteLandmark updates an existing landmark with the same name (e.g. two surfaces with the same name):
 	// add a progressive number until the name is unique, so a new landmark is always created
+	albaString lmName = baseName;
 	for (int i = 2; lmc->GetLandmarkIndex(lmName.GetCStr()) >= 0; i++)
-		lmName.Printf("Closest %s on %s (%d)", lm->GetName(), surface->GetName(), i);
+		lmName.Printf("%s (%d)", baseName.GetCStr(), i);
 
 	lmc->AppendAbsoluteLandmark(closestPoint, lmName.GetCStr());
 

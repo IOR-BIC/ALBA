@@ -195,6 +195,25 @@ void albaOpNearestLandmarkTest::TestCreateClosestPointUniqueName()
 }
 
 //----------------------------------------------------------------------------
+void albaOpNearestLandmarkTest::TestCreateClosestPointCustomName()
+{
+	vtkALBASmartPointer<vtkTransform> transform;
+	transform->SetMatrix(m_Surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+	vtkALBASmartPointer<vtkTransformPolyDataFilter> filter;
+	filter->SetInputData((vtkPolyData *)m_Surface->GetOutput()->GetVTKData());
+	filter->SetTransform(transform);
+	filter->Update();
+
+	// Name given by the caller (e.g. albaOpCreateCentroid), still made unique
+	albaOpNearestLandmark::CreateClosestPoint(filter->GetOutput(), m_Landmark, m_Surface, "sphere Centroid on surface");
+	CheckLastLandmark("sphere Centroid on surface");
+
+	albaOpNearestLandmark::CreateClosestPoint(filter->GetOutput(), m_Landmark, m_Surface, "sphere Centroid on surface");
+	CPPUNIT_ASSERT(m_Cloud->GetNumberOfLandmarks() == 3);
+	CheckLastLandmark("sphere Centroid on surface (2)");
+}
+
+//----------------------------------------------------------------------------
 void albaOpNearestLandmarkTest::TestOpRunWithLandmarkInput()
 {
 	// Landmark selected: only the surface is asked

@@ -35,7 +35,7 @@ class ALBA_EXPORT albaOpNearestLandmark : public albaOp
 {
 public:
 	/** Constructor. */
-	albaOpNearestLandmark(wxString label = "Create Closest Landmark");
+	albaOpNearestLandmark(wxString label = "Closest Landmark on Surface");
 
 	/** Destructor. */
 	~albaOpNearestLandmark();
@@ -49,8 +49,9 @@ public:
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
 
-	/** Create The closest Point*/
-	static albaVMELandmarkCloud *CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface);
+	/** Create the point of poly closest to lm, as a new landmark in the cloud of lm.
+	name is the name of the new landmark, default "Closest <lm> on <surface>"; a progressive number is added if it already exists. */
+	static albaVMELandmarkCloud *CreateClosestPoint(vtkPolyData * poly, albaVMELandmark * lm, albaVME * surface, const char *name = NULL);
 	
 	/** Execute the operation. */
 	/*virtual*/ void OpDo();

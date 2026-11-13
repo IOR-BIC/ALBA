@@ -46,6 +46,7 @@ public:
 	CPPUNIT_TEST( TestLandmarkAndSurfaceAccept );
 	CPPUNIT_TEST( TestCreateClosestPoint );
 	CPPUNIT_TEST( TestCreateClosestPointUniqueName );
+	CPPUNIT_TEST( TestCreateClosestPointCustomName );
 	CPPUNIT_TEST( TestOpRunWithLandmarkInput );
 	CPPUNIT_TEST( TestOpRunWithOtherInput );
 	CPPUNIT_TEST( TestOpRunCancel );
@@ -58,6 +59,7 @@ protected:
 	void TestLandmarkAndSurfaceAccept();
 	void TestCreateClosestPoint();
 	void TestCreateClosestPointUniqueName();
+	void TestCreateClosestPointCustomName();
 	void TestOpRunWithLandmarkInput();
 	void TestOpRunWithOtherInput();
 	void TestOpRunCancel();

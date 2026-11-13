@@ -33,7 +33,7 @@ class ALBA_EXPORT albaOpCreateCentroid : public albaOp
 {
 public:
 	/** Constructor. */
-	albaOpCreateCentroid(wxString label = "Create Centroid Landmark");
+	albaOpCreateCentroid(wxString label = "Centroid Landmarks");
 
 	/** Destructor. */
 	~albaOpCreateCentroid();

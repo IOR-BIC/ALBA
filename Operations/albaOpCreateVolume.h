@@ -32,7 +32,7 @@ dataset filled with a constant scalar value. This is useful for testing purposes
 class ALBA_EXPORT albaOpCreateVolume: public albaOp
 {
 public:
-  albaOpCreateVolume(const wxString &label = "Synthetic homogeneous volume");
+  albaOpCreateVolume(const wxString &label = "Synthetic Homogeneous Volume");
   ~albaOpCreateVolume(); 
 
   albaTypeMacro(albaOpCreateVolume, albaOp);
