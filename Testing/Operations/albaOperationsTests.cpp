@@ -25,6 +25,7 @@
 #include "albaFakeLogicForTest.h"
 #include "albaGeometryEditorPolylineGraphTest.h"
 #include "albaOpAddLandmarkTest.h"
+#include "albaOpNearestLandmarkTest.h"
 #include "albaOpApplyTrajectoryTest.h"
 #include "albaOpBooleanSurfaceTest.h"
 #include "albaOpClassicICPRegistrationTest.h"
@@ -218,6 +219,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpCreateVolumeTest::suite());
 	runner.addTest(albaOpVOIDensityEditorTestTest::suite());
 	runner.addTest(albaOpAddLandmarkTest::suite());
+	runner.addTest(albaOpNearestLandmarkTest::suite());
 	runner.addTest(albaOpApplyTrajectoryTest::suite());
 	runner.addTest(albaOpExtractIsosurfaceTest::suite());
  	runner.addTest(albaOpExporterMSFTest::suite());
