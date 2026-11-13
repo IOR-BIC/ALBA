@@ -1387,7 +1387,7 @@ void albaLogicWithManagers::VmeDoubleClicked(albaEvent &e)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)
 {
-
+	EnableCameraUpdateSkip();
 	if (vme != NULL && m_OpManager && m_OpManager->GetSelectedVme()!=vme)
 	{
 		m_OpManager->OpSelect(vme);
@@ -1400,6 +1400,7 @@ void albaLogicWithManagers::VmeSelect(albaVME *vme)
 
 		EnableMenuAndToolbar();
 	}
+	DisableCameraUpdateSkip();
 }
 
 //----------------------------------------------------------------------------
