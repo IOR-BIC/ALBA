@@ -60,7 +60,6 @@ IF (ALBA_USE_VTK)
   albaVMEOutputSurface.cpp  					albaVMEOutputSurface.h
   albaVMEOutputVolume.cpp  					albaVMEOutputVolume.h
   albaVMEOutputVTK.cpp  						albaVMEOutputVTK.h
-  albaVMEPointSet.cpp  						albaVMEPointSet.h
   albaVMEPolyline.cpp  						albaVMEPolyline.h
   albaVMEPolylineSpline.cpp  				albaVMEPolylineSpline.h
   albaVMERefSys.cpp  						albaVMERefSys.h

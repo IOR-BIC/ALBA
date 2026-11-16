@@ -62,7 +62,7 @@ class albaVMELandmarkCloudTest : public albaTest
 		void DeepCopyTest();
 		void CopyTreeTest();
 
-		// Tests of the behavior inherited from albaVMEPointSet
+		// Tests of the point data handling (formerly inherited from albaVMEPointSet)
 		void SetDataPointsOnlyTest();
 		void CreateLMStructureFromDataVectorTest();
 		void PolydataPointsTest();

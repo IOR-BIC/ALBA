@@ -61,7 +61,6 @@
 #include "albaVMEOutputVTKTest.h"
 #include "albaVMEOutputVolumeTest.h"
 #include "albaVMEOutputWrappedMeterTest.h"
-#include "albaVMEPointSetTest.h"
 #include "albaVMEPolylineEditorTest.h"
 #include "albaVMEPolylineGraphTest.h"
 #include "albaVMEPolylineSplineTest.h"
@@ -140,7 +139,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEInfoTextTest::suite());
 	runner.addTest(mmaMeterTest::suite());
 	runner.addTest(albaVMEOutputMeterTest::suite());
-	runner.addTest(albaVMEPointSetTest::suite());
 	runner.addTest(albaVMEVectorTest::suite());
 	runner.addTest(albaVMEOutputPolylineTest::suite());
 	runner.addTest(albaVMEOutputSurfaceTest::suite());

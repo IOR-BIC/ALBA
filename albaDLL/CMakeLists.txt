@@ -524,8 +524,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaVMEOutputVolume.h
     ../VME/albaVMEOutputVTK.cpp
     ../VME/albaVMEOutputVTK.h
-    ../VME/albaVMEPointSet.cpp
-    ../VME/albaVMEPointSet.h
     ../VME/albaVMEPolyline.cpp
     ../VME/albaVMEPolyline.h
     ../VME/albaVMEPolylineSpline.cpp
@@ -623,7 +621,6 @@ IF (ALBA_USE_VTK)
   ../VME/albaVMEOutputSurface.cpp  					../VME/albaVMEOutputSurface.h
   ../VME/albaVMEOutputVolume.cpp  					../VME/albaVMEOutputVolume.h
   ../VME/albaVMEOutputVTK.cpp  						../VME/albaVMEOutputVTK.h
-  ../VME/albaVMEPointSet.cpp  						../VME/albaVMEPointSet.h
   ../VME/albaVMEPolyline.cpp  						../VME/albaVMEPolyline.h
   ../VME/albaVMEPolylineSpline.cpp  				../VME/albaVMEPolylineSpline.h
   ../VME/albaVMEProber.cpp  						../VME/albaVMEProber.h

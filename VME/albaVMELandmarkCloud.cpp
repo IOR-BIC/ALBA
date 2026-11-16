@@ -27,6 +27,7 @@ const bool DEBUG_MODE = false;
 #include "albaVMELandmarkCloud.h"
 #include "mmuIdFactory.h"
 #include "albaDataVector.h"
+#include "albaDataPipe.h"
 #include "albaMatrixInterpolator.h"
 #include "albaDataPipeInterpolator.h"
 #include "albaTagArray.h"
@@ -157,6 +158,9 @@ int albaVMELandmarkCloud::InternalInitialize()
 
   if (Superclass::InternalInitialize()==ALBA_OK)
   {
+    // force material allocation
+    GetMaterial();
+
     //Old versions of LC does not have ALBA_LMC_VERSION tag
 		//If we have and old LC it can be open or closed 
 		//closed LC contains LMs as combination of vtk data (for position) and tags (for names)
@@ -188,10 +192,10 @@ int albaVMELandmarkCloud::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
 	//Remove all landmarks
 	//SetNumberOfLandmarks(0);
 
-  if (polydata != NULL && Superclass::SetData(polydata,t,mode)==ALBA_OK)
-  {
-    return ALBA_OK;
-  }
+  // only polydata made of points are accepted
+  if (polydata != NULL && polydata->GetPolys()->GetNumberOfCells() == 0 && polydata->GetStrips()->GetNumberOfCells() == 0 && polydata->GetLines()->GetNumberOfCells() == 0)
+    return Superclass::SetData(data,t,mode);
+
   return ALBA_ERROR;
 }
 //-------------------------------------------------------------------------
@@ -361,7 +365,7 @@ int albaVMELandmarkCloud::SetLandmarkToPolydata(int idx, double x, double y, dou
 	if (!polydata)
 		polydata = NewPolyData(t);
 
-	Superclass::SetPoint(polydata, idx, x, y, z);
+	SetPoint(polydata, idx, x, y, z);
 	
 	return SetLandmarkVisibility(polydata, idx, visibility);
 }
@@ -451,7 +455,22 @@ void albaVMELandmarkCloud::SetLandmarkName(int idx,const char *name)
 int albaVMELandmarkCloud::AppendPoint(vtkPolyData *polydata,double x,double y,double z,int num)
 {
   int oldnum = polydata->GetNumberOfPoints();
-  int idx = Superclass::AppendPoint(polydata,x,y,z,num);
+  int idx = -1;
+
+  if (num > 0)
+  {
+    vtkPoints *points = polydata->GetPoints();
+    if (points)
+    {
+      for (int i = 0; i < num; i++)
+        idx = points->InsertNextPoint(x,y,z);
+
+      points->Modified();
+      polydata->Modified();
+    }
+    else
+      albaErrorMacro("Corrupted PolyData inside VME-LandmarkCloud: Cannot found Points or Vertx cells");
+  }
 
   // test if the right number of points have been inserted
   if (idx-oldnum+1 == num)
@@ -610,7 +629,12 @@ albaVMELandmark * albaVMELandmarkCloud::GetNearestLandmark(double pos[3], bool S
 //-------------------------------------------------------------------------
 vtkPolyData *albaVMELandmarkCloud::NewPolyData(albaTimeStamp t)
 {
-  vtkPolyData *polydata = Superclass::NewPolyData(t);
+  vtkALBASmartPointer<vtkPolyData> newPolydata;
+  vtkALBASmartPointer<vtkPoints> points;
+  newPolydata->SetPoints(points);
+  SetDataByReference(newPolydata,t);
+
+  vtkPolyData *polydata = newPolydata;
   if (polydata)
   {
     // add cell array for visible points
@@ -1130,3 +1154,170 @@ int albaVMELandmarkCloud::GetLandmarkShowNumber()
 	return m_LanfmarkShowNumber;
 }
 
+
+//-------------------------------------------------------------------------
+albaVMEOutput *albaVMELandmarkCloud::GetOutput()
+{
+	// allocate the right type of output on demand
+	if (m_Output == NULL)
+		SetOutput(albaVMEOutputLandmarkCloud::New()); // create the output
+
+	return m_Output;
+}
+
+//-------------------------------------------------------------------------
+vtkPolyData *albaVMELandmarkCloud::GetPolyData(albaTimeStamp t)
+{
+	albaVMEItemVTK *item = albaVMEItemVTK::SafeDownCast(m_DataVector->GetItem(t));
+	if (item)
+		return vtkPolyData::SafeDownCast(item->GetData());
+
+	return NULL;
+}
+
+//-------------------------------------------------------------------------
+int albaVMELandmarkCloud::GetNumberOfPoints(albaTimeStamp t)
+{
+	t = t < 0 ? m_CurrentTime : t;
+
+	vtkPolyData *polydata = GetPolyData(t);
+	if (polydata)
+		return polydata->GetNumberOfPoints();
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int albaVMELandmarkCloud::SetPoint(vtkPolyData *polydata, int idx, double x, double y, double z)
+{
+	vtkPoints *points = polydata->GetPoints();
+	if (!points)
+	{
+		albaErrorMacro("SetPoint: Corrupted PolyData inside VME-LandmarkCloud, Points' data not found");
+		return ALBA_ERROR;
+	}
+
+	if (idx >= points->GetNumberOfPoints())
+	{
+		albaErrorMacro("SetPoint: point index out of range");
+		return ALBA_ERROR;
+	}
+
+	points->SetPoint(idx, x, y, z);
+	points->Modified();
+	polydata->Modified();
+
+	return ALBA_OK;
+}
+
+//-------------------------------------------------------------------------
+int albaVMELandmarkCloud::GetPoint(int idx, double xyz[3], albaTimeStamp t)
+{
+	t = t < 0 ? m_CurrentTime : t;
+
+	int ret = ALBA_ERROR;
+
+	if (t != m_CurrentTime)
+	{
+		// force the pipe to the specified timestamp
+		GetDataPipe()->SetTimeStamp(t);
+		GetDataPipe()->Update();
+	}
+
+	vtkPolyData *polydata = (vtkPolyData *)GetPointSetOutput()->GetPointSetData();
+	if (polydata)
+		ret = GetPoint(polydata, idx, xyz);
+
+	// reset the pipe timestamp and its output
+	if (t != m_CurrentTime)
+	{
+		GetDataPipe()->SetTimeStamp(m_CurrentTime);
+		GetDataPipe()->Update();
+	}
+
+	return ret;
+}
+
+//-------------------------------------------------------------------------
+int albaVMELandmarkCloud::GetPoint(int idx, double &x, double &y, double &z, albaTimeStamp t)
+{
+	double xyz[3];
+
+	if (GetPoint(idx, xyz, t) == ALBA_ERROR)
+		return ALBA_ERROR;
+
+	x = xyz[0];
+	y = xyz[1];
+	z = xyz[2];
+
+	return ALBA_OK;
+}
+
+//-------------------------------------------------------------------------
+int albaVMELandmarkCloud::GetPoint(vtkPolyData *polydata, int idx, double xyz[3])
+{
+	if (!polydata)
+	{
+		albaErrorMacro("Currupted VME-item: wrong (not PolyData) or empty dataset in VME-LandmarkCloud");
+		return ALBA_ERROR;
+	}
+
+	vtkPoints *points = polydata->GetPoints();
+	if (!points)
+	{
+		albaErrorMacro("Corrupted vtkPolyDaya in VME-item: Points data not found");
+		return ALBA_ERROR;
+	}
+
+	if (idx >= 0 && idx < points->GetNumberOfPoints())
+	{
+		points->GetPoint(idx, xyz);
+		return ALBA_OK;
+	}
+
+	albaErrorMacro("GetPoint: point index out of range");
+	return ALBA_ERROR;
+}
+
+//-------------------------------------------------------------------------
+int albaVMELandmarkCloud::RemovePoint(vtkPolyData *polydata, int idx)
+{
+	if (!polydata)
+	{
+		albaErrorMacro("RemovePoint: Currupted VME-item, wrong (not PolyData) or empty dataset in VME-LandmarkCloud");
+		return ALBA_ERROR;
+	}
+
+	vtkPoints *points = polydata->GetPoints();
+	vtkCellArray *cells = polydata->GetVerts();
+
+	if (!points || !cells)
+	{
+		albaErrorMacro("RemovePoint: Currupted Polydata inside VME-LandmarkCloud, cannot found Points or Vertx cells");
+		return ALBA_ERROR;
+	}
+
+	if (idx >= points->GetNumberOfPoints())
+	{
+		albaErrorMacro("RemovePoint: point index out of range");
+		return ALBA_ERROR;
+	}
+
+	// Squeeze the array
+	vtkDataArray *pointdata = points->GetData();
+	double *pnttuple = new double[pointdata->GetNumberOfComponents()];
+
+	for (int i = idx; i < pointdata->GetNumberOfTuples() - 1; i++)
+	{
+		pointdata->GetTuple(i + 1, pnttuple);
+		pointdata->SetTuple(i, pnttuple);
+	}
+	delete[] pnttuple;
+
+	pointdata->Resize(pointdata->GetNumberOfTuples() - 1);
+
+	points->Modified();
+	polydata->Modified();
+
+	return ALBA_OK;
+}

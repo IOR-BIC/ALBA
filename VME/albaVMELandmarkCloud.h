@@ -20,18 +20,20 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaVMEPointSet.h"
+#include "albaVMEGeneric.h"
 #include "albaEvent.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class albaVMELandmark;
+class albaVMEOutputPointSet;
 class mmaMaterial;
+class vtkPolyData;
 
 /** albaVMELandmarkCloud - this class represents a cloud of landmarks
 albaVMELandmarkRigidCloud is a concrete VME object storing a cloud of landmarks whose
-relative position can change along time. This VME is a specialization of albaVMEPointSet
+relative position can change along time. The points are stored as polydata of vertices,
 with all time frames having the same number of points (thus each point exist in all 
 time frames) and a table of names assigned to each point. This table are
 stored into the VME TagArray with tag names "LM_NAME". This class also supports time-varying
@@ -46,7 +48,7 @@ The landmarks vme communicate with this cloud through parent variable, and some 
 on  albaLogicWithManagers
 @sa
 albaVME albaPointSet albaLandmark albaLogicWithManagers.*/
-class ALBA_EXPORT albaVMELandmarkCloud : public albaVMEPointSet
+class ALBA_EXPORT albaVMELandmarkCloud : public albaVMEGeneric
 {
 public:
   //------------------------------------------------------------------------------
@@ -58,8 +60,22 @@ public:
   ALBA_ID_DEC(CLOUD_SPHERE_RES);      ///< Event rised when the sphere resolution is changed with a SetSphereResolution()
   /** @} */
 
-  albaTypeMacro(albaVMELandmarkCloud, albaVMEPointSet);
-  
+  albaTypeMacro(albaVMELandmarkCloud, albaVMEGeneric);
+
+  /** return the right type of output */
+  virtual albaVMEOutput *GetOutput();
+
+  /** return the output casted to albaVMEOutputPointSet */
+  albaVMEOutputPointSet *GetPointSetOutput() {return (albaVMEOutputPointSet *)GetOutput();}
+
+  /** Get the coordinates of the idx-th point at the time stamp t (the current time if t<0).
+  Return ALBA_ERROR if the index is out of range. */
+  virtual int GetPoint(int idx, double &x,double &y,double &z,albaTimeStamp t=-1);
+  virtual int GetPoint(int idx, double xyz[3],albaTimeStamp t=-1);
+
+  /** Return the number of points stored at the time stamp t (the current time if t<0) */
+  virtual int GetNumberOfPoints(albaTimeStamp t=-1);
+
   /** Precess events coming from other objects */ 
   virtual void OnEvent(albaEventBase *alba_event);
 
@@ -231,8 +247,15 @@ protected:
   /** Internal function to instantiate a VMEItem with for timestamp t containing a new polydata*/
   virtual vtkPolyData *NewPolyData(albaTimeStamp t);
 
-  /** Internal functions redefined to support cells*/
+  /** Return the polydata stored at the time stamp t, NULL if it does not exist */
+  vtkPolyData *GetPolyData(albaTimeStamp t);
+
+  /** Internal functions to append, set, get and remove the points of the given polydata.
+  AppendPoint also adds the visibility scalar and the vertex cell of the new points. */
   virtual int AppendPoint(vtkPolyData *polydata,double x,double y,double z,int num=1);
+  int SetPoint(vtkPolyData *polydata,int idx, double x,double y,double z);
+  int GetPoint(vtkPolyData *polydata,int idx,double xyz[3]);
+  virtual int RemovePoint(vtkPolyData *polydata,int idx);
 
   /** Internal functions used to set/get visibility for point idx of the given polydata*/
   virtual int SetLandmarkVisibility(vtkPolyData *polydata,int idx,bool a);
@@ -261,17 +284,7 @@ private:
   albaVMELandmarkCloud(const albaVMELandmarkCloud&); // Not implemented
   void operator=(const albaVMELandmarkCloud&); // Not implemented
 
-  /** private to avoid calling by external classes */
+  /** private to avoid calling by external classes, only polydata without lines and polygons are accepted */
   virtual int SetData(vtkDataSet *data, albaTimeStamp t, int mode=ALBA_VME_COPY_DATA);
-
-  /**
-  Hidden parents' functions: the root node does not have items,
-  its a simple grouping node, and does not have a parent...*/
-  virtual int AppendPoint(double x,double y,double z,albaTimeStamp t) {albaErrorMacro("Unsupported function, use AppendLandmark instead!"); return -1;}
-  int SetPoint(int idx,double x,double y,double z,albaTimeStamp t) {albaErrorMacro("Unsupported function, use SetLandmark instead!"); return ALBA_ERROR;}
-  virtual int RemovePoint(int idx,albaTimeStamp t=-1) {albaErrorMacro("Unsupported function, use RemoveLandmark instead!"); return ALBA_ERROR;};
-  virtual void SetNumberOfPoints(int num,albaTimeStamp t=-1) {albaErrorMacro("Unsupported function, use SetNumberOfLandmarks instead!");};
-  virtual int RemovePoint(vtkPolyData *polydata,int idx) {return this->Superclass::RemovePoint(polydata,idx);}
-	
 };
 #endif
