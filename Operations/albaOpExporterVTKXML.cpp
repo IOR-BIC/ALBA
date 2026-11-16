@@ -121,8 +121,10 @@ void albaOpExporterVTKXML::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case wxOK:
-        ExportVTK();
-        OpStop(OP_RUN_OK);
+        if (ExportVTK() == ALBA_OK)
+          OpStop(OP_RUN_OK);
+        else
+          OpStop(OP_RUN_CANCEL);
       break;
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
@@ -142,22 +144,26 @@ int albaOpExporterVTKXML::ExportVTK()
 
 	if (m_File.IsEmpty())
 	{
-		albaString wildc;
+		albaString ext;
 		if (inputData->IsA("vtkRectilinearGrid"))
-			wildc = "vtk xml Data (*.vtr)|*.vtr";
+			ext = "vtr";
 		else if (inputData->IsA("vtkPolyData"))
-			wildc = "vtk xml Data (*.vtp)|*.vtp";
+			ext = "vtp";
 		else if (inputData->IsA("vtkImageData"))
-			wildc = "vtk xml Data (*.vti)|*.vti";		
+			ext = "vti";
 		else if (inputData->IsA("vtkUnstructuredGrid"))
-			wildc = "vtk xml Data (*.vtu)|*.vtu";
+			ext = "vtu";
 		else if (inputData->IsA("vtkStructuredGrid"))
-			wildc = "vtk xml Data (*.vts)|*.vts";
+			ext = "vts";
+
+		albaString wildc;
+		wildc << "vtk xml Data (*." << ext << ")|*." << ext;
 
 		m_FileDir = albaGetLastUserFolder();
-		m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
+		m_File = m_FileDir + "\\" + m_Input->GetName();
+		m_File << "." << ext;
 
-		m_File = albaGetSaveFile(m_FileDir, wildc, _("Choose VTK file"));
+		m_File = albaGetSaveFile(m_File, wildc, _("Choose VTK file"));
 
 		if (m_File.IsEmpty())
 			return ALBA_ERROR;
