@@ -153,7 +153,6 @@
 #include "albaOpLabelExtractor.h"
 #include "albaOpInteractionDebugger.h"
 #include "albaOpOpenExternalFile.h"
-#include "albaOpScalarToSurface.h"
 #include "albaOpVOIDensityEditor.h"
 #include "albaOpValidateTree.h"
 #include "albaOpVolumeUnion.h"
@@ -324,7 +323,6 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpGarbageCollectMSFDir(), "TMP to test");
 	logic->Plug(new albaOpInteractionDebugger(), "TMP to test");
 	logic->Plug(new albaOpOpenExternalFile(), "TMP to test");
-	logic->Plug(new albaOpScalarToSurface(), "TMP to test");
 	logic->Plug(new albaOpVOIDensityEditor(), "TMP to test");
 	logic->Plug(new albaOpValidateTree(), "TMP to test");
 	logic->Plug(new albaOpVolumeUnion(), "TMP to test");

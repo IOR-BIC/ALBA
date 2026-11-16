@@ -18,7 +18,6 @@ SET(PROJECT_SRCS
 	albaVMESurfaceTest.h albaVMESurfaceTest.cpp
 	albaVMEGroupTest.h albaVMEGroupTest.cpp
 	albaVMEGizmoTest.h albaVMEGizmoTest.cpp
-	albaVMEScalarTest.h albaVMEScalarTest.cpp
 	albaVMEPolylineTest.h albaVMEPolylineTest.cpp
 	albaVMEPolylineSplineTest.h albaVMEPolylineSplineTest.cpp
 	albaVMEMeshTest.h albaVMEMeshTest.cpp
@@ -33,12 +32,9 @@ SET(PROJECT_SRCS
 	albaVMEInfoTextTest.h albaVMEInfoTextTest.cpp
 	mmaMeterTest.h mmaMeterTest.cpp
 	albaVMEOutputMeterTest.h albaVMEOutputMeterTest.cpp
-	albaVMEPointSetTest.h albaVMEPointSetTest.cpp
-	albaVMEVectorTest.h albaVMEVectorTest.cpp
 	albaVMEOutputPolylineTest.h albaVMEOutputPolylineTest.cpp
 	albaVMEOutputSurfaceTest.h albaVMEOutputSurfaceTest.cpp
 	albaVMEOutputPointSetTest.h albaVMEOutputPointSetTest.cpp
-	albaVMEOutputScalarTest.h albaVMEOutputScalarTest.cpp
 	albaVMEOutputLandmarkCloudTest.h albaVMEOutputLandmarkCloudTest.cpp
 	albaVMEOutputMeshTest.h albaVMEOutputMeshTest.cpp
 	albaVMEOutputImageTest.h albaVMEOutputImageTest.cpp
@@ -47,7 +43,6 @@ SET(PROJECT_SRCS
 	albaMatrixInterpolatorTest.h albaMatrixInterpolatorTest.cpp
 	albaVMEGenericTest.h albaVMEGenericTest.cpp
 	albaVMEOutputVTKTest.h albaVMEOutputVTKTest.cpp
-	albaScalarVectorTest.h albaScalarVectorTest.cpp
 	albaVMEGenericAbstractTest.h albaVMEGenericAbstractTest.cpp
 	albaVMEItemTest.h albaVMEItemTest.cpp
 	albaVMERefSysTest.h albaVMERefSysTest.cpp
@@ -60,7 +55,6 @@ SET(PROJECT_SRCS
 	albaVMEOutputPolylineEditorTest.h albaVMEOutputPolylineEditorTest.cpp
 	albaVMESurfaceEditorTest.h albaVMESurfaceEditorTest.cpp
 	albaVMEPolylineEditorTest.h albaVMEPolylineEditorTest.cpp
-	albaVMEMapsTest.h albaVMEMapsTest.cpp
 	albaVMEPointCloudTest.cpp albaVMEPointCloudTest.h
 	albaVMEOutputWrappedMeterTest.h albaVMEOutputWrappedMeterTest.cpp
 	albaVMEPolylineGraphTest.h albaVMEPolylineGraphTest.cpp

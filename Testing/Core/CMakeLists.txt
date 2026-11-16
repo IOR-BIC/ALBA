@@ -21,7 +21,6 @@ SET(PROJECT_SRCS
 	albaOpTest.h albaOpTest.cpp
 	albaEventIOTest.h albaEventIOTest.cpp
 	albaUserTest.h albaUserTest.cpp
-	albaTimeMapScalarTest.h albaTimeMapScalarTest.cpp
 	albaOpSelectTest.h albaOpSelectTest.cpp
 	albaVMERootTest.h albaVMERootTest.cpp
 	albaOpCutTest.h albaOpCutTest.cpp

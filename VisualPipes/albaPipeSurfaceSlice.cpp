@@ -58,7 +58,6 @@
 #include "vtkALBAExtendedGlyph3D.h"
 #include "vtkSphereSource.h"
 #include "vtkLookupTable.h"
-#include "albaVMEMaps.h"
 
 #include <vector>
 
@@ -370,13 +369,6 @@ void albaPipeSurfaceSlice::OnEvent(albaEventBase *alba_event)
 						
 			UpdateScalars();
 
-			if (m_Vme->IsA("albaVMEMaps"))
-			{
-				mmaMaterial *material = (mmaMaterial *)((albaVMEMaps *)m_Vme)->GetMaterial();
-				if (material)
-					SetLookupTable(material->m_ColorLut);
-			}
-		
 			GetLogicManager()->CameraUpdate();
 		}
 		break;

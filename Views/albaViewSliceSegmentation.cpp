@@ -43,7 +43,6 @@ const bool DEBUG_MODE = false;
 #include "albaRWI.h"
 #include "albaSceneGraph.h"
 #include "albaAttachCamera.h"
-#include "albaPipePolylineGraphEditor.h"
 #include "albaTransform.h"
 #include "albaAbsMatrixPipe.h"
 

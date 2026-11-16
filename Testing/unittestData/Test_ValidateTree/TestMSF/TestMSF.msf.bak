@@ -2629,7 +2629,7 @@
         </DataVector>
         <MatrixVector NumberOfItems="0"/>
       </Node>
-      <Node Crypting="0" Id="11" Name="test_vector_GRFtimevar" Type="albaVMEVector">
+      <Node Crypting="0" Id="11" Name="test_vector_GRFtimevar" Type="albaVMEPolyline">
         <Attributes NumberOfItems="3">
           <Item NumberOfTags="0" Type="albaTagArray">
             <Name>LHDL</Name>
@@ -2764,7 +2764,7 @@
             </TItem>
             <TItem Mult="1" Name="L0000_resource_ALBA_VmeType" Type="STR">
               <TItem>
-                <TC>albaVMEVector</TC>
+                <TC>albaVMEPolyline</TC>
               </TItem>
             </TItem>
             <TItem Mult="1" Name="L0000_resource_data" Type="STR">

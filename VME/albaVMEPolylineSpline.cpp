@@ -46,7 +46,6 @@
 #include <assert.h>
 #include "albaVMELandmarkCloud.h"
 #include "albaVME.h"
-#include "albaVMEPointSet.h"
 #include "albaVMEOutput.h"
 
 //-------------------------------------------------------------------------

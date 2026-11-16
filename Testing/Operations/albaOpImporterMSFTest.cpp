@@ -93,7 +93,7 @@ void albaOpImporterMSFTest::TestImporter()
       CPPUNIT_ASSERT(child->IsA("albaVMESurface"));
       break;
     case 3:
-      CPPUNIT_ASSERT(child->IsA("albaVMEVector"));
+      CPPUNIT_ASSERT(child->IsA("albaVMEPolyline"));
       break;
     case 4:
       CPPUNIT_ASSERT(child->IsA("albaVMELandmarkCloud"));
@@ -145,7 +145,7 @@ void albaOpImporterMSFTest::TestImporter()
 			int n=child->GetNumberOfChildren();
 			CPPUNIT_ASSERT(n==0);
 		}
-    if(child->IsA("albaVMEVector"))
+    if(child->IsA("albaVMEPolyline"))
     {
       //check the name of the node
       name = child->GetName();
@@ -229,7 +229,7 @@ void albaOpImporterMSFTest::TestImporterMAF()
 			CPPUNIT_ASSERT(child->IsA("albaVMESurface"));
 			break;
 		case 3:
-			CPPUNIT_ASSERT(child->IsA("albaVMEVector"));
+			CPPUNIT_ASSERT(child->IsA("albaVMEPolyline"));
 			break;
 		case 4:
 			CPPUNIT_ASSERT(child->IsA("albaVMELandmarkCloud"));
@@ -281,7 +281,7 @@ void albaOpImporterMSFTest::TestImporterMAF()
 			int n = child->GetNumberOfChildren();
 			CPPUNIT_ASSERT(n == 0);
 		}
-		if (child->IsA("albaVMEVector"))
+		if (child->IsA("albaVMEPolyline"))
 		{
 			//check the name of the node
 			name = child->GetName();
@@ -381,7 +381,7 @@ void albaOpImporterMSFTest::TestImporterCompareALBA_MAF()
 			CPPUNIT_ASSERT(child->IsA("albaVMESurface") && childMaf->IsA("albaVMESurface"));
 			break;
 		case 3:
-			CPPUNIT_ASSERT(child->IsA("albaVMEVector") && childMaf->IsA("albaVMEVector"));
+			CPPUNIT_ASSERT(child->IsA("albaVMEPolyline") && childMaf->IsA("albaVMEPolyline"));
 			break;
 		case 4:
 			CPPUNIT_ASSERT(child->IsA("albaVMELandmarkCloud") && childMaf->IsA("albaVMELandmarkCloud"));
@@ -440,7 +440,7 @@ void albaOpImporterMSFTest::TestImporterZMSF()
       CPPUNIT_ASSERT(child->IsA("albaVMESurface"));
       break;
     case 3:
-      CPPUNIT_ASSERT(child->IsA("albaVMEVector"));
+      CPPUNIT_ASSERT(child->IsA("albaVMEPolyline"));
       break;
     case 4:
       CPPUNIT_ASSERT(child->IsA("albaVMELandmarkCloud"));
@@ -481,7 +481,7 @@ void albaOpImporterMSFTest::TestImporterZMSF()
       int n=child->GetNumberOfChildren();
       CPPUNIT_ASSERT(n==0);
     }
-    if(child->IsA("albaVMEVector"))
+    if(child->IsA("albaVMEPolyline"))
     {
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_vector_GRFtimevar") == 0);

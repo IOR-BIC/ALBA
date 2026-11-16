@@ -20,6 +20,13 @@
 #include "albaColor.h"
 #include "vtkLookupTable.h"
 
+/** indexes of some LUT presets */
+enum LUT_PRESETS_IDS
+{
+	LUT_PRESET_RED_TO_GREEN = 21,
+	LUT_PRESET_GREEN_TO_RED = 22,
+};
+
 /** number of the available LUT presets */
 extern const int lutPresetNum;
 

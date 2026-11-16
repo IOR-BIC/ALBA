@@ -26,7 +26,6 @@
 #include "albaPipeCompoundVolumeIsosurfaceTest.h"
 #include "albaPipeCompoundVolumeTest.h"
 #include "albaPipeCompoundVolumefixedScalarsTest.h"
-#include "albaPipeDensityDistanceTest.h"
 #include "albaPipeFactoryVMETest.h"
 #include "albaPipeGizmoTest.h"
 #include "albaPipeImage3DTest.h"
@@ -35,11 +34,9 @@
 #include "albaPipeMeshSliceTest.h"
 #include "albaPipeMeshTest.h"
 #include "albaPipeMeterTest.h"
-#include "albaPipePointSetTest.h"
 #include "albaPipePolylineGraphEditorTest.h"
 #include "albaPipePolylineSliceTest.h"
 #include "albaPipePolylineTest.h"
-#include "albaPipeScalarTest.h"
 #include "albaPipeSliceTest.h"
 #include "albaPipeSurfaceEditorTest.h"
 #include "albaPipeSurfaceSliceTest.h"
@@ -55,7 +52,6 @@
 #include "albaPipeVectorFieldSliceTest.h"
 #include "albaPipeVectorFieldSurfaceTest.h"
 #include "albaPipeVectorFieldTest.h"
-#include "albaPipeVectorTest.h"
 #include "albaPipeVolumeProjectedTest.h"
 #include "albaPipeVolumeArbSliceTest.h"
 #include "albaPipeVolumeOrthoSliceTest.h"
@@ -126,14 +122,11 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipePointCloudTest::suite());
 	runner.addTest(albaPipeGizmoTest::suite()); 
 	runner.addTest(albaPipeSurfaceTexturedTest::suite()); 
-	runner.addTest(albaPipeScalarTest::suite());
 	runner.addTest(albaPipeImage3DTest::suite());
 	runner.addTest(albaPipeIsosurfaceTest::suite());
-	runner.addTest(albaPipePointSetTest::suite());
 	runner.addTest(albaPipeFactoryVMETest::suite());
 	runner.addTest(albaPipePolylineTest::suite()); 
 	runner.addTest(albaPipeLandmarkCloudTest::suite()); 
-	runner.addTest(albaPipeVectorTest::suite()); 
 	runner.addTest(albaPipeMeterTest::suite());
 	runner.addTest(albaPipeVolumeProjectedTest::suite());
 	runner.addTest(albaPipePolylineGraphEditorTest::suite()); 
@@ -145,7 +138,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeSliceTest::suite()); 
 	runner.addTest(albaPipePolylineSliceTest::suite()); 
 	runner.addTest(albaPipeWrappedMeterTest::suite()); 
-	runner.addTest(albaPipeDensityDistanceTest::suite());
 	runner.addTest(albaPipeCompoundTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());
 	runner.addTest(albaPipeCompoundVolumeTest::suite());

@@ -53,7 +53,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUILutSwatch.h"
 #include "albaPipeMesh.h"
 #include "albaPipeMeshSlice.h"
-#include "albaPipePolylineGraphEditor.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"

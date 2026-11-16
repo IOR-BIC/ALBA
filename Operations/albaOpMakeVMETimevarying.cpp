@@ -33,10 +33,8 @@
 #include "vtkDataSet.h"
 #include "albaVMEImage.h"
 #include "albaVMEMesh.h"
-#include "albaVMEPointSet.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEPolyLine.h"
-#include "albaVMEVector.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolume.h"
 #include "albaVMEVolumeGray.h"
@@ -422,7 +420,7 @@ void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
       case ID_OK_BUTTON:
       {
         Execute();
-        OpStop(OP_RUN_OK);
+        OpStop(m_VMETimevarying ? OP_RUN_OK : OP_RUN_CANCEL);
         break;
       }
       //------------------------------------------//
@@ -449,6 +447,21 @@ void albaOpMakeVMETimevarying::OpStop(int result)
 {
   HideGui();
 	albaEventMacro(albaEvent(this,result));
+}
+//----------------------------------------------------------------------------
+bool albaOpMakeVMETimevarying::DialogAcceptVME(albaVME* node)
+{
+	//only the VME types that Execute can convert to a timevarying VME
+	const char *types[] = { "albaVMEImage", "albaVMEMesh", "albaVMELandmarkCloud", "albaVMESurface", "albaVMESurfaceParametric", "albaVMEVolumeGray", "albaVMEVolumeRGB", "albaVMEPolyline" };
+
+	if (node == NULL)
+		return false;
+
+	for (int i = 0; i < sizeof(types) / sizeof(types[0]); i++)
+		if (strcmp(node->GetTypeName(), types[i]) == 0)
+			return true;
+
+	return false;
 }
 //----------------------------------------------------------------------------
 bool albaOpMakeVMETimevarying::AcceptVME(albaVME * vme)
@@ -571,21 +584,9 @@ void albaOpMakeVMETimevarying::Execute()
     albaNEW(tmpVME);
     m_VMETimevarying = tmpVME;
   }
-  else if(m_VMEsType.Equals(albaString(_("albaVMEPointSet"))))
-  {
-    albaVMEPointSet * tmpVME;
-    albaNEW(tmpVME);
-    m_VMETimevarying = tmpVME;
-  }
   else if(m_VMEsType.Equals(albaString(_("albaVMELandmarkCloud"))))//OK
   {
     albaVMELandmarkCloud * tmpVME;
-    albaNEW(tmpVME);
-    m_VMETimevarying = tmpVME;
-  }
-  else if(m_VMEsType.Equals(albaString(_("albaVMEVector"))))
-  {
-    albaVMEVector * tmpVME;
     albaNEW(tmpVME);
     m_VMETimevarying = tmpVME;
   }
@@ -620,12 +621,8 @@ void albaOpMakeVMETimevarying::Execute()
     albaNEW(tmpVME);
     m_VMETimevarying = tmpVME;
   }
-  else //Default
-  {
-    albaVMEGeneric * tmpVME;
-    albaNEW(tmpVME);
-    m_VMETimevarying = tmpVME;
-  }
+  else //Unsupported type, not accepted by DialogAcceptVME
+    return;
 
   std::vector<VmeTimevaryingItem *>::iterator AddedVMEsIter;
 

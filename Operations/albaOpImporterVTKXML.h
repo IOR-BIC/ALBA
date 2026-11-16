@@ -27,13 +27,12 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaString;
-class albaVMEPointSet;
+class albaVMEPointCloud;
 class albaVMEPolylineGraph;
 class albaVMESurface;
 class albaVMEVolumeGray;
 class albaVMEVolumeRGB;
 class albaVMEMesh;
-class albaVMEGeneric;
 
 class vtkCallbackCommand;
 
@@ -73,13 +72,12 @@ protected:
 
   albaString m_FileDir;
 
-  albaVMEPointSet *m_VmePointSet;
+  albaVMEPointCloud *m_VmePointCloud;
   albaVMEPolylineGraph *m_VmePolyLine;
   albaVMESurface *m_VmeSurface;
   albaVMEVolumeGray *m_VmeGrayVol;
   albaVMEVolumeRGB *m_VmeRGBVol;
   albaVMEMesh *m_VmeMesh;  
-  albaVMEGeneric *m_VmeGeneric;
 
   vtkCallbackCommand *m_EventRouter;
 
