@@ -39,6 +39,14 @@ class albaVMELandmarkCloudTest : public albaTest
     CPPUNIT_TEST( SetSphereResolutionTest );
 		CPPUNIT_TEST(DeepCopyTest);
 		CPPUNIT_TEST(CopyTreeTest);
+		CPPUNIT_TEST(SetDataPointsOnlyTest);
+		CPPUNIT_TEST(CreateLMStructureFromDataVectorTest);
+		CPPUNIT_TEST(PolydataPointsTest);
+		CPPUNIT_TEST(TimeVaryingPointsTest);
+		CPPUNIT_TEST(RemoveLandmarkPointsTest);
+		CPPUNIT_TEST(ShowLandmarkTest);
+		CPPUNIT_TEST(OutputPointSetTest);
+		CPPUNIT_TEST(StoreRestoreTest);
 		CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -53,6 +61,16 @@ class albaVMELandmarkCloudTest : public albaTest
     void SetSphereResolutionTest();
 		void DeepCopyTest();
 		void CopyTreeTest();
+
+		// Tests of the behavior inherited from albaVMEPointSet
+		void SetDataPointsOnlyTest();
+		void CreateLMStructureFromDataVectorTest();
+		void PolydataPointsTest();
+		void TimeVaryingPointsTest();
+		void RemoveLandmarkPointsTest();
+		void ShowLandmarkTest();
+		void OutputPointSetTest();
+		void StoreRestoreTest();
 
 };
 
