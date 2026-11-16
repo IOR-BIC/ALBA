@@ -85,7 +85,6 @@ void albaOpExporterPLY::OpRun()
 	m_Gui->Label("");
 	m_Gui->Divider(true);
 	m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,m_File != "");
 	
 	m_Gui->Divider();
 
@@ -130,7 +129,7 @@ int albaOpExporterPLY::ExportSurface()
 		m_FileDir = albaGetLastUserFolder();
 		m_File = m_FileDir + "\\" + m_Input->GetName() + ".ply";
 
-		m_File = albaGetSaveFile(m_FileDir, "Polygon File Format (*.ply)|*.ply", _("Choose PLY file"));
+		m_File = albaGetSaveFile(m_File, "Polygon File Format (*.ply)|*.ply", _("Choose PLY file"));
 
 		if (m_File.IsEmpty())
 			return ALBA_ERROR;

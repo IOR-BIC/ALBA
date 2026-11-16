@@ -92,8 +92,6 @@ void albaOpExporterMetaImage::OpRun()
 	m_Gui->OkCancel();
 	m_Gui->Label("");
 
-	m_Gui->Enable(wxOK, !m_File.IsEmpty());
-
 	ShowGui();
 }
 //----------------------------------------------------------------------------
@@ -129,9 +127,9 @@ int albaOpExporterMetaImage::ExportMetaImage()
 	if (m_File.IsEmpty())
 	{
 		m_FileDir = albaGetLastUserFolder();
-		m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
+		m_File = m_FileDir + "\\" + m_Input->GetName() + ".mha";
 
-		m_File = albaGetSaveFile(m_FileDir, "vtk Data (*.vtk)|*.vtk", _("Choose VTK file"));
+		m_File = albaGetSaveFile(m_File, "Meta Data Image (*.mha)|*.mha", _("Choose MHA file"));
 
 		if (m_File.IsEmpty())
 			return ALBA_ERROR;

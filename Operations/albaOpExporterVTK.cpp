@@ -158,7 +158,7 @@ int albaOpExporterVTK::ExportVTK()
 		m_FileDir = albaGetLastUserFolder();
 		m_File = m_FileDir + "\\" + m_Input->GetName() + ".vtk";
 
-		m_File = albaGetSaveFile(m_FileDir, "vtk Data (*.vtk)|*.vtk", _("Choose VTK file"));
+		m_File = albaGetSaveFile(m_File, "vtk Data (*.vtk)|*.vtk", _("Choose VTK file"));
 
 		if(m_File.IsEmpty())
 			return ALBA_ERROR;
