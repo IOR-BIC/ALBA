@@ -25,7 +25,6 @@ SET(PROJECT_SRCS
   albaTagArray.cpp  				albaTagArray.h
   albaTagItem.cpp  				albaTagItem.h
   albaTimeMap.h
-  albaTimeMapScalar.h
   albaUser.cpp  					albaUser.h
   albaVME.cpp  					albaVME.h
   albaVMEManager.cpp  			albaVMEManager.h

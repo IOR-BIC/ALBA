@@ -29,7 +29,6 @@
 #include "albaVMESurface.h"
 #include "albaVMEPolyline.h"
 #include "albaVMEImage.h"
-#include "albaVMEScalar.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkImageData.h"
@@ -137,7 +136,6 @@ void albaOpFilterVolumeTest::TestAccept()
 {
   albaSmartPointer<albaVMEVolumeGray> volume;
   albaSmartPointer<albaVMESurface> surface;
-  albaSmartPointer<albaVMEScalar> scalar;
   albaSmartPointer<albaVMEPolyline> polyline;
   albaSmartPointer<albaVMEImage> image;
 
@@ -148,9 +146,6 @@ void albaOpFilterVolumeTest::TestAccept()
   TEST_RESULT;
 
   m_Result = !op->Accept(surface);
-  TEST_RESULT;
-
-  m_Result = !op->Accept(scalar);
   TEST_RESULT;
 
   m_Result = !op->Accept(polyline);

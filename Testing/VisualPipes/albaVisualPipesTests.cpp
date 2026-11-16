@@ -38,7 +38,6 @@
 #include "albaPipePolylineGraphEditorTest.h"
 #include "albaPipePolylineSliceTest.h"
 #include "albaPipePolylineTest.h"
-#include "albaPipeScalarTest.h"
 #include "albaPipeSliceTest.h"
 #include "albaPipeSurfaceEditorTest.h"
 #include "albaPipeSurfaceSliceTest.h"
@@ -125,7 +124,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipePointCloudTest::suite());
 	runner.addTest(albaPipeGizmoTest::suite()); 
 	runner.addTest(albaPipeSurfaceTexturedTest::suite()); 
-	runner.addTest(albaPipeScalarTest::suite());
 	runner.addTest(albaPipeImage3DTest::suite());
 	runner.addTest(albaPipeIsosurfaceTest::suite());
 	runner.addTest(albaPipePointSetTest::suite());

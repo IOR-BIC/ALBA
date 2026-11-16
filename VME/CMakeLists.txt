@@ -12,7 +12,6 @@ SET(PROJECT_SRCS
   albaMatrixInterpolator.cpp  				albaMatrixInterpolator.h
   albaMatrixVector.cpp  					albaMatrixVector.h
   albaPipeFactoryVME.cpp  					albaPipeFactoryVME.h
-  albaScalarVector.cpp  					albaScalarVector.h
   albaVMEExternalData.cpp  					albaVMEExternalData.h
   albaVMEFactory.cpp  						albaVMEFactory.h
   albaVMEGenericAbstract.cpp  				albaVMEGenericAbstract.h
@@ -20,8 +19,6 @@ SET(PROJECT_SRCS
   albaVMEItem.cpp  							albaVMEItem.h
   albaVMEInfoText.cpp  						albaVMEInfoText.h
   albaMSFImporter.cpp  						albaMSFImporter.h
-  albaVMEOutputScalar.cpp  					albaVMEOutputScalar.h
-  albaVMEScalar.cpp  						albaVMEScalar.h
   ###############
   albaVMELabeledVolume.cpp  				albaVMELabeledVolume.h
 

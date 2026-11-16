@@ -187,7 +187,6 @@ ENDIF (ALBA_USE_GDCM)
     albaParabolicMeshToLinearMeshFilter.cxx	albaParabolicMeshToLinearMeshFilter.h
     albaOpImporterMesh.cpp				albaOpImporterMesh.h
     albaOpExporterMesh.cpp				albaOpExporterMesh.h
-    albaOpScalarToSurface.cpp			albaOpScalarToSurface.h
 	
 	albaOpExporterLandmark.cpp		albaOpExporterLandmark.h
     albaOpClassicICPRegistration.cpp	albaOpClassicICPRegistration.h

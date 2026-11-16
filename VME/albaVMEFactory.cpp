@@ -39,7 +39,6 @@
 #include "albaVMEPolylineSpline.h"
 #include "albaVMERefSys.h"
 #include "albaVMERoot.h"
-#include "albaVMEScalar.h"
 #include "albaVMESurface.h"
 #include "albaVMESurfaceParametric.h"
 #include "albaVMEVector.h"
@@ -128,7 +127,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMELandmarkCloud,"Landmark Cloud");
   albaPlugVMEMacro(albaVMEPointSet,"Point set");
   albaPlugVMEMacro(albaVMERefSys,"Reference System");
-  albaPlugVMEMacro(albaVMEScalar,"Scalar");
   albaPlugVMEMacro(albaVMEVector,"Vector");
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
   albaPlugVMEMacro(albaVMEPolylineGraph,"Polyline Graph");

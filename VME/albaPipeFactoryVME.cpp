@@ -42,7 +42,6 @@
 #include "albaPipeImage3D.h"
 #include "albaPipeVector.h"
 #include "albaPipeMesh.h"
-#include "albaPipeScalar.h"
 #include "albaPipeVolumeMIP.h"
 #include "albaPipeVolumeDRR.h"
 #include "albaPipeVolumeVR.h"
@@ -128,7 +127,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeIsosurface,"Pipe for render vtk volumes as a iso-surface");
   albaPlugPipeMacro(albaPipeImage3D,"Pipe for render images");
 	albaPlugPipeMacro(albaPipeMesh,"Pipe for render Mesh");
-  albaPlugPipeMacro(albaPipeScalar,"Pipe for render scalar data");
   albaPlugPipeMacro(albaPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
   albaPlugPipeMacro(albaPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
   albaPlugPipeMacro(albaPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");

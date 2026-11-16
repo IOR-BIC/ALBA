@@ -12,7 +12,6 @@ SET(PROJECT_SRCS
   albaPipeMesh.cpp 							albaPipeMesh.h
   albaPipeSurface.cpp 						albaPipeSurface.h
   albaPipeRefSys.cpp 						albaPipeRefSys.h
-  albaPipeScalar.cpp  						albaPipeScalar.h
   albaPipeVolumeMIP.cpp  					albaPipeVolumeMIP.h
   albaPipeTrajectories.cpp  					albaPipeTrajectories.h
   albaPipeVolumeDRR.cpp  					albaPipeVolumeDRR.h
