@@ -78,7 +78,6 @@ void albaOpExporterSTL::OpRun()
 	m_Gui->Label("");
   m_Gui->Divider(1);
 	m_Gui->OkCancel();
-  m_Gui->Enable(wxOK,m_File != "");
 	
 
 	ShowGui();
@@ -91,7 +90,7 @@ void albaOpExporterSTL::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case wxOK:
-        if(ExportSurface())
+        if(ExportSurface() == ALBA_OK)
           OpStop(OP_RUN_OK);
         else
           OpStop(OP_RUN_CANCEL);
@@ -120,7 +119,7 @@ int albaOpExporterSTL::ExportSurface()
 		m_FileDir = albaGetLastUserFolder();
 		m_File = m_FileDir + "\\" + m_Input->GetName() + ".stl";
 
-		m_File = albaGetSaveFile(m_FileDir, "Stereo Litography (*.stl)|*.stl", _("Choose STL file"));
+		m_File = albaGetSaveFile(m_File, "Stereo Litography (*.stl)|*.stl", _("Choose STL file"));
 
 		if (m_File.IsEmpty())
 			return ALBA_ERROR;
