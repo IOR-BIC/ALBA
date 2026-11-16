@@ -50,6 +50,7 @@
 #include "albaOpMeshScarlarsImporter.h"
 #include "albaOpImporterDicFile.h"
 #include "albaOpImporterPointCloud.h"
+#include "albaOpImporterPolyline.h"
 #include "albaOpImporterScancoImageIO.h"
 
 //EXPORTERS
@@ -71,6 +72,7 @@
 #include "albaOpExporterMetaImage.h"
 #include "albaOpExporterAbaqusFile.h"
 #include "albaOpExporterPointCloud.h"
+#include "albaOpExporterPolyline.h"
 #include "albaOpExporterDicFile.h"
 
 // OPERATIONS
@@ -208,6 +210,7 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 
 	logic->Plug(new albaOpImporterDicFile("Digital Image Correlation (DIC)"));
 	logic->Plug(new albaOpImporterPointCloud("Generic Point Cloud"));
+	logic->Plug(new albaOpImporterPolyline("Polyline"));
 	logic->Plug(new albaOpImporterScancoImageIO("Scanco IO")); 
 	logic->Plug(new albaOpImporterExternalFile());
 
@@ -229,6 +232,7 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpExporterImages("Images"));
 	logic->Plug(new albaOpExporterLandmark("Landmark"));
 	logic->Plug(new albaOpExporterPointCloud());
+	logic->Plug(new albaOpExporterPolyline());
 	logic->Plug(new albaOpExporterMeters());
 	logic->Plug(new albaOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
 	logic->Plug(new albaOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");

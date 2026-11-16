@@ -148,6 +148,7 @@ IF (ALBA_USE_VTK)
 	
 	albaOpImporterDicFile.cpp		albaOpImporterDicFile.h
 	albaOpImporterPointCloud.cpp	albaOpImporterPointCloud.h
+	albaOpImporterPolyline.cpp	albaOpImporterPolyline.h
 	albaOpCreateProsthesis.cpp		albaOpCreateProsthesis.h
 	albaOpImportProsthesisToDB.cpp  albaOpImportProsthesisToDB.h
 	
@@ -197,6 +198,7 @@ ENDIF (ALBA_USE_GDCM)
 	albaOpFilterImage.cpp			albaOpFilterImage.h
 	albaOpCreateAveragePlane.cpp	albaOpCreateAveragePlane.h
 	albaOpExporterPointCloud.cpp	albaOpExporterPointCloud.h
+	albaOpExporterPolyline.cpp	albaOpExporterPolyline.h
 	albaOpImageCalibration.cpp 		albaOpImageCalibration.h
   )
 

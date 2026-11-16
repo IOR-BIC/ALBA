@@ -121,6 +121,8 @@
 #include "albaVMEMeshAnsysTextExporterTest.h"
 #include "albaVMEMeshAnsysTextImporterTest.h"
 #include "albaOpImporterPointCloudTest.h"
+#include "albaOpImporterPolylineTest.h"
+#include "albaOpExporterPolylineTest.h"
 #include "albaOpFilterImageTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
@@ -291,6 +293,8 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpExporterAbaqusFileTest::suite());
 	runner.addTest(albaOpImporterDICFileTest::suite());
 	runner.addTest(albaOpImporterPointCloudTest::suite());
+	runner.addTest(albaOpImporterPolylineTest::suite());
+	runner.addTest(albaOpExporterPolylineTest::suite());
 	runner.addTest(albaOpFilterImageTest::suite()); 
 	runner.addTest(albaOpExporterDicFileTest::suite()); /* */
 	
