@@ -36,7 +36,7 @@
 #include "albaVMELandmark.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEMeter.h"
-#include "albaVMEPointSet.h"
+#include "albaVMEPointCloud.h"
 #include "albaVMERefSys.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolumeGray.h"
@@ -392,7 +392,7 @@ albaVME *mmuMSF1xDocument::CreateVMEInstance(albaString &name)
   }
   else if (name == "mflVMEPointSet")
   {
-    return albaVMEPointSet::New();
+    return albaVMEPointCloud::New();
   }
   else if (name == "mflVMERefSys")
   {

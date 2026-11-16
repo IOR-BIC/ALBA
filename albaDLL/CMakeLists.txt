@@ -476,8 +476,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaPipeLandmarkCloud.h
     ../VME/albaPipeMeter.cpp
     ../VME/albaPipeMeter.h
-    ../VME/albaPipePointSet.cpp
-    ../VME/albaPipePointSet.h
     ../VME/albaPipePolyline.cpp
     ../VME/albaPipePolyline.h
     ../VME/albaPipeSurface.cpp
@@ -730,7 +728,6 @@ IF (ALBA_USE_VTK)
   ../VisualPipes/albaPipeIsosurface.cpp  					../VisualPipes/albaPipeIsosurface.h
   ../VisualPipes/albaPipeLandmarkCloud.cpp  				../VisualPipes/albaPipeLandmarkCloud.h
   ../VisualPipes/albaPipeMeter.cpp  						../VisualPipes/albaPipeMeter.h
-  ../VisualPipes/albaPipePointSet.cpp  						../VisualPipes/albaPipePointSet.h
   ../VisualPipes/albaPipePolyline.cpp  						../VisualPipes/albaPipePolyline.h
   ../VisualPipes/albaPipeSurfaceTextured.cpp  				../VisualPipes/albaPipeSurfaceTextured.h
   ../VisualPipes/albaPipeVector.cpp  						../VisualPipes/albaPipeVector.h

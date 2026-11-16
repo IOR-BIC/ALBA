@@ -55,7 +55,6 @@ IF (ALBA_USE_VTK)
   albaPipeIsosurface.cpp  					albaPipeIsosurface.h
   albaPipeLandmarkCloud.cpp  				albaPipeLandmarkCloud.h
   albaPipeMeter.cpp  						albaPipeMeter.h
-  albaPipePointSet.cpp  						albaPipePointSet.h
   albaPipePolyline.cpp  						albaPipePolyline.h
   albaPipeSurfaceTextured.cpp  				albaPipeSurfaceTextured.h
   albaPipeVector.cpp  						albaPipeVector.h

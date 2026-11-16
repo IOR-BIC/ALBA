@@ -28,7 +28,7 @@
 #include "albaVMEPolylineGraph.h"
 
 #include "albaVMEImage.h"
-#include "albaVMEPointSet.h"
+#include "albaVMEPointCloud.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
@@ -63,7 +63,7 @@ albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) : albaOpImport
   m_Canundo = true;
   m_Input   = NULL;
 
-  m_VmePointSet = NULL;
+  m_VmePointCloud = NULL;
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
   m_VmeGrayVol  = NULL;
@@ -83,7 +83,7 @@ albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) : albaOpImport
 //----------------------------------------------------------------------------
 albaOpImporterVTKXML::~albaOpImporterVTKXML()
 {
-  albaDEL(m_VmePointSet);
+  albaDEL(m_VmePointCloud);
   albaDEL(m_VmePolyLine);
   albaDEL(m_VmeSurface);
   albaDEL(m_VmeGrayVol);
@@ -139,7 +139,7 @@ int albaOpImporterVTKXML::ImportFile()
 {
   vtkDataSet *data = NULL;
 
-  albaNEW(m_VmePointSet);
+  albaNEW(m_VmePointCloud);
   albaNEW(m_VmePolyLine);
   albaNEW(m_VmeSurface);
   albaNEW(m_VmeGrayVol);
@@ -193,9 +193,9 @@ int albaOpImporterVTKXML::ImportFile()
 			{
 				m_Output = m_VmeSurface;
 			}
-			else if (m_VmePointSet->SetDataByDetaching(data, 0) == ALBA_OK)
+			else if (m_VmePointCloud->SetDataByDetaching(data, 0) == ALBA_OK)
 			{
-				m_Output = m_VmePointSet;
+				m_Output = m_VmePointCloud;
 			}
 		}
 	}

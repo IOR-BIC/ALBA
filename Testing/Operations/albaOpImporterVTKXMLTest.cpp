@@ -31,7 +31,7 @@
 #include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
 #include "albaVMEMesh.h"
-#include "albaVMEPointSet.h"
+#include "albaVMEPointCloud.h"
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
@@ -202,7 +202,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKMesh()
   albaDEL(importer);
 }
 //-----------------------------------------------------------
-void albaOpImporterVTKXMLTest::TestImportVTKPointSet() 
+void albaOpImporterVTKXMLTest::TestImportVTKPointCloud() 
 //-----------------------------------------------------------
 {
   albaOpImporterVTKXML *importer=new albaOpImporterVTKXML();
@@ -211,7 +211,7 @@ void albaOpImporterVTKXMLTest::TestImportVTKPointSet()
   fileName<<"/VTKXML/pointset.vtp";
   importer->SetFileName(fileName);
   importer->ImportFile();
-  albaVMEPointSet *pointset=albaVMEPointSet::SafeDownCast(importer->GetOutput());
+  albaVMEPointCloud *pointset=albaVMEPointCloud::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(pointset!=NULL);
   pointset->Modified();

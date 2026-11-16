@@ -27,7 +27,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaString;
-class albaVMEPointSet;
+class albaVMEPointCloud;
 class albaVMEPolylineGraph;
 class albaVMESurface;
 class albaVMEVolumeGray;
@@ -72,7 +72,7 @@ protected:
 
   albaString m_FileDir;
 
-  albaVMEPointSet *m_VmePointSet;
+  albaVMEPointCloud *m_VmePointCloud;
   albaVMEPolylineGraph *m_VmePolyLine;
   albaVMESurface *m_VmeSurface;
   albaVMEVolumeGray *m_VmeGrayVol;

@@ -33,7 +33,6 @@
 #include "vtkDataSet.h"
 #include "albaVMEImage.h"
 #include "albaVMEMesh.h"
-#include "albaVMEPointSet.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEPolyLine.h"
 #include "albaVMEVector.h"
@@ -456,7 +455,7 @@ void albaOpMakeVMETimevarying::OpStop(int result)
 bool albaOpMakeVMETimevarying::DialogAcceptVME(albaVME* node)
 {
 	//only the VME types that Execute can convert to a timevarying VME
-	const char *types[] = { "albaVMEImage", "albaVMEMesh", "albaVMEPointSet", "albaVMELandmarkCloud", "albaVMEVector", "albaVMESurface", "albaVMESurfaceParametric", "albaVMEVolumeGray", "albaVMEVolumeRGB", "albaVMEPolyline" };
+	const char *types[] = { "albaVMEImage", "albaVMEMesh", "albaVMELandmarkCloud", "albaVMEVector", "albaVMESurface", "albaVMESurfaceParametric", "albaVMEVolumeGray", "albaVMEVolumeRGB", "albaVMEPolyline" };
 
 	if (node == NULL)
 		return false;
@@ -585,12 +584,6 @@ void albaOpMakeVMETimevarying::Execute()
   else if(m_VMEsType.Equals(albaString(_("albaVMEMesh"))))//OK
   {
     albaVMEMesh * tmpVME;
-    albaNEW(tmpVME);
-    m_VMETimevarying = tmpVME;
-  }
-  else if(m_VMEsType.Equals(albaString(_("albaVMEPointSet"))))
-  {
-    albaVMEPointSet * tmpVME;
     albaNEW(tmpVME);
     m_VMETimevarying = tmpVME;
   }

@@ -35,7 +35,7 @@ public:
   CPPUNIT_TEST( TestImportVTKVolumeRG );
   CPPUNIT_TEST( TestImportVTKSurface );
   CPPUNIT_TEST( TestImportVTKMesh );
-  CPPUNIT_TEST( TestImportVTKPointSet );
+  CPPUNIT_TEST( TestImportVTKPointCloud );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -47,7 +47,7 @@ protected:
   void TestImportVTKVolumeRG();
   void TestImportVTKSurface();
   void TestImportVTKMesh();
-  void TestImportVTKPointSet();
+  void TestImportVTKPointCloud();
 };
 
 #endif

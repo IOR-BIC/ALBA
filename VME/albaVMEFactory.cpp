@@ -33,7 +33,6 @@
 #include "albaVMEMeter.h"
 #include "albaVMEInfoText.h"
 #include "albaVMEMesh.h"
-#include "albaVMEPointSet.h"
 #include "albaVMEPolyline.h"
 #include "albaVMEPolylineSpline.h"
 #include "albaVMERefSys.h"
@@ -123,7 +122,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEInfoText,"Text");
   albaPlugVMEMacro(albaVMELandmark,"Landmark");
   albaPlugVMEMacro(albaVMELandmarkCloud,"Landmark Cloud");
-  albaPlugVMEMacro(albaVMEPointSet,"Point set");
   albaPlugVMEMacro(albaVMERefSys,"Reference System");
   albaPlugVMEMacro(albaVMEVector,"Vector");
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
