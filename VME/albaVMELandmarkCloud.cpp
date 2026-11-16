@@ -1018,14 +1018,16 @@ int albaVMELandmarkCloud::AddChild(albaVME *node)
 			albaMatrix *mat = albaMatrix::SafeDownCast(it->second);
 			albaTimeStamp timeStamp = mat->GetTimeStamp();
 
-			double pos[3], rPos[3];
-			lm->GetOutput()->GetPose(pos, rPos);
-			
+			//use the landmark position at this time stamp, not the current one
+			double pos[3] = { mat->GetElement(0, 3), mat->GetElement(1, 3), mat->GetElement(2, 3) };
+
 			//On reparent the node is not showed, so visibility is set to false.
 			SetLandmarkToPolydata(m_NumberOfLandmarks - 1, pos[0], pos[1], pos[2], false, timeStamp);
 		}
 		GetOutput()->Update();
 	}
+
+	return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
