@@ -31,23 +31,28 @@ class albaVMEOutputPointSet;
 class mmaMaterial;
 class vtkPolyData;
 
-/** albaVMELandmarkCloud - this class represents a cloud of landmarks
-albaVMELandmarkRigidCloud is a concrete VME object storing a cloud of landmarks whose
-relative position can change along time. The points are stored as polydata of vertices,
-with all time frames having the same number of points (thus each point exist in all 
-time frames) and a table of names assigned to each point. This table are
-stored into the VME TagArray with tag names "LM_NAME". This class also supports time-varying
-visibility for landmarks: for any timestamp can be defined a visibility. Notice that for each
-time stamp for which is defined a position is also defined a default visibility (see SetDefaultVisibility)
-and vice versa for each time stamp for which a visibility is defined also a position is automatically set
-eventually copying the position returned by interpolator if not. This is due to internal data 
-representation, and defines that time base for positions and visibility attributes are the same.
-The cloud manage also children VMELandmarks, when a landmark is reparent to the cloud the landmark is added
-to the out but is visibility is set to false. On the show operations the visibility of the landmark is changed.
-The landmarks vme communicate with this cloud through parent variable, and some special management is defined 
-on  albaLogicWithManagers
+/** albaVMELandmarkCloud - this class represents a cloud of landmarks whose relative
+position can change along time.
+
+The landmarks are the albaVMELandmark children of the cloud: they are the master data and
+hold names, positions and visibility along time. They are the only data stored in the MSF.
+
+The cloud also keeps a polydata of points for each time stamp, used for rendering. It is
+derived from the children and it is not stored: it is updated when a landmark is added,
+moved, removed, shown or hidden. All the time stamps have one point for each landmark, in
+the same order of the landmarks. Each point has:
+- a visibility scalar, used by the visual pipe to draw the landmark or not
+- a vertex cell, only if the point is visible
+When a landmark is reparented to the cloud its point is added as not visible: it becomes
+visible with ShowLandmark, if the landmark is visible at that time stamp.
+
+Positions returned by GetLandmark are absolute, the ones of the polydata (GetPoint,
+GetLandmarkPosition) are relative to the cloud.
+
+The landmarks communicate with the cloud through the parent pointer, and some special
+management is defined in albaLogicWithManagers.
 @sa
-albaVME albaPointSet albaLandmark albaLogicWithManagers.*/
+albaVME albaVMELandmark albaLogicWithManagers.*/
 class ALBA_EXPORT albaVMELandmarkCloud : public albaVMEGeneric
 {
 public:
@@ -115,11 +120,12 @@ public:
 	int SetLandmark(const char *name, double x, double y, double z, albaTimeStamp t = 0) { return this->SetLandmark(this->GetLandmarkIndex(name), x, y, z, t); }
 	int SetLandmark(albaVMELandmark *lm, double x, double y, double z, albaTimeStamp t = 0) { return this->SetLandmark(this->GetLandmarkIndex(lm), x, y, z, t); }
 
-	//int SetLandmarkForTimeFrame(int idx,double x,double y,double z,unsigned long tid,albaTimeStamp t);
-  int GetLandmark(int idx, double &x,double &y,double &z,albaTimeStamp t=0);
-  int GetLandmark(const char *name, double &x,double &y,double &z,albaTimeStamp t=0) {return this->GetLandmark(this->GetLandmarkIndex(name),x,y,z,t);} 
-  int GetLandmark(int idx, double xyz[3],albaTimeStamp t=0);
-  int GetLandmark(const char *name, double xyz[3],albaTimeStamp t=0) {return this->GetLandmark(this->GetLandmarkIndex(name), xyz,t);}
+  /** Get the absolute position of a landmark at the time stamp t (the current time if t<0).
+  Return ALBA_ERROR if the landmark does not exist. */
+  int GetLandmark(int idx, double &x,double &y,double &z,albaTimeStamp t=-1);
+  int GetLandmark(const char *name, double &x,double &y,double &z,albaTimeStamp t=-1) {return this->GetLandmark(this->GetLandmarkIndex(name),x,y,z,t);}
+  int GetLandmark(int idx, double xyz[3],albaTimeStamp t=-1);
+  int GetLandmark(const char *name, double xyz[3],albaTimeStamp t=-1) {return this->GetLandmark(this->GetLandmarkIndex(name), xyz,t);}
 
   /** Find the index of a landmark given its name.*/
   albaVMELandmark *GetLandmark(const char *name);
@@ -134,7 +140,7 @@ public:
 	int GetLandmarkIndex(const char *name);
 
 
-  /** Return the position of the landmark number 'idx' at the timestamp t.*/
+  /** Return the position, relative to the cloud, of the landmark number 'idx' at the timestamp t.*/
   void GetLandmarkPosition(int idx, double pos[3], albaTimeStamp t=-1);
 
   
@@ -142,10 +148,8 @@ public:
   BEWARE: landmark is removed from all the VME-items*/
   int RemoveLandmark(int idx);
 
-  /** Set/Get the number of landmarks stored in this VME. BEWARE the number of
-  landmarks is the same for all the time frames (items)*/
+  /** Get the number of landmarks of the cloud, it is the same for all the time frames */
   int GetNumberOfLandmarks();
-  virtual int SetNumberOfLandmarks(int num);
 
   /** Set/get the name for idx-th landmark. Return null in case no landmark name 
   was defined for that index.*/
@@ -165,7 +169,7 @@ public:
   virtual int GetSphereResolution();
 
   
-  enum LANDMAERK_CLOUD_WIDGET_ID
+  enum LANDMARK_CLOUD_WIDGET_ID
   {
     ID_LM_RADIUS = Superclass::ID_LAST,
     ID_LM_SPHERE_RESOLUTION,
@@ -184,19 +188,9 @@ public:
   virtual bool GetLandmarkVisibility(int idx,albaTimeStamp t=0);
   bool GetLandmarkVisibility(const char *name,albaTimeStamp t=0) {return this->GetLandmarkVisibility(this->GetLandmarkIndex(name),t);}
 
-  /**
-  Set/Get the default visibility attribute. When default visibility is set to true, the creation 
-  of a new time frame (by setting a landmark position for a given timestamp), makes all the other
-  landmarks to be also visible at the same timestamp. If false, the visibility of the others landmark is
-  automatically set to false for the other landmarks. Notice currently this is not a persistent attribute.*/
-  void SetDefaultVisibility(int v) {this->m_DefaultVisibility = v; this->Modified();}
+  /** Get the default visibility of the points added to a new time frame */
   int GetDefaultVisibility() {return m_DefaultVisibility;}
-  void DefaultVisibilityOn() {SetDefaultVisibility(1);};
-  void DefaultVisibilityOff() {SetDefaultVisibility(0);};
 
-  /** Return number of visible landmarks*/
-  int GetNumberOfVisibleLandmarks(albaTimeStamp t=0);
-  
   /** Return true if it's a rigid landmark cloud (i.e. it has a single time frame)*/
   bool IsRigid();
 
@@ -215,23 +209,27 @@ public:
   /** Return true if the data associated with the VME is present and updated at the current time.*/
   virtual bool IsDataAvailable();
 
-	/** Remove a child node*/
+	/** Add a child node: a landmark is also added, as not shown, to the points of the cloud */
 	virtual int AddChild(albaVME *node);
 
-	/** Remove a child node*/
+	/** Remove a child node: a landmark is also removed from the points of the cloud */
 	virtual void RemoveChild(albaVME *node);
 
+	/** Show/hide a landmark in the cloud points: a shown landmark is drawn in the time stamps where it is visible */
 	void ShowLandmark(albaVMELandmark *lm, bool show);
-
 	void ShowAllLandmarks(bool show=true);
 
+	/** Return true if the landmark is shown */
 	bool IsLandmarkShow(albaVMELandmark *lm);
 
+	/** Return the number of shown landmarks */
 	int GetLandmarkShowNumber();
 
-	/** */
+	/** Create the landmark children from the points of the data vector, used by importers and to load old clouds.
+	Landmark names are read from the "LM_NAME_" tags of old clouds, otherwise they are named "Landmark <index>" */
 	void CreateLMStructureFromDataVector();
 
+	/** Return the landmark nearest to the given absolute position */
 	albaVMELandmark *GetNearestLandmark(double pos[3],  bool SerchOnlyVisible);
 
 protected:
@@ -250,6 +248,13 @@ protected:
   /** Return the polydata stored at the time stamp t, NULL if it does not exist */
   vtkPolyData *GetPolyData(albaTimeStamp t);
 
+  /** Return the polydata of all the time stamps */
+  std::vector<vtkPolyData *> GetAllPolyData();
+
+  /** Set the number of points of all the time stamps: new points are added in the origin, exceeding points are removed.
+  Called when a landmark is added, the landmark children are not changed. */
+  int SetNumberOfLandmarks(int num);
+
   /** Internal functions to append, set, get and remove the points of the given polydata.
   AppendPoint also adds the visibility scalar and the vertex cell of the new points. */
   virtual int AppendPoint(vtkPolyData *polydata,double x,double y,double z,int num=1);
@@ -267,13 +272,12 @@ protected:
   /** Internally used to create a new instance of the GUI.*/
   virtual albaGUI *CreateGui();
 
-  int m_SingleFile;
   int m_NumberOfLandmarks;
   int m_DefaultVisibility;
   int m_SphereResolution;
   double m_Radius;
 
-	int m_LanfmarkShowNumber;
+	int m_LandmarkShowNumber;
 	std::vector<albaVMELandmark *> m_LMChildren;
 	std::vector<bool> m_LMChildrenShow;
 	std::map<albaVMELandmark *, int> m_LMIndexesMap;

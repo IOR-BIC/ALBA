@@ -38,6 +38,9 @@
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
+#include "vtkIdList.h"
 #include "vtkSphereSource.h"
 //#include "albaMatrix.h"
 
@@ -186,24 +189,6 @@ void albaVMELandmarkCloudTest::RemoveLandmarkTest()
   //Check if landmark has been removed
   bool result = false;
   result = albaEquals(cloud->GetNumberOfChildren(),0);
-  CPPUNIT_ASSERT(result);
-}
-
-//----------------------------------------------------------------------------
-void albaVMELandmarkCloudTest::SetNumberOfLandmarksTest()
-//----------------------------------------------------------------------------
-{
-  int number;
-
-  albaSmartPointer<albaVMELandmarkCloud> cloud;
-  albaSmartPointer<albaVMELandmark> landmark;
-
-  cloud->SetNumberOfLandmarks(10);
-  number = cloud->GetNumberOfLandmarks();
-
-  //Check if landmark number is correct
-  bool result = false;
-  result = albaEquals(number,10);
   CPPUNIT_ASSERT(result);
 }
 
@@ -672,4 +657,125 @@ void albaVMELandmarkCloudTest::StoreRestoreTest()
 
 	root->CleanTree();
 	albaDEL(storage2);
+}
+
+//----------------------------------------------------------------------------
+void albaVMELandmarkCloudTest::RemoveLandmarkVisibilityTest()
+{
+	albaSmartPointer<albaVMELandmarkCloud> cloud;
+	cloud->TestModeOn();
+	cloud->AppendLandmark(1, 2, 3, "lm0");
+	cloud->AppendLandmark(4, 5, 6, "lm1");
+	cloud->AppendLandmark(7, 8, 9, "lm2");
+
+	// only the second landmark is shown
+	cloud->ShowLandmark(cloud->GetLandmark(1), true);
+
+	CPPUNIT_ASSERT(cloud->RemoveLandmark(0) == ALBA_OK);
+
+	// the shown landmark is now the first one: its visibility and its vertex cell must follow it
+	CPPUNIT_ASSERT(cloud->IsLandmarkShow(cloud->GetLandmark(0)));
+	CPPUNIT_ASSERT(!cloud->IsLandmarkShow(cloud->GetLandmark(1)));
+	CPPUNIT_ASSERT(cloud->GetLandmarkShowNumber() == 1);
+
+	cloud->GetOutput()->Update();
+	vtkPolyData *output = vtkPolyData::SafeDownCast(cloud->GetOutput()->GetVTKData());
+	CPPUNIT_ASSERT(output->GetNumberOfPoints() == 2);
+
+	vtkDataArray *visibility = output->GetPointData()->GetScalars();
+	CPPUNIT_ASSERT(visibility != NULL);
+	CPPUNIT_ASSERT(visibility->GetNumberOfTuples() == 2);
+	CPPUNIT_ASSERT(visibility->GetTuple1(0) == 1);
+	CPPUNIT_ASSERT(visibility->GetTuple1(1) == 0);
+
+	CPPUNIT_ASSERT(output->GetNumberOfVerts() == 1);
+	vtkALBASmartPointer<vtkIdList> cellPoints;
+	output->GetVerts()->GetCellAtId(0, cellPoints);
+	CPPUNIT_ASSERT(cellPoints->GetNumberOfIds() == 1);
+	CPPUNIT_ASSERT(cellPoints->GetId(0) == 0);
+}
+
+//----------------------------------------------------------------------------
+void albaVMELandmarkCloudTest::GetLandmarkTest()
+{
+	albaSmartPointer<albaVMELandmarkCloud> cloud;
+	cloud->TestModeOn();
+	cloud->AppendLandmark(1, 2, 3, "lm0");
+	cloud->SetLandmark(0, 10, 20, 30, 1.0);
+
+	double xyz[3], x, y, z;
+
+	// return values
+	CPPUNIT_ASSERT(cloud->GetLandmark(0, xyz) == ALBA_OK);
+	CPPUNIT_ASSERT(cloud->GetLandmark(0, x, y, z) == ALBA_OK);
+	CPPUNIT_ASSERT(cloud->GetLandmark(5, xyz) == ALBA_ERROR);
+	CPPUNIT_ASSERT(cloud->GetLandmark(-1, x, y, z) == ALBA_ERROR);
+
+	// without time stamp the current time is used
+	cloud->GetLandmark(0, xyz);
+	CPPUNIT_ASSERT(PointEquals(xyz, 1, 2, 3));
+
+	// the time stamp parameter is used
+	CPPUNIT_ASSERT(cloud->GetLandmark(0, xyz, 1.0) == ALBA_OK);
+	CPPUNIT_ASSERT(PointEquals(xyz, 10, 20, 30));
+	CPPUNIT_ASSERT(cloud->GetLandmark(0, xyz, 0.0) == ALBA_OK);
+	CPPUNIT_ASSERT(PointEquals(xyz, 1, 2, 3));
+	CPPUNIT_ASSERT(cloud->GetLandmark("lm0", x, y, z, 1.0) == ALBA_OK);
+	CPPUNIT_ASSERT(albaEquals(x, 10) && albaEquals(y, 20) && albaEquals(z, 30));
+}
+
+//----------------------------------------------------------------------------
+void albaVMELandmarkCloudTest::InvalidLandmarkTest()
+{
+	albaSmartPointer<albaVMELandmarkCloud> cloud;
+	cloud->TestModeOn();
+	cloud->AppendLandmark(1, 2, 3, "lm0");
+
+	// a landmark that does not belong to the cloud
+	albaSmartPointer<albaVMELandmark> other;
+	other->SetName("other");
+
+	cloud->ShowLandmark(other, true);
+	CPPUNIT_ASSERT(cloud->GetLandmarkShowNumber() == 0);
+	CPPUNIT_ASSERT(!cloud->IsLandmarkShow(other));
+	CPPUNIT_ASSERT(cloud->GetLandmarkIndex(other) == -1);
+
+	// the visibility of a missing landmark is false
+	CPPUNIT_ASSERT(!cloud->GetLandmarkVisibility(5));
+	CPPUNIT_ASSERT(cloud->RemoveLandmark(5) == ALBA_ERROR);
+	CPPUNIT_ASSERT(cloud->GetNumberOfLandmarks() == 1);
+}
+
+//----------------------------------------------------------------------------
+void albaVMELandmarkCloudTest::RemoveShownLandmarkTest()
+{
+	albaSmartPointer<albaVMELandmarkCloud> cloud;
+	cloud->TestModeOn();
+	cloud->AppendLandmark(1, 2, 3, "lm0");
+	cloud->AppendLandmark(4, 5, 6, "lm1");
+	cloud->AppendLandmark(7, 8, 9, "lm2");
+	cloud->ShowAllLandmarks(true);
+	CPPUNIT_ASSERT(cloud->GetLandmarkShowNumber() == 3);
+
+	// removing a shown landmark updates the number of shown landmarks and the vertex cells
+	CPPUNIT_ASSERT(cloud->RemoveLandmark(1) == ALBA_OK);
+	CPPUNIT_ASSERT(cloud->GetLandmarkShowNumber() == 2);
+
+	cloud->GetOutput()->Update();
+	vtkPolyData *output = vtkPolyData::SafeDownCast(cloud->GetOutput()->GetVTKData());
+	CPPUNIT_ASSERT(output->GetNumberOfPoints() == 2);
+	CPPUNIT_ASSERT(output->GetNumberOfVerts() == 2);
+
+	vtkDataArray *visibility = output->GetPointData()->GetScalars();
+	CPPUNIT_ASSERT(visibility->GetNumberOfTuples() == 2);
+	CPPUNIT_ASSERT(visibility->GetTuple1(0) == 1 && visibility->GetTuple1(1) == 1);
+
+	// every cell refers to an existing point
+	for (int i = 0; i < 2; i++)
+	{
+		vtkALBASmartPointer<vtkIdList> cellPoints;
+		output->GetVerts()->GetCellAtId(i, cellPoints);
+		CPPUNIT_ASSERT(cellPoints->GetNumberOfIds() == 1);
+		CPPUNIT_ASSERT(cellPoints->GetId(0) == i);
+	}
 }

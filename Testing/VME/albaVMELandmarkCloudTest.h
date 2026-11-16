@@ -33,7 +33,6 @@ class albaVMELandmarkCloudTest : public albaTest
     CPPUNIT_TEST( SetLandmarkTest );
     CPPUNIT_TEST( FindLandmarkIndexTest );
     CPPUNIT_TEST( RemoveLandmarkTest );
-    CPPUNIT_TEST( SetNumberOfLandmarksTest );
     CPPUNIT_TEST( GetLandmarkNameTest );
     CPPUNIT_TEST( SetRadiusTest );
     CPPUNIT_TEST( SetSphereResolutionTest );
@@ -47,6 +46,10 @@ class albaVMELandmarkCloudTest : public albaTest
 		CPPUNIT_TEST(ShowLandmarkTest);
 		CPPUNIT_TEST(OutputPointSetTest);
 		CPPUNIT_TEST(StoreRestoreTest);
+		CPPUNIT_TEST(RemoveLandmarkVisibilityTest);
+		CPPUNIT_TEST(GetLandmarkTest);
+		CPPUNIT_TEST(InvalidLandmarkTest);
+		CPPUNIT_TEST(RemoveShownLandmarkTest);
 		CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -55,7 +58,6 @@ class albaVMELandmarkCloudTest : public albaTest
     void SetLandmarkTest();
     void FindLandmarkIndexTest();
     void RemoveLandmarkTest();
-    void SetNumberOfLandmarksTest();
     void GetLandmarkNameTest();
     void SetRadiusTest();
     void SetSphereResolutionTest();
@@ -71,6 +73,10 @@ class albaVMELandmarkCloudTest : public albaTest
 		void ShowLandmarkTest();
 		void OutputPointSetTest();
 		void StoreRestoreTest();
+		void RemoveLandmarkVisibilityTest();
+		void GetLandmarkTest();
+		void InvalidLandmarkTest();
+		void RemoveShownLandmarkTest();
 
 };
 

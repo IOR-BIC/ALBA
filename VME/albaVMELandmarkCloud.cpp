@@ -28,8 +28,6 @@ const bool DEBUG_MODE = false;
 #include "mmuIdFactory.h"
 #include "albaDataVector.h"
 #include "albaDataPipe.h"
-#include "albaMatrixInterpolator.h"
-#include "albaDataPipeInterpolator.h"
 #include "albaTagArray.h"
 #include "albaVMELandmark.h"
 #include "albaMatrixVector.h"
@@ -37,27 +35,22 @@ const bool DEBUG_MODE = false;
 #include "albaVMEOutputLandmarkCloud.h"
 #include "albaGUI.h"
 #include "mmaMaterial.h"
-#include "albaVMEIterator.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPolyData.h"
+#include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkBitArray.h"
 #include "vtkPointData.h"
-#include "vtkTransform.h"
 #include "vtkDataSet.h"
-#include "vtkDataSetWriter.h"
 #include "vtkCellArrayIterator.h"
 
 #include <vector>
 
-#include <albaGUIBusyInfo.h>
-#include "albaProgressBarHelper.h"
 #include "vtkMath.h"
 //------------------------------------------------------------------------------
 // local defines
 
-#define ALBA_LMC_ITEMS_NUMBER_TAG "MFL_VME_NUMBER_OF_LANDMARKS"
 #define ALBA_LMC_VERSION "ALBA_LMC_VERSION"
 
 //------------------------------------------------------------------------------
@@ -82,8 +75,7 @@ albaVMELandmarkCloud::albaVMELandmarkCloud()
   m_Radius            = 1.0;
   m_SphereResolution  = 15;
 
-  m_SingleFile = 0;
-	m_LanfmarkShowNumber = 0;
+	m_LandmarkShowNumber = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -175,7 +167,6 @@ int albaVMELandmarkCloud::InternalInitialize()
 		//Setting state tag to Open Cloud in order to maintain backward compatibility
 		GetTagArray()->SetTag(albaTagItem("MFL_VME_LANDMARK_CLOUD_STATE", open_cloud_state));
 
-    GetMaterial();
 
 
     return ALBA_OK;
@@ -188,9 +179,6 @@ int albaVMELandmarkCloud::SetData(vtkDataSet *data, albaTimeStamp t, int mode)
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
-
-	//Remove all landmarks
-	//SetNumberOfLandmarks(0);
 
   // only polydata made of points are accepted
   if (polydata != NULL && polydata->GetPolys()->GetNumberOfCells() == 0 && polydata->GetStrips()->GetNumberOfCells() == 0 && polydata->GetLines()->GetNumberOfCells() == 0)
@@ -224,62 +212,45 @@ int albaVMELandmarkCloud::GetNumberOfLandmarks()
 //-------------------------------------------------------------------------
 int albaVMELandmarkCloud::SetNumberOfLandmarks(int num)
 {  
-  int oldnum = GetNumberOfLandmarks();
+	int oldnum = GetNumberOfLandmarks();
 
-  if (num == oldnum)
-    return ALBA_OK;
-  else if (num > oldnum)
-  {
-		//if(m_DataVector->GetNumberOfItems()==0)
-		//	NewPolyData(m_CurrentTime);
+	if (num == oldnum)
+		return ALBA_OK;
 
-    // add a new point and a new vertex to all items
-    for (albaDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
-    {
-      albaVMEItemVTK *item = albaVMEItemVTK::SafeDownCast(it->second);
-      assert(item);
-      vtkPolyData *polydata = vtkPolyData::SafeDownCast(item->GetData());
-
-      int idx = -1;
-      // set the right number of points for each item
-      // In case an item with a different number of points is added, 
-      // this function is called to flat the number of points in all 
-      // the time frames. See AddItem()
-      int itemoldnum = polydata->GetNumberOfPoints();
-
-      idx = AppendPoint(polydata,0,0,0,num-oldnum);
-      if (idx != (num-1) && (itemoldnum != num))
-      {
-        albaErrorMacro("AppendLandmark: unexpected number of landmarks for timestamp t = "<<item->GetTimeStamp());
-        return ALBA_ERROR;
-      }  
-    }
-
-  }
-	else //(num < oldnum) 
+	// all the time stamps must have the same number of points
+	std::vector<vtkPolyData *> polydataList = GetAllPolyData();
+	for (int i = 0; i < polydataList.size(); i++)
 	{
-		// remove point from all items
-		for (albaDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
-		{
-			albaVMEItemVTK *item = albaVMEItemVTK::SafeDownCast(it->second);
-			assert(item);
-			vtkPolyData *polydata = vtkPolyData::SafeDownCast(item->GetData());
+		vtkPolyData *polydata = polydataList[i];
+		int itemoldnum = polydata->GetNumberOfPoints();
 
-			int itemoldnum = polydata->GetNumberOfPoints();
+		if (num > oldnum)
+		{
+			// add the new points, with their visibility, in the origin
+			int idx = AppendPoint(polydata, 0, 0, 0, num - oldnum);
+			if (idx != (num - 1) && (itemoldnum != num))
+			{
+				albaErrorMacro("SetNumberOfLandmarks: unexpected number of points in the cloud data");
+				return ALBA_ERROR;
+			}
+		}
+		else
+		{
+			// remove the last points
 			for (int j = itemoldnum - 1; j >= num; j--)
 			{
 				if (RemovePoint(polydata, j) != ALBA_OK)
 				{
-					albaErrorMacro("RemoveLandmark: unexpected number of landmarks for timestamp t=" << item->GetTimeStamp());
+					albaErrorMacro("SetNumberOfLandmarks: unexpected number of points in the cloud data");
 					return ALBA_ERROR;
 				}
 			}
 		}
 	}
 
-  m_NumberOfLandmarks = num;
+	m_NumberOfLandmarks = num;
 
-  return ALBA_OK;
+	return ALBA_OK;
 }
 
 
@@ -387,20 +358,16 @@ int albaVMELandmarkCloud::GetLandmarkIndex(const char *name)
 //-------------------------------------------------------------------------
 int albaVMELandmarkCloud::GetLandmark(int idx, double &x,double &y,double &z,albaTimeStamp t)
 {
-	double rPos[3];
 	albaVMELandmark *lm=GetLandmark(idx);
-	
+
 	if (lm == NULL)
-		return false;
+		return ALBA_ERROR;
 
-	lm->GetPoint(x, y, z);
-
-	return true;
+	return lm->GetPoint(x, y, z, t);
 }
 //-------------------------------------------------------------------------
 int albaVMELandmarkCloud::GetLandmark(int idx, double xyz[3],albaTimeStamp t)
 {
-	double rPos[3];
 	return GetLandmark(idx, xyz[0], xyz[1], xyz[2], t);
 }
 
@@ -629,26 +596,25 @@ albaVMELandmark * albaVMELandmarkCloud::GetNearestLandmark(double pos[3], bool S
 //-------------------------------------------------------------------------
 vtkPolyData *albaVMELandmarkCloud::NewPolyData(albaTimeStamp t)
 {
-  vtkALBASmartPointer<vtkPolyData> newPolydata;
-  vtkALBASmartPointer<vtkPoints> points;
-  newPolydata->SetPoints(points);
-  SetDataByReference(newPolydata,t);
+	// the polydata is stored by reference in the data vector, which keeps it alive
+	vtkALBASmartPointer<vtkPolyData> polydata;
+	vtkALBASmartPointer<vtkPoints> points;
+	polydata->SetPoints(points);
+	SetDataByReference(polydata,t);
 
-  vtkPolyData *polydata = newPolydata;
-  if (polydata)
-  {
-    // add cell array for visible points
-    vtkALBASmartPointer<vtkCellArray> cells;
-    polydata->SetVerts(cells);
+	// cell array for the visible points
+	vtkALBASmartPointer<vtkCellArray> cells;
+	polydata->SetVerts(cells);
 
-    // add scalars for visibility attribute
-    vtkPointData* pdata = polydata->GetPointData();
-    vtkALBASmartPointer<vtkBitArray> data;
-    pdata->SetScalars(data);
-    if(GetNumberOfLandmarks() >0)
-      AppendPoint(polydata,0,0,0,GetNumberOfLandmarks());
-  }
-  return polydata;
+	// scalars for the visibility attribute
+	vtkALBASmartPointer<vtkBitArray> visibility;
+	polydata->GetPointData()->SetScalars(visibility);
+
+	// all the time stamps have one point for each landmark
+	if (GetNumberOfLandmarks() > 0)
+		AppendPoint(polydata,0,0,0,GetNumberOfLandmarks());
+
+	return polydata;
 }
 
 //-------------------------------------------------------------------------
@@ -760,7 +726,7 @@ bool albaVMELandmarkCloud::GetLandmarkVisibility(int idx,albaTimeStamp t)
   else
   {
     albaErrorMacro("GetVisibility: problems retrieving "<<idx<<"th child landamark for getting its visibility!");
-    return ALBA_ERROR;
+    return false;
   }
 }
 
@@ -856,19 +822,6 @@ bool albaVMELandmarkCloud::GetLandmarkVisibility(vtkPolyData *polydata,int idx)
 }
 
 //-------------------------------------------------------------------------
-int albaVMELandmarkCloud::GetNumberOfVisibleLandmarks(albaTimeStamp t)
-{
-  int num = GetNumberOfLandmarks();
-  int numvis = 0;
-  for (int idx = 0; idx < num; idx++)
-  {
-    if (GetLandmarkVisibility(idx,t))
-      numvis++;
-  }
-  return numvis;
-}
-
-//-------------------------------------------------------------------------
 bool albaVMELandmarkCloud::IsRigid()
 {
   return m_DataVector->GetNumberOfItems() == 1;
@@ -896,7 +849,6 @@ albaGUI* albaVMELandmarkCloud::CreateGui()
   m_Gui->SetListener(this);
 
 	m_Gui->Divider();
-  GetRadius(); // Called to update m_Radius var from tag
 
   m_Gui->Double(ID_LM_RADIUS, "Radius", &m_Radius, 0.0,MAXDOUBLE,-1);
   m_Gui->Integer(ID_LM_SPHERE_RESOLUTION, "Resolution", &m_SphereResolution, 0.0,MAXINT);
@@ -1030,7 +982,6 @@ int albaVMELandmarkCloud::AddChild(albaVME *node)
 
 	if (albaVMELandmark *lm=albaVMELandmark::SafeDownCast(node))
 	{
-		double lmPos[3];
 		m_LMChildren.push_back(lm);
 		m_LMChildrenShow.push_back(false);
 		m_LMIndexesMap[lm] = m_NumberOfLandmarks;
@@ -1072,18 +1023,17 @@ void albaVMELandmarkCloud::RemoveChild(albaVME *node)
 		for (int i = pos + 1; i < m_NumberOfLandmarks; i++)
 			m_LMIndexesMap[m_LMChildren[i]]--;
 
+		if (m_LMChildrenShow[pos])
+			m_LandmarkShowNumber--;
+
 		m_LMChildren.erase(m_LMChildren.begin() + pos);
 		m_LMChildrenShow.erase(m_LMChildrenShow.begin() + pos);
 		m_LMIndexesMap.erase(lm);
 
-		// remove the point to all data items
-		for (albaDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
-		{
-			albaVMEItemVTK *item = albaVMEItemVTK::SafeDownCast(it->second);
-			assert(item);
-			vtkPolyData *polydata = vtkPolyData::SafeDownCast(item->GetData());
-			RemovePoint(polydata, pos);
-		}
+		// remove the point from all the time stamps
+		std::vector<vtkPolyData *> polydataList = GetAllPolyData();
+		for (int i = 0; i < polydataList.size(); i++)
+			RemovePoint(polydataList[i], pos);
 
 		GetOutput()->Update();
 
@@ -1098,6 +1048,7 @@ void albaVMELandmarkCloud::ShowLandmark(albaVMELandmark *lm, bool show)
 	if (idx < 0 || idx >= m_NumberOfLandmarks)
 	{
 		albaErrorMacro("Error: try to show a wrong landmark");
+		return;
 	}
 	
 	//No status change, return
@@ -1120,9 +1071,9 @@ void albaVMELandmarkCloud::ShowLandmark(albaVMELandmark *lm, bool show)
 	}
 
 	if (show)
-		m_LanfmarkShowNumber++;
+		m_LandmarkShowNumber++;
 	else
-		m_LanfmarkShowNumber--;
+		m_LandmarkShowNumber--;
 
 	GetOutput()->Update();
 }
@@ -1151,7 +1102,7 @@ bool albaVMELandmarkCloud::IsLandmarkShow(albaVMELandmark *lm)
 //----------------------------------------------------------------------------
 int albaVMELandmarkCloud::GetLandmarkShowNumber()
 {
-	return m_LanfmarkShowNumber;
+	return m_LandmarkShowNumber;
 }
 
 
@@ -1316,8 +1267,53 @@ int albaVMELandmarkCloud::RemovePoint(vtkPolyData *polydata, int idx)
 
 	pointdata->Resize(pointdata->GetNumberOfTuples() - 1);
 
+	// remove also the visibility of the point
+	vtkDataArray *visibility = polydata->GetPointData()->GetScalars();
+	if (visibility && idx < visibility->GetNumberOfTuples())
+	{
+		// vtkBitArray does not implement RemoveTuple: squeeze the array
+		for (int i = idx; i < visibility->GetNumberOfTuples() - 1; i++)
+			visibility->SetTuple1(i, visibility->GetTuple1(i + 1));
+
+		visibility->Resize(visibility->GetNumberOfTuples() - 1);
+	}
+
+	// rebuild the vertex cells without the removed point, the ids of the following points are decreased
+	vtkALBASmartPointer<vtkCellArray> newcells;
+	vtkSmartPointer<vtkCellArrayIterator> cellIterator = cells->NewIterator();
+	for (cellIterator->GoToFirstCell(); !cellIterator->IsDoneWithTraversal(); cellIterator->GoToNextCell())
+	{
+		vtkIdType npts;
+		const vtkIdType* pts;
+		cellIterator->GetCurrentCell(npts, pts);
+
+		if (npts == 1 && pts[0] != idx)
+		{
+			newcells->InsertNextCell(1);
+			newcells->InsertCellPoint(pts[0] > idx ? pts[0] - 1 : pts[0]);
+		}
+	}
+	polydata->SetVerts(newcells);
+	polydata->DeleteCells();
+
 	points->Modified();
 	polydata->Modified();
 
 	return ALBA_OK;
+}
+
+//-------------------------------------------------------------------------
+std::vector<vtkPolyData *> albaVMELandmarkCloud::GetAllPolyData()
+{
+	std::vector<vtkPolyData *> polydataList;
+
+	for (albaDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
+	{
+		albaVMEItemVTK *item = albaVMEItemVTK::SafeDownCast(it->second);
+		vtkPolyData *polydata = item ? vtkPolyData::SafeDownCast(item->GetData()) : NULL;
+		if (polydata)
+			polydataList.push_back(polydata);
+	}
+
+	return polydataList;
 }
