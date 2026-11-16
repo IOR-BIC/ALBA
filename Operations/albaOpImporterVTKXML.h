@@ -33,7 +33,6 @@ class albaVMESurface;
 class albaVMEVolumeGray;
 class albaVMEVolumeRGB;
 class albaVMEMesh;
-class albaVMEGeneric;
 
 class vtkCallbackCommand;
 
@@ -79,7 +78,6 @@ protected:
   albaVMEVolumeGray *m_VmeGrayVol;
   albaVMEVolumeRGB *m_VmeRGBVol;
   albaVMEMesh *m_VmeMesh;  
-  albaVMEGeneric *m_VmeGeneric;
 
   vtkCallbackCommand *m_EventRouter;
 

@@ -25,7 +25,6 @@
 #include "albaVMEFactory.h"
 
 #include "albaVMEExternalData.h"
-#include "albaVMEGeneric.h"
 #include "albaVMEGizmo.h"
 #include "albaVMEGroup.h"
 #include "albaVMEImage.h"
@@ -111,7 +110,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMERoot,"Root");
   albaPlugVMEMacro(albaVMEExternalData,"External data.");
   albaPlugVMEMacro(albaVMEGroup,"Group");
-  albaPlugVMEMacro(albaVMEGeneric,"Generic");
   albaPlugVMEMacro(albaVMEImage,"Image");
   albaPlugVMEMacro(albaVMEMesh,"Mesh");
   albaPlugVMEMacro(albaVMESurface,"Surface");

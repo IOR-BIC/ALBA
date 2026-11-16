@@ -27,7 +27,6 @@
 #include "albaEvent.h"
 
 #include "albaVME.h"
-#include "albaVMEGeneric.h"
 #include "albaVMEImage.h"
 //#include "albaVMEPointSet.h"
 #include "albaVMELandmarkCloud.h"
@@ -44,7 +43,6 @@
 #include "vtkDataSetReader.h"
 #include "vtkPolyDataReader.h"
 #include "vtkStructuredPointsReader.h"
-#include "vtkStructuredGridReader.h"
 #include "vtkRectilinearGridReader.h"
 #include "vtkUnstructuredGridReader.h"
 
@@ -72,7 +70,6 @@ albaOpImporterVTK::albaOpImporterVTK(const wxString &label) :albaOpImporterFile(
   m_VmeGrayVol  = NULL;
   m_VmeRGBVol  = NULL;
   m_VmeMesh     = NULL;
-  m_VmeGeneric  = NULL;
 
   m_FileDir = albaGetLastUserFolder();
 }
@@ -87,7 +84,6 @@ albaOpImporterVTK::~albaOpImporterVTK()
   albaDEL(m_VmeGrayVol);
   albaDEL(m_VmeRGBVol);
   albaDEL(m_VmeMesh);
-  albaDEL(m_VmeGeneric);
 }
 //----------------------------------------------------------------------------
 albaOp* albaOpImporterVTK::Copy()   
@@ -141,9 +137,6 @@ int albaOpImporterVTK::ImportFile()
 	case VTK_STRUCTURED_POINTS:
 		preader = vtkStructuredPointsReader::New();
 		break;
-	case VTK_STRUCTURED_GRID:
-		preader = vtkStructuredGridReader::New();
-		break;
 	case VTK_RECTILINEAR_GRID:
 		preader = vtkRectilinearGridReader::New();
 		break;
@@ -172,7 +165,6 @@ int albaOpImporterVTK::ImportFile()
 			albaNEW(m_VmeGrayVol);
 			albaNEW(m_VmeRGBVol);
 			albaNEW(m_VmeMesh);
-			albaNEW(m_VmeGeneric);
 
 			if(reader->ReadOutputType() == VTK_UNSTRUCTURED_GRID)
 				CheckAndAddIDsToUnstructuredGrid(vtkUnstructuredGrid::SafeDownCast(data));
@@ -209,28 +201,24 @@ int albaOpImporterVTK::ImportFile()
 			{
 				m_Output = m_VmeMesh;
 			}
-			else
+
+			//data not supported by any VME
+			if (m_Output)
 			{
-				m_VmeGeneric->SetDataByDetaching(data, 0);
-				m_Output = m_VmeGeneric;
+				albaTagItem tag_Nature;
+				tag_Nature.SetName("VME_NATURE");
+				tag_Nature.SetValue("NATURAL");
+				m_Output->GetTagArray()->SetTag(tag_Nature);
+				m_Output->ReparentTo(m_Input);
+				m_Output->SetName(name.ToAscii());
+
+				success = true;
 			}
-
-			albaTagItem tag_Nature;
-			tag_Nature.SetName("VME_NATURE");
-			tag_Nature.SetValue("NATURAL");
-			m_Output->GetTagArray()->SetTag(tag_Nature);
-			m_Output->ReparentTo(m_Input);
-			m_Output->SetName(name.ToAscii());
-
-			success = true;
 		}
 	}
 	vtkDEL(preader);
-	if (!success && !this->m_TestMode)
-	{
-		albaMessage(_("Error reading VTK file."), _("I/O Error"), wxICON_ERROR);
+	if (!success)
 		return ALBA_ERROR;
-	}
 	return ALBA_OK;
 }
 

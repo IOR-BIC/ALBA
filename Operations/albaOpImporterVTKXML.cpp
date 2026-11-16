@@ -27,7 +27,6 @@
 
 #include "albaVMEPolylineGraph.h"
 
-#include "albaVMEGeneric.h"
 #include "albaVMEImage.h"
 #include "albaVMEPointSet.h"
 #include "albaVMESurface.h"
@@ -41,13 +40,11 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkStructuredGrid.h"
 #include "vtkXMLPolyDataReader.h"
 #include "vtkXMLImageDataReader.h"
 #include "vtkXMLRectilinearGridReader.h"
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkCallbackCommand.h"
-#include "vtkXMLStructuredGridReader.h"
 #include "vtkALBASmartPointer.h"
 #include "wx/filename.h"
 
@@ -61,7 +58,7 @@ static int m_ErrorCount = 0;
 //----------------------------------------------------------------------------
 albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) : albaOpImporterFile(label)
 {
-	SetWildc("VTK XML (*.vti;*.vtp;*.vts;*.vtr;*.vtu)|*.vti;*.vtp;*.vts;*.vtr;*.vtu| VTK XML ImageData (*.vti)|*.vti|VTK XML PolyData (*.vtp)|*.vtp|VTK XML StructuredGrid (*.vts)|*.vts|VTK XML RectilinearGrid (*.vtr)|*.vtr|VTK XML UnstructuredGrid (*.vtu)|*.vtu");
+	SetWildc("VTK XML (*.vti;*.vtp;*.vtr;*.vtu)|*.vti;*.vtp;*.vtr;*.vtu| VTK XML ImageData (*.vti)|*.vti|VTK XML PolyData (*.vtp)|*.vtp|VTK XML RectilinearGrid (*.vtr)|*.vtr|VTK XML UnstructuredGrid (*.vtu)|*.vtu");
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Input   = NULL;
@@ -72,7 +69,6 @@ albaOpImporterVTKXML::albaOpImporterVTKXML(const wxString &label) : albaOpImport
   m_VmeGrayVol  = NULL;
   m_VmeRGBVol   = NULL;
   m_VmeMesh     = NULL;
-  m_VmeGeneric  = NULL;
 
   m_EventRouter = NULL;
   vtkNEW(m_EventRouter);
@@ -93,7 +89,6 @@ albaOpImporterVTKXML::~albaOpImporterVTKXML()
   albaDEL(m_VmeGrayVol);
   albaDEL(m_VmeRGBVol);
   albaDEL(m_VmeMesh);
-  albaDEL(m_VmeGeneric);
 
   vtkDEL(m_EventRouter);
 }
@@ -150,7 +145,6 @@ int albaOpImporterVTKXML::ImportFile()
   albaNEW(m_VmeGrayVol);
   albaNEW(m_VmeRGBVol);
   albaNEW(m_VmeMesh);
-  albaNEW(m_VmeGeneric);
 
 	wxString path, name, ext;
 	wxFileName::SplitPath(m_FileName.GetCStr(), &path, &name, &ext);
@@ -178,11 +172,6 @@ int albaOpImporterVTKXML::ImportFile()
 			{
 				m_Output = m_VmeSurface;
 			}
-			else
-			{
-				m_VmeGeneric->SetDataByDetaching(data, 0);
-				m_Output = m_VmeGeneric;
-			}
 		}
 	}
 	else if (ext == "vtp")
@@ -208,11 +197,6 @@ int albaOpImporterVTKXML::ImportFile()
 			{
 				m_Output = m_VmePointSet;
 			}
-			else
-			{
-				m_VmeGeneric->SetDataByDetaching(data, 0);
-				m_Output = m_VmeGeneric;
-			}
 		}
 	}
 	else if (ext == "vtr")
@@ -234,11 +218,6 @@ int albaOpImporterVTKXML::ImportFile()
 			{
 				m_Output = m_VmeRGBVol;
 			}
-			else
-			{
-				m_VmeGeneric->SetDataByDetaching(data, 0);
-				m_Output = m_VmeGeneric;
-			}
 		}
 	}
 	else if (ext == "vtu")
@@ -256,30 +235,9 @@ int albaOpImporterVTKXML::ImportFile()
 			{
 				m_Output = m_VmeMesh;
 			}
-			else
-			{
-				m_VmeGeneric->SetDataByDetaching(data, 0);
-				m_Output = m_VmeGeneric;
-			}
 		}
 	}
-	else if (ext == "vts")
-	{
-		vtkALBASmartPointer<vtkXMLStructuredGridReader> sgReader;
-		sgReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
-		sgReader->SetFileName(m_FileName.GetCStr());
-		sgReader->Update();
-
-		if (m_ErrorCount == 0)
-		{
-			data = sgReader->GetOutput();
-
-			m_VmeGeneric->SetDataByDetaching(data, 0);
-			m_Output = m_VmeGeneric;
-		}
-	}
-
-	if (m_ErrorCount == 0)
+	if (m_ErrorCount == 0 && m_Output)
 	{
 		albaTagItem tag_Nature;
 		tag_Nature.SetName("VME_NATURE");
