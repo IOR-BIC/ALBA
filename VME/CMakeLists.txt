@@ -28,7 +28,6 @@ SET(PROJECT_SRCS
   albaVMEPolylineGraph.cpp  					albaVMEPolylineGraph.h
   albaVMEPolylineEditor.cpp  				albaVMEPolylineEditor.h
   albaVMEOutputPolylineEditor.cpp  			albaVMEOutputPolylineEditor.h
-  albaVMEMaps.cpp  							albaVMEMaps.h  
   albaVMEWrappedMeter.cpp  					albaVMEWrappedMeter.h
   albaVMEOutputWrappedMeter.cpp  			albaVMEOutputWrappedMeter.h
   albaVMESurfaceEditor.cpp  				albaVMESurfaceEditor.h

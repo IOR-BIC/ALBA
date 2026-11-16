@@ -50,7 +50,6 @@
 #include "albaPipeWrappedMeter.h"
 #include "albaPipeSurfaceEditor.h"
 #include "albaVisualPipePolylineGraph.h"
-#include "albaPipeDensityDistance.h"
 #include "albaPipePolylineGraphEditor.h"
 #include "albaPipeMeshSlice.h"
 #include "albaPipePolylineSlice.h"
@@ -133,7 +132,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
   albaPlugPipeMacro(albaPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
   albaPlugPipeMacro(albaPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");
-  albaPlugPipeMacro(albaPipeDensityDistance, "Pipe for visualize the value of scalars on a surface.");
   albaPlugPipeMacro(albaPipeTrajectories, "Pipe to render animated Landmark trajectories in a time interval.");
   albaPlugPipeMacro(albaPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
   albaPlugPipeMacro(albaPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");

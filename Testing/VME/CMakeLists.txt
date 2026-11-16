@@ -60,7 +60,6 @@ SET(PROJECT_SRCS
 	albaVMEOutputPolylineEditorTest.h albaVMEOutputPolylineEditorTest.cpp
 	albaVMESurfaceEditorTest.h albaVMESurfaceEditorTest.cpp
 	albaVMEPolylineEditorTest.h albaVMEPolylineEditorTest.cpp
-	albaVMEMapsTest.h albaVMEMapsTest.cpp
 	albaVMEPointCloudTest.cpp albaVMEPointCloudTest.h
 	albaVMEOutputWrappedMeterTest.h albaVMEOutputWrappedMeterTest.cpp
 	albaVMEPolylineGraphTest.h albaVMEPolylineGraphTest.cpp

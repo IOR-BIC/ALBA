@@ -58,7 +58,6 @@
 #include "albaVMEWrappedMeter.h"
 #include "albaVMEPolylineGraph.h"
 #include "albaVMEPolylineEditor.h"
-#include "albaVMEMaps.h"
 #include "albaVMESurfaceEditor.h"
 #include "albaVMELabeledVolume.h"
 
@@ -136,7 +135,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEPolylineEditor,"Polyline Editor");
   albaPlugVMEMacro(albaVMESurfaceEditor,"Surface Editor");
   albaPlugVMEMacro(albaVMELabeledVolume,"Labeled Volume");
-  albaPlugVMEMacro(albaVMEMaps, "VME representing density-distace surface scalars");
 }
 
 //------------------------------------------------------------------------------

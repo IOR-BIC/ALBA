@@ -591,7 +591,6 @@ SET(VME_SRCS
   ../VME/albaVMEPolylineGraph.cpp  					../VME/albaVMEPolylineGraph.h
   ../VME/albaVMEPolylineEditor.cpp  				../VME/albaVMEPolylineEditor.h
   ../VME/albaVMEOutputPolylineEditor.cpp  			../VME/albaVMEOutputPolylineEditor.h
-  ../VME/albaVMEMaps.cpp  							../VME/albaVMEMaps.h  
   ../VME/albaVMEWrappedMeter.cpp  					../VME/albaVMEWrappedMeter.h
   ../VME/albaVMEOutputWrappedMeter.cpp  			../VME/albaVMEOutputWrappedMeter.h
   ../VME/albaVMESurfaceEditor.cpp  					../VME/albaVMESurfaceEditor.h
@@ -695,7 +694,6 @@ SET(VISUAL_PIPES_SRCS
   ../VisualPipes/albaPipeScalar.cpp  						../VisualPipes/albaPipeScalar.h
   ../VisualPipes/albaVisualPipeVolumeRayCasting.cpp  		../VisualPipes/albaVisualPipeVolumeRayCasting.h
   ../VisualPipes/albaPipeVolumeMIP.cpp  					../VisualPipes/albaPipeVolumeMIP.h
-  ../VisualPipes/albaPipeDensityDistance.cpp  				../VisualPipes/albaPipeDensityDistance.h
   ../VisualPipes/albaPipeTrajectories.cpp  					../VisualPipes/albaPipeTrajectories.h
   ../VisualPipes/albaPipeVolumeDRR.cpp  					../VisualPipes/albaPipeVolumeDRR.h
   ../VisualPipes/albaPipeVolumeVR.cpp  						../VisualPipes/albaPipeVolumeVR.h

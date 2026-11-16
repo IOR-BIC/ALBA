@@ -47,7 +47,6 @@
 #include "albaVMELabeledVolumeTest.h"
 #include "albaVMELandmarkCloudTest.h"
 #include "albaVMELandmarkTest.h"
-#include "albaVMEMapsTest.h"
 #include "albaVMEMeshTest.h"
 #include "albaVMEMeterTest.h"
 #include "albaVMEOutputImageTest.h"
@@ -172,7 +171,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEOutputPolylineEditorTest::suite());
 	runner.addTest(albaVMESurfaceEditorTest::suite());
 	runner.addTest(albaVMEPolylineEditorTest::suite());
-	runner.addTest(albaVMEMapsTest::suite());
 	runner.addTest(albaVMEOutputWrappedMeterTest::suite());
 	runner.addTest(albaVMEPolylineGraphTest::suite());
 	runner.addTest(albaPolylineGraphVertexTest::suite());
