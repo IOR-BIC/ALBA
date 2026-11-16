@@ -41,7 +41,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaAttachCamera.h"
 #include "albaGUIFloatSlider.h"
 #include "albaGUILutSlider.h"
-#include "albaPipePolylineGraphEditor.h"
 #include "albaViewSliceBlend.h"
 #include "albaPipeVolumeSliceBlend.h"
 
@@ -507,7 +506,7 @@ void albaViewSliceBlend::VmeShow(albaVME *vme, bool show)
 //----------------------------------------------------------------------------
 void albaViewSliceBlend::VmeRemove(albaVME *vme)
 {
-  if(vme->IsA("albaVMEPolyline")||vme->IsA("albaVMESurface")||vme->IsA("albaVMEPolylineEditor"))
+  if(vme->IsA("albaVMEPolyline")||vme->IsA("albaVMESurface"))
   {
     //remove surfaces from surfaces list
     this->UpdateSurfacesList(vme);
