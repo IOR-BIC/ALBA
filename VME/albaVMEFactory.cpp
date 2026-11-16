@@ -25,7 +25,6 @@
 #include "albaVMEFactory.h"
 
 #include "albaVMEExternalData.h"
-#include "albaVMEGeneric.h"
 #include "albaVMEGizmo.h"
 #include "albaVMEGroup.h"
 #include "albaVMEImage.h"
@@ -34,15 +33,12 @@
 #include "albaVMEMeter.h"
 #include "albaVMEInfoText.h"
 #include "albaVMEMesh.h"
-#include "albaVMEPointSet.h"
 #include "albaVMEPolyline.h"
 #include "albaVMEPolylineSpline.h"
 #include "albaVMERefSys.h"
 #include "albaVMERoot.h"
-#include "albaVMEScalar.h"
 #include "albaVMESurface.h"
 #include "albaVMESurfaceParametric.h"
-#include "albaVMEVector.h"
 #include "albaVMEVolume.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
@@ -58,7 +54,6 @@
 #include "albaVMEWrappedMeter.h"
 #include "albaVMEPolylineGraph.h"
 #include "albaVMEPolylineEditor.h"
-#include "albaVMEMaps.h"
 #include "albaVMESurfaceEditor.h"
 #include "albaVMELabeledVolume.h"
 
@@ -113,7 +108,6 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMERoot,"Root");
   albaPlugVMEMacro(albaVMEExternalData,"External data.");
   albaPlugVMEMacro(albaVMEGroup,"Group");
-  albaPlugVMEMacro(albaVMEGeneric,"Generic");
   albaPlugVMEMacro(albaVMEImage,"Image");
   albaPlugVMEMacro(albaVMEMesh,"Mesh");
   albaPlugVMEMacro(albaVMESurface,"Surface");
@@ -127,16 +121,12 @@ albaVMEFactory::albaVMEFactory()
   albaPlugVMEMacro(albaVMEInfoText,"Text");
   albaPlugVMEMacro(albaVMELandmark,"Landmark");
   albaPlugVMEMacro(albaVMELandmarkCloud,"Landmark Cloud");
-  albaPlugVMEMacro(albaVMEPointSet,"Point set");
   albaPlugVMEMacro(albaVMERefSys,"Reference System");
-  albaPlugVMEMacro(albaVMEScalar,"Scalar");
-  albaPlugVMEMacro(albaVMEVector,"Vector");
   albaPlugVMEMacro(albaVMEWrappedMeter,"Wrapped Meter");
   albaPlugVMEMacro(albaVMEPolylineGraph,"Polyline Graph");
   albaPlugVMEMacro(albaVMEPolylineEditor,"Polyline Editor");
   albaPlugVMEMacro(albaVMESurfaceEditor,"Surface Editor");
   albaPlugVMEMacro(albaVMELabeledVolume,"Labeled Volume");
-  albaPlugVMEMacro(albaVMEMaps, "VME representing density-distace surface scalars");
 }
 
 //------------------------------------------------------------------------------

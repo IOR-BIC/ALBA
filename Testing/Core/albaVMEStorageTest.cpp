@@ -315,7 +315,8 @@ void albaVMEStorageTest::CreateVMETestTree()
   m_StorageRoot=m_Storage->GetRoot();
 
   // this will be destroyed when the tree is destroyed: no need to call delete... 
-  m_RootVme = albaVMEGeneric::New();
+  // a polyline: albaVMEGeneric is not registered in the factory, so it cannot be restored
+  m_RootVme = albaVMEPolyline::New();
 
   albaSmartPointer<albaVMESurface> vsphere;
   albaSmartPointer<albaVMESurface> vcone;

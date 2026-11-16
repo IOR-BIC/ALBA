@@ -12,7 +12,6 @@ SET(PROJECT_SRCS
   albaMatrixInterpolator.cpp  				albaMatrixInterpolator.h
   albaMatrixVector.cpp  					albaMatrixVector.h
   albaPipeFactoryVME.cpp  					albaPipeFactoryVME.h
-  albaScalarVector.cpp  					albaScalarVector.h
   albaVMEExternalData.cpp  					albaVMEExternalData.h
   albaVMEFactory.cpp  						albaVMEFactory.h
   albaVMEGenericAbstract.cpp  				albaVMEGenericAbstract.h
@@ -20,15 +19,12 @@ SET(PROJECT_SRCS
   albaVMEItem.cpp  							albaVMEItem.h
   albaVMEInfoText.cpp  						albaVMEInfoText.h
   albaMSFImporter.cpp  						albaMSFImporter.h
-  albaVMEOutputScalar.cpp  					albaVMEOutputScalar.h
-  albaVMEScalar.cpp  						albaVMEScalar.h
   ###############
   albaVMELabeledVolume.cpp  				albaVMELabeledVolume.h
 
   albaVMEPolylineGraph.cpp  					albaVMEPolylineGraph.h
   albaVMEPolylineEditor.cpp  				albaVMEPolylineEditor.h
   albaVMEOutputPolylineEditor.cpp  			albaVMEOutputPolylineEditor.h
-  albaVMEMaps.cpp  							albaVMEMaps.h  
   albaVMEWrappedMeter.cpp  					albaVMEWrappedMeter.h
   albaVMEOutputWrappedMeter.cpp  			albaVMEOutputWrappedMeter.h
   albaVMESurfaceEditor.cpp  				albaVMESurfaceEditor.h
@@ -64,13 +60,11 @@ IF (ALBA_USE_VTK)
   albaVMEOutputSurface.cpp  					albaVMEOutputSurface.h
   albaVMEOutputVolume.cpp  					albaVMEOutputVolume.h
   albaVMEOutputVTK.cpp  						albaVMEOutputVTK.h
-  albaVMEPointSet.cpp  						albaVMEPointSet.h
   albaVMEPolyline.cpp  						albaVMEPolyline.h
   albaVMEPolylineSpline.cpp  				albaVMEPolylineSpline.h
   albaVMERefSys.cpp  						albaVMERefSys.h
   albaVMESurface.cpp  						albaVMESurface.h
   albaVMESurfaceParametric.cpp  				albaVMESurfaceParametric.h
-  albaVMEVector.cpp  						albaVMEVector.h
   albaVMEVolume.cpp  						albaVMEVolume.h
   albaVMEVolumeGray.cpp  					albaVMEVolumeGray.h
   albaVMEVolumeRGB.cpp  						albaVMEVolumeRGB.h

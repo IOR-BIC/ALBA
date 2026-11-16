@@ -46,9 +46,11 @@ void lutVolRenRGB(vtkLookupTable *lut);
 void lutVolRenTwoLev(vtkLookupTable *lut);
 void defaultBlueToRed(vtkLookupTable *lut);
 void lutGrayReversed(vtkLookupTable *lut);
+void lutRedToGreen(vtkLookupTable *lut);
+void lutGreenToRed(vtkLookupTable *lut);
 
 
-const int lutPresetNum = 21;
+const int lutPresetNum = 23;
 
 //---------------------------------------------------------------------
 wxString LutNames[lutPresetNum] = 
@@ -74,7 +76,9 @@ wxString LutNames[lutPresetNum] =
 "Volren RGB",
 "Volren Two Level",
 "Default blue to red",
-"Gray reversed"
+"Gray reversed",
+"Red to green",
+"Green to red"
 };
 
 //---------------------------------------------------------------------
@@ -104,6 +108,8 @@ void lutPreset(int idx, vtkLookupTable *lut)
 	case 18: lutVolRenTwoLev(lut);   break;  
 	case 19: defaultBlueToRed(lut);  break;  
 	case 20: lutGrayReversed(lut);			 break;
+	case 21: lutRedToGreen(lut);     break;
+	case 22: lutGreenToRed(lut);     break;
 	default: lutDefault(lut);        break;  
   }
 }
@@ -2074,6 +2080,34 @@ void defaultBlueToRed(vtkLookupTable *lut)
 	{
 
 		int h = ((255-i)*240.0)/255.0;
+		c.SetHSV(h,255,255);
+		lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
+	}
+};
+//---------------------------------------------------------------------
+void lutRedToGreen(vtkLookupTable *lut)
+//---------------------------------------------------------------------
+{
+	albaColor c;
+
+	lut->SetNumberOfTableValues(256);
+	for(int i=0; i<256; i++)
+	{
+		int h = (i*120.0)/255.0;
+		c.SetHSV(h,255,255);
+		lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
+	}
+};
+//---------------------------------------------------------------------
+void lutGreenToRed(vtkLookupTable *lut)
+//---------------------------------------------------------------------
+{
+	albaColor c;
+
+	lut->SetNumberOfTableValues(256);
+	for(int i=0; i<256; i++)
+	{
+		int h = ((255-i)*120.0)/255.0;
 		c.SetHSV(h,255,255);
 		lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
 	}

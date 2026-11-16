@@ -48,6 +48,7 @@
 #include "vtkCellData.h"
 #include "albaGUIDialog.h"
 #include "albaGUIHistogramWidget.h"
+#include "albaGUILutSwatch.h"
 
 #include <vector>
 #include "vtkALBAPolyDataNormals.h"
@@ -69,6 +70,7 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_NumberOfComponents = 0;
 	m_ComponentIndex = 0;
 	m_Table = NULL;
+	m_BackupTable = NULL;
 
 	m_ActiveScalarType = POINT_TYPE;
 	m_PointCellArraySeparation = 0;
@@ -82,6 +84,9 @@ albaPipeWithScalar::albaPipeWithScalar()
 	m_ProbeVolume = NULL;
 
 	m_MapsStackActive = m_ProbeMapActive = m_ScalarMapActive   = m_ShowScalarBar = 0;
+	m_ProbeMode = PROBE_DENSITY;
+	m_ProbeTarget = 0;
+	m_ProbeMaxDistance = 10;
 	m_ScalarBarPos = SB_ON_RIGHT;
 	m_ScalarBarActor = NULL;
 	m_ScalarBarLabNum = 2;
@@ -96,6 +101,7 @@ albaPipeWithScalar::~albaPipeWithScalar()
 {
 	DeleteHistogramDialog();
 	vtkDEL(m_Table);
+	vtkDEL(m_BackupTable);
 	cppDEL(m_LutSlider);
 
 	delete[] m_ScalarsInComboBoxNames;
@@ -179,7 +185,11 @@ void albaPipeWithScalar::CreateScalarsGui(albaGUI *gui)
 
 	gui->Divider();
 	gui->Bool(ID_PROBE_MAPS, _("Enable Volume Scalar Probe Map"), &m_ProbeMapActive, 1);
-	gui->Button(ID_SELECT_PROBE_VME, &m_ProbeVolName, "Select Volume...","Select Scalar Source Volume"),
+	gui->Button(ID_SELECT_PROBE_VME, &m_ProbeVolName, "Select Volume...","Select Scalar Source Volume");
+	wxString probeModes[] = { "Density", "Distance" };
+	gui->Combo(ID_PROBE_MODE, "Mode", &m_ProbeMode, 2, probeModes, "Density: volume value at points\nDistance: distance along normals to the target isosurface");
+	gui->Double(ID_PROBE_TARGET, "Target", &m_ProbeTarget, MINDOUBLE, MAXDOUBLE, -1, "Isosurface value used in distance mode");
+	gui->Double(ID_PROBE_MAX_DISTANCE, "Max dist.", &m_ProbeMaxDistance, 0, MAXDOUBLE, -1, "Maximum distance searched along normals");
 	gui->Divider(1);
 	
 
@@ -215,10 +225,18 @@ void albaPipeWithScalar::CreateProbeMapStack()
 	m_ProbeFilter->SetDistanceModeToScalar();
 	m_ProbeFilter->SetSource(m_ProbeVolume->GetOutput()->GetVTKData());
 	m_ProbeFilter->SetInputConnection(m_Mapper->GetInputConnection(0,0));
-	m_ProbeFilter->SetFilterModeToDensity();
 	m_ProbeFilter->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 	m_ProbeFilter->SetOutOfBoundsDensity(-9999);
+	UpdateProbeFilterParameters();
 	m_ProbeFilter->Update();
+
+	//backup the current lut, it will be restored when the probe map is disabled
+	if (!m_BackupTable)
+	{
+		vtkNEW(m_BackupTable);
+		m_BackupTable->DeepCopy(m_Table);
+	}
+	ApplyProbeLut();
 
 	m_Mapper->SetInputConnection(m_ProbeFilter->GetOutputPort());
 	m_Mapper->SetScalarVisibility(true);
@@ -299,6 +317,15 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				SetProbeVolume(vme);
 			}
 			break;
+			case ID_PROBE_MODE:
+				SetProbeMode(m_ProbeMode);
+				break;
+			case ID_PROBE_TARGET:
+				SetProbeTarget(m_ProbeTarget);
+				break;
+			case ID_PROBE_MAX_DISTANCE:
+				SetProbeMaxDistance(m_ProbeMaxDistance);
+				break;
 			case ID_ENABLE_SCALAR_BAR:
 			{
 				ShowScalarBarActor(m_ShowScalarBar);
@@ -369,6 +396,22 @@ void albaPipeWithScalar::DestroyProbeMapStack()
 
 	vtkDEL(m_ProbeFilter);
 	m_MapsStackActive = false;
+
+	//restore the lut used before the probe map
+	if (m_BackupTable)
+	{
+		double sr[2];
+		m_Table->DeepCopy(m_BackupTable);
+		vtkDEL(m_BackupTable);
+		m_Table->GetTableRange(sr);
+		m_Mapper->SetScalarRange(sr);
+		if (m_LutSlider)
+		{
+			m_LutSlider->SetRange(sr);
+			m_LutSlider->SetSubRange(sr);
+		}
+		UpdateLutGui();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -419,6 +462,9 @@ void albaPipeWithScalar::EnableDisableGuiComponents()
 		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive && !m_ProbeMapActive);
 		m_Gui->Enable(ID_COMPONENTS, m_ScalarMapActive && !m_ProbeMapActive && m_NumberOfComponents > 1);
 		m_Gui->Enable(ID_SELECT_PROBE_VME, m_ProbeMapActive);
+		m_Gui->Enable(ID_PROBE_MODE, m_ProbeMapActive && (m_ProbeMode == PROBE_DISTANCE || HasPointNormals()));
+		m_Gui->Enable(ID_PROBE_TARGET, m_ProbeMapActive && m_ProbeMode == PROBE_DISTANCE);
+		m_Gui->Enable(ID_PROBE_MAX_DISTANCE, m_ProbeMapActive && m_ProbeMode == PROBE_DISTANCE);
 		m_Gui->Enable(ID_LUT, scalarMangement);
 		m_LutSlider->Enable(scalarMangement);
 		m_Gui->Enable(ID_ENABLE_SCALAR_BAR, scalarMangement);
@@ -458,8 +504,14 @@ void albaPipeWithScalar::UpdateVisualizationWithNewSelectedScalars()
 	{
 		if (m_MapsStackActive)
 		{
-			m_ProbeVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
 			scalars = m_Mapper->GetInput()->GetPointData()->GetScalars(DISTANCE_FILTER_SCALARS_NAME);
+			if (m_ProbeMode == PROBE_DISTANCE)
+			{
+				sr[0] = 0;
+				sr[1] = m_ProbeMaxDistance;
+			}
+			else
+				m_ProbeVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
 		}
 		else
 		{
@@ -794,3 +846,75 @@ void albaPipeWithScalar::SetProbeMapActive(int val)
  
 }
 
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetProbeMode(int mode)
+{
+	if (mode == PROBE_DISTANCE && !HasPointNormals())
+		mode = PROBE_DENSITY;
+	m_ProbeMode = mode;
+
+	if (m_ProbeFilter)
+	{
+		UpdateProbeFilterParameters();
+		m_ProbeFilter->Update();
+		ApplyProbeLut();
+		UpdateVisualizationWithNewSelectedScalars();
+	}
+
+	if (m_Gui)
+		m_Gui->Update();
+	EnableDisableGuiComponents();
+	GetLogicManager()->CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetProbeTarget(double target)
+{
+	m_ProbeTarget = target;
+	SetProbeMode(m_ProbeMode);
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::SetProbeMaxDistance(double maxDistance)
+{
+	m_ProbeMaxDistance = maxDistance;
+	SetProbeMode(m_ProbeMode);
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::UpdateProbeFilterParameters()
+{
+	if (m_ProbeMode == PROBE_DISTANCE)
+	{
+		m_ProbeFilter->SetFilterModeToDistance();
+		m_ProbeFilter->SetThreshold(m_ProbeTarget);
+		m_ProbeFilter->SetMaxDistance(m_ProbeMaxDistance);
+	}
+	else
+		m_ProbeFilter->SetFilterModeToDensity();
+}
+
+//----------------------------------------------------------------------------
+bool albaPipeWithScalar::HasPointNormals()
+{
+	vtkDataSet *data = m_ProbeFilter ? m_ProbeFilter->GetInput() : m_Mapper->GetInput();
+	return data && data->GetPointData()->GetNormals();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::ApplyProbeLut()
+{
+	//density: green on high values, distance: green near zero
+	lutPreset(m_ProbeMode == PROBE_DISTANCE ? LUT_PRESET_GREEN_TO_RED : LUT_PRESET_RED_TO_GREEN, m_Table);
+	m_Table->Modified();
+	UpdateLutGui();
+}
+
+//----------------------------------------------------------------------------
+void albaPipeWithScalar::UpdateLutGui()
+{
+	m_ObjectMaterial->m_ColorLut->DeepCopy(m_Table);
+	m_ObjectMaterial->UpdateFromLut();
+	if (m_LutSwatch)
+		m_LutSwatch->SetLut(m_Table);
+}

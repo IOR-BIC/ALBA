@@ -49,7 +49,6 @@
 #include "albaServiceLocator.h"
 #include "albaTagArrayTest.h"
 #include "albaTagItemTest.h"
-#include "albaTimeMapScalarTest.h"
 #include "albaTimeMapTest.h"
 #include "albaUserTest.h"
 #include "albaVMEFactoryTest.h"
@@ -191,7 +190,6 @@ int main(int argc, char* argv[])
 	runner.addTest(albaViewManagerTest::suite());
 	runner.addTest(albaUserTest::suite());
 	runner.addTest(albaTimeMapTest::suite());
-	runner.addTest(albaTimeMapScalarTest::suite());
 	runner.addTest(albaTagItemTest::suite());
 	runner.addTest(albaTagArrayTest::suite());
 	runner.addTest(albaSceneNodeTest::suite());

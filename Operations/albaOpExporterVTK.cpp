@@ -104,7 +104,7 @@ void albaOpExporterVTK::OpRun()
 	m_Gui->Bool(ID_ABS_MATRIX, "Apply Absolute matrix", &m_ABSMatrixFlag, 1);
 	m_Gui->Label("");
 
-	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMEPointSet") || m_Input->IsA("albaVMEGroup") || m_Input->IsA("albaVMEMesh") || m_Input->IsA("albaVMEPolyline"))
+	if (m_Input->IsA("albaVMESurface") || m_Input->IsA("albaVMELandmarkCloud") || m_Input->IsA("albaVMEGroup") || m_Input->IsA("albaVMEMesh") || m_Input->IsA("albaVMEPolyline"))
 		m_Gui->Enable(ID_ABS_MATRIX, true);
 	else
 		m_Gui->Enable(ID_ABS_MATRIX, false);

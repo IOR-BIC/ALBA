@@ -308,7 +308,7 @@ void VMEGenericTest::VMEGenericMainTest()
         node->SetAttribute("ClientData",attr);
         renderer->AddActor(vmeasm);
       }
-      else if (node->IsA("albaVMEPointSet"))
+      else if (node->IsA("albaVMELandmarkCloud"))
       {
         vtkDataSet *data=node->GetOutput()->GetVTKData();
         CPPUNIT_ASSERT(data!=NULL);

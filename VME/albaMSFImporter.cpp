@@ -36,7 +36,7 @@
 #include "albaVMELandmark.h"
 #include "albaVMELandmarkCloud.h"
 #include "albaVMEMeter.h"
-#include "albaVMEPointSet.h"
+#include "albaVMEPointCloud.h"
 #include "albaVMERefSys.h"
 #include "albaVMESurface.h"
 #include "albaVMEVolumeGray.h"
@@ -344,16 +344,13 @@ albaVME *mmuMSF1xDocument::RestoreVME(albaStorageElement *node, albaVME *parent)
 albaVME *mmuMSF1xDocument::CreateVMEInstance(albaString &name)
 //------------------------------------------------------------------------------
 {
-  if (
-    name == "albaVMEGeneric"         ||
-    name == "mflVMEAlias"
-    )
+  if (name == "mflVMEAlias")
   {
-    return albaVMEGeneric::New();
+    return albaVMEGroup::New();
   }
   else if (name == "mflVMELink")
   {
-    albaVME *link = albaVMEGeneric::New();
+    albaVME *link = albaVMEGroup::New();
     link->GetTagArray()->SetTag("mflVMELink","1");
     return link;
   }
@@ -395,7 +392,7 @@ albaVME *mmuMSF1xDocument::CreateVMEInstance(albaString &name)
   }
   else if (name == "mflVMEPointSet")
   {
-    return albaVMEPointSet::New();
+    return albaVMEPointCloud::New();
   }
   else if (name == "mflVMERefSys")
   {
@@ -537,7 +534,8 @@ int mmuMSF1xDocument::RestoreVItem(albaStorageElement *node, albaVME *vme)
           albaSmartPointer<albaVMEItemVTK> vitem;
           albaStorageElement *tarray=node->FindNestedElement("TArray");
           albaVMEGeneric *vme_generic=albaVMEGeneric::SafeDownCast(vme);
-          assert(vme_generic);
+          if (!vme_generic) // e.g. alias and link are imported as groups, they cannot store data
+            return ALBA_ERROR;
           if (tarray)
           {
             if (RestoreTagArray(tarray,vitem->GetTagArray())==ALBA_OK)

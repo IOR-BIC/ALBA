@@ -98,7 +98,6 @@ SET(CORE_SRCS
   ../Core/albaTagArray.cpp  				../Core/albaTagArray.h
   ../Core/albaTagItem.cpp  				../Core/albaTagItem.h
   ../Core/albaTimeMap.h
-  ../Core/albaTimeMapScalar.h
   ../Core/albaUser.cpp  					../Core/albaUser.h
   ../Core/albaVME.cpp  					../Core/albaVME.h
   ../Core/albaVMEManager.cpp  			../Core/albaVMEManager.h
@@ -420,8 +419,6 @@ SET(VME_SRCS
   ../VME/albaMatrixVector.h
   ../VME/albaPipeFactoryVME.cpp
   ../VME/albaPipeFactoryVME.h
-  ../VME/albaScalarVector.cpp
-  ../VME/albaScalarVector.h
   ../VME/albaVMEExternalData.cpp
   ../VME/albaVMEExternalData.h
   ../VME/albaVMEFactory.cpp
@@ -442,14 +439,8 @@ SET(VME_SRCS
   ../VME/albaPipeMesh.h
   ../VME/albaPipeMeshSlice.cpp
   ../VME/albaPipeMeshSlice.h
-  ../VME/albaPipeScalar.cpp
-  ../VME/albaPipeScalar.h
   ../VME/albaVisualPipeVolumeRayCasting.cpp
   ../VME/albaVisualPipeVolumeRayCasting.h
-  ../VME/albaVMEOutputScalar.cpp
-  ../VME/albaVMEOutputScalar.h
-  ../VME/albaVMEScalar.cpp
-  ../VME/albaVMEScalar.h
 )
 
 IF (ALBA_USE_CRYPTO)
@@ -485,8 +476,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaPipeLandmarkCloud.h
     ../VME/albaPipeMeter.cpp
     ../VME/albaPipeMeter.h
-    ../VME/albaPipePointSet.cpp
-    ../VME/albaPipePointSet.h
     ../VME/albaPipePolyline.cpp
     ../VME/albaPipePolyline.h
     ../VME/albaPipeSurface.cpp
@@ -495,8 +484,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaPipeSurfaceSlice.h
     ../VME/albaPipeSurfaceTextured.cpp
     ../VME/albaPipeSurfaceTextured.h
-    ../VME/albaPipeVector.cpp
-    ../VME/albaPipeVector.h
     ../VME/albaPipeVolumeProjected.cpp
     ../VME/albaPipeVolumeProjected.h
     ../VME/albaPipeVolumeSlice.cpp
@@ -535,8 +522,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaVMEOutputVolume.h
     ../VME/albaVMEOutputVTK.cpp
     ../VME/albaVMEOutputVTK.h
-    ../VME/albaVMEPointSet.cpp
-    ../VME/albaVMEPointSet.h
     ../VME/albaVMEPolyline.cpp
     ../VME/albaVMEPolyline.h
     ../VME/albaVMEPolylineSpline.cpp
@@ -551,8 +536,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaVMESurface.h
     ../VME/albaVMESurfaceParametric.cpp
     ../VME/albaVMESurfaceParametric.h
-    ../VME/albaVMEVector.cpp
-    ../VME/albaVMEVector.h
     ../VME/albaVMEVolume.cpp
     ../VME/albaVMEVolume.h
     ../VME/albaVMEVolumeGray.cpp
@@ -577,7 +560,6 @@ SET(VME_SRCS
   ../VME/albaMatrixInterpolator.cpp  				../VME/albaMatrixInterpolator.h
   ../VME/albaMatrixVector.cpp  						../VME/albaMatrixVector.h
   ../VME/albaPipeFactoryVME.cpp  					../VME/albaPipeFactoryVME.h
-  ../VME/albaScalarVector.cpp  						../VME/albaScalarVector.h
   ../VME/albaVMEExternalData.cpp  					../VME/albaVMEExternalData.h
   ../VME/albaVMEFactory.cpp  						../VME/albaVMEFactory.h
   ../VME/albaVMEGenericAbstract.cpp  				../VME/albaVMEGenericAbstract.h
@@ -585,13 +567,10 @@ SET(VME_SRCS
   ../VME/albaVMEItem.cpp  							../VME/albaVMEItem.h
   ../VME/albaVMEInfoText.cpp  						../VME/albaVMEInfoText.h
   ../VME/albaMSFImporter.cpp  						../VME/albaMSFImporter.h
-  ../VME/albaVMEOutputScalar.cpp  					../VME/albaVMEOutputScalar.h
-  ../VME/albaVMEScalar.cpp  						../VME/albaVMEScalar.h
   ../VME/albaVMELabeledVolume.cpp  					../VME/albaVMELabeledVolume.h
   ../VME/albaVMEPolylineGraph.cpp  					../VME/albaVMEPolylineGraph.h
   ../VME/albaVMEPolylineEditor.cpp  				../VME/albaVMEPolylineEditor.h
   ../VME/albaVMEOutputPolylineEditor.cpp  			../VME/albaVMEOutputPolylineEditor.h
-  ../VME/albaVMEMaps.cpp  							../VME/albaVMEMaps.h  
   ../VME/albaVMEWrappedMeter.cpp  					../VME/albaVMEWrappedMeter.h
   ../VME/albaVMEOutputWrappedMeter.cpp  			../VME/albaVMEOutputWrappedMeter.h
   ../VME/albaVMESurfaceEditor.cpp  					../VME/albaVMESurfaceEditor.h
@@ -638,7 +617,6 @@ IF (ALBA_USE_VTK)
   ../VME/albaVMEOutputSurface.cpp  					../VME/albaVMEOutputSurface.h
   ../VME/albaVMEOutputVolume.cpp  					../VME/albaVMEOutputVolume.h
   ../VME/albaVMEOutputVTK.cpp  						../VME/albaVMEOutputVTK.h
-  ../VME/albaVMEPointSet.cpp  						../VME/albaVMEPointSet.h
   ../VME/albaVMEPolyline.cpp  						../VME/albaVMEPolyline.h
   ../VME/albaVMEPolylineSpline.cpp  				../VME/albaVMEPolylineSpline.h
   ../VME/albaVMEProber.cpp  						../VME/albaVMEProber.h
@@ -646,7 +624,6 @@ IF (ALBA_USE_VTK)
   ../VME/albaVMESlicer.cpp  						../VME/albaVMESlicer.h
   ../VME/albaVMESurface.cpp  						../VME/albaVMESurface.h
   ../VME/albaVMESurfaceParametric.cpp  				../VME/albaVMESurfaceParametric.h
-  ../VME/albaVMEVector.cpp  						../VME/albaVMEVector.h
   ../VME/albaVMEVolume.cpp  						../VME/albaVMEVolume.h
   ../VME/albaVMEVolumeGray.cpp  					../VME/albaVMEVolumeGray.h
   ../VME/albaVMEVolumeRGB.cpp  						../VME/albaVMEVolumeRGB.h
@@ -692,10 +669,8 @@ SET(VISUAL_PIPES_SRCS
   ../VisualPipes/albaPipeMesh.cpp 							../VisualPipes/albaPipeMesh.h
   ../VisualPipes/albaPipeSurface.cpp 						../VisualPipes/albaPipeSurface.h
   ../VisualPipes/albaPipeRefSys.cpp 						../VisualPipes/albaPipeRefSys.h
-  ../VisualPipes/albaPipeScalar.cpp  						../VisualPipes/albaPipeScalar.h
   ../VisualPipes/albaVisualPipeVolumeRayCasting.cpp  		../VisualPipes/albaVisualPipeVolumeRayCasting.h
   ../VisualPipes/albaPipeVolumeMIP.cpp  					../VisualPipes/albaPipeVolumeMIP.h
-  ../VisualPipes/albaPipeDensityDistance.cpp  				../VisualPipes/albaPipeDensityDistance.h
   ../VisualPipes/albaPipeTrajectories.cpp  					../VisualPipes/albaPipeTrajectories.h
   ../VisualPipes/albaPipeVolumeDRR.cpp  					../VisualPipes/albaPipeVolumeDRR.h
   ../VisualPipes/albaPipeVolumeVR.cpp  						../VisualPipes/albaPipeVolumeVR.h
@@ -745,10 +720,8 @@ IF (ALBA_USE_VTK)
   ../VisualPipes/albaPipeIsosurface.cpp  					../VisualPipes/albaPipeIsosurface.h
   ../VisualPipes/albaPipeLandmarkCloud.cpp  				../VisualPipes/albaPipeLandmarkCloud.h
   ../VisualPipes/albaPipeMeter.cpp  						../VisualPipes/albaPipeMeter.h
-  ../VisualPipes/albaPipePointSet.cpp  						../VisualPipes/albaPipePointSet.h
   ../VisualPipes/albaPipePolyline.cpp  						../VisualPipes/albaPipePolyline.h
   ../VisualPipes/albaPipeSurfaceTextured.cpp  				../VisualPipes/albaPipeSurfaceTextured.h
-  ../VisualPipes/albaPipeVector.cpp  						../VisualPipes/albaPipeVector.h
   ../VisualPipes/albaPipeVolumeProjected.cpp  				../VisualPipes/albaPipeVolumeProjected.h
   ../VisualPipes/albaPipeGraph.cpp  						../VisualPipes/albaPipeGraph.h
   )
@@ -939,7 +912,6 @@ IF (ALBA_USE_ITK)
     ../Operations/albaParabolicMeshToLinearMeshFilter.cxx	../Operations/albaParabolicMeshToLinearMeshFilter.h
     ../Operations/albaOpImporterMesh.cpp				../Operations/albaOpImporterMesh.h
     ../Operations/albaOpExporterMesh.cpp				../Operations/albaOpExporterMesh.h
-    ../Operations/albaOpScalarToSurface.cpp			../Operations/albaOpScalarToSurface.h
     ../Operations/albaOpImporterVMEDataSetAttributes.cpp	../Operations/albaOpImporterVMEDataSetAttributes.h
 	
 	##########################################

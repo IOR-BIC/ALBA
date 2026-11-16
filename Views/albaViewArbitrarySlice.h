@@ -36,7 +36,6 @@ class albaAttachCamera;
 class albaGUI;
 class albaGUILutSlider;
 class albaGUILutSwatch;
-class albaVMEPolylineEditor;
 class vtkMatrix4x4;
 
 /** 

@@ -68,6 +68,9 @@ public:
 		ID_COMPONENTS,
 		ID_PROBE_MAPS,
 		ID_SELECT_PROBE_VME,
+		ID_PROBE_MODE,
+		ID_PROBE_TARGET,
+		ID_PROBE_MAX_DISTANCE,
 		ID_LUT,
 		ID_LUT_SLIDER,
 		ID_SCALAR_MAP_ACTIVE,
@@ -82,6 +85,12 @@ public:
 	{
 		POINT_TYPE = 0,
 		CELL_TYPE,
+	};
+
+	enum PROBE_MODES
+	{
+		PROBE_DENSITY = 0,
+		PROBE_DISTANCE,
 	};
 
 	enum SCALAR_BAR_POSITIONS
@@ -131,6 +140,19 @@ public:
 	int IsProbeMapActive() const { return m_ProbeMapActive; }
 	void SetProbeMapActive(int val);
 
+	/** Set/Get the probe mode: PROBE_DENSITY samples the volume scalars at the points, PROBE_DISTANCE computes for each point
+	the distance along its normal to the isosurface of value ProbeTarget (requires point normals) */
+	int GetProbeMode() const { return m_ProbeMode; }
+	void SetProbeMode(int mode);
+
+	/** Set/Get the isosurface value used in PROBE_DISTANCE mode */
+	double GetProbeTarget() const { return m_ProbeTarget; }
+	void SetProbeTarget(double target);
+
+	/** Set/Get the maximum traversed distance used in PROBE_DISTANCE mode */
+	double GetProbeMaxDistance() const { return m_ProbeMaxDistance; }
+	void SetProbeMaxDistance(double maxDistance);
+
 	/** Creates/Show the Histogram */
 	void CreateHistogramDialog();
 
@@ -142,6 +164,7 @@ public:
 protected:
 	
   vtkLookupTable  *m_Table;
+	vtkLookupTable  *m_BackupTable; //lut used before the probe map activation, restored on deactivation
 	albaVME *m_ProbeVolume;
 	
 	albaGUILutSwatch *m_LutSwatch;
@@ -168,6 +191,18 @@ protected:
 
 	/** Destroys the Density Map Stack */
 	void DestroyProbeMapStack();
+
+	/** Applies probe mode, target and max distance to the probe filter */
+	void UpdateProbeFilterParameters();
+
+	/** Returns true if the probed dataset has point normals, needed by PROBE_DISTANCE mode */
+	bool HasPointNormals();
+
+	/** Sets the lut preset related to the probe mode: red to green for density, green to red for distance */
+	void ApplyProbeLut();
+
+	/** Copies the current lut to the material and updates the lut swatch */
+	void UpdateLutGui();
 	
 	/** Deletes the Histogram Dialog */
 	void DeleteHistogramDialog();
@@ -207,6 +242,9 @@ protected:
 	int											 m_OldActiveScalarType;
 	int                      m_ScalarMapActive;  //Gui option to enable scalar maps generation to be active a volume must be selected
 	int                      m_ProbeMapActive;
+	int                      m_ProbeMode;
+	double                   m_ProbeTarget;
+	double                   m_ProbeMaxDistance;
 	int											 m_ShowScalarBar;
 	int											 m_ScalarBarLabNum;
 	int											 m_ScalarBarPos;

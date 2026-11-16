@@ -12,9 +12,7 @@ SET(PROJECT_SRCS
   albaPipeMesh.cpp 							albaPipeMesh.h
   albaPipeSurface.cpp 						albaPipeSurface.h
   albaPipeRefSys.cpp 						albaPipeRefSys.h
-  albaPipeScalar.cpp  						albaPipeScalar.h
   albaPipeVolumeMIP.cpp  					albaPipeVolumeMIP.h
-  albaPipeDensityDistance.cpp  				albaPipeDensityDistance.h
   albaPipeTrajectories.cpp  					albaPipeTrajectories.h
   albaPipeVolumeDRR.cpp  					albaPipeVolumeDRR.h
   albaPipeVolumeVR.cpp  						albaPipeVolumeVR.h
@@ -57,10 +55,8 @@ IF (ALBA_USE_VTK)
   albaPipeIsosurface.cpp  					albaPipeIsosurface.h
   albaPipeLandmarkCloud.cpp  				albaPipeLandmarkCloud.h
   albaPipeMeter.cpp  						albaPipeMeter.h
-  albaPipePointSet.cpp  						albaPipePointSet.h
   albaPipePolyline.cpp  						albaPipePolyline.h
   albaPipeSurfaceTextured.cpp  				albaPipeSurfaceTextured.h
-  albaPipeVector.cpp  						albaPipeVector.h
   albaPipeVolumeProjected.cpp  				albaPipeVolumeProjected.h
   )
 ENDIF (ALBA_USE_VTK)

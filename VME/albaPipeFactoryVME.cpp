@@ -35,14 +35,11 @@
 #include "albaPipeMeter.h"
 #include "albaPipeGizmo.h"
 #include "albaPipeLandmarkCloud.h"
-#include "albaPipePointSet.h"
 #include "albaPipePointCloud.h"
 #include "albaPipePolyline.h"
 #include "albaPipeIsosurface.h"
 #include "albaPipeImage3D.h"
-#include "albaPipeVector.h"
 #include "albaPipeMesh.h"
-#include "albaPipeScalar.h"
 #include "albaPipeVolumeMIP.h"
 #include "albaPipeVolumeDRR.h"
 #include "albaPipeVolumeVR.h"
@@ -50,7 +47,6 @@
 #include "albaPipeWrappedMeter.h"
 #include "albaPipeSurfaceEditor.h"
 #include "albaVisualPipePolylineGraph.h"
-#include "albaPipeDensityDistance.h"
 #include "albaPipePolylineGraphEditor.h"
 #include "albaPipeMeshSlice.h"
 #include "albaPipePolylineSlice.h"
@@ -121,19 +117,15 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeGizmo,"Pipe to render gizmos");
   albaPlugPipeMacro(albaPipeMeter,"Pipe for albaVMEMeter");
   albaPlugPipeMacro(albaPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");
-  albaPlugPipeMacro(albaPipePointSet,"Pipe for render vtk pointset");
 	albaPlugPipeMacro(albaPipePointCloud, "Pipe for render pointcloud");
   albaPlugPipeMacro(albaPipePolyline,"Pipe for render polylines");
-  albaPlugPipeMacro(albaPipeVector,"Pipe to render vectors ");
   albaPlugPipeMacro(albaPipeLandmarkCloud,"Pipe for render landmark clouds");
   albaPlugPipeMacro(albaPipeIsosurface,"Pipe for render vtk volumes as a iso-surface");
   albaPlugPipeMacro(albaPipeImage3D,"Pipe for render images");
 	albaPlugPipeMacro(albaPipeMesh,"Pipe for render Mesh");
-  albaPlugPipeMacro(albaPipeScalar,"Pipe for render scalar data");
   albaPlugPipeMacro(albaPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
   albaPlugPipeMacro(albaPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
   albaPlugPipeMacro(albaPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");
-  albaPlugPipeMacro(albaPipeDensityDistance, "Pipe for visualize the value of scalars on a surface.");
   albaPlugPipeMacro(albaPipeTrajectories, "Pipe to render animated Landmark trajectories in a time interval.");
   albaPlugPipeMacro(albaPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
   albaPlugPipeMacro(albaPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");

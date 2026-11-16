@@ -79,7 +79,7 @@ protected:
   /** Update the added VMEs ListBox */
   void UpdateAddedVMEsListBox();//GUI
   /** Implements the condition for accepting node in the dialog */
-  static bool DialogAcceptVME(albaVME* node) {return(node != NULL)&&(!node->IsA("albaVMERoot"));};
+  static bool DialogAcceptVME(albaVME* node);
 
   /** Return true if the specified VME represent the same object of previously added VMEs */
   bool AcceptVME(albaVME * vme);
