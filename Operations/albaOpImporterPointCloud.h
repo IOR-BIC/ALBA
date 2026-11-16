@@ -99,6 +99,7 @@ protected:
 	albaString m_FileName;
 
 	friend class albaOpImporterPointCloudTest;
+	friend class albaOpExporterPointCloudTest;
   	
 private:
 	bool IsEmptyLine(char *line);

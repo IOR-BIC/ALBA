@@ -123,6 +123,7 @@
 #include "albaOpImporterPointCloudTest.h"
 #include "albaOpImporterPolylineTest.h"
 #include "albaOpExporterPolylineTest.h"
+#include "albaOpExporterPointCloudTest.h"
 #include "albaOpFilterImageTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
@@ -295,6 +296,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaOpImporterPointCloudTest::suite());
 	runner.addTest(albaOpImporterPolylineTest::suite());
 	runner.addTest(albaOpExporterPolylineTest::suite());
+	runner.addTest(albaOpExporterPointCloudTest::suite());
 	runner.addTest(albaOpFilterImageTest::suite()); 
 	runner.addTest(albaOpExporterDicFileTest::suite()); /* */
 	

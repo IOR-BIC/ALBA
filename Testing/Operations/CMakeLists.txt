@@ -114,6 +114,7 @@ SET(PROJECT_SRCS
 	albaOpImporterPointCloudTest.cpp albaOpImporterPointCloudTest.h
 	albaOpImporterPolylineTest.cpp albaOpImporterPolylineTest.h
 	albaOpExporterPolylineTest.cpp albaOpExporterPolylineTest.h
+	albaOpExporterPointCloudTest.cpp albaOpExporterPointCloudTest.h
 	albaOpFilterImageTest.cpp albaOpFilterImageTest.h
 	albaOpExporterDicFileTest.cpp albaOpExporterDicFileTest.h
 	albaOpImporterDICFileTest.cpp albaOpImporterDICFileTest.h
