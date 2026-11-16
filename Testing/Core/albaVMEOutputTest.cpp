@@ -31,7 +31,7 @@
 #include "albaVMEFactory.H"
 #include "albaVMEStorage.h"
 #include "albaVMERoot.h" 
-#include "albaVMEVector.h"
+#include "albaVMEPolyline.h"
 #include "albaMatrix.h"
 #include "albaSmartPointer.h"
 
@@ -298,7 +298,7 @@ void albaVMEOutputTest::TestGetlocalTimeBounds()
   albaVME *node = storage->GetRoot();
   albaVME *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
 
-  albaVMEVector *vector = albaVMEVector::SafeDownCast(vectorNode);
+  albaVMEPolyline *vector = albaVMEPolyline::SafeDownCast(vectorNode);
 
   double tbounds[2];
   vector->GetOutput()->GetLocalTimeBounds(tbounds);
@@ -366,7 +366,7 @@ void albaVMEOutputTest::TestGetVMEBounds()
   albaVME *node = storage->GetRoot();
   albaVME *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
 
-  albaVMEVector *vector = albaVMEVector::SafeDownCast(vectorNode);
+  albaVMEPolyline *vector = albaVMEPolyline::SafeDownCast(vectorNode);
 
   albaVMEOutput *vme_out = vector->GetOutput();
   double bounds[6];
@@ -402,7 +402,7 @@ void albaVMEOutputTest::TestGetVMELocalBounds()
   albaVME *node = storage->GetRoot();
   albaVME *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
 
-  albaVMEVector *vector = albaVMEVector::SafeDownCast(vectorNode);
+  albaVMEPolyline *vector = albaVMEPolyline::SafeDownCast(vectorNode);
 
   albaVMEOutput *vme_out = vector->GetOutput();
   double bounds[6];

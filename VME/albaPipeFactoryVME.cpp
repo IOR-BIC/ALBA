@@ -39,7 +39,6 @@
 #include "albaPipePolyline.h"
 #include "albaPipeIsosurface.h"
 #include "albaPipeImage3D.h"
-#include "albaPipeVector.h"
 #include "albaPipeMesh.h"
 #include "albaPipeVolumeMIP.h"
 #include "albaPipeVolumeDRR.h"
@@ -120,7 +119,6 @@ albaPipeFactoryVME::albaPipeFactoryVME()
   albaPlugPipeMacro(albaPipeVolumeProjected,"Pipe for render vtk volumes as a projected image along X,Y or Z axes");
 	albaPlugPipeMacro(albaPipePointCloud, "Pipe for render pointcloud");
   albaPlugPipeMacro(albaPipePolyline,"Pipe for render polylines");
-  albaPlugPipeMacro(albaPipeVector,"Pipe to render vectors ");
   albaPlugPipeMacro(albaPipeLandmarkCloud,"Pipe for render landmark clouds");
   albaPlugPipeMacro(albaPipeIsosurface,"Pipe for render vtk volumes as a iso-surface");
   albaPlugPipeMacro(albaPipeImage3D,"Pipe for render images");

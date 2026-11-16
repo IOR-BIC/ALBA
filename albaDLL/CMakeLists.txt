@@ -484,8 +484,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaPipeSurfaceSlice.h
     ../VME/albaPipeSurfaceTextured.cpp
     ../VME/albaPipeSurfaceTextured.h
-    ../VME/albaPipeVector.cpp
-    ../VME/albaPipeVector.h
     ../VME/albaPipeVolumeProjected.cpp
     ../VME/albaPipeVolumeProjected.h
     ../VME/albaPipeVolumeSlice.cpp
@@ -538,8 +536,6 @@ IF (ALBA_USE_VTK)
     ../VME/albaVMESurface.h
     ../VME/albaVMESurfaceParametric.cpp
     ../VME/albaVMESurfaceParametric.h
-    ../VME/albaVMEVector.cpp
-    ../VME/albaVMEVector.h
     ../VME/albaVMEVolume.cpp
     ../VME/albaVMEVolume.h
     ../VME/albaVMEVolumeGray.cpp
@@ -628,7 +624,6 @@ IF (ALBA_USE_VTK)
   ../VME/albaVMESlicer.cpp  						../VME/albaVMESlicer.h
   ../VME/albaVMESurface.cpp  						../VME/albaVMESurface.h
   ../VME/albaVMESurfaceParametric.cpp  				../VME/albaVMESurfaceParametric.h
-  ../VME/albaVMEVector.cpp  						../VME/albaVMEVector.h
   ../VME/albaVMEVolume.cpp  						../VME/albaVMEVolume.h
   ../VME/albaVMEVolumeGray.cpp  					../VME/albaVMEVolumeGray.h
   ../VME/albaVMEVolumeRGB.cpp  						../VME/albaVMEVolumeRGB.h
@@ -727,7 +722,6 @@ IF (ALBA_USE_VTK)
   ../VisualPipes/albaPipeMeter.cpp  						../VisualPipes/albaPipeMeter.h
   ../VisualPipes/albaPipePolyline.cpp  						../VisualPipes/albaPipePolyline.h
   ../VisualPipes/albaPipeSurfaceTextured.cpp  				../VisualPipes/albaPipeSurfaceTextured.h
-  ../VisualPipes/albaPipeVector.cpp  						../VisualPipes/albaPipeVector.h
   ../VisualPipes/albaPipeVolumeProjected.cpp  				../VisualPipes/albaPipeVolumeProjected.h
   ../VisualPipes/albaPipeGraph.cpp  						../VisualPipes/albaPipeGraph.h
   )

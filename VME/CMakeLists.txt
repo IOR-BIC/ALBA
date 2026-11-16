@@ -65,7 +65,6 @@ IF (ALBA_USE_VTK)
   albaVMERefSys.cpp  						albaVMERefSys.h
   albaVMESurface.cpp  						albaVMESurface.h
   albaVMESurfaceParametric.cpp  				albaVMESurfaceParametric.h
-  albaVMEVector.cpp  						albaVMEVector.h
   albaVMEVolume.cpp  						albaVMEVolume.h
   albaVMEVolumeGray.cpp  					albaVMEVolumeGray.h
   albaVMEVolumeRGB.cpp  						albaVMEVolumeRGB.h

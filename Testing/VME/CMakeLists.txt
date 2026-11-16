@@ -32,7 +32,6 @@ SET(PROJECT_SRCS
 	albaVMEInfoTextTest.h albaVMEInfoTextTest.cpp
 	mmaMeterTest.h mmaMeterTest.cpp
 	albaVMEOutputMeterTest.h albaVMEOutputMeterTest.cpp
-	albaVMEVectorTest.h albaVMEVectorTest.cpp
 	albaVMEOutputPolylineTest.h albaVMEOutputPolylineTest.cpp
 	albaVMEOutputSurfaceTest.h albaVMEOutputSurfaceTest.cpp
 	albaVMEOutputPointSetTest.h albaVMEOutputPointSetTest.cpp

@@ -69,7 +69,6 @@
 #include "albaVMESurfaceEditorTest.h"
 #include "albaVMESurfaceParametricTest.h"
 #include "albaVMESurfaceTest.h"
-#include "albaVMEVectorTest.h"
 #include "albaVMEVolumeGrayTest.h"
 #include "albaVMEVolumeRGBTest.h"
 #include "albaVMEWrappedMeterTest.h"
@@ -139,7 +138,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaVMEInfoTextTest::suite());
 	runner.addTest(mmaMeterTest::suite());
 	runner.addTest(albaVMEOutputMeterTest::suite());
-	runner.addTest(albaVMEVectorTest::suite());
 	runner.addTest(albaVMEOutputPolylineTest::suite());
 	runner.addTest(albaVMEOutputSurfaceTest::suite());
 	runner.addTest(albaVMEOutputPointSetTest::suite());

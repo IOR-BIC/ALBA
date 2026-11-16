@@ -28,7 +28,6 @@
 #include "albaTransform.h"
 
 #include "albaSceneNode.h"
-#include "albaVMEVector.h"
 #include "mmaMaterial.h"
 #include "albaVMERoot.h"
 #include "albaVMEStorage.h"

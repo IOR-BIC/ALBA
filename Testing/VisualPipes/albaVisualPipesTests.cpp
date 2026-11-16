@@ -52,7 +52,6 @@
 #include "albaPipeVectorFieldSliceTest.h"
 #include "albaPipeVectorFieldSurfaceTest.h"
 #include "albaPipeVectorFieldTest.h"
-#include "albaPipeVectorTest.h"
 #include "albaPipeVolumeProjectedTest.h"
 #include "albaPipeVolumeArbSliceTest.h"
 #include "albaPipeVolumeOrthoSliceTest.h"
@@ -128,7 +127,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaPipeFactoryVMETest::suite());
 	runner.addTest(albaPipePolylineTest::suite()); 
 	runner.addTest(albaPipeLandmarkCloudTest::suite()); 
-	runner.addTest(albaPipeVectorTest::suite()); 
 	runner.addTest(albaPipeMeterTest::suite());
 	runner.addTest(albaPipeVolumeProjectedTest::suite());
 	runner.addTest(albaPipePolylineGraphEditorTest::suite()); 

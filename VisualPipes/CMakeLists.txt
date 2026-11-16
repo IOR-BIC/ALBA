@@ -57,7 +57,6 @@ IF (ALBA_USE_VTK)
   albaPipeMeter.cpp  						albaPipeMeter.h
   albaPipePolyline.cpp  						albaPipePolyline.h
   albaPipeSurfaceTextured.cpp  				albaPipeSurfaceTextured.h
-  albaPipeVector.cpp  						albaPipeVector.h
   albaPipeVolumeProjected.cpp  				albaPipeVolumeProjected.h
   )
 ENDIF (ALBA_USE_VTK)
