@@ -29,6 +29,7 @@
 #include "albaGUI.h"
 #include "albaGUIValidator.h"
 #include "albaGUILutSlider.h"
+#include "albaViewVTK.h"
 #include "albaSceneGraph.h"
 #include "albaVME.h"
 #include "albaVMEOutputVolume.h"
@@ -70,6 +71,7 @@ albaGUIWizardPageNew::albaGUIWizardPageNew(albaGUIWizard *wizardParent,long styl
   m_GuiView = new albaGUI(this);
 
 	m_Rwi = NULL;
+	m_View = NULL;
   m_GuiLowerLeft = NULL;
   m_GuiLowerCenter = NULL;
   m_GuiLowerUnderLeft = NULL;
@@ -77,7 +79,14 @@ albaGUIWizardPageNew::albaGUIWizardPageNew(albaGUIWizard *wizardParent,long styl
 
 	if(style & albaWIZARDUSERWI)
   {
-    m_Rwi = new albaRWI(this);
+    // the page has a real view: an operation can select it, so the mouse and the interaction work on it
+    wxWindow *oldFrame = albaGetFrame();
+    albaSetFrame(this);
+    m_View = new albaViewVTK(label, CAMERA_CT, false);
+    m_View->Create();
+    albaSetFrame(oldFrame);
+
+    m_Rwi = m_View->m_Rwi;
     m_Rwi->SetSize(0,0,512,384);
     m_Rwi->Show(true);
     m_Rwi->CameraSet(CAMERA_CT);
@@ -140,7 +149,8 @@ albaGUIWizardPageNew::albaGUIWizardPageNew(albaGUIWizard *wizardParent,long styl
 albaGUIWizardPageNew::~albaGUIWizardPageNew()
 //----------------------------------------------------------------------------
 {
-	cppDEL(m_Rwi);
+	albaDEL(m_View);
+	m_Rwi = NULL;
 }
 //--------------------------------------------------------------------------------
 void albaGUIWizardPageNew::OnEvent(albaEventBase *alba_event)
