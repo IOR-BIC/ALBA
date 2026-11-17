@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   AlbaMaster
-Module:    albaOpInteractionOp.cpp
+Module:    exWizardSample.cpp
 Language:  C++
 Date:      $Date: 2018-01-01 12:00:00 $
 Version:   $Revision: 1.0.0.0 $

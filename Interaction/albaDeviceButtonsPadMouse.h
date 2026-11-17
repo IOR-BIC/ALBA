@@ -82,6 +82,9 @@ public:
   /** Return the RenderWindowInteractor used by mouse device */
   albaRWIBase *GetRWI();
 
+  /** Set the view the mouse works on */
+  void SetView(albaView *view) {m_SelectedView = view;}
+
   void DisplayToNormalizedDisplay(double display[2]);
   void NormalizedDisplayToDisplay(double normalized[2]);
 

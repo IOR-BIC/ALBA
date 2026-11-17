@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUIWizardPageNew.h"
 #include "albaGUIValidator.h"
 #include "albaDeviceButtonsPadMouse.h"
-#include "albaInteractorDICOMImporter.h"
+#include "albaDICOMImporterTool.h"
 #include "albaTagArray.h"
 #include "albaVMERoot.h"
 #include "albaVME.h"
@@ -120,7 +120,7 @@ albaOp(label)
 	m_TextMapper=NULL;
 	m_CurrentSliceID = NULL;
 	//other pointers
-	m_DicomInteractor = NULL;
+	m_DicomTool = NULL;
 	m_TagArray = NULL;
 	m_StudyList = NULL;
 	m_SelectedSeries = NULL;
@@ -320,8 +320,8 @@ void albaOpImporterDicom::OpDo()
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::OpStop(int result)
 {
-	if (m_DicomInteractor)
-		m_Mouse->RemoveObserver(m_DicomInteractor);
+	if (m_DicomTool)
+		GetLogicManager()->PopTool(m_DicomTool);
 
 	if (m_LoadPage)
 	{
@@ -338,7 +338,7 @@ void albaOpImporterDicom::OpStop(int result)
 	vtkDEL(m_TextActor);
 
 	albaDEL(m_TagArray);
-	albaDEL(m_DicomInteractor);
+	albaDEL(m_DicomTool);
 	cppDEL(m_StudyList);
 
 	if (!this->m_TestMode)
@@ -595,7 +595,7 @@ void albaOpImporterDicom::CreateCropPage()
 
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	m_DicomInteractor->SetRWI(m_CropPage->GetRWI());
+	m_DicomTool->SetRendererAndView(m_CropPage->GetRWI()->m_RenFront, NULL);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::GuiUpdate()
@@ -783,9 +783,8 @@ void albaOpImporterDicom::CreateSliceVTKPipeline()
 	// interactor
 	if (m_Mouse)
 	{
-		albaNEW(m_DicomInteractor);
-		m_DicomInteractor->SetListener(this);
-		m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
+		albaNEW(m_DicomTool);
+		m_DicomTool->SetListener(this);
 	}
 }
 //----------------------------------------------------------------------------
@@ -1129,8 +1128,8 @@ void albaOpImporterDicom::CalculateCropExtent()
 	m_CurrentSliceID->GetSpacing(spacing);
 	m_SelectedSeries->GetSlice(0)->GetImagePositionPatient(sliceOrigin);
 	
-	if (m_DicomInteractor)
-		m_DicomInteractor->GetPlaneBounds(crop_bounds);
+	if (m_DicomTool)
+		m_DicomTool->GetPlaneBounds(crop_bounds);
 	else
 		m_CurrentSliceID->GetBounds(crop_bounds);
 
@@ -1342,8 +1341,8 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 			//get the current windowing in order to maintain subrange thought the wizard pages 
 			m_LoadPage->GetWindowing(m_SliceRange, m_SliceSubRange);
 
-			m_DicomInteractor->SetSliceBounds(m_SliceBounds);
-			m_DicomInteractor->PlaneVisibilityOn();
+			m_DicomTool->SetSliceBounds(m_SliceBounds);
+			GetLogicManager()->PushTool(m_DicomTool); // the crop rectangle is edited only in the crop page
 
 			m_CropPage->RemoveGuiLowerCenter(m_CropGuiCenter);
 			m_CropGuiCenter = new albaGUI(this);
@@ -1372,7 +1371,7 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_CropPage->GetWindowing(m_SliceRange, m_SliceSubRange);
-		m_DicomInteractor->PlaneVisibilityOff();
+		GetLogicManager()->PopTool(m_DicomTool);
 
 		//TODO RESTORE THIS
 		wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);

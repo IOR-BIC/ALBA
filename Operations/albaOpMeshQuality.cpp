@@ -28,7 +28,6 @@
 #include "albaGUIDialog.h"
 #include "albaRWIBase.h"
 #include "albaRWI.h"
-#include "albaInteractorCameraMove.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
@@ -151,7 +150,6 @@ void albaOpMeshQuality::OpStop(int result)
 void albaOpMeshQuality::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Mouse->RemoveObserver(m_Picker);
 
 	m_Rwi->m_RenFront->RemoveActor(m_Actor);
 	m_Rwi->m_RenFront->RemoveActor(m_BarActor);
@@ -166,7 +164,6 @@ void albaOpMeshQuality::DeleteOpDialog()
   vtkDEL(m_TubeFilter);
   vtkDEL(m_FeatureEdgeFilter);
 
-	albaDEL(m_Picker);
 
 	cppDEL(m_Rwi); 
 	cppDEL(m_Dialog);
@@ -188,9 +185,6 @@ void albaOpMeshQuality::CreateOpDialog()
 	//m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
 	m_Rwi->Show(true);
 	m_Rwi->m_RwiBase->SetMouse(m_Mouse);
-	albaNEW(m_Picker);
-	m_Picker->SetListener(this);
-	m_Mouse->AddObserver(m_Picker, MCH_INPUT);
 
 	wxPoint p = wxDefaultPosition;
 

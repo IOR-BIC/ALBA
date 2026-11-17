@@ -42,6 +42,7 @@
 #include "albaRWIBase.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUI.h"
+#include "albaAbsLogicManager.h"
 
 
 /*
@@ -102,7 +103,7 @@ void albaViewManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
 {
   m_Mouse = mouse;
   if(m_SelectedView && m_Mouse)
-    m_Mouse->OnEvent(&albaEvent(this,VIEW_SELECT,m_SelectedView)); // Update the mouse for the selected view
+    m_Mouse->SetView(m_SelectedView); // Update the mouse for the selected view
 }
 
 //----------------------------------------------------------------------------
@@ -192,8 +193,8 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 
         ViewSelected(view/*, rwi*/);
 
-        if(notifylogic)
-          albaEventMacro(albaEvent(this,VIEW_SELECT)); // forward the view selection event to logic
+        if (notifylogic && GetLogicManager())
+          GetLogicManager()->SelectView(view);
       }
       break;
 
@@ -260,12 +261,6 @@ void albaViewManager::ViewSelected(albaView *view/*, albaRWIBase *rwi*/)
 //    m_SelectedRWI->SetInteractorStyle(NULL);
 
   m_SelectedRWI = view->GetRWI();
-  if (m_Mouse)
-  {
-    albaEvent e(this,VIEW_SELECT,m_SelectedView);
-    e.SetChannel(MCH_OUTPUT);
-    m_Mouse->OnEvent(&e); // update the mouse
-  }
 }
 //----------------------------------------------------------------------------
 void albaViewManager::VmeAdd(albaVME *vme)   

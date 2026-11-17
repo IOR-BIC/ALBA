@@ -44,7 +44,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMESurface.h"
 #include "albaVMEGroup.h"
 #include "albaVMEOutput.h"
-#include "albaInteractorExtractIsosurface.h"
+#include "albaExtractIsosurfaceTool.h"
 #include "mmaVolumeMaterial.h"
 
 #include "vtkLight.h"
@@ -262,7 +262,8 @@ void albaOpExtractIsosurface::CreateOpDialog()
   m_Rwi->m_RwiBase->SetMouse(m_Mouse);
   albaNEW(m_DensityPicker);
   m_DensityPicker->SetListener(this);	
-  m_Mouse->AddObserver(m_DensityPicker, MCH_INPUT);
+  m_DensityPicker->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+  GetLogicManager()->PushTool(m_DensityPicker);
   m_PIPRen->SetViewport(.6, .01, .99, .4);
   m_PIPRen->GetActiveCamera()->SetFocalPoint(0,0,0);
   m_PIPRen->GetActiveCamera()->SetPosition(0,0,-70);
@@ -560,7 +561,7 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
 //----------------------------------------------------------------------------
 void albaOpExtractIsosurface::DeleteOpDialog()
 {
-  m_Mouse->RemoveObserver(m_DensityPicker);
+  GetLogicManager()->PopTool(m_DensityPicker);
 
   m_VolNode->DeletePipe();
   cppDEL(m_VolNode);

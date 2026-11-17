@@ -56,7 +56,6 @@ class albaSnapshotManager;
 class mmaApplicationLayout;
 class albaProsthesesDBManager;
 
-typedef int(*eventfilterFunc)(wxEvent& event);
 
 //----------------------------------------------------------------------------
 // albaLogicWithManagers :
@@ -222,10 +221,6 @@ public:
 
 	virtual void PrintImage(albaVMEImage *img);
 
-	eventfilterFunc GetEventFilterFunc() const { return m_EventFilterFunc; }
-
-	void SetEventFilterFunc(eventfilterFunc val) { m_EventFilterFunc = val;}
-
 	/** Get  application layout*/
 	mmaApplicationLayout* GetLayout() { return m_AppLayout; };
 
@@ -267,10 +262,17 @@ public:
 	/** Set the link to the citation Paper */
 	void SetCitationPaper(char *link) { m_CitationPaper = link; }
 
-	void RegisterForKeyEvents(albaObserver *listener) override;
+	/** Select a view: the side bar, the interaction and the operations work on it */
+	void SelectView(albaView *view) override;
 
+	/** Return the selected view, NULL if none */
+	albaView *GetSelectedView() override { return m_SelectedView; }
 
-	void UnRegisterForKeyEvents(albaObserver *listener) override;
+	/** Push a tool on the tool stack of the positional event router */
+	void PushTool(albaInteractionTool *tool) override;
+
+	/** Remove a tool from the tool stack of the positional event router */
+	void PopTool(albaInteractionTool *tool) override;
 
 
 	bool IsTimeVaringEnabled() override;
@@ -402,8 +404,6 @@ protected:
 	virtual void ViewCreate(int viewId);
 	/** A new View has Been Created - Logic must create the View Frame */
 	virtual void ViewCreated(albaView *v);
-	/** Select a view and update the display list for the tree. */
-	virtual void ViewSelect();
 
 	virtual void CameraUpdate();
 
@@ -472,7 +472,7 @@ protected:
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
 
-	eventfilterFunc m_EventFilterFunc;
+	albaView *m_SelectedView; ///< the view selected with SelectView
 
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;
@@ -512,7 +512,6 @@ protected:
 	albaGUIApplicationSettings *m_ApplicationSettings;
 	albaGUISettingsTimeBar  *m_TimeBarSettings;
 
-	std::vector<albaObserver *> m_KeyEventListeners; ///< List of the observers that are registered to receive key events.
 
 	bool m_Quitting;    ///< Variable that allows to determine if the application is Quitting or not.
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.

@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 // forward references :
 //----------------------------------------------------------------------------
 class albaDicomSlice;
-class albaInteractorDICOMImporter;
+class albaDICOMImporterTool;
 class albaGUIWizardPageNew;
 class albaString;
 class albaTagArray;
@@ -238,7 +238,7 @@ protected:
 	vtkActor2D    *m_TextActor;
 	vtkTextMapper	*m_TextMapper;
 
-	albaInteractorDICOMImporter *m_DicomInteractor;
+	albaDICOMImporterTool *m_DicomTool;
 
 	albaGUIWizard			*m_Wizard;
 	albaGUIWizardPageNew	*m_LoadPage;

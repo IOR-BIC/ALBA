@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 template <class T> class vtkTemplatedList;
 class albaDevice;
-class albaInteractor;
+class albaAgent;
 class vtkRenderer;
 
 /** Class used to route events from devices to interactors */
@@ -62,8 +62,8 @@ public:
   void UnBindDevice(albaDevice *device);
 
   /** Bind/Unbind an interactor to this action */
-  void BindInteractor(albaInteractor *inter);
-  void UnBindInteractor(albaInteractor *inter);
+  void BindInteractor(albaAgent *inter);
+  void UnBindInteractor(albaAgent *inter);
 
   /** Get list of devices assigned to this action */
   const mmuDeviceList *GetDevices() {return &m_Devices;}

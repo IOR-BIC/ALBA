@@ -28,7 +28,7 @@
 #include "albaGUIDialog.h"
 #include "albaRWIBase.h"
 #include "albaRWI.h"
-#include "albaInteractorSelectPoint.h"
+#include "albaSelectPointTool.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
@@ -245,7 +245,7 @@ void albaOpFillHoles::OpStop(int result)
 void albaOpFillHoles::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	m_Mouse->RemoveObserver(m_Picker);
+	GetLogicManager()->PopTool(m_Picker);
 
 	if(m_ActorSurface)
 		m_Rwi->m_RenFront->RemoveActor(m_ActorSurface);
@@ -290,7 +290,8 @@ void albaOpFillHoles::CreateOpDialog()
 
 	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
-	m_Mouse->AddObserver(m_Picker, MCH_INPUT);
+	m_Picker->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+	GetLogicManager()->PushTool(m_Picker);
 
 	wxPoint p = wxDefaultPosition;
 

@@ -23,6 +23,7 @@
 #include "albaEvent.h"
 #include "albaObserver.h"
 #include "albaGUISettings.h"
+#include "albaServiceClient.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -54,7 +55,7 @@ enum VieweSettingsEvents
 // albaViewManager :
 //----------------------------------------------------------------------------
 /** An implementation of albaViewManager with [D]ynamic view [C]reation feature */
-class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings
+class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings, public albaServiceClient
 {
 
 public:

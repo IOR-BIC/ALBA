@@ -704,12 +704,6 @@ void albaAvatar3D::OnEvent(albaEventBase* event)
  
   switch(event->GetId()) 
   {
-   case VIEW_SELECT:
-      {
-        albaEvent *e=albaEvent::SafeDownCast(event);
-        OnViewSelected(e);
-      }
-    break;
     case ID_FITTING_COMBO:
       SetFittingMode(m_FittingMode);
     break;

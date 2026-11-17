@@ -42,7 +42,7 @@
 #include "albaVME.h"
 #include "albaVMESurface.h"
 #include "albaVMEOutput.h"
-#include "albaInteractorSelectCell.h"
+#include "albaSelectCellTool.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -79,7 +79,7 @@ albaOp(label)
   m_Dialog = NULL;
   m_Rwi = NULL;
 
-  m_SelectCellInteractor  = NULL;
+  m_SelectCellTool  = NULL;
 
   m_Rcf = NULL;
 
@@ -239,10 +239,11 @@ void albaOpRemoveCells::CreateOpDialog()
   m_Rwi->m_RenFront->ResetCamera(polydata->GetBounds());
   m_Rwi->m_RenFront->ResetCameraClippingRange(bounds);
 
-  albaNEW(m_SelectCellInteractor);
+  albaNEW(m_SelectCellTool);
 
-  m_SelectCellInteractor->SetListener(this);
-  m_Mouse->AddObserver(m_SelectCellInteractor, MCH_INPUT);
+  m_SelectCellTool->SetListener(this);
+  m_SelectCellTool->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+  GetLogicManager()->PushTool(m_SelectCellTool);
 
  
   wxPoint p = wxDefaultPosition;
@@ -326,9 +327,9 @@ void albaOpRemoveCells::CreateSurfacePipeline()
 void albaOpRemoveCells::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-  m_Mouse->RemoveObserver(m_SelectCellInteractor);
+  GetLogicManager()->PopTool(m_SelectCellTool);
 
-  albaDEL(m_SelectCellInteractor);
+  albaDEL(m_SelectCellTool);
 
   cppDEL(m_Rwi); 
   cppDEL(m_Dialog);
@@ -406,13 +407,11 @@ void albaOpRemoveCells::OnEvent(albaEventBase *alba_event)
 			  //achiarini (27.11.2007)
 			  //this is to guarantee that the clippingplanes are not reset during interaction
 			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOn(); 
-			  m_SelectCellInteractor->AutoResetClippingRangeOn();
 
 		  }
 		  else{
 			  //this is to guarantee that the clippingplanes are not reset during interaction
 			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOff(); 
-			  m_SelectCellInteractor->AutoResetClippingRangeOff();
 			  m_Rwi->CameraUpdate();
 		  }
 

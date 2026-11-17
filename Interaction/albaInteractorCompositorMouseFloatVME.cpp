@@ -27,7 +27,6 @@
 
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaEventInteraction.h"
-#include "albaInteractorCameraMove.h"
 #include "albaView.h"
 
 #include "vtkCamera.h"

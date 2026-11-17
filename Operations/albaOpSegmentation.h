@@ -21,15 +21,11 @@
 
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
-#include "albaLogicWithManagers.h"
 
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaAction;
-class albaDeviceButtonsPadMouseDialog;
-class albaDeviceManager;
 class albaEvent;
 class albaGUI;
 class albaGUIButton;
@@ -38,15 +34,11 @@ class albaGUIFloatSlider;
 class albaGUILutHistogramSwatch;
 class albaGUILutSlider;
 class albaGUIRollOut;
-class albaInteractor;
-class albaInteractorCameraMove;
 class albaInteractorGenericMouse;
 class albaInteractorPER;
-class albaInteractorPERBrushFeedback;
-class albaInteractorPERScalarInformation;
 class albaInteractorPicker;
-class albaInteractorSER;
-class albaInteractorSegmentationPicker;
+class albaSegmentationEditTool;
+class albaSegmentationThresholdTool;
 class albaMatrix;
 class albaVME;
 class albaVMEImage;
@@ -61,6 +53,7 @@ class vtkSphereSource;
 class vtkImageData;
 class vtkTextMapper;
 class vtkUnsignedCharArray;
+class wxNotebook;
 class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
@@ -187,8 +180,6 @@ public:
 	/** Return true if node is of type albaVMEVolume. */
 	static bool MaskAccept(albaVME* node);
 
-	static int OpSegmentationEventFilter(wxEvent& event);
-
 
 	/** Sets SliceIndex */
 	void SetSlicingIndexes(int planeindex, int sliceIndex);
@@ -311,15 +302,13 @@ protected:
 	wxNotebook *m_SegmentationOperationsNotebook;
   albaGUI *m_SegmentationOperationsGui[2]; //<Steps gui
   wxComboBox *m_OperationsList;         //<List if operations (not used)
-  albaInteractor *m_OldBehavior;         //<Old volume behavior
   albaVME *m_OldVolumeParent;           //<Old volume parent
-  albaDeviceButtonsPadMouseDialog* m_DialogMouse; //<Dialog mouse
-  albaDeviceManager *m_DeviceManager;    //<Device manager
-  albaInteractorSER *m_SER;              //<Static event router                        
   albaMatrix m_Matrix;                   //<Volume initial matrix
 	albaVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
-  albaInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
+  albaSegmentationThresholdTool *m_ThresholdTool; //<Tool of the threshold initialization
+  albaSegmentationEditTool *m_EditTool;           //<Tool of the editing
+  albaView *m_OldSelectedView;                    //<View selected before the operation
 
 	albaGUI* m_AppendingOpGui;
 	  	  
@@ -361,7 +350,6 @@ protected:
 	
   std::vector<UndoRedoState> m_UndoList;  //< Undo stack
   std::vector<UndoRedoState> m_RedoList;  // Redo stack
-  albaInteractorPERBrushFeedback *m_EditPER;   //<Dynamic event router
   vtkUnsignedCharArray *m_SliceBackup;       //<Real drawn image used in brush preview
   int m_LastMouseMovePointID;                   //<Last point id in mouse move event
   wxStaticBoxSizer *m_FillEditingSizer;       //<
@@ -420,7 +408,6 @@ protected:
   vtkTextMapper *m_AutomaticSliceTextMapper;    //<Text mapper for slice visualization
   vtkActor2D *m_AutomaticSliceTextActor;        //<Text mapper for slice visualization
 
-  albaInteractorPERScalarInformation *m_InitPER; //<Interactor for scalar value visualization on mouse move
   //////////////////////////////////////////////////////////////////////////
 
   /** Update slice visualization on manual step */
@@ -449,6 +436,9 @@ protected:
 
 	int ReleaseKey(int keyCode, bool ctrl, bool alt, bool shift);
 
+	/** Handle the keys forwarded by the tools: the event bool is set to true if the key is used */
+	void OnKeyEvent(albaEvent *e);
+
 	std::vector<wxImage> m_CursorImageVect;
 
 	enum MOUSE_CURSOR
@@ -471,7 +461,6 @@ protected:
 
 private:
 
-	eventfilterFunc m_OldEventFunc;
 	void SelectRangeByCurrentSlice();
 	void Conntectivity3D(albaEvent * e);
 

@@ -39,7 +39,7 @@ class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkRenderer;
 
-class albaInteractorExtractIsosurface;
+class albaExtractIsosurfaceTool;
 class vtkImageData;
 class vtkTexture;
 class vtkPolyData;
@@ -154,7 +154,7 @@ protected:
   vtkPlane          *m_CutterPlane;
   vtkALBAFixedCutter    *m_IsosurfaceCutter;
 
-  albaInteractorExtractIsosurface *m_DensityPicker;
+  albaExtractIsosurfaceTool *m_DensityPicker;
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);

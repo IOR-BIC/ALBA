@@ -16,6 +16,7 @@
 
 #include "albaFakeLogicForTest.h"
 #include "albaVME.h"
+#include <algorithm>
 
 //-------------------------------------------------------------------------
 albaFakeLogicForTest::albaFakeLogicForTest()
@@ -194,15 +195,24 @@ void albaFakeLogicForTest::SetCitationPaper(char *link)
 }
 
 //----------------------------------------------------------------------------
-void albaFakeLogicForTest::RegisterForKeyEvents(albaObserver *listener)
+void albaFakeLogicForTest::PushTool(albaInteractionTool *tool)
 {
-	return;
+	if (!IsToolPushed(tool))
+		m_PushedTools.push_back(tool);
 }
 
 //----------------------------------------------------------------------------
-void albaFakeLogicForTest::UnRegisterForKeyEvents(albaObserver *listener)
+void albaFakeLogicForTest::PopTool(albaInteractionTool *tool)
 {
-	return;
+	std::vector<albaInteractionTool *>::iterator it = std::find(m_PushedTools.begin(), m_PushedTools.end(), tool);
+	if (it != m_PushedTools.end())
+		m_PushedTools.erase(it);
+}
+
+//----------------------------------------------------------------------------
+bool albaFakeLogicForTest::IsToolPushed(albaInteractionTool *tool)
+{
+	return std::find(m_PushedTools.begin(), m_PushedTools.end(), tool) != m_PushedTools.end();
 }
 
 //----------------------------------------------------------------------------

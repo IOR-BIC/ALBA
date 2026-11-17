@@ -468,13 +468,10 @@ wxString  albaIdString(int id)
      case VIEW_CREATED:         s="VIEW_CREATED"; break; 
      case VIEW_DELETE:          s="VIEW_DELETE"; break; 
      case VIEW_SELECT:          s="VIEW_SELECT"; break; 
-     case VIEW_SELECTED:        s="VIEW_SELECTED"; break; 
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
      case VIEW_MAXIMIZE:        s="VIEW_CLICKED"; break; 
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
 
-     case PER_PUSH:             s="PER_PUSH"; break; 
-     case PER_POP:              s="PER_POP"; break; 
      case CAMERA_FRONT:	        s="CAMERA_FRONT"; break; 
      case CAMERA_BACK:	        s="CAMERA_BACK"; break; 
      case CAMERA_LEFT:	        s="CAMERA_LEFT"; break; 
@@ -506,8 +503,6 @@ wxString  albaIdString(int id)
      case DEVICE_ADD:           s="DEVICE_ADD"; break; 
      case DEVICE_REMOVE:        s="DEVICE_REMOVE"; break; 
      case DEVICE_GET:           s="DEVICE_GET"; break; 
-     case INTERACTOR_ADD:       s="INTERACTOR_ADD"; break; 
-     case INTERACTOR_REMOVE:    s="INTERACTOR_REMOVE"; break; 
 
      case OP_RUN:	              s="OP_RUN"; break; 
      case OP_RUN_OK:	          s="OP_RUN_OK"; break; 

@@ -31,7 +31,7 @@
 class albaRWI;
 class albaVME;
 class albaGUIDialog;
-class albaInteractorSelectCell;
+class albaSelectCellTool;
 
 class vtkActor;
 class vtkPolyData;
@@ -133,7 +133,7 @@ protected:
 	albaRWI							*m_Rwi;
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;
-	albaInteractorSelectCell				*m_SelectCellInteractor;
+	albaSelectCellTool				*m_SelectCellTool;
 	vtkALBACellsFilter			*m_CellFilter;
   vtkALBARemoveCellsFilter *m_RemoveSelectedCells;
   vtkALBARemoveCellsFilter *m_RemoveUnSelectedCells;

@@ -106,14 +106,6 @@ void albaDeviceButtonsPadMouse::OnEvent(albaEventBase *event)
     e->SetSender(this);
     InvokeEvent(e,(albaID)MCH_INPUT);
   }
-  else if (id == VIEW_SELECT)
-  {
-    albaEvent *ev = albaEvent::SafeDownCast(event);
-    if (ev)
-    {
-      m_SelectedView = ev->GetView();    
-    }
-  }
   else if (id == GetMouseCharEventId())
   {
     albaEvent *ev = albaEvent::SafeDownCast(event);

@@ -74,7 +74,6 @@
 #include "albaOpExporterDicFile.h"
 
 // OPERATIONS
-#include "albaOp2DMeasure.h"
 #include "albaOpMeasure2D.h"
 #include "albaOpComputeInertialTensor.h"
 #include "albaOpTransformOld.h"
@@ -157,7 +156,6 @@
 #include "albaOpVOIDensityEditor.h"
 #include "albaOpValidateTree.h"
 #include "albaOpVolumeUnion.h"
-#include "albaOpInteractorSliderSample.h"
 
 // VIEWS
 #include "albaView3D.h"
@@ -297,7 +295,6 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpTransformAtoB(), "Modify");
 
 	logic->Plug(new albaOpMeasure2D("2D Measure"), "Measure");
-	logic->Plug(new albaOp2DMeasure("2D Measure (Old)"), "Measure");
 	logic->Plug(new albaOpVOIDensity("VOI Density"), "Measure");
 	logic->Plug(new albaOpVolumeMeasure("Volume"), "Measure");
 	logic->Plug(new albaOpMeshQuality("Mesh Quality"), "Measure");
@@ -329,7 +326,6 @@ void albaLogicStandardPlugs::PlugStandardOperations(albaLogicWithManagers *logic
 	logic->Plug(new albaOpVOIDensityEditor(), "TMP to test");
 	logic->Plug(new albaOpValidateTree(), "TMP to test");
 	logic->Plug(new albaOpVolumeUnion(), "TMP to test");
-	logic->Plug(new albaOpInteractorSliderSample(), "TMP to test");
 
 }
 

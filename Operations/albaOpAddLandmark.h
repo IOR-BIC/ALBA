@@ -22,7 +22,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 
 #include "albaEvent.h"
-#include "albaInteractorPERPicker.h"
+#include "albaPickerTool.h"
 #include "albaString.h"
 #include "albaVME.h"
 #include "albaVMELandmarkCloud.h"
@@ -37,7 +37,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 class albaGUIDictionaryWidget;
 class albaInteractor;
-class albaInteractorPERPicker;
+class albaPickerTool;
 class albaVME;
 class albaVMELandmark;
 class albaVMELandmarkCloud;
@@ -201,7 +201,7 @@ protected:
 	albaString m_Dictionary;
 	ADD_LM_LINK_TYPE m_LinkType;
 
-	albaInteractorPERPicker	*m_LandmarkPicker;
+	albaPickerTool	*m_LandmarkPicker;
 
 	wxComboBox *m_GroupComboBox;
 	albaGUIDictionaryWidget *m_LandmarkGuiDict;

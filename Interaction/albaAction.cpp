@@ -89,7 +89,7 @@ void albaAction::UnBindDevice(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-void albaAction::BindInteractor(albaInteractor *inter)
+void albaAction::BindInteractor(albaAgent *inter)
 //------------------------------------------------------------------------------
 {
   assert(inter);
@@ -104,7 +104,7 @@ void albaAction::BindInteractor(albaInteractor *inter)
 }
 
 //------------------------------------------------------------------------------
-void albaAction::UnBindInteractor(albaInteractor *inter)
+void albaAction::UnBindInteractor(albaAgent *inter)
 //------------------------------------------------------------------------------
 {
   assert(inter);

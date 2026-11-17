@@ -85,25 +85,20 @@ albaOp *albaOpCrop::Copy()
 bool albaOpCrop::InternalAccept(albaVME* node)
 //----------------------------------------------------------------------------
 {
-	albaEvent e(this,VIEW_SELECTED);
-	albaEventMacro(e);
-	return (node && node->IsA("albaVMEVolumeGray") /*&& e.GetBool()*/);
+	return (node && node->IsA("albaVMEVolumeGray"));
 }
 //----------------------------------------------------------------------------
 void albaOpCrop::OpRun()   
 //----------------------------------------------------------------------------
 {
 	//m_Input->Modified();
-  albaEvent e(this,VIEW_SELECTED);
-  albaEventMacro(e);
-
 	albaVME* volume = m_Input;
 	volume->Update();
 	// create gizmo roi
 	if(!m_TestMode)
 	{
 		m_GizmoROI = new albaGizmoROI(volume, this,albaGizmoHandle::BOUNDS,NULL,m_ShowShadingPlane);
-		m_GizmoROI->Show(e.GetBool());
+		m_GizmoROI->Show((GetLogicManager()->GetSelectedView() != NULL));
 	}
 
 	if (volume->GetOutput()->GetVTKData()->IsA("vtkImageData"))

@@ -16,15 +16,22 @@
 #ifndef __albaInteractorPER_h
 #define __albaInteractorPER_h
 
-#include "albaInteractor.h"
+#include "albaInteractionAgent.h"
 #include <map>
+#include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
 class albaVME;
+class albaDevice;
+class albaEventInteraction;
+class albaInteractor;
 class myPIMPL;
 class vtkCamera;
+class albaInteractionTool;
+class albaCameraTool;
 
 /** Class implementing routing of events based on picking.
   This class routes events from input devices depending on picking information.
@@ -36,10 +43,10 @@ class vtkCamera;
   - create interactor for CameraBehavior
   - manage sending events to logic (VME_SELECT, CAMERA_FIT  the 
 */
-class ALBA_EXPORT albaInteractorPER : public albaInteractor
+class ALBA_EXPORT albaInteractorPER : public albaInteractionAgent
 {
-public: 
-  albaTypeMacro(albaInteractorPER,albaInteractor);
+public:
+  albaTypeMacro(albaInteractorPER,albaInteractionAgent);
 
   virtual void EnableSelect(bool enable) {m_CanSelect = enable;};
 
@@ -52,15 +59,15 @@ public:
    interaction has been started by a specific button. */
   bool IsInteracting(albaDevice *device, int button=-1);
 
-  /** Redefined to support multiple input devices */
+  /** Start the default interaction of a device with a button */
   virtual int StartInteraction(albaDevice *device, int button);
-  
-  /** Redefined to support multiple input devices */
+
+  /** Stop the default interaction of a device with a button */
   virtual int StopInteraction(albaDevice *device, int button);
 
   virtual void OnEvent(albaEventBase *event);
 
-  void OnVmeSelected(albaVME *vme){ SetPickedVME(GetDevice(),vme); }
+  void OnVmeSelected(albaVME *vme){ m_VME = vme; }
 
   enum modalities {SINGLE_BUTTON=0,MULTI_BUTTON};
 
@@ -69,17 +76,37 @@ public:
   void SetModeToSingleButton() {m_Mode=SINGLE_BUTTON;}
   void SetModeToMultiButton() {m_Mode=MULTI_BUTTON;}
 
-  albaInteractor *GetCameraMouseInteractor() {return m_CameraMouseBehavior;};
+  /** Return the tool moving the camera, always at the bottom of the tool stack */
+  albaCameraTool *GetCameraTool() {return m_CameraTool;}
 
-  albaInteractor *GetCameraInteractor() {return m_CameraBehavior;};
+  /** Push a tool on top of the tool stack: it receives the events before the tools
+  below it and before the default behavior. The PER keeps a reference to the tool. */
+  void PushTool(albaInteractionTool *tool);
+
+  /** Remove a tool from the tool stack, wherever it is */
+  void PopTool(albaInteractionTool *tool);
+
+  /** Offer a key pressed or released to the tools, from the top of the stack; return true if a tool used it */
+  bool DispatchKey(int keyCode, bool pressed);
+
+  /** Return the number of tools pushed on the stack (the camera tool is not counted) */
+  int GetNumberOfTools() {return m_Tools.size();}
+
+  /** Enable/disable the event tracing: each input event is written in the log
+  with the device, the button, the modifiers and who handled it. */
+  void SetEventTracing(bool enable) {m_EventTracing = enable;}
+  bool GetEventTracing() {return m_EventTracing;}
+
+  /** Return the last trace written in the log */
+  const char *GetLastEventTrace() {return m_LastEventTrace.c_str();}
 
 protected:
   albaInteractorPER();
   virtual ~albaInteractorPER();
   
-  /** redefined to support the three buttons */  
+  /** Start the default interaction on a button down, with the three buttons */
   virtual int OnStartInteraction(albaEventInteraction *e);
-  /** redefined to support the three buttons */
+  /** Stop the default interaction on a button up, with the three buttons */
   virtual int OnStopInteraction(albaEventInteraction *e);
 
   /** 
@@ -118,6 +145,16 @@ protected:
   /** internally used to return the picked VME for given device */
   albaVME *GetPickedVME(albaDevice *device);
 
+  /** Add who handled the current event to its trace (only when the event tracing is on) */
+  void TraceHandler(const char *handler, albaObject *obj = NULL);
+
+  /** Write the trace of the current event in the log (only when the event tracing is on) */
+  void WriteEventTrace(albaEventBase *event);
+
+  bool            m_EventTracing;   ///< true if the events are traced in the log
+  std::string     m_EventTrace;     ///< who handled the current event
+  std::string     m_LastEventTrace; ///< last trace written in the log
+
   bool            m_FlyToFlag;
   bool            m_DraggingLeft; 
   bool            m_CanSelect; 
@@ -125,8 +162,28 @@ protected:
 
   int             m_Mode;
   int             m_FirstTime;
-  albaInteractor*  m_CameraBehavior; ///< the camera interactor
-  albaInteractor*  m_CameraMouseBehavior; ///< the mouse camera interactor
+  /** Offer the event to the tools, from the top of the stack; return true if a tool used it */
+  bool DispatchToTools(albaEventInteraction *e, albaDevice *device);
+
+  /** Call the button down method of the tool for the button of the event */
+  static bool ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** Call the button up method of the tool for the button of the event */
+  static bool ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** Return true if the button down picks a VME with a behavior: the behavior comes before the tools */
+  bool PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device);
+
+  /** The tool interacting with a device and the button that started the interaction */
+  struct ToolInteraction
+  {
+    albaInteractionTool *Tool;
+    int Button;
+  };
+
+  albaCameraTool *m_CameraTool; ///< tool moving the camera, at the bottom of the stack
+  std::vector<albaInteractionTool *> m_Tools; ///< the tool stack, the top is the last one
+  std::map<albaID, ToolInteraction> m_ToolInteractions; ///< the tool interacting with each device, until the starting button is released
 
   class DeviceItem
   {
@@ -136,6 +193,7 @@ protected:
   };
   
   std::map<albaID,DeviceItem> m_Devices; ///< Stores the list of devices currently interacting
+  albaVME *m_VME; ///< the VME selected in the tree, used as picked VME when no device is given
   
 private:
   albaInteractorPER(const albaInteractorPER&);  // Not implemented.

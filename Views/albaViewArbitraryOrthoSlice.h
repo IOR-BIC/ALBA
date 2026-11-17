@@ -34,7 +34,6 @@
 #include "vtkLineSource.h"
 #include "albaPipeSurface.h"
 #include "albaInteractorPicker.h"
-#include "albaInteractorCameraPicker.h"
 #include "vtkCaptionActor2D.h"
 
 using namespace std;

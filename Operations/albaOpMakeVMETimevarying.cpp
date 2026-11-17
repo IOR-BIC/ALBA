@@ -121,8 +121,6 @@ albaOpMakeVMETimevarying::~albaOpMakeVMETimevarying()
 bool albaOpMakeVMETimevarying::InternalAccept(albaVME* vme) 
 //----------------------------------------------------------------------------
 {
-	albaEvent e(this,VIEW_SELECTED);
-	albaEventMacro(e);
   return true;
 }
 //----------------------------------------------------------------------------

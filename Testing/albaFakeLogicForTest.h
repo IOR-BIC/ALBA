@@ -110,14 +110,27 @@ public:
 
 	void SetCitationPaper(char *link) override;
 
-	void RegisterForKeyEvents(albaObserver *listener) override;
+	/** Store the selected view */
+	void SelectView(albaView *view) override { m_SelectedView = view; };
 
-	void UnRegisterForKeyEvents(albaObserver *listener) override;
+	/** Return the selected view */
+	albaView *GetSelectedView() override { return m_SelectedView; };
+
+	/** Store the pushed tool: no PER is involved */
+	void PushTool(albaInteractionTool *tool) override;
+
+	/** Remove the tool from the pushed ones */
+	void PopTool(albaInteractionTool *tool) override;
+
+	/** Return true if the tool has been pushed and not popped */
+	bool IsToolPushed(albaInteractionTool *tool);
 
 	bool IsTimeVaringEnabled() override;
 
 protected:
 	
 	std::vector<calls> m_Calls;
+	std::vector<albaInteractionTool *> m_PushedTools;
+	albaView *m_SelectedView = NULL;
 };
 #endif
