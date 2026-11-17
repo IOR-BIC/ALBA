@@ -30,7 +30,7 @@
 #include "albaRefSys.h"
 
 #include "mmaMaterial.h"
-#include "albaInteractorCompositorMouse.h"
+#include "albaCompositorMouseBehavior.h"
 
 #include "albaVMEGizmo.h"
 #include "albaGizmoTranslate.h"
@@ -748,7 +748,7 @@ void albaOpClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+		if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);

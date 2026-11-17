@@ -30,6 +30,7 @@
 class albaGUIWizard;
 class albaGUI;
 class albaGUILutSlider;
+class albaViewVTK;
 
 //----------------------------------------------------------------------------
 // Const:
@@ -119,6 +120,9 @@ public:
   /** Retrieve the current Render Window. */
 	albaRWI* GetRWI(){return m_Rwi;};
 
+  /** Retrieve the view of the page: an operation can select it with SelectView, so the mouse and the interaction work on it */
+	albaViewVTK* GetView(){return m_View;};
+
 protected:
 
 	wxBoxSizer *m_GUISizer; ///< Sizer used for the Lower GUI
@@ -127,7 +131,8 @@ protected:
   wxBoxSizer *m_RwiSizer; ///< Sizer used for the vtk render window and if you want to plug any gui on bottom of the RWI
   wxBoxSizer *m_SizerAll; ///< Vertical sizer used to include all other sizer
 
-	albaRWI     *m_Rwi; ///< Render window
+	albaRWI     *m_Rwi; ///< Render window of m_View
+	albaViewVTK *m_View; ///< the view of the page
 
   albaGUI     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
   albaGUI     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER

@@ -31,7 +31,7 @@ class vtkRenderer;
 /** Common base class of interactors and interaction tools.
   It holds the renderer and the view the object is working on and the helpers
   that do not depend on devices or buttons: the device and button state belong
-  to albaInteractor, the tools receive the events already interpreted by the PER. */
+  to albaInteractionBehavior, the tools receive the events already interpreted by the PER. */
 class ALBA_EXPORT albaInteractionAgent : public albaAgent
 {
 public:

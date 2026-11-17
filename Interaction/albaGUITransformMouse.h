@@ -22,15 +22,15 @@
 //----------------------------------------------------------------------------
 #include "albaObserver.h"
 #include "albaGUITransformInterface.h"
-#include "albaInteractorCompositorMouse.h"
+#include "albaCompositorMouseBehavior.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class albaGUI;
 class albaGUIButton;
-class albaInteractorGenericMouse;
-class albaInteractor;
+class albaGenericMouseBehavior;
+class albaInteractionBehavior;
 class albaVME;
 
 //----------------------------------------------------------------------------
@@ -85,12 +85,12 @@ public:
   void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
-  albaInteractorGenericMouse* CreateBehavior(MMI_ACTIVATOR activator);
+  albaGenericMouseBehavior* CreateBehavior(MMI_ACTIVATOR activator);
 
-  albaInteractorGenericMouse* GetIsaRotate();
+  albaGenericMouseBehavior* GetIsaRotate();
 
 protected:  
-  albaInteractor* m_OldInteractor;
+  albaInteractionBehavior* m_OldInteractor;
    
   /** Create interactors */
   void CreateISA();
@@ -98,11 +98,11 @@ protected:
   /** Override superclass */
   void CreateGui();
 
-  albaInteractorCompositorMouse *m_IsaCompositor;
+  albaCompositorMouseBehavior *m_IsaCompositor;
 
-  albaInteractorGenericMouse *m_IsaRotate;
-  albaInteractorGenericMouse *m_IsaTranslate;
-  albaInteractorGenericMouse *m_IsaRoll;
+  albaGenericMouseBehavior *m_IsaRotate;
+  albaGenericMouseBehavior *m_IsaTranslate;
+  albaGenericMouseBehavior *m_IsaRoll;
 
   int m_RotationConstraintId;
 	int m_TranslationConstraintId;

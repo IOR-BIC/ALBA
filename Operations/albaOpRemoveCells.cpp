@@ -32,6 +32,7 @@
 
 #include "albaRWIBase.h"
 #include "albaRWI.h"
+#include "albaViewVTK.h"
 #include "albaDeviceButtonsPadMouse.h"
 
 #include "albaGUIButton.h"
@@ -61,7 +62,6 @@
 #include "vtkIdList.h"
 #include "vtkTriangle.h"
 #include "vtkCamera.h"
-#include "vtkInteractorStyle.h"
 
 const int ID_REGION = 0;
 
@@ -78,6 +78,8 @@ albaOp(label)
   m_Canundo = true;
   m_Dialog = NULL;
   m_Rwi = NULL;
+  m_View = NULL;
+  m_OldSelectedView = NULL;
 
   m_SelectCellTool  = NULL;
 
@@ -101,7 +103,6 @@ albaOp(label)
 
 
   m_TriangeCentreComputationList = NULL;
-  m_AutoClip = 1;
 }
 //----------------------------------------------------------------------------
 albaOpRemoveCells::~albaOpRemoveCells()
@@ -206,7 +207,6 @@ enum REMOVE_CELL_ID
   ID_UNSELECT,
   ID_CANCEL,
   ID_CLIP,
-  ID_AUTOCLIP,
 };
 //----------------------------------------------------------------------------
 void albaOpRemoveCells::CreateOpDialog()
@@ -217,7 +217,17 @@ void albaOpRemoveCells::CreateOpDialog()
   //===== setup interface ====
   m_Dialog = new albaGUIDialog("Remove Cells", albaCLOSEWINDOW | albaRESIZABLE);
   
-  m_Rwi = new albaRWI(m_Dialog,ONE_LAYER,false);
+  // the dialog has a real view: the mouse, the picking of the PER and the tools work on it
+  wxWindow *oldFrame = albaGetFrame();
+  albaSetFrame(m_Dialog);
+  m_View = new albaViewVTK("Remove Cells", CAMERA_PERSPECTIVE, true);
+  m_View->Create();
+  albaSetFrame(oldFrame);
+
+  // the view GUI, built by the side bar when the view is selected, needs the selected VME
+  m_View->VmeSelect(m_Input, true);
+
+  m_Rwi = m_View->m_Rwi;
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
 
@@ -225,6 +235,9 @@ void albaOpRemoveCells::CreateOpDialog()
   m_Rwi->SetSize(0,0,800,800);
   m_Rwi->Show(true);
   m_Rwi->m_RwiBase->SetMouse(m_Mouse);
+  m_View->SetMouse(m_Mouse);
+  m_OldSelectedView = GetLogicManager()->GetSelectedView();
+  GetLogicManager()->SelectView(m_View);
 
   m_Rwi->m_RenFront->AddActor(m_PolydataActor);
 
@@ -242,7 +255,7 @@ void albaOpRemoveCells::CreateOpDialog()
   albaNEW(m_SelectCellTool);
 
   m_SelectCellTool->SetListener(this);
-  m_SelectCellTool->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+  m_SelectCellTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
   GetLogicManager()->PushTool(m_SelectCellTool);
 
  
@@ -252,7 +265,6 @@ void albaOpRemoveCells::CreateOpDialog()
   wxStaticText *foo  = new wxStaticText(m_Dialog,-1, " ");
   wxTextCtrl   *diameter = new wxTextCtrl  (m_Dialog,ID_DIAMETER, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
   wxCheckBox *unselect =   new wxCheckBox(m_Dialog, ID_DELETE,         "unselect", p, wxSize(80,20));
-  wxCheckBox *b_clip =   new wxCheckBox(m_Dialog, ID_AUTOCLIP,         "autoclipping", p, wxSize(80,20));
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
@@ -262,7 +274,6 @@ void albaOpRemoveCells::CreateOpDialog()
   albaGUIButton  *cancel = new albaGUIButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
 	
-  b_clip->SetValidator(albaGUIValidator(this,ID_AUTOCLIP,b_clip,(int*)&m_AutoClip));
   // AACC: 10-03-2009 please add more decimal digits...
   diameter->SetValidator(albaGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize, 4));
   unselect->SetValidator(albaGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
@@ -281,7 +292,6 @@ void albaOpRemoveCells::CreateOpDialog()
   h_sizer1->Add(foo,     0,wxRIGHT);	
   h_sizer1->Add(unselect,     0,wxRIGHT);	
 
-  h_sizer1->Add(b_clip,0,wxRIGHT);
 
 
   wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
@@ -331,7 +341,11 @@ void albaOpRemoveCells::DeleteOpDialog()
 
   albaDEL(m_SelectCellTool);
 
-  cppDEL(m_Rwi); 
+  // the previous view is selected again before the view of the dialog is deleted
+  if (m_View)
+    GetLogicManager()->SelectView(m_OldSelectedView);
+  albaDEL(m_View);
+  m_Rwi = NULL;
   cppDEL(m_Dialog);
 }
 
@@ -401,22 +415,6 @@ void albaOpRemoveCells::OnEvent(albaEventBase *alba_event)
 
       }     
       break ;
-	  case ID_AUTOCLIP:
-		  if(m_AutoClip)
-		  {
-			  //achiarini (27.11.2007)
-			  //this is to guarantee that the clippingplanes are not reset during interaction
-			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOn(); 
-
-		  }
-		  else{
-			  //this is to guarantee that the clippingplanes are not reset during interaction
-			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOff(); 
-			  m_Rwi->CameraUpdate();
-		  }
-
-		  break;
-
 	 default:
         albaEventMacro(*e);
       break; 

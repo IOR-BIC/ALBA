@@ -31,7 +31,7 @@ class albaGUI;
 class albaGUIButton;
 class mmiGenericMouse;
 class mmiCompositorMouse;
-class albaInteractor;
+class albaInteractionBehavior;
 class albaVME;
 class albaMatrix;
 class albaGUIFloatSlider;

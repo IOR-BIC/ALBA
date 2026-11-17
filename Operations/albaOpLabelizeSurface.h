@@ -32,8 +32,8 @@ class albaGizmoRotate;
 class albaGizmoScale;
 class albaVMESurface;
 class albaVMESurfaceEditor;
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 class vtkPlane;
 class vtkPlaneSource;
 class vtkArrowSource;
@@ -102,14 +102,14 @@ protected:
 
 	void SetPlaneDimension();
 
-	albaInteractorCompositorMouse *m_IsaCompositorWithoutGizmo;
-	albaInteractorCompositorMouse *m_IsaCompositorWithGizmo;
-	albaInteractorGenericMouse    *m_IsaTranslate;
-	albaInteractorGenericMouse    *m_IsaRotate;
-	albaInteractorGenericMouse		 *m_IsaChangeArrowWithGizmo;
-	albaInteractorGenericMouse		 *m_IsaChangeArrowWithoutGizmo;	
-	albaInteractorGenericMouse		 *m_IsaLabelizeWithGizmo;
-	albaInteractorGenericMouse		 *m_IsaLabelizeWithoutGizmo;
+	albaCompositorMouseBehavior *m_IsaCompositorWithoutGizmo;
+	albaCompositorMouseBehavior *m_IsaCompositorWithGizmo;
+	albaGenericMouseBehavior    *m_IsaTranslate;
+	albaGenericMouseBehavior    *m_IsaRotate;
+	albaGenericMouseBehavior		 *m_IsaChangeArrowWithGizmo;
+	albaGenericMouseBehavior		 *m_IsaChangeArrowWithoutGizmo;	
+	albaGenericMouseBehavior		 *m_IsaLabelizeWithGizmo;
+	albaGenericMouseBehavior		 *m_IsaLabelizeWithoutGizmo;
 
 	int		m_LabelInside;
 

@@ -31,7 +31,7 @@
 #include "albaGUI.h"
 #include "albaGUIButton.h"
 
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "albaMatrix.h"
 #include "albaAbsMatrixPipe.h"
@@ -282,7 +282,7 @@ void albaGUITransformMouse::CreateISA()
   m_OldInteractor = m_InputVME->GetBehavior();
 
   // Create the isa compositor:
-  m_IsaCompositor = albaInteractorCompositorMouse::New();
+  m_IsaCompositor = albaCompositorMouseBehavior::New();
 
   // default aux ref sys is the vme ref sys
   m_RefSysVME = m_InputVME;
@@ -388,13 +388,13 @@ void albaGUITransformMouse::RefSysVmeChanged()
   m_IsaRoll->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
-albaInteractorGenericMouse* albaGUITransformMouse::CreateBehavior(MMI_ACTIVATOR activator)
+albaGenericMouseBehavior* albaGUITransformMouse::CreateBehavior(MMI_ACTIVATOR activator)
 //----------------------------------------------------------------------------
 {
   return m_IsaCompositor->CreateBehavior(activator);
 }
 
-albaInteractorGenericMouse* albaGUITransformMouse::GetIsaRotate()
+albaGenericMouseBehavior* albaGUITransformMouse::GetIsaRotate()
 {
   return m_IsaRotate;
 }

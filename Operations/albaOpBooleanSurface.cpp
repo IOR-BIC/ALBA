@@ -32,8 +32,8 @@
 #include "albaVMEGizmo.h"
 #include "albaTransform.h"
 #include "mmaMaterial.h"
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaGenericMouseBehavior.h"
 #include "vtkALBASmartPointer.h"
 
 #include "vtkPolyData.h"

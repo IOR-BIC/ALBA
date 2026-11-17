@@ -38,7 +38,7 @@
 #include "albaGUITransformTextEntries.h"
 #include "albaVMELandmark.h"
 
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "albaSmartPointer.h"
 #include "albaTransform.h"

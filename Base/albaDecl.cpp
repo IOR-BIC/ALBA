@@ -469,7 +469,7 @@ wxString  albaIdString(int id)
      case VIEW_DELETE:          s="VIEW_DELETE"; break; 
      case VIEW_SELECT:          s="VIEW_SELECT"; break; 
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
-     case VIEW_MAXIMIZE:        s="VIEW_CLICKED"; break; 
+     case VIEW_MAXIMIZE:        s="VIEW_MAXIMIZE"; break; 
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
 
      case CAMERA_FRONT:	        s="CAMERA_FRONT"; break; 

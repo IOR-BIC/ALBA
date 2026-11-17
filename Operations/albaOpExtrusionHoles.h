@@ -32,6 +32,8 @@
 class albaGUIDialog;
 class albaGUIButton;
 class albaRWI;
+class albaView;
+class albaViewVTK;
 class albaSelectPointTool;
 class albaVMESurface;
 class vtkHoleConnectivity;
@@ -104,7 +106,9 @@ protected:
 
 	albaGUIDialog							*m_Dialog;
 	albaGUIButton							*m_ButtonOk;
-	albaRWI								*m_Rwi;
+	albaRWI *m_Rwi;
+	albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
+	albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
 	albaSelectPointTool				*m_Picker;
 
 	vtkPolyData						*m_ResultPolydata;

@@ -32,7 +32,7 @@
 #include "albaVME.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
-#include "albaInteractorPicker.h"
+#include "albaPickerBehavior.h"
 #include "albaTagArray.h"
 
 #include "vtkDataSet.h"
@@ -127,7 +127,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpRun()
     
 	  m_OldBehavior = m_ResampleInput->GetBehavior();
 
-	  m_Picker = albaInteractorPicker::New();
+	  m_Picker = albaPickerBehavior::New();
 	  m_Picker->SetListener(this);
 	  m_ResampleInput->SetBehavior(m_Picker);
 

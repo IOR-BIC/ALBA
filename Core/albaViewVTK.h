@@ -128,7 +128,7 @@ public:
   Find the pocked VME at button down. As argument the function needs
   the device which performed the action, and provides as result pointers
   to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior);
+  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior);
 
   /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);

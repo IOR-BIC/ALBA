@@ -41,11 +41,11 @@ albaSelectCellTool::albaSelectCellTool()
 //------------------------------------------------------------------------------
 bool albaSelectCellTool::OnLeftButtonDown(albaEventInteraction *e)
 {
-  if (!e->GetModifier(ALBA_CTRL_KEY) || GetEventRenderer(e) == NULL)
+  // outside the cells the button goes to the camera (CTRL: spin)
+  if (!e->GetModifier(ALBA_CTRL_KEY) || !PickCell(e))
     return false;
 
   m_IsPicking = true;
-  PickCell(e);
   return true;
 }
 
@@ -67,11 +67,11 @@ bool albaSelectCellTool::OnDrag(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void albaSelectCellTool::PickCell(albaEventInteraction *e)
+bool albaSelectCellTool::PickCell(albaEventInteraction *e)
 {
   vtkRenderer *renderer = GetEventRenderer(e);
   if (renderer == NULL)
-    return;
+    return false;
 
   double mousePos[2];
   e->Get2DPosition(mousePos);
@@ -79,11 +79,13 @@ void albaSelectCellTool::PickCell(albaEventInteraction *e)
   vtkCellPicker *cellPicker;
   vtkNEW(cellPicker);
   cellPicker->SetTolerance(0.001);
-  if (cellPicker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer))
+  bool picked = cellPicker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer) != 0;
+  if (picked)
   {
     double pickedPos[3];
     cellPicker->GetPickedPositions()->GetPoint(0, pickedPos);
     SendPickedPointEvent(VME_PICKED, pickedPos, cellPicker->GetCellId());
   }
   vtkDEL(cellPicker);
+  return picked;
 }

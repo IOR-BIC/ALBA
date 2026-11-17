@@ -29,8 +29,8 @@
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 
 
 class albaEvent;
@@ -106,8 +106,8 @@ protected:
 
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;
-  albaInteractorCompositorMouse *m_GizmoInteractor;
-  albaInteractorGenericMouse *m_LeftMouseInteractor;
+  albaCompositorMouseBehavior *m_GizmoInteractor;
+  albaGenericMouseBehavior *m_LeftMouseInteractor;
   
   vtkLineSource *m_LineSource;
   vtkSphereSource  *m_SphereSource;

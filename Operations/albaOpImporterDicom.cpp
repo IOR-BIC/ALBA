@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUIValidator.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaDICOMImporterTool.h"
+#include "albaViewVTK.h"
 #include "albaTagArray.h"
 #include "albaVMERoot.h"
 #include "albaVME.h"
@@ -270,6 +271,7 @@ void albaOpImporterDicom::OpRun()
 
 		if (OpenDir(path))
 		{
+			GetLogicManager()->SelectView(m_LoadPage->GetView());
 			int wizardResult = RunWizard();
 			OpStop(wizardResult);
 		}
@@ -282,6 +284,9 @@ void albaOpImporterDicom::OpRun()
 //----------------------------------------------------------------------------
 int albaOpImporterDicom::RunWizard()
 {
+	// the first render happens before the wizard has its final size: render again once it is shown
+	m_Wizard->CallAfter([this]() { CameraUpdate(); });
+
 	if(m_Wizard->Run())
 	{
 		//Prepare data structures for output VME generation
@@ -322,6 +327,10 @@ void albaOpImporterDicom::OpStop(int result)
 {
 	if (m_DicomTool)
 		GetLogicManager()->PopTool(m_DicomTool);
+
+	// the previous view is selected again before the views of the pages are deleted
+	if (m_LoadPage)
+		GetLogicManager()->SelectView(m_OldSelectedView);
 
 	if (m_LoadPage)
 	{
@@ -575,7 +584,11 @@ void albaOpImporterDicom::CreateLoadPage()
 	m_LoadPage->AddGuiLowerUnderCenter(m_LoadGuiUnderCenter);
 	m_LoadPage->AddGuiLowerCenter(m_LoadGuiCenter);
 
-	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
+	// the views of the pages are selected while they are shown: the mouse and the interaction work on them
+	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	m_LoadPage->GetView()->SetMouse(m_Mouse);
+	if (m_Input)
+		m_LoadPage->GetView()->VmeSelect(m_Input, true); // the view GUI, built by the side bar, needs the selected VME
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 
@@ -593,9 +606,11 @@ void albaOpImporterDicom::CreateCropPage()
 	m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
 	m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
 
-	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
+	m_CropPage->GetView()->SetMouse(m_Mouse);
+	if (m_Input)
+		m_CropPage->GetView()->VmeSelect(m_Input, true); // the view GUI, built by the side bar, needs the selected VME
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	m_DicomTool->SetRendererAndView(m_CropPage->GetRWI()->m_RenFront, NULL);
+	m_DicomTool->SetRendererAndView(m_CropPage->GetView()->GetFrontRenderer(), m_CropPage->GetView());
 }
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::GuiUpdate()
@@ -662,6 +677,11 @@ void albaOpImporterDicom::OnEvent(albaEventBase *alba_event)
 				m_Wizard->GetCurrentPage()->Show();
 				m_Wizard->GetCurrentPage()->SetFocus();
 				m_Wizard->GetCurrentPage()->Update();
+
+				if (m_Wizard->GetCurrentPage() == m_LoadPage)
+					GetLogicManager()->SelectView(m_LoadPage->GetView());
+				else if (m_CropPage && m_Wizard->GetCurrentPage() == m_CropPage)
+					GetLogicManager()->SelectView(m_CropPage->GetView());
 
 				wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);
 				wxString tmp = NextButton->GetLabel();

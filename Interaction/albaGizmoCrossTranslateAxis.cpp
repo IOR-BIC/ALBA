@@ -35,8 +35,8 @@
 #include "albaVMEOutput.h"
 #include "albaVMEGizmo.h"
 #include "albaTagArray.h"
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaRefSys.h"
 
 
@@ -280,7 +280,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 void albaGizmoCrossTranslateAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-	m_IsaComp = albaInteractorCompositorMouse::New();
+	m_IsaComp = albaCompositorMouseBehavior::New();
 
 	m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
 

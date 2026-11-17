@@ -1,0 +1,402 @@
+/*=========================================================================
+
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaInteractionBehaviorTest
+ Authors: Alberto Losi
+ 
+ Copyright (c) BIC
+ All rights reserved. See Copyright.txt or
+
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "albaDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
+#include <cppunit/config/SourcePrefix.h>
+#include "albaInteractionBehaviorTest.h"
+#include "albaObject.h"
+#include "albaInteractionBehavior.h"
+#include "vtkRenderer.h"
+#include "albaDevice.h"
+#include "albaEventInteraction.h"
+
+enum EVENTS_ID
+{
+  START_INTERACTION_EVENT = 0,
+  STOP_INTERACTION_EVENT,
+};
+enum MODALITIES_ID
+{
+  SINGLE_BUTTON_MODE=0,
+  MULTI_BUTTON_MODE,
+};
+//----------------------------------------------------------------------------
+class albaInteractionBehaviorDummy : public albaInteractionBehavior // concrete class for test
+//----------------------------------------------------------------------------
+{
+public:
+  albaInteractionBehaviorDummy(){Superclass;};
+  ~albaInteractionBehaviorDummy(){Superclass;};
+
+  void OnButtonDown(albaEventInteraction *e){};
+  void OnButtonUp(albaEventInteraction *e){};
+
+  albaTypeMacro(albaInteractionBehaviorDummy,albaInteractionBehavior);
+};
+
+albaCxxTypeMacro(albaInteractionBehaviorDummy);
+
+//----------------------------------------------------------------------------
+class albaInteractionBehaviorButtonsDummy : public albaInteractionBehavior // concrete class using the default button handling
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaInteractionBehaviorButtonsDummy,albaInteractionBehavior);
+};
+
+albaCxxTypeMacro(albaInteractionBehaviorButtonsDummy);
+
+//----------------------------------------------------------------------------
+class albaInteractionBehaviorTestListener : public albaObserver // stores the sender of the received button events
+//----------------------------------------------------------------------------
+{
+public:
+  albaInteractionBehaviorTestListener() {m_ButtonDownSender = m_ButtonUpSender = NULL;};
+  virtual void OnEvent(albaEventBase *e)
+  {
+    if (e->GetId() == albaInteractionBehavior::BUTTON_DOWN)
+      m_ButtonDownSender = e->GetSender();
+    else if (e->GetId() == albaInteractionBehavior::BUTTON_UP)
+      m_ButtonUpSender = e->GetSender();
+  };
+
+  void *m_ButtonDownSender;
+  void *m_ButtonUpSender;
+};
+
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestFixture()
+//----------------------------------------------------------------------------
+{
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestConstructorDestructor()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor = albaInteractionBehaviorDummy::New();
+
+  cppDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetRenderer()
+//----------------------------------------------------------------------------
+{
+  vtkRenderer *renderer;
+  vtkNEW(renderer);
+
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  // renderer and view start empty (they belong to albaInteractionAgent)
+  CPPUNIT_ASSERT(interactor->GetRenderer() == NULL);
+  CPPUNIT_ASSERT(interactor->GetView() == NULL);
+  CPPUNIT_ASSERT(interactor->IsA("albaInteractionAgent"));
+
+  interactor->SetRendererAndView(renderer,NULL);
+  CPPUNIT_ASSERT(interactor->GetRenderer() == renderer);
+
+  vtkDEL(renderer);
+  albaDEL(interactor);
+
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetDevice()
+//----------------------------------------------------------------------------
+{
+  albaDevice *device;
+  albaNEW(device);
+
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  interactor->SetDevice(device);
+  CPPUNIT_ASSERT(interactor->GetDevice() == device);
+
+  albaDEL(device);
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetIgnoreTriggerEvents()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  interactor->SetIgnoreTriggerEvents(true);
+  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 1);
+
+  interactor->SetIgnoreTriggerEvents(false);
+  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 0);
+
+  interactor->IgnoreTriggerEventsOn();
+  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 1);
+
+  interactor->IgnoreTriggerEventsOff();
+  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 0);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetStartInteractionEvent()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  albaID dummyInteractionEvent = START_INTERACTION_EVENT;
+  interactor->SetStartInteractionEvent(dummyInteractionEvent);
+
+  CPPUNIT_ASSERT(interactor->GetStartInteractionEvent() == dummyInteractionEvent);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetStopInteractionEvent()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  albaID dummyInteractionEvent = STOP_INTERACTION_EVENT;
+  interactor->SetStopInteractionEvent(dummyInteractionEvent);
+
+  CPPUNIT_ASSERT(interactor->GetStopInteractionEvent() == dummyInteractionEvent);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetStartButton()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  int button = 0;
+  interactor->SetStartButton(button);
+
+  CPPUNIT_ASSERT(interactor->GetStartButton() == button);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetModifiers()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  int modifiers = 1;
+  interactor->SetModifiers(modifiers);
+
+  CPPUNIT_ASSERT(interactor->GetModifiers() == modifiers);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestGetCurrentButton()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  albaDevice *device;
+  albaNEW(device);
+
+  interactor->SetDevice(device);
+
+  // setup the interactor
+  interactor->SetStartInteractionEvent(START_INTERACTION_EVENT);
+  interactor->SetStopInteractionEvent(STOP_INTERACTION_EVENT);
+  interactor->IgnoreTriggerEventsOff();
+  int button = 1;
+  interactor->SetStartButton(button);
+  interactor->SetModifiers(0);
+
+  albaEventInteraction e;
+  e.SetSender(device);
+  e.SetId(START_INTERACTION_EVENT);
+  e.SetButton(button);
+  e.SetChannel(MCH_INPUT);
+  interactor->OnEvent(&e);
+
+  CPPUNIT_ASSERT(interactor->GetCurrentButton() == button);
+
+  albaDEL(interactor);
+  albaDEL(device);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestGetCurrentModifier()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  albaDevice *device;
+  albaNEW(device);
+
+  interactor->SetDevice(device);
+
+  // setup the interactor
+  interactor->SetStartInteractionEvent(START_INTERACTION_EVENT);
+  interactor->SetStopInteractionEvent(STOP_INTERACTION_EVENT);
+  interactor->IgnoreTriggerEventsOff();
+  long modifier = 1;
+  int button = 0;
+  interactor->SetStartButton(button);
+  interactor->SetModifiers(0);
+
+  albaEventInteraction e;
+  e.SetSender(device);
+  e.SetId(START_INTERACTION_EVENT);
+  e.SetModifiers(modifier);
+  e.SetButton(button);
+  e.SetChannel(MCH_INPUT);
+  interactor->OnEvent(&e);
+
+  CPPUNIT_ASSERT(interactor->GetCurrentModifier() == modifier);
+
+  albaDEL(interactor);
+  albaDEL(device);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestStartStopInteraction()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  albaDevice *device;
+  albaNEW(device);
+
+  interactor->SetDevice(device);
+
+  CPPUNIT_ASSERT(interactor->StartInteraction(device) == true);
+  CPPUNIT_ASSERT(interactor->IsInteracting(device) == true);
+  CPPUNIT_ASSERT(interactor->StartInteraction(device) == false);
+  CPPUNIT_ASSERT(interactor->StopInteraction(device) == true);
+  // CPPUNIT_ASSERT(interactor->StopInteraction(device) == false); raise a warning
+
+  albaDEL(device);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestIsInteracting()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  albaDevice *device;
+  albaNEW(device);
+
+  albaDevice *deviceDummy;
+  albaNEW(deviceDummy);
+
+
+  interactor->SetDevice(device);
+
+  CPPUNIT_ASSERT(interactor->IsInteracting(device) == false);
+  CPPUNIT_ASSERT(interactor->IsInteracting(deviceDummy) == false);
+
+  interactor->StartInteraction(device) == true;
+
+  CPPUNIT_ASSERT(interactor->IsInteracting(device) == true);
+  CPPUNIT_ASSERT(interactor->IsInteracting(deviceDummy) == false);
+
+  interactor->StopInteraction(device) == true;
+
+  CPPUNIT_ASSERT(interactor->IsInteracting(device) == false);
+  CPPUNIT_ASSERT(interactor->IsInteracting(deviceDummy) == false);
+
+  albaDEL(device);
+
+  albaDEL(deviceDummy);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestSetGetButtonMode()
+//----------------------------------------------------------------------------
+{
+  albaInteractionBehaviorDummy *interactor;
+  albaNEW(interactor);
+
+  interactor->SetButtonMode(SINGLE_BUTTON_MODE);
+
+  CPPUNIT_ASSERT(interactor->GetButtonMode() == SINGLE_BUTTON_MODE);
+
+  interactor->SetButtonMode(MULTI_BUTTON_MODE);
+
+  CPPUNIT_ASSERT(interactor->GetButtonMode() == MULTI_BUTTON_MODE);
+
+  interactor->SetButtonModeToSingleButton();
+
+  CPPUNIT_ASSERT(interactor->GetButtonMode() == SINGLE_BUTTON_MODE);
+
+  interactor->SetButtonModeToMultiButton();
+
+  CPPUNIT_ASSERT(interactor->GetButtonMode() == MULTI_BUTTON_MODE);
+
+  albaDEL(interactor);
+}
+//----------------------------------------------------------------------------
+void albaInteractionBehaviorTest::TestButtonEventsKeepIncomingEvent()
+//----------------------------------------------------------------------------
+{
+  albaDevice *device;
+  albaNEW(device);
+
+  albaInteractionBehaviorButtonsDummy *interactor;
+  albaNEW(interactor);
+
+  albaInteractionBehaviorTestListener listener;
+  interactor->SetListener(&listener);
+
+  // button down: the listener receives BUTTON_DOWN, the incoming event is unchanged
+  albaEventInteraction downEvent(device, interactor->GetStartInteractionEvent());
+  downEvent.SetButton(ALBA_LEFT_BUTTON);
+  downEvent.SetChannel(MCH_INPUT);
+  interactor->OnEvent(&downEvent);
+
+  CPPUNIT_ASSERT(interactor->IsInteracting());
+  CPPUNIT_ASSERT(listener.m_ButtonDownSender == interactor);
+  CPPUNIT_ASSERT(downEvent.GetId() == interactor->GetStartInteractionEvent());
+  CPPUNIT_ASSERT(downEvent.GetSender() == device);
+  CPPUNIT_ASSERT(downEvent.GetChannel() == MCH_INPUT);
+
+  // button up: the listener receives BUTTON_UP, the incoming event is unchanged
+  albaEventInteraction upEvent(device, interactor->GetStopInteractionEvent());
+  upEvent.SetButton(ALBA_LEFT_BUTTON);
+  upEvent.SetChannel(MCH_INPUT);
+  interactor->OnEvent(&upEvent);
+
+  CPPUNIT_ASSERT(!interactor->IsInteracting());
+  CPPUNIT_ASSERT(listener.m_ButtonUpSender == interactor);
+  CPPUNIT_ASSERT(upEvent.GetId() == interactor->GetStopInteractionEvent());
+  CPPUNIT_ASSERT(upEvent.GetSender() == device);
+  CPPUNIT_ASSERT(upEvent.GetChannel() == MCH_INPUT);
+
+  albaDEL(interactor);
+  albaDEL(device);
+}

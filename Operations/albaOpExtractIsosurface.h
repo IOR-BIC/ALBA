@@ -32,6 +32,8 @@ class albaSceneNode;
 class albaVMEGroup;
 class albaVME;
 class albaRWI;
+class albaView;
+class albaViewVTK;
 
 class vtkActor;
 class albaPipeIsosurface; 
@@ -106,7 +108,9 @@ protected:
 
   albaVMEGroup *m_OutputGroup; 
   albaGUIDialog		*m_Dialog;
-	albaRWI      *m_Rwi;
+	albaRWI *m_Rwi;
+	albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
+	albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
   vtkRenderer *m_PIPRen;
 	double       m_IsoValue;
 	double       m_MaxDensity;
