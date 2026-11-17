@@ -73,7 +73,6 @@ SET(PROJECT_SRCS
   albaGUISplashScreen.cpp				albaGUISplashScreen.h
   albaGUIDialogProsthesisSelection.cpp	albaGUIDialogProsthesisSelection.h
   albaGUIHyperLink.cpp					albaGUIHyperLink.h
-  albaGUITransformMouseFree.cpp	albaGUITransformMouseFree.h
   albaGUIBusyInfo.cpp albaGUIBusyInfo.h
 )
 

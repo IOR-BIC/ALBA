@@ -30,7 +30,7 @@
 #include "albaGUI.h"
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
-#include "albaGUITransformMouse.h"
+#include "albaTransformMouseGUI.h"
 
 #include "albaGenericMouseBehavior.h"
 

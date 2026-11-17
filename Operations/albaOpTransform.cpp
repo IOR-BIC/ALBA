@@ -29,7 +29,7 @@
 
 #include "albaDecl.h"
 #include "albaGUI.h"
-#include "albaGUITransformMouse.h"
+#include "albaTransformMouseGUI.h"
 #include "albaGUIRollOut.h"
 #include "albaGUISaveRestorePose.h"
 #include "albaGizmoTranslate.h"

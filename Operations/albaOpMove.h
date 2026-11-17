@@ -29,7 +29,7 @@
 class albaGizmoTranslate;
 class albaGizmoRotate;
 class albaGizmoScale;
-class albaGUITransformMouse;
+class albaTransformMouseGUI;
 class albaGUISaveRestorePose;
 class albaGUITransformTextEntries;
 class albaVME;
@@ -84,7 +84,7 @@ protected:
   plugged objects */
   albaGizmoTranslate           *m_GizmoTranslate;  
   albaGizmoRotate              *m_GizmoRotate;
-  albaGUITransformMouse        *m_GuiTransformMouse;
+  albaTransformMouseGUI        *m_GuiTransformMouse;
   albaGUISaveRestorePose       *m_GuiSaveRestorePose;
   albaGUITransformTextEntries  *m_GuiTransformTextEntries;
 

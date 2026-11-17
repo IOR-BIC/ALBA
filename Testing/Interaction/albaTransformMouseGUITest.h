@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformMouseTest
+ Module: albaTransformMouseGUITest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaGUITransformMouseTest_H__
-#define __CPP_UNIT_albaGUITransformMouseTest_H__
+#ifndef __CPP_UNIT_albaTransformMouseGUITest_H__
+#define __CPP_UNIT_albaTransformMouseGUITest_H__
 
 //----------------------------------------------------------------------------
 // includes :
@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 class albaGUIFrame;
 
-class albaGUITransformMouseTest : public albaTest
+class albaTransformMouseGUITest : public albaTest
 {
 public:
 
@@ -37,7 +37,7 @@ public:
   /** Executed after each test */
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( albaGUITransformMouseTest );
+  CPPUNIT_TEST_SUITE( albaTransformMouseGUITest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestEnableWidgets);

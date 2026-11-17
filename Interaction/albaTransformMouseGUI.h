@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformMouse
+ Module: albaTransformMouseGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,53 +14,29 @@
 
 =========================================================================*/
 
-#ifndef __albaGUITransformMouse_H__
-#define __albaGUITransformMouse_H__
+#ifndef __albaTransformMouseGUI_H__
+#define __albaTransformMouseGUI_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaObserver.h"
 #include "albaGUITransformInterface.h"
-#include "albaCompositorMouseBehavior.h"
 
 //----------------------------------------------------------------------------
-// forward references :
+// forward declarations :
 //----------------------------------------------------------------------------
-class albaGUI;
-class albaGUIButton;
-class albaGenericMouseBehavior;
 class albaInteractionBehavior;
+class albaTransformMouseBehavior;
 class albaVME;
 
-//----------------------------------------------------------------------------
-/** transform gui
-
-  @sa
- 
-  @todo
-
-*/
-class ALBA_EXPORT albaGUITransformMouse : public albaGUITransformInterface
+/** GUI of the transform mouse behavior: it creates an albaTransformMouseBehavior for the VME, assigns it to
+  the VME while the widgets are enabled, and lets the user choose the rotation and translation constraints.
+  The transforms of the behavior are forwarded to the listener (ID_TRANSFORM, sent by this object). */
+class ALBA_EXPORT albaTransformMouseGUI : public albaGUITransformInterface
 {
 public:
-  albaGUITransformMouse(albaVME *input, albaObserver *listener = NULL, bool testMode = false);
-	~albaGUITransformMouse(); 
-
-  // constraints enum
-  enum TRANSFORM_MOUSE_WIDGET_ID
-  {
-    X_AXIS = 0,
-    Y_AXIS, 
-    Z_AXIS,
-    VIEW_PLANE, 
-    NORMAL_VIEW_PLANE,
-    XY_PLANE, 
-    XZ_PLANE, 
-    YZ_PLANE,
-    SURFACE_SNAP,
-    NORMAL_SURFACE,
-  };
+  albaTransformMouseGUI(albaVME *input, albaObserver *listener = NULL, bool testMode = false);
+	~albaTransformMouseGUI();
 
   void OnEvent(albaEventBase *alba_event);
 
@@ -68,49 +44,39 @@ public:
 	void EnableWidgets(bool enable);
 
   //----------------------------------------------------------------------------
-  //gui constants: 
+  //gui constants:
   //----------------------------------------------------------------------------
-
-  // this constants must be visible from the owner object  
+  // this constants must be visible from the owner object
   enum GUI_TRANSFORM_MOUSE_ID
   {
       ID_ROTATION_AXES = MINID,
       ID_TRASLATION_AXES,
   };
 
-  /** Start and stop interaction through this object isa */
+  /** Assign the behavior to the VME, or give the VME its previous behavior again */
   void AttachInteractorToVme();
   void DetachInteractorFromVme();
 
+  /** Set the constraints, as albaTransformMouseBehavior::TRANSFORM_CONSTRAINT */
   void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
-  albaGenericMouseBehavior* CreateBehavior(MMI_ACTIVATOR activator);
+  /** Return the behavior moving the VME */
+  albaTransformMouseBehavior *GetBehavior() {return m_Behavior;}
 
-  albaGenericMouseBehavior* GetIsaRotate();
-
-protected:  
-  albaInteractionBehavior* m_OldInteractor;
-   
-  /** Create interactors */
-  void CreateISA();
-
+protected:
   /** Override superclass */
   void CreateGui();
 
-  albaCompositorMouseBehavior *m_IsaCompositor;
+  /** Override superclass */
+  void RefSysVmeChanged();
 
-  albaGenericMouseBehavior *m_IsaRotate;
-  albaGenericMouseBehavior *m_IsaTranslate;
-  albaGenericMouseBehavior *m_IsaRoll;
+  albaTransformMouseBehavior *m_Behavior;  ///< the behavior moving the VME
+  albaInteractionBehavior *m_OldBehavior;  ///< the behavior of the VME before this one
 
   int m_RotationConstraintId;
 	int m_TranslationConstraintId;
-  
-  /** Override superclass */;
-  void RefSysVmeChanged();
 
-  friend class albaGUITransformMouseTest;
-  
+  friend class albaTransformMouseGUITest;
 };
 #endif

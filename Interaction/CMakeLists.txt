@@ -45,7 +45,7 @@ SET(PROJECT_SRCS
   albaGUIGizmoTranslate.cpp  				albaGUIGizmoTranslate.h
   albaGUISaveRestorePose.cpp  				albaGUISaveRestorePose.h
   albaGUITransformInterface.cpp  			albaGUITransformInterface.h
-  albaGUITransformMouse.cpp  				albaGUITransformMouse.h
+  albaTransformMouseGUI.cpp  				albaTransformMouseGUI.h
   albaGUITransformTextEntries.cpp  			albaGUITransformTextEntries.h
   albaInteractionFactory.cpp  				albaInteractionFactory.h
   albaInteractionManager.cpp  				albaInteractionManager.h
@@ -68,6 +68,8 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
   albaCompositorMouseBehavior.cpp  		albaCompositorMouseBehavior.h
+  albaTransformMouseBehavior.cpp  					albaTransformMouseBehavior.h
+  albaTransformMouseFreeBehavior.cpp  					albaTransformMouseFreeBehavior.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
   albaGenericMouseBehavior.cpp  			albaGenericMouseBehavior.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
@@ -98,7 +100,6 @@ SET(PROJECT_SRCS
 	alba2DMeasureSegmentTool.cpp			alba2DMeasureSegmentTool.h
 	alba2DMeasureTemplateTool.cpp		alba2DMeasureTemplateTool.h
 	
-	albaCompositorMouseFreeTransformBehavior.cpp albaCompositorMouseFreeTransformBehavior.h
 	albaGenericMouseFreeTransformBehavior.cpp	albaGenericMouseFreeTransformBehavior.h
 	alba2DMeasureEllipseTool.cpp alba2DMeasureEllipseTool.h
 )
