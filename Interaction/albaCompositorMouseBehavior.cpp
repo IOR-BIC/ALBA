@@ -84,7 +84,7 @@ albaGenericMouseBehavior *albaCompositorMouseBehavior::CreateBehavior(MMI_ACTIVA
 //----------------------------------------------------------------------------
 {
   // create the generic behavior and populate the map
-  albaGenericMouseBehavior *pISAG = albaGenericMouseBehavior::New();
+  albaGenericMouseBehavior *pISAG = NewGenericMouse();
   
   m_ActivatorMap[activator] = pISAG;
   switch (activator)
@@ -125,6 +125,12 @@ albaGenericMouseBehavior *albaCompositorMouseBehavior::CreateBehavior(MMI_ACTIVA
   }
   
   return pISAG;
+}
+
+//----------------------------------------------------------------------------
+albaGenericMouseBehavior *albaCompositorMouseBehavior::NewGenericMouse()
+{
+  return albaGenericMouseBehavior::New();
 }
 
 //----------------------------------------------------------------------------

@@ -116,7 +116,6 @@ protected:
   vtkIdList *m_PointIds;
   vtkIdList *m_CellIds;
   double m_Diameter;
-  int   m_AutoClip;
  
   double m_MinBrushSize;
   double m_MaxBrushMSize;

@@ -62,7 +62,6 @@
 #include "vtkIdList.h"
 #include "vtkTriangle.h"
 #include "vtkCamera.h"
-#include "vtkInteractorStyle.h"
 
 const int ID_REGION = 0;
 
@@ -104,7 +103,6 @@ albaOp(label)
 
 
   m_TriangeCentreComputationList = NULL;
-  m_AutoClip = 1;
 }
 //----------------------------------------------------------------------------
 albaOpRemoveCells::~albaOpRemoveCells()
@@ -209,7 +207,6 @@ enum REMOVE_CELL_ID
   ID_UNSELECT,
   ID_CANCEL,
   ID_CLIP,
-  ID_AUTOCLIP,
 };
 //----------------------------------------------------------------------------
 void albaOpRemoveCells::CreateOpDialog()
@@ -268,7 +265,6 @@ void albaOpRemoveCells::CreateOpDialog()
   wxStaticText *foo  = new wxStaticText(m_Dialog,-1, " ");
   wxTextCtrl   *diameter = new wxTextCtrl  (m_Dialog,ID_DIAMETER, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
   wxCheckBox *unselect =   new wxCheckBox(m_Dialog, ID_DELETE,         "unselect", p, wxSize(80,20));
-  wxCheckBox *b_clip =   new wxCheckBox(m_Dialog, ID_AUTOCLIP,         "autoclipping", p, wxSize(80,20));
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
@@ -278,7 +274,6 @@ void albaOpRemoveCells::CreateOpDialog()
   albaGUIButton  *cancel = new albaGUIButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
 	
-  b_clip->SetValidator(albaGUIValidator(this,ID_AUTOCLIP,b_clip,(int*)&m_AutoClip));
   // AACC: 10-03-2009 please add more decimal digits...
   diameter->SetValidator(albaGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize, 4));
   unselect->SetValidator(albaGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
@@ -297,7 +292,6 @@ void albaOpRemoveCells::CreateOpDialog()
   h_sizer1->Add(foo,     0,wxRIGHT);	
   h_sizer1->Add(unselect,     0,wxRIGHT);	
 
-  h_sizer1->Add(b_clip,0,wxRIGHT);
 
 
   wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
@@ -421,22 +415,6 @@ void albaOpRemoveCells::OnEvent(albaEventBase *alba_event)
 
       }     
       break ;
-	  case ID_AUTOCLIP:
-		  if(m_AutoClip)
-		  {
-			  //achiarini (27.11.2007)
-			  //this is to guarantee that the clippingplanes are not reset during interaction
-			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOn(); 
-
-		  }
-		  else{
-			  //this is to guarantee that the clippingplanes are not reset during interaction
-			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOff(); 
-			  m_Rwi->CameraUpdate();
-		  }
-
-		  break;
-
 	 default:
         albaEventMacro(*e);
       break; 

@@ -103,6 +103,9 @@ protected:
   albaCompositorMouseBehavior();
   ~albaCompositorMouseBehavior();
 
+  /** Create the generic mouse behavior used by CreateBehavior: subclasses can create a specialized one */
+  virtual albaGenericMouseBehavior *NewGenericMouse();
+
   virtual void OnButtonDown(albaEventInteraction *e);
   
   virtual void OnButtonUp(albaEventInteraction *e);
