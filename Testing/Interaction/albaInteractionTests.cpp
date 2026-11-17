@@ -33,15 +33,14 @@
 #include "albaDeviceTest.h"
 #include "albaEventInteractionTest.h"
 #include "albaFakeLogicForTest.h"
-#include "albaGUIGizmoInterfaceTest.h"
-#include "albaGUIGizmoRotateTest.h"
-#include "albaGUIGizmoScaleTest.h"
-#include "albaGUIGizmoTranslateTest.h"
-#include "albaGUISaveRestorePoseTest.h"
-#include "albaGUITransformInterfaceTest.h"
+#include "albaGizmoInterfaceGUITest.h"
+#include "albaGizmoRotateGUITest.h"
+#include "albaGizmoScaleGUITest.h"
+#include "albaGizmoTranslateGUITest.h"
+#include "albaSaveRestorePoseGUITest.h"
+#include "albaTransformInterfaceGUITest.h"
 #include "albaTransformMouseGUITest.h"
-#include "albaGUITransformSlidersTest.h"
-#include "albaGUITransformTextEntriesTest.h"
+#include "albaTransformTextEntriesGUITest.h"
 #include "albaGizmoBoundingBoxTest.h"
 #include "albaGizmoHandleTest.h"
 #include "albaGizmoInteractionDebuggerTest.h"
@@ -146,16 +145,16 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaInteractorConstraintTest::suite());
 	runner.addTest(albaRefSysTest::suite());
 	runner.addTest(albaDeviceSetTest::suite());
-	runner.addTest(albaGUIGizmoTranslateTest::suite());
-	runner.addTest(albaGUIGizmoRotateTest::suite());
-	runner.addTest(albaGUIGizmoScaleTest::suite());
+	runner.addTest(albaGizmoTranslateGUITest::suite());
+	runner.addTest(albaGizmoRotateGUITest::suite());
+	runner.addTest(albaGizmoScaleGUITest::suite());
 	runner.addTest(albaEventInteractionTest::suite());
 	runner.addTest(albaDeviceManagerTest::suite());
 	runner.addTest(albaInteractionFactoryTest::suite());
-	runner.addTest(albaGUITransformTextEntriesTest::suite());
+	runner.addTest(albaTransformTextEntriesGUITest::suite());
 	runner.addTest(albaCompositorMouseBehaviorTest::suite());
 	runner.addTest(albaActionTest::suite());
-	runner.addTest(albaGUISaveRestorePoseTest::suite());
+	runner.addTest(albaSaveRestorePoseGUITest::suite());
 	runner.addTest(albaAgentEventQueueTest::suite());
 	runner.addTest(albaAgentThreadedTest::suite());
 	runner.addTest(albaPositionalEventRouterTest::suite());
@@ -166,12 +165,11 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaInteractionBehaviorTest::suite());
 	runner.addTest(albaAvatarTest::suite());
 	runner.addTest(albaStaticEventRouterTest::suite());
-	runner.addTest(albaGUIGizmoInterfaceTest::suite());
-	runner.addTest(albaGUITransformInterfaceTest::suite());
+	runner.addTest(albaGizmoInterfaceGUITest::suite());
+	runner.addTest(albaTransformInterfaceGUITest::suite());
 	runner.addTest(albaAvatar3DConeTest::suite());
 	runner.addTest(albaTransformMouseGUITest::suite());
 	runner.addTest(albaGizmoPolylineGraphTest::suite());
-	runner.addTest(albaGUITransformSlidersTest::suite());
 	runner.addTest(albaVTKPickerToolTest::suite());
 	runner.addTest(albaSelectPointToolTest::suite());
 	runner.addTest(albaPickHelperTest::suite());

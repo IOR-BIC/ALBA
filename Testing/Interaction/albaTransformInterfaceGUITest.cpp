@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformInterfaceTest
+ Module: albaTransformInterfaceGUITest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -25,16 +25,16 @@
 
 #include <cppunit/config/SourcePrefix.h>
 
-#include "albaGUITransformInterfaceTest.h"
-#include "albaGUITransformInterface.h"
+#include "albaTransformInterfaceGUITest.h"
+#include "albaTransformInterfaceGUI.h"
 
 #include "albaVMEGroup.h"
 
-class albaGUITransformInterfaceDummy : public albaGUITransformInterface
+class albaTransformInterfaceGUIDummy : public albaTransformInterfaceGUI
 {
 public:
-  albaGUITransformInterfaceDummy():albaGUITransformInterface(){};
-  ~albaGUITransformInterfaceDummy(){};
+  albaTransformInterfaceGUIDummy():albaTransformInterfaceGUI(){};
+  ~albaTransformInterfaceGUIDummy(){};
 
   /*virtual*/ void EnableWidgets(bool enable){};
 protected:
@@ -42,29 +42,29 @@ private:
 };
 
 //----------------------------------------------------------------------------
-void albaGUITransformInterfaceTest::TestFixture()
+void albaTransformInterfaceGUITest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void albaGUITransformInterfaceTest::TestDynamicAllocation()
+void albaTransformInterfaceGUITest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
-  albaGUITransformInterfaceDummy *transform = new albaGUITransformInterfaceDummy();
+  albaTransformInterfaceGUIDummy *transform = new albaTransformInterfaceGUIDummy();
 
   cppDEL(transform);
 }
 //----------------------------------------------------------------------------
-void albaGUITransformInterfaceTest::TestStaticAllocation()
+void albaTransformInterfaceGUITest::TestStaticAllocation()
 //----------------------------------------------------------------------------
 {
-  albaGUITransformInterfaceDummy transform;
+  albaTransformInterfaceGUIDummy transform;
 }
 //----------------------------------------------------------------------------
-void albaGUITransformInterfaceTest::TestTestModeOn()
+void albaTransformInterfaceGUITest::TestTestModeOn()
 //----------------------------------------------------------------------------
 {
-  albaGUITransformInterfaceDummy *transform = new albaGUITransformInterfaceDummy();
+  albaTransformInterfaceGUIDummy *transform = new albaTransformInterfaceGUIDummy();
 
   transform->TestModeOn();
 
@@ -73,10 +73,10 @@ void albaGUITransformInterfaceTest::TestTestModeOn()
   cppDEL(transform);
 }
 //----------------------------------------------------------------------------
-void albaGUITransformInterfaceTest::TestTestModeOff()
+void albaTransformInterfaceGUITest::TestTestModeOff()
 //----------------------------------------------------------------------------
 {
-  albaGUITransformInterfaceDummy *transform = new albaGUITransformInterfaceDummy();
+  albaTransformInterfaceGUIDummy *transform = new albaTransformInterfaceGUIDummy();
 
   transform->TestModeOff();
 
@@ -85,10 +85,10 @@ void albaGUITransformInterfaceTest::TestTestModeOff()
   cppDEL(transform);
 }
 //----------------------------------------------------------------------------
-void albaGUITransformInterfaceTest::TestSetRefSys()
+void albaTransformInterfaceGUITest::TestSetRefSys()
 //----------------------------------------------------------------------------
 {
-  albaGUITransformInterfaceDummy *transform = new albaGUITransformInterfaceDummy();
+  albaTransformInterfaceGUIDummy *transform = new albaTransformInterfaceGUIDummy();
 
   albaSmartPointer<albaVMEGroup> refSys;
 

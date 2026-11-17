@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaGUITransformInterface.h"
+#include "albaTransformInterfaceGUI.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -32,7 +32,7 @@ class albaVME;
 /** GUI of the transform mouse behavior: it creates an albaTransformMouseBehavior for the VME, assigns it to
   the VME while the widgets are enabled, and lets the user choose the rotation and translation constraints.
   The transforms of the behavior are forwarded to the listener (ID_TRANSFORM, sent by this object). */
-class ALBA_EXPORT albaTransformMouseGUI : public albaGUITransformInterface
+class ALBA_EXPORT albaTransformMouseGUI : public albaTransformInterfaceGUI
 {
 public:
   albaTransformMouseGUI(albaVME *input, albaObserver *listener = NULL, bool testMode = false);

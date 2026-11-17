@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoInterface
+ Module: albaGizmoInterfaceGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -40,11 +40,11 @@ class albaObserver;
   - enforce superclass implementation by using pure virtuals
 */
 
-class ALBA_EXPORT albaGUIGizmoInterface : public albaObserver
+class ALBA_EXPORT albaGizmoInterfaceGUI : public albaObserver
 {
 public:
 
-  virtual ~albaGUIGizmoInterface(); 
+  virtual ~albaGizmoInterfaceGUI(); 
 
   virtual void OnEvent(albaEventBase *alba_event) {};
 
@@ -67,13 +67,13 @@ public:
 protected:
   virtual void CreateGui() {};
   
-  albaGUIGizmoInterface(albaObserver *listener = NULL);
+  albaGizmoInterfaceGUI(albaObserver *listener = NULL);
 
   albaObserver *m_Listener;
   albaGUI      *m_Gui;    
   bool m_TestMode;
 
   /** Test friend */
-  friend class albaGUIGizmoInterfaceTest;
+  friend class albaGizmoInterfaceGUITest;
 };
 #endif

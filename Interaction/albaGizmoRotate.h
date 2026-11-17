@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaEvent.h"
 #include "albaGizmoInterface.h"
-#include "albaGUIGizmoRotate.h"
+#include "albaGizmoRotateGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -133,7 +133,7 @@ public:
   double GetCircleFanRadius();
 
 protected:
-  albaGUIGizmoRotate *m_GuiGizmoRotate;
+  albaGizmoRotateGUI *m_GuiGizmoRotate;
 
   /** Send matrix to postmultiply to listener */
   void SendTransformMatrixFromGui(albaEventBase *alba_event);

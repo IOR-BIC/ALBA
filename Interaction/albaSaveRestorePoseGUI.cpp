@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUISaveRestorePose
+ Module: albaSaveRestorePoseGUI
  Authors: Paolo Quadrani , Stefano Perticoni
  
  Copyright (c) BIC
@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaGUISaveRestorePose.h"
+#include "albaSaveRestorePoseGUI.h"
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaSmartPointer.h"
@@ -41,7 +41,7 @@
 albaString dummyPoseNameUsedForTesting = "dummyPoseNameUsedForTesting";
 
 //----------------------------------------------------------------------------
-albaGUISaveRestorePose::albaGUISaveRestorePose(albaVME *input, albaObserver *listener, int typeGui, bool testMode)
+albaSaveRestorePoseGUI::albaSaveRestorePoseGUI(albaVME *input, albaObserver *listener, int typeGui, bool testMode)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -59,13 +59,13 @@ albaGUISaveRestorePose::albaGUISaveRestorePose(albaVME *input, albaObserver *lis
   }
 }
 //----------------------------------------------------------------------------
-albaGUISaveRestorePose::~albaGUISaveRestorePose() 
+albaSaveRestorePoseGUI::~albaSaveRestorePoseGUI() 
 //----------------------------------------------------------------------------
 { 
 }
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::CreateGui()
+void albaSaveRestorePoseGUI::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
@@ -95,7 +95,7 @@ void albaGUISaveRestorePose::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::OnEvent(albaEventBase *alba_event)
+void albaSaveRestorePoseGUI::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
@@ -132,7 +132,7 @@ void albaGUISaveRestorePose::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::EnableWidgets(bool enable)
+void albaSaveRestorePoseGUI::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   int num_stored_poses = m_PositionsList->GetCount();
@@ -142,7 +142,7 @@ void albaGUISaveRestorePose::EnableWidgets(bool enable)
   m_Gui->Enable(ID_APPLY, enable && num_stored_poses > 0);
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::FillListBoxWithABSPosesStoredInInputVME()
+void albaSaveRestorePoseGUI::FillListBoxWithABSPosesStoredInInputVME()
 //----------------------------------------------------------------------------
 {
 	albaTagArray *tag_array = m_InputVME->GetTagArray();
@@ -164,7 +164,7 @@ void albaGUISaveRestorePose::FillListBoxWithABSPosesStoredInInputVME()
 	}
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::StorePose()
+void albaSaveRestorePoseGUI::StorePose()
 {
   assert(m_InputVME);
 
@@ -209,7 +209,7 @@ void albaGUISaveRestorePose::StorePose()
   }
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::RemovePose( int absPoseListBoxID )
+void albaSaveRestorePoseGUI::RemovePose( int absPoseListBoxID )
 {
   wxString pose_name;
 
@@ -232,7 +232,7 @@ void albaGUISaveRestorePose::RemovePose( int absPoseListBoxID )
   }
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePose::RestorePose( int absPoseListBoxID )
+void albaSaveRestorePoseGUI::RestorePose( int absPoseListBoxID )
 {
   wxString pose_name;
 
@@ -249,7 +249,7 @@ void albaGUISaveRestorePose::RestorePose( int absPoseListBoxID )
   return;
 }
 
-void albaGUISaveRestorePose::RestorePoseHelper( albaString pose_name )
+void albaSaveRestorePoseGUI::RestorePoseHelper( albaString pose_name )
 {
   assert(m_InputVME);
 
@@ -276,7 +276,7 @@ void albaGUISaveRestorePose::RestorePoseHelper( albaString pose_name )
   e2s.SetId(ID_TRANSFORM);
   albaEventMacro(e2s);
 }
-void albaGUISaveRestorePose::StorePoseHelper( albaString absPoseTagName )
+void albaSaveRestorePoseGUI::StorePoseHelper( albaString absPoseTagName )
 {
   assert(m_InputVME);
   albaMatrix *absPose = m_InputVME->GetOutput()->GetAbsMatrix();
@@ -302,7 +302,7 @@ void albaGUISaveRestorePose::StorePoseHelper( albaString absPoseTagName )
   m_InputVME->GetTagArray()->SetTag(item);
 }
 
-void albaGUISaveRestorePose::RemovePoseHelper( albaString absPoseTagName )
+void albaSaveRestorePoseGUI::RemovePoseHelper( albaString absPoseTagName )
 {
   assert(m_InputVME);
   if (m_InputVME->GetTagArray()->IsTagPresent(absPoseTagName.GetCStr()))

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoTranslateTest
+ Module: albaTransformTextEntriesGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -26,85 +26,84 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaInteractionTests.h"
 
-#include "albaGUIGizmoTranslateTest.h"
+#include "albaTransformTextEntriesGUITest.h"
 #include "albaVMESurface.h"
 #include "albaDecl.h"
-#include "albaGUIGizmoTranslate.h"
+#include "albaTransformTextEntriesGUI.h"
 
 #include "vtkSphereSource.h"
 
 #include <iostream>
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslateTest::TestFixture()
+void albaTransformTextEntriesGUITest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslateTest::BeforeTest()
+void albaTransformTextEntriesGUITest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMESphere = albaVMESurface::New();
   m_VMESphere->SetName("m_VMESphere");
   
   m_VTKSphere = vtkSphereSource::New();
-  m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1); 
+  m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1);
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslateTest::AfterTest()
+void albaTransformTextEntriesGUITest::AfterTest()
 //----------------------------------------------------------------------------
 {
   albaDEL(m_VMESphere);
   vtkDEL(m_VTKSphere);
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslateTest::TestConstructorDestructor()
+void albaTransformTextEntriesGUITest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  albaGUIGizmoTranslate *guiGizmoTranslate = new albaGUIGizmoTranslate(NULL,true);
-  CPPUNIT_ASSERT(guiGizmoTranslate->m_Listener == NULL);
-  cppDEL(guiGizmoTranslate);
-
-  guiGizmoTranslate = new albaGUIGizmoTranslate(m_VMESphere,true);
-  CPPUNIT_ASSERT(guiGizmoTranslate->m_Listener == m_VMESphere);
-  cppDEL(guiGizmoTranslate);
+  albaTransformTextEntriesGUI *guiTransformTextEntries = new albaTransformTextEntriesGUI(m_VMESphere, NULL, true, true);
+  cppDEL(guiTransformTextEntries);
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslateTest::TestSetAbsPosition()
+void albaTransformTextEntriesGUITest::TestSetAbsPose()
 //----------------------------------------------------------------------------
 {
-  albaGUIGizmoTranslate *guiGizmoTranslate = new albaGUIGizmoTranslate(NULL,true);
+  albaTransformTextEntriesGUI *guiTransformTextEntries = new albaTransformTextEntriesGUI(m_VMESphere, NULL, true, true);
   
   albaMatrix absPose;
   absPose.SetElement(0,3, 0);
   absPose.SetElement(1,3, 10);
   absPose.SetElement(2,3, 20);
 
-  guiGizmoTranslate->SetAbsPosition(&absPose);
+  guiTransformTextEntries->SetAbsPose(&absPose);
 
-  CPPUNIT_ASSERT_EQUAL(guiGizmoTranslate->m_Position[0], 0.0);
-  CPPUNIT_ASSERT_EQUAL(guiGizmoTranslate->m_Position[1], 10.0);
-  CPPUNIT_ASSERT_EQUAL(guiGizmoTranslate->m_Position[2], 20.0);
+  CPPUNIT_ASSERT_EQUAL(guiTransformTextEntries->m_Position[0], 0.0);
+  CPPUNIT_ASSERT_EQUAL(guiTransformTextEntries->m_Position[1], 10.0);
+  CPPUNIT_ASSERT_EQUAL(guiTransformTextEntries->m_Position[2], 20.0);
 
-  cppDEL(guiGizmoTranslate);
+  cppDEL(guiTransformTextEntries);
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslateTest::TestOnEvent()
+void albaTransformTextEntriesGUITest::TestOnEvent()
 //----------------------------------------------------------------------------
 {
-  DummyObserver *dummy = new DummyObserver();
+  DummyObserver *dummyObserver = new DummyObserver();
 
-  albaGUIGizmoTranslate *guiGizmoTranslate = new albaGUIGizmoTranslate(dummy,true);
-  albaEvent eventSent(this, albaGUIGizmoTranslate::ID_TRANSLATE_X);
-  guiGizmoTranslate->OnEvent(&eventSent);
+  albaTransformTextEntriesGUI *guiTransformTextEntries = new albaTransformTextEntriesGUI(m_VMESphere, dummyObserver, true, true);
   
-  int dummyReceivedEventID = dummy->GetLastReceivedEventID();
+  //  in response to an ID_TRANSLATE_X event from GUI...(*)
+  albaEvent eventSent(this, albaTransformTextEntriesGUI::ID_TRANSLATE_X);
+  guiTransformTextEntries->OnEvent(&eventSent);
+  
+  int dummyReceivedEventID = dummyObserver->GetLastReceivedEventID();
 
-  CPPUNIT_ASSERT(dummyReceivedEventID == albaGUIGizmoTranslate::ID_TRANSLATE_X);
+  // (*)... the observer is notified with a ID_TRANSFORM event 
+  // containing the already set VME ABS matrix
+  CPPUNIT_ASSERT(dummyReceivedEventID == ID_TRANSFORM);
 
-  cppDEL(guiGizmoTranslate);
+  cppDEL(guiTransformTextEntries);
 
-  cppDEL(dummy);
+  cppDEL(dummyObserver);
 }

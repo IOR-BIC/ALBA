@@ -23,7 +23,7 @@
 #include "albaEvent.h"
 #include "albaObserver.h"
 #include "albaGizmoInterface.h"
-#include "albaGUIGizmoScale.h"
+#include "albaGizmoScaleGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -124,7 +124,7 @@ public:
 
 protected:
 
-  albaGUIGizmoScale *m_GuiGizmoScale;
+  albaGizmoScaleGUI *m_GuiGizmoScale;
 
   /** Gizmo components events handling */
   void OnEventGizmoGui(albaEventBase *alba_event);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoTranslate
+ Module: albaGizmoScaleGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -24,68 +24,68 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaGUIGizmoTranslate.h"
+#include "albaGizmoScaleGUI.h"
 #include "albaDecl.h"
-#include "albaGUIButton.h"
 #include "albaGUI.h"
+#include "albaGUIButton.h"
 
 #include "albaGizmoInterface.h"
-#include "albaGizmoTranslate.h"
 
 #include "albaTransform.h"
-
 #include "albaMatrix.h"
 
+#include "vtkMatrix4x4.h"
+
 //----------------------------------------------------------------------------
-albaGUIGizmoTranslate::albaGUIGizmoTranslate(albaObserver *listener, bool testMode)
+albaGizmoScaleGUI::albaGizmoScaleGUI(albaObserver *listener, bool testMode)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
-
-  m_Position[0] = m_Position[1] = m_Position[2] = 0;
-
   m_TestMode = testMode;
+
+  m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1;
 
   if (m_TestMode == false)
   {
     CreateGui();
-  }
+  }  
 }
+
 //----------------------------------------------------------------------------
-albaGUIGizmoTranslate::~albaGUIGizmoTranslate() 
+albaGizmoScaleGUI::~albaGizmoScaleGUI() 
 //----------------------------------------------------------------------------
 { 	
   
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslate::CreateGui()
+void albaGizmoScaleGUI::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
 
   m_Gui->Divider(2);
-  m_Gui->Label("Translation gizmo abs position", true);
-  m_Gui->Double(ID_TRANSLATE_X, "Translate X", &m_Position[0]);
-  m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
-  m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &m_Position[2]);
+  m_Gui->Label("scaling gizmo abs scaling", true);
+  m_Gui->Double(ID_SCALE_X, "Scaling X", &m_Scaling[0], 0);
+  m_Gui->Double(ID_SCALE_Y, "Scaling Y", &m_Scaling[1], 0);
+  m_Gui->Double(ID_SCALE_Z, "Scaling Z", &m_Scaling[2], 0);
 	m_Gui->Divider();
   m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslate::OnEvent(albaEventBase *alba_event)
+void albaGizmoScaleGUI::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
     switch(e->GetId())
     {
-      case ID_TRANSLATE_X:
-      case ID_TRANSLATE_Y:
-      case ID_TRANSLATE_Z:
+      case ID_SCALE_X:
+      case ID_SCALE_Y:
+      case ID_SCALE_Z:
       {
-        SendAbsPosition(e);
+        SendAbsScaling(e);
       }
       break;
 
@@ -96,21 +96,21 @@ void albaGUIGizmoTranslate::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslate::EnableWidgets(bool enable)
+void albaGizmoScaleGUI::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
-  m_Gui->Enable(ID_TRANSLATE_X, enable);
-  m_Gui->Enable(ID_TRANSLATE_Y, enable);
-  m_Gui->Enable(ID_TRANSLATE_Z, enable);
+  m_Gui->Enable(ID_SCALE_X, enable);
+  m_Gui->Enable(ID_SCALE_Y, enable);
+  m_Gui->Enable(ID_SCALE_Z, enable);
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslate::SendAbsPosition(albaEventBase *sourceEvent)
+void albaGizmoScaleGUI::SendAbsScaling(albaEventBase *sourceEvent)
 //----------------------------------------------------------------------------
 {
-  // build abs matrix position
+  // build abs matrix scaling
   albaMatrix m2send;
-  albaTransform::SetPosition(m2send, m_Position);
+  albaTransform::Scale(m2send, m_Scaling[0], m_Scaling[1], m_Scaling[2], PRE_MULTIPLY);
 
   albaEvent event2Send;
   event2Send.SetSender(this);
@@ -121,10 +121,10 @@ void albaGUIGizmoTranslate::SendAbsPosition(albaEventBase *sourceEvent)
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoTranslate::SetAbsPosition(albaMatrix *pose)
+void albaGizmoScaleGUI::SetAbsScaling(albaMatrix *pose)
 //----------------------------------------------------------------------------
 {
-  albaTransform::GetPosition(*pose, m_Position);
+  albaTransform::GetScale(*pose, m_Scaling);
   
   if (m_TestMode == false)
   {

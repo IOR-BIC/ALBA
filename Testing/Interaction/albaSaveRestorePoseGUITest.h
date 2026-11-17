@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformTextEntriesTest
+ Module: albaSaveRestorePoseGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,19 +14,16 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNITalbaGUITransformTextEntriesTest_H__
-#define __CPP_UNITalbaGUITransformTextEntriesTest_H__
+#ifndef __CPP_UNITalbaSaveRestorePoseGUITest_H__
+#define __CPP_UNITalbaSaveRestorePoseGUITest_H__
 
 #include "albaTest.h"
-
-#include "albaEventBase.h"
-#include "albaObserver.h"
 
 class vtkSphereSource;
 class albaVMESurface;
 
-/** albaGUITransformTextEntriesTest */
-class albaGUITransformTextEntriesTest : public albaTest
+/** albaSaveRestorePoseGUITest */
+class albaSaveRestorePoseGUITest : public albaTest
 {
 public: 
   /** Executed before each test */
@@ -35,11 +32,15 @@ public:
   /** Executed after each test */
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( albaGUITransformTextEntriesTest );
+  CPPUNIT_TEST_SUITE( albaSaveRestorePoseGUITest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestConstructorDestructor);
-  CPPUNIT_TEST(TestSetAbsPose);
-  CPPUNIT_TEST(TestOnEvent);
+  CPPUNIT_TEST(TestStorePose);
+  CPPUNIT_TEST(TestRestorePose);
+  CPPUNIT_TEST(TestRemovePose);
+  CPPUNIT_TEST(TestStorePoseHelper);
+  CPPUNIT_TEST(TestRestorePoseHelper);
+  CPPUNIT_TEST(TestRemovePoseHelper);
   CPPUNIT_TEST_SUITE_END();
 
   
@@ -47,8 +48,12 @@ private:
 
   void TestFixture();
   void TestConstructorDestructor();
-  void TestSetAbsPose();
-  void TestOnEvent();
+  void TestStorePose();
+  void TestRestorePose();
+  void TestRemovePose();  
+  void TestStorePoseHelper();
+  void TestRestorePoseHelper();
+  void TestRemovePoseHelper();
   
   albaVMESurface *m_VMESphere;
   vtkSphereSource *m_VTKSphere;

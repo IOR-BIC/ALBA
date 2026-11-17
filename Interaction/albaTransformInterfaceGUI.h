@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformInterface
+ Module: albaTransformInterfaceGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaGUITransformInterface_H__
-#define __albaGUITransformInterface_H__
+#ifndef __albaTransformInterfaceGUI_H__
+#define __albaTransformInterfaceGUI_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -40,7 +40,7 @@ class albaVME;
   @todo
 
 */
-class ALBA_EXPORT albaGUITransformInterface : public albaObserver
+class ALBA_EXPORT albaTransformInterfaceGUI : public albaObserver
 {
 public:
 
@@ -72,8 +72,8 @@ public:
 
 protected:
   
-  albaGUITransformInterface();
-  ~albaGUITransformInterface(); 
+  albaTransformInterfaceGUI();
+  ~albaTransformInterfaceGUI(); 
    
   /** Create the GUI */
   virtual void CreateGui() {};

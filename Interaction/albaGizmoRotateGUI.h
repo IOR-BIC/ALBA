@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoRotate
+ Module: albaGizmoRotateGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaEvent.h"
 #include "albaObserver.h"
-#include "albaGUIGizmoInterface.h"
+#include "albaGizmoInterfaceGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -37,12 +37,12 @@ class albaMatrix;
  
   @todo
 */
-class ALBA_EXPORT albaGUIGizmoRotate : public albaGUIGizmoInterface
+class ALBA_EXPORT albaGizmoRotateGUI : public albaGizmoInterfaceGUI
 {
 public:
 
-  albaGUIGizmoRotate(albaObserver *listener, bool testMode = false);
-  ~albaGUIGizmoRotate(); 
+  albaGizmoRotateGUI(albaObserver *listener, bool testMode = false);
+  ~albaGizmoRotateGUI(); 
 
   void OnEvent(albaEventBase *alba_event);
 
@@ -79,7 +79,7 @@ protected:
   void SendAbsOrientation(albaEventBase *sourceEvent);
 
   /** friend test */
-  friend class albaGUIGizmoRotateTest;
+  friend class albaGizmoRotateGUITest;
 
 };
 #endif

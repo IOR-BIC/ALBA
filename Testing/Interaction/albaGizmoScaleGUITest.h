@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoTranslateTest
+ Module: albaGizmoScaleGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,18 +14,18 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNITalbaGUIGizmoTranslateTest_H__
-#define __CPP_UNITalbaGUIGizmoTranslateTest_H__
+#ifndef __CPP_UNIT_albaGizmoScaleGUITest_H__
+#define __CPP_UNIT_albaGizmoScaleGUITest_H__
 
 #include "albaTest.h"
 #include "albaEventBase.h"
 #include "albaObserver.h"
 
-class vtkSphereSource;
+class vtkCubeSource;
 class albaVMESurface;
 
-/** albaGUIGizmoTranslateTest */
-class albaGUIGizmoTranslateTest : public albaTest
+/** albaGizmoScaleGUITest */
+class albaGizmoScaleGUITest : public albaTest
 {
 public: 
   /** Executed before each test */
@@ -34,23 +34,22 @@ public:
   /** Executed after each test */
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( albaGUIGizmoTranslateTest );
+  CPPUNIT_TEST_SUITE( albaGizmoScaleGUITest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestConstructorDestructor);
-  CPPUNIT_TEST(TestSetAbsPosition);
+  CPPUNIT_TEST(TestSetAbsScaling);
   CPPUNIT_TEST(TestOnEvent);
   CPPUNIT_TEST_SUITE_END();
 
-  
 private:
 
   void TestFixture();
   void TestConstructorDestructor();
-  void TestSetAbsPosition();
+  void TestSetAbsScaling();
   void TestOnEvent();
   
-  albaVMESurface *m_VMESphere;
-  vtkSphereSource *m_VTKSphere;
+  albaVMESurface *m_VMECube;
+  vtkCubeSource *m_VTKCube;
 };
 
 #endif

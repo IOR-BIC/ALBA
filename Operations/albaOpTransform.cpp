@@ -31,7 +31,7 @@
 #include "albaGUI.h"
 #include "albaTransformMouseGUI.h"
 #include "albaGUIRollOut.h"
-#include "albaGUISaveRestorePose.h"
+#include "albaSaveRestorePoseGUI.h"
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"

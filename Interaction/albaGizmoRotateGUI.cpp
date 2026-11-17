@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoRotate
+ Module: albaGizmoRotateGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaGUIGizmoRotate.h"
+#include "albaGizmoRotateGUI.h"
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaGUIButton.h"
@@ -36,7 +36,7 @@
 #include "albaMatrix.h"
 
 //----------------------------------------------------------------------------
-albaGUIGizmoRotate::albaGUIGizmoRotate(albaObserver *listener, bool testMode)
+albaGizmoRotateGUI::albaGizmoRotateGUI(albaObserver *listener, bool testMode)
 //----------------------------------------------------------------------------
 {
   m_TestMode = testMode;
@@ -51,14 +51,14 @@ albaGUIGizmoRotate::albaGUIGizmoRotate(albaObserver *listener, bool testMode)
 }
 
 //----------------------------------------------------------------------------
-albaGUIGizmoRotate::~albaGUIGizmoRotate() 
+albaGizmoRotateGUI::~albaGizmoRotateGUI() 
 //----------------------------------------------------------------------------
 {
   
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoRotate::CreateGui()
+void albaGizmoRotateGUI::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
@@ -73,7 +73,7 @@ void albaGUIGizmoRotate::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoRotate::OnEvent(albaEventBase *alba_event)
+void albaGizmoRotateGUI::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
@@ -94,7 +94,7 @@ void albaGUIGizmoRotate::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoRotate::EnableWidgets(bool enable)
+void albaGizmoRotateGUI::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_ROTATE_X, enable);
@@ -103,7 +103,7 @@ void albaGUIGizmoRotate::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoRotate::SendAbsOrientation(albaEventBase *sourceEvent)
+void albaGizmoRotateGUI::SendAbsOrientation(albaEventBase *sourceEvent)
 //----------------------------------------------------------------------------
 {
   // build abs matrix position
@@ -119,7 +119,7 @@ void albaGUIGizmoRotate::SendAbsOrientation(albaEventBase *sourceEvent)
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoRotate::SetAbsOrientation(albaMatrix *pose)
+void albaGizmoRotateGUI::SetAbsOrientation(albaMatrix *pose)
 //----------------------------------------------------------------------------
 {
   albaTransform::GetOrientation(*pose, m_Orientation);

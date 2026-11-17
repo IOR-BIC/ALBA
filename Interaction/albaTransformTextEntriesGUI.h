@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformTextEntries
+ Module: albaTransformTextEntriesGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,14 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __albaGUITransformTextEntries_H__
-#define __albaGUITransformTextEntries_H__
+#ifndef __albaTransformTextEntriesGUI_H__
+#define __albaTransformTextEntriesGUI_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "albaObserver.h"
-#include "albaGUITransformInterface.h"
+#include "albaTransformInterfaceGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -43,7 +43,7 @@ class albaMatrix;
   
   Example Usage:
   ...
-  guiTransformTextEntries = new albaGUITransformTextEntries(vmeToMove, observerOperation);
+  guiTransformTextEntries = new albaTransformTextEntriesGUI(vmeToMove, observerOperation);
   observerOperation->GetGui()->AddGui(guiTransformTextEntries->GetGui());
   ...
 
@@ -55,12 +55,12 @@ class albaMatrix;
 
 
 */
-class ALBA_EXPORT albaGUITransformTextEntries : public albaGUITransformInterface
+class ALBA_EXPORT albaTransformTextEntriesGUI : public albaTransformInterfaceGUI
 {
 public:
 
-  albaGUITransformTextEntries(albaVME *input, albaObserver *listener = NULL, bool enableScaling = true, bool testMode = false);
-	~albaGUITransformTextEntries(); 
+  albaTransformTextEntriesGUI(albaVME *input, albaObserver *listener = NULL, bool enableScaling = true, bool testMode = false);
+	~albaTransformTextEntriesGUI(); 
 
   void OnEvent(albaEventBase *alba_event);
 
@@ -109,6 +109,6 @@ protected:
   bool m_EnableScaling;
 
   /** test friend */
-  friend class albaGUITransformTextEntriesTest;
+  friend class albaTransformTextEntriesGUITest;
 };
 #endif

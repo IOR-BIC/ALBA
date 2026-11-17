@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUISaveRestorePoseTest
+ Module: albaSaveRestorePoseGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -27,8 +27,8 @@
 
 #include "albaVMESurface.h"
 #include "albaDecl.h"
-#include "albaGUISaveRestorePoseTest.h"
-#include "albaGUISaveRestorePose.h"
+#include "albaSaveRestorePoseGUITest.h"
+#include "albaSaveRestorePoseGUI.h"
 #include "albaTagArray.h"
 
 #include "vtkSphereSource.h"
@@ -37,12 +37,12 @@
 
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::TestFixture()
+void albaSaveRestorePoseGUITest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::BeforeTest()
+void albaSaveRestorePoseGUITest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMESphere = albaVMESurface::New();
@@ -52,28 +52,28 @@ void albaGUISaveRestorePoseTest::BeforeTest()
   m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1); 
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::AfterTest()
+void albaSaveRestorePoseGUITest::AfterTest()
 //----------------------------------------------------------------------------
 {
   albaDEL(m_VMESphere);
   vtkDEL(m_VTKSphere);
 }
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::TestConstructorDestructor()
+void albaSaveRestorePoseGUITest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  albaGUISaveRestorePose *guiSRPPoseGUI = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSRPPoseGUI = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
   cppDEL(guiSRPPoseGUI);
 
-  albaGUISaveRestorePose *guiSRPScaleGUI = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_SCALE_GUI, true);
+  albaSaveRestorePoseGUI *guiSRPScaleGUI = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_SCALE_GUI, true);
   cppDEL(guiSRPScaleGUI);
 }
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::TestStorePose()
+void albaSaveRestorePoseGUITest::TestStorePose()
 //----------------------------------------------------------------------------
 {
-  albaGUISaveRestorePose *guiSaveRestorePose = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSaveRestorePose = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
 
   albaString absMatrixTagName =  "STORED_ABS_POS_dummyPoseNameUsedForTesting";
 
@@ -107,10 +107,10 @@ void albaGUISaveRestorePoseTest::TestStorePose()
 }
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::TestRestorePose()
+void albaSaveRestorePoseGUITest::TestRestorePose()
 //----------------------------------------------------------------------------
 {
-  albaGUISaveRestorePose *guiSaveRestorePose = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSaveRestorePose = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
 
   albaString absMatrixTagName =  "STORED_ABS_POS_dummyPoseNameUsedForTesting";
 
@@ -151,10 +151,10 @@ void albaGUISaveRestorePoseTest::TestRestorePose()
 }
 
 //----------------------------------------------------------------------------
-void albaGUISaveRestorePoseTest::TestRemovePose()
+void albaSaveRestorePoseGUITest::TestRemovePose()
 //----------------------------------------------------------------------------
 {
-  albaGUISaveRestorePose *guiSaveRestorePose = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSaveRestorePose = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
 
   albaString absMatrixTagName =  "STORED_ABS_POS_dummyPoseNameUsedForTesting";
 
@@ -201,9 +201,9 @@ void albaGUISaveRestorePoseTest::TestRemovePose()
 
 }
 
-void albaGUISaveRestorePoseTest::TestStorePoseHelper()
+void albaSaveRestorePoseGUITest::TestStorePoseHelper()
 {
-  albaGUISaveRestorePose *guiSaveRestorePose = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSaveRestorePose = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
 
   albaString absMatrixTagName =  "Stored_Pose";
 
@@ -236,9 +236,9 @@ void albaGUISaveRestorePoseTest::TestStorePoseHelper()
 
 }
 
-void albaGUISaveRestorePoseTest::TestRestorePoseHelper()
+void albaSaveRestorePoseGUITest::TestRestorePoseHelper()
 {
-  albaGUISaveRestorePose *guiSaveRestorePose = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSaveRestorePose = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
 
   albaString absMatrixTagName =  "Stored_Pose";
 
@@ -277,9 +277,9 @@ void albaGUISaveRestorePoseTest::TestRestorePoseHelper()
 
 }
 
-void albaGUISaveRestorePoseTest::TestRemovePoseHelper()
+void albaSaveRestorePoseGUITest::TestRemovePoseHelper()
 {
-  albaGUISaveRestorePose *guiSaveRestorePose = new albaGUISaveRestorePose(m_VMESphere, NULL, albaGUISaveRestorePose::ID_POSE_GUI, true);
+  albaSaveRestorePoseGUI *guiSaveRestorePose = new albaSaveRestorePoseGUI(m_VMESphere, NULL, albaSaveRestorePoseGUI::ID_POSE_GUI, true);
 
   albaString absMatrixTagName =  "Stored_Pose";
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoRotateTest
+ Module: albaGizmoInterfaceGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,42 +14,38 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaGUIGizmoRotateTest_H__
-#define __CPP_UNIT_albaGUIGizmoRotateTest_H__
+#ifndef __CPP_UNITalbaGizmoInterfaceGUITest_H__
+#define __CPP_UNITalbaGizmoInterfaceGUITest_H__
 
 #include "albaTest.h"
-#include "albaEventBase.h"
-#include "albaObserver.h"
 
-class vtkCubeSource;
-class albaVMESurface;
-
-/** albaGUIGizmoRotateTest */
-class albaGUIGizmoRotateTest : public albaTest
+/** albaGizmoInterfaceGUITest */
+class albaGizmoInterfaceGUITest : public albaTest
 {
 public: 
-  /** Executed before each test */
-  void BeforeTest();
 
-  /** Executed after each test */
-  void AfterTest();
-
-  CPPUNIT_TEST_SUITE( albaGUIGizmoRotateTest );
+  CPPUNIT_TEST_SUITE( albaGizmoInterfaceGUITest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-  CPPUNIT_TEST(TestConstructorDestructor);
-  CPPUNIT_TEST(TestSetAbsOrientation);
   CPPUNIT_TEST(TestOnEvent);
+  CPPUNIT_TEST(TestGetGui);
+  CPPUNIT_TEST(TestEnableWidgets);
+  CPPUNIT_TEST(TestTestModeOn);
+  CPPUNIT_TEST(TestTestModeOff);
+  CPPUNIT_TEST(TestGetTestMode);
   CPPUNIT_TEST_SUITE_END();
 
+  
 private:
 
   void TestFixture();
   void TestConstructorDestructor();
-  void TestSetAbsOrientation();
   void TestOnEvent();
-  
-  albaVMESurface *m_VMECube;
-  vtkCubeSource *m_VTKCube;
+  void TestGetGui();
+  void TestEnableWidgets();
+  void TestTestModeOn();
+  void TestTestModeOff();
+  void TestGetTestMode();
+
 };
 
 #endif

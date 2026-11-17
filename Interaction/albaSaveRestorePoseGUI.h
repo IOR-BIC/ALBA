@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUISaveRestorePose
+ Module: albaSaveRestorePoseGUI
  Authors: Paolo Quadrani , Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,14 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __albaGUISaveRestorePose_H__
-#define __albaGUISaveRestorePose_H__
+#ifndef __albaSaveRestorePoseGUI_H__
+#define __albaSaveRestorePoseGUI_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "albaObserver.h"
-#include "albaGUITransformInterface.h"
+#include "albaTransformInterfaceGUI.h"
 #include "albaTagArray.h"
 //----------------------------------------------------------------------------
 // forward references :
@@ -35,13 +35,13 @@ class albaMatrix;
   
   Example usage to plug this component into an operation:
   
-  guiSaveRestorePose = new albaGUISaveRestorePose(opInputVME, this);
+  guiSaveRestorePose = new albaSaveRestorePoseGUI(opInputVME, this);
   clientOpGUI->AddGui(guiSaveRestorePose->GetGui());
 
   @sa albaOpTransformOld
   
 */
-class ALBA_EXPORT albaGUISaveRestorePose : public albaGUITransformInterface
+class ALBA_EXPORT albaSaveRestorePoseGUI : public albaTransformInterfaceGUI
 {
 public:
 
@@ -51,8 +51,8 @@ public:
     ID_SCALE_GUI, 
   };
 
-  albaGUISaveRestorePose(albaVME *input, albaObserver *listener = NULL , int typeGui = ID_POSE_GUI, bool testMode = false);
-	~albaGUISaveRestorePose(); 
+  albaSaveRestorePoseGUI(albaVME *input, albaObserver *listener = NULL , int typeGui = ID_POSE_GUI, bool testMode = false);
+	~albaSaveRestorePoseGUI(); 
 
   /** Events handling */
   void OnEvent(albaEventBase *alba_event);
@@ -101,7 +101,7 @@ protected:
   int               m_TypeGui;
 
   /** friend test */
-  friend class albaGUISaveRestorePoseTest;
+  friend class albaSaveRestorePoseGUITest;
 
 };
 #endif

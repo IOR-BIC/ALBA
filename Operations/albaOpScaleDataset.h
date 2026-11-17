@@ -28,8 +28,8 @@
 //----------------------------------------------------------------------------
 class albaGizmoScale;
 class albaTransformMouseGUI;
-class albaGUISaveRestorePose;
-class albaGUITransformTextEntries;
+class albaSaveRestorePoseGUI;
+class albaTransformTextEntriesGUI;
 class albaVME;
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ protected:
   /** 
   plugged objects */
   albaGizmoScale               *m_GizmoScale;
-  albaGUISaveRestorePose       *m_GuiSaveRestorePose;
+  albaSaveRestorePoseGUI       *m_GuiSaveRestorePose;
 
   /** 
   Override superclass*/

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoScale
+ Module: albaGizmoTranslateGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,71 +14,70 @@
 
 =========================================================================*/
 
-#ifndef __albaGizmoGuiScale_H__
-#define __albaGizmoGuiScale_H__
+#ifndef __albaGizmoGuiTranslate_H__
+#define __albaGizmoGuiTranslate_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaGUIGizmoInterface.h"
+#include "albaObserver.h"
+#include "albaGizmoInterfaceGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class albaGUIButton;
-class albaObserver;
 class albaGUI;
 
 //----------------------------------------------------------------------------
-/** GUI class for scaling gizmo
+/** gui class for translation gizmo
 
   @sa
  
   @todo
 */
-
-class ALBA_EXPORT albaGUIGizmoScale : public albaGUIGizmoInterface
+class ALBA_EXPORT albaGizmoTranslateGUI : public albaGizmoInterfaceGUI
 {
 public:
 
-  albaGUIGizmoScale(albaObserver *listener = NULL, bool testMode = false);
-	~albaGUIGizmoScale(); 
+  albaGizmoTranslateGUI(albaObserver *listener = NULL, bool testMode = false);
+	~albaGizmoTranslateGUI(); 
 
   void OnEvent(albaEventBase *alba_event);
 
   /** Enable-Disable the GUI's widgets */
 	void EnableWidgets(bool enable);
 
-  //----------------------------------------------------------------------------
-  //gui constants: 
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//gui constants: 
+//----------------------------------------------------------------------------
 
-  // this constants must be visible from the owner gizmo  
+// this constants must be visible from the owner gizmo  
 
-  enum GIZMO_SCALE_ID
-  {
-      ID_SCALE_X = MINID,
-      ID_SCALE_Y,
-      ID_SCALE_Z,
-  };
+enum GUI_GIZMO_TRANSLATE_ID
+{
+    ID_TRANSLATE_X = MINID,
+    ID_TRANSLATE_Y,
+    ID_TRANSLATE_Z,
+};
 
   /**
-  Update Scaling ivar; only scaling part is copied from pose */
-  void SetAbsScaling(albaMatrix *pose);
+  Update Position ivar; only translation part is copied from pose */
+  void SetAbsPosition(albaMatrix *pose);
 
 protected:
 
-  void SendAbsScaling(albaEventBase *sourceEvent);
+  void SendAbsPosition(albaEventBase *sourceEvent);
 
 	/** Create the GUI*/
 	void CreateGui();
 
   /**
   Gizmo abs pose*/
-  double m_Scaling[3];
+  double m_Position[3];
 
   /** test friend */
-  friend class albaGUIGizmoScaleTest;
+  friend class albaGizmoTranslateGUITest;
 
 };
 #endif

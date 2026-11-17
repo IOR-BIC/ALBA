@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoInterface
+ Module: albaTransformInterfaceGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -24,19 +24,46 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaGUIGizmoInterface.h"
+#include "albaTransformInterfaceGUI.h"
+#include "albaDecl.h"
+
+#include "albaGUI.h"
+#include "albaGUIButton.h"
+
+#include "albaGenericMouseBehavior.h"
+#include "albaCompositorMouseBehavior.h"
+
+#include "albaMatrix.h"
+#include "albaTransform.h"
+#include "albaVME.h"
+
+#include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-albaGUIGizmoInterface::albaGUIGizmoInterface(albaObserver *listener)
+albaTransformInterfaceGUI::albaTransformInterfaceGUI()
 //----------------------------------------------------------------------------
 {
-  m_Listener = listener;
+  m_CurrentTime = -1;
+  m_Listener = NULL;
+  m_InputVME = NULL;
   m_Gui = NULL;
+  m_RefSysVME = m_InputVME;
   m_TestMode = false;
 }
 //----------------------------------------------------------------------------
-albaGUIGizmoInterface::~albaGUIGizmoInterface() 
+albaTransformInterfaceGUI::~albaTransformInterfaceGUI() 
 //----------------------------------------------------------------------------
-{
+{   
+ 
+}
 
+//----------------------------------------------------------------------------
+void albaTransformInterfaceGUI::SetRefSys(albaVME* refSysVme)
+//----------------------------------------------------------------------------
+{ 
+  if (refSysVme == NULL)
+  return;
+
+  m_RefSysVME = refSysVme;
+  RefSysVmeChanged();
 }

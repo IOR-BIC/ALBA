@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoScaleTest
+ Module: albaGizmoRotateGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -26,23 +26,24 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaInteractionTests.h"
 
-#include "albaGUIGizmoScaleTest.h"
+#include "albaGizmoRotateGUITest.h"
 #include "albaVMESurface.h"
 #include "albaDecl.h"
-#include "albaGUIGizmoScale.h"
+#include "albaGizmoRotateGUI.h"
 #include "albaTransform.h"
 
 #include "vtkCubeSource.h"
 
 #include <iostream>
 
+
 //----------------------------------------------------------------------------
-void albaGUIGizmoScaleTest::TestFixture()
+void albaGizmoRotateGUITest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoScaleTest::BeforeTest()
+void albaGizmoRotateGUITest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMECube = albaVMESurface::New();
@@ -52,78 +53,77 @@ void albaGUIGizmoScaleTest::BeforeTest()
   m_VMECube->SetData(m_VTKCube->GetOutput(), -1);  
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoScaleTest::AfterTest()
+void albaGizmoRotateGUITest::AfterTest()
 //----------------------------------------------------------------------------
 {
   albaDEL(m_VMECube);
   vtkDEL(m_VTKCube);
 }
 //----------------------------------------------------------------------------
-void albaGUIGizmoScaleTest::TestConstructorDestructor()
+void albaGizmoRotateGUITest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  albaGUIGizmoScale *guiGizmoScale = new albaGUIGizmoScale(NULL, true);
-  CPPUNIT_ASSERT(guiGizmoScale->m_Listener == NULL);
-  cppDEL(guiGizmoScale);
+  albaGizmoRotateGUI *guiGizmoRotate = new albaGizmoRotateGUI(NULL, true);
+  CPPUNIT_ASSERT(guiGizmoRotate->m_Listener == NULL);
+  cppDEL(guiGizmoRotate);
 
-  guiGizmoScale = new albaGUIGizmoScale(m_VMECube, true);
-  CPPUNIT_ASSERT(guiGizmoScale->m_Listener == m_VMECube);
-  cppDEL(guiGizmoScale);
+  guiGizmoRotate = new albaGizmoRotateGUI(m_VMECube, true);
+  CPPUNIT_ASSERT(guiGizmoRotate->m_Listener == m_VMECube);
+  cppDEL(guiGizmoRotate);
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoScaleTest::TestSetAbsScaling()
+void albaGizmoRotateGUITest::TestSetAbsOrientation()
 //----------------------------------------------------------------------------
 {
-  albaGUIGizmoScale *guiGizmoScale = new albaGUIGizmoScale(NULL, true);
+  albaGizmoRotateGUI *guiGizmoRotate = new albaGizmoRotateGUI(NULL, true);
   
-  CPPUNIT_ASSERT_EQUAL(guiGizmoScale->m_Scaling[0], 1.0);
-  CPPUNIT_ASSERT_EQUAL(guiGizmoScale->m_Scaling[1], 1.0);
-  CPPUNIT_ASSERT_EQUAL(guiGizmoScale->m_Scaling[2], 1.0);
+  CPPUNIT_ASSERT_EQUAL(guiGizmoRotate->m_Orientation[0], 0.0);
+  CPPUNIT_ASSERT_EQUAL(guiGizmoRotate->m_Orientation[1], 0.0);
+  CPPUNIT_ASSERT_EQUAL(guiGizmoRotate->m_Orientation[2], 0.0);
 
-  albaMatrix absScaling;
-  albaTransform::Scale(absScaling, 2, 3, 4, PRE_MULTIPLY);
-  absScaling.Print(cout);
+  albaMatrix absPose;
+  albaTransform::RotateZ(absPose, 45, PRE_MULTIPLY);
+  absPose.Print(cout);
   
-  guiGizmoScale->SetAbsScaling(&absScaling);
+  guiGizmoRotate->SetAbsOrientation(&absPose);
 
-  CPPUNIT_ASSERT_EQUAL(guiGizmoScale->m_Scaling[0], 2.0);
-  CPPUNIT_ASSERT_EQUAL(guiGizmoScale->m_Scaling[1], 3.0);
-  CPPUNIT_ASSERT_EQUAL(guiGizmoScale->m_Scaling[2], 4.0);
+  CPPUNIT_ASSERT_EQUAL(guiGizmoRotate->m_Orientation[0], 0.0);
+  CPPUNIT_ASSERT_EQUAL(guiGizmoRotate->m_Orientation[1], 0.0);
+  CPPUNIT_ASSERT_EQUAL(guiGizmoRotate->m_Orientation[2], 45.0);
 
-
-  cppDEL(guiGizmoScale);
+  cppDEL(guiGizmoRotate);
 }
 
 //----------------------------------------------------------------------------
-void albaGUIGizmoScaleTest::TestOnEvent()
+void albaGizmoRotateGUITest::TestOnEvent()
 //----------------------------------------------------------------------------
 {
   DummyObserver *dummy = new DummyObserver();
 
-  albaGUIGizmoScale *guiGizmoScale = new albaGUIGizmoScale(dummy, true);
-  albaEvent eventSent(this, albaGUIGizmoScale::ID_SCALE_X);
-  guiGizmoScale->OnEvent(&eventSent);
+  albaGizmoRotateGUI *guiGizmoRotate = new albaGizmoRotateGUI(dummy, true);
+  albaEvent eventSent(this, albaGizmoRotateGUI::ID_ROTATE_X);
+  guiGizmoRotate->OnEvent(&eventSent);
   
   int dummyReceivedEventID = dummy->GetLastReceivedEventID();
 
-  CPPUNIT_ASSERT(dummyReceivedEventID == albaGUIGizmoScale::ID_SCALE_X);
+  CPPUNIT_ASSERT(dummyReceivedEventID == albaGizmoRotateGUI::ID_ROTATE_X);
 
-  eventSent.SetId(albaGUIGizmoScale::ID_SCALE_Y);
-  guiGizmoScale->OnEvent(&eventSent);
-
-  dummyReceivedEventID = dummy->GetLastReceivedEventID();
-
-  CPPUNIT_ASSERT(dummyReceivedEventID == albaGUIGizmoScale::ID_SCALE_Y);
-
-  eventSent.SetId(albaGUIGizmoScale::ID_SCALE_Z);
-  guiGizmoScale->OnEvent(&eventSent);
+  eventSent.SetId(albaGizmoRotateGUI::ID_ROTATE_Y);
+  guiGizmoRotate->OnEvent(&eventSent);
 
   dummyReceivedEventID = dummy->GetLastReceivedEventID();
 
-  CPPUNIT_ASSERT(dummyReceivedEventID == albaGUIGizmoScale::ID_SCALE_Z);
+  CPPUNIT_ASSERT(dummyReceivedEventID == albaGizmoRotateGUI::ID_ROTATE_Y);
 
-  cppDEL(guiGizmoScale);
+  eventSent.SetId(albaGizmoRotateGUI::ID_ROTATE_Z);
+  guiGizmoRotate->OnEvent(&eventSent);
+
+  dummyReceivedEventID = dummy->GetLastReceivedEventID();
+
+  CPPUNIT_ASSERT(dummyReceivedEventID == albaGizmoRotateGUI::ID_ROTATE_Z);
+
+  cppDEL(guiGizmoRotate);
 
   cppDEL(dummy);
 }

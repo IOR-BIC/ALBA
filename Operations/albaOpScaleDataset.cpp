@@ -32,8 +32,8 @@
 #include "albaGUI.h"
 #include "albaGizmoScale.h"
 #include "albaTransformMouseGUI.h"
-#include "albaGUISaveRestorePose.h"
-#include "albaGUITransformTextEntries.h"
+#include "albaSaveRestorePoseGUI.h"
+#include "albaTransformTextEntriesGUI.h"
 
 #include "albaGenericMouseBehavior.h"
 
@@ -262,7 +262,7 @@ void albaOpScaleDataset::CreateGui()
   //---------------------------------
   // Store/Restore position Gui
   //---------------------------------
-  m_GuiSaveRestorePose = new albaGUISaveRestorePose(m_Input, this);
+  m_GuiSaveRestorePose = new albaSaveRestorePoseGUI(m_Input, this);
   
   // add Gui to operation
   m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
@@ -313,7 +313,7 @@ void albaOpScaleDataset::RefSysVmeChanged()
   // plugged components set their refsys;
   /*
   this should cycle on all plugged components => improve in order to use base class
-  SetRefSys on albaGUITransformInterface pointer
+  SetRefSys on albaTransformInterfaceGUI pointer
   */
   
   if (!m_TestMode)

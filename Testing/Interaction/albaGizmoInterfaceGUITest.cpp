@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIGizmoInterfaceTest
+ Module: albaGizmoInterfaceGUITest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -25,51 +25,51 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "albaDecl.h"
-#include "albaGUIGizmoInterfaceTest.h"
-#include "albaGUIGizmoInterface.h"
+#include "albaGizmoInterfaceGUITest.h"
+#include "albaGizmoInterfaceGUI.h"
 
-void albaGUIGizmoInterfaceTest::TestFixture()
+void albaGizmoInterfaceGUITest::TestFixture()
 {
 
 }
 
 
-void albaGUIGizmoInterfaceTest::TestConstructorDestructor()
+void albaGizmoInterfaceGUITest::TestConstructorDestructor()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
 	cppDEL(dummyGizmoInterface);
 }
 
-void albaGUIGizmoInterfaceTest::TestOnEvent()
+void albaGizmoInterfaceGUITest::TestOnEvent()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
 	// simple call since this method is doing nothing...
 	dummyGizmoInterface->OnEvent(NULL);
 	cppDEL(dummyGizmoInterface);	
 }
 
-void albaGUIGizmoInterfaceTest::TestGetGui()
+void albaGizmoInterfaceGUITest::TestGetGui()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
 	albaGUI *gui = dummyGizmoInterface->GetGui();
 	// no gui is built by default so:
 	CPPUNIT_ASSERT(gui == NULL);
 	cppDEL(dummyGizmoInterface);	
 }
 
-void albaGUIGizmoInterfaceTest::TestEnableWidgets()
+void albaGizmoInterfaceGUITest::TestEnableWidgets()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
-	// maybe an iVar registering widget enabling could be added to albaGUIGizmoInterface...
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
+	// maybe an iVar registering widget enabling could be added to albaGizmoInterfaceGUI...
 	// simple call since this method is doing nothing...
 	dummyGizmoInterface->EnableWidgets(true);
 	dummyGizmoInterface->EnableWidgets(false);
 	cppDEL(dummyGizmoInterface);	
 }
 
-void albaGUIGizmoInterfaceTest::TestTestModeOn()
+void albaGizmoInterfaceGUITest::TestTestModeOn()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
 	bool defaultTestMode = dummyGizmoInterface->GetTestMode();
 
 	CPPUNIT_ASSERT(defaultTestMode == false);
@@ -81,9 +81,9 @@ void albaGUIGizmoInterfaceTest::TestTestModeOn()
 	cppDEL(dummyGizmoInterface);	
 }
 
-void albaGUIGizmoInterfaceTest::TestTestModeOff()
+void albaGizmoInterfaceGUITest::TestTestModeOff()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
 	bool defaultTestMode = dummyGizmoInterface->GetTestMode();
 	CPPUNIT_ASSERT(defaultTestMode == false);
 
@@ -94,9 +94,9 @@ void albaGUIGizmoInterfaceTest::TestTestModeOff()
 	cppDEL(dummyGizmoInterface);	
 }
 
-void albaGUIGizmoInterfaceTest::TestGetTestMode()
+void albaGizmoInterfaceGUITest::TestGetTestMode()
 {
-	albaGUIGizmoInterface *dummyGizmoInterface = new albaGUIGizmoInterface(NULL);
+	albaGizmoInterfaceGUI *dummyGizmoInterface = new albaGizmoInterfaceGUI(NULL);
 	bool defaultTestMode = dummyGizmoInterface->GetTestMode();
 	
 	// default test mode must be false

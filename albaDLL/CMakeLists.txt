@@ -314,14 +314,14 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoTranslatePlane.cpp  				../Interaction/albaGizmoTranslatePlane.h
   ../Interaction/albaGizmoSlice.cpp  						../Interaction/albaGizmoSlice.h
   ../Interaction/albaGizmoInteractionDebugger.cpp  			../Interaction/albaGizmoInteractionDebugger.h
-  ../Interaction/albaGUIGizmoInterface.cpp  				../Interaction/albaGUIGizmoInterface.h
-  ../Interaction/albaGUIGizmoRotate.cpp  					../Interaction/albaGUIGizmoRotate.h
-  ../Interaction/albaGUIGizmoScale.cpp  					../Interaction/albaGUIGizmoScale.h
-  ../Interaction/albaGUIGizmoTranslate.cpp  				../Interaction/albaGUIGizmoTranslate.h
-  ../Interaction/albaGUISaveRestorePose.cpp  				../Interaction/albaGUISaveRestorePose.h
-  ../Interaction/albaGUITransformInterface.cpp  			../Interaction/albaGUITransformInterface.h
+  ../Interaction/albaGizmoInterfaceGUI.cpp  				../Interaction/albaGizmoInterfaceGUI.h
+  ../Interaction/albaGizmoRotateGUI.cpp  					../Interaction/albaGizmoRotateGUI.h
+  ../Interaction/albaGizmoScaleGUI.cpp  					../Interaction/albaGizmoScaleGUI.h
+  ../Interaction/albaGizmoTranslateGUI.cpp  				../Interaction/albaGizmoTranslateGUI.h
+  ../Interaction/albaSaveRestorePoseGUI.cpp  				../Interaction/albaSaveRestorePoseGUI.h
+  ../Interaction/albaTransformInterfaceGUI.cpp  			../Interaction/albaTransformInterfaceGUI.h
   ../Interaction/albaTransformMouseGUI.cpp  				../Interaction/albaTransformMouseGUI.h
-  ../Interaction/albaGUITransformTextEntries.cpp  			../Interaction/albaGUITransformTextEntries.h
+  ../Interaction/albaTransformTextEntriesGUI.cpp  			../Interaction/albaTransformTextEntriesGUI.h
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractionBehavior.cpp  						../Interaction/albaInteractionBehavior.h
@@ -353,7 +353,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaPickerTool.cpp  				../Interaction/albaPickerTool.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
-  ../Interaction/albaGUITransformSliders.cpp  				../Interaction/albaGUITransformSliders.h    
   ../Interaction/albaGizmoCrossRotateTranslate.cpp  		../Interaction/albaGizmoCrossRotateTranslate.h	  
   ../Interaction/albaGizmoCrossRotate.cpp  					../Interaction/albaGizmoCrossRotate.h
   ../Interaction/albaGizmoCrossRotateAxis.cpp  				../Interaction/albaGizmoCrossRotateAxis.h

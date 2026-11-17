@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUITransformInterfaceTest
+ Module: albaTransformInterfaceGUITest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -14,17 +14,17 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaGUITransformInterfaceTest_H__
-#define __CPP_UNIT_albaGUITransformInterfaceTest_H__
+#ifndef __CPP_UNIT_albaTransformInterfaceGUITest_H__
+#define __CPP_UNIT_albaTransformInterfaceGUITest_H__
 
 #include "albaTest.h"
 
-/** albaGUITransformInterfaceTest */
-class albaGUITransformInterfaceTest : public albaTest
+/** albaTransformInterfaceGUITest */
+class albaTransformInterfaceGUITest : public albaTest
 {
 public: 
 
-	CPPUNIT_TEST_SUITE( albaGUITransformInterfaceTest );
+	CPPUNIT_TEST_SUITE( albaTransformInterfaceGUITest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestStaticAllocation);
