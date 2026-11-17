@@ -71,16 +71,15 @@ bool albaVTKPickerTool::OnLeftButtonDown(albaEventInteraction *e)
   m_Picker->SetTolerance(0.001);
   if (m_Picker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer) == 0)
   {
-    // nothing was picked
+    // nothing was picked: the button goes to the camera
     vtkDEL(m_Picker);
+    return false;
   }
-  else
-  {
-    m_PickRenderer = renderer;
-    albaEvent ev(this, VME_PICKING, m_Picker);
-    ev.SetBool(false);
-    albaEventMacro(ev);
-  }
+
+  m_PickRenderer = renderer;
+  albaEvent ev(this, VME_PICKING, m_Picker);
+  ev.SetBool(false);
+  albaEventMacro(ev);
   return true;
 }
 

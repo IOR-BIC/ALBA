@@ -30,6 +30,8 @@
 class vtkMeshQuality;
 class albaGUIDialog;
 class albaRWI;
+class albaView;
+class albaViewVTK;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkScalarBarActor;
@@ -71,7 +73,9 @@ protected:
 	void CreatePolydataPipeline();
 
 	albaGUIDialog								*m_Dialog;
-	albaRWI									*m_Rwi;
+	albaRWI *m_Rwi;
+	albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
+	albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
 	vtkPolyDataMapper				*m_Mapper;
 	vtkActor								*m_Actor;
 	vtkScalarBarActor				*m_BarActor;

@@ -348,7 +348,8 @@ void albaOpRemoveCells::DeleteOpDialog()
   albaDEL(m_SelectCellTool);
 
   // the previous view is selected again before the view of the dialog is deleted
-  GetLogicManager()->SelectView(m_OldSelectedView);
+  if (m_View)
+    GetLogicManager()->SelectView(m_OldSelectedView);
   albaDEL(m_View);
   m_Rwi = NULL;
   cppDEL(m_Dialog);

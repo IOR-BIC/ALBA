@@ -41,11 +41,11 @@ albaSelectPointTool::albaSelectPointTool()
 //------------------------------------------------------------------------------
 bool albaSelectPointTool::OnLeftButtonDown(albaEventInteraction *e)
 {
-  if ((m_UseCtrlModifier && !e->GetModifier(ALBA_CTRL_KEY)) || GetEventRenderer(e) == NULL)
+  // when no point is picked the button goes to the camera
+  if ((m_UseCtrlModifier && !e->GetModifier(ALBA_CTRL_KEY)) || !PickPoint(e))
     return false;
 
   m_IsPicking = true;
-  PickPoint(e);
   return true;
 }
 
@@ -63,11 +63,11 @@ bool albaSelectPointTool::OnDrag(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void albaSelectPointTool::PickPoint(albaEventInteraction *e)
+bool albaSelectPointTool::PickPoint(albaEventInteraction *e)
 {
   vtkRenderer *renderer = GetEventRenderer(e);
   if (renderer == NULL)
-    return;
+    return false;
 
   double mousePos[2];
   e->Get2DPosition(mousePos);
@@ -75,11 +75,13 @@ void albaSelectPointTool::PickPoint(albaEventInteraction *e)
   vtkPointPicker *pointPicker;
   vtkNEW(pointPicker);
   pointPicker->SetTolerance(0.01);
-  if (pointPicker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer))
+  bool picked = pointPicker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer) != 0;
+  if (picked)
   {
     double pickedPos[3];
     pointPicker->GetPickPosition(pickedPos);
     SendPickedPointEvent(VME_PICKED, pickedPos, pointPicker->GetPointId());
   }
   vtkDEL(pointPicker);
+  return picked;
 }

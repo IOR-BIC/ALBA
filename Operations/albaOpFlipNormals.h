@@ -29,6 +29,8 @@
 //----------------------------------------------------------------------------
 
 class albaRWI;
+class albaView;
+class albaViewVTK;
 class albaVME;
 class albaGUIDialog;
 class albaSelectCellTool;
@@ -126,7 +128,9 @@ protected:
 	int                  m_UnselectCells;
 
 	albaGUIDialog						*m_Dialog;
-	albaRWI							*m_Rwi;
+	albaRWI *m_Rwi;
+	albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
+	albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;
 	albaSelectCellTool				*m_SelectCellTool;
