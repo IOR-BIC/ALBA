@@ -31,6 +31,8 @@ class albaGUIFloatSlider;
 class albaVMESurface;
 class albaVME;
 class albaRWI;
+class albaView;
+class albaViewVTK;
 
 class vtkActor;
 class vtkPolyDataMapper;
@@ -121,7 +123,9 @@ protected:
   int m_UnselectCells;
 
   albaGUIDialog		*m_Dialog;
-	albaRWI      *m_Rwi;
+	albaRWI      *m_Rwi;            ///< render window of m_View
+	albaViewVTK  *m_View;           ///< the view of the dialog: the mouse and the interaction work on it
+	albaView     *m_OldSelectedView; ///< view selected before the operation
   vtkPolyDataMapper *m_PolydataMapper;
   vtkActor          *m_PolydataActor;
   albaSelectCellTool *m_SelectCellTool;
