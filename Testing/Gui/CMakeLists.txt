@@ -39,7 +39,6 @@ SET(PROJECT_SRCS
 	albaGUIDicomSettingsTest.h 		albaGUIDicomSettingsTest.cpp
 	albaGUIWizardTest.h 				albaGUIWizardTest.cpp
 	albaGUIWizardPageTest.h 			albaGUIWizardPageTest.cpp
-	albaGUILandmarkTest.h 			albaGUILandmarkTest.cpp
 	albaGUIWizardPageNewTest.h 		albaGUIWizardPageNewTest.cpp
 )
 

@@ -239,7 +239,6 @@ SET(GUI_SRCS
   ../Gui/albaGUIViewWin.cpp  				../Gui/albaGUIViewWin.h
   ../Gui/albaGUICrossIncremental.cpp  		../Gui/albaGUICrossIncremental.h
   ../Gui/albaGUIComboBox.cpp  				../Gui/albaGUIComboBox.h
-  ../Gui/albaGUILandmark.cpp  				../Gui/albaGUILandmark.h
   ../Gui/albaGUIWizard.cpp  				../Gui/albaGUIWizard.h
   ../Gui/albaGUIWizardPage.cpp  			../Gui/albaGUIWizardPage.h
   ../Gui/albaGUIWizardPageNew.cpp  			../Gui/albaGUIWizardPageNew.h

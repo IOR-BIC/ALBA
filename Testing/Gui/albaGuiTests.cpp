@@ -25,7 +25,6 @@
 #include "albaGUIDicomSettingsTest.h"
 #include "albaGUIWizardTest.h"
 #include "albaGUIWizardPageTest.h"
-#include "albaGUILandmarkTest.h"
 #include "albaGUIWizardPageNewTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaServiceLocator.h"
@@ -70,7 +69,6 @@ int main( int argc, char* argv[] )
 	runner.addTest(albaGUISettingsAdvancedTest::suite());
 	runner.addTest(albaGUIDicomSettingsTest::suite());
 	runner.addTest(albaGUIWizardPageTest::suite());
-	runner.addTest(albaGUILandmarkTest::suite());
 	runner.addTest(albaGUIWizardPageNewTest::suite());
 
 	runner.run( controller );

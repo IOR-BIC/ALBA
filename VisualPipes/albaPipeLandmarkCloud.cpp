@@ -227,6 +227,7 @@ void albaPipeLandmarkCloud::CreateCloudPipe(vtkAlgorithmOutput *port, double rad
   if (m_Cloud)
   {
     m_CloudActor->SetProperty(m_Cloud->GetMaterial()->m_Prop);
+    m_CloudActor->SetPickable(m_Cloud->GetPickable());
   }
   else
   {

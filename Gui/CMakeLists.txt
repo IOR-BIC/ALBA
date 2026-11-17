@@ -59,7 +59,6 @@ SET(PROJECT_SRCS
   albaGUIViewWin.cpp  				albaGUIViewWin.h
   albaGUICrossIncremental.cpp  		albaGUICrossIncremental.h
   albaGUIComboBox.cpp  				albaGUIComboBox.h
-  albaGUILandmark.cpp  				albaGUILandmark.h
   albaGUIWizard.cpp  				albaGUIWizard.h
   albaGUIWizardPage.cpp  			albaGUIWizardPage.h
   albaGUIWizardPageNew.cpp  			albaGUIWizardPageNew.h
