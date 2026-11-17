@@ -25,7 +25,7 @@
 
 
 #include "albaGizmoInterface.h"
-#include "albaGUIGizmoInterface.h"
+#include "albaGizmoInterfaceGUI.h"
 
 #include "albaVME.h"
 

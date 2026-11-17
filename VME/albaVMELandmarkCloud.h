@@ -162,6 +162,10 @@ public:
   virtual void SetRadius(double rad, bool force_update = false);
   virtual double GetRadius();
 
+  /** Set/Get if the landmarks can be picked: when false the picking goes through them. It is not stored. */
+  void SetPickable(bool pickable) {m_Pickable = pickable;}
+  bool GetPickable() {return m_Pickable;}
+
   /**
   Set/Get the resolution of the landmarks' spheres. The resolution is stored as an TAG item: "LM_SPHERE_RESOLUTION".
   If no resolution has been ever set, default value is "15".*/
@@ -276,6 +280,7 @@ protected:
   int m_DefaultVisibility;
   int m_SphereResolution;
   double m_Radius;
+  bool m_Pickable; ///< false if the picking goes through the landmarks
 
 	int m_LandmarkShowNumber;
 	std::vector<albaVMELandmark *> m_LMChildren;

@@ -26,7 +26,10 @@
 #include <albaGUIBusyInfo.h>
 
 #include "albaOpIterativeRegistration.h"
-#include "albaGUILandmark.h"
+#include "albaPickerBehavior.h"
+#include "mmaMaterial.h"
+#include "vtkProperty.h"
+#include <vector>
 
 
 #include "albaEvent.h" 
@@ -46,15 +49,17 @@
 #include "vtkMatrix4x4.h"
 
  
-enum 
-{
-  SOURCE = 0,
-  TARGET,
-};
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpIterativeRegistration);
 //----------------------------------------------------------------------------
+
+// sides of the registration
+enum REGISTRATION_SIDE
+{
+  SOURCE = 0,
+  TARGET,
+};
 
 //----------------------------------------------------------------------------
 albaOpIterativeRegistration::albaOpIterativeRegistration(wxString label) 
@@ -77,6 +82,14 @@ albaOpIterativeRegistration::albaOpIterativeRegistration(wxString label)
 
   m_UndoSourceAbsPose = NULL;
   m_RegistrationMatrix = NULL;
+
+  for (int side = SOURCE; side <= TARGET; side++)
+  {
+    m_Picker[side] = NULL;
+    m_OldBehavior[side] = NULL;
+    m_Cloud[side] = NULL;
+    m_Landmark[side] = NULL;
+  }
 }
 //----------------------------------------------------------------------------
 albaOpIterativeRegistration::~albaOpIterativeRegistration( ) 
@@ -162,13 +175,13 @@ void albaOpIterativeRegistration::OnEvent(albaEventBase *alba_event)
     {
       OnEventThis(e);  
     }
-    else if (e->GetSender() == m_GuiLandmark[SOURCE]) // from source gui
+    else if (e->GetId() == VME_PICKED && e->GetSender() == m_Picker[SOURCE])
     {
-      OnEventGuiSource(e);
+      OnVmePicked(SOURCE, e);
     }
-    else if (e->GetSender() == m_GuiLandmark[TARGET]) // from target gui
+    else if (e->GetId() == VME_PICKED && e->GetSender() == m_Picker[TARGET])
     {
-      OnEventGuiTarget(e);
+      OnVmePicked(TARGET, e);
     } 
     else
     {
@@ -187,8 +200,7 @@ void albaOpIterativeRegistration::OpStop(int result)
   wxString progress_string("destroying gui...");
   albaGUIBusyInfo wait(progress_string.ToAscii(),m_TestMode);
 
-  cppDEL(m_GuiLandmark[SOURCE]);
-  cppDEL(m_GuiLandmark[TARGET]);
+  Clear();
    
   albaEventMacro(albaEvent(this,result));   
 }
@@ -210,24 +222,10 @@ void albaOpIterativeRegistration::CreateGui()
 	m_Gui->Button(ID_CHOOSE_TARGET, "Choose target", "", "Choose registration target vme");
 	m_Gui->Divider(2);
 
-	m_Gui->HintBox(NULL, "Left btn: pick landmark\nMiddle btn: translate landmark\nMiddle btn+ctrl: translate and snap","Mouse interaction");
-
   m_Gui->Button(ID_REGISTER,"Register","","Perform rigid registration");
   m_Gui->Enable(ID_REGISTER, false);
-	m_Gui->Divider(2);
-
-  // source gui
-  m_Gui->Label("Source landmark:", true);
-  m_GuiLandmark[SOURCE] = new albaGUILandmark(m_SourceVME, this);
-  m_GuiLandmark[SOURCE]->SetLMCloudName("source_lc");
-  m_Gui->AddGui(m_GuiLandmark[SOURCE]->GetGui());
-
-  // target gui
-  m_Gui->Divider(2);
-  m_Gui->Label("Target landmark:", true);
-  m_GuiLandmark[TARGET] = new albaGUILandmark(m_TargetVME, this);
-  m_GuiLandmark[TARGET]->SetLMCloudName("target_lc");
-  m_Gui->AddGui(m_GuiLandmark[TARGET]->GetGui());
+  // a left click on the source and on the target VME places their landmarks
+  AttachPicker(SOURCE, m_SourceVME);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
@@ -242,10 +240,11 @@ void albaOpIterativeRegistration::OnRegister(albaEventBase *alba_event)
 { 
   Register();
 
-  m_Gui->Enable(ID_REGISTER,false); 
-  m_GuiLandmark[SOURCE]->SetGUIStatusToPick();
-  m_GuiLandmark[TARGET]->SpawnLMOn();
-  m_GuiLandmark[TARGET]->SetGUIStatusToPick();    
+  m_Gui->Enable(ID_REGISTER,false);
+
+  // the next picks create a new pair of landmarks
+  m_Landmark[SOURCE] = NULL;
+  m_Landmark[TARGET] = NULL;
 	GetLogicManager()->CameraUpdate();
 }
 
@@ -259,13 +258,12 @@ void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
     {
       albaString title = _("Choose target vme");
       albaEvent e(this,VME_CHOOSE,&title);
-			e.SetPointer(&albaGUILandmark::VmeAccept);
+			e.SetPointer(&albaOpIterativeRegistration::VmeAccept);
       albaEventMacro(e); 
       m_TargetVME = e.GetVme();
       if (m_TargetVME)
       {
-        m_GuiLandmark[TARGET]->SetInputVME(m_TargetVME);
-        m_GuiLandmark[TARGET]->SetGUIStatusToPick();
+        AttachPicker(TARGET, m_TargetVME);
         m_Gui->Enable(ID_CHOOSE_TARGET, false);
         m_TargetVmeName = m_TargetVME->GetName();
         m_Gui->Update();
@@ -303,56 +301,99 @@ void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
   }
 }
 
-void albaOpIterativeRegistration::OnEventGuiSource(albaEventBase *alba_event)
+//----------------------------------------------------------------------------
+void albaOpIterativeRegistration::AttachPicker(int side, albaVME *vme)
+//----------------------------------------------------------------------------
 {
-  if(albaEvent *e = albaEvent::SafeDownCast(alba_event))
+  albaNEW(m_Picker[side]);
+  m_Picker[side]->SetListener(this);
+  m_OldBehavior[side] = vme->GetBehavior();
+  vme->SetBehavior(m_Picker[side]);
+}
+//----------------------------------------------------------------------------
+void albaOpIterativeRegistration::OnVmePicked(int side, albaEvent *e)
+//----------------------------------------------------------------------------
+{
+  albaVME *vme = side == SOURCE ? m_SourceVME : m_TargetVME;
+
+  // new landmark abs position from event
+  double absPosition[3] = {0, 0, 0};
+  ((vtkPoints *)e->GetVtkObj())->GetPoint(0, absPosition);
+
+  if (m_Cloud[side] == NULL)
   {
-    switch(e->GetId())
-  {
-    case VME_PICKED:
-    {
-      if (m_GuiLandmark[TARGET]->GetGuiStatus() == albaGUILandmark::ENABLED)
-      {
-        m_Gui->Enable(ID_REGISTER, true);
-        assert(m_GuiLandmark[SOURCE]->GetLandmarkCLoud()->GetNumberOfLandmarks() ==
-        m_GuiLandmark[TARGET]->GetLandmarkCLoud()->GetNumberOfLandmarks());
-        m_Gui->Update();
-      }
-    }
-    break; 
-    default:
-    {
-      albaEventMacro(*e);
-    } 
+    albaNEW(m_Cloud[side]);
+    m_Cloud[side]->SetName(side == SOURCE ? "source_lc" : "target_lc");
+
+    double b[6];
+    vme->GetOutput()->GetVTKData()->GetBounds(b);
+    double maxBound = MAX(MAX(fabs(b[1] - b[0]), fabs(b[3] - b[2])), fabs(b[5] - b[4]));
+    m_Cloud[side]->SetRadius(maxBound / 60);
+
+    // the landmarks are half transparent and the picking goes through them, on the VME
+    m_Cloud[side]->GetMaterial()->m_Opacity = 0.5;
+    m_Cloud[side]->GetMaterial()->m_Prop->SetOpacity(0.5);
+    m_Cloud[side]->SetPickable(false);
+
+    m_Cloud[side]->ReparentTo(vme);
+    GetLogicManager()->VmeAdd(m_Cloud[side]);
+    GetLogicManager()->VmeShow(m_Cloud[side], true);
   }
+
+  if (m_Landmark[side] == NULL)
+  {
+    wxString name("lm_");
+    name << m_Cloud[side]->GetNumberOfLandmarks();
+    albaNEW(m_Landmark[side]);
+    m_Landmark[side]->SetName(name.ToAscii());
+    m_Landmark[side]->ReparentTo(m_Cloud[side]);
+    m_Landmark[side]->Update();
+    m_Landmark[side]->SetAbsPose(absPosition[0], absPosition[1], absPosition[2], 0, 0, 0);
+    GetLogicManager()->VmeAdd(m_Landmark[side]);
+    m_Landmark[side]->Delete(); // the cloud keeps it
+  }
+  else
+    m_Landmark[side]->SetAbsPose(absPosition[0], absPosition[1], absPosition[2], 0, 0, 0);
+
+  GetLogicManager()->VmeShow(m_Landmark[side], true);
+
+  // a pair of landmarks can be registered
+  if (m_Landmark[SOURCE] && m_Landmark[TARGET])
+  {
+    m_Gui->Enable(ID_REGISTER, true);
+    m_Gui->Update();
+  }
+  GetLogicManager()->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void albaOpIterativeRegistration::Clear()
+//----------------------------------------------------------------------------
+{
+  albaVME *vmes[2] = {m_SourceVME, m_TargetVME};
+  for (int side = SOURCE; side <= TARGET; side++)
+  {
+    if (m_Picker[side])
+      vmes[side]->SetBehavior(m_OldBehavior[side]);
+    albaDEL(m_Picker[side]);
+
+    if (m_Cloud[side])
+    {
+      std::vector<albaVME *> landmarks;
+      for (int i = 0; i < m_Cloud[side]->GetNumberOfChildren(); i++)
+        landmarks.push_back(m_Cloud[side]->GetChild(i));
+      for (int i = 0; i < landmarks.size(); i++)
+      {
+        GetLogicManager()->VmeShow(landmarks[i], false);
+        GetLogicManager()->VmeRemove(landmarks[i]);
+      }
+      GetLogicManager()->VmeShow(m_Cloud[side], false);
+      GetLogicManager()->VmeRemove(m_Cloud[side]);
+      albaDEL(m_Cloud[side]);
+    }
+    m_Landmark[side] = NULL;
   }
 }
 
-void albaOpIterativeRegistration::OnEventGuiTarget(albaEventBase *alba_event)
-{
-  if(albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-  {
-    case VME_PICKED:
-    {
-      if (m_GuiLandmark[SOURCE]->GetGuiStatus() == albaGUILandmark::ENABLED)
-      {
-        m_Gui->Enable(ID_REGISTER, true);
-        assert(m_GuiLandmark[SOURCE]->GetLandmarkCLoud()->GetNumberOfLandmarks() ==
-        m_GuiLandmark[TARGET]->GetLandmarkCLoud()->GetNumberOfLandmarks());
-        m_Gui->Update();
-      }
-    }
-    break; 
-    default:
-    {
-      albaEventMacro(*e);
-    } 
-  }
-
-  }
-}
 
 //----------------------------------------------------------------------------
 int albaOpIterativeRegistration::Register() 
@@ -364,8 +405,8 @@ int albaOpIterativeRegistration::Register()
 	sourcePoints->Reset();
 	targetPoints->Reset();
   
-  albaVMELandmarkCloud *sourceLC = m_GuiLandmark[SOURCE]->GetLandmarkCLoud();
-  albaVMELandmarkCloud *targetLC = m_GuiLandmark[TARGET]->GetLandmarkCLoud();
+  albaVMELandmarkCloud *sourceLC = m_Cloud[SOURCE];
+  albaVMELandmarkCloud *targetLC = m_Cloud[TARGET];
     
   sourceLC->Update();
   targetLC->Update();

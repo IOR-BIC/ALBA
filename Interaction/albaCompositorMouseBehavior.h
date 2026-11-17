@@ -76,7 +76,7 @@ enum MOUSE_BUTTON
 
   @sa
   - albaGenericMouseBehavior since albaCompositorMouseBehavior is working in pair with this class
-  - albaGUITransformMouse component used by albaOpTransformOld
+  - albaTransformMouseBehavior, used through albaTransformMouseGUI by albaOpTransformOld
   
 */
 class ALBA_EXPORT albaCompositorMouseBehavior : public albaInteractionBehavior

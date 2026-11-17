@@ -29,7 +29,10 @@
 //----------------------------------------------------------------------------
 class albaVME;
 class albaEvent; 
-class albaGUILandmark;
+class albaInteractionBehavior;
+class albaPickerBehavior;
+class albaVMELandmark;
+class albaVMELandmarkCloud;
 class vtkPoints;
 class vtkMatrix4x4;
 
@@ -37,13 +40,10 @@ class vtkMatrix4x4;
 // albaOpIterativeRegistration :
 //----------------------------------------------------------------------------
  
-/** Perform point based registration in iterative way
-
-  @sa
-  - albaGUILandmark 
- 
-  @todo
-  - Code cleaning and improve documentation
+/** Perform point based registration in iterative way.
+  A left click on the source and on the target VME places a pair of landmarks (a new click moves them);
+  Register computes the rigid registration of all the pairs and moves the source VME, and the next clicks
+  place a new pair. The landmarks are half transparent and the picking goes through them.
 */
 
 class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
@@ -91,10 +91,15 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
 
     //void OnEventThis(albaEvent &e);
     void OnEventThis(albaEventBase *alba_event);
-    //void OnEventGuiSource(albaEvent &e);
-    void OnEventGuiSource(albaEventBase *alba_event);
-    //void OnEventGuiTarget(albaEvent &e);
-    void OnEventGuiTarget(albaEventBase *alba_event);
+
+    /** Assign the picker of a side (SOURCE or TARGET) to its VME */
+    void AttachPicker(int side, albaVME *vme);
+
+    /** A pick on a side creates its landmark, or moves its current landmark */
+    void OnVmePicked(int side, albaEvent *e);
+
+    /** Give the VMEs their behaviors again and remove the landmark clouds */
+    void Clear();
 
     int Register();
 
@@ -103,7 +108,10 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
     albaVME *m_SourceVME;
     albaVME *m_TargetVME;
  
-    albaGUILandmark *m_GuiLandmark[2];
+    albaPickerBehavior *m_Picker[2];           ///< pickers of the source and target VMEs
+    albaInteractionBehavior *m_OldBehavior[2]; ///< behaviors of the source and target VMEs before the operation
+    albaVMELandmarkCloud *m_Cloud[2];          ///< landmarks of the source and target VMEs
+    albaVMELandmark *m_Landmark[2];            ///< current landmarks: a pick moves them, NULL after a registration
 
     albaString m_SourceVmeName;
     albaString m_TargetVmeName;

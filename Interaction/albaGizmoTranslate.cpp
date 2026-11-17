@@ -29,7 +29,7 @@
 #include "albaGenericMouseBehavior.h"
 #include "albaGizmoTranslateAxis.h"
 #include "albaGizmoTranslatePlane.h"
-#include "albaGUIGizmoTranslate.h"
+#include "albaGizmoTranslateGUI.h"
 #include "albaSmartPointer.h"
 
 #include "albaGenericMouseBehavior.h"
@@ -93,7 +93,7 @@ albaGizmoTranslate::albaGizmoTranslate(albaVME* input, albaObserver *listener, b
   {
     // create the gizmo gui
     // gui is sending events to this
-    m_GuiGizmoTranslate = new albaGUIGizmoTranslate(this);
+    m_GuiGizmoTranslate = new albaGizmoTranslateGUI(this);
     // initialize gizmo gui
     m_GuiGizmoTranslate->SetAbsPosition(absInputMatrix);
   }
@@ -275,18 +275,18 @@ void albaGizmoTranslate::OnEventGizmoGui(albaEventBase *alba_event)
   switch(alba_event->GetId())
   {
     // process events from the gui   
-    case (albaGUIGizmoTranslate::ID_TRANSLATE_X):
+    case (albaGizmoTranslateGUI::ID_TRANSLATE_X):
     {
       // receiving abs position from gui
       SendTransformMatrixFromGui(alba_event);     
     }
     break;
-    case (albaGUIGizmoTranslate::ID_TRANSLATE_Y):
+    case (albaGizmoTranslateGUI::ID_TRANSLATE_Y):
     {
       SendTransformMatrixFromGui(alba_event);     
     }
     break;
-    case (albaGUIGizmoTranslate::ID_TRANSLATE_Z):
+    case (albaGizmoTranslateGUI::ID_TRANSLATE_Z):
     {
       SendTransformMatrixFromGui(alba_event);     
     }

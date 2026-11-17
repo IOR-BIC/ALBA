@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 #include "albaEvent.h"
 #include "albaGizmoInterface.h"
-#include "albaGUIGizmoTranslate.h"
+#include "albaGizmoTranslateGUI.h"
 #include "albaGizmoPath.h"
 #include <vector>
 //----------------------------------------------------------------------------

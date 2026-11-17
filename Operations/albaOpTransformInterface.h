@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 class albaGizmoTranslate;
 class albaGizmoRotate;
-class albaGUITransformMouse;
+class albaTransformMouseGUI;
 class albaInteractionBehavior;
 class albaCompositorMouseBehavior;
 class albaGenericMouseBehavior;
@@ -48,7 +48,7 @@ class albaVME;
   for a concrete implementation.
 
   @sa
-  albaOpTransformOld, albaGUITransformInterface, albaGizmoInterface
+  albaOpTransformOld, albaTransformInterfaceGUI, albaGizmoInterface
 
   @todo
   - improve components plugging: see comments in albaOpTransformOld.cpp

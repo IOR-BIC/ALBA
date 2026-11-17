@@ -59,7 +59,6 @@ SET(PROJECT_SRCS
   albaGUIViewWin.cpp  				albaGUIViewWin.h
   albaGUICrossIncremental.cpp  		albaGUICrossIncremental.h
   albaGUIComboBox.cpp  				albaGUIComboBox.h
-  albaGUILandmark.cpp  				albaGUILandmark.h
   albaGUIWizard.cpp  				albaGUIWizard.h
   albaGUIWizardPage.cpp  			albaGUIWizardPage.h
   albaGUIWizardPageNew.cpp  			albaGUIWizardPageNew.h
@@ -73,7 +72,6 @@ SET(PROJECT_SRCS
   albaGUISplashScreen.cpp				albaGUISplashScreen.h
   albaGUIDialogProsthesisSelection.cpp	albaGUIDialogProsthesisSelection.h
   albaGUIHyperLink.cpp					albaGUIHyperLink.h
-  albaGUITransformMouseFree.cpp	albaGUITransformMouseFree.h
   albaGUIBusyInfo.cpp albaGUIBusyInfo.h
 )
 

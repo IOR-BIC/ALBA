@@ -86,7 +86,7 @@ albaGizmoScale::albaGizmoScale(albaVME* input, albaObserver *listener , bool bui
 	{
 		// create the gizmo gui
 		// gui is sending events to this
-		m_GuiGizmoScale = new albaGUIGizmoScale(this);
+		m_GuiGizmoScale = new albaGizmoScaleGUI(this);
 
 		// initialize gizmo gui
 		m_GuiGizmoScale->SetAbsScaling(m_InputVME->GetOutput()->GetAbsMatrix());
@@ -395,18 +395,18 @@ void albaGizmoScale::OnEventGizmoGui(albaEventBase *alba_event)
 	switch(alba_event->GetId())
 	{
 		// process events from the gui   
-	case (albaGUIGizmoScale::ID_SCALE_X):
+	case (albaGizmoScaleGUI::ID_SCALE_X):
 		{
 			// receiving abs scaling from gui
 			SendTransformMatrixFromGui(alba_event);
 		}
 		break;
-	case (albaGUIGizmoScale::ID_SCALE_Y):
+	case (albaGizmoScaleGUI::ID_SCALE_Y):
 		{
 			SendTransformMatrixFromGui(alba_event);
 		}
 		break;
-	case (albaGUIGizmoScale::ID_SCALE_Z):
+	case (albaGizmoScaleGUI::ID_SCALE_Z):
 		{
 			SendTransformMatrixFromGui(alba_event);
 		}
