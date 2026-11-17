@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 #include "albaEvent.h"
 #include "albaGizmoInterface.h"
-#include "albaGUIGizmoTranslate.h"
+#include "albaGizmoTranslateGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -130,7 +130,7 @@ protected:
   bool m_ConstrainTranslationToInputVMEBounds;
 
   /** Gizmo gui */
-  albaGUIGizmoTranslate *m_GuiGizmoTranslate;
+  albaGizmoTranslateGUI *m_GuiGizmoTranslate;
 
   /** Gizmo components events handling */
   void OnEventGizmoGui(albaEventBase *alba_event);

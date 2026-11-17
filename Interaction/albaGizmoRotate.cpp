@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaGizmoRotateCircle.h"
 #include "albaGizmoRotateFan.h"
-#include "albaGUIGizmoRotate.h"
+#include "albaGizmoRotateGUI.h"
 #include "albaSmartPointer.h"
 
 #include "albaGenericMouseBehavior.h"
@@ -80,7 +80,7 @@ albaGizmoRotate::albaGizmoRotate(albaVME* input, albaObserver *listener, bool bu
   {
     // create the gizmo gui
     // gui is sending events to this
-    m_GuiGizmoRotate = new albaGUIGizmoRotate(this);
+    m_GuiGizmoRotate = new albaGizmoRotateGUI(this);
 
     // initialize gizmo gui
     m_GuiGizmoRotate->SetAbsOrientation(m_InputVME->GetOutput()->GetAbsMatrix());
@@ -206,18 +206,18 @@ void albaGizmoRotate::OnEventGizmoGui(albaEventBase *alba_event)
   // process events from the gui
   switch (alba_event->GetId())
   {
-    case (albaGUIGizmoRotate::ID_ROTATE_X):
+    case (albaGizmoRotateGUI::ID_ROTATE_X):
     {
       // receiving abs orientation from gui
       SendTransformMatrixFromGui(alba_event);
     }
     break;
-    case (albaGUIGizmoRotate::ID_ROTATE_Y):
+    case (albaGizmoRotateGUI::ID_ROTATE_Y):
     {
       SendTransformMatrixFromGui(alba_event);     
     }
     break;
-    case (albaGUIGizmoRotate::ID_ROTATE_Z):
+    case (albaGizmoRotateGUI::ID_ROTATE_Z):
     {
       SendTransformMatrixFromGui(alba_event);     
     }

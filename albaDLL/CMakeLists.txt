@@ -239,7 +239,6 @@ SET(GUI_SRCS
   ../Gui/albaGUIViewWin.cpp  				../Gui/albaGUIViewWin.h
   ../Gui/albaGUICrossIncremental.cpp  		../Gui/albaGUICrossIncremental.h
   ../Gui/albaGUIComboBox.cpp  				../Gui/albaGUIComboBox.h
-  ../Gui/albaGUILandmark.cpp  				../Gui/albaGUILandmark.h
   ../Gui/albaGUIWizard.cpp  				../Gui/albaGUIWizard.h
   ../Gui/albaGUIWizardPage.cpp  			../Gui/albaGUIWizardPage.h
   ../Gui/albaGUIWizardPageNew.cpp  			../Gui/albaGUIWizardPageNew.h
@@ -315,14 +314,14 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoTranslatePlane.cpp  				../Interaction/albaGizmoTranslatePlane.h
   ../Interaction/albaGizmoSlice.cpp  						../Interaction/albaGizmoSlice.h
   ../Interaction/albaGizmoInteractionDebugger.cpp  			../Interaction/albaGizmoInteractionDebugger.h
-  ../Interaction/albaGUIGizmoInterface.cpp  				../Interaction/albaGUIGizmoInterface.h
-  ../Interaction/albaGUIGizmoRotate.cpp  					../Interaction/albaGUIGizmoRotate.h
-  ../Interaction/albaGUIGizmoScale.cpp  					../Interaction/albaGUIGizmoScale.h
-  ../Interaction/albaGUIGizmoTranslate.cpp  				../Interaction/albaGUIGizmoTranslate.h
-  ../Interaction/albaGUISaveRestorePose.cpp  				../Interaction/albaGUISaveRestorePose.h
-  ../Interaction/albaGUITransformInterface.cpp  			../Interaction/albaGUITransformInterface.h
-  ../Interaction/albaGUITransformMouse.cpp  				../Interaction/albaGUITransformMouse.h
-  ../Interaction/albaGUITransformTextEntries.cpp  			../Interaction/albaGUITransformTextEntries.h
+  ../Interaction/albaGizmoInterfaceGUI.cpp  				../Interaction/albaGizmoInterfaceGUI.h
+  ../Interaction/albaGizmoRotateGUI.cpp  					../Interaction/albaGizmoRotateGUI.h
+  ../Interaction/albaGizmoScaleGUI.cpp  					../Interaction/albaGizmoScaleGUI.h
+  ../Interaction/albaGizmoTranslateGUI.cpp  				../Interaction/albaGizmoTranslateGUI.h
+  ../Interaction/albaSaveRestorePoseGUI.cpp  				../Interaction/albaSaveRestorePoseGUI.h
+  ../Interaction/albaTransformInterfaceGUI.cpp  			../Interaction/albaTransformInterfaceGUI.h
+  ../Interaction/albaTransformMouseGUI.cpp  				../Interaction/albaTransformMouseGUI.h
+  ../Interaction/albaTransformTextEntriesGUI.cpp  			../Interaction/albaTransformTextEntriesGUI.h
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractionBehavior.cpp  						../Interaction/albaInteractionBehavior.h
@@ -344,6 +343,8 @@ SET(INTERACTION_SRCS
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
   ../Interaction/albaCompositorMouseBehavior.cpp  		../Interaction/albaCompositorMouseBehavior.h
+  ../Interaction/albaTransformMouseBehavior.cpp  					../Interaction/albaTransformMouseBehavior.h
+  ../Interaction/albaTransformMouseFreeBehavior.cpp  					../Interaction/albaTransformMouseFreeBehavior.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
   ../Interaction/albaGenericMouseBehavior.cpp  			../Interaction/albaGenericMouseBehavior.h
   ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h
@@ -352,7 +353,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaPickerTool.cpp  				../Interaction/albaPickerTool.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
-  ../Interaction/albaGUITransformSliders.cpp  				../Interaction/albaGUITransformSliders.h    
   ../Interaction/albaGizmoCrossRotateTranslate.cpp  		../Interaction/albaGizmoCrossRotateTranslate.h	  
   ../Interaction/albaGizmoCrossRotate.cpp  					../Interaction/albaGizmoCrossRotate.h
   ../Interaction/albaGizmoCrossRotateAxis.cpp  				../Interaction/albaGizmoCrossRotateAxis.h

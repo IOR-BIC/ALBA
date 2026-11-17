@@ -39,14 +39,14 @@ SET(PROJECT_SRCS
   albaGizmoTranslatePlane.cpp  				albaGizmoTranslatePlane.h
   albaGizmoSlice.cpp  						albaGizmoSlice.h
   albaGizmoInteractionDebugger.cpp  			albaGizmoInteractionDebugger.h
-  albaGUIGizmoInterface.cpp  				albaGUIGizmoInterface.h
-  albaGUIGizmoRotate.cpp  					albaGUIGizmoRotate.h
-  albaGUIGizmoScale.cpp  					albaGUIGizmoScale.h
-  albaGUIGizmoTranslate.cpp  				albaGUIGizmoTranslate.h
-  albaGUISaveRestorePose.cpp  				albaGUISaveRestorePose.h
-  albaGUITransformInterface.cpp  			albaGUITransformInterface.h
-  albaGUITransformMouse.cpp  				albaGUITransformMouse.h
-  albaGUITransformTextEntries.cpp  			albaGUITransformTextEntries.h
+  albaGizmoInterfaceGUI.cpp  				albaGizmoInterfaceGUI.h
+  albaGizmoRotateGUI.cpp  					albaGizmoRotateGUI.h
+  albaGizmoScaleGUI.cpp  					albaGizmoScaleGUI.h
+  albaGizmoTranslateGUI.cpp  				albaGizmoTranslateGUI.h
+  albaSaveRestorePoseGUI.cpp  				albaSaveRestorePoseGUI.h
+  albaTransformInterfaceGUI.cpp  			albaTransformInterfaceGUI.h
+  albaTransformMouseGUI.cpp  				albaTransformMouseGUI.h
+  albaTransformTextEntriesGUI.cpp  			albaTransformTextEntriesGUI.h
   albaInteractionFactory.cpp  				albaInteractionFactory.h
   albaInteractionManager.cpp  				albaInteractionManager.h
   albaInteractionBehavior.cpp  						albaInteractionBehavior.h
@@ -68,6 +68,8 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
   albaCompositorMouseBehavior.cpp  		albaCompositorMouseBehavior.h
+  albaTransformMouseBehavior.cpp  					albaTransformMouseBehavior.h
+  albaTransformMouseFreeBehavior.cpp  					albaTransformMouseFreeBehavior.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
   albaGenericMouseBehavior.cpp  			albaGenericMouseBehavior.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
@@ -76,7 +78,6 @@ SET(PROJECT_SRCS
   albaPickerTool.cpp  						albaPickerTool.h
   albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
-  albaGUITransformSliders.cpp  						albaGUITransformSliders.h    
   albaGizmoCrossRotateTranslate.cpp  			albaGizmoCrossRotateTranslate.h	  
   albaGizmoCrossRotate.cpp  							albaGizmoCrossRotate.h
   albaGizmoCrossRotateAxis.cpp  					albaGizmoCrossRotateAxis.h
@@ -98,7 +99,6 @@ SET(PROJECT_SRCS
 	alba2DMeasureSegmentTool.cpp			alba2DMeasureSegmentTool.h
 	alba2DMeasureTemplateTool.cpp		alba2DMeasureTemplateTool.h
 	
-	albaCompositorMouseFreeTransformBehavior.cpp albaCompositorMouseFreeTransformBehavior.h
 	albaGenericMouseFreeTransformBehavior.cpp	albaGenericMouseFreeTransformBehavior.h
 	alba2DMeasureEllipseTool.cpp alba2DMeasureEllipseTool.h
 )

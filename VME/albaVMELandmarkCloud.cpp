@@ -73,6 +73,7 @@ albaVMELandmarkCloud::albaVMELandmarkCloud()
   m_NumberOfLandmarks = 0;
   m_DefaultVisibility = 1;
   m_Radius            = 1.0;
+  m_Pickable          = true;
   m_SphereResolution  = 15;
 
 	m_LandmarkShowNumber = 0;

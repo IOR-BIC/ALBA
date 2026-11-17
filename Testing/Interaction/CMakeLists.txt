@@ -31,16 +31,16 @@ SET(PROJECT_SRCS
 	albaInteractorConstraintTest.h albaInteractorConstraintTest.cpp
 	albaRefSysTest.h albaRefSysTest.cpp
 	albaDeviceSetTest.h albaDeviceSetTest.cpp
-	albaGUIGizmoTranslateTest.h albaGUIGizmoTranslateTest.cpp
-	albaGUIGizmoRotateTest.h albaGUIGizmoRotateTest.cpp
-	albaGUIGizmoScaleTest.h albaGUIGizmoScaleTest.cpp
+	albaGizmoTranslateGUITest.h albaGizmoTranslateGUITest.cpp
+	albaGizmoRotateGUITest.h albaGizmoRotateGUITest.cpp
+	albaGizmoScaleGUITest.h albaGizmoScaleGUITest.cpp
 	albaEventInteractionTest.h albaEventInteractionTest.cpp
 	albaDeviceManagerTest.h albaDeviceManagerTest.cpp
 	albaInteractionFactoryTest.h albaInteractionFactoryTest.cpp
-	albaGUITransformTextEntriesTest.h albaGUITransformTextEntriesTest.cpp
+	albaTransformTextEntriesGUITest.h albaTransformTextEntriesGUITest.cpp
 	albaCompositorMouseBehaviorTest.h albaCompositorMouseBehaviorTest.cpp
 	albaActionTest.h albaActionTest.cpp
-	albaGUISaveRestorePoseTest.h albaGUISaveRestorePoseTest.cpp
+	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
 	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp
 	albaAgentThreadedTest.h albaAgentThreadedTest.cpp
 	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp
@@ -52,12 +52,11 @@ SET(PROJECT_SRCS
 	albaInteractionBehaviorTest.h albaInteractionBehaviorTest.cpp
 	albaAvatarTest.h albaAvatarTest.cpp 
 	albaStaticEventRouterTest.h albaStaticEventRouterTest.cpp
-	albaGUIGizmoInterfaceTest.h albaGUIGizmoInterfaceTest.cpp
-	albaGUITransformInterfaceTest.h albaGUITransformInterfaceTest.cpp
+	albaGizmoInterfaceGUITest.h albaGizmoInterfaceGUITest.cpp
+	albaTransformInterfaceGUITest.h albaTransformInterfaceGUITest.cpp
 	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
-	albaGUITransformMouseTest.h albaGUITransformMouseTest.cpp
+	albaTransformMouseGUITest.h albaTransformMouseGUITest.cpp
 	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
-	albaGUITransformSlidersTest.h albaGUITransformSlidersTest.cpp
 	albaVTKPickerToolTest.h albaVTKPickerToolTest.cpp
 	albaPickHelperTest.h albaPickHelperTest.cpp
 	albaInteractionRoutingTest.h albaInteractionRoutingTest.cpp

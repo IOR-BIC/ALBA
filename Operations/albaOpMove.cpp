@@ -33,9 +33,9 @@
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
-#include "albaGUITransformMouse.h"
-#include "albaGUISaveRestorePose.h"
-#include "albaGUITransformTextEntries.h"
+#include "albaTransformMouseGUI.h"
+#include "albaSaveRestorePoseGUI.h"
+#include "albaTransformTextEntriesGUI.h"
 #include "albaVMELandmark.h"
 
 #include "albaGenericMouseBehavior.h"
@@ -414,7 +414,7 @@ void albaOpMove::OnEventGuiTransformMouse(albaEventBase *alba_event)
 {
   switch(alba_event->GetId())
 	{
-    case ID_TRANSFORM: // from albaGUITransformMouse
+    case ID_TRANSFORM: // from albaTransformMouseGUI
     {
       PostMultiplyEventMatrix(alba_event);
 
@@ -525,7 +525,7 @@ void albaOpMove::CreateGui()
   // Transform Gui
   //---------------------------------
   // create the transform Gui
-  m_GuiTransformMouse = new albaGUITransformMouse(m_Input, this);
+  m_GuiTransformMouse = new albaTransformMouseGUI(m_Input, this);
 
   // add transform gui to operation
   m_Gui->AddGui(m_GuiTransformMouse->GetGui());
@@ -534,7 +534,7 @@ void albaOpMove::CreateGui()
   // Text transform Gui
   //---------------------------------
   // create the transform Gui
-  m_GuiTransformTextEntries = new albaGUITransformTextEntries(m_Input, this,false);
+  m_GuiTransformTextEntries = new albaTransformTextEntriesGUI(m_Input, this,false);
 
   // add transform Gui to operation
   //m_Gui->AddGui(m_GuiTransformTextEntries->GetGui());
@@ -565,7 +565,7 @@ void albaOpMove::CreateGui()
   //---------------------------------
   // Store/Restore position Gui
   //---------------------------------
-  m_GuiSaveRestorePose = new albaGUISaveRestorePose(m_Input, this);
+  m_GuiSaveRestorePose = new albaSaveRestorePoseGUI(m_Input, this);
   
   // add Gui to operation
   //m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
@@ -613,7 +613,7 @@ void albaOpMove::RefSysVmeChanged()
   // plugged components set their refsys;
   /*
   this should cycle on all plugged components => improve in order to use base class
-  SetRefSys on albaGUITransformInterface pointer
+  SetRefSys on albaTransformInterfaceGUI pointer
   */
 
   // change isa refsys

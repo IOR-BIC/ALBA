@@ -27,9 +27,9 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaGizmoScale;
-class albaGUITransformMouse;
-class albaGUISaveRestorePose;
-class albaGUITransformTextEntries;
+class albaTransformMouseGUI;
+class albaSaveRestorePoseGUI;
+class albaTransformTextEntriesGUI;
 class albaVME;
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ protected:
   /** 
   plugged objects */
   albaGizmoScale               *m_GizmoScale;
-  albaGUISaveRestorePose       *m_GuiSaveRestorePose;
+  albaSaveRestorePoseGUI       *m_GuiSaveRestorePose;
 
   /** 
   Override superclass*/

@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 #include "albaEvent.h"
 #include "albaGizmoInterface.h"
-#include "albaGUIGizmoRotate.h"
+#include "albaGizmoRotateGUI.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -114,7 +114,7 @@ public:
   albaGizmoCrossRotateAxis * GetGizmoCrossRotateAxisEW() { return m_GizmoCrossRotateAxisEW; }
   
 protected:
-  albaGUIGizmoRotate *m_GuiGizmoRotate;
+  albaGizmoRotateGUI *m_GuiGizmoRotate;
 
   /** Send matrix to postmultiply to listener */
   void SendTransformMatrixFromGui(albaEventBase *alba_event);
