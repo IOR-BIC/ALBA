@@ -26,8 +26,8 @@
 #include "albaGUI.h"
 #include "mmaMaterial.h"
 #include "albaAbsMatrixPipe.h"
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
@@ -517,7 +517,7 @@ void albaOpLabelizeSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				{
 					if(m_Arrow) 
 					{
-						if(e->GetArg()==albaInteractorGenericMouse::MOUSE_DOWN)
+						if(e->GetArg()==albaGenericMouseBehavior::MOUSE_DOWN)
 						{
 							m_LabelInside= m_LabelInside ? 0 : 1;
 							m_Gui->Update();
@@ -528,7 +528,7 @@ void albaOpLabelizeSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				}
 				else if(e->GetSender()==m_IsaLabelizeWithGizmo || e->GetSender()==m_IsaLabelizeWithoutGizmo)
 				{
-					if(e->GetArg()==albaInteractorGenericMouse::MOUSE_DOWN)
+					if(e->GetArg()==albaGenericMouseBehavior::MOUSE_DOWN)
 					{
 						Labelize();
 						GetLogicManager()->CameraUpdate();
@@ -783,7 +783,7 @@ void albaOpLabelizeSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaInteractorGenericMouse::MOUSE_MOVE)
+		if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);

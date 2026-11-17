@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class albaInteractor6DOF;
 class albaDeviceButtonsPadTracker;
 class albaTransform;
 class albaCameraTransform;

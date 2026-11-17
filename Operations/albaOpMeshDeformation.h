@@ -29,6 +29,8 @@ class albaVME;
 class albaGUIButton;
 class albaGUIDialog;
 class albaRWI;
+class albaView;
+class albaViewVTK;
 class albaPolylineGraph;
 class vtkPolyDataMapper;
 class vtkActor;
@@ -403,7 +405,9 @@ protected:
 
 #pragma region //Visualization stuff
   albaGUIDialog						*m_Dialog;     //<dialog - GUI
-  albaRWI									*m_Rwi;	       //<rendering window
+  albaRWI *m_Rwi;	       //<rendering window
+  albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
+  albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
   albaVTKPickerTool					  *m_Picker;     //<picks VTK objects
 
   vtkSphereSource* m_Spheres[2];        //<this is the source for glyph of vertices

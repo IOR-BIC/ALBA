@@ -325,7 +325,7 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGUITransformTextEntries.cpp  			../Interaction/albaGUITransformTextEntries.h
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
-  ../Interaction/albaInteractor.cpp  						../Interaction/albaInteractor.h
+  ../Interaction/albaInteractionBehavior.cpp  						../Interaction/albaInteractionBehavior.h
   ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h
   ../Interaction/albaInteractionTool.cpp  						../Interaction/albaInteractionTool.h
   ../Interaction/albaCameraTool.cpp  						../Interaction/albaCameraTool.h
@@ -343,16 +343,12 @@ SET(INTERACTION_SRCS
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
-  ../Interaction/albaInteractor6DOF.cpp  					../Interaction/albaInteractor6DOF.h
-  ../Interaction/albaInteractor6DOFCameraMove.cpp  			../Interaction/albaInteractor6DOFCameraMove.h
-  ../Interaction/albaInteractorCompositorMouse.cpp  		../Interaction/albaInteractorCompositorMouse.h
+  ../Interaction/albaCompositorMouseBehavior.cpp  		../Interaction/albaCompositorMouseBehavior.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
-  ../Interaction/albaInteractorGeneric6DOF.cpp  			../Interaction/albaInteractorGeneric6DOF.h
-  ../Interaction/albaInteractorGenericInterface.cpp  		../Interaction/albaInteractorGenericInterface.h
-  ../Interaction/albaInteractorGenericMouse.cpp  			../Interaction/albaInteractorGenericMouse.h
-  ../Interaction/albaInteractorPER.cpp  					../Interaction/albaInteractorPER.h
-  ../Interaction/albaInteractorPicker.cpp  					../Interaction/albaInteractorPicker.h
-  ../Interaction/albaInteractorSER.cpp  					../Interaction/albaInteractorSER.h  ######################
+  ../Interaction/albaGenericMouseBehavior.cpp  			../Interaction/albaGenericMouseBehavior.h
+  ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h
+  ../Interaction/albaPickerBehavior.cpp  					../Interaction/albaPickerBehavior.h
+  ../Interaction/albaStaticEventRouter.cpp  					../Interaction/albaStaticEventRouter.h  ######################
   ../Interaction/albaPickerTool.cpp  				../Interaction/albaPickerTool.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h

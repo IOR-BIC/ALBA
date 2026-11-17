@@ -25,7 +25,8 @@
 class vtkCellPicker;
 
 /** Tool picking the VTK objects of the render window of its renderer.
-  CTRL + left button picks: if something is picked it sends albaEvent(this, VME_PICKING, picker) with GetBool false;
+  CTRL + left button picks: if something is picked it sends albaEvent(this, VME_PICKING, picker) with GetBool false,
+  otherwise the tool does not use the button and the camera moves;
   with continuous picking, dragging sends albaEvent(this, VME_PICKING, points) with the new position and GetBool true;
   the button up sends albaEvent(this, VME_PICKED, picker). While the tool uses the button the camera does not move. */
 class ALBA_EXPORT albaVTKPickerTool : public albaInteractionTool

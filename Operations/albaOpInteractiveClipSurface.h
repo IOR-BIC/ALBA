@@ -31,8 +31,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaEvent;
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 class albaVMESurface;
 class albaVMEGizmo;
 class albaVME;
@@ -164,13 +164,13 @@ protected:
 	vtkALBAClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
-  albaInteractorCompositorMouse *m_IsaCompositor;
-  albaInteractorGenericMouse    *m_IsaTranslate;
-	albaInteractorGenericMouse		 *m_IsaChangeArrowWithoutGizmo;
-	albaInteractorGenericMouse		 *m_IsaClipWithoutGizmo;
-	albaInteractorCompositorMouse *m_IsaCompositorWithArrowGizmo;
-	albaInteractorGenericMouse		 *m_IsaChangeArrowWithGizmo;
-	albaInteractorGenericMouse		 *m_IsaClipWithGizmo;
+  albaCompositorMouseBehavior *m_IsaCompositor;
+  albaGenericMouseBehavior    *m_IsaTranslate;
+	albaGenericMouseBehavior		 *m_IsaChangeArrowWithoutGizmo;
+	albaGenericMouseBehavior		 *m_IsaClipWithoutGizmo;
+	albaCompositorMouseBehavior *m_IsaCompositorWithArrowGizmo;
+	albaGenericMouseBehavior		 *m_IsaChangeArrowWithGizmo;
+	albaGenericMouseBehavior		 *m_IsaClipWithGizmo;
 
   vtkPolyData *m_OldSurface;
 	std::vector<vtkPolyData*> m_ResultPolyData;

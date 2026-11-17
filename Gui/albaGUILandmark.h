@@ -31,10 +31,10 @@
 //----------------------------------------------------------------------------
 class albaGUI;
 class albaGUIButton;
-class albaInteractorGenericMouse;
-class albaInteractorCompositorMouse;
-class albaInteractorPicker;
-class albaInteractor;
+class albaGenericMouseBehavior;
+class albaCompositorMouseBehavior;
+class albaPickerBehavior;
+class albaInteractionBehavior;
 class albaVMELandmark;
 class albaVMELandmarkCloud;
  
@@ -113,10 +113,10 @@ protected:
   void CreateGui();
 
   /** Attach interactor to vme; return 0 on success, -1 otherwise  */
-  int AttachInteractor(albaVME *vme, albaInteractor *newInteractor,
-  albaInteractor *storeOldInteractor);
+  int AttachInteractor(albaVME *vme, albaInteractionBehavior *newInteractor,
+  albaInteractionBehavior *storeOldInteractor);
 
-  int AttachInteractor(albaVME *vme, albaInteractor *newInteractor);
+  int AttachInteractor(albaVME *vme, albaInteractionBehavior *newInteractor);
 
   void UpdateGuiInternal();
 
@@ -142,12 +142,12 @@ protected:
 
   bool m_TestMode;
   
-  albaInteractor* m_OldInteractor;
-  albaInteractorPicker *m_PickerInteractor;
-  albaInteractorCompositorMouse *m_IsaCompositor;
-  albaInteractorGenericMouse *m_IsaTranslate;
-  albaInteractorGenericMouse *m_IsaTranslateSnap;
-  albaInteractor *m_OldInputVMEBehavior;
+  albaInteractionBehavior* m_OldInteractor;
+  albaPickerBehavior *m_PickerInteractor;
+  albaCompositorMouseBehavior *m_IsaCompositor;
+  albaGenericMouseBehavior *m_IsaTranslate;
+  albaGenericMouseBehavior *m_IsaTranslateSnap;
+  albaInteractionBehavior *m_OldInputVMEBehavior;
 
   albaObserver *m_Listener;
   albaGUI      *m_Gui;

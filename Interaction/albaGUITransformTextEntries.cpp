@@ -32,8 +32,8 @@
 #include "albaGUI.h"
 #include "albaGUIButton.h"
 
-#include "albaInteractorGenericMouse.h"
-#include "albaInteractorCompositorMouse.h"
+#include "albaGenericMouseBehavior.h"
+#include "albaCompositorMouseBehavior.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"

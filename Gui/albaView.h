@@ -32,7 +32,7 @@ class albaGUI;
 class albaGUIHolder;
 class albaDeviceButtonsPadMouse;
 class albaDevice;
-class albaInteractor;
+class albaInteractionBehavior;
 
 class albaRWIBase;
 class vtkCellPicker;
@@ -112,7 +112,7 @@ public:
   Find the pocked VME at button down. As argument the function needs
   the device which performed the action, and provides as result pointers
   to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior) {return false;};
+  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having albaView::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph

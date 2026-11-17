@@ -28,6 +28,7 @@
 #include "albaGUIDialog.h"
 #include "albaRWIBase.h"
 #include "albaRWI.h"
+#include "albaViewVTK.h"
 #include "albaSelectPointTool.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIButton.h"
@@ -267,7 +268,11 @@ void albaOpFillHoles::DeleteOpDialog()
 	vtkDEL(m_ExctractFreeEdges);
   vtkDEL(m_ExctractHole);
 	albaDEL(m_Picker);
-	cppDEL(m_Rwi); 
+	// the previous view is selected again before the view of the dialog is deleted
+	if (m_View)
+		GetLogicManager()->SelectView(m_OldSelectedView);
+	albaDEL(m_View);
+	m_Rwi = NULL;
 	cppDEL(m_Dialog);
 
 }
@@ -280,17 +285,30 @@ void albaOpFillHoles::CreateOpDialog()
 	//===== setup interface ====
 	m_Dialog = new albaGUIDialog("Fill Holes", albaCLOSEWINDOW | albaRESIZABLE);
 
-	m_Rwi = new albaRWI(m_Dialog,ONE_LAYER,false);
+	// the dialog has a real view: the mouse, the picking of the PER and the tools work on it
+	wxWindow *oldFrame = albaGetFrame();
+	albaSetFrame(m_Dialog);
+	m_View = new albaViewVTK("Fill Holes", CAMERA_PERSPECTIVE, false);
+	m_View->Create();
+	albaSetFrame(oldFrame);
+
+	// the view GUI, built by the side bar when the view is selected, needs the selected VME
+	m_View->VmeSelect(m_Input, true);
+
+	m_Rwi = m_View->m_Rwi;
 	m_Rwi->SetListener(this);
 	m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
 	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
 	m_Rwi->SetSize(0,0,500,500);
 	m_Rwi->Show(true);
 	m_Rwi->m_RwiBase->SetMouse(m_Mouse);
+	m_View->SetMouse(m_Mouse);
+	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	GetLogicManager()->SelectView(m_View);
 
 	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
-	m_Picker->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+	m_Picker->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
 	GetLogicManager()->PushTool(m_Picker);
 
 	wxPoint p = wxDefaultPosition;

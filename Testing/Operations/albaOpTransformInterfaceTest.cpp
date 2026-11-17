@@ -31,7 +31,7 @@
 #include "albaVMEExternalData.h"
 #include "albaEvent.h"
 #include "albaMatrix.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaTransform.h"
 
 #include "vtkALBASmartPointer.h"
@@ -78,7 +78,7 @@ void albaOpTransformInterfaceTest::TestPostMultiplyEventMatrix()
   translateMatrix->SetElement(3,3,1);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
+  e->SetArg(albaGenericMouseBehavior::MOUSE_MOVE);
   e->SetMatrix(translateMatrix);
 
   albaOpTransformInterface *op = new albaOpTransformInterface();
@@ -117,7 +117,7 @@ void albaOpTransformInterfaceTest::TestOpDo()
   albaTransform::SetOrientation(rotateMatrix,10,20,30);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaInteractorGenericMouse::MOUSE_MOVE);
+  e->SetArg(albaGenericMouseBehavior::MOUSE_MOVE);
   e->SetMatrix(&rotateMatrix);
 
   albaOpTransformInterface *op = new albaOpTransformInterface();

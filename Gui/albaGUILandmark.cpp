@@ -27,9 +27,9 @@
 
 #include "albaGUI.h"
 #include "albaGUIButton.h"
-#include "albaInteractorGenericMouse.h"
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorPicker.h"            
+#include "albaGenericMouseBehavior.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaPickerBehavior.h"            
 #include "albaMatrix.h"
 #include "albaTransform.h"
 #include "albaVME.h"
@@ -76,7 +76,7 @@ albaGUILandmark::albaGUILandmark(albaVME *inputVME, albaObserver *listener, bool
 
   m_OldInputVMEBehavior = NULL;
 
-  m_PickerInteractor = albaInteractorPicker::New();
+  m_PickerInteractor = albaPickerBehavior::New();
   //m_PickerInteractor->SetMListener(this);
   m_PickerInteractor->SetListener(this);
 
@@ -227,7 +227,7 @@ void albaGUILandmark::CreateTranslateISACompositor()
   assert(m_Landmark);
 
   // Create the isa compositor:
-  m_IsaCompositor = albaInteractorCompositorMouse::New();
+  m_IsaCompositor = albaCompositorMouseBehavior::New();
 
   // default aux ref sys is the vme ref sys
   m_RefSysVME = m_InputVME;
@@ -266,7 +266,7 @@ void albaGUILandmark::CreateTranslateISACompositor()
 }
  
 //----------------------------------------------------------------------------
-int albaGUILandmark::AttachInteractor(albaVME *vme, albaInteractor *newInteractor, albaInteractor *storeOldInteractor)
+int albaGUILandmark::AttachInteractor(albaVME *vme, albaInteractionBehavior *newInteractor, albaInteractionBehavior *storeOldInteractor)
 //----------------------------------------------------------------------------
 { 
   if (!vme) return -1;
@@ -277,7 +277,7 @@ int albaGUILandmark::AttachInteractor(albaVME *vme, albaInteractor *newInteracto
 }
 
 //----------------------------------------------------------------------------
-int albaGUILandmark::AttachInteractor(albaVME *vme, albaInteractor *newInteractor)
+int albaGUILandmark::AttachInteractor(albaVME *vme, albaInteractionBehavior *newInteractor)
 //----------------------------------------------------------------------------
 { 
   if (!vme) return -1;

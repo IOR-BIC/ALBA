@@ -25,7 +25,7 @@ class wxFrame;
 class albaRWIBase;
 class albaDeviceButtonsPadMouse;
 class albaRoutingTestView;
-class albaInteractorPER;
+class albaPositionalEventRouter;
 class albaInteractionTool;
 
 /** Records the ids of the events received */
@@ -85,10 +85,10 @@ protected:
   void SendWheel(double x, double y, double rotation);
 
   /** Return a PER observing the mouse, with the tool pushed and m_Listener as listener */
-  albaInteractorPER *NewPERWithTool(albaInteractionTool *tool);
+  albaPositionalEventRouter *NewPERWithTool(albaInteractionTool *tool);
 
   /** Detach the PER from the mouse and delete it */
-  void DeletePER(albaInteractorPER *per);
+  void DeletePER(albaPositionalEventRouter *per);
 
   /** Use a parallel camera and disable the spin, as the 2D views do */
   void Set2DCamera();

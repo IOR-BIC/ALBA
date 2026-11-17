@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 class albaDicomSlice;
 class albaDICOMImporterTool;
 class albaGUIWizardPageNew;
+class albaView;
 class albaString;
 class albaTagArray;
 class albaVME;
@@ -243,6 +244,7 @@ protected:
 	albaGUIWizard			*m_Wizard;
 	albaGUIWizardPageNew	*m_LoadPage;
 	albaGUIWizardPageNew	*m_CropPage;
+	albaView *m_OldSelectedView = NULL; ///< view selected before the operation
 	
 	albaGUI	*m_LoadGuiLeft;
 	albaGUI	*m_LoadGuiUnderLeft;

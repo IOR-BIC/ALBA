@@ -30,8 +30,8 @@
 #include "albaGUIMaterialButton.h"
 #include "albaRefSys.h"
 
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaGenericMouseBehavior.h"
 
 #include "albaTransform.h"
 #include "albaSmartPointer.h"
@@ -506,7 +506,7 @@ void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
 	}
 	else if(albaEventInteraction *e = albaEventInteraction::SafeDownCast(alba_event))
 	{
-		if(e->GetId()==albaInteractor::BUTTON_UP)
+		if(e->GetId()==albaInteractionBehavior::BUTTON_UP)
 		{
 			albaSmartPointer<albaTransform> tr;
 			tr->SetMatrix(*m_VmeGizmo->GetOutput()->GetMatrix());

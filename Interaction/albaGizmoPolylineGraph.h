@@ -23,14 +23,14 @@
 #include "albaDefines.h"
 #include "albaGizmoInterface.h"
 #include "albaMatrix.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaCurvilinearAbscissaOnSkeletonHelper.h"
 
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaInteractorCompositorMouse;
-class albaInteractorGenericMouse;
+class albaCompositorMouseBehavior;
+class albaGenericMouseBehavior;
 
 
 class albaEvent;
@@ -141,8 +141,8 @@ protected:
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;     //<VME gizmo (this is used by medCurvilinearAbscisaHelper)
 
-  albaInteractorCompositorMouse *m_GizmoInteractor;
-  albaInteractorGenericMouse *m_LeftMouseInteractor;
+  albaCompositorMouseBehavior *m_GizmoInteractor;
+  albaGenericMouseBehavior *m_LeftMouseInteractor;
     
   vtkSphereSource  *m_SphereSource;   //<sphere denoting the position  
   vtkArrowSource* m_AxisSource[3];          //<source for axis

@@ -196,7 +196,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VME_ADDED,     // from albaVmeManager to albaLogic (to be removed Marco)
 											 VME_REMOVING,  // from albaVmeManager to albaLogic 
 											 VME_SELECT,    // from albaGUITree or albaISV - run albaOpSelect
-											 VME_DCLICKED,  // from albaInteractorPER issued to infor logic that a double click has been done on a VME.
+											 VME_DCLICKED,  // from albaPositionalEventRouter issued to infor logic that a double click has been done on a VME.
 											 VME_SELECTED,  // from albaOpSelect
 											 VME_TRANSFORM, // from albaISV to albaLogic
 											 VME_CHOOSE,    // from a albaOp to receive more operands

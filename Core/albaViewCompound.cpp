@@ -30,7 +30,7 @@
 #include "albaSceneNode.h"
 #include "albaGUIViewWin.h"
 #include "albaGUI.h"
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
 
@@ -223,7 +223,7 @@ albaPipe *albaViewCompound::GetNodePipe(albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
-bool albaViewCompound::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractor *&picked_behavior)
+bool albaViewCompound::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
 //----------------------------------------------------------------------------
 {
   albaViewVTK *v = albaViewVTK::SafeDownCast(GetSubView());

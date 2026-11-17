@@ -29,8 +29,8 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaGenericMouseBehavior.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -251,7 +251,7 @@ void albaGizmoTranslateAxis::CreateISA()
   // create isa compositor and assign behaviors to IsaGen ivar
   for (int i = 0; i < 2; i++)
   {
-    m_IsaComp[i] = albaInteractorCompositorMouse::New();
+    m_IsaComp[i] = albaCompositorMouseBehavior::New();
 
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix

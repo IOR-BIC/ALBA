@@ -33,8 +33,8 @@
 #include "albaGUIButton.h"
 #include "albaGUIFloatSlider.h"
 
-#include "albaInteractorGenericMouse.h"
-#include "albaInteractorCompositorMouse.h"
+#include "albaGenericMouseBehavior.h"
+#include "albaCompositorMouseBehavior.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"

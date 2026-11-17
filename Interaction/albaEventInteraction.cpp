@@ -160,7 +160,7 @@ void albaEventInteraction::DeepCopy(const albaEventBase *event)
 }
 
 //------------------------------------------------------------------------------
-bool albaEventInteraction::FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractor *&pickedBehavior)
+bool albaEventInteraction::FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior)
 //------------------------------------------------------------------------------
 {
   if (!m_PickDone || view != m_PickView || device != m_PickDevice)

@@ -22,7 +22,7 @@
 /** Tool picking the points of the render window of its renderer.
   Left button picks a point, with CTRL if the CTRL modifier is on (default), and sends
   albaEvent(this, VME_PICKED) with the picked point (GetVtkObj, a vtkPoints) and the point id (GetArg).
-  While picking the camera does not move; otherwise the tool does not use the button and the camera moves. */
+  While picking the camera does not move; when no point is picked the tool does not use the button and the camera moves. */
 class ALBA_EXPORT albaSelectPointTool : public albaInteractionTool
 {
 public:
@@ -53,8 +53,8 @@ protected:
   albaSelectPointTool();
   virtual ~albaSelectPointTool() {}
 
-  /** Pick the point under the mouse and send it to the listener */
-  void PickPoint(albaEventInteraction *e);
+  /** Pick the point under the mouse and send it to the listener; return true if a point was picked */
+  bool PickPoint(albaEventInteraction *e);
 
   bool m_IsPicking;       ///< true while the picking button is down
   bool m_UseCtrlModifier; ///< true if the picking needs CTRL

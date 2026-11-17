@@ -36,7 +36,7 @@ PURPOSE. See the above copyright notice for more information.
 // forward references :
 //----------------------------------------------------------------------------
 class albaGUIDictionaryWidget;
-class albaInteractor;
+class albaInteractionBehavior;
 class albaPickerTool;
 class albaVME;
 class albaVMELandmark;

@@ -28,6 +28,7 @@
 #include "albaDecl.h"
 
 #include "albaRWI.h"
+#include "albaViewVTK.h"
 #include "albaDeviceButtonsPadMouse.h"
 
 #include "albaGUIDialog.h"
@@ -220,7 +221,17 @@ void albaOpSmoothSurfaceCells::CreateOpDialog()
 	//===== setup interface ====
 	m_Dialog = new albaGUIDialog("Smooth Cells", albaCLOSEWINDOW | albaRESIZABLE);
 
-	m_Rwi = new albaRWI(m_Dialog,ONE_LAYER,false);
+	// the dialog has a real view: the mouse, the picking of the PER and the tools work on it
+	wxWindow *oldFrame = albaGetFrame();
+	albaSetFrame(m_Dialog);
+	m_View = new albaViewVTK("Smooth Surface Cells", CAMERA_PERSPECTIVE, false);
+	m_View->Create();
+	albaSetFrame(oldFrame);
+
+	// the view GUI, built by the side bar when the view is selected, needs the selected VME
+	m_View->VmeSelect(m_Input, true);
+
+	m_Rwi = m_View->m_Rwi;
 	m_Rwi->SetListener(this);
 	m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
 
@@ -228,6 +239,9 @@ void albaOpSmoothSurfaceCells::CreateOpDialog()
 	m_Rwi->SetSize(0,0,800,800);
 	m_Rwi->Show(true);
 	m_Rwi->m_RwiBase->SetMouse(m_Mouse);
+	m_View->SetMouse(m_Mouse);
+	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	GetLogicManager()->SelectView(m_View);
 
 	m_Rwi->m_RenFront->AddActor(m_PolydataActor);
 
@@ -243,7 +257,7 @@ void albaOpSmoothSurfaceCells::CreateOpDialog()
 	albaNEW(m_SelectCellTool);
 
 	m_SelectCellTool->SetListener(this);
-	m_SelectCellTool->SetRendererAndView(m_Rwi->m_RenFront, NULL);
+	m_SelectCellTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
 	GetLogicManager()->PushTool(m_SelectCellTool);
 
 	wxPoint p = wxDefaultPosition;
@@ -396,7 +410,11 @@ void albaOpSmoothSurfaceCells::DeleteOpDialog()
   vtkDEL(m_RemoveSelectedCells);
   vtkDEL(m_RemoveUnSelectedCells);
 
-	cppDEL(m_Rwi); 
+	// the previous view is selected again before the view of the dialog is deleted
+	if (m_View)
+		GetLogicManager()->SelectView(m_OldSelectedView);
+	albaDEL(m_View);
+	m_Rwi = NULL;
 	cppDEL(m_Dialog);
 }
 

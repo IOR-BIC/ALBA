@@ -35,7 +35,7 @@
 
 #include "albaEvent.h"
 #include "albaAttachCamera.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"

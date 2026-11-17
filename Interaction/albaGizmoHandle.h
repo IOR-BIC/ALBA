@@ -30,8 +30,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaInteractorGenericMouse;
-class albaInteractorCompositorMouse;
+class albaGenericMouseBehavior;
+class albaCompositorMouseBehavior;
 class albaVME;
 class vtkCubeSource;
 class vtkCylinderSource;
@@ -220,9 +220,9 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  albaInteractorCompositorMouse *m_IsaComp; ///< Interactor style compositor
+  albaCompositorMouseBehavior *m_IsaComp; ///< Interactor style compositor
 
-  albaInteractorGenericMouse *m_IsaGen; ///< Generic Interactor style
+  albaGenericMouseBehavior *m_IsaGen; ///< Generic Interactor style
 
   /** Set the gizmo color */
   void SetColor(double col[3]);

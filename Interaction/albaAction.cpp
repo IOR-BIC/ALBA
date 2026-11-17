@@ -15,7 +15,7 @@
 =========================================================================*/
 
 #include "albaDevice.h"
-#include "albaInteractor.h"
+#include "albaInteractionBehavior.h"
 
 #include "albaAction.h"
 #include "mmuIdFactory.h"

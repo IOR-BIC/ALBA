@@ -30,6 +30,8 @@
 class albaGUIButton;
 class albaGUIDialog;
 class albaRWI;
+class albaView;
+class albaViewVTK;
 class albaSelectPointTool;
 class vtkFeatureEdges;
 class vtkHoleConnectivity;
@@ -110,7 +112,9 @@ protected:
   std::vector<vtkPolyData*> m_UndoStack;
 
 	albaGUIDialog						*m_Dialog;
-	albaRWI									*m_Rwi;
+	albaRWI *m_Rwi;
+	albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
+	albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
 	albaSelectPointTool					*m_Picker;
 
 	vtkFeatureEdges					*m_ExctractFreeEdges;

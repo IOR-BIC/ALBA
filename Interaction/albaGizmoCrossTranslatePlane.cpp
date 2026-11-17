@@ -28,8 +28,8 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaInteractorCompositorMouse.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaCompositorMouseBehavior.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaRefSys.h"
 
 // vme stuff
@@ -282,7 +282,7 @@ void albaGizmoCrossTranslatePlane::CreateISA()
 	// Default isa is constrained to plane XZ.
 	for (int i = 0; i < NUM_GIZMO_PARTS; i++)
 	{
-		m_IsaComp[i] = albaInteractorCompositorMouse::New();
+		m_IsaComp[i] = albaCompositorMouseBehavior::New();
 
 		// default behavior is activated by mouse left and is constrained to X axis,
 		// default ref sys is input vme abs matrix
@@ -407,7 +407,7 @@ void albaGizmoCrossTranslatePlane::OnEvent(albaEventBase *alba_event)
 		// mouse down change gizmo selection status
 		if (e->GetId() == ID_TRANSFORM)
 		{
-			if (e->GetArg() == albaInteractorGenericMouse::MOUSE_DOWN)
+			if (e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
 			{
 				this->SetIsActive(true);
 			}

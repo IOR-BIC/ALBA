@@ -26,7 +26,7 @@
 #include "albaGizmoPath.h"
 #include "albaGizmoPathRuler.h"
 #include "albaDecl.h"
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "albaSmartPointer.h"
 #include "albaVector.h"
 #include "albaVMEGizmo.h"

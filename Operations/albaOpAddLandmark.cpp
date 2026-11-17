@@ -26,8 +26,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaEvent.h"
 #include "albaGUI.h"
 #include "albaGUIDictionaryWidget.h"
-#include "albaInteractor.h"
-#include "albaInteractorPicker.h"
 #include "albaLogicWithManagers.h"
 #include "albaTagArray.h"
 #include "albaVME.h"

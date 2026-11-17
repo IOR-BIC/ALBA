@@ -38,7 +38,7 @@
 #include "albaObserver.h"
 #include "albaTransform.h"
 
-#include "albaInteractorGenericMouse.h"
+#include "albaGenericMouseBehavior.h"
 #include "mmaMaterial.h"
 
 #include "vtkALBASmartPointer.h"
