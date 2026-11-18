@@ -25,8 +25,6 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaCompositorMouseBehaviorTest.h"
 #include "albaCompositorMouseBehavior.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 
 
 void albaCompositorMouseBehaviorTest::TestFixture()
@@ -42,61 +40,37 @@ void albaCompositorMouseBehaviorTest::TestConstructorDestructor()
   compositorMouse->Delete(); 
 }
 
-void albaCompositorMouseBehaviorTest::TestStartInteraction()
+void albaCompositorMouseBehaviorTest::TestButtonDown()
 {
   albaCompositorMouseBehavior *compositorMouse = albaCompositorMouseBehavior::New();
-  CPPUNIT_ASSERT(compositorMouse != NULL);
-  
-  albaDeviceButtonsPadMouse *dummyMouse = albaDeviceButtonsPadMouse::New();
-  CPPUNIT_ASSERT(dummyMouse->GetRenderer() == NULL);
+  double pos[2] = {10, 20};
 
-  // cannot start interaction since there is no renderer: should return false
-  int returnValue = compositorMouse->StartInteraction(dummyMouse);
-  CPPUNIT_ASSERT(returnValue == false);
+  // no generic mouse behavior for the button: the button is not used
+  CPPUNIT_ASSERT(!compositorMouse->OnLeftButtonDown(NULL, NULL, pos));
+
+  // without a renderer the interaction cannot start
+  compositorMouse->CreateBehavior(MOUSE_LEFT);
+  CPPUNIT_ASSERT(!compositorMouse->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!compositorMouse->OnLeftButtonUp(NULL, NULL, pos));
+
+  // the modifier keys select another generic mouse behavior
+  compositorMouse->SetModifierKeys(true, false, false);
+  CPPUNIT_ASSERT(!compositorMouse->OnMiddleButtonDown(NULL, NULL, pos));
 
   compositorMouse->Delete(); 
-  dummyMouse->Delete();
 }
 
-void albaCompositorMouseBehaviorTest::TestOnEvent()
+void albaCompositorMouseBehaviorTest::TestOnDrag()
 {
-  albaCompositorMouseBehavior *compositorMouse = NULL;
-  compositorMouse = albaCompositorMouseBehavior::New();
-  CPPUNIT_ASSERT(compositorMouse != NULL);
-  
-  CPPUNIT_ASSERT(compositorMouse->m_MousePose[0] == 0  && 
-  compositorMouse->m_MousePose[1] == 0);
+  albaCompositorMouseBehavior *compositorMouse = albaCompositorMouseBehavior::New();
+  compositorMouse->CreateBehavior(MOUSE_LEFT);
 
-  CPPUNIT_ASSERT(compositorMouse->m_LastMousePose[0] == 0  && 
-  compositorMouse->m_LastMousePose[1] == 0);
+  // without an interaction the drags are not used and the mouse pose does not change
+  double pos[2] = {10, 20};
+  CPPUNIT_ASSERT(!compositorMouse->OnDrag(NULL, NULL, pos));
+  CPPUNIT_ASSERT(compositorMouse->m_MousePose[0] == 0 && compositorMouse->m_MousePose[1] == 0);
+  CPPUNIT_ASSERT(compositorMouse->m_LastMousePose[0] == 0 && compositorMouse->m_LastMousePose[1] == 0);
 
-  CPPUNIT_ASSERT(compositorMouse->m_InteractionFlag == false);
-
-  // trying to create a fake mouse device to fool the compositor OnEvent...
-  compositorMouse->m_InteractionFlag = true;
-  
-  albaDeviceButtonsPadMouse *dummyMouse = albaDeviceButtonsPadMouse::New();
-  CPPUNIT_ASSERT(dummyMouse !=  NULL);
-  compositorMouse->m_Device = dummyMouse;
-
-  albaEventInteraction dummyMouse2DMoveEvent;
-  dummyMouse2DMoveEvent.SetChannel(MCH_INPUT);
-  dummyMouse2DMoveEvent.SetSender(this);
-  dummyMouse2DMoveEvent.SetId(albaDeviceButtonsPadMouse::GetMouse2DMoveId());
-
-  double dummyPosition[2] = {10,20};
-  dummyMouse2DMoveEvent.Set2DPosition(dummyPosition);
-
-  compositorMouse->OnEvent(&dummyMouse2DMoveEvent);
-  
-  // ...and then check that the interactor is not fooled 
-  CPPUNIT_ASSERT(compositorMouse->m_MousePose[0] == 0  && 
-  compositorMouse->m_MousePose[1] == 0);
-
-  CPPUNIT_ASSERT(compositorMouse->m_LastMousePose[0] == 0  && 
-  compositorMouse->m_LastMousePose[1] == 0);
-  
-  dummyMouse->Delete();
   compositorMouse->Delete(); 
 }
 

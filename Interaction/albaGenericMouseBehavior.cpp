@@ -1136,10 +1136,9 @@ void albaGenericMouseBehavior::OnButtonDownAction(int X, int Y)
   }
   else
   {
-    albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Device);
-    if (mouse)
+        if (m_View)
     {
-      albaView *v = mouse->GetView();
+      albaView *v = m_View;
       if (v && v->Pick(X,Y))
       {
         v->GetPickedPosition(m_LastPickPosition);
@@ -1392,10 +1391,9 @@ void albaGenericMouseBehavior::NormalOnSurface()
 
 	bool picked = false;
 	double newAbsPickPos[3];
-	albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Device);
-	if (mouse)
+		if (m_View)
 	{
-		albaView *v = mouse->GetView();
+		albaView *v = m_View;
 		if (v)
 		{
 			picked = v->Pick(x,y);
@@ -1448,11 +1446,10 @@ void albaGenericMouseBehavior::NormalOnSurface()
 
 	bool picked = false;
 	double newAbsPickPos[3];
-	albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Device);
-	albaVME *pickedVme;
-	if (mouse)
+		albaVME *pickedVme;
+	if (m_View)
 	{
-		albaView *v = mouse->GetView();
+		albaView *v = m_View;
 		if (v)
 		{
 			picked = v->Pick(x,y);
@@ -1571,10 +1568,9 @@ void albaGenericMouseBehavior::SnapOnSurface()
   
   bool picked = false;
   double newAbsPickPos[3];
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Device);
-  if (mouse)
+    if (m_View)
   {
-    albaView *v = mouse->GetView();
+    albaView *v = m_View;
     if (v)
     {
       picked = v->Pick(x,y);

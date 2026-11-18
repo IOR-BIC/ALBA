@@ -64,6 +64,7 @@ albaInteractionBehavior::albaInteractionBehavior()
   m_Device              = NULL;
   m_VME                 = NULL;
   m_Prop                = NULL;
+  m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0;
   m_TestMode = false;
   
   m_DeviceIsSet           = false;

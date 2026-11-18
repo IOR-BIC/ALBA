@@ -25,9 +25,7 @@
 
 #include "albaCompositorMouseBehavior.h"
 
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaDecl.h"
-#include "albaEventInteraction.h"
 #include "albaView.h"
 #include "albaVME.h"
 
@@ -58,21 +56,6 @@ albaCompositorMouseBehavior::albaCompositorMouseBehavior()
 albaCompositorMouseBehavior::~albaCompositorMouseBehavior() 
 //----------------------------------------------------------------------------
 {
-}
-
-//------------------------------------------------------------------------------
-int albaCompositorMouseBehavior::StartInteraction(albaDeviceButtonsPadMouse *mouse)
-//------------------------------------------------------------------------------
-{
-  // fill this object m_Renderer ivar and get the camera
-  SetRendererAndView(mouse->GetRenderer(),mouse->GetView());
-  if (m_Renderer)
-  {
-    m_CurrentCamera = m_Renderer->GetActiveCamera();
-    return true;
-  }
-
-  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -138,52 +121,6 @@ albaGenericMouseBehavior *albaCompositorMouseBehavior::GetBehavior(MMI_ACTIVATOR
 }
 
 //----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnMiddleButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-	InitInteraction(MOUSE_MIDDLE_PRESSED, e);
-}
-//----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnMiddleButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnLeftButtonUp(e);
-}
-//----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnLeftButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
- 	InitInteraction(MOUSE_LEFT_PRESSED, e);
-}
-//----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnLeftButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-
-  if (m_ActiveMMIGeneric)
-  {
-    albaDeviceButtonsPadMouse *mouse = (albaDeviceButtonsPadMouse *)e->GetSender();
-    if (m_ActiveMMIGeneric->StopInteraction(mouse)) // stop interaction
-    {
-      m_ActiveMMIGeneric->OnButtonUpAction();
-      m_ActiveMMIGeneric = NULL;
-    }
-  }
-}
-//----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnRightButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
- 	InitInteraction(MOUSE_RIGHT_PRESSED, e);
-}
-//----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnRightButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnLeftButtonUp(e);
-}
-
-//----------------------------------------------------------------------------
 int albaCompositorMouseBehavior::MouseToActivator(int mouseButton, int shift, int ctrl)
 //----------------------------------------------------------------------------
 {
@@ -222,167 +159,56 @@ int albaCompositorMouseBehavior::MouseToActivator(int mouseButton, int shift, in
 }
    
 //----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::InitInteraction(int buttonPressed, albaEventInteraction *e)
-//----------------------------------------------------------------------------
+bool albaCompositorMouseBehavior::StartTransform(int buttonPressed, albaView *view, vtkRenderer *ren, double pos[2])
 {
-  double pos[2];
-  e->Get2DPosition(pos);
+  StopTransform();
 
-  // fill this object MousePos ivar
-  m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
-  m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
-
-  albaDeviceButtonsPadMouse *mouse = (albaDeviceButtonsPadMouse *)e->GetSender(); 
-
-  // get info from picked vme
-  albaVME        *picked_vme  = NULL;
-  vtkProp3D     *picked_prop = NULL;
-  albaInteractionBehavior *picked_bh   = NULL;
-
-  albaView *v = mouse->GetView();
-  assert(v);
-  // reuse the picking already performed on this event (e.g. by the PER)
-  bool picked = e->FindPokedVme(v,mouse,picked_prop,picked_vme,picked_bh);
-  double picked_pos[3];
-  e->GetPickedPosition(picked_pos);
-
-  // Set the m_Renderer and m_CurrentCamera ivar
-  StartInteraction(mouse);
-
-  // check for ctrl and shift pressure
-  // get the activator from key mouse combination:
   int activator = MouseToActivator(buttonPressed, m_ShiftDown, m_CtrlDown);
+  if (ren == NULL || m_ActivatorMap.count(activator) == 0 || m_ActivatorMap[activator] == NULL)
+    return false;
 
-  // get the behavior from the m_ActivatorMap
-  if (m_ActivatorMap.count(activator))
-  {
-    m_ActiveMMIGeneric = m_ActivatorMap[activator];
-    if (m_ActiveMMIGeneric != NULL) 
-    {
-      // m_ActiveMMIGeneric is the current active mouse behavior
-     
-      m_ActiveMMIGeneric->SetRendererAndView(m_Renderer,m_View);
-      m_ActiveMMIGeneric->SetProp(picked_prop);
-      m_ActiveMMIGeneric->SetCurrentCamera(m_Renderer->GetActiveCamera());
-      if (m_ActiveMMIGeneric->StartInteraction(mouse)) // force
-      {
-        m_ActiveMMIGeneric->SetButtonDownPick(picked, picked_pos);
-        m_ActiveMMIGeneric->OnButtonDownAction(m_MousePose[0], m_MousePose[1]);
-      }
-    }
-  }
-  else
-  // no behavior is associated with current key combo
-  {
-    m_ActiveMMIGeneric = NULL;
-  }
-}
-
-
-//----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  // if in multi button mode and already interacting simply forward the event...
-  if (m_ActiveMMIGeneric && m_ButtonMode==MULTI_BUTTON_MODE)
-  {
-    m_ActiveMMIGeneric->OnEvent(e);
-    return;
-  }
-
-  // get the button pressed
-  m_ButtonPressed = e->GetButton(); 
-
-  double pos[2];
-  e->Get2DPosition(pos);
+  SetRendererAndView(ren, view);
+  m_CurrentCamera = ren->GetActiveCamera();
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  switch(m_ButtonPressed) 
-  {
-    case ALBA_LEFT_BUTTON:
-      OnLeftButtonDown(e);
-  	break;
-    case ALBA_MIDDLE_BUTTON:
-      OnMiddleButtonDown(e);
-  	break;
-    case ALBA_RIGHT_BUTTON:
-      OnRightButtonDown(e);
-  	break;
-
-  }
+  // the VME has been picked by the PER, which set the prop and the picked position
+  m_ActiveMMIGeneric = m_ActivatorMap[activator];
+  m_ActiveMMIGeneric->SetRendererAndView(ren, view);
+  m_ActiveMMIGeneric->SetProp(m_Prop);
+  m_ActiveMMIGeneric->SetCurrentCamera(m_CurrentCamera);
+  m_ActiveMMIGeneric->SetButtonDownPick(true, m_PickedPosition);
+  m_ActiveMMIGeneric->OnButtonDownAction(m_MousePose[0], m_MousePose[1]);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
+bool albaCompositorMouseBehavior::StopTransform()
 {
-  m_ButtonPressed = e->GetButton();
-  if ( m_CurrentButton>=0 && m_ButtonPressed!=m_CurrentButton )
-  {
-    if (m_ActiveMMIGeneric && m_ButtonMode==MULTI_BUTTON_MODE)
-      m_ActiveMMIGeneric->OnEvent(e);
+  if (m_ActiveMMIGeneric == NULL)
+    return false;
 
-    return;
-  }
-  
-  switch(m_ButtonPressed) 
-  {
-    case ALBA_LEFT_BUTTON:
-      OnLeftButtonUp(e);
-  	break;
-    case ALBA_MIDDLE_BUTTON:
-      OnMiddleButtonUp(e);
-  	break;
-    case ALBA_RIGHT_BUTTON:
-      OnRightButtonUp(e);
-  	break;
-  }
+  albaGenericMouseBehavior *active = m_ActiveMMIGeneric;
+  m_ActiveMMIGeneric = NULL;
+  active->OnButtonUpAction();
+  return true;
 }
 
-//------------------------------------------------------------------------------
-void albaCompositorMouseBehavior::OnEvent(albaEventBase *event)
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+bool albaCompositorMouseBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  assert(event);
-  assert(event->GetSender());
-  
-  albaID id=event->GetId();
-  albaID channel=event->GetChannel();
+  if (m_ActiveMMIGeneric == NULL)
+    return false;
 
-  if (channel == MCH_INPUT && m_InteractionFlag)
+  m_MousePose[0] = (int)pos[0];
+  m_MousePose[1] = (int)pos[1];
+
+  // the moves without a change of position are discarded
+  if (m_MousePose[0] != m_LastMousePose[0] || m_MousePose[1] != m_LastMousePose[1])
   {
-    albaEventInteraction *e = (albaEventInteraction *)event;
-    albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(GetDevice());
-    
-    // if the event comes from tracker which started the interaction continue...
-    // Move2DEvent handling
-    if (id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() && mouse)
-    {
-      
-      if (!m_CurrentCamera)
-        return;
-
-	    double pos2d[2];
-      e->Get2DPosition(pos2d);
-
-      // get the mouse pose and forward it to the active interactor 
-      m_MousePose[0] = (int)pos2d[0];
-      m_MousePose[1] = (int)pos2d[1];
-
-      // if the position has not changed discard OnMouseMoveAction
-      if (!(m_MousePose[0] == m_LastMousePose[0] && m_MousePose[1] == m_LastMousePose[1]))
-      {
-        if (m_ActiveMMIGeneric) 
-        {
-          m_ActiveMMIGeneric->OnMouseMoveAction(m_MousePose[0], m_MousePose[1]);
-          m_LastMousePose[0] = m_MousePose[0];
-          m_LastMousePose[1] = m_MousePose[1];
-        }
-      }
-      return;
-    }
+    m_ActiveMMIGeneric->OnMouseMoveAction(m_MousePose[0], m_MousePose[1]);
+    m_LastMousePose[0] = m_MousePose[0];
+    m_LastMousePose[1] = m_MousePose[1];
   }
-    
-  Superclass::OnEvent(event);
+  return true;
 }

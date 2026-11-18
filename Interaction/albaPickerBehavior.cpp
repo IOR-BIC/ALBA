@@ -31,10 +31,7 @@
 #include "albaView.h"
 //#include "albaViewCompound.h"
 #include "albaDeviceButtonsPadTracker.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaAvatar3D.h"
-
-#include "albaEventInteraction.h"
 
 #include "albaRWIBase.h"
 #include "albaVME.h"
@@ -69,54 +66,42 @@ albaPickerBehavior::~albaPickerBehavior()
 {
 }
 
-//------------------------------------------------------------------------------
-void albaPickerBehavior::OnEvent(albaEventBase *event)
-//------------------------------------------------------------------------------
-{
-  Superclass::OnEvent(event);
-  if (m_ContinuousPickingFlag)
-  {
-    if (albaDeviceButtonsPadMouse *mouse=albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)event->GetSender()))
-    { 
-      double mouse_pos[2];
-      ((albaEventInteraction *)event)->Get2DPosition(mouse_pos);
-      SendPickingInformation(mouse->GetView(), mouse_pos,VME_PICKING);
-    }
-  }
-}
 //----------------------------------------------------------------------------
-void albaPickerBehavior::OnButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
+bool albaPickerBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  PickFromEvent(e);
+  SendPickingInformation(view, pos);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void albaPickerBehavior::OnButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
+bool albaPickerBehavior::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
   if (m_ContinuousPickingFlag)
-    PickFromEvent(e);
+    SendPickingInformation(view, pos);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void albaPickerBehavior::PickFromEvent(albaEventInteraction *e)
-//----------------------------------------------------------------------------
+bool albaPickerBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (albaDeviceButtonsPadTracker *tracker=albaDeviceButtonsPadTracker::SafeDownCast((albaDevice *)e->GetSender()))
-  {
-    // the tracker picks along its pose in the world frame, no avatar == no picking
-    albaMatrix world_pose;
-    if (tracker->TrackerToWorld(*e->GetMatrix(), world_pose))
-      SendPickingInformation(tracker->GetView(),NULL,VME_PICKED,&world_pose,false);
-  }
-  else if (albaDeviceButtonsPadMouse *mouse=albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()))
-  {
-    double mouse_pos[2];
-    e->Get2DPosition(mouse_pos);
-    SendPickingInformation(mouse->GetView(), mouse_pos);
-  }
+  if (m_ContinuousPickingFlag)
+    SendPickingInformation(view, pos, VME_PICKING);
+  return true;
 }
+
+//----------------------------------------------------------------------------
+bool albaPickerBehavior::OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose)
+{
+  if (button != ALBA_LEFT_BUTTON)
+    return false;
+
+  // the tracker picks along its pose in the world frame, no avatar == no picking
+  albaMatrix worldPose;
+  if (pose && tracker->TrackerToWorld(*pose, worldPose))
+    SendPickingInformation(tracker->GetView(), NULL, VME_PICKED, &worldPose, false);
+  return true;
+}
+
 //----------------------------------------------------------------------------
 void albaPickerBehavior::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------

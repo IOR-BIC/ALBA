@@ -138,8 +138,10 @@ protected:
   /** remove a device in the set of devices currently interacting */
   void RemoveDevice(albaDevice *device);
 
-  /** internally used to set which behavior was picked by device */
-  void SetCurrentBehavior(albaDevice *device,albaInteractionBehavior *inter);
+  /** Set the behavior interacting with the device, until the button that started the interaction is released */
+  void SetCurrentBehavior(albaDevice *device, albaInteractionBehavior *behavior);
+
+  /** Return the behavior interacting with the device, NULL if none */
   albaInteractionBehavior *GetCurrentBehavior(albaDevice *device);
 
   /** internally used to set VME picked by device at button down */
@@ -203,6 +205,7 @@ protected:
   public:
     albaVME *m_VME;
     int     m_Button;
+    albaInteractionBehavior *m_Behavior; ///< the behavior interacting with the device, NULL if none
   };
   
   std::map<albaID,DeviceItem> m_Devices; ///< Stores the list of devices currently interacting

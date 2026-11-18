@@ -84,11 +84,18 @@ class ALBA_EXPORT albaCompositorMouseBehavior : public albaInteractionBehavior
 public:
   albaTypeMacro(albaCompositorMouseBehavior, albaInteractionBehavior);
 
-  /** Start the interaction with the selected object; set m_CurrentCamera and Renderer ivar */
-  virtual int StartInteraction(albaDeviceButtonsPadMouse *mouse);
+  /** The button starts the generic mouse behavior associated with the button and the modifier keys, if any */
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return StartTransform(MOUSE_LEFT_PRESSED, view, ren, pos);}
+  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return StartTransform(MOUSE_MIDDLE_PRESSED, view, ren, pos);}
+  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return StartTransform(MOUSE_RIGHT_PRESSED, view, ren, pos);}
 
-  /**  Process events coming from the mouse */
-  virtual void OnEvent(albaEventBase *event);
+  /** The release of the button stops the active generic mouse behavior */
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return StopTransform();}
+  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return StopTransform();}
+  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return StopTransform();}
+
+  /** The drags go to the active generic mouse behavior */
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
 
   /**
   Create a behavior given the activator*/
@@ -106,18 +113,6 @@ protected:
   /** Create the generic mouse behavior used by CreateBehavior: subclasses can create a specialized one */
   virtual albaGenericMouseBehavior *NewGenericMouse();
 
-  virtual void OnButtonDown(albaEventInteraction *e);
-  
-  virtual void OnButtonUp(albaEventInteraction *e);
-
-  /** mouse driven events*/
-  void OnLeftButtonDown   (albaEventInteraction *e);
-  void OnLeftButtonUp     (albaEventInteraction *e);
-  void OnMiddleButtonDown (albaEventInteraction *e);
-  void OnMiddleButtonUp   (albaEventInteraction *e);
-  void OnRightButtonDown  (albaEventInteraction *e);
-  void OnRightButtonUp    (albaEventInteraction *e);
-
   typedef std::map<int, albaAutoPointer<albaGenericMouseBehavior> > mmuActivatorMap;
 
   /**
@@ -133,10 +128,11 @@ protected:
   map holding activator<->behavior association*/
   mmuActivatorMap m_ActivatorMap;
 
-  /** 
-	init the interactor for the corresponding pressed button.
-	*/
-	void InitInteraction(int buttonPressed, albaEventInteraction *e);
+  /** Start the generic mouse behavior associated with the button and the modifier keys; return false if there is none */
+  bool StartTransform(int buttonPressed, albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** Stop the active generic mouse behavior; return false if there is none */
+  bool StopTransform();
 	
 	/**
   conversion from mouse-keyboard combo to the corresponding activator value ie
@@ -153,7 +149,6 @@ private:
 
   int m_MousePose[2];
   int m_LastMousePose[2];
-  int m_ButtonPressed;
 
   vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
   

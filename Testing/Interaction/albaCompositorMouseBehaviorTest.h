@@ -26,8 +26,8 @@ class albaCompositorMouseBehaviorTest : public albaTest
   CPPUNIT_TEST_SUITE( albaCompositorMouseBehaviorTest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
-  CPPUNIT_TEST(TestStartInteraction);
-  CPPUNIT_TEST(TestOnEvent);
+  CPPUNIT_TEST(TestButtonDown);
+  CPPUNIT_TEST(TestOnDrag);
   CPPUNIT_TEST(TestCreateBehavior);
   CPPUNIT_TEST(TestGetBehavior);
   CPPUNIT_TEST_SUITE_END();
@@ -36,8 +36,8 @@ class albaCompositorMouseBehaviorTest : public albaTest
     
     void TestFixture();
     void TestConstructorDestructor();   
-    void TestStartInteraction();
-    void TestOnEvent();
+    void TestButtonDown();
+    void TestOnDrag();
     void TestCreateBehavior();
     void TestGetBehavior();    
 };

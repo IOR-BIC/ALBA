@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 
 #include "albaTransformMouseFreeBehavior.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGenericMouseFreeTransformBehavior.h"
 #include "albaInteractorConstraint.h"
 #include "albaRefSys.h"
@@ -41,8 +40,7 @@ albaGenericMouseBehavior *albaTransformMouseFreeBehavior::NewGenericMouse()
 //------------------------------------------------------------------------------
 void albaTransformMouseFreeBehavior::OnTransform()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast(m_Rotate->GetDevice());
-  albaView *v = mouse ? mouse->GetView() : NULL;
+  albaView *v = m_Rotate->GetView();
   if (v == NULL)
     return;
 

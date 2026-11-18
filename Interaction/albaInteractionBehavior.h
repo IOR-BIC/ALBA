@@ -17,7 +17,7 @@
 #ifndef __albaInteractionBehavior_h
 #define __albaInteractionBehavior_h
 
-#include "albaInteractionAgent.h"
+#include "albaInteractionTool.h"
 #include "albaString.h"
 #include "vtkALBASmartPointer.h"
 #include "vtkType.h"
@@ -34,6 +34,13 @@ class vtkRenderer;
 class vtkProp3D;
 
 /** Abstract class for ALBA interactors
+  A behavior is the interaction tool of a VME: the PER calls its button, drag and wheel methods
+  (see albaInteractionTool) when a button is pressed on the VME, and keeps sending the drags and
+  the button up to it until that button is released. Before the button down the PER sets the VME,
+  the prop and the picked position. A method returning false leaves the button to the camera.
+  The start/stop machinery below (OnEvent, StartInteraction, start button and modifiers) is not used
+  by the PER any more and will be removed.
+
   This class provides base interface and features of ALBA continuous event interactors.
   Among the available features we find support for a current renderer member variable,
   that may be used by interactors to perform interaction according to user point
@@ -58,7 +65,7 @@ class vtkProp3D;
   Interactors usually send output events through the DefaultChannel, and also through the m_listener by wrapping
   the event inside a MFL_EVENT_ID event (event can be retrieved with albaEvent::GetVtkObject().
 */
-class ALBA_EXPORT albaInteractionBehavior : public albaInteractionAgent
+class ALBA_EXPORT albaInteractionBehavior : public albaInteractionTool
 {
 public:
   albaInteractionBehavior();
@@ -72,7 +79,7 @@ public:
   ALBA_ID_DEC(BUTTON_DOWN);         ///< Issued when a button is pressed
   ALBA_ID_DEC(BUTTON_UP);           ///< Issued when a button is released
 
-  albaAbstractTypeMacro(albaInteractionBehavior,albaInteractionAgent);
+  albaAbstractTypeMacro(albaInteractionBehavior,albaInteractionTool);
 
   /** Return the current input device. */
   albaDevice *GetDevice() {return m_Device;}
@@ -84,6 +91,9 @@ public:
 
   /** Set the prop to be transformed (optional and to be removed!!!)*/
   void SetProp(vtkProp3D *prop);
+
+  /** Set the position picked on the VME by the button down */
+  void SetPickedPosition(double pos[3]) {m_PickedPosition[0] = pos[0]; m_PickedPosition[1] = pos[1]; m_PickedPosition[2] = pos[2];}
 
   /** 
     Enable/Disable trigger events processing. Trigger events are StartInteraction
@@ -194,6 +204,7 @@ protected:
 
   albaVME       *m_VME;                  ///< the object being interacted (optional)
 	vtkALBASmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
+  double m_PickedPosition[3]; ///< the position picked on the VME by the button down
 
   bool m_TestMode;///< Flag used with cppunitTest
 

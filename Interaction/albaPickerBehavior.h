@@ -29,8 +29,18 @@ class ALBA_EXPORT albaPickerBehavior : public albaInteractionBehavior
 public:
   albaTypeMacro(albaPickerBehavior,albaInteractionBehavior);
 
-  /** Redefined to send picking events if continuous picking is enabled */
-  virtual void OnEvent(albaEventBase *event);
+  /** The left button picks and sends VME_PICKED */
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** With continuous picking the release of the left button picks and sends VME_PICKED */
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** With continuous picking the drags pick and send VME_PICKING */
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** The left button of a tracker picks along the tracker pose and sends VME_PICKED */
+  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose);
+  virtual bool OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button) {return button == ALBA_LEFT_BUTTON;}
 
   /** Enable/disable continuous picking in OnEvent. */
   void EnableContinuousPicking(bool enable) {m_ContinuousPickingFlag = enable;};
@@ -41,11 +51,6 @@ protected:
   albaPickerBehavior();
   virtual ~albaPickerBehavior();
   
-  virtual void OnButtonDown   (albaEventInteraction *e);
-  virtual void OnButtonUp     (albaEventInteraction *e);
-
-  /** Pick at the position of the device sending the event and send the picking information */
-  void PickFromEvent(albaEventInteraction *e);
 
   bool m_ContinuousPickingFlag;
 

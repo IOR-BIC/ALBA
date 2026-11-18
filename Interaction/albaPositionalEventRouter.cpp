@@ -370,6 +370,7 @@ void albaPositionalEventRouter::InsertDevice(albaDevice *device,int button)
   {
     m_Devices[device->GetID()].m_Button = button;
     m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
+    m_Devices[device->GetID()].m_Behavior = NULL;
   }
   else
   {
@@ -378,6 +379,7 @@ void albaPositionalEventRouter::InsertDevice(albaDevice *device,int button)
     {
 //      if ((*iter).first==device->GetID())
       m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
+      m_Devices[device->GetID()].m_Behavior = NULL;
       m_Devices[device->GetID()].m_Button = 1;
 
     }
@@ -433,6 +435,21 @@ void albaPositionalEventRouter::SetPickedVME(albaDevice *device,albaVME *vme)
   {
     m_VME = vme;
   }
+}
+
+//----------------------------------------------------------------------------
+void albaPositionalEventRouter::SetCurrentBehavior(albaDevice *device, albaInteractionBehavior *behavior)
+{
+  std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
+  if (iter != m_Devices.end())
+    (*iter).second.m_Behavior = behavior;
+}
+
+//----------------------------------------------------------------------------
+albaInteractionBehavior *albaPositionalEventRouter::GetCurrentBehavior(albaDevice *device)
+{
+  std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
+  return (iter != m_Devices.end()) ? (*iter).second.m_Behavior : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -556,18 +573,25 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
       InvokeEvent(this,VME_SELECT,MCH_UP,picked_vme);
     }
   }
-  // Forward the start event to the right behavior
+  // the behavior of the picked VME interacts with the device until the button is released
   if(picked_bh)
   {
-    // if a vme with a behavior has been picked... 
     picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
     picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!)
-    TraceHandler("Behavior", picked_bh);
+    double pickedPos[3];
+    e->GetPickedPosition(pickedPos);
+    picked_bh->SetPickedPosition(pickedPos);
     picked_bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
-    picked_bh->OnEvent(e); // forward the start event to picked behavior
+    if (ToolButtonDown(picked_bh, e))
+    {
+      TraceHandler("Behavior", picked_bh);
+      SetCurrentBehavior(device, picked_bh);
+      return;
+    }
   }
-  // if no VME with a behavior has been picked the camera tool moves the camera, if free
-  else if (ToolButtonDown(m_CameraTool, e))
+
+  // if no behavior uses the button the camera tool moves the camera, if free
+  if (ToolButtonDown(m_CameraTool, e))
   {
     TraceHandler("Camera", m_CameraTool->GetInteractingTool(device));
   }
@@ -577,6 +601,16 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
 void albaPositionalEventRouter::OnButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
+  // the release of the button ends the interaction of the behavior
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaInteractionBehavior *behavior = GetCurrentBehavior(device);
+  if (behavior)
+  {
+    TraceHandler("Behavior", behavior);
+    behavior->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
+    ToolButtonUp(behavior, e);
+    SetCurrentBehavior(device, NULL);
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -727,17 +761,13 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
         albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
         OnMove(e);
       }
-      // In any case, forward the event to the right behavior
-      albaVME *vme = GetPickedVME(device);
-      if(vme)
+      // the drags go to the behavior interacting with the device
+      albaInteractionBehavior *bh = GetCurrentBehavior(device);
+      if (bh && (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId()))
       {
-        albaInteractionBehavior *bh = vme->GetBehavior(); //can be NULL
-        if (bh)
-        {
-          TraceHandler("Behavior", bh);
-          bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
-          bh->OnEvent(event); // forward to VME behavior
-        }
+        TraceHandler("Behavior", bh);
+        bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
+        ToolDrag(bh, ei);
       }
       // forward to the camera, if it is interacting with this device
       albaInteractionTool *camera = m_CameraTool->GetInteractingTool(device);
