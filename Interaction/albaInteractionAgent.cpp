@@ -37,6 +37,7 @@ albaInteractionAgent::albaInteractionAgent()
 {
   m_View = NULL;
   m_Renderer = NULL;
+  m_CtrlDown = m_AltDown = m_ShiftDown = false;
 }
 
 //------------------------------------------------------------------------------
@@ -49,6 +50,14 @@ void albaInteractionAgent::SetRendererAndView(vtkRenderer *ren, albaView *view)
 {
   m_Renderer = ren;
   m_View = view;
+}
+
+//------------------------------------------------------------------------------
+void albaInteractionAgent::SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown)
+{
+  m_CtrlDown = ctrlDown;
+  m_AltDown = altDown;
+  m_ShiftDown = shiftDown;
 }
 
 //----------------------------------------------------------------------------

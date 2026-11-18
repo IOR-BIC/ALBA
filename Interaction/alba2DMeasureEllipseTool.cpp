@@ -52,7 +52,6 @@ alba2DMeasureEllipseTool::alba2DMeasureEllipseTool() : alba2DMeasureTool()
 	m_MeasureTypeText = "CENTER_POINT";
 
 	m_CurrPoint = NO_POINT;
-	m_CTRLPressed = false;
 	m_CenterPointSize = 5.0;
 
 	m_LastPoint[0] = m_LastPoint[1] = m_LastPoint[2] = 0.0;
@@ -289,7 +288,7 @@ void alba2DMeasureEllipseTool::FindAndHighlight(double * point)
 				
 				if ((p1Dist < p2Dist) && (p1Dist <= minDist))
 				{
-					if(m_CTRLPressed)
+					if (m_CtrlDown)
 						SetAction(ACTION_ROTATE_MEASURE);
 					else
 						SetAction(ACTION_EDIT_MEASURE);
@@ -298,7 +297,7 @@ void alba2DMeasureEllipseTool::FindAndHighlight(double * point)
 				}
 				else if (p2Dist <= minDist)
 				{
-					if (m_CTRLPressed)
+					if (m_CtrlDown)
 						SetAction(ACTION_ROTATE_MEASURE);
 					else
 						SetAction(ACTION_EDIT_MEASURE);
@@ -727,14 +726,12 @@ bool alba2DMeasureEllipseTool::Save(albaVME *input, wxString tag)
 }
 
 //----------------------------------------------------------------------------
-bool alba2DMeasureEllipseTool::OnKey(int keyCode, bool pressed)
+void alba2DMeasureEllipseTool::SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown)
 {
-	if (!m_IsEnabled || keyCode != WXK_CONTROL)
-		return false;
-
-	m_CTRLPressed = pressed;
-	FindAndHighlight(m_LastPoint);
-	return true;
+	bool ctrlChanged = ctrlDown != m_CtrlDown;
+	Superclass::SetModifierKeys(ctrlDown, altDown, shiftDown);
+	if (m_IsEnabled && ctrlChanged && m_Renderer)
+		FindAndHighlight(m_LastPoint);
 }
 
 //----------------------------------------------------------------------------

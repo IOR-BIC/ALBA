@@ -45,6 +45,9 @@ public:
   virtual bool OnDrag(albaEventInteraction *e);
   virtual bool OnWheel(albaEventInteraction *e);
 
+  /** Set the state of the modifier keys, also on the mouse and tracker tools */
+  virtual void SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown);
+
   /** Return the tool moving the camera because of the device, NULL if none */
   albaInteractionTool *GetInteractingTool(albaDevice *device);
 

@@ -43,7 +43,8 @@ void albaSelectCellToolTest::TestEventsWithoutRenderer()
 {
   albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaSelectCellTool *tool = albaSelectCellTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON, 1 << ALBA_CTRL_KEY);
+  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  tool->SetModifierKeys(true, false, false); // CTRL down
 
   // no renderer: the button goes to the camera
   CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));

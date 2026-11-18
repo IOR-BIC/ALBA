@@ -54,17 +54,8 @@ public:
   /** Send VME_PICKING while picking; the drag is left to the camera */
   bool OnDrag(albaEventInteraction *e) override;
 
-  /** Update the state of the modifier keys and forward the key to the listener */
+  /** Forward the key to the listener, which reads the modifier keys with GetCtrlDown, GetAltDown and GetShiftDown */
   bool OnKey(int keyCode, bool pressed) override;
-
-  /** Return true if CTRL is down */
-  bool GetCtrlDown() {return m_CtrlDown;}
-
-  /** Return true if ALT is down */
-  bool GetAltDown() {return m_AltDown;}
-
-  /** Return true if SHIFT is down */
-  bool GetShiftDown() {return m_ShiftDown;}
 
 protected:
   albaSegmentationTool();
@@ -78,9 +69,6 @@ protected:
 
   bool m_IsPicking;          ///< true while the left button, pressed on a VME, is down
   double m_PickPosition[3];  ///< the last picked position
-  bool m_CtrlDown;           ///< true while CTRL is down
-  bool m_AltDown;            ///< true while ALT is down
-  bool m_ShiftDown;          ///< true while SHIFT is down
 
 private:
   albaSegmentationTool(const albaSegmentationTool&);  // Not implemented.

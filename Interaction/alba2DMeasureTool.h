@@ -286,8 +286,6 @@ protected:
 	
  	albaString m_MeasureTypeText;
 
-	int m_AltPressed;
-	int m_ShiftPressed;
 
 	Color m_Colors[5];
 

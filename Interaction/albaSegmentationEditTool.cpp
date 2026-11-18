@@ -44,7 +44,7 @@ bool albaSegmentationEditTool::OnMove(albaEventInteraction *e)
   albaEvent pickEvent(this, MOUSE_MOVE);
   pickEvent.SetPointer(m_PickPosition);
   pickEvent.SetArg(pickedSomething);
-  pickEvent.SetBool(e->GetModifier(ALBA_CTRL_KEY));
+  pickEvent.SetBool(m_CtrlDown);
   albaEventMacro(pickEvent);
   return true;
 }
@@ -52,7 +52,7 @@ bool albaSegmentationEditTool::OnMove(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 bool albaSegmentationEditTool::OnWheel(albaEventInteraction *e)
 {
-  if (!IsOnToolView(e) || !e->GetModifier(ALBA_SHIFT_KEY))
+  if (!IsOnToolView(e) || !m_ShiftDown)
     return false;
 
   long rotation = *(double *)e->GetData();

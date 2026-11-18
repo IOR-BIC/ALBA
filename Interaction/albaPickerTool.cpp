@@ -37,7 +37,7 @@ bool albaPickerTool::OnLeftButtonDown(albaEventInteraction *e)
 {
   // only the mouse picks, and SHIFT leaves the button to the PER
   m_Dragged = false;
-  return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) && !e->GetModifier(ALBA_SHIFT_KEY);
+  return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) && !m_ShiftDown;
 }
 
 //----------------------------------------------------------------------------

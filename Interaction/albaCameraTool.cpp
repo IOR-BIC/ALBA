@@ -100,3 +100,11 @@ bool albaCameraTool::OnWheel(albaEventInteraction *e)
 {
   return m_MouseTool->OnWheel(e) || m_TrackerTool->OnWheel(e);
 }
+
+//------------------------------------------------------------------------------
+void albaCameraTool::SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown)
+{
+  Superclass::SetModifierKeys(ctrlDown, altDown, shiftDown);
+  m_MouseTool->SetModifierKeys(ctrlDown, altDown, shiftDown);
+  m_TrackerTool->SetModifierKeys(ctrlDown, altDown, shiftDown);
+}

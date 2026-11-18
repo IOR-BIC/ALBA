@@ -74,8 +74,6 @@ alba2DMeasureTool::alba2DMeasureTool()
 	m_MaxMeasures = -1; // -1 = Infinite
 	m_CurrMeasure = -1;
 
-	m_ShiftPressed = false;
-	m_AltPressed = false;
 	m_EndMeasure = false;
 
 	m_AddMeasureEnable = true;
@@ -227,10 +225,7 @@ bool alba2DMeasureTool::OnLeftButtonDown(albaEventInteraction *e)
 
 	// with SHIFT, or with CTRL while adding a measure, the button is left to the PER for the whole interaction;
 	// in a perspective view the measure does not work, so the button moves the camera
-	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY) ? 1 : 0;
-	m_AltPressed = e->GetModifier(ALBA_ALT_KEY) ? 1 : 0;
-	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
-	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE) || !m_ParallelView)
+	if (m_ShiftDown || (m_CtrlDown && m_Action == ACTION_ADD_MEASURE) || !m_ParallelView)
 		return false;
 
 	m_ButtonDownInside = m_IsInBound;
@@ -339,16 +334,12 @@ bool alba2DMeasureTool::OnMove(albaEventInteraction *e)
 
 	InitRenderer(e);
 
-	m_ShiftPressed = e->GetModifier(ALBA_SHIFT_KEY);
-	m_AltPressed = e->GetModifier(ALBA_ALT_KEY);
-	bool ctrlPressed = e->GetModifier(ALBA_CTRL_KEY);
-
 	double pos_2d[2];
 	e->Get2DPosition(pos_2d);
 	double pointCoord[3];
 	ScreenToWorld(pos_2d, pointCoord);
 
-	if (m_ShiftPressed || (ctrlPressed && m_Action == ACTION_ADD_MEASURE))
+	if (m_ShiftDown || (m_CtrlDown && m_Action == ACTION_ADD_MEASURE))
 	{
 		FindAndHighlight(pointCoord);
 		return false;

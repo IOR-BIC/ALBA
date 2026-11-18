@@ -42,7 +42,7 @@ albaSelectPointTool::albaSelectPointTool()
 bool albaSelectPointTool::OnLeftButtonDown(albaEventInteraction *e)
 {
   // when no point is picked the button goes to the camera
-  if ((m_UseCtrlModifier && !e->GetModifier(ALBA_CTRL_KEY)) || !PickPoint(e))
+  if ((m_UseCtrlModifier && !m_CtrlDown) || !PickPoint(e))
     return false;
 
   m_IsPicking = true;

@@ -250,11 +250,8 @@ void albaCompositorMouseBehavior::InitInteraction(int buttonPressed, albaEventIn
   StartInteraction(mouse);
 
   // check for ctrl and shift pressure
-  int shiftPressed = e->GetModifier(ALBA_SHIFT_KEY) ? 1 : 0;
-  int ctrlPressed = e->GetModifier(ALBA_CTRL_KEY) ? 1 : 0;
-
   // get the activator from key mouse combination:
-  int activator = MouseToActivator(buttonPressed, shiftPressed, ctrlPressed);
+  int activator = MouseToActivator(buttonPressed, m_ShiftDown, m_CtrlDown);
 
   // get the behavior from the m_ActivatorMap
   if (m_ActivatorMap.count(activator))

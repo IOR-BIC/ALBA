@@ -102,6 +102,18 @@ public:
 albaCxxTypeMacro(albaRoutingTestEllipse);
 
 //----------------------------------------------------------------------------
+class albaRoutingTestKeyTool : public albaInteractionTool // uses all the keys
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaRoutingTestKeyTool, albaInteractionTool);
+
+  bool OnKey(int keyCode, bool pressed) override {return true;}
+};
+
+albaCxxTypeMacro(albaRoutingTestKeyTool);
+
+//----------------------------------------------------------------------------
 void albaRoutingTestListener::OnEvent(albaEventBase *event)
 {
   m_Ids.push_back(event->GetId());
@@ -575,8 +587,8 @@ void albaInteractionRoutingTest::TestEllipseCtrlRotates()
   SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 300, 300);
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_EDIT_MEASURE);
 
-  // pressing CTRL, without moving the mouse, switches to rotation
-  CPPUNIT_ASSERT(per->OnKey(WXK_CONTROL, true));
+  // pressing CTRL, without moving the mouse, switches to rotation; the key is not used, it only changes the modifier state
+  CPPUNIT_ASSERT(!per->OnKey(WXK_CONTROL, true));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_ROTATE_MEASURE);
 
   // other keys are not used
@@ -584,9 +596,47 @@ void albaInteractionRoutingTest::TestEllipseCtrlRotates()
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_ROTATE_MEASURE);
 
   // releasing CTRL goes back to editing
-  CPPUNIT_ASSERT(per->OnKey(WXK_CONTROL, false));
+  CPPUNIT_ASSERT(!per->OnKey(WXK_CONTROL, false));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_EDIT_MEASURE);
 
   DeletePER(per);
   albaDEL(ellipse);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::TestModifierKeysReachAllTools()
+{
+  albaRoutingTestKeyTool *bottom, *top, *pushedLater;
+  albaNEW(bottom);
+  albaNEW(top);
+  albaNEW(pushedLater);
+  albaPositionalEventRouter *per = NewPERWithTool(bottom);
+  per->PushTool(top);
+
+  // the tool on top uses CTRL, but all the tools and the camera see it
+  CPPUNIT_ASSERT(per->OnKey(WXK_CONTROL, true));
+  CPPUNIT_ASSERT(per->GetCtrlDown() && top->GetCtrlDown() && bottom->GetCtrlDown());
+  CPPUNIT_ASSERT(per->GetCameraTool()->GetMouseTool()->GetCtrlDown());
+  CPPUNIT_ASSERT(!bottom->GetAltDown() && !bottom->GetShiftDown());
+
+  // a tool pushed later starts with the current state
+  per->PushTool(pushedLater);
+  CPPUNIT_ASSERT(pushedLater->GetCtrlDown());
+
+  // other keys do not change the state
+  per->OnKey('A', true);
+  CPPUNIT_ASSERT(bottom->GetCtrlDown());
+
+  // the mouse events carry the state of the modifier keys
+  SendMouse(albaDeviceButtonsPadMouse::GetMouse2DMoveId(), 300, 300, 0, ALBA_SHIFT_KEY, ALBA_ALT_KEY);
+  CPPUNIT_ASSERT(!bottom->GetCtrlDown() && bottom->GetAltDown() && bottom->GetShiftDown());
+  CPPUNIT_ASSERT(per->GetCameraTool()->GetMouseTool()->GetShiftDown());
+
+  per->OnKey(WXK_SHIFT, false);
+  CPPUNIT_ASSERT(!top->GetShiftDown() && top->GetAltDown());
+
+  DeletePER(per);
+  albaDEL(pushedLater);
+  albaDEL(top);
+  albaDEL(bottom);
 }

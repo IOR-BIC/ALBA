@@ -42,7 +42,7 @@ albaSelectCellTool::albaSelectCellTool()
 bool albaSelectCellTool::OnLeftButtonDown(albaEventInteraction *e)
 {
   // outside the cells the button goes to the camera (CTRL: spin)
-  if (!e->GetModifier(ALBA_CTRL_KEY) || !PickCell(e))
+  if (!m_CtrlDown || !PickCell(e))
     return false;
 
   m_IsPicking = true;

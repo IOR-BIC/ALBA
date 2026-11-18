@@ -54,7 +54,7 @@ albaVTKPickerTool::~albaVTKPickerTool()
 bool albaVTKPickerTool::OnLeftButtonDown(albaEventInteraction *e)
 {
   vtkRenderer *renderer = GetEventRenderer(e);
-  if (renderer == NULL || !e->GetModifier(ALBA_CTRL_KEY))
+  if (renderer == NULL || !m_CtrlDown)
     return false;
 
   // a picking not ended by a button up is ended here

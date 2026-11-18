@@ -41,7 +41,6 @@ albaCxxAbstractTypeMacro(albaSegmentationTool);
 albaSegmentationTool::albaSegmentationTool()
 {
   m_IsPicking = false;
-  m_CtrlDown = m_AltDown = m_ShiftDown = false;
   m_PickPosition[0] = m_PickPosition[1] = m_PickPosition[2] = 0;
 }
 
@@ -59,9 +58,9 @@ bool albaSegmentationTool::OnLeftButtonDown(albaEventInteraction *e)
     return false;
 
   long modifier = 0;
-  if (e->GetModifier(ALBA_CTRL_KEY))
+  if (m_CtrlDown)
     modifier = ALBA_CTRL_KEY;
-  else if (e->GetModifier(ALBA_ALT_KEY))
+  else if (m_AltDown)
     modifier = ALBA_ALT_KEY;
 
   m_IsPicking = SendPickingInformation(e, modifier, VME_PICKED);
@@ -103,13 +102,6 @@ bool albaSegmentationTool::OnDrag(albaEventInteraction *e)
 //------------------------------------------------------------------------------
 bool albaSegmentationTool::OnKey(int keyCode, bool pressed)
 {
-  if (keyCode == WXK_CONTROL)
-    m_CtrlDown = pressed;
-  else if (keyCode == WXK_ALT)
-    m_AltDown = pressed;
-  else if (keyCode == WXK_SHIFT)
-    m_ShiftDown = pressed;
-
   albaEvent keyEvent(this, pressed ? KEY_PRESSED : KEY_RELEASED, (long)keyCode);
   keyEvent.SetBool(false);
   albaEventMacro(keyEvent);

@@ -59,12 +59,9 @@ bool albaCameraMouseTool::IsInteracting(albaDevice *device)
 //------------------------------------------------------------------------------
 bool albaCameraMouseTool::OnLeftButtonDown(albaEventInteraction *e)
 {
-  bool shift = e->GetModifier(ALBA_SHIFT_KEY);
-  bool ctrl = e->GetModifier(ALBA_CTRL_KEY);
-
-  if (shift)
-    return Start(e, ctrl ? MOTION_DOLLY : MOTION_PAN);
-  return Start(e, ctrl ? MOTION_SPIN : MOTION_ROTATE);
+  if (m_ShiftDown)
+    return Start(e, m_CtrlDown ? MOTION_DOLLY : MOTION_PAN);
+  return Start(e, m_CtrlDown ? MOTION_SPIN : MOTION_ROTATE);
 }
 
 //------------------------------------------------------------------------------

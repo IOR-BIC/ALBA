@@ -86,8 +86,12 @@ public:
   /** Remove a tool from the tool stack, wherever it is */
   void PopTool(albaInteractionTool *tool);
 
-  /** Offer a key pressed or released to the tools, from the top of the stack; return true if a tool used it */
+  /** Offer a key pressed or released to the tools, from the top of the stack; return true if a tool used it.
+    CTRL, ALT and SHIFT update the state of the modifier keys of all the tools first. */
   bool OnKey(int keyCode, bool pressed);
+
+  /** Set the state of the modifier keys, also on the camera tool and on all the tools of the stack */
+  virtual void SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown);
 
   /** Return the number of tools pushed on the stack (the camera tool is not counted) */
   int GetNumberOfTools() {return m_Tools.size();}
@@ -167,6 +171,9 @@ protected:
 
   /** Call the button up method of the tool for the button of the event */
   static bool ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** Return true for the mouse events carrying the state of the modifier keys */
+  static bool IsMouseInputEvent(albaID id);
 
   /** Return true if the button down picks a VME with a behavior: the behavior comes before the tools */
   bool PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device);

@@ -56,15 +56,16 @@ void albaSelectPointToolTest::TestEventsWithoutRenderer()
 {
   albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaSelectPointTool *tool = albaSelectPointTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON, 1 << ALBA_CTRL_KEY);
+  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  tool->SetModifierKeys(true, false, false); // CTRL down
 
   // no renderer: the button goes to the camera
   CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
   CPPUNIT_ASSERT(!tool->OnDrag(&down));
 
   // without CTRL the button is not used when the CTRL modifier is on
-  albaEventInteraction plainDown(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&plainDown));
+  tool->SetModifierKeys(false, false, false);
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
 
   tool->Delete();
   mouse->Delete();

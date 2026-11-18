@@ -68,7 +68,7 @@ public:
 	bool Save(albaVME *input, wxString tag);
 
 	/** CTRL switches from editing to rotating the ellipse, without moving the mouse */
-	virtual bool OnKey(int keyCode, bool pressed);
+	virtual void SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown);
 
 	/** Returns true if the point is inside the ellipse. Works only on current ellipse plane, the other coordinate will be ignored */
 	bool IsPointInsideMeasure(double *point, int measureIndex=-1);
@@ -108,7 +108,6 @@ protected:
 
 	double m_CenterPointSize;
 	double m_LastPoint[3];
-	bool m_CTRLPressed;
 
 private:
 	alba2DMeasureEllipseTool(const alba2DMeasureEllipseTool&);   // Not implemented.

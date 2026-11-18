@@ -88,6 +88,7 @@ void albaPositionalEventRouter::PushTool(albaInteractionTool *tool)
 
   tool->Register(this);
   m_Tools.push_back(tool);
+  tool->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
   tool->OnPush();
 }
 
@@ -113,8 +114,25 @@ void albaPositionalEventRouter::PopTool(albaInteractionTool *tool)
 }
 
 //------------------------------------------------------------------------------
+void albaPositionalEventRouter::SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown)
+{
+  Superclass::SetModifierKeys(ctrlDown, altDown, shiftDown);
+  m_CameraTool->SetModifierKeys(ctrlDown, altDown, shiftDown);
+  for (int i = 0; i < m_Tools.size(); i++)
+    m_Tools[i]->SetModifierKeys(ctrlDown, altDown, shiftDown);
+}
+
+//------------------------------------------------------------------------------
 bool albaPositionalEventRouter::OnKey(int keyCode, bool pressed)
 {
+  // all the tools see the modifier keys, also when a tool above uses the key
+  if (keyCode == WXK_CONTROL)
+    SetModifierKeys(pressed, m_AltDown, m_ShiftDown);
+  else if (keyCode == WXK_ALT)
+    SetModifierKeys(m_CtrlDown, pressed, m_ShiftDown);
+  else if (keyCode == WXK_SHIFT)
+    SetModifierKeys(m_CtrlDown, m_AltDown, pressed);
+
   // a tool can push or pop tools while handling an event: iterate on a copy
   std::vector<albaInteractionTool *> tools = m_Tools;
   for (int i = tools.size() - 1; i >= 0; i--)
@@ -263,6 +281,13 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
   }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool albaPositionalEventRouter::IsMouseInputEvent(albaID id)
+{
+  return id == albaDeviceButtonsPad::GetButtonDownId() || id == albaDeviceButtonsPad::GetButtonUpId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() ||
+    id == albaDeviceButtonsPadMouse::GetMouseDClickId() || id == albaDeviceButtonsPadMouse::GetWheelId();
 }
 
 //----------------------------------------------------------------------------
@@ -488,6 +513,7 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
     picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
     picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!)
     TraceHandler("Behavior", picked_bh);
+    picked_bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
     picked_bh->OnEvent(e); // forward the start event to picked behavior
   }
   // if no VME with a behavior has been picked the camera tool moves the camera, if free
@@ -621,8 +647,12 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
     assert(device);
     m_EventTrace.clear();
 
-    // the tools come first
+    // the mouse events carry the state of the modifier keys
     albaEventInteraction *ei = albaEventInteraction::SafeDownCast(event);
+    if (ei && albaDeviceButtonsPadMouse::SafeDownCast(device) && IsMouseInputEvent(id))
+      SetModifierKeys(ei->GetModifier(ALBA_CTRL_KEY), ei->GetModifier(ALBA_ALT_KEY), ei->GetModifier(ALBA_SHIFT_KEY));
+
+    // the tools come first
     if (ei && DispatchToTools(ei, device))
     {
       WriteEventTrace(event);
@@ -655,6 +685,7 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
         if (bh)
         {
           TraceHandler("Behavior", bh);
+          bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
           bh->OnEvent(event); // forward to VME behavior
         }
       }
