@@ -576,15 +576,15 @@ void albaInteractionRoutingTest::TestEllipseCtrlRotates()
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_EDIT_MEASURE);
 
   // pressing CTRL, without moving the mouse, switches to rotation
-  CPPUNIT_ASSERT(per->DispatchKey(WXK_CONTROL, true));
+  CPPUNIT_ASSERT(per->OnKey(WXK_CONTROL, true));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_ROTATE_MEASURE);
 
   // other keys are not used
-  CPPUNIT_ASSERT(!per->DispatchKey('A', true));
+  CPPUNIT_ASSERT(!per->OnKey('A', true));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_ROTATE_MEASURE);
 
   // releasing CTRL goes back to editing
-  CPPUNIT_ASSERT(per->DispatchKey(WXK_CONTROL, false));
+  CPPUNIT_ASSERT(per->OnKey(WXK_CONTROL, false));
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == alba2DMeasureTool::ACTION_EDIT_MEASURE);
 
   DeletePER(per);

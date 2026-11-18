@@ -113,7 +113,7 @@ void albaPositionalEventRouter::PopTool(albaInteractionTool *tool)
 }
 
 //------------------------------------------------------------------------------
-bool albaPositionalEventRouter::DispatchKey(int keyCode, bool pressed)
+bool albaPositionalEventRouter::OnKey(int keyCode, bool pressed)
 {
   // a tool can push or pop tools while handling an event: iterate on a copy
   std::vector<albaInteractionTool *> tools = m_Tools;
