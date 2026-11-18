@@ -29,7 +29,6 @@
 class albaGUI;
 class albaGUIButton;
 class albaTransformBehavior;
-class albaCompositorMouseBehavior;
 class albaInteractionBehavior;
 class albaVME;
 class albaMatrix;

@@ -34,9 +34,9 @@ class albaTransform;
 class vtkCamera;
 class vtkDoubleArray;
 
-/** Constrained interaction with mouse device.
-  Use albaCompositorMouseBehavior in order to associate instances of this class
-  to mouse buttons with keys modifiers.
+/** Constrained interaction with mouse device: the left button moves the VME (see OnLeftButtonDown).
+  It can be set as behavior of a VME, as the gizmos do, or used by a behavior with more modes,
+  like albaRotateTranslateBehavior, which chooses one of its transform behaviors in its button methods.
 
   Among the other features we have: translation constrains, like projection on an axis or plane,
   and rotational constrains like rotation around a single axis or translation snapping on specified
@@ -54,9 +54,6 @@ class vtkDoubleArray;
 
   By setting the ResultMatrix the interactor will automatically concatenate the transformation
   matrix to the ResultMatrix.
-
-  @sa
-  - mmoTransformGeneric for examples on how to use this class with albaCompositorMouseBehavior
 */
 class ALBA_EXPORT albaTransformBehavior : public albaInteractionBehavior
 {

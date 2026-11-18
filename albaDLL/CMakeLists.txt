@@ -342,7 +342,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
-  ../Interaction/albaCompositorMouseBehavior.cpp  		../Interaction/albaCompositorMouseBehavior.h
   ../Interaction/albaRotateTranslateBehavior.cpp  					../Interaction/albaRotateTranslateBehavior.h
   ../Interaction/albaProsthesisBehavior.cpp  					../Interaction/albaProsthesisBehavior.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h

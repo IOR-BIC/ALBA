@@ -38,7 +38,6 @@ SET(PROJECT_SRCS
 	albaDeviceManagerTest.h albaDeviceManagerTest.cpp
 	albaInteractionFactoryTest.h albaInteractionFactoryTest.cpp
 	albaTransformTextEntriesGUITest.h albaTransformTextEntriesGUITest.cpp
-	albaCompositorMouseBehaviorTest.h albaCompositorMouseBehaviorTest.cpp
 	albaActionTest.h albaActionTest.cpp
 	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
 	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp

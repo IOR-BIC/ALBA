@@ -24,64 +24,43 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "albaInteractionBehaviorTest.h"
-#include "albaObject.h"
 #include "albaInteractionBehavior.h"
+#include "albaEvent.h"
 #include "vtkRenderer.h"
-#include "albaDevice.h"
-#include "albaEventInteraction.h"
 
-enum EVENTS_ID
-{
-  START_INTERACTION_EVENT = 0,
-  STOP_INTERACTION_EVENT,
-};
-enum MODALITIES_ID
-{
-  SINGLE_BUTTON_MODE=0,
-  MULTI_BUTTON_MODE,
-};
 //----------------------------------------------------------------------------
 class albaInteractionBehaviorDummy : public albaInteractionBehavior // concrete class for test
 //----------------------------------------------------------------------------
 {
 public:
-  albaInteractionBehaviorDummy(){Superclass;};
-  ~albaInteractionBehaviorDummy(){Superclass;};
+  albaTypeMacro(albaInteractionBehaviorDummy, albaInteractionBehavior);
 
-  void OnButtonDown(albaEventInteraction *e){};
-  void OnButtonUp(albaEventInteraction *e){};
-
-  albaTypeMacro(albaInteractionBehaviorDummy,albaInteractionBehavior);
+  /** The left button sends the click with modifier, if enabled */
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return SendModifierClick();}
 };
 
 albaCxxTypeMacro(albaInteractionBehaviorDummy);
 
 //----------------------------------------------------------------------------
-class albaInteractionBehaviorButtonsDummy : public albaInteractionBehavior // concrete class using the default button handling
+class albaInteractionBehaviorTestListener : public albaObserver // stores the clicks with modifier
 //----------------------------------------------------------------------------
 {
 public:
-  albaTypeMacro(albaInteractionBehaviorButtonsDummy,albaInteractionBehavior);
-};
-
-albaCxxTypeMacro(albaInteractionBehaviorButtonsDummy);
-
-//----------------------------------------------------------------------------
-class albaInteractionBehaviorTestListener : public albaObserver // stores the sender of the received button events
-//----------------------------------------------------------------------------
-{
-public:
-  albaInteractionBehaviorTestListener() {m_ButtonDownSender = m_ButtonUpSender = NULL;};
-  virtual void OnEvent(albaEventBase *e)
+  albaInteractionBehaviorTestListener() {m_ClickCount = 0; m_ClickKey = -1; m_ClickSender = NULL;};
+  virtual void OnEvent(albaEventBase *event)
   {
-    if (e->GetId() == albaInteractionBehavior::BUTTON_DOWN)
-      m_ButtonDownSender = e->GetSender();
-    else if (e->GetId() == albaInteractionBehavior::BUTTON_UP)
-      m_ButtonUpSender = e->GetSender();
+    albaEvent *e = albaEvent::SafeDownCast(event);
+    if (e && e->GetId() == albaInteractionBehavior::MODIFIER_CLICK)
+    {
+      m_ClickCount++;
+      m_ClickKey = e->GetArg();
+      m_ClickSender = e->GetSender();
+    }
   };
 
-  void *m_ButtonDownSender;
-  void *m_ButtonUpSender;
+  int m_ClickCount;
+  long m_ClickKey;
+  void *m_ClickSender;
 };
 
 //----------------------------------------------------------------------------
@@ -93,9 +72,9 @@ void albaInteractionBehaviorTest::TestFixture()
 void albaInteractionBehaviorTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  albaInteractionBehaviorDummy *interactor = albaInteractionBehaviorDummy::New();
-
-  cppDEL(interactor);
+  albaInteractionBehaviorDummy *behavior;
+  albaNEW(behavior);
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
 void albaInteractionBehaviorTest::TestSetGetRenderer()
@@ -104,299 +83,89 @@ void albaInteractionBehaviorTest::TestSetGetRenderer()
   vtkRenderer *renderer;
   vtkNEW(renderer);
 
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
+  albaInteractionBehaviorDummy *behavior;
+  albaNEW(behavior);
 
   // renderer and view start empty (they belong to albaInteractionAgent)
-  CPPUNIT_ASSERT(interactor->GetRenderer() == NULL);
-  CPPUNIT_ASSERT(interactor->GetView() == NULL);
-  CPPUNIT_ASSERT(interactor->IsA("albaInteractionAgent"));
+  CPPUNIT_ASSERT(behavior->GetRenderer() == NULL);
+  CPPUNIT_ASSERT(behavior->GetView() == NULL);
+  CPPUNIT_ASSERT(behavior->IsA("albaInteractionTool"));
 
-  interactor->SetRendererAndView(renderer,NULL);
-  CPPUNIT_ASSERT(interactor->GetRenderer() == renderer);
+  behavior->SetRendererAndView(renderer, NULL);
+  CPPUNIT_ASSERT(behavior->GetRenderer() == renderer);
 
   vtkDEL(renderer);
-  albaDEL(interactor);
-
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetDevice()
-//----------------------------------------------------------------------------
-{
-  albaDevice *device;
-  albaNEW(device);
-
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  interactor->SetDevice(device);
-  CPPUNIT_ASSERT(interactor->GetDevice() == device);
-
-  albaDEL(device);
-  albaDEL(interactor);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetIgnoreTriggerEvents()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  interactor->SetIgnoreTriggerEvents(true);
-  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 1);
-
-  interactor->SetIgnoreTriggerEvents(false);
-  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 0);
-
-  interactor->IgnoreTriggerEventsOn();
-  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 1);
-
-  interactor->IgnoreTriggerEventsOff();
-  CPPUNIT_ASSERT(interactor->GetIgnoreTriggerEvents(false) == 0);
-
-  albaDEL(interactor);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetStartInteractionEvent()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  albaID dummyInteractionEvent = START_INTERACTION_EVENT;
-  interactor->SetStartInteractionEvent(dummyInteractionEvent);
-
-  CPPUNIT_ASSERT(interactor->GetStartInteractionEvent() == dummyInteractionEvent);
-
-  albaDEL(interactor);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetStopInteractionEvent()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  albaID dummyInteractionEvent = STOP_INTERACTION_EVENT;
-  interactor->SetStopInteractionEvent(dummyInteractionEvent);
-
-  CPPUNIT_ASSERT(interactor->GetStopInteractionEvent() == dummyInteractionEvent);
-
-  albaDEL(interactor);
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
 void albaInteractionBehaviorTest::TestSetGetStartButton()
 //----------------------------------------------------------------------------
 {
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
+  albaInteractionBehaviorDummy *behavior;
+  albaNEW(behavior);
 
-  int button = 0;
-  interactor->SetStartButton(button);
+  CPPUNIT_ASSERT(behavior->GetStartButton() == ALBA_LEFT_BUTTON);
+  behavior->SetStartButton(ALBA_MIDDLE_BUTTON);
+  CPPUNIT_ASSERT(behavior->GetStartButton() == ALBA_MIDDLE_BUTTON);
 
-  CPPUNIT_ASSERT(interactor->GetStartButton() == button);
-
-  albaDEL(interactor);
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
 void albaInteractionBehaviorTest::TestSetGetModifiers()
 //----------------------------------------------------------------------------
 {
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
+  albaInteractionBehaviorDummy *behavior;
+  albaNEW(behavior);
 
-  int modifiers = 1;
-  interactor->SetModifiers(modifiers);
+  CPPUNIT_ASSERT(behavior->GetModifiers() == 0);
+  behavior->SetModifiers(ALBA_CTRL_KEY);
+  CPPUNIT_ASSERT(behavior->GetModifiers() == ALBA_CTRL_KEY);
 
-  CPPUNIT_ASSERT(interactor->GetModifiers() == modifiers);
-
-  albaDEL(interactor);
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestGetCurrentButton()
+void albaInteractionBehaviorTest::TestButtonsNotUsed()
 //----------------------------------------------------------------------------
 {
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
+  albaInteractionBehaviorDummy *behavior;
+  albaNEW(behavior);
+  double pos[2] = {10, 20};
 
-  albaDevice *device;
-  albaNEW(device);
+  // the methods not redefined leave the buttons to the camera
+  CPPUNIT_ASSERT(!behavior->OnMiddleButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnRightButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnDrag(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnLeftButtonUp(NULL, NULL, pos));
 
-  interactor->SetDevice(device);
-
-  // setup the interactor
-  interactor->SetStartInteractionEvent(START_INTERACTION_EVENT);
-  interactor->SetStopInteractionEvent(STOP_INTERACTION_EVENT);
-  interactor->IgnoreTriggerEventsOff();
-  int button = 1;
-  interactor->SetStartButton(button);
-  interactor->SetModifiers(0);
-
-  albaEventInteraction e;
-  e.SetSender(device);
-  e.SetId(START_INTERACTION_EVENT);
-  e.SetButton(button);
-  e.SetChannel(MCH_INPUT);
-  interactor->OnEvent(&e);
-
-  CPPUNIT_ASSERT(interactor->GetCurrentButton() == button);
-
-  albaDEL(interactor);
-  albaDEL(device);
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestGetCurrentModifier()
+void albaInteractionBehaviorTest::TestModifierClick()
 //----------------------------------------------------------------------------
 {
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  albaDevice *device;
-  albaNEW(device);
-
-  interactor->SetDevice(device);
-
-  // setup the interactor
-  interactor->SetStartInteractionEvent(START_INTERACTION_EVENT);
-  interactor->SetStopInteractionEvent(STOP_INTERACTION_EVENT);
-  interactor->IgnoreTriggerEventsOff();
-  long modifier = 1;
-  int button = 0;
-  interactor->SetStartButton(button);
-  interactor->SetModifiers(0);
-
-  albaEventInteraction e;
-  e.SetSender(device);
-  e.SetId(START_INTERACTION_EVENT);
-  e.SetModifiers(modifier);
-  e.SetButton(button);
-  e.SetChannel(MCH_INPUT);
-  interactor->OnEvent(&e);
-
-  CPPUNIT_ASSERT(interactor->GetCurrentModifier() == modifier);
-
-  albaDEL(interactor);
-  albaDEL(device);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestStartStopInteraction()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  albaDevice *device;
-  albaNEW(device);
-
-  interactor->SetDevice(device);
-
-  CPPUNIT_ASSERT(interactor->StartInteraction(device) == true);
-  CPPUNIT_ASSERT(interactor->IsInteracting(device) == true);
-  CPPUNIT_ASSERT(interactor->StartInteraction(device) == false);
-  CPPUNIT_ASSERT(interactor->StopInteraction(device) == true);
-  // CPPUNIT_ASSERT(interactor->StopInteraction(device) == false); raise a warning
-
-  albaDEL(device);
-
-  albaDEL(interactor);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestIsInteracting()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  albaDevice *device;
-  albaNEW(device);
-
-  albaDevice *deviceDummy;
-  albaNEW(deviceDummy);
-
-
-  interactor->SetDevice(device);
-
-  CPPUNIT_ASSERT(interactor->IsInteracting(device) == false);
-  CPPUNIT_ASSERT(interactor->IsInteracting(deviceDummy) == false);
-
-  interactor->StartInteraction(device) == true;
-
-  CPPUNIT_ASSERT(interactor->IsInteracting(device) == true);
-  CPPUNIT_ASSERT(interactor->IsInteracting(deviceDummy) == false);
-
-  interactor->StopInteraction(device) == true;
-
-  CPPUNIT_ASSERT(interactor->IsInteracting(device) == false);
-  CPPUNIT_ASSERT(interactor->IsInteracting(deviceDummy) == false);
-
-  albaDEL(device);
-
-  albaDEL(deviceDummy);
-
-  albaDEL(interactor);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetButtonMode()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *interactor;
-  albaNEW(interactor);
-
-  interactor->SetButtonMode(SINGLE_BUTTON_MODE);
-
-  CPPUNIT_ASSERT(interactor->GetButtonMode() == SINGLE_BUTTON_MODE);
-
-  interactor->SetButtonMode(MULTI_BUTTON_MODE);
-
-  CPPUNIT_ASSERT(interactor->GetButtonMode() == MULTI_BUTTON_MODE);
-
-  interactor->SetButtonModeToSingleButton();
-
-  CPPUNIT_ASSERT(interactor->GetButtonMode() == SINGLE_BUTTON_MODE);
-
-  interactor->SetButtonModeToMultiButton();
-
-  CPPUNIT_ASSERT(interactor->GetButtonMode() == MULTI_BUTTON_MODE);
-
-  albaDEL(interactor);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestButtonEventsKeepIncomingEvent()
-//----------------------------------------------------------------------------
-{
-  albaDevice *device;
-  albaNEW(device);
-
-  albaInteractionBehaviorButtonsDummy *interactor;
-  albaNEW(interactor);
-
+  albaInteractionBehaviorDummy *behavior;
+  albaNEW(behavior);
   albaInteractionBehaviorTestListener listener;
-  interactor->SetListener(&listener);
+  behavior->SetListener(&listener);
+  double pos[2] = {10, 20};
 
-  // button down: the listener receives BUTTON_DOWN, the incoming event is unchanged
-  albaEventInteraction downEvent(device, interactor->GetStartInteractionEvent());
-  downEvent.SetButton(ALBA_LEFT_BUTTON);
-  downEvent.SetChannel(MCH_INPUT);
-  interactor->OnEvent(&downEvent);
+  // disabled by default
+  behavior->SetModifierKeys(true, false, false);
+  CPPUNIT_ASSERT(!behavior->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(listener.m_ClickCount == 0);
 
-  CPPUNIT_ASSERT(interactor->IsInteracting());
-  CPPUNIT_ASSERT(listener.m_ButtonDownSender == interactor);
-  CPPUNIT_ASSERT(downEvent.GetId() == interactor->GetStartInteractionEvent());
-  CPPUNIT_ASSERT(downEvent.GetSender() == device);
-  CPPUNIT_ASSERT(downEvent.GetChannel() == MCH_INPUT);
+  // CTRL, then SHIFT, which wins over CTRL
+  behavior->EnableModifierClicks(true);
+  CPPUNIT_ASSERT(behavior->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(listener.m_ClickCount == 1 && listener.m_ClickKey == ALBA_CTRL_KEY && listener.m_ClickSender == behavior);
+  behavior->SetModifierKeys(true, false, true);
+  CPPUNIT_ASSERT(behavior->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(listener.m_ClickCount == 2 && listener.m_ClickKey == ALBA_SHIFT_KEY);
 
-  // button up: the listener receives BUTTON_UP, the incoming event is unchanged
-  albaEventInteraction upEvent(device, interactor->GetStopInteractionEvent());
-  upEvent.SetButton(ALBA_LEFT_BUTTON);
-  upEvent.SetChannel(MCH_INPUT);
-  interactor->OnEvent(&upEvent);
+  // ALT alone or no modifiers: no click
+  behavior->SetModifierKeys(false, true, false);
+  CPPUNIT_ASSERT(!behavior->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(listener.m_ClickCount == 2);
 
-  CPPUNIT_ASSERT(!interactor->IsInteracting());
-  CPPUNIT_ASSERT(listener.m_ButtonUpSender == interactor);
-  CPPUNIT_ASSERT(upEvent.GetId() == interactor->GetStopInteractionEvent());
-  CPPUNIT_ASSERT(upEvent.GetSender() == device);
-  CPPUNIT_ASSERT(upEvent.GetChannel() == MCH_INPUT);
-
-  albaDEL(interactor);
-  albaDEL(device);
+  albaDEL(behavior);
 }

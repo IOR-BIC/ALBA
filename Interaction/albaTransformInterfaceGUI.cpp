@@ -31,7 +31,6 @@
 #include "albaGUIButton.h"
 
 #include "albaTransformBehavior.h"
-#include "albaCompositorMouseBehavior.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"

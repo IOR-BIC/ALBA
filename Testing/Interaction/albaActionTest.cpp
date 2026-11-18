@@ -26,7 +26,7 @@
 #include "albaActionTest.h"
 #include "albaAction.h"
 #include "albaDevice.h"
-#include "albaCompositorMouseBehavior.h"
+#include "albaPickerBehavior.h"
 
 typedef std::list<albaAutoPointer<albaDevice> > mmuDeviceList;
 
@@ -134,8 +134,8 @@ void albaActionTest::TestUnBindDevice()
 
 void albaActionTest::TestBindInteractor()
 {
-  albaCompositorMouseBehavior *dummyInteractor = NULL;
-  dummyInteractor =  albaCompositorMouseBehavior::New();
+  albaPickerBehavior *dummyInteractor = NULL;
+  dummyInteractor =  albaPickerBehavior::New();
   dummyInteractor->SetName("dummy interactor");
 
   albaAction *action = NULL;
@@ -159,8 +159,8 @@ void albaActionTest::TestBindInteractor()
 
 void albaActionTest::TestUnBindInteractor()
 {
-  albaCompositorMouseBehavior *dummyInteractor = NULL;
-  dummyInteractor =  albaCompositorMouseBehavior::New();
+  albaPickerBehavior *dummyInteractor = NULL;
+  dummyInteractor =  albaPickerBehavior::New();
   dummyInteractor->SetName("dummy interactor");
 
   albaAction *action = NULL;

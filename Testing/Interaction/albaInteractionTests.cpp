@@ -60,7 +60,6 @@
 #include "albaGizmoTranslatePlaneTest.h"
 #include "albaGizmoTranslateTest.h"
 #include "albaInteractionFactoryTest.h"
-#include "albaCompositorMouseBehaviorTest.h"
 #include "albaInteractorConstraintTest.h"
 #include "albaExtractIsosurfaceToolTest.h"
 #include "albaPositionalEventRouterTest.h"
@@ -152,7 +151,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDeviceManagerTest::suite());
 	runner.addTest(albaInteractionFactoryTest::suite());
 	runner.addTest(albaTransformTextEntriesGUITest::suite());
-	runner.addTest(albaCompositorMouseBehaviorTest::suite());
 	runner.addTest(albaActionTest::suite());
 	runner.addTest(albaSaveRestorePoseGUITest::suite());
 	runner.addTest(albaAgentEventQueueTest::suite());
