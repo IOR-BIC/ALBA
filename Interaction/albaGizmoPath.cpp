@@ -28,7 +28,7 @@
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"

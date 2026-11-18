@@ -32,7 +32,7 @@
 albaCxxTypeMacro(albaTransformMouseFreeBehavior);
 
 //------------------------------------------------------------------------------
-albaGenericMouseBehavior *albaTransformMouseFreeBehavior::NewGenericMouse()
+albaTransformBehavior *albaTransformMouseFreeBehavior::NewTransformBehavior()
 {
   return albaGenericMouseFreeTransformBehavior::New();
 }

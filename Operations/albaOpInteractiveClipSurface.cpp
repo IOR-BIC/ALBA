@@ -34,7 +34,7 @@ bool DEBUG_MODE = true;
 
 #include "mmaMaterial.h"
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 
 #include "albaSmartPointer.h"
 #include "albaVMEGizmo.h"
@@ -528,7 +528,7 @@ void albaOpInteractiveClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				{
 					if(m_Arrow) 
 					{
-						if(e->GetArg()==albaGenericMouseBehavior::MOUSE_DOWN)
+						if(e->GetArg()==albaTransformBehavior::MOUSE_DOWN)
 						{
 							m_ClipInside= m_ClipInside ? 0 : 1;
 							m_Gui->Update();
@@ -539,7 +539,7 @@ void albaOpInteractiveClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				}
 				else if(e->GetSender()==m_IsaClipWithoutGizmo || e->GetSender()==m_IsaClipWithGizmo)
 				{
-					if(e->GetArg()==albaGenericMouseBehavior::MOUSE_DOWN)
+					if(e->GetArg()==albaTransformBehavior::MOUSE_DOWN)
 					{
 						Clip();
 						GetLogicManager()->CameraUpdate();
@@ -825,7 +825,7 @@ void albaOpInteractiveClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_e
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
+		if (arg == albaTransformBehavior::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneVMEGizmo->SetAbsMatrix(absPose);

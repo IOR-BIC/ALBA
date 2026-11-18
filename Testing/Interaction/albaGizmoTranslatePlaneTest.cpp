@@ -40,7 +40,7 @@
 #include "albaObserver.h"
 #include "albaTransform.h"
 
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPoints.h"

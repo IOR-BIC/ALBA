@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 
 //----------------------------------------------------------------------------
 //forward ref
@@ -24,10 +24,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class albaDeviceButtonsPadMouse;
 
 
-class ALBA_EXPORT albaGenericMouseFreeTransformBehavior : public albaGenericMouseBehavior
+class ALBA_EXPORT albaGenericMouseFreeTransformBehavior : public albaTransformBehavior
 {
 public:
-  albaTypeMacro(albaGenericMouseFreeTransformBehavior, albaGenericMouseBehavior);
+  albaTypeMacro(albaGenericMouseFreeTransformBehavior, albaTransformBehavior);
   
   /** Set the current camera */
   //virtual void SetCurrentCamera(vtkCamera *camera) {m_CurrentCamera=camera;}

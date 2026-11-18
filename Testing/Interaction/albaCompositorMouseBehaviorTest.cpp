@@ -45,7 +45,7 @@ void albaCompositorMouseBehaviorTest::TestButtonDown()
   albaCompositorMouseBehavior *compositorMouse = albaCompositorMouseBehavior::New();
   double pos[2] = {10, 20};
 
-  // no generic mouse behavior for the button: the button is not used
+  // no transform behavior for the button: the button is not used
   CPPUNIT_ASSERT(!compositorMouse->OnLeftButtonDown(NULL, NULL, pos));
 
   // without a renderer the interaction cannot start
@@ -53,7 +53,7 @@ void albaCompositorMouseBehaviorTest::TestButtonDown()
   CPPUNIT_ASSERT(!compositorMouse->OnLeftButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(!compositorMouse->OnLeftButtonUp(NULL, NULL, pos));
 
-  // the modifier keys select another generic mouse behavior
+  // the modifier keys select another transform behavior
   compositorMouse->SetModifierKeys(true, false, false);
   CPPUNIT_ASSERT(!compositorMouse->OnMiddleButtonDown(NULL, NULL, pos));
 
@@ -80,7 +80,7 @@ void albaCompositorMouseBehaviorTest::TestCreateBehavior()
   compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
 
-  albaGenericMouseBehavior *mouseBehavior = NULL;
+  albaTransformBehavior *mouseBehavior = NULL;
   mouseBehavior = compositorMouse->GetBehavior(MOUSE_LEFT);
   CPPUNIT_ASSERT(mouseBehavior == NULL);
     
@@ -99,20 +99,20 @@ void albaCompositorMouseBehaviorTest::TestGetBehavior()
   compositorMouse = albaCompositorMouseBehavior::New();
   CPPUNIT_ASSERT(compositorMouse != NULL);
 
-  albaGenericMouseBehavior *getNotYetCreatedMouseBehavior = NULL;
+  albaTransformBehavior *getNotYetCreatedMouseBehavior = NULL;
   getNotYetCreatedMouseBehavior = compositorMouse->GetBehavior(MOUSE_MIDDLE);
   CPPUNIT_ASSERT(getNotYetCreatedMouseBehavior == NULL);
 
-  albaGenericMouseBehavior *createdMouseMiddleBehavior = NULL;
+  albaTransformBehavior *createdMouseMiddleBehavior = NULL;
   createdMouseMiddleBehavior = compositorMouse->CreateBehavior(MOUSE_MIDDLE);
   CPPUNIT_ASSERT(createdMouseMiddleBehavior != NULL);
   
-  albaGenericMouseBehavior *getMouseMiddleBehavior = NULL;
+  albaTransformBehavior *getMouseMiddleBehavior = NULL;
   getMouseMiddleBehavior = compositorMouse->GetBehavior(MOUSE_MIDDLE);
   CPPUNIT_ASSERT(getMouseMiddleBehavior != NULL);
   CPPUNIT_ASSERT(getMouseMiddleBehavior == createdMouseMiddleBehavior);
   
-  albaGenericMouseBehavior *getMouseMiddleCtrlBehavior = NULL;
+  albaTransformBehavior *getMouseMiddleCtrlBehavior = NULL;
   getMouseMiddleCtrlBehavior = compositorMouse->GetBehavior(MOUSE_MIDDLE_CONTROL);
   CPPUNIT_ASSERT(getMouseMiddleCtrlBehavior == NULL);
 

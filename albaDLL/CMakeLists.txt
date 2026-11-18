@@ -346,7 +346,7 @@ SET(INTERACTION_SRCS
   ../Interaction/albaTransformMouseBehavior.cpp  					../Interaction/albaTransformMouseBehavior.h
   ../Interaction/albaTransformMouseFreeBehavior.cpp  					../Interaction/albaTransformMouseFreeBehavior.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
-  ../Interaction/albaGenericMouseBehavior.cpp  			../Interaction/albaGenericMouseBehavior.h
+  ../Interaction/albaTransformBehavior.cpp  			../Interaction/albaTransformBehavior.h
   ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h
   ../Interaction/albaPickerBehavior.cpp  					../Interaction/albaPickerBehavior.h
   ../Interaction/albaStaticEventRouter.cpp  					../Interaction/albaStaticEventRouter.h  ######################

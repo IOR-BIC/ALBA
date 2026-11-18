@@ -48,7 +48,7 @@ albaCompositorMouseBehavior::albaCompositorMouseBehavior()
 {
   m_StartButton = -1;
 
-  m_ActiveMMIGeneric = NULL;  
+  m_ActiveTransform = NULL;  
   m_MousePose[0] = m_MousePose[1] = m_LastMousePose[0] = m_LastMousePose[1] = 0;
   m_CurrentCamera = NULL;
 }
@@ -59,11 +59,11 @@ albaCompositorMouseBehavior::~albaCompositorMouseBehavior()
 }
 
 //----------------------------------------------------------------------------
-albaGenericMouseBehavior *albaCompositorMouseBehavior::CreateBehavior(MMI_ACTIVATOR activator)
+albaTransformBehavior *albaCompositorMouseBehavior::CreateBehavior(MMI_ACTIVATOR activator)
 //----------------------------------------------------------------------------
 {
   // create the generic behavior and populate the map
-  albaGenericMouseBehavior *pISAG = NewGenericMouse();
+  albaTransformBehavior *pISAG = NewTransformBehavior();
   
   m_ActivatorMap[activator] = pISAG;
   switch (activator)
@@ -107,13 +107,13 @@ albaGenericMouseBehavior *albaCompositorMouseBehavior::CreateBehavior(MMI_ACTIVA
 }
 
 //----------------------------------------------------------------------------
-albaGenericMouseBehavior *albaCompositorMouseBehavior::NewGenericMouse()
+albaTransformBehavior *albaCompositorMouseBehavior::NewTransformBehavior()
 {
-  return albaGenericMouseBehavior::New();
+  return albaTransformBehavior::New();
 }
 
 //----------------------------------------------------------------------------
-albaGenericMouseBehavior *albaCompositorMouseBehavior::GetBehavior(MMI_ACTIVATOR activator)
+albaTransformBehavior *albaCompositorMouseBehavior::GetBehavior(MMI_ACTIVATOR activator)
 //----------------------------------------------------------------------------
 {
   // return pointer to the behavior given the map key
@@ -173,23 +173,23 @@ bool albaCompositorMouseBehavior::StartTransform(int buttonPressed, albaView *vi
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
   // the VME has been picked by the PER, which set the prop and the picked position
-  m_ActiveMMIGeneric = m_ActivatorMap[activator];
-  m_ActiveMMIGeneric->SetRendererAndView(ren, view);
-  m_ActiveMMIGeneric->SetProp(m_Prop);
-  m_ActiveMMIGeneric->SetCurrentCamera(m_CurrentCamera);
-  m_ActiveMMIGeneric->SetButtonDownPick(true, m_PickedPosition);
-  m_ActiveMMIGeneric->OnButtonDownAction(m_MousePose[0], m_MousePose[1]);
+  m_ActiveTransform = m_ActivatorMap[activator];
+  m_ActiveTransform->SetRendererAndView(ren, view);
+  m_ActiveTransform->SetProp(m_Prop);
+  m_ActiveTransform->SetCurrentCamera(m_CurrentCamera);
+  m_ActiveTransform->SetButtonDownPick(true, m_PickedPosition);
+  m_ActiveTransform->OnButtonDownAction(m_MousePose[0], m_MousePose[1]);
   return true;
 }
 
 //----------------------------------------------------------------------------
 bool albaCompositorMouseBehavior::StopTransform()
 {
-  if (m_ActiveMMIGeneric == NULL)
+  if (m_ActiveTransform == NULL)
     return false;
 
-  albaGenericMouseBehavior *active = m_ActiveMMIGeneric;
-  m_ActiveMMIGeneric = NULL;
+  albaTransformBehavior *active = m_ActiveTransform;
+  m_ActiveTransform = NULL;
   active->OnButtonUpAction();
   return true;
 }
@@ -197,7 +197,7 @@ bool albaCompositorMouseBehavior::StopTransform()
 //----------------------------------------------------------------------------
 bool albaCompositorMouseBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (m_ActiveMMIGeneric == NULL)
+  if (m_ActiveTransform == NULL)
     return false;
 
   m_MousePose[0] = (int)pos[0];
@@ -206,7 +206,7 @@ bool albaCompositorMouseBehavior::OnDrag(albaView *view, vtkRenderer *ren, doubl
   // the moves without a change of position are discarded
   if (m_MousePose[0] != m_LastMousePose[0] || m_MousePose[1] != m_LastMousePose[1])
   {
-    m_ActiveMMIGeneric->OnMouseMoveAction(m_MousePose[0], m_MousePose[1]);
+    m_ActiveTransform->OnMouseMoveAction(m_MousePose[0], m_MousePose[1]);
     m_LastMousePose[0] = m_MousePose[0];
     m_LastMousePose[1] = m_MousePose[1];
   }

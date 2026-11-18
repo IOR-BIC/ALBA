@@ -32,7 +32,7 @@
 
 // isa stuff
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -280,7 +280,7 @@ void albaGizmoRotateCircle::OnEvent(albaEventBase *alba_event)
   {
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
+      if (e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }
@@ -348,7 +348,7 @@ void albaGizmoRotateCircle::SetInput(albaVME *vme)
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-albaGenericMouseBehavior *albaGizmoRotateCircle::GetInteractor()
+albaTransformBehavior *albaGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
   return m_IsaGen;

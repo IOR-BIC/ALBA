@@ -32,7 +32,7 @@ class albaGizmoRotate;
 class albaTransformMouseGUI;
 class albaInteractionBehavior;
 class albaCompositorMouseBehavior;
-class albaGenericMouseBehavior;
+class albaTransformBehavior;
 class albaVME;
 class albaVME;
 

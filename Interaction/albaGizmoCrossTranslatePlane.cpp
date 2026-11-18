@@ -29,7 +29,7 @@
 
 // isa stuff
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaRefSys.h"
 
 // vme stuff
@@ -407,7 +407,7 @@ void albaGizmoCrossTranslatePlane::OnEvent(albaEventBase *alba_event)
 		// mouse down change gizmo selection status
 		if (e->GetId() == ID_TRANSFORM)
 		{
-			if (e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
+			if (e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
 			{
 				this->SetIsActive(true);
 			}

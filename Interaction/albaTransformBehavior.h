@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGenericMouseBehavior
+ Module: albaTransformBehavior
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaGenericMouseBehavior_h
-#define __albaGenericMouseBehavior_h
+#ifndef __albaTransformBehavior_h
+#define __albaTransformBehavior_h
 
 //----------------------------------------------------------------------------
 // Include:
@@ -58,10 +58,10 @@ class vtkDoubleArray;
   @sa
   - mmoTransformGeneric for examples on how to use this class with albaCompositorMouseBehavior
 */
-class ALBA_EXPORT albaGenericMouseBehavior : public albaInteractionBehavior
+class ALBA_EXPORT albaTransformBehavior : public albaInteractionBehavior
 {
 public:
-  albaTypeMacro(albaGenericMouseBehavior, albaInteractionBehavior);
+  albaTypeMacro(albaTransformBehavior, albaInteractionBehavior);
 
   /**
     Get the Target ref sys, i.e. the object hosting the output matrix 
@@ -233,8 +233,8 @@ public:
 
 protected:
 
-  albaGenericMouseBehavior();
-  ~albaGenericMouseBehavior();
+  albaTransformBehavior();
+  ~albaTransformBehavior();
 
   /** Only one flag can be true: the mouse can only translate, rotate or scale during a single move */
   void EnableTranslationInternal(bool enable);
@@ -359,8 +359,8 @@ protected:
 
 private:
 
-  albaGenericMouseBehavior(const albaGenericMouseBehavior&);  // Not implemented.
-  void operator=(const albaGenericMouseBehavior&);   // Not implemented.
+  albaTransformBehavior(const albaTransformBehavior&);  // Not implemented.
+  void operator=(const albaTransformBehavior&);   // Not implemented.
 	        
   // Projection Accumulator; accumulates projections of the motion
   // vector along mouse move events 

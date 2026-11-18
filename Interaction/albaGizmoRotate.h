@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 class albaGizmoRotateCircle;
 class albaGizmoRotateFan;
-class albaGenericMouseBehavior;
+class albaTransformBehavior;
 class albaMatrix;
 
 //----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public:
 
   /**
   Get the Interactor asscociated to each axis*/
-  albaGenericMouseBehavior *GetInteractor(int axis);
+  albaTransformBehavior *GetInteractor(int axis);
 
   //----------------------------------------------------------------------------
   // RefSys

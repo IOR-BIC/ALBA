@@ -32,7 +32,7 @@
 
 // isa stuff
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaRefSys.h"
 
 // vme stuff
@@ -352,7 +352,7 @@ void albaGizmoCrossRotateAxis::OnEvent(albaEventBase *alba_event)
 	{
 		if (e->GetId() == ID_TRANSFORM)
 		{
-			if (e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
+			if (e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
 			{
 				this->SetIsActive(true);
 			}
@@ -421,7 +421,7 @@ void albaGizmoCrossRotateAxis::SetInput(albaVME *vme)
 	SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-albaGenericMouseBehavior *albaGizmoCrossRotateAxis::GetInteractor()
+albaTransformBehavior *albaGizmoCrossRotateAxis::GetInteractor()
 //----------------------------------------------------------------------------
 {
 	return m_IsaGen;

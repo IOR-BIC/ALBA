@@ -19,7 +19,7 @@
 
 #include "albaInteractionBehavior.h"
 #include "albaEvent.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaTransform.h"
 #include "albaMatrix.h"
 #include "albaSmartPointer.h"
@@ -62,9 +62,9 @@ enum MOUSE_BUTTON
     MOUSE_RIGHT_PRESSED, 
 };
 
-/** Associates instances of albaGenericMouseBehavior to mouse buttons and ctrl/shift keys combinations.
+/** Associates instances of albaTransformBehavior to mouse buttons and ctrl/shift keys combinations.
   
-  Associates instances of albaGenericMouseBehavior to mouse buttons and ctrl/shift keys combinations.
+  Associates instances of albaTransformBehavior to mouse buttons and ctrl/shift keys combinations.
   For example:
 
   // Create the compositor:
@@ -75,7 +75,7 @@ enum MOUSE_BUTTON
   ...
 
   @sa
-  - albaGenericMouseBehavior since albaCompositorMouseBehavior is working in pair with this class
+  - albaTransformBehavior since albaCompositorMouseBehavior is working in pair with this class
   - albaTransformMouseBehavior, used through albaTransformMouseGUI by albaOpTransformOld
   
 */
@@ -84,36 +84,36 @@ class ALBA_EXPORT albaCompositorMouseBehavior : public albaInteractionBehavior
 public:
   albaTypeMacro(albaCompositorMouseBehavior, albaInteractionBehavior);
 
-  /** The button starts the generic mouse behavior associated with the button and the modifier keys, if any */
+  /** The button starts the transform behavior associated with the button and the modifier keys, if any */
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return StartTransform(MOUSE_LEFT_PRESSED, view, ren, pos);}
   virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return StartTransform(MOUSE_MIDDLE_PRESSED, view, ren, pos);}
   virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return StartTransform(MOUSE_RIGHT_PRESSED, view, ren, pos);}
 
-  /** The release of the button stops the active generic mouse behavior */
+  /** The release of the button stops the active transform behavior */
   virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return StopTransform();}
   virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return StopTransform();}
   virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return StopTransform();}
 
-  /** The drags go to the active generic mouse behavior */
+  /** The drags go to the active transform behavior */
   virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
 
   /**
   Create a behavior given the activator*/
-  virtual albaGenericMouseBehavior *CreateBehavior(MMI_ACTIVATOR activator);
+  virtual albaTransformBehavior *CreateBehavior(MMI_ACTIVATOR activator);
 
   /**
   Get a behavior given the activator*/
-  albaGenericMouseBehavior *GetBehavior(MMI_ACTIVATOR activator);
+  albaTransformBehavior *GetBehavior(MMI_ACTIVATOR activator);
   
 protected:
 
   albaCompositorMouseBehavior();
   ~albaCompositorMouseBehavior();
 
-  /** Create the generic mouse behavior used by CreateBehavior: subclasses can create a specialized one */
-  virtual albaGenericMouseBehavior *NewGenericMouse();
+  /** Create the transform behavior used by CreateBehavior: subclasses can create a specialized one */
+  virtual albaTransformBehavior *NewTransformBehavior();
 
-  typedef std::map<int, albaAutoPointer<albaGenericMouseBehavior> > mmuActivatorMap;
+  typedef std::map<int, albaAutoPointer<albaTransformBehavior> > mmuActivatorMap;
 
   /**
                     ActivatorMap
@@ -128,10 +128,10 @@ protected:
   map holding activator<->behavior association*/
   mmuActivatorMap m_ActivatorMap;
 
-  /** Start the generic mouse behavior associated with the button and the modifier keys; return false if there is none */
+  /** Start the transform behavior associated with the button and the modifier keys; return false if there is none */
   bool StartTransform(int buttonPressed, albaView *view, vtkRenderer *ren, double pos[2]);
 
-  /** Stop the active generic mouse behavior; return false if there is none */
+  /** Stop the active transform behavior; return false if there is none */
   bool StopTransform();
 	
 	/**
@@ -140,7 +140,7 @@ protected:
   int MouseToActivator(int mouseButton, int shift, int ctrl);
 
   // the active behavior
-  albaGenericMouseBehavior *m_ActiveMMIGeneric;
+  albaTransformBehavior *m_ActiveTransform;
 
 private:
 

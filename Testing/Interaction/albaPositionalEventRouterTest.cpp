@@ -32,7 +32,7 @@
 #include "albaView.h"
 #include "albaEvent.h"
 #include "albaDeviceButtonsPad.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaTransform.h"
 #include "albaInteractionTool.h"
 #include "albaCameraTool.h"
@@ -94,7 +94,7 @@ public:
   virtual void OnEvent(albaEventBase *event)
   {
     albaEvent *e = albaEvent::SafeDownCast(event);
-    if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
+    if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
     {
       m_MouseDownCount++;
       albaTransform::GetPosition(*albaMatrix::SafeDownCast(e->GetMafObject()), m_PickedPosition);
@@ -477,7 +477,7 @@ void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
   albaVMESurface *vme = albaVMESurface::New();
   view->m_FakeVme = vme;
 
-  albaGenericMouseBehavior *generic = albaGenericMouseBehavior::New();
+  albaTransformBehavior *generic = albaTransformBehavior::New();
   albaPERTestTransformListener listener;
   generic->SetListener(&listener);
   generic->SetRendererAndView(NULL, view);

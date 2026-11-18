@@ -25,7 +25,7 @@
 #include "albaTransformMouseBehavior.h"
 #include "albaDecl.h"
 #include "albaEventBase.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaInteractorConstraint.h"
 #include "albaRefSys.h"
 #include "albaVME.h"
@@ -244,7 +244,7 @@ void albaTransformMouseBehavior::SetTranslationConstraint(int constraint)
 //------------------------------------------------------------------------------
 void albaTransformMouseBehavior::OnEvent(albaEventBase *event)
 {
-  // the events of the generic mouse behaviors go to the listener
+  // the events of the transform behaviors go to the listener
   if (event->GetChannel() != MCH_INPUT)
   {
     if (event->GetId() == ID_TRANSFORM)

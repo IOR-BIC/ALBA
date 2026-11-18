@@ -748,7 +748,7 @@ void albaOpClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
+		if (arg == albaTransformBehavior::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);

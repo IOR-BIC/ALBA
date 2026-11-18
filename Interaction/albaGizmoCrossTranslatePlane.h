@@ -42,7 +42,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaGenericMouseBehavior;
+class albaTransformBehavior;
 class albaCompositorMouseBehavior;
 class albaVME;
 class albaVMEGizmo;
@@ -205,9 +205,9 @@ protected:
   albaCompositorMouseBehavior *m_IsaComp[2];
 
   /** isa generic*/
-  albaGenericMouseBehavior *m_IsaGen[2];
+  albaTransformBehavior *m_IsaGen[2];
 
-  /** Used by albaGenericMouseBehavior */
+  /** Used by albaTransformBehavior */
   vtkTransform *m_PivotTransform;
 
   /**

@@ -36,8 +36,8 @@ protected:
   albaTransformMouseFreeBehavior() {}
   virtual ~albaTransformMouseFreeBehavior() {}
 
-  /** Create the free transform generic mouse */
-  albaGenericMouseBehavior *NewGenericMouse() override;
+  /** Create the free transform behavior */
+  albaTransformBehavior *NewTransformBehavior() override;
 
   /** Adapt the rotation constraint to the view */
   void OnTransform() override;

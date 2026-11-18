@@ -31,7 +31,7 @@
 #include "albaRefSys.h"
 
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 
 #include "albaTransform.h"
 #include "albaSmartPointer.h"

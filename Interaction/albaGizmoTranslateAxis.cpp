@@ -30,7 +30,7 @@
 
 // isa stuff
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 
 // vme stuff
 #include "mmaMaterial.h"

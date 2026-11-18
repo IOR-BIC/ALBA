@@ -30,7 +30,7 @@
 // forward refs:
 //---------------------------------------------------------------------------
 class albaCompositorMouseBehavior;
-class albaGenericMouseBehavior;
+class albaTransformBehavior;
 
 
 class albaEvent;
@@ -107,7 +107,7 @@ protected:
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;
   albaCompositorMouseBehavior *m_GizmoInteractor;
-  albaGenericMouseBehavior *m_LeftMouseInteractor;
+  albaTransformBehavior *m_LeftMouseInteractor;
   
   vtkLineSource *m_LineSource;
   vtkSphereSource  *m_SphereSource;

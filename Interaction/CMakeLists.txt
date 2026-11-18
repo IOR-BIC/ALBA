@@ -71,7 +71,7 @@ SET(PROJECT_SRCS
   albaTransformMouseBehavior.cpp  					albaTransformMouseBehavior.h
   albaTransformMouseFreeBehavior.cpp  					albaTransformMouseFreeBehavior.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
-  albaGenericMouseBehavior.cpp  			albaGenericMouseBehavior.h
+  albaTransformBehavior.cpp  			albaTransformBehavior.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
   albaPickerBehavior.cpp  					albaPickerBehavior.h
   albaStaticEventRouter.cpp  									albaStaticEventRouter.h  ######################

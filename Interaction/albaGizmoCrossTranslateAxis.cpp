@@ -36,7 +36,7 @@
 #include "albaVMEGizmo.h"
 #include "albaTagArray.h"
 #include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaTransformBehavior.h"
 #include "albaRefSys.h"
 
 

@@ -31,7 +31,7 @@
 class albaEvent;
 
 class albaCompositorMouseBehavior;
-class albaGenericMouseBehavior;
+class albaTransformBehavior;
 class albaVMESurface;
 class albaVMEGizmo;
 class albaGizmoTranslate;
@@ -147,8 +147,8 @@ protected:
   vtkGlyph3D      *m_Arrow;
 
   albaCompositorMouseBehavior *m_IsaCompositor;
-  albaGenericMouseBehavior    *m_IsaTranslate;
-  albaGenericMouseBehavior    *m_IsaRotate;
+  albaTransformBehavior    *m_IsaTranslate;
+  albaTransformBehavior    *m_IsaRotate;
 
   vtkPolyData *m_OldSurface;
 	vtkPolyData *m_ResultPolyData;
