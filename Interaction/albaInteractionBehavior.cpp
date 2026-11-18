@@ -52,6 +52,7 @@ ALBA_ID_IMP(albaInteractionBehavior::INTERACTION_STARTED);
 ALBA_ID_IMP(albaInteractionBehavior::INTERACTION_STOPPED);
 ALBA_ID_IMP(albaInteractionBehavior::BUTTON_DOWN);
 ALBA_ID_IMP(albaInteractionBehavior::BUTTON_UP);
+ALBA_ID_IMP(albaInteractionBehavior::MODIFIER_CLICK);
 
 //------------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaInteractionBehavior);
@@ -65,6 +66,7 @@ albaInteractionBehavior::albaInteractionBehavior()
   m_VME                 = NULL;
   m_Prop                = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0;
+  m_ModifierClicks = false;
   m_TestMode = false;
   
   m_DeviceIsSet           = false;
@@ -115,6 +117,16 @@ void albaInteractionBehavior::SetProp(vtkProp3D *prop)
 //------------------------------------------------------------------------------
 {
   m_Prop=prop;
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionBehavior::SendModifierClick()
+{
+  if (!m_ModifierClicks || !(m_ShiftDown || m_CtrlDown))
+    return false;
+
+  albaEventMacro(albaEvent(this, MODIFIER_CLICK, (long)(m_ShiftDown ? ALBA_SHIFT_KEY : ALBA_CTRL_KEY)));
+  return true;
 }
 
 //------------------------------------------------------------------------------

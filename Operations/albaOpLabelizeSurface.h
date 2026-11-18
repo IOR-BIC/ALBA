@@ -32,7 +32,7 @@ class albaGizmoRotate;
 class albaGizmoScale;
 class albaVMESurface;
 class albaVMESurfaceEditor;
-class albaCompositorMouseBehavior;
+class albaRotateTranslateBehavior;
 class albaTransformBehavior;
 class vtkPlane;
 class vtkPlaneSource;
@@ -102,14 +102,10 @@ protected:
 
 	void SetPlaneDimension();
 
-	albaCompositorMouseBehavior *m_IsaCompositorWithoutGizmo;
-	albaCompositorMouseBehavior *m_IsaCompositorWithGizmo;
+	albaRotateTranslateBehavior *m_PlaneBehavior;      ///< behavior of the plane without gizmo
+	albaRotateTranslateBehavior *m_PlaneClickBehavior; ///< behavior of the plane with gizmo: only the SHIFT and CTRL clicks
 	albaTransformBehavior    *m_IsaTranslate;
 	albaTransformBehavior    *m_IsaRotate;
-	albaTransformBehavior		 *m_IsaChangeArrowWithGizmo;
-	albaTransformBehavior		 *m_IsaChangeArrowWithoutGizmo;	
-	albaTransformBehavior		 *m_IsaLabelizeWithGizmo;
-	albaTransformBehavior		 *m_IsaLabelizeWithoutGizmo;
 
 	int		m_LabelInside;
 

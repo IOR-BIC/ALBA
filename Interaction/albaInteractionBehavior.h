@@ -78,6 +78,7 @@ public:
   ALBA_ID_DEC(INTERACTION_STOPPED); ///< Issued when interaction is stopped
   ALBA_ID_DEC(BUTTON_DOWN);         ///< Issued when a button is pressed
   ALBA_ID_DEC(BUTTON_UP);           ///< Issued when a button is released
+  ALBA_ID_DEC(MODIFIER_CLICK);      ///< Left button with SHIFT or CTRL, when enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY (SHIFT wins)
 
   albaAbstractTypeMacro(albaInteractionBehavior,albaInteractionTool);
 
@@ -91,6 +92,10 @@ public:
 
   /** Set the prop to be transformed (optional and to be removed!!!)*/
   void SetProp(vtkProp3D *prop);
+
+  /** Enable/disable the clicks with modifier: the left button with SHIFT or CTRL sends MODIFIER_CLICK
+    to the listener instead of being handled by the behavior (default disabled) */
+  void EnableModifierClicks(bool enable) {m_ModifierClicks = enable;}
 
   /** Set the position picked on the VME by the button down */
   void SetPickedPosition(double pos[3]) {m_PickedPosition[0] = pos[0]; m_PickedPosition[1] = pos[1]; m_PickedPosition[2] = pos[2];}
@@ -205,6 +210,10 @@ protected:
   albaVME       *m_VME;                  ///< the object being interacted (optional)
 	vtkALBASmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
   double m_PickedPosition[3]; ///< the position picked on the VME by the button down
+  bool m_ModifierClicks;      ///< true if the left button with SHIFT or CTRL sends MODIFIER_CLICK
+
+  /** Send MODIFIER_CLICK if the clicks with modifier are enabled and SHIFT or CTRL is down; return true if sent */
+  bool SendModifierClick();
 
   bool m_TestMode;///< Flag used with cppunitTest
 

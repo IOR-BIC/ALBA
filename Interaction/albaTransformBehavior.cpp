@@ -194,6 +194,9 @@ void albaTransformBehavior::SetScaleConstraint(albaInteractorConstraint *constra
 //------------------------------------------------------------------------------
 bool albaTransformBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
+  if (SendModifierClick())
+    return true;
+
   if (ren == NULL)
     return false;
 

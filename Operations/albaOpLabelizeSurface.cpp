@@ -26,7 +26,7 @@
 #include "albaGUI.h"
 #include "mmaMaterial.h"
 #include "albaAbsMatrixPipe.h"
-#include "albaCompositorMouseBehavior.h"
+#include "albaRotateTranslateBehavior.h"
 #include "albaTransformBehavior.h"
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
@@ -78,8 +78,8 @@ albaOp(label)
 	m_ArrowShape = NULL;
 	m_Arrow = NULL;
 	m_Gizmo = NULL;
-	m_IsaCompositorWithGizmo = NULL;
-	m_IsaCompositorWithoutGizmo = NULL;
+	m_PlaneBehavior = NULL;
+	m_PlaneClickBehavior = NULL;
 	m_InputSurface = NULL;
 	m_OriginalPolydata = NULL;
 	m_ClipperBoundingBox = NULL;
@@ -265,9 +265,14 @@ void albaOpLabelizeSurface::CreateGizmos()
 void albaOpLabelizeSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-	albaNEW(m_IsaCompositorWithoutGizmo);
+	// without gizmo: left button rotates, middle button translates, SHIFT and CTRL clicks change the arrow and labelize
+	albaNEW(m_PlaneBehavior);
+	m_PlaneBehavior->SetListener(this);
+	m_PlaneBehavior->EnableRoll(false);
+	m_PlaneBehavior->EnableModifierClicks(true);
+	m_PlaneBehavior->CreateTransformBehaviors(m_ImplicitPlaneGizmo);
 
-	m_IsaRotate = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT);
+	m_IsaRotate = m_PlaneBehavior->GetRotateBehavior();
 	m_IsaRotate->SetListener(this);
 	m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
 	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
@@ -277,7 +282,7 @@ void albaOpLabelizeSurface::AttachInteraction()
 	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
 	m_IsaRotate->EnableRotation(true);
 
-	m_IsaTranslate = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_MIDDLE);
+	m_IsaTranslate = m_PlaneBehavior->GetTranslateBehavior();
 	m_IsaTranslate->SetListener(this);
 	m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
 	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
@@ -287,28 +292,15 @@ void albaOpLabelizeSurface::AttachInteraction()
 	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
 	m_IsaTranslate->EnableTranslation(true);
 
-	m_IsaChangeArrowWithoutGizmo = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
-	m_IsaChangeArrowWithoutGizmo->SetListener(this);
-	m_IsaChangeArrowWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
-
-	m_IsaLabelizeWithoutGizmo = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
-	m_IsaLabelizeWithoutGizmo->SetListener(this);
-	m_IsaLabelizeWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
-
-	albaNEW(m_IsaCompositorWithGizmo);
-
-	m_IsaChangeArrowWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
-	m_IsaChangeArrowWithGizmo->SetListener(this);
-	m_IsaChangeArrowWithGizmo->SetVME(m_ImplicitPlaneGizmo);
-
-	m_IsaLabelizeWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
-	m_IsaLabelizeWithGizmo->SetListener(this);
-	m_IsaLabelizeWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+	// with gizmo the gizmo moves the plane: only the SHIFT and CTRL clicks
+	albaNEW(m_PlaneClickBehavior);
+	m_PlaneClickBehavior->SetListener(this);
+	m_PlaneClickBehavior->EnableModifierClicks(true);
 
 	if(!m_UseGizmo)
-		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithoutGizmo);
+		m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
 	else
-		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
+		m_ImplicitPlaneGizmo->SetBehavior(m_PlaneClickBehavior);
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::ShowClipPlane(bool show)
@@ -452,10 +444,10 @@ void albaOpLabelizeSurface::OnEventThis(albaEventBase *alba_event)
 			break;
 		case ID_USE_GIZMO:
 			{
-				if(m_IsaCompositorWithoutGizmo && !m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithoutGizmo);
-				else if(m_IsaCompositorWithGizmo && m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
+				if(m_PlaneBehavior && !m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
+				else if(m_PlaneClickBehavior && m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_PlaneClickBehavior);
 
 
 				ChangeGizmo();
@@ -509,50 +501,44 @@ void albaOpLabelizeSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
+		// SHIFT click changes the side of the arrow, CTRL click labelizes
+		if (e->GetId() == albaInteractionBehavior::MODIFIER_CLICK)
+		{
+			if (e->GetArg() == ALBA_SHIFT_KEY)
+			{
+				if (m_Arrow)
+				{
+					m_LabelInside = m_LabelInside ? 0 : 1;
+					m_Gui->Update();
+					m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
+				}
+			}
+			else
+				Labelize();
+			GetLogicManager()->CameraUpdate();
+			return;
+		}
+
 		switch(alba_event->GetId())
 		{
 		case ID_TRANSFORM:
 			{
-				if(e->GetSender()==m_IsaChangeArrowWithGizmo || e->GetSender()==m_IsaChangeArrowWithoutGizmo)
-				{
-					if(m_Arrow) 
-					{
-						if(e->GetArg()==albaTransformBehavior::MOUSE_DOWN)
-						{
-							m_LabelInside= m_LabelInside ? 0 : 1;
-							m_Gui->Update();
-							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-							GetLogicManager()->CameraUpdate();
-						}
-					}
-				}
-				else if(e->GetSender()==m_IsaLabelizeWithGizmo || e->GetSender()==m_IsaLabelizeWithoutGizmo)
-				{
-					if(e->GetArg()==albaTransformBehavior::MOUSE_DOWN)
-					{
-						Labelize();
-						GetLogicManager()->CameraUpdate();
-					}
-				}
-				else
-				{
-					vtkTransform *currTr = vtkTransform::New();
-					currTr->PostMultiply();
-					currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
-					currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-					currTr->Update();
+				vtkTransform *currTr = vtkTransform::New();
+				currTr->PostMultiply();
+				currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+				currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+				currTr->Update();
 
-					albaMatrix newAbsMatr;
-					newAbsMatr.DeepCopy(currTr->GetMatrix());
-					newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
+				albaMatrix newAbsMatr;
+				newAbsMatr.DeepCopy(currTr->GetMatrix());
+				newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
 
-					// set the new pose to the gizmo
-					m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
-					UpdateISARefSys();
+				// set the new pose to the gizmo
+				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
+				UpdateISARefSys();
 
-					GetLogicManager()->CameraUpdate();
-					currTr->Delete();
-				}
+				GetLogicManager()->CameraUpdate();
+				currTr->Delete();
 			}
 			break;
 		default:
@@ -606,8 +592,8 @@ void albaOpLabelizeSurface::OpStop(int result)
 	vtkDEL(m_Arrow);
 	vtkDEL(m_ClipperPlane);
 
-	albaDEL(m_IsaCompositorWithoutGizmo);
-	albaDEL(m_IsaCompositorWithGizmo);
+	albaDEL(m_PlaneBehavior);
+	albaDEL(m_PlaneClickBehavior);
 
 	if(m_GizmoTranslate)
 		m_GizmoTranslate->Show(false);

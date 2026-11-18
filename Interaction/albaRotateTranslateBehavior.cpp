@@ -70,6 +70,9 @@ albaTransformBehavior *albaRotateTranslateBehavior::GetLeftButtonTransform()
 //------------------------------------------------------------------------------
 bool albaRotateTranslateBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
+  if (SendModifierClick())
+    return true;
+
   return Start(GetLeftButtonTransform(), view, ren, pos);
 }
 

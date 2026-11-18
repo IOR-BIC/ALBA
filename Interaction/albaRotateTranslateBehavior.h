@@ -71,7 +71,9 @@ public:
   albaTransformBehavior *GetTranslateBehavior() {return m_Translate;}
   albaTransformBehavior *GetRollBehavior() {return m_Roll;}
 
-  /** The left button rotates, with CTRL it rolls; with SHIFT it is not used */
+  /** The left button rotates, with CTRL it rolls; with SHIFT it is not used.
+    With the clicks with modifier enabled, SHIFT and CTRL send MODIFIER_CLICK instead.
+    Without CreateTransformBehaviors the behavior only sends the clicks with modifier. */
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
 
   /** The middle button translates, without modifier keys */
