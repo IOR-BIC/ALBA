@@ -31,7 +31,6 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
 #include "albaTransformBehavior.h"
 #include "albaRefSys.h"
 
@@ -96,7 +95,7 @@ albaGizmoCrossRotateAxis::albaGizmoCrossRotateAxis(albaVME *input, albaObserver 
 
 	// default axis is X
 	m_RotationAxis = X;
-	m_IsaComp = NULL;
+	m_IsaGen = NULL;
 	m_Radius = -1;
 
 	m_Listener = listener;
@@ -126,7 +125,7 @@ albaGizmoCrossRotateAxis::albaGizmoCrossRotateAxis(albaVME *input, albaObserver 
 	// m_GizmoCross->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 1));
 
 	// assign isa to S1 and S2;
-	m_GizmoCross->SetBehavior(m_IsaComp);
+	m_GizmoCross->SetBehavior(m_IsaGen);
 
 	// set the axis to X axis
 	this->SetRotationAxis(m_RotationAxis);
@@ -159,7 +158,7 @@ albaGizmoCrossRotateAxis::~albaGizmoCrossRotateAxis()
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
-	vtkDEL(m_IsaComp); 
+	vtkDEL(m_IsaGen); 
 
 	m_GizmoCross->ReparentTo(NULL);
 
@@ -265,13 +264,11 @@ void albaGizmoCrossRotateAxis::CreatePipeline()
 void albaGizmoCrossRotateAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-	// Create isa compositor and assign behaviors to IsaGen ivar.
+	// create the transform behavior of the gizmo
 	// Default isa constrain rotation around X axis.
-	m_IsaComp = albaCompositorMouseBehavior::New();
-
 	// default behavior is activated by mouse left and is constrained to X axis,
 	// default ref sys is input vme abs matrix
-	m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
+	m_IsaGen = albaTransformBehavior::New();
 	m_IsaGen->SetVME(m_InputVme);
 	m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK); 
 	m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);

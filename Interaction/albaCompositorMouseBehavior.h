@@ -147,11 +147,6 @@ private:
   albaCompositorMouseBehavior(const albaCompositorMouseBehavior&);  // Not implemented.
   void operator=(const albaCompositorMouseBehavior&);   // Not implemented.
 
-  int m_MousePose[2];
-  int m_LastMousePose[2];
-
-  vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
-  
   /** friend test class */
   friend class albaCompositorMouseBehaviorTest;
 

@@ -29,7 +29,6 @@ const bool DEBUG_MODE = true;
 #include "albaEvent.h"
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
-#include "albaCompositorMouseBehavior.h"
 #include "albaTransformBehavior.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
@@ -71,8 +70,7 @@ void albaGizmoInteractionDebugger::CreateInteractor()
   albaMatrix *absMatrix;
   absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
 
-  albaNEW(m_GizmoInteractor);
-  m_LeftMouseInteractor = m_GizmoInteractor->CreateBehavior(MOUSE_LEFT);
+  albaNEW(m_LeftMouseInteractor);
 
   m_LeftMouseInteractor->SetListener(this);
   m_LeftMouseInteractor->SetVME(m_InputVME);
@@ -82,7 +80,7 @@ void albaGizmoInteractionDebugger::CreateInteractor()
   m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
   m_LeftMouseInteractor->EnableTranslation(true);    
 
-  m_VmeGizmo->SetBehavior(m_GizmoInteractor);
+  m_VmeGizmo->SetBehavior(m_LeftMouseInteractor);
 }
 
 void albaGizmoInteractionDebugger::Constructor(albaVME *imputVme, albaObserver *listener, const char* name, bool testMode)
@@ -109,7 +107,7 @@ void albaGizmoInteractionDebugger::Destructor()
   m_AppendPolyData->Delete();
 
   m_VmeGizmo->SetBehavior(NULL);
-  albaDEL(m_GizmoInteractor);
+  albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmo->ReparentTo(NULL);
   albaDEL(m_VmeGizmo);
@@ -244,7 +242,7 @@ void albaGizmoInteractionDebugger::DestroyVMEGizmo()
   assert(m_VmeGizmo != NULL);
 
   m_VmeGizmo->SetBehavior(NULL);
-  albaDEL(m_GizmoInteractor);
+  albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmo->ReparentTo(NULL);
   albaDEL(m_VmeGizmo);

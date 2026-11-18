@@ -504,6 +504,23 @@ void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
   delete view;
 }
 
+void albaPositionalEventRouterTest::TestTransformBehaviorButtons()
+{
+  albaTransformBehavior *transform = albaTransformBehavior::New();
+  double pos[2] = {10, 20};
+
+  // without a renderer the transform does not start, and drags and button up are not used
+  CPPUNIT_ASSERT(!transform->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!transform->OnDrag(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!transform->OnLeftButtonUp(NULL, NULL, pos));
+
+  // only the left button starts the transform
+  CPPUNIT_ASSERT(!transform->OnMiddleButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!transform->OnRightButtonDown(NULL, NULL, pos));
+
+  transform->Delete();
+}
+
 void albaPositionalEventRouterTest::TestEventTracing()
 {
   albaFakePickView *view = new albaFakePickView();

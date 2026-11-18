@@ -50,6 +50,8 @@ albaCxxTypeMacro(albaTransformBehavior);
 albaTransformBehavior::albaTransformBehavior() 
 //----------------------------------------------------------------------------
 {
+  m_Transforming = false;
+  m_LastDragPos[0] = m_LastDragPos[1] = 0;
   m_TranslationFlag       = true;
   m_RotationFlag          = true;
   m_ScalingFlag           = true;
@@ -189,6 +191,50 @@ void albaTransformBehavior::SetScaleConstraint(albaInteractorConstraint *constra
   *m_ScaleConstraint=*constrain;
 }
  
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  if (ren == NULL)
+    return false;
+
+  SetRendererAndView(ren, view);
+  SetCurrentCamera(ren->GetActiveCamera());
+  m_LastDragPos[0] = (int)pos[0];
+  m_LastDragPos[1] = (int)pos[1];
+
+  // the VME has been picked by the PER, which set the prop and the picked position
+  SetButtonDownPick(true, m_PickedPosition);
+  OnButtonDownAction(m_LastDragPos[0], m_LastDragPos[1]);
+  m_Transforming = true;
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  if (!m_Transforming)
+    return false;
+
+  if ((int)pos[0] != m_LastDragPos[0] || (int)pos[1] != m_LastDragPos[1])
+  {
+    m_LastDragPos[0] = (int)pos[0];
+    m_LastDragPos[1] = (int)pos[1];
+    OnMouseMoveAction(m_LastDragPos[0], m_LastDragPos[1]);
+  }
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  if (!m_Transforming)
+    return false;
+
+  m_Transforming = false;
+  OnButtonUpAction();
+  return true;
+}
+
 //------------------------------------------------------------------------------
 void albaTransformBehavior::SetVME(albaVME *vme)
 //------------------------------------------------------------------------------

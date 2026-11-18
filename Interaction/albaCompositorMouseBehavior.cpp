@@ -49,8 +49,6 @@ albaCompositorMouseBehavior::albaCompositorMouseBehavior()
   m_StartButton = -1;
 
   m_ActiveTransform = NULL;  
-  m_MousePose[0] = m_MousePose[1] = m_LastMousePose[0] = m_LastMousePose[1] = 0;
-  m_CurrentCamera = NULL;
 }
 //----------------------------------------------------------------------------
 albaCompositorMouseBehavior::~albaCompositorMouseBehavior() 
@@ -164,21 +162,18 @@ bool albaCompositorMouseBehavior::StartTransform(int buttonPressed, albaView *vi
   StopTransform();
 
   int activator = MouseToActivator(buttonPressed, m_ShiftDown, m_CtrlDown);
-  if (ren == NULL || m_ActivatorMap.count(activator) == 0 || m_ActivatorMap[activator] == NULL)
+  if (m_ActivatorMap.count(activator) == 0 || m_ActivatorMap[activator] == NULL)
     return false;
 
-  SetRendererAndView(ren, view);
-  m_CurrentCamera = ren->GetActiveCamera();
-  m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
-  m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
+  // the transform behavior of the button starts as if it were picked with the left button
+  albaTransformBehavior *transform = m_ActivatorMap[activator];
+  transform->SetProp(m_Prop);
+  transform->SetPickedPosition(m_PickedPosition);
+  transform->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
+  if (!transform->OnLeftButtonDown(view, ren, pos))
+    return false;
 
-  // the VME has been picked by the PER, which set the prop and the picked position
-  m_ActiveTransform = m_ActivatorMap[activator];
-  m_ActiveTransform->SetRendererAndView(ren, view);
-  m_ActiveTransform->SetProp(m_Prop);
-  m_ActiveTransform->SetCurrentCamera(m_CurrentCamera);
-  m_ActiveTransform->SetButtonDownPick(true, m_PickedPosition);
-  m_ActiveTransform->OnButtonDownAction(m_MousePose[0], m_MousePose[1]);
+  m_ActiveTransform = transform;
   return true;
 }
 
@@ -190,25 +185,13 @@ bool albaCompositorMouseBehavior::StopTransform()
 
   albaTransformBehavior *active = m_ActiveTransform;
   m_ActiveTransform = NULL;
-  active->OnButtonUpAction();
+  double pos[2] = {0, 0};
+  active->OnLeftButtonUp(NULL, NULL, pos);
   return true;
 }
 
 //----------------------------------------------------------------------------
 bool albaCompositorMouseBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (m_ActiveTransform == NULL)
-    return false;
-
-  m_MousePose[0] = (int)pos[0];
-  m_MousePose[1] = (int)pos[1];
-
-  // the moves without a change of position are discarded
-  if (m_MousePose[0] != m_LastMousePose[0] || m_MousePose[1] != m_LastMousePose[1])
-  {
-    m_ActiveTransform->OnMouseMoveAction(m_MousePose[0], m_MousePose[1]);
-    m_LastMousePose[0] = m_MousePose[0];
-    m_LastMousePose[1] = m_MousePose[1];
-  }
-  return true;
+  return m_ActiveTransform && m_ActiveTransform->OnDrag(view, ren, pos);
 }

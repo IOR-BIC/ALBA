@@ -35,7 +35,6 @@
 #include "albaVMEOutput.h"
 #include "albaVMEGizmo.h"
 #include "albaTagArray.h"
-#include "albaCompositorMouseBehavior.h"
 #include "albaTransformBehavior.h"
 #include "albaRefSys.h"
 
@@ -86,7 +85,7 @@ albaGizmoCrossTranslateAxis::albaGizmoCrossTranslateAxis(albaVME *input, albaObs
 
 	m_CylinderLength = 0.5;
 
-	m_IsaComp = NULL;
+	m_IsaGen = NULL;
 
 	m_Listener = listener;
 	m_InputVme = input;
@@ -112,7 +111,7 @@ albaGizmoCrossTranslateAxis::albaGizmoCrossTranslateAxis(albaVME *input, albaObs
 	// cone gizmo
 
 	// assign isa to cylinder and cone
-	m_TranslationCylinderGizmo->SetBehavior(m_IsaComp);
+	m_TranslationCylinderGizmo->SetBehavior(m_IsaGen);
 
 	// default gizmo abs pose is the input vme one
 	SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
@@ -146,7 +145,7 @@ albaGizmoCrossTranslateAxis::~albaGizmoCrossTranslateAxis()
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData);
 	//----------------------
-	vtkDEL(m_IsaComp); 
+	vtkDEL(m_IsaGen); 
 
 	// clean up translation feedback stuff
 	vtkDEL(m_TranslationFeedbackGizmo);
@@ -280,9 +279,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 void albaGizmoCrossTranslateAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-	m_IsaComp = albaCompositorMouseBehavior::New();
-
-	m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
+	m_IsaGen = albaTransformBehavior::New();
 
 	m_IsaGen->SetVME(m_InputVme);
 	m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

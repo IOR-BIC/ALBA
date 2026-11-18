@@ -65,11 +65,10 @@ void albaCompositorMouseBehaviorTest::TestOnDrag()
   albaCompositorMouseBehavior *compositorMouse = albaCompositorMouseBehavior::New();
   compositorMouse->CreateBehavior(MOUSE_LEFT);
 
-  // without an interaction the drags are not used and the mouse pose does not change
+  // without an interaction the drags are not used
   double pos[2] = {10, 20};
   CPPUNIT_ASSERT(!compositorMouse->OnDrag(NULL, NULL, pos));
-  CPPUNIT_ASSERT(compositorMouse->m_MousePose[0] == 0 && compositorMouse->m_MousePose[1] == 0);
-  CPPUNIT_ASSERT(compositorMouse->m_LastMousePose[0] == 0 && compositorMouse->m_LastMousePose[1] == 0);
+  CPPUNIT_ASSERT(compositorMouse->m_ActiveTransform == NULL);
 
   compositorMouse->Delete(); 
 }

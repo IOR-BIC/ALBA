@@ -30,7 +30,6 @@
 #include "albaGUIMaterialButton.h"
 #include "albaRefSys.h"
 
-#include "albaCompositorMouseBehavior.h"
 #include "albaTransformBehavior.h"
 
 #include "albaTransform.h"
@@ -99,8 +98,7 @@ void albaGizmoSlice::CreateGizmoSlice(albaVME *imputVme, albaObserver *listener,
   m_VmeGizmo->SetName(m_Name);
   m_VmeGizmo->ReparentTo(m_InputVME);
 
-  albaNEW(m_GizmoBehavior);
-  m_MouseBH = m_GizmoBehavior->CreateBehavior(MOUSE_LEFT);
+  albaNEW(m_MouseBH);
   m_MouseBH->SetListener(this);
   m_MouseBH->SetVME(m_VmeGizmo);
 	if(m_InputVME)
@@ -111,7 +109,7 @@ void albaGizmoSlice::CreateGizmoSlice(albaVME *imputVme, albaObserver *listener,
   m_MouseBH->EnableTranslation(true);
   m_MouseBH->ResultMatrixConcatenationOn();
 
-  m_VmeGizmo->SetBehavior(m_GizmoBehavior);
+  m_VmeGizmo->SetBehavior(m_MouseBH);
 
   vtkNEW(m_Point);
   m_Point->SetNumberOfPoints(1);
@@ -123,7 +121,7 @@ void albaGizmoSlice::SetGizmoEnableMoving(bool enable)
 {
   if(true == enable)
   {
-    m_VmeGizmo->SetBehavior(m_GizmoBehavior);
+    m_VmeGizmo->SetBehavior(m_MouseBH);
   }
   else
   {
@@ -137,7 +135,7 @@ void albaGizmoSlice::DestroyGizmoSlice()
 {
   albaDEL(m_GizmoHandleCenterMatrix);
   m_VmeGizmo->SetBehavior(NULL);
-  albaDEL(m_GizmoBehavior);
+  albaDEL(m_MouseBH);
 
   m_VmeGizmo->ReparentTo(NULL);
   albaDEL(m_VmeGizmo);

@@ -172,6 +172,16 @@ public:
 	void SurfaceNormalOff() {SetSurfaceNormal(false);}
 
   
+  /** The left button starts the transform; the PER sets the prop and the picked position first.
+    Return false without a renderer. */
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** The drags change the transform */
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** The release of the left button ends the transform */
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+
   //----------------------------------------------------------------------------
   // Actions performed on mouse driven events
   //----------------------------------------------------------------------------
@@ -235,6 +245,9 @@ protected:
 
   albaTransformBehavior();
   ~albaTransformBehavior();
+
+  bool m_Transforming;    ///< true from the button down to the button up
+  int m_LastDragPos[2];   ///< the last position of the drags, the drags without a change of position are discarded
 
   /** Only one flag can be true: the mouse can only translate, rotate or scale during a single move */
   void EnableTranslationInternal(bool enable);

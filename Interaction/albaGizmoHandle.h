@@ -31,7 +31,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaTransformBehavior;
-class albaCompositorMouseBehavior;
 class albaVME;
 class vtkCubeSource;
 class vtkCylinderSource;
@@ -220,7 +219,6 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  albaCompositorMouseBehavior *m_IsaComp; ///< Interactor style compositor
 
   albaTransformBehavior *m_IsaGen; ///< Generic Interactor style
 

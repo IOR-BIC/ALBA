@@ -31,7 +31,6 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
 #include "albaTransformBehavior.h"
 
 // vme stuff

@@ -27,7 +27,6 @@
 #include "albaDecl.h"
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
-#include "albaCompositorMouseBehavior.h"
 #include "albaTransformBehavior.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
@@ -56,8 +55,7 @@ albaGizmoPath::albaGizmoPath(albaVME* imputVme, albaObserver *listener, const ch
 //----------------------------------------------------------------------------
 void albaGizmoPath::CreateInteractor()
 {
-  albaNEW(m_GizmoInteractor);
-  m_LeftMouseInteractor = m_GizmoInteractor->CreateBehavior(MOUSE_LEFT);
+  albaNEW(m_LeftMouseInteractor);
   m_LeftMouseInteractor->SetListener(this);
   m_LeftMouseInteractor->SetVME(m_VmeGizmoPath);
   m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
@@ -90,7 +88,7 @@ void albaGizmoPath::Constructor(albaVME *imputVme, albaObserver *listener, const
 
 
   CreateInteractor();
-  m_VmeGizmoPath->SetBehavior(m_GizmoInteractor);
+  m_VmeGizmoPath->SetBehavior(m_LeftMouseInteractor);
 
   m_TextSidePosition = ID_LEFT_TEXT_SIDE;
 }
@@ -101,7 +99,7 @@ void albaGizmoPath::Destructor()
   m_LineSource->Delete();
 
   m_VmeGizmoPath->SetBehavior(NULL);
-  albaDEL(m_GizmoInteractor);
+  albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmoPath->ReparentTo(NULL);
   albaDEL(m_VmeGizmoPath);
@@ -433,7 +431,7 @@ void albaGizmoPath::DestroyVMEGizmo()
   assert(m_VmeGizmoPath != NULL);
 
   m_VmeGizmoPath->SetBehavior(NULL);
-  albaDEL(m_GizmoInteractor);
+  albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmoPath->ReparentTo(NULL);
   albaDEL(m_VmeGizmoPath);

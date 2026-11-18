@@ -576,7 +576,7 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
   // the behavior of the picked VME interacts with the device until the button is released
   if(picked_bh)
   {
-    picked_bh->SetVME(picked_vme);   // set the VME (Marco: to be removed, the operation should set the VME to the interactor!) 
+    // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME
     picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!)
     double pickedPos[3];
     e->GetPickedPosition(pickedPos);

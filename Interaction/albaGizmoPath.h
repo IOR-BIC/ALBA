@@ -23,7 +23,6 @@
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaCompositorMouseBehavior;
 class albaTransformBehavior;
 class albaVME;
 class albaVMEGizmo;
@@ -126,7 +125,6 @@ protected:
 
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmoPath;
-  albaCompositorMouseBehavior *m_GizmoInteractor;
   albaTransformBehavior    *m_LeftMouseInteractor;
   albaGUI             *m_GizmoGui;
 

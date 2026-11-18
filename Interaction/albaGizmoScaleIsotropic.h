@@ -27,7 +27,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaTransformBehavior;
-class albaCompositorMouseBehavior;
 class albaVMEGizmo;
 class albaMatrix;
 class albaVME;
@@ -109,8 +108,6 @@ protected:
   /** Create isa stuff */
   void CreateISA();
 
-  /** isa compositor*/
-  albaCompositorMouseBehavior *m_IsaComp;
 
   /** isa generic*/
   albaTransformBehavior *m_IsaGen;

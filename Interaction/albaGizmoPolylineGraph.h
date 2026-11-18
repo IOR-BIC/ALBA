@@ -29,7 +29,6 @@
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaCompositorMouseBehavior;
 class albaTransformBehavior;
 
 
@@ -141,7 +140,6 @@ protected:
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;     //<VME gizmo (this is used by medCurvilinearAbscisaHelper)
 
-  albaCompositorMouseBehavior *m_GizmoInteractor;
   albaTransformBehavior *m_LeftMouseInteractor;
     
   vtkSphereSource  *m_SphereSource;   //<sphere denoting the position  

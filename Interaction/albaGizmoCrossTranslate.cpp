@@ -32,7 +32,6 @@
 #include "albaGizmoTranslateGUI.h"
 #include "albaSmartPointer.h"
 
-#include "albaTransformBehavior.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"
