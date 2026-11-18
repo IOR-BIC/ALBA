@@ -55,6 +55,9 @@ public:
   /** Create the rotate, translate and roll behaviors moving the VME */
   virtual void CreateTransformBehaviors(albaVME *vme);
 
+  /** Enable/disable the roll with the left button + CTRL (default enabled) */
+  void EnableRoll(bool enable) {m_RollEnabled = enable;}
+
   /** Set the VME giving the reference system of the constraints */
   void SetRefSysVME(albaVME *refSysVME);
 
@@ -107,6 +110,7 @@ protected:
   albaTransformBehavior *m_Translate; ///< middle button
   albaTransformBehavior *m_Roll;      ///< left button + CTRL
   albaTransformBehavior *m_Active;    ///< the transform behavior moving the VME, NULL if none
+  bool m_RollEnabled;                 ///< true if the left button + CTRL rolls
   albaVME *m_RefSysVME;                  ///< VME giving the reference system of the constraints
 
 private:

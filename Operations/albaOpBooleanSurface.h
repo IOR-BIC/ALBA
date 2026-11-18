@@ -32,7 +32,7 @@ class vtkPlane;
 class vtkGlyph3D;
 class vtkPlaneSource;
 class albaVMEGizmo;
-class albaCompositorMouseBehavior;
+class albaRotateTranslateBehavior;
 class albaTransformBehavior;
 
 #ifdef ALBA_EXPORTS
@@ -100,7 +100,7 @@ protected:
 	albaVMEGizmo			*m_ImplicitPlaneGizmo;
 	bool						m_PlaneCreated;
 
-	albaCompositorMouseBehavior *m_IsaCompositor;
+	albaRotateTranslateBehavior *m_PlaneBehavior; ///< left button rotates the plane, middle button translates it
 	albaTransformBehavior    *m_IsaTranslate;
 	albaTransformBehavior    *m_IsaRotate;
 

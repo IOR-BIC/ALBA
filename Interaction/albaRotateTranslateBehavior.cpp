@@ -41,6 +41,7 @@ albaRotateTranslateBehavior::albaRotateTranslateBehavior()
   m_Translate = NULL;
   m_Roll = NULL;
   m_Active = NULL;
+  m_RollEnabled = true;
   m_RefSysVME = NULL;
 }
 
@@ -61,7 +62,7 @@ albaTransformBehavior *albaRotateTranslateBehavior::NewTransformBehavior()
 //------------------------------------------------------------------------------
 albaTransformBehavior *albaRotateTranslateBehavior::GetLeftButtonTransform()
 {
-  if (m_ShiftDown)
+  if (m_ShiftDown || (m_CtrlDown && !m_RollEnabled))
     return NULL;
   return m_CtrlDown ? m_Roll : m_Rotate;
 }
