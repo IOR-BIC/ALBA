@@ -39,7 +39,7 @@
 #include "albaGizmoTranslateGUITest.h"
 #include "albaSaveRestorePoseGUITest.h"
 #include "albaTransformInterfaceGUITest.h"
-#include "albaTransformMouseGUITest.h"
+#include "albaRotateTranslateGUITest.h"
 #include "albaTransformTextEntriesGUITest.h"
 #include "albaGizmoBoundingBoxTest.h"
 #include "albaGizmoHandleTest.h"
@@ -168,7 +168,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoInterfaceGUITest::suite());
 	runner.addTest(albaTransformInterfaceGUITest::suite());
 	runner.addTest(albaAvatar3DConeTest::suite());
-	runner.addTest(albaTransformMouseGUITest::suite());
+	runner.addTest(albaRotateTranslateGUITest::suite());
 	runner.addTest(albaGizmoPolylineGraphTest::suite());
 	runner.addTest(albaVTKPickerToolTest::suite());
 	runner.addTest(albaSelectPointToolTest::suite());

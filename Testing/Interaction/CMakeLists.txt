@@ -55,7 +55,7 @@ SET(PROJECT_SRCS
 	albaGizmoInterfaceGUITest.h albaGizmoInterfaceGUITest.cpp
 	albaTransformInterfaceGUITest.h albaTransformInterfaceGUITest.cpp
 	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
-	albaTransformMouseGUITest.h albaTransformMouseGUITest.cpp
+	albaRotateTranslateGUITest.h albaRotateTranslateGUITest.cpp
 	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
 	albaVTKPickerToolTest.h albaVTKPickerToolTest.cpp
 	albaPickHelperTest.h albaPickHelperTest.cpp

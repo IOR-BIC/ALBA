@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseGUI
+ Module: albaRotateTranslateGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaTransformMouseGUI_H__
-#define __albaTransformMouseGUI_H__
+#ifndef __albaRotateTranslateGUI_H__
+#define __albaRotateTranslateGUI_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -26,17 +26,17 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class albaInteractionBehavior;
-class albaTransformMouseBehavior;
+class albaRotateTranslateBehavior;
 class albaVME;
 
-/** GUI of the transform mouse behavior: it creates an albaTransformMouseBehavior for the VME, assigns it to
+/** GUI of the transform mouse behavior: it creates an albaRotateTranslateBehavior for the VME, assigns it to
   the VME while the widgets are enabled, and lets the user choose the rotation and translation constraints.
   The transforms of the behavior are forwarded to the listener (ID_TRANSFORM, sent by this object). */
-class ALBA_EXPORT albaTransformMouseGUI : public albaTransformInterfaceGUI
+class ALBA_EXPORT albaRotateTranslateGUI : public albaTransformInterfaceGUI
 {
 public:
-  albaTransformMouseGUI(albaVME *input, albaObserver *listener = NULL, bool testMode = false);
-	~albaTransformMouseGUI();
+  albaRotateTranslateGUI(albaVME *input, albaObserver *listener = NULL, bool testMode = false);
+	~albaRotateTranslateGUI();
 
   void OnEvent(albaEventBase *alba_event);
 
@@ -57,12 +57,12 @@ public:
   void AttachInteractorToVme();
   void DetachInteractorFromVme();
 
-  /** Set the constraints, as albaTransformMouseBehavior::TRANSFORM_CONSTRAINT */
+  /** Set the constraints, as albaRotateTranslateBehavior::TRANSFORM_CONSTRAINT */
   void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
   /** Return the behavior moving the VME */
-  albaTransformMouseBehavior *GetBehavior() {return m_Behavior;}
+  albaRotateTranslateBehavior *GetBehavior() {return m_Behavior;}
 
 protected:
   /** Override superclass */
@@ -71,12 +71,12 @@ protected:
   /** Override superclass */
   void RefSysVmeChanged();
 
-  albaTransformMouseBehavior *m_Behavior;  ///< the behavior moving the VME
+  albaRotateTranslateBehavior *m_Behavior;  ///< the behavior moving the VME
   albaInteractionBehavior *m_OldBehavior;  ///< the behavior of the VME before this one
 
   int m_RotationConstraintId;
 	int m_TranslationConstraintId;
 
-  friend class albaTransformMouseGUITest;
+  friend class albaRotateTranslateGUITest;
 };
 #endif

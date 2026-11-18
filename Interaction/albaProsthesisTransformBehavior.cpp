@@ -10,7 +10,7 @@ Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "albaGenericMouseFreeTransformBehavior.h"
+#include "albaProsthesisTransformBehavior.h"
 
 #include "albaDecl.h"
 #include "albaDevice.h"
@@ -24,20 +24,20 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 
-albaCxxTypeMacro(albaGenericMouseFreeTransformBehavior);
+albaCxxTypeMacro(albaProsthesisTransformBehavior);
 
 // ----------------------------------------------------------------------------
-albaGenericMouseFreeTransformBehavior::albaGenericMouseFreeTransformBehavior() 
+albaProsthesisTransformBehavior::albaProsthesisTransformBehavior() 
 {
 	m_Modality2D = false;
 }
 
 // ----------------------------------------------------------------------------
-albaGenericMouseFreeTransformBehavior::~albaGenericMouseFreeTransformBehavior() 
+albaProsthesisTransformBehavior::~albaProsthesisTransformBehavior() 
 { }
 
 //----------------------------------------------------------------------------
-void albaGenericMouseFreeTransformBehavior::TrackballRotate()
+void albaProsthesisTransformBehavior::TrackballRotate()
 {
 
 	if (m_Modality2D)
@@ -113,7 +113,7 @@ void albaGenericMouseFreeTransformBehavior::TrackballRotate()
 }
 
 //----------------------------------------------------------------------------
-void albaGenericMouseFreeTransformBehavior::TrackballRoll()
+void albaProsthesisTransformBehavior::TrackballRoll()
 {
    // get the rotation refsys
    m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();  

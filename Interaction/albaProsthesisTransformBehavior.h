@@ -10,8 +10,8 @@ Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __albaGenericMouseFreeTransformBehavior_h
-#define __albaGenericMouseFreeTransformBehavior_h
+#ifndef __albaProsthesisTransformBehavior_h
+#define __albaProsthesisTransformBehavior_h
 
 //----------------------------------------------------------------------------
 // Include:
@@ -24,10 +24,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class albaDeviceButtonsPadMouse;
 
 
-class ALBA_EXPORT albaGenericMouseFreeTransformBehavior : public albaTransformBehavior
+class ALBA_EXPORT albaProsthesisTransformBehavior : public albaTransformBehavior
 {
 public:
-  albaTypeMacro(albaGenericMouseFreeTransformBehavior, albaTransformBehavior);
+  albaTypeMacro(albaProsthesisTransformBehavior, albaTransformBehavior);
   
   /** Set the current camera */
   //virtual void SetCurrentCamera(vtkCamera *camera) {m_CurrentCamera=camera;}
@@ -36,8 +36,8 @@ public:
 
 protected:
 
-  albaGenericMouseFreeTransformBehavior();
-  ~albaGenericMouseFreeTransformBehavior();
+  albaProsthesisTransformBehavior();
+  ~albaProsthesisTransformBehavior();
 
   //----------------------------------------------------------------------------
   // trackball interaction style stuff 

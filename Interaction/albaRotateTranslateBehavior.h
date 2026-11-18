@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseBehavior
+ Module: albaRotateTranslateBehavior
  Authors: Gianluigi Crimi, from albaGUITransformMouse by Stefano Perticoni
 
  Copyright (c) BIC
@@ -14,26 +14,28 @@
 
 =========================================================================*/
 
-#ifndef __albaTransformMouseBehavior_h
-#define __albaTransformMouseBehavior_h
+#ifndef __albaRotateTranslateBehavior_h
+#define __albaRotateTranslateBehavior_h
 
-#include "albaCompositorMouseBehavior.h"
+#include "albaInteractionBehavior.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class albaVME;
+class albaTransformBehavior;
 
 /** Behavior moving a VME with the mouse: left button rotates, middle button translates,
   left button + CTRL rotates around the view normal.
-  CreateTransformBehaviors creates the three transform behaviors; their transforms (ID_TRANSFORM)
+  CreateTransformBehaviors creates the three transform behaviors (rotate, translate and roll), and the
+  button methods choose which one moves the VME; their transforms (ID_TRANSFORM)
   and the other events they send go to the listener of this behavior. The constraints of rotation and
   translation are changed with SetRotationConstraint and SetTranslationConstraint, in the reference
   system of SetRefSysVME (default: the moved VME). */
-class ALBA_EXPORT albaTransformMouseBehavior : public albaCompositorMouseBehavior
+class ALBA_EXPORT albaRotateTranslateBehavior : public albaInteractionBehavior
 {
 public:
-  albaTypeMacro(albaTransformMouseBehavior, albaCompositorMouseBehavior);
+  albaTypeMacro(albaRotateTranslateBehavior, albaInteractionBehavior);
 
   /** Constraints of rotation and translation */
   enum TRANSFORM_CONSTRAINT
@@ -51,7 +53,7 @@ public:
   };
 
   /** Create the rotate, translate and roll behaviors moving the VME */
-  void CreateTransformBehaviors(albaVME *vme);
+  virtual void CreateTransformBehaviors(albaVME *vme);
 
   /** Set the VME giving the reference system of the constraints */
   void SetRefSysVME(albaVME *refSysVME);
@@ -66,12 +68,37 @@ public:
   albaTransformBehavior *GetTranslateBehavior() {return m_Translate;}
   albaTransformBehavior *GetRollBehavior() {return m_Roll;}
 
+  /** The left button rotates, with CTRL it rolls; with SHIFT it is not used */
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** The middle button translates, without modifier keys */
+  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** The release of the button ends the motion */
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return Stop(view, ren, pos);}
+  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return Stop(view, ren, pos);}
+
+  /** The drags go to the transform behavior moving the VME */
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+
   /** Redefined to forward the events of the transform behaviors to the listener */
   virtual void OnEvent(albaEventBase *event);
 
 protected:
-  albaTransformMouseBehavior();
-  virtual ~albaTransformMouseBehavior() {}
+  albaRotateTranslateBehavior();
+  virtual ~albaRotateTranslateBehavior();
+
+  /** Create a transform behavior: subclasses can create a specialized one */
+  virtual albaTransformBehavior *NewTransformBehavior();
+
+  /** Return the transform behavior of the left button for the current modifier keys, NULL if none */
+  virtual albaTransformBehavior *GetLeftButtonTransform();
+
+  /** Start the motion of the transform behavior */
+  bool Start(albaTransformBehavior *transform, albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** Stop the motion, if any */
+  bool Stop(albaView *view, vtkRenderer *ren, double pos[2]);
 
   /** Called on each transform of the transform behaviors, before forwarding it to the listener */
   virtual void OnTransform() {}
@@ -79,11 +106,12 @@ protected:
   albaTransformBehavior *m_Rotate;    ///< left button
   albaTransformBehavior *m_Translate; ///< middle button
   albaTransformBehavior *m_Roll;      ///< left button + CTRL
+  albaTransformBehavior *m_Active;    ///< the transform behavior moving the VME, NULL if none
   albaVME *m_RefSysVME;                  ///< VME giving the reference system of the constraints
 
 private:
-  albaTransformMouseBehavior(const albaTransformMouseBehavior&);  // Not implemented.
-  void operator=(const albaTransformMouseBehavior&);  // Not implemented.
+  albaRotateTranslateBehavior(const albaRotateTranslateBehavior&);  // Not implemented.
+  void operator=(const albaRotateTranslateBehavior&);  // Not implemented.
 };
 
 #endif

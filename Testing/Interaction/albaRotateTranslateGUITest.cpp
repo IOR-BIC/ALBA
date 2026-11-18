@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseGUITest
+ Module: albaRotateTranslateGUITest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -23,18 +23,17 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "albaTransformMouseGUITest.h"
-#include "albaTransformMouseGUI.h"
-#include "albaTransformMouseBehavior.h"
+#include "albaRotateTranslateGUITest.h"
+#include "albaRotateTranslateGUI.h"
+#include "albaRotateTranslateBehavior.h"
 #include "albaRefSys.h"
 #include "albaVMEGroup.h"
 #include "albaGUIFrame.h"
 #include "albaTransformBehavior.h"
-#include "albaCompositorMouseBehavior.h"
 #include "wx/module.h"
 
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::BeforeTest()
+void albaRotateTranslateGUITest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Win = new albaGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
@@ -42,32 +41,32 @@ void albaTransformMouseGUITest::BeforeTest()
   wxModule::InitializeModules();
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::AfterTest()
+void albaRotateTranslateGUITest::AfterTest()
 //----------------------------------------------------------------------------
 {
   wxModule::CleanUpModules();
   delete m_Win;
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestFixture()
+void albaRotateTranslateGUITest::TestFixture()
 //----------------------------------------------------------------------------
 {
 
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestDynamicAllocation()
+void albaRotateTranslateGUITest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaTransformMouseGUI *gui = new albaTransformMouseGUI(group,NULL,true);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
   delete gui;
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestEnableWidgets()
+void albaRotateTranslateGUITest::TestEnableWidgets()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaTransformMouseGUI *gui = new albaTransformMouseGUI(group,NULL,true);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
 
   gui->EnableWidgets(true);
 
@@ -80,11 +79,11 @@ void albaTransformMouseGUITest::TestEnableWidgets()
   delete gui;
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestAttachInteractorToVme()
+void albaRotateTranslateGUITest::TestAttachInteractorToVme()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaTransformMouseGUI *gui = new albaTransformMouseGUI(group,NULL,true);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
 
   gui->AttachInteractorToVme();
 
@@ -93,11 +92,11 @@ void albaTransformMouseGUITest::TestAttachInteractorToVme()
   delete gui;
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestDetachInteractorFromVme()
+void albaRotateTranslateGUITest::TestDetachInteractorFromVme()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaTransformMouseGUI *gui = new albaTransformMouseGUI(group,NULL,true);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
 
   gui->DetachInteractorFromVme();
 
@@ -106,52 +105,42 @@ void albaTransformMouseGUITest::TestDetachInteractorFromVme()
   delete gui;
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestCreateBehavior()
+void albaRotateTranslateGUITest::TestTransformBehaviors()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaTransformMouseGUI *gui = new albaTransformMouseGUI(group,NULL,true);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
+  albaRotateTranslateBehavior *behavior = gui->GetBehavior();
 
-  albaTransformBehavior *mouse = NULL;
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_LEFT);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_LEFT_BUTTON );
+  // three transform behaviors: left button rotates, middle button translates, left button with CTRL rolls
+  albaTransformBehavior *rotate = behavior->GetRotateBehavior();
+  albaTransformBehavior *translate = behavior->GetTranslateBehavior();
+  albaTransformBehavior *roll = behavior->GetRollBehavior();
+  CPPUNIT_ASSERT(rotate && translate && roll && rotate != translate && rotate != roll && translate != roll);
+  CPPUNIT_ASSERT(rotate->GetStartButton() == ALBA_LEFT_BUTTON && rotate->GetModifiers() == 0);
+  CPPUNIT_ASSERT(translate->GetStartButton() == ALBA_MIDDLE_BUTTON && translate->GetModifiers() == 0);
+  CPPUNIT_ASSERT(roll->GetStartButton() == ALBA_LEFT_BUTTON && roll->GetModifiers() == ALBA_CTRL_KEY);
 
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_LEFT_CONTROL);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_LEFT_BUTTON && mouse->GetModifiers() == ALBA_CTRL_KEY);
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_LEFT_SHIFT);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_LEFT_BUTTON && mouse->GetModifiers() == ALBA_SHIFT_KEY);
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_RIGHT);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_RIGHT_BUTTON );
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_RIGHT_CONTROL);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_RIGHT_BUTTON && mouse->GetModifiers() == ALBA_CTRL_KEY);
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_RIGHT_SHIFT);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_RIGHT_BUTTON && mouse->GetModifiers() == ALBA_SHIFT_KEY);
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_MIDDLE);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_MIDDLE_BUTTON );
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_MIDDLE_CONTROL);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_MIDDLE_BUTTON && mouse->GetModifiers() == ALBA_CTRL_KEY);
-
-  mouse = gui->GetBehavior()->CreateBehavior(MOUSE_MIDDLE_SHIFT);
-  CPPUNIT_ASSERT( mouse->GetStartButton() == ALBA_MIDDLE_BUTTON && mouse->GetModifiers() == ALBA_SHIFT_KEY);
+  // without a renderer the buttons are not used; the right button is never used
+  double pos[2] = {10, 20};
+  CPPUNIT_ASSERT(!behavior->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnMiddleButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnRightButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnDrag(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!behavior->OnLeftButtonUp(NULL, NULL, pos));
 
   delete gui;
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUITest::TestOnEvent()
+void albaRotateTranslateGUITest::TestOnEvent()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaTransformMouseGUI *gui = new albaTransformMouseGUI(group,NULL,true);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
 
   albaEvent e;
-  e.SetId(albaTransformMouseGUI::ID_ROTATION_AXES);
-  gui->m_RotationConstraintId = albaTransformMouseBehavior::X_AXIS;
+  e.SetId(albaRotateTranslateGUI::ID_ROTATION_AXES);
+  gui->m_RotationConstraintId = albaRotateTranslateBehavior::X_AXIS;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -160,7 +149,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_RotationConstraintId = albaTransformMouseBehavior::Y_AXIS;
+  gui->m_RotationConstraintId = albaRotateTranslateBehavior::Y_AXIS;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -169,7 +158,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_RotationConstraintId = albaTransformMouseBehavior::Z_AXIS;
+  gui->m_RotationConstraintId = albaRotateTranslateBehavior::Z_AXIS;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -178,7 +167,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
-  gui->m_RotationConstraintId = albaTransformMouseBehavior::VIEW_PLANE;
+  gui->m_RotationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -187,7 +176,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_RotationConstraintId = albaTransformMouseBehavior::NORMAL_VIEW_PLANE;
+  gui->m_RotationConstraintId = albaRotateTranslateBehavior::NORMAL_VIEW_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -196,8 +185,8 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
   //////////////////////////////////////////////////////////////////////////
-  e.SetId(albaTransformMouseGUI::ID_TRASLATION_AXES);
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::X_AXIS;
+  e.SetId(albaRotateTranslateGUI::ID_TRASLATION_AXES);
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::X_AXIS;
   gui->OnEvent(&e);
   
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -206,7 +195,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::Y_AXIS;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::Y_AXIS;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -215,7 +204,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::Z_AXIS;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::Z_AXIS;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -224,13 +213,13 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::VIEW_PLANE;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::NORMAL_VIEW_PLANE;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::NORMAL_VIEW_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -239,7 +228,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::XY_PLANE;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::XY_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -248,7 +237,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::XZ_PLANE;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::XZ_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -257,7 +246,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::YZ_PLANE;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::YZ_PLANE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
@@ -266,7 +255,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::SURFACE_SNAP;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::SURFACE_SNAP;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetSurfaceSnap() == true );
@@ -276,7 +265,7 @@ void albaTransformMouseGUITest::TestOnEvent()
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
-  gui->m_TranslationConstraintId = albaTransformMouseBehavior::NORMAL_SURFACE;
+  gui->m_TranslationConstraintId = albaRotateTranslateBehavior::NORMAL_SURFACE;
   gui->OnEvent(&e);
 
   CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetSurfaceNormal() == true );

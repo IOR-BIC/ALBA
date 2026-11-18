@@ -320,7 +320,7 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoTranslateGUI.cpp  				../Interaction/albaGizmoTranslateGUI.h
   ../Interaction/albaSaveRestorePoseGUI.cpp  				../Interaction/albaSaveRestorePoseGUI.h
   ../Interaction/albaTransformInterfaceGUI.cpp  			../Interaction/albaTransformInterfaceGUI.h
-  ../Interaction/albaTransformMouseGUI.cpp  				../Interaction/albaTransformMouseGUI.h
+  ../Interaction/albaRotateTranslateGUI.cpp  				../Interaction/albaRotateTranslateGUI.h
   ../Interaction/albaTransformTextEntriesGUI.cpp  			../Interaction/albaTransformTextEntriesGUI.h
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
@@ -343,8 +343,8 @@ SET(INTERACTION_SRCS
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
   ../Interaction/albaCompositorMouseBehavior.cpp  		../Interaction/albaCompositorMouseBehavior.h
-  ../Interaction/albaTransformMouseBehavior.cpp  					../Interaction/albaTransformMouseBehavior.h
-  ../Interaction/albaTransformMouseFreeBehavior.cpp  					../Interaction/albaTransformMouseFreeBehavior.h
+  ../Interaction/albaRotateTranslateBehavior.cpp  					../Interaction/albaRotateTranslateBehavior.h
+  ../Interaction/albaProsthesisBehavior.cpp  					../Interaction/albaProsthesisBehavior.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
   ../Interaction/albaTransformBehavior.cpp  			../Interaction/albaTransformBehavior.h
   ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h

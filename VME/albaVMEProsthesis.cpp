@@ -37,8 +37,8 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "wx/listctrl.h"
-#include "albaTransformMouseFreeBehavior.h"
-#include "albaGenericMouseFreeTransformBehavior.h"
+#include "albaProsthesisBehavior.h"
+#include "albaProsthesisTransformBehavior.h"
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
@@ -58,7 +58,6 @@ albaVMEProsthesis::albaVMEProsthesis()
 	m_ContentGui = NULL;
 	m_GroupGui = NULL;
 	m_TransformBehavior = NULL;
-  m_GenericMouseFreeTransform = NULL;
 
 	m_RotCenterVME = NULL;
 	m_LockOnOpRun = true;
@@ -91,10 +90,6 @@ int albaVMEProsthesis::InternalInitialize()
 		m_TransformBehavior->SetListener(this);
 		m_TransformBehavior->CreateTransformBehaviors(this);
 		SetBehavior(m_TransformBehavior);
-
-		m_GenericMouseFreeTransform = albaGenericMouseFreeTransformBehavior::SafeDownCast(m_TransformBehavior->CreateBehavior(MOUSE_LEFT_SHIFT));
-		m_GenericMouseFreeTransform->SetListener(this);
-		m_GenericMouseFreeTransform->SetVME(this);
 	}
 
 	if (Superclass::InternalInitialize() == ALBA_OK)
@@ -614,7 +609,7 @@ void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
 //----------------------------------------------------------------------------
 void albaVMEProsthesis::Set2dModality(bool mod2d)
 {
-	albaGenericMouseFreeTransformBehavior* isaRotate = albaGenericMouseFreeTransformBehavior::SafeDownCast(m_TransformBehavior->GetRotateBehavior());
+	albaProsthesisTransformBehavior* isaRotate = albaProsthesisTransformBehavior::SafeDownCast(m_TransformBehavior->GetRotateBehavior());
 	isaRotate->Set2DModality(mod2d);
 }
 

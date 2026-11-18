@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseFreeBehavior
+ Module: albaProsthesisBehavior
  Authors: Gianluigi Crimi, from albaGUITransformMouseFloatVME by Nicola Vanella
 
  Copyright (c) BIC
@@ -22,23 +22,53 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaTransformMouseFreeBehavior.h"
-#include "albaGenericMouseFreeTransformBehavior.h"
+#include "albaProsthesisBehavior.h"
+#include "albaProsthesisTransformBehavior.h"
 #include "albaInteractorConstraint.h"
 #include "albaRefSys.h"
 #include "albaViewCompound.h"
+#include "albaDecl.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaTransformMouseFreeBehavior);
+albaCxxTypeMacro(albaProsthesisBehavior);
 
 //------------------------------------------------------------------------------
-albaTransformBehavior *albaTransformMouseFreeBehavior::NewTransformBehavior()
+albaProsthesisBehavior::albaProsthesisBehavior()
 {
-  return albaGenericMouseFreeTransformBehavior::New();
+  m_ShiftTransform = NULL;
 }
 
 //------------------------------------------------------------------------------
-void albaTransformMouseFreeBehavior::OnTransform()
+albaProsthesisBehavior::~albaProsthesisBehavior()
+{
+  albaDEL(m_ShiftTransform);
+}
+
+//------------------------------------------------------------------------------
+void albaProsthesisBehavior::CreateTransformBehaviors(albaVME *vme)
+{
+  Superclass::CreateTransformBehaviors(vme);
+
+  m_ShiftTransform = NewTransformBehavior();
+  m_ShiftTransform->SetModifiers(ALBA_SHIFT_KEY);
+  m_ShiftTransform->SetListener(this);
+  m_ShiftTransform->SetVME(vme);
+}
+
+//------------------------------------------------------------------------------
+albaTransformBehavior *albaProsthesisBehavior::GetLeftButtonTransform()
+{
+  return m_ShiftDown ? m_ShiftTransform : Superclass::GetLeftButtonTransform();
+}
+
+//------------------------------------------------------------------------------
+albaTransformBehavior *albaProsthesisBehavior::NewTransformBehavior()
+{
+  return albaProsthesisTransformBehavior::New();
+}
+
+//------------------------------------------------------------------------------
+void albaProsthesisBehavior::OnTransform()
 {
   albaView *v = m_Rotate->GetView();
   if (v == NULL)
@@ -52,7 +82,7 @@ void albaTransformMouseFreeBehavior::OnTransform()
 }
 
 //------------------------------------------------------------------------------
-bool albaTransformMouseFreeBehavior::IsSliceView(albaView *v)
+bool albaProsthesisBehavior::IsSliceView(albaView *v)
 {
   if (albaViewCompound::SafeDownCast(v))
 	{

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseGUITest
+ Module: albaRotateTranslateGUITest
  Authors: Matteo Giacomoni
  
  Copyright (c) BIC
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaTransformMouseGUITest_H__
-#define __CPP_UNIT_albaTransformMouseGUITest_H__
+#ifndef __CPP_UNIT_albaRotateTranslateGUITest_H__
+#define __CPP_UNIT_albaRotateTranslateGUITest_H__
 
 //----------------------------------------------------------------------------
 // includes :
@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 class albaGUIFrame;
 
-class albaTransformMouseGUITest : public albaTest
+class albaRotateTranslateGUITest : public albaTest
 {
 public:
 
@@ -37,13 +37,13 @@ public:
   /** Executed after each test */
   void AfterTest();
 
-  CPPUNIT_TEST_SUITE( albaTransformMouseGUITest );
+  CPPUNIT_TEST_SUITE( albaRotateTranslateGUITest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestEnableWidgets);
   CPPUNIT_TEST(TestAttachInteractorToVme);
   CPPUNIT_TEST(TestDetachInteractorFromVme);
-  CPPUNIT_TEST(TestCreateBehavior);
+  CPPUNIT_TEST(TestTransformBehaviors);
   CPPUNIT_TEST(TestOnEvent);
   CPPUNIT_TEST_SUITE_END();
 
@@ -54,7 +54,7 @@ protected:
   void TestEnableWidgets();
   void TestAttachInteractorToVme();
   void TestDetachInteractorFromVme();
-  void TestCreateBehavior();
+  void TestTransformBehaviors();
   void TestOnEvent();
 
   albaGUIFrame *m_Win;

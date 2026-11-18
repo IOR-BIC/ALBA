@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseBehavior
+ Module: albaRotateTranslateBehavior
  Authors: Gianluigi Crimi, from albaGUITransformMouse by Stefano Perticoni
 
  Copyright (c) BIC
@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "albaTransformMouseBehavior.h"
+#include "albaRotateTranslateBehavior.h"
 #include "albaDecl.h"
 #include "albaEventBase.h"
 #include "albaTransformBehavior.h"
@@ -32,26 +32,96 @@
 #include "albaVMEOutput.h"
 
 //------------------------------------------------------------------------------
-albaCxxTypeMacro(albaTransformMouseBehavior);
+albaCxxTypeMacro(albaRotateTranslateBehavior);
 
 //------------------------------------------------------------------------------
-albaTransformMouseBehavior::albaTransformMouseBehavior()
+albaRotateTranslateBehavior::albaRotateTranslateBehavior()
 {
   m_Rotate = NULL;
   m_Translate = NULL;
   m_Roll = NULL;
+  m_Active = NULL;
   m_RefSysVME = NULL;
 }
 
 //------------------------------------------------------------------------------
-void albaTransformMouseBehavior::CreateTransformBehaviors(albaVME *vme)
+albaRotateTranslateBehavior::~albaRotateTranslateBehavior()
+{
+  albaDEL(m_Rotate);
+  albaDEL(m_Translate);
+  albaDEL(m_Roll);
+}
+
+//------------------------------------------------------------------------------
+albaTransformBehavior *albaRotateTranslateBehavior::NewTransformBehavior()
+{
+  return albaTransformBehavior::New();
+}
+
+//------------------------------------------------------------------------------
+albaTransformBehavior *albaRotateTranslateBehavior::GetLeftButtonTransform()
+{
+  if (m_ShiftDown)
+    return NULL;
+  return m_CtrlDown ? m_Roll : m_Rotate;
+}
+
+//------------------------------------------------------------------------------
+bool albaRotateTranslateBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  return Start(GetLeftButtonTransform(), view, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaRotateTranslateBehavior::OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  return Start((m_CtrlDown || m_ShiftDown) ? NULL : m_Translate, view, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaRotateTranslateBehavior::Start(albaTransformBehavior *transform, albaView *view, vtkRenderer *ren, double pos[2])
+{
+  Stop(view, ren, pos);
+  if (transform == NULL)
+    return false;
+
+  // the transform behavior moves the VME as if it were picked with the left button
+  transform->SetProp(m_Prop);
+  transform->SetPickedPosition(m_PickedPosition);
+  if (!transform->OnLeftButtonDown(view, ren, pos))
+    return false;
+
+  m_Active = transform;
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool albaRotateTranslateBehavior::Stop(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  if (m_Active == NULL)
+    return false;
+
+  albaTransformBehavior *active = m_Active;
+  m_Active = NULL;
+  active->OnLeftButtonUp(view, ren, pos);
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool albaRotateTranslateBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  return m_Active && m_Active->OnDrag(view, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+void albaRotateTranslateBehavior::CreateTransformBehaviors(albaVME *vme)
 {
   // default ref sys is the vme ref sys
   m_RefSysVME = vme;
   albaMatrix *absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
 
   // rotate
-  m_Rotate = CreateBehavior(MOUSE_LEFT);
+  m_Rotate = NewTransformBehavior();
   m_Rotate->SetListener(this);
   m_Rotate->SetVME(vme);
   m_Rotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
@@ -61,7 +131,8 @@ void albaTransformMouseBehavior::CreateTransformBehaviors(albaVME *vme)
   m_Rotate->EnableRotation(true);
 
   // translate
-  m_Translate = CreateBehavior(MOUSE_MIDDLE);
+  m_Translate = NewTransformBehavior();
+  m_Translate->SetStartButton(ALBA_MIDDLE_BUTTON);
   m_Translate->SetListener(this);
   m_Translate->SetVME(vme);
   m_Translate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
@@ -72,7 +143,8 @@ void albaTransformMouseBehavior::CreateTransformBehaviors(albaVME *vme)
   m_Translate->EnableTranslation(true);
 
   // roll
-  m_Roll = CreateBehavior(MOUSE_LEFT_CONTROL);
+  m_Roll = NewTransformBehavior();
+  m_Roll->SetModifiers(ALBA_CTRL_KEY);
   m_Roll->SetListener(this);
   m_Roll->SetVME(vme);
   m_Roll->GetRotationConstraint()->GetRefSys()->SetTypeToView();
@@ -84,7 +156,7 @@ void albaTransformMouseBehavior::CreateTransformBehaviors(albaVME *vme)
 }
 
 //------------------------------------------------------------------------------
-void albaTransformMouseBehavior::SetRefSysVME(albaVME *refSysVME)
+void albaRotateTranslateBehavior::SetRefSysVME(albaVME *refSysVME)
 {
   if (refSysVME == NULL || m_Rotate == NULL)
     return;
@@ -99,7 +171,7 @@ void albaTransformMouseBehavior::SetRefSysVME(albaVME *refSysVME)
 }
 
 //------------------------------------------------------------------------------
-void albaTransformMouseBehavior::SetRotationConstraint(int constraint)
+void albaRotateTranslateBehavior::SetRotationConstraint(int constraint)
 {
   // set rotation constraint;
   if (constraint == X_AXIS)
@@ -141,7 +213,7 @@ void albaTransformMouseBehavior::SetRotationConstraint(int constraint)
 }
 
 //------------------------------------------------------------------------------
-void albaTransformMouseBehavior::SetTranslationConstraint(int constraint)
+void albaRotateTranslateBehavior::SetTranslationConstraint(int constraint)
 {
   // set translation constraint;
   if (constraint == X_AXIS)
@@ -242,7 +314,7 @@ void albaTransformMouseBehavior::SetTranslationConstraint(int constraint)
 }
 
 //------------------------------------------------------------------------------
-void albaTransformMouseBehavior::OnEvent(albaEventBase *event)
+void albaRotateTranslateBehavior::OnEvent(albaEventBase *event)
 {
   // the events of the transform behaviors go to the listener
   if (event->GetChannel() != MCH_INPUT)

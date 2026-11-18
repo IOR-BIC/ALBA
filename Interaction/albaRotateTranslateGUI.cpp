@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaTransformMouseGUI
+ Module: albaRotateTranslateGUI
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -24,14 +24,14 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaTransformMouseGUI.h"
+#include "albaRotateTranslateGUI.h"
 #include "albaDecl.h"
 #include "albaGUI.h"
-#include "albaTransformMouseBehavior.h"
+#include "albaRotateTranslateBehavior.h"
 #include "albaVME.h"
 
 //----------------------------------------------------------------------------
-albaTransformMouseGUI::albaTransformMouseGUI(albaVME *input, albaObserver *listener /* = NULL */, bool testMode /* = false */)
+albaRotateTranslateGUI::albaRotateTranslateGUI(albaVME *input, albaObserver *listener /* = NULL */, bool testMode /* = false */)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -39,8 +39,8 @@ albaTransformMouseGUI::albaTransformMouseGUI(albaVME *input, albaObserver *liste
   m_InputVME = input;
   m_TestMode = testMode;
   m_Gui = NULL;
-  m_RotationConstraintId = albaTransformMouseBehavior::VIEW_PLANE;
-  m_TranslationConstraintId = albaTransformMouseBehavior::VIEW_PLANE;
+  m_RotationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
+  m_TranslationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
   m_RefSysVME = m_InputVME;
 
   m_OldBehavior = m_InputVME->GetBehavior();
@@ -54,14 +54,14 @@ albaTransformMouseGUI::albaTransformMouseGUI(albaVME *input, albaObserver *liste
   AttachInteractorToVme();
 }
 //----------------------------------------------------------------------------
-albaTransformMouseGUI::~albaTransformMouseGUI()
+albaRotateTranslateGUI::~albaRotateTranslateGUI()
 //----------------------------------------------------------------------------
 {
   DetachInteractorFromVme();
   albaDEL(m_Behavior);
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUI::CreateGui()
+void albaRotateTranslateGUI::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new albaGUI(this);
@@ -91,7 +91,7 @@ void albaTransformMouseGUI::CreateGui()
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUI::OnEvent(albaEventBase *alba_event)
+void albaRotateTranslateGUI::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   switch(alba_event->GetId())
@@ -115,7 +115,7 @@ void albaTransformMouseGUI::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUI::EnableWidgets(bool enable)
+void albaRotateTranslateGUI::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   if (!m_TestMode)
@@ -130,19 +130,19 @@ void albaTransformMouseGUI::EnableWidgets(bool enable)
     DetachInteractorFromVme();
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUI::AttachInteractorToVme()
+void albaRotateTranslateGUI::AttachInteractorToVme()
 //----------------------------------------------------------------------------
 {
   m_InputVME->SetBehavior(m_Behavior);
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUI::DetachInteractorFromVme()
+void albaRotateTranslateGUI::DetachInteractorFromVme()
 //----------------------------------------------------------------------------
 {
   m_InputVME->SetBehavior(m_OldBehavior);
 }
 //----------------------------------------------------------------------------
-void albaTransformMouseGUI::RefSysVmeChanged()
+void albaRotateTranslateGUI::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
   m_Behavior->SetRefSysVME(m_RefSysVME);
