@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaGizmoInteractionDebugger_h
-#define __albaGizmoInteractionDebugger_h
+#ifndef __albaGizmoPolylineGraph_h
+#define __albaGizmoPolylineGraph_h
 
 //----------------------------------------------------------------------------
 // Include:

@@ -115,7 +115,6 @@ protected:
   void OnLeftButtonUp     (albaEventInteraction *e);
   void OnMiddleButtonDown (albaEventInteraction *e);
   void OnMiddleButtonUp   (albaEventInteraction *e);
-  void OnMouseMove        ();
   void OnRightButtonDown  (albaEventInteraction *e);
   void OnRightButtonUp    (albaEventInteraction *e);
 

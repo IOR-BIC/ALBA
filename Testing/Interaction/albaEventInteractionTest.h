@@ -38,8 +38,6 @@ public:
   CPPUNIT_TEST(TestSetXYFlag_GetXYFlag);
   /** CPPUNIT test : set/get button */
   CPPUNIT_TEST(TestSetButton_GetButton);
-  /** CPPUNIT test : set/get key */
-  CPPUNIT_TEST(TestSetKey_GetKey);
   /** CPPUNIT test : set/get matrix */
   CPPUNIT_TEST(TestSetMatrix_GetMatrix);
   /** CPPUNIT test : set/get modifier */
@@ -63,8 +61,6 @@ private:
   void TestSetXYFlag_GetXYFlag();
   /** set/get button */
   void TestSetButton_GetButton();
-  /** set/get key */
-  void TestSetKey_GetKey();
   /** set/get matrix */
   void TestSetMatrix_GetMatrix();
   /** set/get modifier */
@@ -78,11 +74,6 @@ private:
   {
     ID_MODIFIER_1 = 1,
     ID_MODIFIER_2,
-  };
-  enum
-  {
-    ID_KEY_1,
-    ID_KEY_2,
   };
   enum
   {

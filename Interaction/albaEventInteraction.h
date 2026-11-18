@@ -63,11 +63,6 @@ public:
   /** Get the triggering button */
   int GetButton() {return m_Button;}
 
-  /** Set the optional key argument */
-  void SetKey(unsigned char key);
-  /** Get the optional key argument */
-  unsigned char GetKey() {return m_Key;}
-
   /** Get the pose matrix, for 3D tracking devices */
   albaMatrix *GetMatrix();
   /** Set the pose matrix, for 3D tracking devices */
@@ -99,15 +94,15 @@ public:
 
   /** overloaded constructor */
   albaEventInteraction(void *sender=NULL,albaID id=-1,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,albaMatrix *matrix,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,double x,double y,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers),m_Key(0) {ResetPick();}
+  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers) {ResetPick();}
   virtual ~albaEventInteraction() {}
 
 protected:
@@ -123,7 +118,6 @@ protected:
 
   int           m_Button;     ///< Optional button which triggered the event
   unsigned long m_Modifiers;  ///< Optional modifiers for the button 
-  unsigned char m_Key;        ///< Optional Key 
   double        m_X;          ///< X coordinate, used by mouse device
   double        m_Y;          ///< Y coordinate, used by mouse device
   bool          m_XYFlag;     ///< Used to signal a 2D coordinate is present

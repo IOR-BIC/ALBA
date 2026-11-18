@@ -215,7 +215,7 @@ public:
   void SetResultMatrixConcatenationSemanticToPostMultiply() 
        { this->m_ResultMatrixConcatenationSemantic = POSTMULTIPLY; }
   void SetResultMatrixConcatenationSemanticToPreMultiply()
-       { this->m_ResultMatrixConcatenationSemantic = POSTMULTIPLY; }
+       { this->m_ResultMatrixConcatenationSemantic = PREMULTIPLY; }
   int  GetResultMatrixConcatenationSemantic()
        { return this->m_ResultMatrixConcatenationSemantic; }
 

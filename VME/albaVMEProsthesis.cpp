@@ -92,7 +92,7 @@ int albaVMEProsthesis::InternalInitialize()
 		m_TransformBehavior->CreateTransformBehaviors(this);
 		SetBehavior(m_TransformBehavior);
 
-		m_GenericMouseFreeTransform = (albaGenericMouseFreeTransformBehavior *)m_TransformBehavior->CreateBehavior(MOUSE_LEFT_SHIFT);
+		m_GenericMouseFreeTransform = albaGenericMouseFreeTransformBehavior::SafeDownCast(m_TransformBehavior->CreateBehavior(MOUSE_LEFT_SHIFT));
 		m_GenericMouseFreeTransform->SetListener(this);
 		m_GenericMouseFreeTransform->SetVME(this);
 	}

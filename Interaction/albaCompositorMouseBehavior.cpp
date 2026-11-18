@@ -58,10 +58,6 @@ albaCompositorMouseBehavior::albaCompositorMouseBehavior()
 albaCompositorMouseBehavior::~albaCompositorMouseBehavior() 
 //----------------------------------------------------------------------------
 {
-	// traverse the map and destroy all the behaviors
-	mmuActivatorMap::iterator iter = m_ActivatorMap.begin();
-	mmuActivatorMap::iterator iterEnd = m_ActivatorMap.end();
-
 }
 
 //------------------------------------------------------------------------------

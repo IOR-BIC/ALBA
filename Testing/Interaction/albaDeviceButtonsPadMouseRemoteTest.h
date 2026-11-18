@@ -32,7 +32,6 @@ class albaDeviceButtonsPadMouseRemoteTest : public albaTest
     CPPUNIT_TEST(TestOnEventButtonUp);
     CPPUNIT_TEST(TestOnEventViewSelect);
     CPPUNIT_TEST(TestOnEventViewDelete);
-    CPPUNIT_TEST(TestOnEventMouseCharEvent);
   CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -45,7 +44,6 @@ class albaDeviceButtonsPadMouseRemoteTest : public albaTest
   void TestOnEventButtonUp();
   void TestOnEventViewSelect();
   void TestOnEventViewDelete();
-  void TestOnEventMouseCharEvent();
 };
 
 #endif

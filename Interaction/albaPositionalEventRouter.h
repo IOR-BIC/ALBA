@@ -124,7 +124,6 @@ protected:
   virtual void OnRightButtonDown  (albaEventInteraction *e);
   virtual void OnRightButtonUp    (albaEventInteraction *e);
   virtual void OnMove             (albaEventInteraction *e);
-  virtual void OnChar             (albaEventInteraction *e);
 
   /** internally used to fly to a clicked point */
   virtual void FlyTo(albaEventInteraction *e,int numstep=20, double zoom=1);
@@ -156,12 +155,10 @@ protected:
   std::string     m_LastEventTrace; ///< last trace written in the log
 
   bool            m_FlyToFlag;
-  bool            m_DraggingLeft; 
-  bool            m_CanSelect; 
+  bool            m_CanSelect;
   bool	          m_ShowContextMenu; ///< flag for showing the context menu
 
   int             m_Mode;
-  int             m_FirstTime;
   /** Offer the event to the tools, from the top of the stack; return true if a tool used it */
   bool DispatchToTools(albaEventInteraction *e, albaDevice *device);
 

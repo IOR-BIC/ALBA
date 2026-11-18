@@ -45,17 +45,11 @@ public:
       Issued when a mouse is moved */
   // ALBA_ID_DEC(MOUSE_2D_MOVE)
   /** @ingroup Events
-      Issued when a keyboard char is pressed */
-  // ALBA_ID_DEC(MOUSE_CHAR_EVENT)
-  /** @ingroup Events
       Issued on double click mouse button */
   // ALBA_ID_DEC(MOUSE_DCLICK)
 
   /** return the mouse 2d move id */
   static albaID GetMouse2DMoveId();
-
-  /** return the mouse char event id */
-  static albaID GetMouseCharEventId();
 
   /** return the mouse D click id */
   static albaID GetMouseDClickId();

@@ -81,14 +81,6 @@ void albaEventInteraction::SetButton(int button)
 }
 
 //------------------------------------------------------------------------------
-void albaEventInteraction::SetKey(unsigned char key)
-//------------------------------------------------------------------------------
-{
-  m_Key=key;
-  //Modified();
-}
-
-//------------------------------------------------------------------------------
 albaMatrix *albaEventInteraction::GetMatrix()
 //------------------------------------------------------------------------------
 {
@@ -149,7 +141,6 @@ void albaEventInteraction::DeepCopy(const albaEventBase *event)
     m_X=e->m_X;;
     m_Y=e->m_Y;
     m_Modifiers=e->m_Modifiers;
-    m_Key=e->m_Key;
     ResetPick();
   }
   else

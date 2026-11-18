@@ -178,14 +178,6 @@ protected:
   virtual void OnButtonDown       (albaEventInteraction *e);
   virtual void OnButtonUp         (albaEventInteraction *e);
 
-
-  /** 
-    Find the pocked VME at button down. As argument the function needs
-    the device which performed the action, and provides as result pointers
-    to piked prop, vme and its behavior if it exists. */
-//  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior);
-
-
   albaDevice     *m_Device;
 
   bool          m_DeviceIsSet;          ///< true if the device has been set with SetDevice by other classes  

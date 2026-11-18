@@ -634,15 +634,6 @@ void albaRWIBase::OnChar(wxKeyEvent &event)
     SetKeyEventInformation(event.ControlDown(),event.ShiftDown(),event.GetKeyCode(), 1);
     InvokeEvent(vtkCommand::CharEvent,NULL);
   }
-  else
-  {
-    if(m_Mouse) 
-    {
-      albaEvent e(this,albaDeviceButtonsPadMouse::GetMouseCharEventId(),(long) event.GetKeyCode());
-      e.SetChannel(MCH_OUTPUT);
-      m_Mouse->OnEvent(&e);
-    }
-  }
 
   event.Skip();
 }

@@ -41,7 +41,6 @@
 // Events
 //------------------------------------------------------------------------------
 // ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_2D_MOVE)
-// ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
 // ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_DCLICK)
 
 //------------------------------------------------------------------------------
@@ -105,17 +104,6 @@ void albaDeviceButtonsPadMouse::OnEvent(albaEventBase *event)
     e->Get2DPosition(m_LastPosition);
     e->SetSender(this);
     InvokeEvent(e,(albaID)MCH_INPUT);
-  }
-  else if (id == GetMouseCharEventId())
-  {
-    albaEvent *ev = albaEvent::SafeDownCast(event);
-    if (ev)
-    {
-      unsigned char key = (unsigned char)ev->GetArg();
-      albaEventInteraction ei(this,GetMouseCharEventId());
-      ei.SetKey(key);
-      InvokeEvent(&ei,(albaID)MCH_INPUT);
-    }
   }
 }
 
@@ -216,13 +204,6 @@ albaID albaDeviceButtonsPadMouse::GetMouse2DMoveId()
 {
   static const albaID mouse2DMoveId = mmuIdFactory::GetNextId("MOUSE_2D_MOVE");
   return mouse2DMoveId;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadMouse::GetMouseCharEventId()
-//------------------------------------------------------------------------------
-{
-  static const albaID mouseCharEventId = mmuIdFactory::GetNextId("MOUSE_CHAR_EVENT");
-  return mouseCharEventId;
 }
 //------------------------------------------------------------------------------
 albaID albaDeviceButtonsPadMouse::GetMouseDClickId()

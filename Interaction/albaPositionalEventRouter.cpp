@@ -59,14 +59,13 @@ albaCxxTypeMacro(albaPositionalEventRouter)
 albaPositionalEventRouter::albaPositionalEventRouter()
 //------------------------------------------------------------------------------
 {
-  m_DraggingLeft    = false; 
-  m_CanSelect       = true; 
+  m_CanSelect       = true;
   m_FlyToFlag       = false;
+  m_ShowContextMenu = false;
   m_EventTracing    = false;
   m_VME             = NULL;
 
   SetModeToSingleButton();
-  m_FirstTime = 0;
 
   m_CameraTool = albaCameraTool::New();
 }
@@ -378,39 +377,6 @@ albaVME *albaPositionalEventRouter::GetPickedVME(albaDevice *device)
 }
 
 //----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnChar(albaEventInteraction *e) 
-//----------------------------------------------------------------------------
-{
-  switch (e->GetKey()) 
-  {
-    case 'r' :      
-    case 'R' :
-    {
-      albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-      if (mouse)
-      {
-        albaView *view = mouse->GetView();
-        InvokeEvent(this,CAMERA_FIT,MCH_UP,view);
-      }
-    }
-    break; 
-    case 'f' :      
-    case 'F' :
-			FlyTo(e,20,1.4);
-    break;
-    case 'g' :      
-    case 'G' :
-			FlyTo(e,20,-0.6);
-    break;
-    default:
-        //modified by Marco. 30-6-2004
-        // TODO: what to do here???
-		    // vtkInteractorStyle::OnChar();
-    break;
-	}
-}
-
-//----------------------------------------------------------------------------
 void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
@@ -421,9 +387,6 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
   }
 
   OnButtonDown(e);
-
-	if (!e->GetModifier(ALBA_SHIFT_KEY))
-		m_DraggingLeft = true;
 }
 
 //----------------------------------------------------------------------------
@@ -448,9 +411,6 @@ void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
 void albaPositionalEventRouter::OnLeftButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  //if(m_FlyToFlag)
-  //  m_FlyToFlag = false; //SIL. 2-7-2004: - moved in FlyTo because if activated throught the voice label
-                        //we receive a Mouseup right after 
   OnButtonUp(e);
 }
 //----------------------------------------------------------------------------
@@ -463,10 +423,6 @@ void albaPositionalEventRouter::OnMiddleButtonUp(albaEventInteraction *e)
 void albaPositionalEventRouter::OnRightButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-	//if(m_FlyToFlag)
-  //  m_FlyToFlag = false; //SIL. 2-7-2004: - moved in FlyTo because if activated throught the voice label
-                        //we receive a Mouseup right after
-
   albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice*)e->GetSender());
 
 	if(m_ShowContextMenu && mouse)
@@ -542,10 +498,9 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
 }
 
 //----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnButtonUp(albaEventInteraction *e) 
+void albaPositionalEventRouter::OnButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  m_DraggingLeft = false;
 }
 
 //------------------------------------------------------------------------------
@@ -590,9 +545,6 @@ int albaPositionalEventRouter::StopInteraction(albaDevice *device, int button)
     RemoveDevice(device);
     return true;
   }
-
-  albaWarningMacro("StopInteraction without a Start for device "<< device->GetName());
-  return false;
 }
 
 //------------------------------------------------------------------------------
@@ -686,12 +638,6 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
 			return;
 		}
 
-    if (id == albaDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
-    {
-      albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
-      TraceHandler("Keys");
-      OnChar(e);
-    }
     // find if this device is one of those currently interacting
     if (IsInteracting(device))
     {
@@ -800,15 +746,9 @@ void albaPositionalEventRouter::FlyTo(albaEventInteraction *e,int numstep, doubl
 
   if(!ren) return; // no renderer no fly to!
 
-  // mouse events without a position (e.g. keyboard ones) pick at the last mouse position
-  double pose_2d[2] = {0, 0};
-  if(mouse) mouse->GetLastPosition(pose_2d);
-  albaEventInteraction lastPositionEvent(mouse,e->GetId(),pose_2d[0],pose_2d[1]);
-  albaEventInteraction *pick_event = (mouse && !e->GetXYFlag()) ? &lastPositionEvent : e;
-
   vtkCamera *cam = ren->GetActiveCamera();
 
-  if(view && !pick_event->FindPokedVme(view,device,picked_prop,picked_vme,picked_bh))
+  if(view && !e->FindPokedVme(view,device,picked_prop,picked_vme,picked_bh))
     return; // no picking no fly to!
 
   int i, j;
@@ -819,7 +759,7 @@ void albaPositionalEventRouter::FlyTo(albaEventInteraction *e,int numstep, doubl
 
   // find picked position
   double pos[3];
-  pick_event->GetPickedPosition(pos);
+  e->GetPickedPosition(pos);
   double foc_motion[3];
   for (i=0; i<3; i++) 
     foc_motion[i] = pos[i] - f0[i];
