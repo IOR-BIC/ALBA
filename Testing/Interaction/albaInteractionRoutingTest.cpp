@@ -282,7 +282,7 @@ void albaInteractionRoutingTest::TestCameraButtons()
 
   // the release of a button ends the camera motion
   albaCameraMouseTool *mouseTool = per->GetCameraTool()->GetMouseTool();
-  CPPUNIT_ASSERT(!mouseTool->IsInteracting(m_Mouse));
+  CPPUNIT_ASSERT(!mouseTool->IsInteracting());
   CPPUNIT_ASSERT(mouseTool->GetMotion() == albaCameraMouseTool::MOTION_NONE);
 
   m_Mouse->RemoveObserver(per);
@@ -297,25 +297,21 @@ void albaInteractionRoutingTest::TestCameraTrackerTool()
   albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::New();
 
   // the mouse is not handled by the tracker tool
-  albaEventInteraction mouseDown(m_Mouse, albaDeviceButtonsPad::GetButtonDownId());
-  mouseDown.SetButton(ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(!trackerTool->OnLeftButtonDown(&mouseDown));
+  double pos[2] = {10, 10};
+  CPPUNIT_ASSERT(!trackerTool->OnLeftButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(!trackerTool->IsInteracting(m_Mouse));
 
   // a tracker without an albaAvatar3D cannot move the camera
-  albaEventInteraction trackerDown(tracker, albaDeviceButtonsPad::GetButtonDownId());
-  trackerDown.SetButton(ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(!trackerTool->OnLeftButtonDown(&trackerDown));
+  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonDown(tracker, ALBA_LEFT_BUTTON, NULL));
   CPPUNIT_ASSERT(!trackerTool->IsInteracting(tracker));
 
   // events of devices not interacting are not used
-  albaEventInteraction trackerMove(tracker, albaDeviceButtonsPadTracker::GetTracker3DMoveId());
-  CPPUNIT_ASSERT(!trackerTool->OnDrag(&trackerMove));
-  CPPUNIT_ASSERT(!trackerTool->OnLeftButtonUp(&trackerDown));
+  CPPUNIT_ASSERT(!trackerTool->OnTrackerDrag(tracker, NULL));
+  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonUp(tracker, ALBA_LEFT_BUTTON));
 
   // only the left button is handled
-  CPPUNIT_ASSERT(!trackerTool->OnRightButtonDown(&trackerDown));
-  CPPUNIT_ASSERT(!trackerTool->OnMiddleButtonDown(&trackerDown));
+  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonDown(tracker, ALBA_RIGHT_BUTTON, NULL));
+  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonDown(tracker, ALBA_MIDDLE_BUTTON, NULL));
 
   tracker->Delete();
   albaDEL(trackerTool);

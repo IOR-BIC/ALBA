@@ -23,20 +23,13 @@
 //----------------------------------------------------------------------------
 
 #include "albaInteractionTool.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
-
 #include "vtkRenderer.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractionTool);
 
 //------------------------------------------------------------------------------
-vtkRenderer *albaInteractionTool::GetEventRenderer(albaEventInteraction *e)
+bool albaInteractionTool::IsOnToolRenderWindow(vtkRenderer *ren)
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-  vtkRenderer *renderer = mouse ? mouse->GetRenderer() : NULL;
-  if (renderer == NULL || m_Renderer == NULL || renderer->GetRenderWindow() != m_Renderer->GetRenderWindow())
-    return NULL;
-  return renderer;
+  return ren && m_Renderer && ren->GetRenderWindow() == m_Renderer->GetRenderWindow();
 }

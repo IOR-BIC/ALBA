@@ -23,8 +23,6 @@
 //----------------------------------------------------------------------------
 
 #include "albaCameraMouseTool.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 #include "albaView.h"
 
 #include "vtkCamera.h"
@@ -41,7 +39,7 @@ albaCxxTypeMacro(albaCameraMouseTool);
 //------------------------------------------------------------------------------
 albaCameraMouseTool::albaCameraMouseTool()
 {
-  m_Mouse = NULL;
+  m_Interacting = false;
   m_CurrentCamera = NULL;
   m_Motion = MOTION_NONE;
   m_MousePose[0] = m_MousePose[1] = 0;
@@ -51,46 +49,37 @@ albaCameraMouseTool::albaCameraMouseTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraMouseTool::IsInteracting(albaDevice *device)
-{
-  return m_Mouse != NULL && (albaDevice *)m_Mouse == device;
-}
-
-//------------------------------------------------------------------------------
-bool albaCameraMouseTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaCameraMouseTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
   if (m_ShiftDown)
-    return Start(e, m_CtrlDown ? MOTION_DOLLY : MOTION_PAN);
-  return Start(e, m_CtrlDown ? MOTION_SPIN : MOTION_ROTATE);
+    return Start(view, ren, pos, m_CtrlDown ? MOTION_DOLLY : MOTION_PAN);
+  return Start(view, ren, pos, m_CtrlDown ? MOTION_SPIN : MOTION_ROTATE);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraMouseTool::Start(albaEventInteraction *e, int motion)
+bool albaCameraMouseTool::Start(albaView *view, vtkRenderer *ren, double pos[2], int motion)
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-  if (mouse == NULL || m_Mouse != NULL)
+  if (m_Interacting)
     return false;
 
-  m_Mouse = mouse;
+  m_Interacting = true;
   m_Motion = motion;
 
-  double pos[2];
-  e->Get2DPosition(pos);
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  SetRendererAndView(mouse->GetRenderer(), mouse->GetView());
+  SetRendererAndView(ren, view);
   m_CurrentCamera = m_Renderer ? m_Renderer->GetActiveCamera() : NULL;
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraMouseTool::Stop(albaEventInteraction *e)
+bool albaCameraMouseTool::Stop()
 {
-  if (!IsInteracting((albaDevice *)e->GetSender()))
+  if (!m_Interacting)
     return false;
 
-  m_Mouse = NULL;
+  m_Interacting = false;
   m_Motion = MOTION_NONE;
 
   if (m_Renderer)
@@ -102,16 +91,14 @@ bool albaCameraMouseTool::Stop(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraMouseTool::OnDrag(albaEventInteraction *e)
+bool albaCameraMouseTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (!IsInteracting((albaDevice *)e->GetSender()))
+  if (!m_Interacting)
     return false;
 
   if (m_CurrentCamera == NULL)
     return true;
 
-  double pos[2];
-  e->Get2DPosition(pos);
   m_MousePose[0] = (int)pos[0];
   m_MousePose[1] = (int)pos[1];
 
@@ -131,18 +118,13 @@ bool albaCameraMouseTool::OnDrag(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraMouseTool::OnWheel(albaEventInteraction *e)
+bool albaCameraMouseTool::OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation)
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-  if (mouse == NULL)
-    return false;
-
-  SetRendererAndView(mouse->GetRenderer(), mouse->GetView());
+  SetRendererAndView(ren, view);
   if (m_Renderer == NULL)
     return true;
   m_CurrentCamera = m_Renderer->GetActiveCamera();
 
-  double rotation = *(double *)e->GetData();
   double zoomFactor = 1.0 + (rotation / 1200.0);
 
   if (m_CurrentCamera->GetParallelProjection())

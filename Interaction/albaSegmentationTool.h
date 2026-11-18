@@ -44,15 +44,15 @@ public:
 
   albaAbstractTypeMacro(albaSegmentationTool, albaInteractionTool);
 
-  bool OnLeftButtonDown(albaEventInteraction *e) override;
-  bool OnLeftButtonUp(albaEventInteraction *e) override;
-  bool OnMiddleButtonDown(albaEventInteraction *e) override;
-  bool OnMiddleButtonUp(albaEventInteraction *e) override {return true;}
-  bool OnRightButtonDown(albaEventInteraction *e) override;
-  bool OnRightButtonUp(albaEventInteraction *e) override {return true;}
+  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override {return true;}
+  bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override {return true;}
 
   /** Send VME_PICKING while picking; the drag is left to the camera */
-  bool OnDrag(albaEventInteraction *e) override;
+  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Forward the key to the listener, which reads the modifier keys with GetCtrlDown, GetAltDown and GetShiftDown */
   bool OnKey(int keyCode, bool pressed) override;
@@ -61,11 +61,11 @@ protected:
   albaSegmentationTool();
   virtual ~albaSegmentationTool() {}
 
-  /** Return true if the event comes from a mouse working on the view of the tool */
-  bool IsOnToolView(albaEventInteraction *e);
+  /** Return true if the mouse is on the view of the tool */
+  bool IsOnToolView(albaView *view) {return m_View && view == m_View;}
 
   /** Send to the listener the event eventId with the picked position (GetPointer) and the modifier (GetArg); return true if a VME was picked */
-  bool SendPickingInformation(albaEventInteraction *e, long modifier, int eventId);
+  bool SendPickingInformation(double pos[2], long modifier, int eventId);
 
   bool m_IsPicking;          ///< true while the left button, pressed on a VME, is down
   double m_PickPosition[3];  ///< the last picked position

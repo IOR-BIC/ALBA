@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 
 #include "albaSelectPointTool.h"
-#include "albaEventInteraction.h"
 
 #include "vtkPointPicker.h"
 #include "vtkRenderer.h"
@@ -39,10 +38,10 @@ albaSelectPointTool::albaSelectPointTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectPointTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaSelectPointTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
   // when no point is picked the button goes to the camera
-  if ((m_UseCtrlModifier && !m_CtrlDown) || !PickPoint(e))
+  if ((m_UseCtrlModifier && !m_CtrlDown) || !PickPoint(ren, pos))
     return false;
 
   m_IsPicking = true;
@@ -50,32 +49,28 @@ bool albaSelectPointTool::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectPointTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaSelectPointTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectPointTool::OnDrag(albaEventInteraction *e)
+bool albaSelectPointTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
   return m_IsPicking;
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectPointTool::PickPoint(albaEventInteraction *e)
+bool albaSelectPointTool::PickPoint(vtkRenderer *ren, double pos[2])
 {
-  vtkRenderer *renderer = GetEventRenderer(e);
-  if (renderer == NULL)
+  if (!IsOnToolRenderWindow(ren))
     return false;
-
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
 
   vtkPointPicker *pointPicker;
   vtkNEW(pointPicker);
   pointPicker->SetTolerance(0.01);
-  bool picked = pointPicker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer) != 0;
+  bool picked = pointPicker->Pick((int)pos[0], (int)pos[1], 0, ren) != 0;
   if (picked)
   {
     double pickedPos[3];

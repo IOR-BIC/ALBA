@@ -24,9 +24,6 @@
 
 #include "albaVTKPickerToolTest.h"
 #include "albaVTKPickerTool.h"
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -52,15 +49,13 @@ void albaVTKPickerToolTest::TestSetGetContinuousPicking()
 //----------------------------------------------------------------------------
 void albaVTKPickerToolTest::TestEventsWithoutRenderer()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaVTKPickerTool *tool = albaVTKPickerTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  double pos[2] = {10, 10};
   tool->SetModifierKeys(true, false, false); // CTRL down
 
   // no renderer: the button goes to the camera; nothing picked, nothing to send on button up
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
-  CPPUNIT_ASSERT(tool->OnLeftButtonUp(&down));
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(tool->OnLeftButtonUp(NULL, NULL, pos));
 
   tool->Delete();
-  mouse->Delete();
 }

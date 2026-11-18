@@ -28,13 +28,13 @@ public:
   albaTypeMacro(albaExtractIsosurfaceTool, albaInteractionTool);
 
   /** Start a click */
-  bool OnLeftButtonDown(albaEventInteraction *e) override;
+  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Pick the iso-value if the mouse has not been dragged */
-  bool OnLeftButtonUp(albaEventInteraction *e) override;
+  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** A drag cancels the picking; the camera moves */
-  bool OnDrag(albaEventInteraction *e) override;
+  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
 protected:
   albaExtractIsosurfaceTool();

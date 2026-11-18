@@ -26,7 +26,6 @@
 #include "albaAvatar3D.h"
 #include "albaCameraTransform.h"
 #include "albaDeviceButtonsPadTracker.h"
-#include "albaEventInteraction.h"
 #include "albaMatrix.h"
 #include "albaTransform.h"
 
@@ -70,10 +69,9 @@ bool albaCameraTrackerTool::IsInteracting(albaDevice *device)
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTrackerTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaCameraTrackerTool::OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose)
 {
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast((albaDevice *)e->GetSender());
-  if (tracker == NULL || m_Tracker != NULL)
+  if (tracker == NULL || button != ALBA_LEFT_BUTTON || m_Tracker != NULL)
     return false;
 
   // without an albaAvatar3D the mapping from tracker to world is unknown
@@ -84,8 +82,8 @@ bool albaCameraTrackerTool::OnLeftButtonDown(albaEventInteraction *e)
   m_Tracker = tracker;
   m_Avatar = avatar;
 
-  if (e->GetMatrix())
-    TrackerSnapshot(e->GetMatrix());
+  if (pose)
+    TrackerSnapshot(pose);
   else
   {
     m_StartTrackerPoseMatrix->Identity();
@@ -106,9 +104,9 @@ bool albaCameraTrackerTool::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTrackerTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaCameraTrackerTool::OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button)
 {
-  if (!IsInteracting((albaDevice *)e->GetSender()))
+  if (button != ALBA_LEFT_BUTTON || !IsInteracting(tracker))
     return false;
 
   m_Tracker = NULL;
@@ -117,14 +115,14 @@ bool albaCameraTrackerTool::OnLeftButtonUp(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTrackerTool::OnDrag(albaEventInteraction *e)
+bool albaCameraTrackerTool::OnTrackerDrag(albaDeviceButtonsPadTracker *tracker, albaMatrix *pose)
 {
-  if (!IsInteracting((albaDevice *)e->GetSender()))
+  if (!IsInteracting(tracker))
     return false;
 
-  if (m_CurrentCamera && e->GetMatrix())
+  if (m_CurrentCamera && pose)
   {
-    m_TrackerPoseMatrix->DeepCopy(e->GetMatrix());
+    m_TrackerPoseMatrix->DeepCopy(pose);
     UpdateCamera();
   }
   return true;

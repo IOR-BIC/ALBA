@@ -23,8 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaExtractIsosurfaceTool.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
+#include "albaView.h"
 #include "albaRWIBase.h"
 
 #include "vtkAbstractPicker.h"
@@ -41,9 +40,9 @@ albaExtractIsosurfaceTool::albaExtractIsosurfaceTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaExtractIsosurfaceTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaExtractIsosurfaceTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (GetEventRenderer(e) == NULL)
+  if (!IsOnToolRenderWindow(ren))
     return false;
 
   m_PickValue = true;
@@ -51,34 +50,30 @@ bool albaExtractIsosurfaceTool::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaExtractIsosurfaceTool::OnDrag(albaEventInteraction *e)
+bool albaExtractIsosurfaceTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
   m_PickValue = false;
   return false;
 }
 
 //------------------------------------------------------------------------------
-bool albaExtractIsosurfaceTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaExtractIsosurfaceTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  vtkRenderer *renderer = GetEventRenderer(e);
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-  if (renderer == NULL || mouse == NULL)
+  if (!IsOnToolRenderWindow(ren) || view == NULL || view->GetRWI() == NULL)
     return true;
 
   if (m_PickValue)
   {
-    double mousePos[2];
-    e->Get2DPosition(mousePos);
-    if (mouse->GetRWI()->GetPicker()->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer))
+    if (view->GetRWI()->GetPicker()->Pick((int)pos[0], (int)pos[1], 0, ren))
     {
       double pickedPos[3];
-      mouse->GetRWI()->GetPicker()->GetPickPosition(pickedPos);
+      view->GetRWI()->GetPicker()->GetPickPosition(pickedPos);
       SendPickedPointEvent(VME_PICKED, pickedPos);
     }
   }
   m_PickValue = false;
 
-  renderer->GetRenderWindow()->SetDesiredUpdateRate(0.001);
-  renderer->GetRenderWindow()->Render();
+  ren->GetRenderWindow()->SetDesiredUpdateRate(0.001);
+  ren->GetRenderWindow()->Render();
   return true;
 }

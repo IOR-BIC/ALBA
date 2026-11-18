@@ -24,9 +24,6 @@
 
 #include "albaExtractIsosurfaceToolTest.h"
 #include "albaExtractIsosurfaceTool.h"
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -42,20 +39,18 @@ void albaExtractIsosurfaceToolTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 void albaExtractIsosurfaceToolTest::TestEventsWithoutRenderer()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaExtractIsosurfaceTool *tool = albaExtractIsosurfaceTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  double pos[2] = {10, 10};
 
   // no renderer: the button goes to the camera
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(tool->m_PickValue == false);
 
   // a drag cancels the picking and moves the camera
   tool->m_PickValue = true;
-  CPPUNIT_ASSERT(!tool->OnDrag(&down));
+  CPPUNIT_ASSERT(!tool->OnDrag(NULL, NULL, pos));
   CPPUNIT_ASSERT(tool->m_PickValue == false);
-  CPPUNIT_ASSERT(tool->OnLeftButtonUp(&down));
+  CPPUNIT_ASSERT(tool->OnLeftButtonUp(NULL, NULL, pos));
 
   tool->Delete();
-  mouse->Delete();
 }

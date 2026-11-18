@@ -172,6 +172,15 @@ protected:
   /** Call the button up method of the tool for the button of the event */
   static bool ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e);
 
+  /** Call the drag method of the tool, for the mouse or for the tracker */
+  static bool ToolDrag(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** Call the move method of the tool (mouse only) */
+  static bool ToolMove(albaInteractionTool *tool, albaEventInteraction *e);
+
+  /** Call the wheel method of the tool */
+  static bool ToolWheel(albaInteractionTool *tool, albaEventInteraction *e);
+
   /** Return true for the mouse events carrying the state of the modifier keys */
   static bool IsMouseInputEvent(albaID id);
 

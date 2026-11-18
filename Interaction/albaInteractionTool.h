@@ -22,9 +22,13 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class albaEventInteraction;
+class albaDeviceButtonsPadTracker;
+class albaMatrix;
 
 /** Base class of the tools pushed on the stack of the PER.
+  The mouse methods receive the view and the renderer under the mouse (NULL when the mouse is
+  not on a view) and the 2D position in display coordinates; the RWI is view->GetRWI() and the
+  modifier keys are GetCtrlDown(), GetAltDown() and GetShiftDown().
   The PER offers each event to the tools from the top of the stack to the bottom:
   a method returns true if the tool used the event, and then the event stops there.
   If no tool uses it, the PER applies its default behavior (VME behavior, selection, camera).
@@ -36,21 +40,30 @@ class ALBA_EXPORT albaInteractionTool : public albaInteractionAgent
 public:
   albaTypeMacro(albaInteractionTool, albaInteractionAgent);
 
-  virtual bool OnLeftButtonDown(albaEventInteraction *e) {return false;}
-  virtual bool OnLeftButtonUp(albaEventInteraction *e) {return false;}
-  virtual bool OnMiddleButtonDown(albaEventInteraction *e) {return false;}
-  virtual bool OnMiddleButtonUp(albaEventInteraction *e) {return false;}
-  virtual bool OnRightButtonDown(albaEventInteraction *e) {return false;}
-  virtual bool OnRightButtonUp(albaEventInteraction *e) {return false;}
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
 
-  /** The device moved with a button pressed: called only on the tool interacting with the device */
-  virtual bool OnDrag(albaEventInteraction *e) {return false;}
+  /** The mouse moved with a button pressed: called only on the tool interacting with the mouse */
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
 
-  /** The device moved without buttons pressed */
-  virtual bool OnMove(albaEventInteraction *e) {return false;}
+  /** The mouse moved without buttons pressed */
+  virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
 
   /** The mouse wheel has been rotated */
-  virtual bool OnWheel(albaEventInteraction *e) {return false;}
+  virtual bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation) {return false;}
+
+  /** A button of a tracker has been pressed; pose can be NULL */
+  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose) {return false;}
+
+  /** A button of a tracker has been released */
+  virtual bool OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button) {return false;}
+
+  /** The tracker moved with a button pressed: called only on the tool interacting with the tracker; pose can be NULL */
+  virtual bool OnTrackerDrag(albaDeviceButtonsPadTracker *tracker, albaMatrix *pose) {return false;}
 
   /** A key has been pressed or released */
   virtual bool OnKey(int keyCode, bool pressed) {return false;}
@@ -65,9 +78,9 @@ protected:
   albaInteractionTool() {}
   virtual ~albaInteractionTool() {}
 
-  /** Return the renderer under the mouse when the event comes from the render window of the tool renderer
-    (set with SetRendererAndView), NULL otherwise: the tool works only on its render window */
-  vtkRenderer *GetEventRenderer(albaEventInteraction *e);
+  /** Return true if ren belongs to the render window of the tool renderer (set with SetRendererAndView):
+    the tool works only on its render window */
+  bool IsOnToolRenderWindow(vtkRenderer *ren);
 
 private:
   albaInteractionTool(const albaInteractionTool&);  // Not implemented.

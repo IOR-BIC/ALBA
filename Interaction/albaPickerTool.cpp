@@ -25,36 +25,30 @@
 
 #include "albaPickerTool.h"
 #include "albaPickHelper.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 #include "albaVME.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaPickerTool)
 
 //----------------------------------------------------------------------------
-bool albaPickerTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaPickerTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  // only the mouse picks, and SHIFT leaves the button to the PER
+  // SHIFT leaves the button to the PER
   m_Dragged = false;
-  return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) && !m_ShiftDown;
+  return !m_ShiftDown;
 }
 
 //----------------------------------------------------------------------------
-bool albaPickerTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaPickerTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-  if (mouse == NULL)
-    return false;
   if (m_Dragged)
     return true;
 
   // gizmos are not picked
-  double mousePos[2], pickedPos[3], scalar;
+  double pickedPos[3], scalar;
   albaVME *pickedVme;
   vtkIdType pointId;
-  e->Get2DPosition(mousePos);
-  if (albaPickHelper::PickPoint(mouse->GetView(), mousePos, NULL, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
+  if (albaPickHelper::PickPoint(view, pos, NULL, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
     SendPickedPointEvent(VME_PICKED, pickedPos, pointId, scalar, pickedVme);
   return true;
 }

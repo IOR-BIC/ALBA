@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 
 #include "albaSelectCellTool.h"
-#include "albaEventInteraction.h"
 
 #include "vtkCellPicker.h"
 #include "vtkPoints.h"
@@ -39,10 +38,10 @@ albaSelectCellTool::albaSelectCellTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectCellTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaSelectCellTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
   // outside the cells the button goes to the camera (CTRL: spin)
-  if (!m_CtrlDown || !PickCell(e))
+  if (!m_CtrlDown || !PickCell(ren, pos))
     return false;
 
   m_IsPicking = true;
@@ -50,36 +49,32 @@ bool albaSelectCellTool::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectCellTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaSelectCellTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectCellTool::OnDrag(albaEventInteraction *e)
+bool albaSelectCellTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
   if (!m_IsPicking)
     return false;
 
-  PickCell(e);
+  PickCell(ren, pos);
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaSelectCellTool::PickCell(albaEventInteraction *e)
+bool albaSelectCellTool::PickCell(vtkRenderer *ren, double pos[2])
 {
-  vtkRenderer *renderer = GetEventRenderer(e);
-  if (renderer == NULL)
+  if (!IsOnToolRenderWindow(ren))
     return false;
-
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
 
   vtkCellPicker *cellPicker;
   vtkNEW(cellPicker);
   cellPicker->SetTolerance(0.001);
-  bool picked = cellPicker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer) != 0;
+  bool picked = cellPicker->Pick((int)pos[0], (int)pos[1], 0, ren) != 0;
   if (picked)
   {
     double pickedPos[3];

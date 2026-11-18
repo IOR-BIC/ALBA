@@ -29,13 +29,13 @@ public:
   albaTypeMacro(albaSelectPointTool, albaInteractionTool);
 
   /** Pick a point */
-  bool OnLeftButtonDown(albaEventInteraction *e) override;
+  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** End picking */
-  bool OnLeftButtonUp(albaEventInteraction *e) override;
+  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** While picking the camera does not move */
-  bool OnDrag(albaEventInteraction *e) override;
+  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Set the CTRL modifier to On => picking performed on LeftButtonDown + CTRL */
   void SetCtrlModifierOn() {m_UseCtrlModifier = true;}
@@ -54,7 +54,7 @@ protected:
   virtual ~albaSelectPointTool() {}
 
   /** Pick the point under the mouse and send it to the listener; return true if a point was picked */
-  bool PickPoint(albaEventInteraction *e);
+  bool PickPoint(vtkRenderer *ren, double pos[2]);
 
   bool m_IsPicking;       ///< true while the picking button is down
   bool m_UseCtrlModifier; ///< true if the picking needs CTRL

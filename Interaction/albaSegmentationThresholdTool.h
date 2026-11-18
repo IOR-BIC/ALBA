@@ -28,7 +28,7 @@ public:
   albaTypeMacro(albaSegmentationThresholdTool, albaSegmentationTool);
 
   /** Send the scalar value under the mouse */
-  bool OnMove(albaEventInteraction *e) override;
+  bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
 protected:
   albaSegmentationThresholdTool() {}

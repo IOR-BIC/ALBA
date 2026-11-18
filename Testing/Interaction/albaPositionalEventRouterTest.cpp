@@ -118,20 +118,22 @@ public:
     m_UseLeft = m_UseRight = m_UseMove = m_UseWheel = false;
     m_UseDrag = true;
     m_LeftDown = m_LeftUp = m_RightDown = m_RightUp = m_Drag = m_Move = m_Wheel = m_Push = m_Pop = 0;
+    m_LastPos[0] = m_LastPos[1] = m_LastRotation = 0;
   };
 
-  virtual bool OnLeftButtonDown(albaEventInteraction *e) {m_LeftDown++; return m_UseLeft;};
-  virtual bool OnLeftButtonUp(albaEventInteraction *e) {m_LeftUp++; return true;};
-  virtual bool OnRightButtonDown(albaEventInteraction *e) {m_RightDown++; return m_UseRight;};
-  virtual bool OnRightButtonUp(albaEventInteraction *e) {m_RightUp++; return true;};
-  virtual bool OnDrag(albaEventInteraction *e) {m_Drag++; return m_UseDrag;};
-  virtual bool OnMove(albaEventInteraction *e) {m_Move++; return m_UseMove;};
-  virtual bool OnWheel(albaEventInteraction *e) {m_Wheel++; return m_UseWheel;};
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {m_LeftDown++; return m_UseLeft;};
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {m_LeftUp++; return true;};
+  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {m_RightDown++; return m_UseRight;};
+  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {m_RightUp++; return true;};
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) {m_Drag++; return m_UseDrag;};
+  virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]) {m_Move++; m_LastPos[0] = pos[0]; m_LastPos[1] = pos[1]; return m_UseMove;};
+  virtual bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation) {m_Wheel++; m_LastRotation = rotation; return m_UseWheel;};
   virtual void OnPush() {m_Push++;};
   virtual void OnPop() {m_Pop++;};
 
   bool m_UseLeft, m_UseRight, m_UseMove, m_UseWheel, m_UseDrag;
   int m_LeftDown, m_LeftUp, m_RightDown, m_RightUp, m_Drag, m_Move, m_Wheel, m_Push, m_Pop;
+  double m_LastPos[2], m_LastRotation;
 };
 
 albaCxxTypeMacro(albaPERTestTool);
@@ -657,6 +659,7 @@ void albaPositionalEventRouterTest::TestToolOrder()
   SendToPER(per, mouse, albaDeviceButtonsPadMouse::GetMouse2DMoveId());
   CPPUNIT_ASSERT(top->m_Move == 1 && bottom->m_Move == 1);
   CPPUNIT_ASSERT(top->m_Drag == 0 && bottom->m_Drag == 0);
+  CPPUNIT_ASSERT(bottom->m_LastPos[0] == 10 && bottom->m_LastPos[1] == 20);
 
   top->m_UseWheel = true;
   double rotation = 120;
@@ -665,6 +668,7 @@ void albaPositionalEventRouterTest::TestToolOrder()
   wheel.SetChannel(MCH_INPUT);
   per->OnEvent(&wheel);
   CPPUNIT_ASSERT(top->m_Wheel == 1 && bottom->m_Wheel == 0);
+  CPPUNIT_ASSERT(top->m_LastRotation == 120);
 
   per->Delete();
   albaDEL(top);

@@ -22,8 +22,6 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class albaDevice;
-class albaDeviceButtonsPadMouse;
 class vtkCamera;
 
 /** Tool moving the camera with the mouse.
@@ -39,17 +37,17 @@ public:
 
   enum CAMERA_MOTIONS {MOTION_NONE = 0, MOTION_ROTATE, MOTION_PAN, MOTION_DOLLY, MOTION_SPIN};
 
-  virtual bool OnLeftButtonDown(albaEventInteraction *e);
-  virtual bool OnLeftButtonUp(albaEventInteraction *e) {return Stop(e);}
-  virtual bool OnMiddleButtonDown(albaEventInteraction *e) {return Start(e, MOTION_PAN);}
-  virtual bool OnMiddleButtonUp(albaEventInteraction *e) {return Stop(e);}
-  virtual bool OnRightButtonDown(albaEventInteraction *e) {return Start(e, MOTION_DOLLY);}
-  virtual bool OnRightButtonUp(albaEventInteraction *e) {return Stop(e);}
-  virtual bool OnDrag(albaEventInteraction *e);
-  virtual bool OnWheel(albaEventInteraction *e);
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return Stop();}
+  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Start(view, ren, pos, MOTION_PAN);}
+  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return Stop();}
+  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Start(view, ren, pos, MOTION_DOLLY);}
+  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return Stop();}
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation);
 
-  /** Return true if the camera is moving because of a button of the device */
-  bool IsInteracting(albaDevice *device);
+  /** Return true if the camera is moving because of a mouse button */
+  bool IsInteracting() {return m_Interacting;}
 
   /** Return the current camera motion */
   int GetMotion() {return m_Motion;}
@@ -61,11 +59,11 @@ protected:
   albaCameraMouseTool();
   virtual ~albaCameraMouseTool() {}
 
-  /** Start the motion if the event comes from a mouse and the camera is not already moving */
-  bool Start(albaEventInteraction *e, int motion);
+  /** Start the motion if the camera is not already moving */
+  bool Start(albaView *view, vtkRenderer *ren, double pos[2], int motion);
 
-  /** Stop the motion if the event comes from the mouse moving the camera */
-  bool Stop(albaEventInteraction *e);
+  /** Stop the motion, if the camera is moving */
+  bool Stop();
 
   void Rotate();
   void Spin();
@@ -78,7 +76,7 @@ protected:
   /** Reset the clipping range of the front renderer considering the other layers */
   void ResetClippingRange();
 
-  albaDeviceButtonsPadMouse *m_Mouse; ///< the mouse moving the camera, NULL if not interacting
+  bool m_Interacting; ///< true while the camera is moving because of a mouse button
   vtkCamera *m_CurrentCamera; ///< the camera being moved
   int m_Motion;
   int m_MousePose[2];

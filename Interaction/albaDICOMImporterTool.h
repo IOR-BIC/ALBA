@@ -35,16 +35,16 @@ public:
   albaTypeMacro(albaDICOMImporterTool, albaInteractionTool);
 
   /** Update the cursor on the sides of the crop rectangle */
-  bool OnMove(albaEventInteraction *e) override;
+  bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Start drawing or dragging the crop rectangle */
-  bool OnLeftButtonDown(albaEventInteraction *e) override;
+  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Draw or drag the crop rectangle */
-  bool OnDrag(albaEventInteraction *e) override;
+  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** End drawing or dragging the crop rectangle */
-  bool OnLeftButtonUp(albaEventInteraction *e) override;
+  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Redefined to add the crop rectangle to the renderer */
   virtual void SetRendererAndView(vtkRenderer *ren, albaView *view);

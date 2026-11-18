@@ -23,8 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaDICOMImporterTool.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
+#include "albaView.h"
 #include "albaRWIBase.h"
 
 #include "vtkActor.h"
@@ -101,42 +100,39 @@ albaDICOMImporterTool::~albaDICOMImporterTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaDICOMImporterTool::OnMove(albaEventInteraction *e)
+bool albaDICOMImporterTool::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
 {
-	if (GetEventRenderer(e) == NULL)
+	if (!IsOnToolRenderWindow(ren))
 		return false;
 
-	double mousePos[2], pos[4];
-	e->Get2DPosition(mousePos);
-	ComputeDisplayToWorld((int)mousePos[0], (int)mousePos[1], -1, pos);
-	CalculateSideDragged(pos);
+	double worldPos[4];
+	ComputeDisplayToWorld((int)pos[0], (int)pos[1], -1, worldPos);
+	CalculateSideDragged(worldPos);
 
-	albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-	UpdateCursor(mouse ? mouse->GetRWI() : NULL);
+	UpdateCursor(view ? view->GetRWI() : NULL);
 
 	m_Renderer->GetRenderWindow()->Render();
 	return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaDICOMImporterTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaDICOMImporterTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-	if (GetEventRenderer(e) == NULL)
+	if (!IsOnToolRenderWindow(ren))
 		return false;
 
-	double mousePos[2], pos[4];
-	e->Get2DPosition(mousePos);
-	ComputeDisplayToWorld((int)mousePos[0], (int)mousePos[1], -1, pos);
+	double worldPos[4];
+	ComputeDisplayToWorld((int)pos[0], (int)pos[1], -1, worldPos);
 
-	CalculateSideDragged(pos);
+	CalculateSideDragged(worldPos);
 
 	if (m_SideToBeDragged == NEW_BOX)
 	{
 		m_GizmoStatus = RESIZING_MODALITY;
-		pos[2] = 0;
-		m_CropPlane->SetOrigin(pos);
-		m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
-		m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
+		worldPos[2] = 0;
+		m_CropPlane->SetOrigin(worldPos);
+		m_CropPlane->SetPoint1(worldPos[0], worldPos[1], worldPos[2]);
+		m_CropPlane->SetPoint2(worldPos[0], worldPos[1], worldPos[2]);
 	}
 	else if (m_SideToBeDragged != NO_DRAGGING)
 		m_GizmoStatus = DRAG_MODALITY;
@@ -148,19 +144,17 @@ bool albaDICOMImporterTool::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaDICOMImporterTool::OnDrag(albaEventInteraction *e)
+bool albaDICOMImporterTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
 	if (m_GizmoStatus == NORMAL_MODALITY)
 		return false;
 
-	double mousePos[2];
-	e->Get2DPosition(mousePos);
-	MoveCropPlane((int)mousePos[0], (int)mousePos[1]);
+	MoveCropPlane((int)pos[0], (int)pos[1]);
 	return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaDICOMImporterTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaDICOMImporterTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
 	m_GizmoStatus = NORMAL_MODALITY;
 

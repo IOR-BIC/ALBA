@@ -25,6 +25,7 @@
 #include "albaCameraTool.h"
 #include "albaCameraMouseTool.h"
 #include "albaCameraTrackerTool.h"
+#include "albaDeviceButtonsPadTracker.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaCameraTool);
@@ -46,59 +47,75 @@ albaCameraTool::~albaCameraTool()
 //------------------------------------------------------------------------------
 albaInteractionTool *albaCameraTool::GetInteractingTool(albaDevice *device)
 {
-  if (m_MouseTool->IsInteracting(device))
-    return m_MouseTool;
-  if (m_TrackerTool->IsInteracting(device))
-    return m_TrackerTool;
-  return NULL;
+  if (albaDeviceButtonsPadTracker::SafeDownCast(device))
+    return m_TrackerTool->IsInteracting(device) ? m_TrackerTool : NULL;
+  return m_MouseTool->IsInteracting() ? m_MouseTool : NULL;
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaCameraTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnLeftButtonDown(e) || m_TrackerTool->OnLeftButtonDown(e);
+  return m_MouseTool->OnLeftButtonDown(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaCameraTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnLeftButtonUp(e) || m_TrackerTool->OnLeftButtonUp(e);
+  return m_MouseTool->OnLeftButtonUp(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnMiddleButtonDown(albaEventInteraction *e)
+bool albaCameraTool::OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnMiddleButtonDown(e) || m_TrackerTool->OnMiddleButtonDown(e);
+  return m_MouseTool->OnMiddleButtonDown(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnMiddleButtonUp(albaEventInteraction *e)
+bool albaCameraTool::OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnMiddleButtonUp(e) || m_TrackerTool->OnMiddleButtonUp(e);
+  return m_MouseTool->OnMiddleButtonUp(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnRightButtonDown(albaEventInteraction *e)
+bool albaCameraTool::OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnRightButtonDown(e) || m_TrackerTool->OnRightButtonDown(e);
+  return m_MouseTool->OnRightButtonDown(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnRightButtonUp(albaEventInteraction *e)
+bool albaCameraTool::OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnRightButtonUp(e) || m_TrackerTool->OnRightButtonUp(e);
+  return m_MouseTool->OnRightButtonUp(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnDrag(albaEventInteraction *e)
+bool albaCameraTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  return m_MouseTool->OnDrag(e) || m_TrackerTool->OnDrag(e);
+  return m_MouseTool->OnDrag(view, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaCameraTool::OnWheel(albaEventInteraction *e)
+bool albaCameraTool::OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation)
 {
-  return m_MouseTool->OnWheel(e) || m_TrackerTool->OnWheel(e);
+  return m_MouseTool->OnWheel(view, ren, pos, rotation);
+}
+
+//------------------------------------------------------------------------------
+bool albaCameraTool::OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose)
+{
+  return m_TrackerTool->OnTrackerButtonDown(tracker, button, pose);
+}
+
+//------------------------------------------------------------------------------
+bool albaCameraTool::OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button)
+{
+  return m_TrackerTool->OnTrackerButtonUp(tracker, button);
+}
+
+//------------------------------------------------------------------------------
+bool albaCameraTool::OnTrackerDrag(albaDeviceButtonsPadTracker *tracker, albaMatrix *pose)
+{
+  return m_TrackerTool->OnTrackerDrag(tracker, pose);
 }
 
 //------------------------------------------------------------------------------

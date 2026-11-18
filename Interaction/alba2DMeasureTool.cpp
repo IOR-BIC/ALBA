@@ -16,9 +16,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "alba2DMeasureTool.h"
 
 #include "albaDecl.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaDeviceButtonsPadTracker.h"
-#include "albaEventInteraction.h"
 #include "albaRWI.h"
 #include "albaTagArray.h"
 #include "albaVME.h"
@@ -50,7 +48,6 @@ alba2DMeasureTool::alba2DMeasureTool()
 	m_Coordinate = vtkCoordinate::New();
 	m_Coordinate->SetCoordinateSystemToWorld();
 
-	m_Mouse = NULL;
 	m_Renderer = NULL;
 	m_CurrentRenderer = NULL;
 	m_AllRenderersVector.clear();
@@ -113,24 +110,17 @@ alba2DMeasureTool::~alba2DMeasureTool()
 }
 
 //----------------------------------------------------------------------------
-void alba2DMeasureTool::InitRenderer(albaEventInteraction *e)
+void alba2DMeasureTool::InitRenderer(albaView *view, vtkRenderer *ren)
 {
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
-		if (m_Mouse == NULL)
-		{
-			albaDevice *device = albaDevice::SafeDownCast((albaDevice*)e->GetSender());
-			albaDeviceButtonsPadMouse  *mouse = albaDeviceButtonsPadMouse::SafeDownCast(device);
-			m_Mouse = mouse;
-		}
+		albaRWIBase *rwi = view ? view->GetRWI() : NULL;
 
-		albaRWIBase * mouseRWI = m_Mouse->GetRWI();
-
-		if (m_CurrentRwi == mouseRWI)
+		if (rwi == NULL || ren == NULL || m_CurrentRwi == rwi)
 			return;
 
-		m_CurrentRwi = mouseRWI;
-		m_Renderer = m_Mouse->GetRenderer();
+		m_CurrentRwi = rwi;
+		m_Renderer = ren;
 
 		double *normal = m_Renderer->GetActiveCamera()->GetViewPlaneNormal();
 		m_ViewPlaneNormal[X] = normal[X];
@@ -149,7 +139,7 @@ void alba2DMeasureTool::InitRenderer(albaEventInteraction *e)
 
 		if (m_Renderer->GetLayer() != 1)//Frontal Render
 		{
-			vtkRendererCollection *rc = m_Mouse->GetRenderer()->GetRenderWindow()->GetRenderers();
+			vtkRendererCollection *rc = ren->GetRenderWindow()->GetRenderers();
 
 			// Searching for a frontal renderer on render collection
 			if (rc)
@@ -208,19 +198,14 @@ void alba2DMeasureTool::SetUpdateDistance(double dist)
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-bool alba2DMeasureTool::IsMouseEvent(albaEventInteraction *e)
+bool alba2DMeasureTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-	return albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender()) != NULL;
-}
-//----------------------------------------------------------------------------
-bool alba2DMeasureTool::OnLeftButtonDown(albaEventInteraction *e)
-{
-	if (!m_IsEnabled || !IsMouseEvent(e))
+	if (!m_IsEnabled)
 		return false;
 
 	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
 
-	InitRenderer(e);
+	InitRenderer(view, ren);
 	m_CurrentRenderer = m_Renderer;
 
 	// with SHIFT, or with CTRL while adding a measure, the button is left to the PER for the whole interaction;
@@ -230,9 +215,8 @@ bool alba2DMeasureTool::OnLeftButtonDown(albaEventInteraction *e)
 
 	m_ButtonDownInside = m_IsInBound;
 
-	double pos_2d[2], pointCoord[3];
-	e->Get2DPosition(pos_2d);
-	ScreenToWorld(pos_2d, pointCoord);
+	double pointCoord[3];
+	ScreenToWorld(pos, pointCoord);
 
 	albaEventMacro(albaEvent(this, ID_MEASURE_STARTED));
 
@@ -258,15 +242,13 @@ bool alba2DMeasureTool::OnLeftButtonDown(albaEventInteraction *e)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool alba2DMeasureTool::OnLeftButtonUp(albaEventInteraction *e)
+bool alba2DMeasureTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
 	if (m_CurrentRenderer != m_Renderer)
 		return true;
 
-	double pos_2d[2];
 	double pointCoord[4];
-	e->Get2DPosition(pos_2d);
-	ScreenToWorld(pos_2d, pointCoord);
+	ScreenToWorld(pos, pointCoord);
 
 	switch (m_Action)
 	{
@@ -294,14 +276,12 @@ bool alba2DMeasureTool::OnLeftButtonUp(albaEventInteraction *e)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool alba2DMeasureTool::OnDrag(albaEventInteraction *e)
+bool alba2DMeasureTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-	InitRenderer(e);
+	InitRenderer(view, ren);
 
-	double pos_2d[2];
-	e->Get2DPosition(pos_2d);
 	double pointCoord[3];
-	ScreenToWorld(pos_2d, pointCoord);
+	ScreenToWorld(pos, pointCoord);
 
 	if (m_IsInBound != IsInBound(pointCoord) && m_Renderer)
 		m_Renderer->GetRenderWindow()->Render();
@@ -327,17 +307,15 @@ bool alba2DMeasureTool::OnDrag(albaEventInteraction *e)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool alba2DMeasureTool::OnMove(albaEventInteraction *e)
+bool alba2DMeasureTool::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
 {
-	if (!m_IsEnabled || !IsMouseEvent(e))
+	if (!m_IsEnabled)
 		return false;
 
-	InitRenderer(e);
+	InitRenderer(view, ren);
 
-	double pos_2d[2];
-	e->Get2DPosition(pos_2d);
 	double pointCoord[3];
-	ScreenToWorld(pos_2d, pointCoord);
+	ScreenToWorld(pos, pointCoord);
 
 	if (m_ShiftDown || (m_CtrlDown && m_Action == ACTION_ADD_MEASURE))
 	{

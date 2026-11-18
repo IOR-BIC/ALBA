@@ -23,9 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaSegmentationTool.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaEvent.h"
-#include "albaEventInteraction.h"
 #include "albaPickHelper.h"
 #include "albaView.h"
 #include "mmuIdFactory.h"
@@ -45,16 +43,9 @@ albaSegmentationTool::albaSegmentationTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationTool::IsOnToolView(albaEventInteraction *e)
+bool albaSegmentationTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice *)e->GetSender());
-  return mouse && m_View && mouse->GetView() == m_View;
-}
-
-//------------------------------------------------------------------------------
-bool albaSegmentationTool::OnLeftButtonDown(albaEventInteraction *e)
-{
-  if (!IsOnToolView(e))
+  if (!IsOnToolView(view))
     return false;
 
   long modifier = 0;
@@ -63,14 +54,14 @@ bool albaSegmentationTool::OnLeftButtonDown(albaEventInteraction *e)
   else if (m_AltDown)
     modifier = ALBA_ALT_KEY;
 
-  m_IsPicking = SendPickingInformation(e, modifier, VME_PICKED);
+  m_IsPicking = SendPickingInformation(pos, modifier, VME_PICKED);
   if (m_IsPicking)
-    SendPickingInformation(e, 0, VME_PICKING);
+    SendPickingInformation(pos, 0, VME_PICKING);
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaSegmentationTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   albaEventMacro(albaEvent(this, MOUSE_UP));
@@ -78,24 +69,24 @@ bool albaSegmentationTool::OnLeftButtonUp(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationTool::OnMiddleButtonDown(albaEventInteraction *e)
+bool albaSegmentationTool::OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
   // the camera moves with the drags
-  return IsOnToolView(e);
+  return IsOnToolView(view);
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationTool::OnRightButtonDown(albaEventInteraction *e)
+bool albaSegmentationTool::OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
   // the camera moves with the drags
-  return IsOnToolView(e);
+  return IsOnToolView(view);
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationTool::OnDrag(albaEventInteraction *e)
+bool albaSegmentationTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
   if (m_IsPicking)
-    SendPickingInformation(e, 0, VME_PICKING);
+    SendPickingInformation(pos, 0, VME_PICKING);
   return false;
 }
 
@@ -109,19 +100,16 @@ bool albaSegmentationTool::OnKey(int keyCode, bool pressed)
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationTool::SendPickingInformation(albaEventInteraction *e, long modifier, int eventId)
+bool albaSegmentationTool::SendPickingInformation(double pos[2], long modifier, int eventId)
 {
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
-
   // position and VME come from the same picking; m_PickPosition changes only when something is picked
   albaVME *pickedVME = NULL;
-  double pos[3];
-  if (albaPickHelper::PickCell(m_View, mousePos[0], mousePos[1], pos, &pickedVME))
+  double pickedPos[3];
+  if (albaPickHelper::PickCell(m_View, pos[0], pos[1], pickedPos, &pickedVME))
   {
-    m_PickPosition[0] = pos[0];
-    m_PickPosition[1] = pos[1];
-    m_PickPosition[2] = pos[2];
+    m_PickPosition[0] = pickedPos[0];
+    m_PickPosition[1] = pickedPos[1];
+    m_PickPosition[2] = pickedPos[2];
   }
 
   if (pickedVME == NULL)

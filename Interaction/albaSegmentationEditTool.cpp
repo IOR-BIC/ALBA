@@ -24,23 +24,19 @@
 
 #include "albaSegmentationEditTool.h"
 #include "albaEvent.h"
-#include "albaEventInteraction.h"
 #include "albaPickHelper.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaSegmentationEditTool);
 
 //------------------------------------------------------------------------------
-bool albaSegmentationEditTool::OnMove(albaEventInteraction *e)
+bool albaSegmentationEditTool::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(e))
+  if (!IsOnToolView(view))
     return false;
 
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
-
   // the position is sent even if nothing has been picked, (0, 0, 0) in that case
-  bool pickedSomething = albaPickHelper::PickCell(m_View, mousePos[0], mousePos[1], m_PickPosition);
+  bool pickedSomething = albaPickHelper::PickCell(m_View, pos[0], pos[1], m_PickPosition);
   albaEvent pickEvent(this, MOUSE_MOVE);
   pickEvent.SetPointer(m_PickPosition);
   pickEvent.SetArg(pickedSomething);
@@ -50,13 +46,12 @@ bool albaSegmentationEditTool::OnMove(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaSegmentationEditTool::OnWheel(albaEventInteraction *e)
+bool albaSegmentationEditTool::OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation)
 {
-  if (!IsOnToolView(e) || !m_ShiftDown)
+  if (!IsOnToolView(view) || !m_ShiftDown)
     return false;
 
-  long rotation = *(double *)e->GetData();
-  albaEvent scrollEvent(this, MOUSE_WHEEL, rotation);
+  albaEvent scrollEvent(this, MOUSE_WHEEL, (long)rotation);
   scrollEvent.SetPointer(m_PickPosition);
   albaEventMacro(scrollEvent);
   return true;

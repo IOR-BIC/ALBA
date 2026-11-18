@@ -31,10 +31,10 @@ public:
   albaTypeMacro(albaSegmentationEditTool, albaSegmentationTool);
 
   /** Send the position under the mouse, for the brush feedback */
-  bool OnMove(albaEventInteraction *e) override;
+  bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** With SHIFT send the wheel rotation */
-  bool OnWheel(albaEventInteraction *e) override;
+  bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation) override;
 
 protected:
   albaSegmentationEditTool() {}

@@ -27,23 +27,25 @@ class albaCameraMouseTool;
 class albaCameraTrackerTool;
 
 /** Tool moving the camera, always at the bottom of the tool stack of the PER.
-  It is made of the mouse camera tool and of the tracker camera tool: each event
-  goes first to the mouse tool, the common case, and to the tracker tool only
-  if the mouse tool did not use it. Removing the tracker support means removing
+  It is made of the mouse camera tool and of the tracker camera tool: the mouse
+  methods go to the mouse tool, the tracker methods to the tracker tool. Removing the tracker support means removing
   this class and the tracker tool and renaming the mouse tool as albaCameraTool. */
 class ALBA_EXPORT albaCameraTool : public albaInteractionTool
 {
 public:
   albaTypeMacro(albaCameraTool, albaInteractionTool);
 
-  virtual bool OnLeftButtonDown(albaEventInteraction *e);
-  virtual bool OnLeftButtonUp(albaEventInteraction *e);
-  virtual bool OnMiddleButtonDown(albaEventInteraction *e);
-  virtual bool OnMiddleButtonUp(albaEventInteraction *e);
-  virtual bool OnRightButtonDown(albaEventInteraction *e);
-  virtual bool OnRightButtonUp(albaEventInteraction *e);
-  virtual bool OnDrag(albaEventInteraction *e);
-  virtual bool OnWheel(albaEventInteraction *e);
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation);
+  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose);
+  virtual bool OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button);
+  virtual bool OnTrackerDrag(albaDeviceButtonsPadTracker *tracker, albaMatrix *pose);
 
   /** Set the state of the modifier keys, also on the mouse and tracker tools */
   virtual void SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown);

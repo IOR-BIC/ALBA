@@ -30,20 +30,20 @@ public:
   albaTypeMacro(albaSelectCellTool, albaInteractionTool);
 
   /** With CTRL on a cell start picking */
-  bool OnLeftButtonDown(albaEventInteraction *e) override;
+  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** End picking */
-  bool OnLeftButtonUp(albaEventInteraction *e) override;
+  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
   /** Keep picking while dragging: the camera does not move */
-  bool OnDrag(albaEventInteraction *e) override;
+  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
 
 protected:
   albaSelectCellTool();
   virtual ~albaSelectCellTool() {}
 
   /** Pick the cell under the mouse and send it to the listener; return true if a cell was picked */
-  bool PickCell(albaEventInteraction *e);
+  bool PickCell(vtkRenderer *ren, double pos[2]);
 
   bool m_IsPicking; ///< true while CTRL + left button is down
 

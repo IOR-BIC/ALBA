@@ -24,9 +24,6 @@
 
 #include "albaSelectCellToolTest.h"
 #include "albaSelectCellTool.h"
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -41,16 +38,14 @@ void albaSelectCellToolTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 void albaSelectCellToolTest::TestEventsWithoutRenderer()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaSelectCellTool *tool = albaSelectCellTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  double pos[2] = {10, 10};
   tool->SetModifierKeys(true, false, false); // CTRL down
 
   // no renderer: the button goes to the camera
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
-  CPPUNIT_ASSERT(!tool->OnDrag(&down));
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!tool->OnDrag(NULL, NULL, pos));
   CPPUNIT_ASSERT(tool->m_IsPicking == false);
 
   tool->Delete();
-  mouse->Delete();
 }

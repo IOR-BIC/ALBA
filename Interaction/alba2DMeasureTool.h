@@ -90,10 +90,10 @@ public:
 	};
 
 	/// TOOL EVENTS
-	virtual bool OnLeftButtonDown(albaEventInteraction *e);
-	virtual bool OnLeftButtonUp(albaEventInteraction *e);
-	virtual bool OnDrag(albaEventInteraction *e);
-	virtual bool OnMove(albaEventInteraction *e);
+	virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+	virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+	virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+	virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]);
 
 	/// MEASURE
 	/** Add Measure*/
@@ -219,10 +219,8 @@ protected:
 	alba2DMeasureTool();
 	virtual ~alba2DMeasureTool();
 
-	void InitRenderer(albaEventInteraction *e);
-
-	/** Return true if the event comes from the mouse: the measures work only with the mouse */
-	bool IsMouseEvent(albaEventInteraction *e);
+	/** Update the renderer and the plane of the measures when the mouse goes on another RWI */
+	void InitRenderer(albaView *view, vtkRenderer *ren);
 		
 	/** Draw New Measure*/
 	virtual void DrawNewMeasure(double * wp) {};
@@ -272,7 +270,6 @@ protected:
 	int PointUpDownLine(double *point, double *lp1, double *lp2);
 	void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance);
 
-	albaDeviceButtonsPadMouse	*m_Mouse;
 	vtkRenderer					*m_Renderer;
 	vtkRenderer					*m_CurrentRenderer;
 	std::vector<vtkRenderer *> m_AllRenderersVector;

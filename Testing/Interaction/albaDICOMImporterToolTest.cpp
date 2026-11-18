@@ -24,9 +24,6 @@
 
 #include "albaDICOMImporterToolTest.h"
 #include "albaDICOMImporterTool.h"
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -40,15 +37,13 @@ void albaDICOMImporterToolTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 void albaDICOMImporterToolTest::TestEventsWithoutRenderer()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaDICOMImporterTool *tool = albaDICOMImporterTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  double pos[2] = {10, 10};
 
   // no renderer: the events are not used
-  CPPUNIT_ASSERT(!tool->OnMove(&down));
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
-  CPPUNIT_ASSERT(!tool->OnDrag(&down));
+  CPPUNIT_ASSERT(!tool->OnMove(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!tool->OnDrag(NULL, NULL, pos));
 
   tool->Delete();
-  mouse->Delete();
 }

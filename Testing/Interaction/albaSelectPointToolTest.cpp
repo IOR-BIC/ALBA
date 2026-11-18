@@ -24,9 +24,6 @@
 
 #include "albaSelectPointToolTest.h"
 #include "albaSelectPointTool.h"
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -54,19 +51,17 @@ void albaSelectPointToolTest::TestSetGetCtrlModifier()
 //----------------------------------------------------------------------------
 void albaSelectPointToolTest::TestEventsWithoutRenderer()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
   albaSelectPointTool *tool = albaSelectPointTool::New();
-  albaEventInteraction down(mouse, albaDeviceButtonsPad::GetButtonDownId(), ALBA_LEFT_BUTTON);
+  double pos[2] = {10, 10};
   tool->SetModifierKeys(true, false, false); // CTRL down
 
   // no renderer: the button goes to the camera
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
-  CPPUNIT_ASSERT(!tool->OnDrag(&down));
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
+  CPPUNIT_ASSERT(!tool->OnDrag(NULL, NULL, pos));
 
   // without CTRL the button is not used when the CTRL modifier is on
   tool->SetModifierKeys(false, false, false);
-  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(&down));
+  CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
 
   tool->Delete();
-  mouse->Delete();
 }

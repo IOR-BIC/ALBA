@@ -23,24 +23,20 @@
 //----------------------------------------------------------------------------
 
 #include "albaSegmentationThresholdTool.h"
-#include "albaEventInteraction.h"
 #include "albaPickHelper.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaSegmentationThresholdTool);
 
 //------------------------------------------------------------------------------
-bool albaSegmentationThresholdTool::OnMove(albaEventInteraction *e)
+bool albaSegmentationThresholdTool::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(e))
+  if (!IsOnToolView(view))
     return false;
-
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
 
   double pickedPos[3];
   albaVME *pickedVME = NULL;
-  if (albaPickHelper::PickCell(m_View, mousePos[0], mousePos[1], pickedPos, &pickedVME) && pickedVME)
+  if (albaPickHelper::PickCell(m_View, pos[0], pos[1], pickedPos, &pickedVME) && pickedVME)
   {
     // the picked position can be slightly outside the data bounds because of approximation errors,
     // so it is clamped into the bounds to find the nearest point

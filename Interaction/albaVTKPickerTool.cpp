@@ -24,7 +24,6 @@
 
 #include "albaVTKPickerTool.h"
 #include "albaEvent.h"
-#include "albaEventInteraction.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkCamera.h"
@@ -51,10 +50,9 @@ albaVTKPickerTool::~albaVTKPickerTool()
 }
 
 //------------------------------------------------------------------------------
-bool albaVTKPickerTool::OnLeftButtonDown(albaEventInteraction *e)
+bool albaVTKPickerTool::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  vtkRenderer *renderer = GetEventRenderer(e);
-  if (renderer == NULL || !m_CtrlDown)
+  if (!IsOnToolRenderWindow(ren) || !m_CtrlDown)
     return false;
 
   // a picking not ended by a button up is ended here
@@ -64,19 +62,16 @@ bool albaVTKPickerTool::OnLeftButtonDown(albaEventInteraction *e)
     vtkDEL(m_Picker);
   }
 
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
-
   vtkNEW(m_Picker);
   m_Picker->SetTolerance(0.001);
-  if (m_Picker->Pick((int)mousePos[0], (int)mousePos[1], 0, renderer) == 0)
+  if (m_Picker->Pick((int)pos[0], (int)pos[1], 0, ren) == 0)
   {
     // nothing was picked: the button goes to the camera
     vtkDEL(m_Picker);
     return false;
   }
 
-  m_PickRenderer = renderer;
+  m_PickRenderer = ren;
   albaEvent ev(this, VME_PICKING, m_Picker);
   ev.SetBool(false);
   albaEventMacro(ev);
@@ -84,7 +79,7 @@ bool albaVTKPickerTool::OnLeftButtonDown(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaVTKPickerTool::OnLeftButtonUp(albaEventInteraction *e)
+bool albaVTKPickerTool::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
   if (m_Picker != NULL)
   {
@@ -95,13 +90,10 @@ bool albaVTKPickerTool::OnLeftButtonUp(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-bool albaVTKPickerTool::OnDrag(albaEventInteraction *e)
+bool albaVTKPickerTool::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
   if (m_Picker == NULL || !m_ContinuousPicking)
     return true;
-
-  double mousePos[2];
-  e->Get2DPosition(mousePos);
 
   // compute the new position of the picked point, at the same distance from the camera
   double cameraPos[3], pointOrigPos[3], pointNewPos[3];
@@ -115,8 +107,8 @@ bool albaVTKPickerTool::OnDrag(albaEventInteraction *e)
   m_PickRenderer->WorldToDisplay(); //project focal point
 
   double selPoint[3];
-  selPoint[0] = (int)mousePos[0];
-  selPoint[1] = (int)mousePos[1];
+  selPoint[0] = (int)pos[0];
+  selPoint[1] = (int)pos[1];
   selPoint[2] = m_PickRenderer->GetDisplayPoint()[2];
   m_PickRenderer->SetDisplayPoint(selPoint);
   m_PickRenderer->DisplayToWorld();

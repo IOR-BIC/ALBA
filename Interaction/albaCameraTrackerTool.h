@@ -37,9 +37,10 @@ class ALBA_EXPORT albaCameraTrackerTool : public albaInteractionTool
 public:
   albaTypeMacro(albaCameraTrackerTool, albaInteractionTool);
 
-  virtual bool OnLeftButtonDown(albaEventInteraction *e);
-  virtual bool OnLeftButtonUp(albaEventInteraction *e);
-  virtual bool OnDrag(albaEventInteraction *e);
+  /** The left button starts the motion */
+  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose);
+  virtual bool OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button);
+  virtual bool OnTrackerDrag(albaDeviceButtonsPadTracker *tracker, albaMatrix *pose);
 
   /** Return true if the camera is moving because of the device */
   bool IsInteracting(albaDevice *device);

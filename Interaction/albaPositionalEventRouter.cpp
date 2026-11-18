@@ -144,11 +144,18 @@ bool albaPositionalEventRouter::OnKey(int keyCode, bool pressed)
 //------------------------------------------------------------------------------
 bool albaPositionalEventRouter::ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e)
 {
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
+  if (tracker)
+    return tool->OnTrackerButtonDown(tracker, e->GetButton(), e->GetMatrix());
+
+  double pos[2];
+  e->Get2DPosition(pos);
   switch (e->GetButton())
   {
-    case ALBA_LEFT_BUTTON:   return tool->OnLeftButtonDown(e);
-    case ALBA_MIDDLE_BUTTON: return tool->OnMiddleButtonDown(e);
-    case ALBA_RIGHT_BUTTON:  return tool->OnRightButtonDown(e);
+    case ALBA_LEFT_BUTTON:   return tool->OnLeftButtonDown(device->GetView(), device->GetRenderer(), pos);
+    case ALBA_MIDDLE_BUTTON: return tool->OnMiddleButtonDown(device->GetView(), device->GetRenderer(), pos);
+    case ALBA_RIGHT_BUTTON:  return tool->OnRightButtonDown(device->GetView(), device->GetRenderer(), pos);
   }
   return false;
 }
@@ -156,13 +163,56 @@ bool albaPositionalEventRouter::ToolButtonDown(albaInteractionTool *tool, albaEv
 //------------------------------------------------------------------------------
 bool albaPositionalEventRouter::ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e)
 {
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
+  if (tracker)
+    return tool->OnTrackerButtonUp(tracker, e->GetButton());
+
+  double pos[2];
+  e->Get2DPosition(pos);
   switch (e->GetButton())
   {
-    case ALBA_LEFT_BUTTON:   return tool->OnLeftButtonUp(e);
-    case ALBA_MIDDLE_BUTTON: return tool->OnMiddleButtonUp(e);
-    case ALBA_RIGHT_BUTTON:  return tool->OnRightButtonUp(e);
+    case ALBA_LEFT_BUTTON:   return tool->OnLeftButtonUp(device->GetView(), device->GetRenderer(), pos);
+    case ALBA_MIDDLE_BUTTON: return tool->OnMiddleButtonUp(device->GetView(), device->GetRenderer(), pos);
+    case ALBA_RIGHT_BUTTON:  return tool->OnRightButtonUp(device->GetView(), device->GetRenderer(), pos);
   }
   return false;
+}
+
+//------------------------------------------------------------------------------
+bool albaPositionalEventRouter::ToolDrag(albaInteractionTool *tool, albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
+  if (tracker)
+    return tool->OnTrackerDrag(tracker, e->GetMatrix());
+
+  double pos[2];
+  e->Get2DPosition(pos);
+  return tool->OnDrag(device->GetView(), device->GetRenderer(), pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaPositionalEventRouter::ToolMove(albaInteractionTool *tool, albaEventInteraction *e)
+{
+  // the tools do not use the moves of the trackers without buttons pressed
+  albaDevice *device = (albaDevice *)e->GetSender();
+  if (albaDeviceButtonsPadTracker::SafeDownCast(device))
+    return false;
+
+  double pos[2];
+  e->Get2DPosition(pos);
+  return tool->OnMove(device->GetView(), device->GetRenderer(), pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaPositionalEventRouter::ToolWheel(albaInteractionTool *tool, albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  double pos[2];
+  e->Get2DPosition(pos);
+  double rotation = e->GetData() ? *(double *)e->GetData() : 0;
+  return tool->OnWheel(device->GetView(), device->GetRenderer(), pos, rotation);
 }
 
 //------------------------------------------------------------------------------
@@ -248,11 +298,11 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
     if (interactingTool)
     {
       TraceHandler("Tool", interactingTool);
-      if (!interactingTool->OnDrag(e))
+      if (!ToolDrag(interactingTool, e))
       {
         // the drags the tool does not use move the camera
         TraceHandler("Camera", m_CameraTool->GetInteractingTool(device));
-        m_CameraTool->OnDrag(e);
+        ToolDrag(m_CameraTool, e);
       }
       return true;
     }
@@ -262,7 +312,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
       return false;
 
     for (int i = tools.size() - 1; i >= 0; i--)
-      if (tools[i]->OnMove(e))
+      if (ToolMove(tools[i], e))
       {
         TraceHandler("Tool", tools[i]);
         return true;
@@ -273,7 +323,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
   if (id == albaDeviceButtonsPadMouse::GetWheelId())
   {
     for (int i = tools.size() - 1; i >= 0; i--)
-      if (tools[i]->OnWheel(e))
+      if (ToolWheel(tools[i], e))
       {
         TraceHandler("Tool", tools[i]);
         return true;
@@ -662,7 +712,7 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
 		if (id == albaDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
 		{
 			m_ShowContextMenu = false;
-			if (m_CameraTool->OnWheel(ei))
+			if (ToolWheel(m_CameraTool, ei))
 				TraceHandler("Camera", m_CameraTool->GetMouseTool());
 			WriteEventTrace(event);
 			return;
@@ -695,7 +745,7 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
       {
         TraceHandler("Camera", camera);
         if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
-          m_CameraTool->OnDrag(ei);
+          ToolDrag(m_CameraTool, ei);
         else if (id == albaDeviceButtonsPad::GetButtonUpId())
           ToolButtonUp(m_CameraTool, ei);
       }
