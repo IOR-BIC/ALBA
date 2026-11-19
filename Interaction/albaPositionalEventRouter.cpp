@@ -548,7 +548,6 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
   if(picked_bh)
   {
     // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME
-    picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!)
     picked_bh->SetPickedPosition(pickedPos);
     picked_bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
     if (ToolButtonDown(picked_bh, e))

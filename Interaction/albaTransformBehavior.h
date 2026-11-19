@@ -358,6 +358,9 @@ protected:
   //----------------------------------------------------------------------------
   void SnapOnSurface();
 
+  /** Pick the surface under the mouse, ignoring the actors of the moved VME; return true if something is picked */
+  bool PickUnderVME(double pickedPos[3], albaVME *&pickedVme);
+
 
 	//----------------------------------------------------------------------------
 	// normal on surface

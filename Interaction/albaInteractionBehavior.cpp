@@ -27,8 +27,6 @@
 #include "albaInteractionBehavior.h"
 #include "albaVME.h"
 
-#include "vtkProp3D.h"
-
 //------------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaInteractionBehavior);
 
@@ -36,7 +34,6 @@ albaCxxAbstractTypeMacro(albaInteractionBehavior);
 albaInteractionBehavior::albaInteractionBehavior()
 {
   m_VME = NULL;
-  m_Prop = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0;
 }
 
@@ -49,10 +46,4 @@ albaInteractionBehavior::~albaInteractionBehavior()
 void albaInteractionBehavior::SetVME(albaVME *vme)
 {
   m_VME = vme;
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionBehavior::SetProp(vtkProp3D *prop)
-{
-  m_Prop = prop;
 }

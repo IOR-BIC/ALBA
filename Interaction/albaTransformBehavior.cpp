@@ -28,6 +28,8 @@
 #include "albaMatrix.h"
 #include "albaTransform.h"
 #include "albaVMESurface.h"
+#include "albaSceneGraph.h"
+#include "albaSceneNode.h"
 
 #include "vtkDoubleArray.h"
 #include "vtkRenderWindowInteractor.h"
@@ -40,6 +42,9 @@
 #include "vtkPolyDataNormals.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkPropCollection.h"
+#include "vtkALBAAssembly.h"
+#include "vtkALBASmartPointer.h"
 #include "mmuIdFactory.h"
 
 albaCxxTypeMacro(albaTransformBehavior);
@@ -1336,12 +1341,10 @@ void albaTransformBehavior::TrackballRotate()
 void albaTransformBehavior::TrackballTranslate()
 //----------------------------------------------------------------------------
 {  
-  // Use initial center as the origin from which to pan
-
-  double *obj_center = m_Prop->GetCenter();
+  // the position picked by the button down gives the depth of the translation in the view plane
   double disp_obj_center[3], new_pick_point[4], old_pick_point[4], motion_vector[3];
   
-  ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], disp_obj_center);
+  ComputeWorldToDisplay(m_PickedPosition[0], m_PickedPosition[1], m_PickedPosition[2], disp_obj_center);
 
   ComputeDisplayToWorld((double)m_MousePointer2DPosition[0], (double)m_MousePointer2DPosition[1], disp_obj_center[2], new_pick_point);
   
@@ -1420,106 +1423,18 @@ void albaTransformBehavior::TrackballRoll()
 void albaTransformBehavior::NormalOnSurface()
 //----------------------------------------------------------------------------
 {
-	/*if (m_Renderer == NULL || m_Prop == NULL ) return;
+  if (m_Renderer == NULL || m_View == NULL || m_VME == NULL)
+    return;
 
-	int x = m_MousePointer2DPosition[0];
-	int y = m_MousePointer2DPosition[1];
-
-	vtkPropCollection *pc = vtkPropCollection::New();
-	m_Prop->GetActors(pc); 
-	pc->InitTraversal();
-	vtkProp* p = pc->GetNextProp();
-	while(p)
-	{
-		p->PickableOff();
-		p = pc->GetNextProp();
-	}
-
-	bool picked = false;
-	double newAbsPickPos[3];
-		if (m_View)
-	{
-		albaView *v = m_View;
-		if (v)
-		{
-			picked = v->Pick(x,y);
-			if(picked)
-			{
-				v->GetPickedPosition(newAbsPickPos);
-			}
-		}
-	}
-
-	pc->InitTraversal();
-	p = pc->GetNextProp();
-	while(p)
-	{
-		p->PickableOn();
-		p = pc->GetNextProp();
-	}
-
-	if (!picked)
-	{
-		TrackballTranslate();
-		return;
-	}
-	double absPivotPos[3];
-	assert(m_VME);
-	albaTransform::GetPosition(m_VME->GetAbsMatrixPipe()->GetMatrix(), absPivotPos);
-
-	double absMotionVec[3];
-	absMotionVec[0] = newAbsPickPos[0] - absPivotPos[0];
-	absMotionVec[1] = newAbsPickPos[1] - absPivotPos[1];
-	absMotionVec[2] = newAbsPickPos[2] - absPivotPos[2];*/
-
-	
   SnapOnSurface();
 
-	if (m_Renderer == NULL || m_Prop == NULL ) return;
-
-	int x = m_MousePointer2DPosition[0];
-	int y = m_MousePointer2DPosition[1];
-
-	vtkPropCollection *pc = vtkPropCollection::New();
-	m_Prop->GetActors(pc); 
-	pc->InitTraversal();
-	vtkProp* p = pc->GetNextProp();
-	while(p)
-	{
-		p->PickableOff();
-		p = pc->GetNextProp();
-	}
-
-	bool picked = false;
-	double newAbsPickPos[3];
-		albaVME *pickedVme;
-	if (m_View)
-	{
-		albaView *v = m_View;
-		if (v)
-		{
-			picked = v->Pick(x,y);
-			if(picked)
-			{
-				v->GetPickedPosition(newAbsPickPos);
-				pickedVme = v->GetPickedVme();
-			}
-		}
-	}
-
-	pc->InitTraversal();
-	p = pc->GetNextProp();
-	while(p)
-	{
-		p->PickableOn();
-		p = pc->GetNextProp();
-	}
-
-	if (!picked)
-	{
-		TrackballTranslate();
-		return;
-	}
+  double newAbsPickPos[3];
+  albaVME *pickedVme = NULL;
+  if (!PickUnderVME(newAbsPickPos, pickedVme))
+  {
+    TrackballTranslate();
+    return;
+  }
 
 	vtkPolyData *poly =  vtkPolyData::SafeDownCast(pickedVme->GetOutput()->GetVTKData());
 	if(poly == NULL) return;
@@ -1597,45 +1512,12 @@ void albaTransformBehavior::NormalOnSurface()
 void albaTransformBehavior::SnapOnSurface()
 //----------------------------------------------------------------------------
 {
-  if (m_Renderer == NULL || m_Prop == NULL ) return;
+  if (m_Renderer == NULL || m_View == NULL || m_VME == NULL)
+    return;
 
-  int x = m_MousePointer2DPosition[0];
-  int y = m_MousePointer2DPosition[1];
-
-	vtkPropCollection *pc = vtkPropCollection::New();
-	m_Prop->GetActors(pc); 
-	pc->InitTraversal();
-	vtkProp* p = pc->GetNextProp();
-	while(p)
-	{
-		p->PickableOff();
-		p = pc->GetNextProp();
-	}
-  
-  bool picked = false;
   double newAbsPickPos[3];
-    if (m_View)
-  {
-    albaView *v = m_View;
-    if (v)
-    {
-      picked = v->Pick(x,y);
-      if(picked)
-      {
-        v->GetPickedPosition(newAbsPickPos);
-      }
-    }
-  }
-
-  pc->InitTraversal();
-  p = pc->GetNextProp();
-  while(p)
-  {
-    p->PickableOn();
-    p = pc->GetNextProp();
-  }
-
-  if (!picked)
+  albaVME *pickedVme = NULL;
+  if (!PickUnderVME(newAbsPickPos, pickedVme))
   {
     TrackballTranslate();
     return;
@@ -1650,6 +1532,34 @@ void albaTransformBehavior::SnapOnSurface()
   absMotionVec[2] = newAbsPickPos[2] - absPivotPos[2];
 
   SendTransformMatrix(absMotionVec);
+}
+//----------------------------------------------------------------------------
+bool albaTransformBehavior::PickUnderVME(double pickedPos[3], albaVME *&pickedVme)
+//----------------------------------------------------------------------------
+{
+  // the actors of the moved VME are not pickable while picking the surface under it
+  albaSceneGraph *sg = m_View->GetSceneGraph();
+  albaSceneNode *node = sg ? sg->Vme2Node(m_VME) : NULL;
+  vtkALBASmartPointer<vtkPropCollection> actors;
+  if (node && node->GetAssemblyFront())
+    node->GetAssemblyFront()->GetActors(actors);
+
+  actors->InitTraversal();
+  for (vtkProp *p = actors->GetNextProp(); p; p = actors->GetNextProp())
+    p->PickableOff();
+
+  bool picked = m_View->Pick(m_MousePointer2DPosition[0], m_MousePointer2DPosition[1]);
+  if (picked)
+  {
+    m_View->GetPickedPosition(pickedPos);
+    pickedVme = m_View->GetPickedVme();
+  }
+
+  actors->InitTraversal();
+  for (vtkProp *p = actors->GetNextProp(); p; p = actors->GetNextProp())
+    p->PickableOn();
+
+  return picked;
 }
 
 //------------------------------------------------------------------------------
