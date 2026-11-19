@@ -56,12 +56,11 @@ public:
 
   virtual void SetBackgroundColor(wxColor color) {};
 
-  virtual bool FindPokedVme(albaDevice *device, albaMatrix &point_pose, vtkProp3D *&picked_prop, albaVME *&picked_vme, albaInteractionBehavior *&picked_behavior)
+  virtual bool FindPokedVme(albaDevice *device, albaMatrix &point_pose, albaVME *&picked_vme, albaInteractionBehavior *&picked_behavior)
   {
     if (!Pick((int)point_pose.GetElement(0,3), (int)point_pose.GetElement(1,3)))
       return false;
     picked_vme = m_PickedVME;
-    picked_prop = m_PickedProp;
     picked_behavior = m_PickedVME->GetBehavior();
     return true;
   };
@@ -72,7 +71,6 @@ public:
     m_LastPickX = x;
     m_LastPickY = y;
     m_PickedVME = m_FakeVme;
-    m_PickedProp = NULL;
     m_PickedPosition[0] = m_FakePosition[0]; m_PickedPosition[1] = m_FakePosition[1]; m_PickedPosition[2] = m_FakePosition[2];
     return m_FakeVme != NULL;
   };
@@ -256,13 +254,12 @@ void albaPositionalEventRouterTest::TestEventPickCache()
   albaEventInteraction e(mouse, DEVICE_BUTTON_DOWN);
   e.Set2DPosition(10, 20);
 
-  vtkProp3D *pickedProp = NULL;
   albaVME *pickedVme = NULL;
   albaInteractionBehavior *pickedBehavior = NULL;
   double pickedPos[3];
 
   // first request: the view picks at the event position
-  CPPUNIT_ASSERT(e.FindPokedVme(view, mouse, pickedProp, pickedVme, pickedBehavior));
+  CPPUNIT_ASSERT(e.FindPokedVme(view, mouse, pickedVme, pickedBehavior));
   CPPUNIT_ASSERT(pickedVme == vme);
   CPPUNIT_ASSERT(view->m_PickCount == 1);
   CPPUNIT_ASSERT(view->m_LastPickX == 10 && view->m_LastPickY == 20);
@@ -271,28 +268,28 @@ void albaPositionalEventRouterTest::TestEventPickCache()
 
   // next requests reuse the cached picking
   pickedVme = NULL;
-  CPPUNIT_ASSERT(e.FindPokedVme(view, mouse, pickedProp, pickedVme, pickedBehavior));
+  CPPUNIT_ASSERT(e.FindPokedVme(view, mouse, pickedVme, pickedBehavior));
   CPPUNIT_ASSERT(pickedVme == vme);
   CPPUNIT_ASSERT(view->m_PickCount == 1);
 
   // changing the position, resetting or using another view picks again
   e.Set2DPosition(30, 40);
-  e.FindPokedVme(view, mouse, pickedProp, pickedVme, pickedBehavior);
+  e.FindPokedVme(view, mouse, pickedVme, pickedBehavior);
   CPPUNIT_ASSERT(view->m_PickCount == 2);
   CPPUNIT_ASSERT(view->m_LastPickX == 30 && view->m_LastPickY == 40);
 
   e.ResetPick();
-  e.FindPokedVme(view, mouse, pickedProp, pickedVme, pickedBehavior);
+  e.FindPokedVme(view, mouse, pickedVme, pickedBehavior);
   CPPUNIT_ASSERT(view->m_PickCount == 3);
 
-  CPPUNIT_ASSERT(!e.FindPokedVme(otherView, mouse, pickedProp, pickedVme, pickedBehavior));
+  CPPUNIT_ASSERT(!e.FindPokedVme(otherView, mouse, pickedVme, pickedBehavior));
   CPPUNIT_ASSERT(pickedVme == NULL);
   CPPUNIT_ASSERT(otherView->m_PickCount == 1);
 
   // the cached picking is not copied
   albaEventInteraction copy;
   copy.DeepCopy(&e);
-  copy.FindPokedVme(view, mouse, pickedProp, pickedVme, pickedBehavior);
+  copy.FindPokedVme(view, mouse, pickedVme, pickedBehavior);
   CPPUNIT_ASSERT(view->m_PickCount == 4);
 
   vme->Delete();

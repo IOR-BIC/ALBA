@@ -151,7 +151,7 @@ void albaEventInteraction::DeepCopy(const albaEventBase *event)
 }
 
 //------------------------------------------------------------------------------
-bool albaEventInteraction::FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior)
+bool albaEventInteraction::FindPokedVme(albaView *view, albaDevice *device, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior)
 //------------------------------------------------------------------------------
 {
   if (!m_PickDone || view != m_PickView || device != m_PickDevice)
@@ -173,13 +173,12 @@ bool albaEventInteraction::FindPokedVme(albaView *view, albaDevice *device, vtkP
         pointPose.SetElement(1, 3, m_Y);
       }
 
-      m_Picked = view->FindPokedVme(device, pointPose, m_PickedProp, m_PickedVme, m_PickedBehavior);
+      m_Picked = view->FindPokedVme(device, pointPose, m_PickedVme, m_PickedBehavior);
       if (m_Picked)
         view->GetPickedPosition(m_PickedPosition);
     }
   }
 
-  pickedProp = m_PickedProp;
   pickedVme = m_PickedVme;
   pickedBehavior = m_PickedBehavior;
   return m_Picked;
@@ -202,7 +201,6 @@ void albaEventInteraction::ResetPick()
   m_Picked = false;
   m_PickView = NULL;
   m_PickDevice = NULL;
-  m_PickedProp = NULL;
   m_PickedVme = NULL;
   m_PickedBehavior = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;

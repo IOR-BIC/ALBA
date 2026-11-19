@@ -553,13 +553,12 @@ albaInteractionBehavior *albaPositionalEventRouter::PickBehavior(albaEventIntera
 {
   albaDevice *device = (albaDevice *)e->GetSender();
   albaView *view = device->GetView();
-  vtkProp3D *pickedProp = NULL;
   albaVME *pickedVme = NULL;
   albaInteractionBehavior *behavior = NULL;
   double pickedPos[3] = {0, 0, 0};
 
   // the picking is cached into the event
-  if (view && e->FindPokedVme(view, device, pickedProp, pickedVme, behavior))
+  if (view && e->FindPokedVme(view, device, pickedVme, behavior))
     e->GetPickedPosition(pickedPos);
 
   // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME

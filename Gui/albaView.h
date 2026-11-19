@@ -38,7 +38,6 @@ class albaRWIBase;
 class vtkCellPicker;
 class vtkALBARayCast3DPicker;
 class vtkAssemblyPath;
-class vtkProp3D;
 
 //----------------------------------------------------------------------------
 // const :
@@ -112,7 +111,7 @@ public:
   Find the pocked VME at button down. As argument the function needs
   the device which performed the action, and provides as result pointers
   to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior) {return false;};
+  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having albaView::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph
@@ -151,9 +150,6 @@ public:
 
   /** Return the picked VME during the Pick method. Return NULL if VME is not found*/
   virtual albaVME *GetPickedVme() {return m_PickedVME;};
-
-  /** Return the corresponding vtkProp3D of the picked VME*/
-  virtual vtkProp3D *GetPickedProp() {return m_PickedProp;};
 
   /** Return the number of visible VMEs.*/ 
   virtual int GetNumberOfVisibleVME() {return m_NumberOfVisibleVme;};
@@ -202,7 +198,6 @@ protected:
   vtkALBARayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
 
   albaVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
-  vtkProp3D     *m_PickedProp;  ///< Pointer to the picked vme Prop3D. It is initialized on picking
   double         m_PickedPosition[3];
   int            m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
 
