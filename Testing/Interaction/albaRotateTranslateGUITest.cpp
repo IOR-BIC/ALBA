@@ -112,12 +112,10 @@ void albaRotateTranslateGUITest::TestTransformBehaviors()
   albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
   albaRotateTranslateBehavior *behavior = gui->GetBehavior();
 
-  // three transform behaviors: left button rotates, middle button translates, left button with CTRL rolls
-  albaTransformBehavior *rotate = behavior->GetRotateBehavior();
-  albaTransformBehavior *translate = behavior->GetTranslateBehavior();
-  albaTransformBehavior *roll = behavior->GetRollBehavior();
-  CPPUNIT_ASSERT(rotate && translate && roll && rotate != translate && rotate != roll && translate != roll);
-  CPPUNIT_ASSERT(rotate->GetRotationFlag() && translate->GetTranslationFlag() && roll->GetRotationFlag());
+  // the behavior moves the input VME, with the default transforms in the view plane
+  CPPUNIT_ASSERT(behavior->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW);
+  CPPUNIT_ASSERT(behavior->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW);
+  CPPUNIT_ASSERT(behavior->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM);
 
   // without a renderer the buttons are not used; the right button is never used
   double pos[2] = {10, 20};
@@ -141,137 +139,127 @@ void albaRotateTranslateGUITest::TestOnEvent()
   gui->m_RotationConstraintId = albaRotateTranslateBehavior::X_AXIS;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_RotationConstraintId = albaRotateTranslateBehavior::Y_AXIS;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_RotationConstraintId = albaRotateTranslateBehavior::Z_AXIS;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
   gui->m_RotationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_RotationConstraintId = albaRotateTranslateBehavior::NORMAL_VIEW_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotateBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetRotationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
   //////////////////////////////////////////////////////////////////////////
   e.SetId(albaRotateTranslateGUI::ID_TRASLATION_AXES);
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::X_AXIS;
   gui->OnEvent(&e);
   
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::Y_AXIS;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::Z_AXIS;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::NORMAL_VIEW_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::XY_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::XZ_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::YZ_PLANE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::SURFACE_SNAP;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetSurfaceSnap() == true );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetSurfaceSnap() == true );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
   gui->m_TranslationConstraintId = albaRotateTranslateBehavior::NORMAL_SURFACE;
   gui->OnEvent(&e);
 
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetSurfaceNormal() == true );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetPivotRefSys()->GetType() == albaRefSys::CUSTOM );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
-  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslateBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetSurfaceNormal() == true );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE );
+  CPPUNIT_ASSERT( gui->GetBehavior()->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK );
 
 
 

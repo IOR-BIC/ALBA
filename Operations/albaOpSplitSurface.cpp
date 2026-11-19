@@ -31,7 +31,7 @@
 #include "albaGUI.h"
 #include "albaRefSys.h"
 #include "mmaMaterial.h"
-#include "albaRotateTranslateBehavior.h"
+#include "albaCutPlaneBehavior.h"
 #include "albaTransformBehavior.h"
 
 #include "albaSmartPointer.h"
@@ -779,30 +779,10 @@ void albaOpSplitSurface::ShowClipPlane(bool show)
 void albaOpSplitSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-  albaNEW(m_PlaneBehavior);
-  m_PlaneBehavior->EnableRoll(false);
-  m_PlaneBehavior->CreateTransformBehaviors(m_ImplicitPlaneGizmo);
-
   // left button rotates, middle button translates
-  m_IsaRotate = m_PlaneBehavior->GetRotateBehavior();
-  m_IsaRotate->SetListener(this);
-  m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetPivotRefSys()->SetTypeToView();
-  m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_IsaRotate->EnableRotation(true);
-
-  m_IsaTranslate = m_PlaneBehavior->GetTranslateBehavior();
-  m_IsaTranslate->SetListener(this);
-  m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_IsaTranslate->EnableTranslation(true);
+  albaNEW(m_PlaneBehavior);
+  m_PlaneBehavior->SetListener(this);
+  m_PlaneBehavior->SetVME(m_ImplicitPlaneGizmo);
 
 	if(!m_UseGizmo)
 		m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
@@ -812,11 +792,7 @@ void albaOpSplitSurface::AttachInteraction()
 void albaOpSplitSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
 {
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_PlaneBehavior->SetRefSysVME(m_ImplicitPlaneGizmo);
 }
 //----------------------------------------------------------------------------
 void albaOpSplitSurface::SetClippingModality(int mode)

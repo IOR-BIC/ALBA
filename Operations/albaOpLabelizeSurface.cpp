@@ -26,7 +26,7 @@
 #include "albaGUI.h"
 #include "mmaMaterial.h"
 #include "albaAbsMatrixPipe.h"
-#include "albaRotateTranslateBehavior.h"
+#include "albaCutPlaneBehavior.h"
 #include "albaTransformBehavior.h"
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
@@ -79,7 +79,6 @@ albaOp(label)
 	m_Arrow = NULL;
 	m_Gizmo = NULL;
 	m_PlaneBehavior = NULL;
-	m_PlaneClickBehavior = NULL;
 	m_InputSurface = NULL;
 	m_OriginalPolydata = NULL;
 	m_ClipperBoundingBox = NULL;
@@ -265,42 +264,14 @@ void albaOpLabelizeSurface::CreateGizmos()
 void albaOpLabelizeSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-	// without gizmo: left button rotates, middle button translates, SHIFT and CTRL clicks change the arrow and labelize
+	// left button rotates, middle button translates, SHIFT and CTRL clicks change the arrow and labelize;
+	// with gizmo the gizmo moves the plane: only the SHIFT and CTRL clicks
 	albaNEW(m_PlaneBehavior);
 	m_PlaneBehavior->SetListener(this);
-	m_PlaneBehavior->EnableRoll(false);
+	m_PlaneBehavior->SetVME(m_ImplicitPlaneGizmo);
 	m_PlaneBehavior->EnableModifierClicks(true);
-	m_PlaneBehavior->CreateTransformBehaviors(m_ImplicitPlaneGizmo);
-
-	m_IsaRotate = m_PlaneBehavior->GetRotateBehavior();
-	m_IsaRotate->SetListener(this);
-	m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
-	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetPivotRefSys()->SetTypeToView();
-	m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-	m_IsaRotate->EnableRotation(true);
-
-	m_IsaTranslate = m_PlaneBehavior->GetTranslateBehavior();
-	m_IsaTranslate->SetListener(this);
-	m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
-	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
-	m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-	m_IsaTranslate->EnableTranslation(true);
-
-	// with gizmo the gizmo moves the plane: only the SHIFT and CTRL clicks
-	albaNEW(m_PlaneClickBehavior);
-	m_PlaneClickBehavior->SetListener(this);
-	m_PlaneClickBehavior->EnableModifierClicks(true);
-
-	if(!m_UseGizmo)
-		m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
-	else
-		m_ImplicitPlaneGizmo->SetBehavior(m_PlaneClickBehavior);
+	m_PlaneBehavior->EnableTransform(!m_UseGizmo);
+	m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::ShowClipPlane(bool show)
@@ -444,10 +415,8 @@ void albaOpLabelizeSurface::OnEventThis(albaEventBase *alba_event)
 			break;
 		case ID_USE_GIZMO:
 			{
-				if(m_PlaneBehavior && !m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
-				else if(m_PlaneClickBehavior && m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_PlaneClickBehavior);
+				if(m_PlaneBehavior)
+					m_PlaneBehavior->EnableTransform(!m_UseGizmo);
 
 
 				ChangeGizmo();
@@ -565,11 +534,7 @@ void albaOpLabelizeSurface::Undo()
 void albaOpLabelizeSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
 {
-	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-
-	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+	m_PlaneBehavior->SetRefSysVME(m_ImplicitPlaneGizmo);
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::OpStop(int result)
@@ -593,7 +558,6 @@ void albaOpLabelizeSurface::OpStop(int result)
 	vtkDEL(m_ClipperPlane);
 
 	albaDEL(m_PlaneBehavior);
-	albaDEL(m_PlaneClickBehavior);
 
 	if(m_GizmoTranslate)
 		m_GizmoTranslate->Show(false);

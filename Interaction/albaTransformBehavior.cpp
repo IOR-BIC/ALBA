@@ -48,7 +48,7 @@ albaCxxTypeMacro(albaTransformBehavior);
 albaTransformBehavior::albaTransformBehavior() 
 //----------------------------------------------------------------------------
 {
-  m_Transforming = false;
+  m_TransformButton = -1;
   m_LastDragPos[0] = m_LastDragPos[1] = 0;
   m_TranslationFlag       = true;
   m_RotationFlag          = true;
@@ -62,6 +62,7 @@ albaTransformBehavior::albaTransformBehavior()
   m_RotationConstraint    = new albaInteractorConstraint;
   m_ScaleConstraint       = new albaInteractorConstraint;
   m_PivotRefSys           = new albaRefSys;
+  m_CurrentRotationConstraint = m_RotationConstraint;
   m_RotationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
   m_TranslationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
   m_PivotRefSys->SetTypeToLocal(); // the VME is set later !!!
@@ -192,13 +193,33 @@ void albaTransformBehavior::SetScaleConstraint(albaInteractorConstraint *constra
 //------------------------------------------------------------------------------
 bool albaTransformBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (SendModifierClick())
-    return true;
+  return StartTransform(ALBA_LEFT_BUTTON, view, ren, pos);
+}
 
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  return StartTransform(ALBA_MIDDLE_BUTTON, view, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::PrepareTransform(int button)
+{
+  return button == ALBA_LEFT_BUTTON;
+}
+
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::StartTransform(int button, albaView *view, vtkRenderer *ren, double pos[2])
+{
+  StopTransform(m_TransformButton);
   if (ren == NULL)
     return false;
 
   SetRendererAndView(ren, view);
+  m_CurrentRotationConstraint = m_RotationConstraint;
+  if (!PrepareTransform(button))
+    return false;
+
   SetCurrentCamera(ren->GetActiveCamera());
   m_LastDragPos[0] = (int)pos[0];
   m_LastDragPos[1] = (int)pos[1];
@@ -206,14 +227,14 @@ bool albaTransformBehavior::OnLeftButtonDown(albaView *view, vtkRenderer *ren, d
   // the VME has been picked by the PER, which set the prop and the picked position
   SetButtonDownPick(true, m_PickedPosition);
   OnButtonDownAction(m_LastDragPos[0], m_LastDragPos[1]);
-  m_Transforming = true;
+  m_TransformButton = button;
   return true;
 }
 
 //------------------------------------------------------------------------------
 bool albaTransformBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (!m_Transforming)
+  if (m_TransformButton < 0)
     return false;
 
   if ((int)pos[0] != m_LastDragPos[0] || (int)pos[1] != m_LastDragPos[1])
@@ -228,10 +249,22 @@ bool albaTransformBehavior::OnDrag(albaView *view, vtkRenderer *ren, double pos[
 //------------------------------------------------------------------------------
 bool albaTransformBehavior::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
 {
-  if (!m_Transforming)
+  return StopTransform(ALBA_LEFT_BUTTON);
+}
+
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+{
+  return StopTransform(ALBA_MIDDLE_BUTTON);
+}
+
+//------------------------------------------------------------------------------
+bool albaTransformBehavior::StopTransform(int button)
+{
+  if (button < 0 || button != m_TransformButton)
     return false;
 
-  m_Transforming = false;
+  m_TransformButton = -1;
   OnButtonUpAction();
   return true;
 }
@@ -688,7 +721,7 @@ void albaTransformBehavior::Rotate(double *p1, double *p2, double *viewup)
 //----------------------------------------------------------------------------
 {
   // set the constraint refsys to rotation constraint
-  m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
+  m_ConstrainRefSys = m_CurrentRotationConstraint->GetRefSys()->GetMatrix();
 
   //motion vector
   double motionVec[3];
@@ -707,15 +740,15 @@ void albaTransformBehavior::Rotate(double *p1, double *p2, double *viewup)
   //transform
   albaTransform transform;
 
-  int refSysType = GetRotationConstraint()->GetRefSys()->GetType();
+  int refSysType = m_CurrentRotationConstraint->GetRefSys()->GetType();
 
-  if (GetRotationConstraint()->GetNumberOfDOF() == 1)
+  if (m_CurrentRotationConstraint->GetNumberOfDOF() == 1)
   {    
 
     //get the constrain axis
-    int axis = GetRotationConstraint()->GetConstraintAxis();
+    int axis = m_CurrentRotationConstraint->GetConstraintAxis();
   
-    switch(GetRotationConstraint()->GetConstraintModality(axis)) 
+    switch(m_CurrentRotationConstraint->GetConstraintModality(axis)) 
     {
       case (albaInteractorConstraint::FREE):
       { 
@@ -729,7 +762,7 @@ void albaTransformBehavior::Rotate(double *p1, double *p2, double *viewup)
           double constrainVers[3];
 
           //get the constrain axis
-          int axis = GetRotationConstraint()->GetConstraintAxis();
+          int axis = m_CurrentRotationConstraint->GetConstraintAxis();
 
           albaTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);
           
@@ -810,7 +843,7 @@ void albaTransformBehavior::Rotate(double *p1, double *p2, double *viewup)
           double constrainVers[3];
 
           //get the constrain axis
-          int axis = GetRotationConstraint()->GetConstraintAxis();
+          int axis = m_CurrentRotationConstraint->GetConstraintAxis();
 
           albaTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);
           // centre of rotation in abs coordinates
@@ -835,7 +868,7 @@ void albaTransformBehavior::Rotate(double *p1, double *p2, double *viewup)
           double p2oSquared = vtkMath::Distance2BetweenPoints(p2, o);
           double p1oSquared = vtkMath::Distance2BetweenPoints(p1, o);
 
-          double angle = GetRotationConstraint()->GetStep(axis);
+          double angle = m_CurrentRotationConstraint->GetStep(axis);
 
           if (angleIsPositive) 
           {
@@ -864,22 +897,22 @@ void albaTransformBehavior::Rotate(double *p1, double *p2, double *viewup)
       break;
     }//switch  
   }//if
-  else if (GetRotationConstraint()->GetNumberOfDOF() == 2)
+  else if (m_CurrentRotationConstraint->GetNumberOfDOF() == 2)
   {
      // the constrain plane
     int constrainPlane;
 
     // get the translation plane
-    constrainPlane = GetRotationConstraint()->GetConstraintPlane();
+    constrainPlane = m_CurrentRotationConstraint->GetConstraintPlane();
 
     // get the constraint axes
     int axis1, axis2;
-    GetRotationConstraint()->GetConstraintPlaneAxes(axis1, axis2);
+    m_CurrentRotationConstraint->GetConstraintPlaneAxes(axis1, axis2);
 
-    if (GetRotationConstraint()->GetConstraintModality(axis1) == albaInteractorConstraint::FREE &&
-        GetRotationConstraint()->GetConstraintModality(axis2) == albaInteractorConstraint::FREE)
+    if (m_CurrentRotationConstraint->GetConstraintModality(axis1) == albaInteractorConstraint::FREE &&
+        m_CurrentRotationConstraint->GetConstraintModality(axis2) == albaInteractorConstraint::FREE)
     {
-      if (GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW)
+      if (m_CurrentRotationConstraint->GetRefSys()->GetType() == albaRefSys::VIEW)
       {
         if (constrainPlane == albaInteractorConstraint::XY)
         {				
@@ -1259,7 +1292,7 @@ void albaTransformBehavior::TrackballRotate()
    double v2[3];
 
    // set constraint refsys to rotation constraint
-   m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
+   m_ConstrainRefSys = m_CurrentRotationConstraint->GetRefSys()->GetMatrix();
 
    // register last mouse position
    int x = m_MousePointer2DPosition[0];
@@ -1330,7 +1363,7 @@ void albaTransformBehavior::TrackballRoll()
 //----------------------------------------------------------------------------
 {
    // get the rotation refsys
-   m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();  
+   m_ConstrainRefSys = m_CurrentRotationConstraint->GetRefSys()->GetMatrix();  
 
    // the refsys center
    double pivotPoint[3];

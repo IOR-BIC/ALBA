@@ -46,7 +46,7 @@ albaRotateTranslateGUI::albaRotateTranslateGUI(albaVME *input, albaObserver *lis
   m_OldBehavior = m_InputVME->GetBehavior();
   albaNEW(m_Behavior);
   m_Behavior->SetListener(this);
-  m_Behavior->CreateTransformBehaviors(m_InputVME);
+  m_Behavior->SetVME(m_InputVME);
 
   if (!m_TestMode)
   	CreateGui();

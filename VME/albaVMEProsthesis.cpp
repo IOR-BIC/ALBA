@@ -38,7 +38,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransformPolyDataFilter.h"
 #include "wx/listctrl.h"
 #include "albaProsthesisBehavior.h"
-#include "albaProsthesisTransformBehavior.h"
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
@@ -88,7 +87,7 @@ int albaVMEProsthesis::InternalInitialize()
 		// the prosthesis is moved freely with the mouse: the transforms come to OnEvent
 		albaNEW(m_TransformBehavior);
 		m_TransformBehavior->SetListener(this);
-		m_TransformBehavior->CreateTransformBehaviors(this);
+		m_TransformBehavior->SetVME(this);
 		SetBehavior(m_TransformBehavior);
 	}
 
@@ -609,8 +608,7 @@ void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
 //----------------------------------------------------------------------------
 void albaVMEProsthesis::Set2dModality(bool mod2d)
 {
-	albaProsthesisTransformBehavior* isaRotate = albaProsthesisTransformBehavior::SafeDownCast(m_TransformBehavior->GetRotateBehavior());
-	isaRotate->Set2DModality(mod2d);
+	m_TransformBehavior->Set2DModality(mod2d);
 }
 
 //-------------------------------------------------------------------------

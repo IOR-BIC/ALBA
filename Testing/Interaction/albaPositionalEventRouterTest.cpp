@@ -90,15 +90,10 @@ class albaPERTestTransformListener : public albaObserver // stores the picked po
 //----------------------------------------------------------------------------
 {
 public:
-  albaPERTestTransformListener() {m_MouseDownCount = m_ClickCount = 0; m_ClickKey = -1; m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;};
+  albaPERTestTransformListener() {m_MouseDownCount = 0; m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;};
   virtual void OnEvent(albaEventBase *event)
   {
     albaEvent *e = albaEvent::SafeDownCast(event);
-    if (e && e->GetId() == ID_CLICK_ON_VME)
-    {
-      m_ClickCount++;
-      m_ClickKey = e->GetArg();
-    }
     if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
     {
       m_MouseDownCount++;
@@ -107,8 +102,6 @@ public:
   };
 
   int    m_MouseDownCount;
-  int    m_ClickCount;
-  long   m_ClickKey;
   double m_PickedPosition[3];
 };
 
@@ -521,25 +514,10 @@ void albaPositionalEventRouterTest::TestTransformBehaviorButtons()
   CPPUNIT_ASSERT(!transform->OnDrag(NULL, NULL, pos));
   CPPUNIT_ASSERT(!transform->OnLeftButtonUp(NULL, NULL, pos));
 
-  // only the left button starts the transform
+  // the middle and right buttons are not used
   CPPUNIT_ASSERT(!transform->OnMiddleButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(!transform->OnRightButtonDown(NULL, NULL, pos));
-
-  // the clicks with modifier, when enabled, send ID_CLICK_ON_VME; SHIFT wins over CTRL
-  albaPERTestTransformListener listener;
-  transform->SetListener(&listener);
-  transform->SetModifierKeys(true, false, false);
-  CPPUNIT_ASSERT(!transform->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_ClickCount == 0);
-  transform->EnableModifierClicks(true);
-  CPPUNIT_ASSERT(transform->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_ClickCount == 1 && listener.m_ClickKey == ALBA_CTRL_KEY);
-  transform->SetModifierKeys(true, false, true);
-  CPPUNIT_ASSERT(transform->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_ClickCount == 2 && listener.m_ClickKey == ALBA_SHIFT_KEY);
-  transform->SetModifierKeys(false, false, false);
-  CPPUNIT_ASSERT(!transform->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_ClickCount == 2);
+  CPPUNIT_ASSERT(!transform->OnMiddleButtonUp(NULL, NULL, pos));
 
   transform->Delete();
 }

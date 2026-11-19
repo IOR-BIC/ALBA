@@ -24,41 +24,37 @@
 //----------------------------------------------------------------------------
 class albaView;
 
-/** Behavior moving the prosthesis freely: it creates albaProsthesisTransformBehavior, which rotates
-  the VME freely around its pivot, and adapts the rotation constraint to the view: in the slice views
-  the rotation is around the view normal. The left button with SHIFT uses a fourth transform behavior
-  with the default constraints. */
+/** Behavior moving the prosthesis: the left button rotates freely around the pivot (SetRefSysVME),
+  in the slice views and in 2D modality around the view normal; the left button + CTRL rolls,
+  the left button + SHIFT and the middle button translate in the view plane. */
 class ALBA_EXPORT albaProsthesisBehavior : public albaRotateTranslateBehavior
 {
 public:
   albaTypeMacro(albaProsthesisBehavior, albaRotateTranslateBehavior);
 
-  /** Create also the transform behavior of the left button with SHIFT */
-  void CreateTransformBehaviors(albaVME *vme) override;
-
-  albaTransformBehavior *GetShiftTransformBehavior() {return m_ShiftTransform;}
+  /** In 2D modality the left button rotates around the view normal */
+  void Set2DModality(bool mod2d) {m_Modality2D = mod2d;}
 
 protected:
   albaProsthesisBehavior();
   virtual ~albaProsthesisBehavior();
 
-  /** The left button with SHIFT uses the SHIFT transform behavior */
-  albaTransformBehavior *GetLeftButtonTransform() override;
+  /** The left button + SHIFT translates; the rotation constraint of the left button depends on the view */
+  bool PrepareTransform(int button) override;
 
-  /** Create the free transform behavior */
-  albaTransformBehavior *NewTransformBehavior() override;
+  /** Free rotation around the pivot, or roll in 2D modality */
+  void TrackballRotate() override;
 
-  /** Adapt the rotation constraint to the view */
-  void OnTransform() override;
+  /** Rotation around the view normal */
+  void TrackballRoll() override;
 
   /** Return true for the slice views */
   bool IsSliceView(albaView *v);
 
-  albaTransformBehavior *m_ShiftTransform; ///< left button + SHIFT
+  bool m_Modality2D; ///< true if the left button rotates around the view normal
 
 private:
   albaProsthesisBehavior(const albaProsthesisBehavior&);  // Not implemented.
   void operator=(const albaProsthesisBehavior&);  // Not implemented.
 };
-
 #endif

@@ -69,6 +69,7 @@ SET(PROJECT_SRCS
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
   albaRotateTranslateBehavior.cpp  					albaRotateTranslateBehavior.h
   albaProsthesisBehavior.cpp  					albaProsthesisBehavior.h
+  albaCutPlaneBehavior.cpp  					albaCutPlaneBehavior.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
   albaTransformBehavior.cpp  			albaTransformBehavior.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
@@ -98,7 +99,6 @@ SET(PROJECT_SRCS
 	alba2DMeasureSegmentTool.cpp			alba2DMeasureSegmentTool.h
 	alba2DMeasureTemplateTool.cpp		alba2DMeasureTemplateTool.h
 	
-	albaProsthesisTransformBehavior.cpp	albaProsthesisTransformBehavior.h
 	alba2DMeasureEllipseTool.cpp alba2DMeasureEllipseTool.h
 )
 

@@ -25,7 +25,6 @@
 
 
 #include "albaInteractionBehavior.h"
-#include "albaEvent.h"
 #include "albaVME.h"
 
 #include "vtkProp3D.h"
@@ -39,7 +38,6 @@ albaInteractionBehavior::albaInteractionBehavior()
   m_VME = NULL;
   m_Prop = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0;
-  m_ModifierClicks = false;
 }
 
 //------------------------------------------------------------------------------
@@ -57,14 +55,4 @@ void albaInteractionBehavior::SetVME(albaVME *vme)
 void albaInteractionBehavior::SetProp(vtkProp3D *prop)
 {
   m_Prop = prop;
-}
-
-//------------------------------------------------------------------------------
-bool albaInteractionBehavior::SendModifierClick()
-{
-  if (!m_ModifierClicks || !(m_ShiftDown || m_CtrlDown))
-    return false;
-
-  albaEventMacro(albaEvent(this, ID_CLICK_ON_VME, (long)(m_ShiftDown ? ALBA_SHIFT_KEY : ALBA_CTRL_KEY)));
-  return true;
 }

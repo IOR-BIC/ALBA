@@ -28,7 +28,6 @@ public:
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestSetGetRenderer );
   CPPUNIT_TEST( TestButtonsNotUsed );
-  CPPUNIT_TEST( TestModifierClick );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -37,7 +36,6 @@ protected:
   void TestConstructorDestructor();
   void TestSetGetRenderer();
   void TestButtonsNotUsed();
-  void TestModifierClick();
 };
 
 #endif

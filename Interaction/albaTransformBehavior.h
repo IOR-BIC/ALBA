@@ -35,8 +35,9 @@ class vtkCamera;
 class vtkDoubleArray;
 
 /** Constrained interaction with mouse device: the left button moves the VME (see OnLeftButtonDown).
-  It can be set as behavior of a VME, as the gizmos do, or used by a behavior with more modes,
-  like albaRotateTranslateBehavior, which chooses one of its transform behaviors in its button methods.
+  It can be set as behavior of a VME, as the gizmos do. Subclasses with more modes, like
+  albaRotateTranslateBehavior, redefine PrepareTransform, which at each button down chooses
+  the transform of that button and modifier keys (flags and rotation constraint), or refuses the button.
 
   Among the other features we have: translation constrains, like projection on an axis or plane,
   and rotational constrains like rotation around a single axis or translation snapping on specified
@@ -169,15 +170,17 @@ public:
 	void SurfaceNormalOff() {SetSurfaceNormal(false);}
 
   
-  /** The left button starts the transform; the PER sets the prop and the picked position first.
-    Return false without a renderer. With the clicks with modifier enabled, SHIFT and CTRL send ID_CLICK_ON_VME instead. */
+  /** The left and middle buttons start the transform if PrepareTransform accepts them;
+    the PER sets the prop and the picked position first. Return false without a renderer. */
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
 
   /** The drags change the transform */
   virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
 
-  /** The release of the left button ends the transform */
+  /** The release of the button that started the transform ends it */
   virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
 
   //----------------------------------------------------------------------------
   // Actions performed on mouse driven events
@@ -243,7 +246,20 @@ protected:
   albaTransformBehavior();
   ~albaTransformBehavior();
 
-  bool m_Transforming;    ///< true from the button down to the button up
+  /** Called at each button down, after setting renderer and view and resetting the current rotation
+    constraint to the rotation constraint: return false if the button is not used; subclasses can choose
+    here the transform of the button and of the modifier keys. Default: only the left button, with the
+    configured flags and constraints. */
+  virtual bool PrepareTransform(int button);
+
+  /** Start the transform of the button, if PrepareTransform accepts it */
+  bool StartTransform(int button, albaView *view, vtkRenderer *ren, double pos[2]);
+
+  /** End the transform, if started by the button */
+  bool StopTransform(int button);
+
+  int m_TransformButton;  ///< the button that started the transform, -1 if none
+  albaInteractorConstraint *m_CurrentRotationConstraint; ///< the rotation constraint of the current transform, chosen by PrepareTransform
   int m_LastDragPos[2];   ///< the last position of the drags, the drags without a change of position are discarded
 
   /** Only one flag can be true: the mouse can only translate, rotate or scale during a single move */

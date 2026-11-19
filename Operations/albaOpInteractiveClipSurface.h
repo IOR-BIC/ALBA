@@ -31,8 +31,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaEvent;
-class albaRotateTranslateBehavior;
-class albaTransformBehavior;
+class albaCutPlaneBehavior;
 class albaVMESurface;
 class albaVMEGizmo;
 class albaVME;
@@ -164,8 +163,7 @@ protected:
 	vtkALBAClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
-  albaTransformBehavior    *m_IsaTranslate;               ///< behavior of the plane without gizmo
-  albaRotateTranslateBehavior *m_PlaneClickBehavior;     ///< behavior of the plane with gizmo: only the SHIFT and CTRL clicks
+  albaCutPlaneBehavior *m_PlaneBehavior;     ///< behavior of the plane: with gizmo only the SHIFT and CTRL clicks
 
   vtkPolyData *m_OldSurface;
 	std::vector<vtkPolyData*> m_ResultPolyData;

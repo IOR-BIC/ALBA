@@ -50,19 +50,10 @@ public:
   /** Set the position picked on the VME by the button down */
   void SetPickedPosition(double pos[3]) {m_PickedPosition[0] = pos[0]; m_PickedPosition[1] = pos[1]; m_PickedPosition[2] = pos[2];}
 
-  /** Enable/disable the clicks with modifier: the left button with SHIFT or CTRL sends ID_CLICK_ON_VME
-    to the listener instead of being handled by the behavior, with ALBA_SHIFT_KEY or ALBA_CTRL_KEY
-    as arg (SHIFT wins); default disabled */
-  void EnableModifierClicks(bool enable) {m_ModifierClicks = enable;}
-
 protected:
-  /** Send ID_CLICK_ON_VME if the clicks with modifier are enabled and SHIFT or CTRL is down; return true if sent */
-  bool SendModifierClick();
-
   albaVME       *m_VME;               ///< the VME moved by the behavior (optional)
   vtkALBASmartPointer<vtkProp3D> m_Prop; ///< the picked prop (optional)
   double m_PickedPosition[3];         ///< the position picked on the VME by the button down
-  bool m_ModifierClicks;              ///< true if the left button with SHIFT or CTRL sends ID_CLICK_ON_VME
 
 private:
   albaInteractionBehavior(const albaInteractionBehavior&);  // Not implemented.
