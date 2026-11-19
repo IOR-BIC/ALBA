@@ -22,12 +22,6 @@ Version:   $Revision: 1.10 $
 #include "vtkALBASmartPointer.h"
 #endif
 
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-ALBA_ID_IMP(albaAgent::AGENT_INITIALIZE);
-
 //------------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaAgent);
 //------------------------------------------------------------------------------
@@ -190,9 +184,6 @@ void albaAgent::OnEvent(albaEventBase *event)
 {
   assert(event);
  
-  if (event->GetId()==AGENT_INITIALIZE)
-    Initialize();
-  
   if (event->GetSender()!=this) // avoid loops!
   {
     // default behavior is to pass on the event on the same channel

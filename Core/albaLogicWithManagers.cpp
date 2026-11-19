@@ -838,14 +838,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
 			break;
-		case DEVICE_ADD:
-			m_InteractionManager->AddDeviceToTree((albaDevice *)e->GetMafObject());
-			break;
-		case DEVICE_REMOVE:
-			m_InteractionManager->RemoveDeviceFromTree((albaDevice *)e->GetMafObject());
-			break;
-		case DEVICE_GET:
-			break;
 		case CREATE_STORAGE:
 			CreateStorage(e);
 			break;

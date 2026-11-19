@@ -31,9 +31,6 @@
 // Events
 //------------------------------------------------------------------------------
 ALBA_ID_IMP(albaAction::DEVICE_BIND);
-ALBA_ID_IMP(albaAction::QUERY_CONNECTED_DEVICES);
-ALBA_ID_IMP(albaAction::DEVICE_PLUGGED);
-ALBA_ID_IMP(albaAction::DEVICE_UNPLUGGED);
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaAction)
@@ -179,32 +176,10 @@ void albaAction::OnEvent(albaEventBase *event)
   albaID id=event->GetId();
   albaID ch=event->GetChannel();
 
-  // for catching view select event
-  if (ch==MCH_OUTPUT && id==QUERY_CONNECTED_DEVICES)
-  {
-    albaAgent *sender=(albaAgent *)event->GetSender();
-    assert(sender);
-    
-    
-    for (mmuDeviceList::iterator it=m_Devices.begin();it!=m_Devices.end();it++)
-    {
-      albaDevice *dev=it->GetPointer();
-      if (dev->IsInitialized())
-      {
-        // send an event only to the inquiring object about all plugged devices
-        sender->OnEvent(&albaEventBase(this,DEVICE_PLUGGED,dev,MCH_INPUT));
-      }      
-    }
-  }
-  else if (ch==MCH_INPUT && id==albaDevice::DEVICE_STARTED)
+  if (ch==MCH_INPUT && id==albaDevice::DEVICE_STARTED)
   {
     // send an event to all observers to advise about a plugged device
     InvokeEvent(this,DEVICE_BIND,MCH_INPUT,(albaDevice *)event->GetSender());
-  }
-  else if (ch==MCH_INPUT && id==albaDevice::DEVICE_STOPPED)
-  {
-    // send an event to all observers to advise about an unplugged device
-    InvokeEvent(this,DEVICE_UNPLUGGED,MCH_INPUT,(albaDevice *)event->GetSender());
   }
   else
   {

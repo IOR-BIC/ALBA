@@ -42,23 +42,11 @@ public:
   // Events
   //------------------------------------------------------------------------------
   /** @ingroup Events 
-      Adds a device (passed in the Data argument) to this set (to be removed) */
-  ALBA_ID_DEC(DEVICE_ADD);
-  /** @ingroup Events 
-      Remove a device (passed in the Data argument) from this set (to be removed) */
-  ALBA_ID_DEC(DEVICE_REMOVE);
-  /** @ingroup Events 
       Issued when a new device (passed in the Data argument) is added to this set */
   ALBA_ID_DEC(DEVICE_ADDED);
   /** @ingroup Events 
       Issued when a device (passed in the Data argument) is being removed from this set */
   ALBA_ID_DEC(DEVICE_REMOVING); 
-  /** @ingroup channel
-      New channel for settings */
-  //ALBA_ID_DEC(MCH_DEVICE_SETUP);
-  /** @ingroup channel 
-      New channel for settings */
-  //ALBA_ID_DEC(MCH_DEVICE_SETDOWN);
 
   albaTypeMacro(albaDeviceSet,albaDevice);
 

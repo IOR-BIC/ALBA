@@ -271,31 +271,6 @@ void albaDeviceButtonsPadTracker::SetLastPoseMatrix(const albaMatrix &matrix)
   // are doing this operation, since that event wouldn't be the last one.
   if (m_LastPose==1&&elapsed_time>m_MoveEventTimeOut)
   {
- /*   
-    int queue_size = GetQueueSize();
-    for (int i=0;i<queue_size;i++)
-    {
-      albaEventBase *temp;
-      albaID ch;
-
-      // check if for some reason queue is already empty (it shouldn't!)
-      if (!PopEvent(temp,ch))
-        break;
-      
-      if (temp->GetID()==mflThreadedAgent::AsyncDispatchEvent)
-      {
-        albaEventBase *event=albaEventBase::SafeDownCast((vtkObject*)temp->GetData());
-        assert(event);
-        if (event->GetID()==TRACKER_3D_MOVE)
-        {
-          temp->UnRegister(this); // simply unregister
-          continue;
-        }
-      }      
-      PushEvent(temp,ch); // re-push
-      // it has been already re-registered by Push
-      temp->UnRegister(this);
-    }*/
     m_LastPose = 0;
     m_Dispatched=true;
   }

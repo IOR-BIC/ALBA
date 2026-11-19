@@ -298,9 +298,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 
 
-																												DEVICE_ADD,
-																												DEVICE_REMOVE,
-																												DEVICE_GET,
 																												// resize window
 																												TILE_WINDOW_CASCADE,
 																												TILE_WINDOW_HORIZONTALLY,
