@@ -36,6 +36,7 @@
 #include "albaTransform.h"
 #include "albaInteractionTool.h"
 #include "albaCameraTool.h"
+#include "albaSelectTool.h"
 #include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
@@ -194,9 +195,10 @@ void albaPositionalEventRouterTest::TestEnableSelect()
   albaPositionalEventRouter *mip = albaPositionalEventRouter::New();
   CPPUNIT_ASSERT(mip);
 
-  CPPUNIT_ASSERT(mip->m_CanSelect == true);
+  // the selection belongs to the select tool of the PER
+  CPPUNIT_ASSERT(mip->GetSelectTool()->IsSelectEnabled());
   mip->EnableSelect(false);
-  CPPUNIT_ASSERT(mip->m_CanSelect == false);
+  CPPUNIT_ASSERT(!mip->GetSelectTool()->IsSelectEnabled());
 
   mip->Delete();
 }

@@ -647,9 +647,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case VME_SELECTED:
 			VmeSelected(e->GetVme());
 			break;
-		case VME_DCLICKED:
-			VmeDoubleClicked(*e);
-			break;
 		case VME_ADDED:
 			VmeAdded(e->GetVme());
 			break;
@@ -1306,15 +1303,6 @@ void albaLogicWithManagers::VmeVisualModeChanged(albaVME * vme)
 	{
 		VmeShow(vme, false);
 		VmeShow(vme, true);
-	}
-}
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::VmeDoubleClicked(albaEvent &e)
-{
-	albaVME *node = e.GetVme();
-	if (node)
-	{
-		albaLogMessage("Double click on %s", node->GetName());
 	}
 }
 //----------------------------------------------------------------------------

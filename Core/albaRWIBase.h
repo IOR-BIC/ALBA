@@ -141,7 +141,7 @@ public:
   void OnPaint(wxPaintEvent &event);
 	/**  */
   void OnEraseBackground (wxEraseEvent& event);
-  /** Capture left mouse double click and notify it.*/
+  /** The double click is sent as a left button down */
   virtual void OnLeftMouseDoubleClick(wxMouseEvent &event);
 	/** Capture mouse and notify the mouse click. */
   virtual void OnLeftMouseButtonDown(wxMouseEvent &event);

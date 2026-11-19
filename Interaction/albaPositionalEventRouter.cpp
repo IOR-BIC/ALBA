@@ -33,6 +33,7 @@
 #include "albaAvatar3D.h"
 #include "albaCameraTool.h"
 #include "albaCameraMouseTool.h"
+#include "albaSelectTool.h"
 
 #include "albaEventBase.h"
 #include "albaEventInteraction.h"
@@ -50,7 +51,6 @@
 #include <algorithm>
 #include <sstream>
 #include <assert.h>
-#include "albaVMELandmarkCloud.h"
 #include "mmuIdFactory.h"
 
 //------------------------------------------------------------------------------
@@ -59,14 +59,14 @@ albaCxxTypeMacro(albaPositionalEventRouter)
 albaPositionalEventRouter::albaPositionalEventRouter()
 //------------------------------------------------------------------------------
 {
-  m_CanSelect       = true;
-  m_ShowContextMenu = false;
   m_EventTracing    = false;
   m_VME             = NULL;
 
   SetModeToSingleButton();
 
   m_CameraTool = albaCameraTool::New();
+  m_SelectTool = albaSelectTool::New();
+  m_SelectTool->SetListener(this);
 }
 
 //------------------------------------------------------------------------------
@@ -77,6 +77,7 @@ albaPositionalEventRouter::~albaPositionalEventRouter()
     PopTool(m_Tools.back());
 
   m_CameraTool->Delete();
+  m_SelectTool->Delete();
 }
 
 //------------------------------------------------------------------------------
@@ -117,6 +118,7 @@ void albaPositionalEventRouter::SetModifierKeys(bool ctrlDown, bool altDown, boo
 {
   Superclass::SetModifierKeys(ctrlDown, altDown, shiftDown);
   m_CameraTool->SetModifierKeys(ctrlDown, altDown, shiftDown);
+  m_SelectTool->SetModifierKeys(ctrlDown, altDown, shiftDown);
   for (int i = 0; i < m_Tools.size(); i++)
     m_Tools[i]->SetModifierKeys(ctrlDown, altDown, shiftDown);
 }
@@ -336,7 +338,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
 bool albaPositionalEventRouter::IsMouseInputEvent(albaID id)
 {
   return id == albaDeviceButtonsPad::GetButtonDownId() || id == albaDeviceButtonsPad::GetButtonUpId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() ||
-    id == albaDeviceButtonsPadMouse::GetMouseDClickId() || id == albaDeviceButtonsPadMouse::GetWheelId();
+    id == albaDeviceButtonsPadMouse::GetWheelId();
 }
 
 //----------------------------------------------------------------------------
@@ -485,8 +487,12 @@ void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   OnButtonDown(e);
+}
 
-	m_ShowContextMenu = true;
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::EnableSelect(bool enable)
+{
+  m_SelectTool->EnableSelect(enable);
 }
 
 //----------------------------------------------------------------------------
@@ -505,23 +511,11 @@ void albaPositionalEventRouter::OnMiddleButtonUp(albaEventInteraction *e)
 void albaPositionalEventRouter::OnRightButtonUp(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::SafeDownCast((albaDevice*)e->GetSender());
-
-	if(m_ShowContextMenu && mouse)
-	{
+  // the right button released without dragging shows the context menu
+  if (ToolButtonUp(m_SelectTool, e))
     TraceHandler("Context menu");
-    albaVME *vme = GetPickedVME(mouse);
-    InvokeEvent(this, SHOW_VIEW_CONTEXTUAL_MENU,MCH_UP,vme);
-	}
 
   OnButtonUp(e);
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMove(albaEventInteraction *e) 
-//----------------------------------------------------------------------------
-{
-	m_ShowContextMenu = false;
 }
 
 //----------------------------------------------------------------------------
@@ -538,38 +532,24 @@ void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
   albaView *v = device ? device->GetView() : NULL;
 
   // the picking is cached into the event and shared with the behavior receiving it
-  if(v && e->FindPokedVme(v, device, picked_prop, picked_vme, picked_bh))
+  double pickedPos[3] = {0, 0, 0};
+  bool picked = v && e->FindPokedVme(v, device, picked_prop, picked_vme, picked_bh);
+  if (picked)
   {
     SetPickedVME(device, picked_vme);
-    // if a VME is picked its pointer is written in PickedVME
-    int but_down_id = e->GetId();
-    if (but_down_id == albaDeviceButtonsPadMouse::GetMouseDClickId() && !picked_vme->IsA("albaVMEGizmo"))
-    {
-      // Send event to inform Logic that a double click event is rised on a VME
-      TraceHandler("Double click");
-      InvokeEvent(this,VME_DCLICKED,MCH_UP,picked_vme);
-    }
-    else if(m_CanSelect && !picked_vme->IsA("albaVMEGizmo"))
-    {
-			if (picked_vme->IsA("albaVMELandmarkCloud"))
-			{
-				double pos[3];
-				e->GetPickedPosition(pos);
-				picked_vme = (albaVME *)((albaVMELandmarkCloud *)picked_vme)->GetNearestLandmark(pos, true);
-
-			}
-      // Send a VME select event to Logic
-      TraceHandler("Select");
-      InvokeEvent(this,VME_SELECT,MCH_UP,picked_vme);
-    }
+    e->GetPickedPosition(pickedPos);
   }
+
+  // the default actions of the click come first: selection and context menu
+  m_SelectTool->SetPickedVME(picked ? picked_vme : NULL, pickedPos);
+  if (ToolButtonDown(m_SelectTool, e))
+    TraceHandler("Select");
+
   // the behavior of the picked VME interacts with the device until the button is released
   if(picked_bh)
   {
     // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME
     picked_bh->SetProp(picked_prop); // set the prop (Marco: to be removed, no access to the vtkProp!!!)
-    double pickedPos[3];
-    e->GetPickedPosition(pickedPos);
     picked_bh->SetPickedPosition(pickedPos);
     picked_bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
     if (ToolButtonDown(picked_bh, e))
@@ -735,7 +715,6 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
 
 		if (id == albaDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
 		{
-			m_ShowContextMenu = false;
 			if (ToolWheel(m_CameraTool, ei))
 				TraceHandler("Camera", m_CameraTool->GetMouseTool());
 			WriteEventTrace(event);
@@ -745,12 +724,9 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
     // find if this device is one of those currently interacting
     if (IsInteracting(device))
     {
-      // process the Move event
+      // a drag cancels the context menu
       if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
-      {
-        albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
-        OnMove(e);
-      }
+        ToolDrag(m_SelectTool, ei);
       // the drags go to the behavior interacting with the device
       albaInteractionBehavior *bh = GetCurrentBehavior(device);
       if (bh && (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId()))
@@ -772,7 +748,7 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
     }
 
     // start and stop the default interaction
-    if (id == albaDeviceButtonsPad::GetButtonDownId() || id == albaDeviceButtonsPadMouse::GetMouseDClickId())
+    if (id == albaDeviceButtonsPad::GetButtonDownId())
       OnStartInteraction(ei);
     else if (id == albaDeviceButtonsPad::GetButtonUpId())
       OnStopInteraction(ei);

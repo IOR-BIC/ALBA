@@ -75,21 +75,6 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonDown()
 }
 
 //----------------------------------------------------------------------------
-void albaDeviceButtonsPadMouseRemoteTest::TestOnEventMouseDClick()
-{
-  albaDeviceButtonsPadMouseRemote *buttonsPadMouse = albaDeviceButtonsPadMouseRemote::New();
-  
-  CPPUNIT_ASSERT(buttonsPadMouse);
-
-  // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction mouseDClickEvent(this,albaDeviceButtonsPadMouse::GetMouseDClickId());
-  buttonsPadMouse->OnEvent(&mouseDClickEvent);
-
-  buttonsPadMouse->Delete();
-
-}
-
-//----------------------------------------------------------------------------
 void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonUp()
 {
   albaDeviceButtonsPadMouseRemote *buttonsPadMouse = albaDeviceButtonsPadMouseRemote::New();

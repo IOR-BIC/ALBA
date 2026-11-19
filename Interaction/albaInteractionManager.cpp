@@ -608,9 +608,9 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
     return;
   }
   
-  if (id == VME_SELECT || id == VME_DCLICKED)
+  if (id == VME_SELECT)
   {
-    // event raised by PER to advise of VME selection or double click on a VME
+    // event raised by the select tool of the PER to advise of VME selection
     albaEventMacro(albaEvent(event->GetSender(), id, (albaVME *)event->GetData()));
   }
   else if (id == albaDeviceManager::DISPATCH_START)

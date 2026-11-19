@@ -349,8 +349,6 @@ protected:
 	/** Called from VmeSelect to select a LM */
 	void SelectLandmark(albaVMELandmark *lm, bool select);
 
-	/** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
-	virtual void VmeDoubleClicked(albaEvent &e);
 	/** Show/Hide the vme. */
 	virtual void VmeShow(albaVME *vme, bool visibility);
 

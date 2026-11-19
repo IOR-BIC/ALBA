@@ -57,6 +57,7 @@ SET(PROJECT_SRCS
 	albaRotateTranslateGUITest.h albaRotateTranslateGUITest.cpp
 	albaRotateTranslateBehaviorTest.h albaRotateTranslateBehaviorTest.cpp
 	albaFlyToToolTest.h albaFlyToToolTest.cpp
+	albaSelectToolTest.h albaSelectToolTest.cpp
 	albaGizmoPolylineGraphTest.h albaGizmoPolylineGraphTest.cpp
 	albaVTKPickerToolTest.h albaVTKPickerToolTest.cpp
 	albaPickHelperTest.h albaPickHelperTest.cpp

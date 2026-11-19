@@ -32,6 +32,7 @@ class myPIMPL;
 class vtkCamera;
 class albaInteractionTool;
 class albaCameraTool;
+class albaSelectTool;
 
 /** Class implementing routing of events based on picking.
   This class routes events from input devices depending on picking information.
@@ -48,7 +49,8 @@ class ALBA_EXPORT albaPositionalEventRouter : public albaInteractionAgent
 public:
   albaTypeMacro(albaPositionalEventRouter,albaInteractionAgent);
 
-  virtual void EnableSelect(bool enable) {m_CanSelect = enable;};
+  /** Enable/disable the selection of the picked VME with a click (see albaSelectTool) */
+  virtual void EnableSelect(bool enable);
 
   /** 
    return true if device is in the set of devices currently interacting
@@ -76,6 +78,9 @@ public:
   /** Return the tool moving the camera, always at the bottom of the tool stack */
   albaCameraTool *GetCameraTool() {return m_CameraTool;}
 
+  /** Return the tool of the default actions of the clicks: selection and context menu */
+  albaSelectTool *GetSelectTool() {return m_SelectTool;}
+
   /** Push a tool on top of the tool stack: it receives the events before the tools
   below it and before the default behavior. The PER keeps a reference to the tool. */
   void PushTool(albaInteractionTool *tool);
@@ -87,7 +92,7 @@ public:
     CTRL, ALT and SHIFT update the state of the modifier keys of all the tools first. */
   bool OnKey(int keyCode, bool pressed);
 
-  /** Set the state of the modifier keys, also on the camera tool and on all the tools of the stack */
+  /** Set the state of the modifier keys, also on the camera and select tools and on all the tools of the stack */
   virtual void SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown);
 
   /** Return the number of tools pushed on the stack (the camera tool is not counted) */
@@ -124,7 +129,6 @@ protected:
   virtual void OnMiddleButtonUp   (albaEventInteraction *e);
   virtual void OnRightButtonDown  (albaEventInteraction *e);
   virtual void OnRightButtonUp    (albaEventInteraction *e);
-  virtual void OnMove             (albaEventInteraction *e);
 
   /** insert a device in the set of devices currently interacting */
   void InsertDevice(albaDevice *device,int button);
@@ -153,9 +157,6 @@ protected:
   bool            m_EventTracing;   ///< true if the events are traced in the log
   std::string     m_EventTrace;     ///< who handled the current event
   std::string     m_LastEventTrace; ///< last trace written in the log
-
-  bool            m_CanSelect;
-  bool	          m_ShowContextMenu; ///< flag for showing the context menu
 
   int             m_Mode;
   /** Offer the event to the tools, from the top of the stack; return true if a tool used it */
@@ -190,6 +191,7 @@ protected:
   };
 
   albaCameraTool *m_CameraTool; ///< tool moving the camera, at the bottom of the stack
+  albaSelectTool *m_SelectTool; ///< default actions of the clicks: selection and context menu
   std::vector<albaInteractionTool *> m_Tools; ///< the tool stack, the top is the last one
   std::map<albaID, ToolInteraction> m_ToolInteractions; ///< the tool interacting with each device, until the starting button is released
 

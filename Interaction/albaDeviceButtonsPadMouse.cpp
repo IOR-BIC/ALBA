@@ -41,7 +41,6 @@
 // Events
 //------------------------------------------------------------------------------
 // ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_2D_MOVE)
-// ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_DCLICK)
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaDeviceButtonsPadMouse)
@@ -89,7 +88,7 @@ void albaDeviceButtonsPadMouse::OnEvent(albaEventBase *event)
 		e->SetSender(this);
 		InvokeEvent(e, (albaID)MCH_INPUT);
 	}
-  else if (id == GetButtonDownId() || id == GetMouseDClickId())
+  else if (id == GetButtonDownId())
   {
     // store the Selected RWI is needed for compounded view
     m_ButtonPressed = true;
@@ -204,11 +203,4 @@ albaID albaDeviceButtonsPadMouse::GetMouse2DMoveId()
 {
   static const albaID mouse2DMoveId = mmuIdFactory::GetNextId("MOUSE_2D_MOVE");
   return mouse2DMoveId;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadMouse::GetMouseDClickId()
-//------------------------------------------------------------------------------
-{
-  static const albaID mouseDClickId = mmuIdFactory::GetNextId("MOUSE_DCLICK");
-  return mouseDClickId;
 }

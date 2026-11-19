@@ -300,32 +300,8 @@ void albaRWIBase::OnEraseBackground(wxEraseEvent &event)
 void albaRWIBase::OnLeftMouseDoubleClick(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  if (!Enabled) return;
-
-  CaptureMouse();
-  NotifyClick(); // this will advise the albaGUIMDIChild of the click and it fires the VIEW_SELECT
-                 // event. If it is necessary will be defined a NotifyDoubleClick with a new ID VIEW_DOUBLE_CLICKED
-
-  if (m_CustomInteractorStyle)
-  {
-    // VTK does not support double click event, so manage it through the albaDeviceButtonsPadMouse
-  }
-  else
-  {
-    albaEventInteraction e(this,albaDeviceButtonsPadMouse::GetMouseDClickId());
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(ALBA_LEFT_BUTTON);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
-  }
+  // the double click is the second press of the left button: it is sent as a button down
+  OnLeftMouseButtonDown(event);
 }
 //----------------------------------------------------------------------------
 void albaRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
