@@ -50,7 +50,7 @@ public:
   virtual void OnEvent(albaEventBase *event)
   {
     albaEvent *e = albaEvent::SafeDownCast(event);
-    if (e && e->GetId() == albaInteractionBehavior::MODIFIER_CLICK)
+    if (e && e->GetId() == ID_CLICK_ON_VME)
     {
       m_ClickCount++;
       m_ClickKey = e->GetArg();
@@ -95,32 +95,6 @@ void albaInteractionBehaviorTest::TestSetGetRenderer()
   CPPUNIT_ASSERT(behavior->GetRenderer() == renderer);
 
   vtkDEL(renderer);
-  albaDEL(behavior);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetStartButton()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *behavior;
-  albaNEW(behavior);
-
-  CPPUNIT_ASSERT(behavior->GetStartButton() == ALBA_LEFT_BUTTON);
-  behavior->SetStartButton(ALBA_MIDDLE_BUTTON);
-  CPPUNIT_ASSERT(behavior->GetStartButton() == ALBA_MIDDLE_BUTTON);
-
-  albaDEL(behavior);
-}
-//----------------------------------------------------------------------------
-void albaInteractionBehaviorTest::TestSetGetModifiers()
-//----------------------------------------------------------------------------
-{
-  albaInteractionBehaviorDummy *behavior;
-  albaNEW(behavior);
-
-  CPPUNIT_ASSERT(behavior->GetModifiers() == 0);
-  behavior->SetModifiers(ALBA_CTRL_KEY);
-  CPPUNIT_ASSERT(behavior->GetModifiers() == ALBA_CTRL_KEY);
-
   albaDEL(behavior);
 }
 //----------------------------------------------------------------------------

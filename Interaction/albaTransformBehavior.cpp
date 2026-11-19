@@ -20,10 +20,8 @@
 #include "albaDevice.h"
 #include "albaRefSys.h"
 
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "albaView.h"
-#include "albaEventInteraction.h"
 #include "albaEvent.h"
 #include "albaAbsMatrixPipe.h"
 #include "albaVME.h"
@@ -1049,40 +1047,6 @@ void albaTransformBehavior::SendTransformMatrix(const albaMatrix &matrix, int mo
   }  
 
   albaEventMacro(e);
-
-  // this code is used by some vertical applications...
-  // cannot remove since this will impact on 
-  // gizmo updating 
-
-  // send standard event too...
-  albaEventInteraction event(this,0);
-  event.SetSender(this);
-  
-  // have to recreate the time stamp :-(
-  albaSmartPointer<albaMatrix> tmatrix;
-  tmatrix->DeepCopy(&matrix);
-  tmatrix->SetTimeStamp(vtkTimerLog::GetUniversalTime());
-
-  event.SetMatrix(tmatrix);
-  event.Set2DPosition(m_MousePointer2DPosition[0],m_MousePointer2DPosition[1]);
-  if (mouseAction == MOUSE_DOWN)
-  {
-    event.SetId(BUTTON_DOWN);
-    event.SetButton(GetStartButton());
-    event.SetModifiers(GetModifiers());
-  }
-  else if (mouseAction == MOUSE_UP)
-  {
-    event.SetId(BUTTON_UP);
-    event.SetButton(GetStartButton());
-    event.SetModifiers(GetModifiers());
-  }
-  else
-  {
-    event.SetId(albaDeviceButtonsPadMouse::GetMouse2DMoveId());
-  }
-
-  albaEventMacro(event);
 }
 
 //----------------------------------------------------------------------------

@@ -94,7 +94,7 @@ public:
   virtual void OnEvent(albaEventBase *event)
   {
     albaEvent *e = albaEvent::SafeDownCast(event);
-    if (e && e->GetId() == albaInteractionBehavior::MODIFIER_CLICK)
+    if (e && e->GetId() == ID_CLICK_ON_VME)
     {
       m_ClickCount++;
       m_ClickKey = e->GetArg();
@@ -525,7 +525,7 @@ void albaPositionalEventRouterTest::TestTransformBehaviorButtons()
   CPPUNIT_ASSERT(!transform->OnMiddleButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(!transform->OnRightButtonDown(NULL, NULL, pos));
 
-  // the clicks with modifier, when enabled, send MODIFIER_CLICK; SHIFT wins over CTRL
+  // the clicks with modifier, when enabled, send ID_CLICK_ON_VME; SHIFT wins over CTRL
   albaPERTestTransformListener listener;
   transform->SetListener(&listener);
   transform->SetModifierKeys(true, false, false);

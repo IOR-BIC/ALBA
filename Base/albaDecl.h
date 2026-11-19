@@ -291,6 +291,8 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
 																												ID_TRANSFORM, //added by Stefano. 30-11-2003 
+
+																												ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY
 																												SHOW_VIEW_CONTEXTUAL_MENU,
 																												SHOW_TREE_CONTEXTUAL_MENU,
 

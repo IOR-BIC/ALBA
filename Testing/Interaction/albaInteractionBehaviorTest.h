@@ -27,8 +27,6 @@ public:
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestSetGetRenderer );
-  CPPUNIT_TEST( TestSetGetStartButton );
-  CPPUNIT_TEST( TestSetGetModifiers );
   CPPUNIT_TEST( TestButtonsNotUsed );
   CPPUNIT_TEST( TestModifierClick );
   CPPUNIT_TEST_SUITE_END();
@@ -38,8 +36,6 @@ protected:
   void TestFixture();
   void TestConstructorDestructor();
   void TestSetGetRenderer();
-  void TestSetGetStartButton();
-  void TestSetGetModifiers();
   void TestButtonsNotUsed();
   void TestModifierClick();
 };

@@ -117,9 +117,7 @@ void albaRotateTranslateGUITest::TestTransformBehaviors()
   albaTransformBehavior *translate = behavior->GetTranslateBehavior();
   albaTransformBehavior *roll = behavior->GetRollBehavior();
   CPPUNIT_ASSERT(rotate && translate && roll && rotate != translate && rotate != roll && translate != roll);
-  CPPUNIT_ASSERT(rotate->GetStartButton() == ALBA_LEFT_BUTTON && rotate->GetModifiers() == 0);
-  CPPUNIT_ASSERT(translate->GetStartButton() == ALBA_MIDDLE_BUTTON && translate->GetModifiers() == 0);
-  CPPUNIT_ASSERT(roll->GetStartButton() == ALBA_LEFT_BUTTON && roll->GetModifiers() == ALBA_CTRL_KEY);
+  CPPUNIT_ASSERT(rotate->GetRotationFlag() && translate->GetTranslationFlag() && roll->GetRotationFlag());
 
   // without a renderer the buttons are not used; the right button is never used
   double pos[2] = {10, 20};

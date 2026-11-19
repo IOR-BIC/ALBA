@@ -522,7 +522,7 @@ void albaOpInteractiveClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
 		// SHIFT click changes the side of the arrow, CTRL click clips
-		if (e->GetId() == albaInteractionBehavior::MODIFIER_CLICK)
+		if (e->GetId() == ID_CLICK_ON_VME)
 		{
 			if (e->GetArg() == ALBA_SHIFT_KEY)
 			{

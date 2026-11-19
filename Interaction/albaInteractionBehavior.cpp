@@ -27,16 +27,8 @@
 #include "albaInteractionBehavior.h"
 #include "albaEvent.h"
 #include "albaVME.h"
-#include "mmuIdFactory.h"
 
 #include "vtkProp3D.h"
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-ALBA_ID_IMP(albaInteractionBehavior::BUTTON_DOWN);
-ALBA_ID_IMP(albaInteractionBehavior::BUTTON_UP);
-ALBA_ID_IMP(albaInteractionBehavior::MODIFIER_CLICK);
 
 //------------------------------------------------------------------------------
 albaCxxAbstractTypeMacro(albaInteractionBehavior);
@@ -44,8 +36,6 @@ albaCxxAbstractTypeMacro(albaInteractionBehavior);
 //------------------------------------------------------------------------------
 albaInteractionBehavior::albaInteractionBehavior()
 {
-  m_StartButton = ALBA_LEFT_BUTTON;
-  m_Modifiers = 0;
   m_VME = NULL;
   m_Prop = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0;
@@ -75,6 +65,6 @@ bool albaInteractionBehavior::SendModifierClick()
   if (!m_ModifierClicks || !(m_ShiftDown || m_CtrlDown))
     return false;
 
-  albaEventMacro(albaEvent(this, MODIFIER_CLICK, (long)(m_ShiftDown ? ALBA_SHIFT_KEY : ALBA_CTRL_KEY)));
+  albaEventMacro(albaEvent(this, ID_CLICK_ON_VME, (long)(m_ShiftDown ? ALBA_SHIFT_KEY : ALBA_CTRL_KEY)));
   return true;
 }

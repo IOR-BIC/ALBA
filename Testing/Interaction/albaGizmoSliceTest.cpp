@@ -38,6 +38,8 @@
 #include "albaAbsMatrixPipe.h"
 #include "albaObserver.h"
 #include "albaTransform.h"
+#include "albaMatrix.h"
+#include "albaEvent.h"
 
 #include "albaTransformBehavior.h"
 
@@ -49,6 +51,24 @@
 #include "vtkTubeFilter.h"
 #include "albaServiceLocator.h"
 #include "albaFakeLogicForTest.h"
+
+//----------------------------------------------------------------------------
+class albaGizmoSliceTestListener : public albaObserver // counts the MOUSE_MOVE and MOUSE_UP events of the gizmo
+//----------------------------------------------------------------------------
+{
+public:
+  albaGizmoSliceTestListener() {m_MoveCount = m_UpCount = 0;};
+  virtual void OnEvent(albaEventBase *event)
+  {
+    if (event->GetId() == MOUSE_MOVE)
+      m_MoveCount++;
+    else if (event->GetId() == MOUSE_UP)
+      m_UpCount++;
+  };
+
+  int m_MoveCount;
+  int m_UpCount;
+};
 
 //----------------------------------------------------------------------------
 void albaGizmoSliceTest::BeforeTest()
@@ -170,5 +190,31 @@ void albaGizmoSliceTest::TestFixture()
 }
   
 
+//----------------------------------------------------------------------------
+void albaGizmoSliceTest::TestTransformEvents()
+//----------------------------------------------------------------------------
+{
+  albaGizmoSliceTestListener listener;
+  albaGizmoSlice *gizmoSlice = new albaGizmoSlice(m_GizmoInputSurface);
+  gizmoSlice->SetListener(&listener);
 
+  albaSmartPointer<albaMatrix> identity;
+  albaEvent transform(this, ID_TRANSFORM);
+  transform.SetMatrix(identity);
 
+  // the button down sends nothing, each drag sends MOUSE_MOVE, the release only MOUSE_UP
+  transform.SetArg(albaTransformBehavior::MOUSE_DOWN);
+  gizmoSlice->OnEvent(&transform);
+  CPPUNIT_ASSERT(listener.m_MoveCount == 0 && listener.m_UpCount == 0);
+
+  transform.SetArg(albaTransformBehavior::MOUSE_MOVE);
+  gizmoSlice->OnEvent(&transform);
+  gizmoSlice->OnEvent(&transform);
+  CPPUNIT_ASSERT(listener.m_MoveCount == 2 && listener.m_UpCount == 0);
+
+  transform.SetArg(albaTransformBehavior::MOUSE_UP);
+  gizmoSlice->OnEvent(&transform);
+  CPPUNIT_ASSERT(listener.m_MoveCount == 2 && listener.m_UpCount == 1);
+
+  cppDEL(gizmoSlice);
+}

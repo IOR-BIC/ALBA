@@ -170,7 +170,7 @@ public:
 
   
   /** The left button starts the transform; the PER sets the prop and the picked position first.
-    Return false without a renderer. With the clicks with modifier enabled, SHIFT and CTRL send MODIFIER_CLICK instead. */
+    Return false without a renderer. With the clicks with modifier enabled, SHIFT and CTRL send ID_CLICK_ON_VME instead. */
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
 
   /** The drags change the transform */

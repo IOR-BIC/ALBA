@@ -50,7 +50,6 @@ void albaProsthesisBehavior::CreateTransformBehaviors(albaVME *vme)
   Superclass::CreateTransformBehaviors(vme);
 
   m_ShiftTransform = NewTransformBehavior();
-  m_ShiftTransform->SetModifiers(ALBA_SHIFT_KEY);
   m_ShiftTransform->SetListener(this);
   m_ShiftTransform->SetVME(vme);
 }

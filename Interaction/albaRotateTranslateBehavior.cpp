@@ -136,7 +136,6 @@ void albaRotateTranslateBehavior::CreateTransformBehaviors(albaVME *vme)
 
   // translate
   m_Translate = NewTransformBehavior();
-  m_Translate->SetStartButton(ALBA_MIDDLE_BUTTON);
   m_Translate->SetListener(this);
   m_Translate->SetVME(vme);
   m_Translate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
@@ -148,7 +147,6 @@ void albaRotateTranslateBehavior::CreateTransformBehaviors(albaVME *vme)
 
   // roll
   m_Roll = NewTransformBehavior();
-  m_Roll->SetModifiers(ALBA_CTRL_KEY);
   m_Roll->SetListener(this);
   m_Roll->SetVME(vme);
   m_Roll->GetRotationConstraint()->GetRefSys()->SetTypeToView();

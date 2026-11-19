@@ -489,8 +489,11 @@ void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
         }
 
 				
+				// MOUSE_MOVE while dragging, MOUSE_UP on release, nothing on the button down
 				m_Point->SetPoint(0,slicePlaneOrigin);
-				albaEventMacro(albaEvent(this,MOUSE_MOVE, m_Point, m_Id));
+				int mouseEvent = e->GetArg() == albaTransformBehavior::MOUSE_MOVE ? MOUSE_MOVE : (e->GetArg() == albaTransformBehavior::MOUSE_UP ? MOUSE_UP : 0);
+				if (mouseEvent)
+					albaEventMacro(albaEvent(this, mouseEvent, m_Point, m_Id));
 
 
       }
@@ -501,42 +504,6 @@ void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
 				}
       break; 
     }
-	}
-	else if(albaEventInteraction *e = albaEventInteraction::SafeDownCast(alba_event))
-	{
-		if(e->GetId()==albaInteractionBehavior::BUTTON_UP)
-		{
-			albaSmartPointer<albaTransform> tr;
-			tr->SetMatrix(*m_VmeGizmo->GetOutput()->GetMatrix());
-			tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
-
-			// update the gizmo local position
-			m_VmeGizmo->SetMatrix(tr->GetMatrix());		 
-
-			//local position of gizmo cube handle centre
-			double slicePlaneOrigin[3];
-			albaTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
-
-			// position sent as vtk point
-      if(m_Axis == GIZMO_SLICE_X)
-		  {
-			  slicePlaneOrigin[1] = 0.;
-        slicePlaneOrigin[2] = 0.;
-		  }
-		  else if(m_Axis == GIZMO_SLICE_Y)
-		  {
-        slicePlaneOrigin[0] = 0.;
-        slicePlaneOrigin[2] = 0.;
-		  }
-		  else if(m_Axis == GIZMO_SLICE_Z)
-		  {
-        slicePlaneOrigin[0] = 0.;
-        slicePlaneOrigin[1] = 0.;
-		  }
-
-			m_Point->SetPoint(0,slicePlaneOrigin);
-			albaEventMacro(albaEvent(this,MOUSE_UP, m_Point, m_Id));
-		}
 	}
 }
 
