@@ -201,18 +201,6 @@ void albaPositionalEventRouterTest::TestEnableSelect()
   mip->Delete();
 }
 
-void albaPositionalEventRouterTest::TestFlyToMode()
-{
-  albaPositionalEventRouter *mip = albaPositionalEventRouter::New();
-  CPPUNIT_ASSERT(mip);
-
-  CPPUNIT_ASSERT(mip->m_FlyToFlag == false);
-  mip->FlyToMode();
-  CPPUNIT_ASSERT(mip->m_FlyToFlag == true);
-
-  mip->Delete();
-}
-
 void albaPositionalEventRouterTest::TestIsInteracting()
 {
   albaPositionalEventRouter *mip = albaPositionalEventRouter::New();

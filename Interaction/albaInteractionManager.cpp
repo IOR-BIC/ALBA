@@ -56,6 +56,7 @@
 #include "albaAction.h"
 #include "albaDeviceSet.h"
 #include "albaDeviceButtonsPadMouse.h"
+#include "albaFlyToTool.h"
   
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
@@ -79,6 +80,7 @@ albaCxxTypeMacro(albaInteractionManager);
 //------------------------------------------------------------------------------
 albaInteractionManager::albaInteractionManager()
 {
+  m_FlyToTool = NULL;
   m_Gui = NULL;  //SIL. 07-jun-2006 : 
   m_Frame = NULL;  //SIL. 07-jun-2006 : 
   m_SelectedView      = NULL;
@@ -133,6 +135,9 @@ albaInteractionManager::albaInteractionManager()
 //------------------------------------------------------------------------------
 albaInteractionManager::~albaInteractionManager()
 {
+  if (m_FlyToTool)
+    m_PositionalEventRouter->PopTool(m_FlyToTool);
+  albaDEL(m_FlyToTool);
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
@@ -174,10 +179,11 @@ void albaInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractionManager::CameraFlyToMode()   
+void albaInteractionManager::CameraFlyToMode()
 {
-  if(m_PositionalEventRouter)
-    m_PositionalEventRouter->FlyToMode();
+  if (m_FlyToTool == NULL)
+    albaNEW(m_FlyToTool);
+  PushTool(m_FlyToTool);
 }
 
 //------------------------------------------------------------------------------

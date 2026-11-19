@@ -118,9 +118,6 @@ public:
 	/** Update the camera for all opened views; optionally the Update can be limited for the selected view. */
   void CameraUpdate(bool only_selected = false);
 
-	/** Set the FlyTo mode for the selected view. */
-	void CameraFlyToMode();
-
 	/** Call PropertyUpdate for all views. */
 	void PropertyUpdate(bool fromTag = false);
 

@@ -355,11 +355,6 @@ void albaViewManager::CameraUpdate(bool only_selected)
     v->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void albaViewManager::CameraFlyToMode()
-{
-//  if(m_is) m_is->FlyToMode();
-}
-//----------------------------------------------------------------------------
 void albaViewManager::OnQuit()
 {
 }

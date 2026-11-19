@@ -60,7 +60,6 @@ albaPositionalEventRouter::albaPositionalEventRouter()
 //------------------------------------------------------------------------------
 {
   m_CanSelect       = true;
-  m_FlyToFlag       = false;
   m_ShowContextMenu = false;
   m_EventTracing    = false;
   m_VME             = NULL;
@@ -472,12 +471,6 @@ albaVME *albaPositionalEventRouter::GetPickedVME(albaDevice *device)
 void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  if(m_FlyToFlag)
-  {
-    TraceHandler("Fly to");
-    FlyTo(e);
-  }
-
   OnButtonDown(e);
 }
 
@@ -491,9 +484,6 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaEventInteraction *e)
 void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-	if(m_FlyToFlag)
-     FlyTo(e,20,-0.6); 
-
   OnButtonDown(e);
 
 	m_ShowContextMenu = true;
@@ -836,69 +826,3 @@ void albaPositionalEventRouter::WriteEventTrace(albaEventBase *event)
   albaLogMessage("%s", m_LastEventTrace.c_str());
 }
 
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::FlyTo(albaEventInteraction *e,int numstep, double zoom)
-//----------------------------------------------------------------------------
-{
-  albaVME        *picked_vme  = NULL;
-  vtkProp3D     *picked_prop = NULL;
-  albaInteractionBehavior *picked_bh   = NULL;
-
-  albaDevice *device = (albaDevice*)e->GetSender();
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
-  albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
-  assert(tracker || mouse);
-
-  if(tracker && !e->GetMatrix()) return; // no tracker pose no fly to!
-
-  // the mouse selected view or the tracker avatar view
-  vtkRenderer *ren = device->GetRenderer();
-  albaView *view = device->GetView();
-
-  if(!ren) return; // no renderer no fly to!
-
-  vtkCamera *cam = ren->GetActiveCamera();
-
-  if(view && !e->FindPokedVme(view,device,picked_prop,picked_vme,picked_bh))
-    return; // no picking no fly to!
-
-  int i, j;
-  double f0[3]; // start focal point
-  cam->GetFocalPoint(f0);
-  double p0[3]; // start camera position
-  cam->GetPosition(p0);
-
-  // find picked position
-  double pos[3];
-  e->GetPickedPosition(pos);
-  double foc_motion[3];
-  for (i=0; i<3; i++) 
-    foc_motion[i] = pos[i] - f0[i];
-  double foc_step = vtkMath::Normalize(foc_motion)/numstep;
-
-  if(zoom >  1) zoom = 1;
-  if(zoom < -1) zoom =-1;
-  double cam_motion[3];
-  for (i=0; i<3; i++) 
-    cam_motion[i] = (pos[i]-f0[i]) + (f0[i]-p0[i])*zoom/2;
-  double cam_step = vtkMath::Normalize(cam_motion)/numstep;
-  double f1[3]; // new focal point
-  double p1[3]; // new camera position
-
-  for (i=0; i<=numstep; i++)
-  {
-    for (j=0; j<3; j++)
-    {
-      f1[j] = f0[j] + foc_motion[j]*i*foc_step;
-      p1[j] = p0[j] + cam_motion[j]*i*cam_step;
-    }
-    cam->SetFocalPoint(f1);
-    cam->SetPosition(p1);
-    ren->ResetCameraClippingRange();
-    // render at each cycle
-    InvokeEvent(this,CAMERA_UPDATE,MCH_UP,view);
-  }
-  cam->OrthogonalizeViewUp();
-  e->ResetPick(); // the camera has been moved
-  m_FlyToFlag = false;
-}

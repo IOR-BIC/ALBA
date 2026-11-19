@@ -50,9 +50,6 @@ public:
 
   virtual void EnableSelect(bool enable) {m_CanSelect = enable;};
 
-  /** Enable fly to mode: next click will select where to fly to */
-  virtual void FlyToMode() {m_FlyToFlag = true;};
-
   /** 
    return true if device is in the set of devices currently interacting
    the optional parameter can be used in SINGLE_BUTTON mode to know if 
@@ -129,9 +126,6 @@ protected:
   virtual void OnRightButtonUp    (albaEventInteraction *e);
   virtual void OnMove             (albaEventInteraction *e);
 
-  /** internally used to fly to a clicked point */
-  virtual void FlyTo(albaEventInteraction *e,int numstep=20, double zoom=1);
-
   /** insert a device in the set of devices currently interacting */
   void InsertDevice(albaDevice *device,int button);
 
@@ -160,7 +154,6 @@ protected:
   std::string     m_EventTrace;     ///< who handled the current event
   std::string     m_LastEventTrace; ///< last trace written in the log
 
-  bool            m_FlyToFlag;
   bool            m_CanSelect;
   bool	          m_ShowContextMenu; ///< flag for showing the context menu
 

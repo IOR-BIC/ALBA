@@ -76,6 +76,7 @@ SET(PROJECT_SRCS
   albaPickerBehavior.cpp  					albaPickerBehavior.h
   albaStaticEventRouter.cpp  									albaStaticEventRouter.h  ######################
   albaPickerTool.cpp  						albaPickerTool.h
+  albaFlyToTool.cpp  						albaFlyToTool.h
   albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
   albaGizmoCrossRotateTranslate.cpp  			albaGizmoCrossRotateTranslate.h	  

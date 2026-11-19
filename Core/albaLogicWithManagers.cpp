@@ -818,7 +818,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			if (m_ViewManager) m_ViewManager->CameraReset(true);
 			break;
 		case CAMERA_FLYTO:
-			if (m_ViewManager) m_ViewManager->CameraFlyToMode();
 			// currently albaInteraction is strictly dependent on VTK (marco)
 #ifdef ALBA_USE_VTK
 			if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.

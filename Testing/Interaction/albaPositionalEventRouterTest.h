@@ -27,7 +27,6 @@ class albaPositionalEventRouterTest : public albaTest
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
   CPPUNIT_TEST(TestEnableSelect);
-  CPPUNIT_TEST(TestFlyToMode);
   CPPUNIT_TEST(TestIsInteracting);
   CPPUNIT_TEST(TestStartInteraction);
   CPPUNIT_TEST(TestStopInteraction);
@@ -55,7 +54,6 @@ class albaPositionalEventRouterTest : public albaTest
   void TestFixture();
   void TestConstructorDestructor();
   void TestEnableSelect();
-  void TestFlyToMode();
   void TestIsInteracting();
   void TestStartInteraction();
   void TestStopInteraction();
