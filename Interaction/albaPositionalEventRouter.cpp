@@ -51,7 +51,6 @@
 #include <algorithm>
 #include <sstream>
 #include <assert.h>
-#include "mmuIdFactory.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaPositionalEventRouter)
@@ -238,7 +237,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
   // a tool can push or pop tools while handling an event: iterate on a copy
   std::vector<albaInteractionTool *> tools = m_Tools;
 
-  if (id == albaDeviceButtonsPad::GetButtonDownId())
+  if (id == DEVICE_BUTTON_DOWN)
   {
     // the other buttons of a device interacting with a tool go to the same tool, and to the camera
     if (interactingTool)
@@ -271,7 +270,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
     return false;
   }
 
-  if (id == albaDeviceButtonsPad::GetButtonUpId())
+  if (id == DEVICE_BUTTON_UP)
   {
     if (interactingTool == NULL)
     {
@@ -294,7 +293,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
     return true;
   }
 
-  if (id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() || id == albaDeviceButtonsPadTracker::GetTracker3DMoveId())
+  if (id == DEVICE_MOUSE_2D_MOVE || id == DEVICE_TRACKER_3D_MOVE)
   {
     if (interactingTool)
     {
@@ -321,7 +320,7 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
     return false;
   }
 
-  if (id == albaDeviceButtonsPadMouse::GetWheelId())
+  if (id == DEVICE_MOUSE_WHEEL)
   {
     for (int i = tools.size() - 1; i >= 0; i--)
       if (ToolWheel(tools[i], e))
@@ -337,8 +336,8 @@ bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDev
 //----------------------------------------------------------------------------
 bool albaPositionalEventRouter::IsMouseInputEvent(albaID id)
 {
-  return id == albaDeviceButtonsPad::GetButtonDownId() || id == albaDeviceButtonsPad::GetButtonUpId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() ||
-    id == albaDeviceButtonsPadMouse::GetWheelId();
+  return id == DEVICE_BUTTON_DOWN || id == DEVICE_BUTTON_UP || id == DEVICE_MOUSE_2D_MOVE ||
+    id == DEVICE_MOUSE_WHEEL;
 }
 
 //----------------------------------------------------------------------------
@@ -713,7 +712,7 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
       return;
     }
 
-		if (id == albaDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
+		if (id == DEVICE_MOUSE_WHEEL && !IsInteracting(device))
 		{
 			if (ToolWheel(m_CameraTool, ei))
 				TraceHandler("Camera", m_CameraTool->GetMouseTool());
@@ -725,11 +724,11 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
     if (IsInteracting(device))
     {
       // a drag cancels the context menu
-      if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
+      if (id == DEVICE_TRACKER_3D_MOVE || id == DEVICE_MOUSE_2D_MOVE)
         ToolDrag(m_SelectTool, ei);
       // the drags go to the behavior interacting with the device
       albaInteractionBehavior *bh = GetCurrentBehavior(device);
-      if (bh && (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId()))
+      if (bh && (id == DEVICE_TRACKER_3D_MOVE || id == DEVICE_MOUSE_2D_MOVE))
       {
         TraceHandler("Behavior", bh);
         bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
@@ -740,17 +739,17 @@ void albaPositionalEventRouter::OnEvent(albaEventBase *event)
       if (camera)
       {
         TraceHandler("Camera", camera);
-        if (id == albaDeviceButtonsPadTracker::GetTracker3DMoveId() || id == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
+        if (id == DEVICE_TRACKER_3D_MOVE || id == DEVICE_MOUSE_2D_MOVE)
           ToolDrag(m_CameraTool, ei);
-        else if (id == albaDeviceButtonsPad::GetButtonUpId())
+        else if (id == DEVICE_BUTTON_UP)
           ToolButtonUp(m_CameraTool, ei);
       }
     }
 
     // start and stop the default interaction
-    if (id == albaDeviceButtonsPad::GetButtonDownId())
+    if (id == DEVICE_BUTTON_DOWN)
       OnStartInteraction(ei);
-    else if (id == albaDeviceButtonsPad::GetButtonUpId())
+    else if (id == DEVICE_BUTTON_UP)
       OnStopInteraction(ei);
 
     WriteEventTrace(event);
@@ -783,15 +782,15 @@ void albaPositionalEventRouter::WriteEventTrace(albaEventBase *event)
 
   // moves that nobody handled would flood the log
   albaID id = event->GetId();
-  if (m_EventTrace.empty() && (id == albaDeviceButtonsPadMouse::GetMouse2DMoveId() || id == albaDeviceButtonsPadTracker::GetTracker3DMoveId()))
+  if (m_EventTrace.empty() && (id == DEVICE_MOUSE_2D_MOVE || id == DEVICE_TRACKER_3D_MOVE))
     return;
 
-  const char *eventName = mmuIdFactory::GetIdName(id);
+  wxString eventName = albaIdString(id);
   albaDevice *device = (albaDevice *)event->GetSender();
   albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
 
   std::ostringstream trace;
-  trace << GetTypeName() << ": " << (eventName ? eventName : "unknown event") << " (" << id << ")";
+  trace << GetTypeName() << ": " << (const char *)eventName.ToAscii() << " (" << id << ")";
   if (device && device->GetName())
     trace << " device=" << device->GetName();
   if (e)

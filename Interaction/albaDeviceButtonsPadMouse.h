@@ -38,15 +38,6 @@ class ALBA_EXPORT albaDeviceButtonsPadMouse : public albaDeviceButtonsPad
 public:
   albaTypeMacro(albaDeviceButtonsPadMouse,albaDeviceButtonsPad); 
 
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  /** @ingroup Events
-      Issued when a mouse is moved */
-  // ALBA_ID_DEC(MOUSE_2D_MOVE)
-
-  /** return the mouse 2d move id */
-  static albaID GetMouse2DMoveId();
 
     
   /** Reimplemented to manage fusion of move events. */

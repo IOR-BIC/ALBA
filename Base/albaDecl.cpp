@@ -583,6 +583,12 @@ wxString  albaIdString(int id)
      case MINID:	              s="MINID"; break; 
      case MAXID:	              s="MAXID"; break; 
      case ID_GUI_UPDATE:	      s="ID_GUI_UPDATE"; break; 
+     case DEVICE_BUTTON_DOWN: s="DEVICE_BUTTON_DOWN"; break;
+     case DEVICE_BUTTON_UP: s="DEVICE_BUTTON_UP"; break;
+     case DEVICE_MOUSE_WHEEL: s="DEVICE_MOUSE_WHEEL"; break;
+     case DEVICE_MOUSE_2D_MOVE: s="DEVICE_MOUSE_2D_MOVE"; break;
+     case DEVICE_TRACKER_3D_MOVE: s="DEVICE_TRACKER_3D_MOVE"; break;
+     case DEVICE_TRACKER_BOUNDS_UPDATED: s="DEVICE_TRACKER_BOUNDS_UPDATED"; break;
      default:
       s << id;
      break;

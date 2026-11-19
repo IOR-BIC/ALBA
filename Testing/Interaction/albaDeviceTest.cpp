@@ -220,7 +220,7 @@ void albaDeviceTest::TestOnEvent()
   albaEventInteraction dummyMouse2DMoveEvent;
   dummyMouse2DMoveEvent.SetChannel(MCH_INPUT);
   dummyMouse2DMoveEvent.SetSender(this);
-  dummyMouse2DMoveEvent.SetId(albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+  dummyMouse2DMoveEvent.SetId(DEVICE_MOUSE_2D_MOVE);
 
   dummyDevice->OnEvent(&dummyMouse2DMoveEvent);
   dummyDevice->Delete();

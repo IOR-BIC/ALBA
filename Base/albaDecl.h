@@ -289,6 +289,14 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												MOUSE_UP,   //(to be removed Marco)
 																												MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
+																												// input events of the devices (albaDeviceButtonsPad, albaDeviceButtonsPadMouse, albaDeviceButtonsPadTracker)
+																												DEVICE_BUTTON_DOWN,
+																												DEVICE_BUTTON_UP,
+																												DEVICE_MOUSE_WHEEL,
+																												DEVICE_MOUSE_2D_MOVE,
+																												DEVICE_TRACKER_3D_MOVE,
+																												DEVICE_TRACKER_BOUNDS_UPDATED,
+
 																												ID_TRANSFORM, //added by Stefano. 30-11-2003 
 
 																												ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY

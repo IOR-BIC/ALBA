@@ -319,7 +319,7 @@ void albaRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPad::GetButtonDownId());
+    albaEventInteraction e(this,DEVICE_BUTTON_DOWN);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
 		e.SetButton(ALBA_LEFT_BUTTON);
 		e.SetModifier(ALBA_SHIFT_KEY, event.ShiftDown());
@@ -350,7 +350,7 @@ void albaRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPad::GetButtonDownId());
+    albaEventInteraction e(this,DEVICE_BUTTON_DOWN);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetButton(ALBA_MIDDLE_BUTTON);
     e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
@@ -381,7 +381,7 @@ void albaRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPad::GetButtonDownId());
+    albaEventInteraction e(this,DEVICE_BUTTON_DOWN);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetButton(ALBA_RIGHT_BUTTON);
     e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
@@ -414,7 +414,7 @@ void albaRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPad::GetButtonUpId());
+    albaEventInteraction e(this,DEVICE_BUTTON_UP);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetButton(ALBA_LEFT_BUTTON);
     e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
@@ -447,7 +447,7 @@ void albaRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPad::GetButtonUpId());
+    albaEventInteraction e(this,DEVICE_BUTTON_UP);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetButton(ALBA_MIDDLE_BUTTON);
     e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
@@ -480,7 +480,7 @@ void albaRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPad::GetButtonUpId());
+    albaEventInteraction e(this,DEVICE_BUTTON_UP);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetButton(ALBA_RIGHT_BUTTON);
     e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
@@ -520,7 +520,7 @@ void albaRWIBase::OnMouseMotion(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,albaDeviceButtonsPadMouse::GetMouse2DMoveId());
+    albaEventInteraction e(this,DEVICE_MOUSE_2D_MOVE);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
     e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
@@ -544,7 +544,7 @@ void albaRWIBase::OnMouseWheel(wxMouseEvent &event)
 
 	double delta;
 	delta = event.GetWheelRotation();
-	albaEventInteraction e(this, albaDeviceButtonsPadMouse::GetWheelId());
+	albaEventInteraction e(this, DEVICE_MOUSE_WHEEL);
 	e.Set2DPosition(event.GetX(), m_Height - event.GetY() - 1);
 	e.SetData(&delta);
 

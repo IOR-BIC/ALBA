@@ -33,19 +33,9 @@ class ALBA_EXPORT albaDeviceButtonsPad : public albaDevice
 public:
   albaTypeMacro(albaDeviceButtonsPad,albaDevice); 
 
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  /** @ingroup Events
-      Issued when one of the tracker's buttons is pressed */
-  // ALBA_ID_DEC(BUTTON_DOWN)
-  /** @ingroup Events
-      Issued when one of the tracker's buttons is released */
-  // ALBA_ID_DEC(BUTTON_UP)
-
   /**
    Internally used to set the last button state. After setting the button state eventual
-   BUTTON_UP or BUTTON_DOWN are rised. A copy of the last pose matrix is sent within
+   DEVICE_BUTTON_UP or DEVICE_BUTTON_DOWN are rised. A copy of the last pose matrix is sent within
    the event. */
   void SetButtonState(int num, bool value, unsigned long modifiers = 0);
 
@@ -59,15 +49,6 @@ public:
     Set the number of buttons for this device. Do not change this
     if you don't know what you are doing.*/
   void SetNumberOfButtons(int num);
-
-  /** return the button down id */
-  static albaID GetButtonDownId();
-
-  /** return the button up id */
-  static albaID GetButtonUpId();
-
-	/** return the Wheel id */
-	static albaID GetWheelId();
 
 protected:
   albaDeviceButtonsPad();

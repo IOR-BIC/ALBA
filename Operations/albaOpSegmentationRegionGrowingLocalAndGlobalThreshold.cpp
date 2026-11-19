@@ -479,7 +479,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBa
 {
   if (albaEventInteraction *ei = albaEventInteraction::SafeDownCast(alba_event))
   {
-    if (ei->GetId() == albaDeviceButtonsPad::GetButtonDownId() && ei->GetButton() == ALBA_LEFT_BUTTON && ei->GetModifier(ALBA_CTRL_KEY))
+    if (ei->GetId() == DEVICE_BUTTON_DOWN && ei->GetButton() == ALBA_LEFT_BUTTON && ei->GetModifier(ALBA_CTRL_KEY))
     {
       //         if(m_Histogram->GetInputData() == NULL) return;
       double pos[2];

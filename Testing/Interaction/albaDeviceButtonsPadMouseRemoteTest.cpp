@@ -53,7 +53,7 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventMouse2DMove()
   CPPUNIT_ASSERT(buttonsPadMouse);
 
   // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction mouse2DMoveEvent(this,albaDeviceButtonsPadMouse::GetMouse2DMoveId(),10,20);
+  albaEventInteraction mouse2DMoveEvent(this,DEVICE_MOUSE_2D_MOVE,10,20);
   buttonsPadMouse->OnEvent(&mouse2DMoveEvent);
   
   buttonsPadMouse->Delete();
@@ -68,7 +68,7 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonDown()
 
   // dummy event sending in order to test for leaks and/or crashes
   
-  albaEventInteraction buttonDownEvent(this,albaDeviceButtonsPadMouse::GetButtonDownId());
+  albaEventInteraction buttonDownEvent(this,DEVICE_BUTTON_DOWN);
   buttonsPadMouse->OnEvent(&buttonDownEvent);
 
   buttonsPadMouse->Delete();  
@@ -82,7 +82,7 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonUp()
   CPPUNIT_ASSERT(buttonsPadMouse);
 
   // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction buttonUpEvent(this,albaDeviceButtonsPadMouse::GetButtonUpId());
+  albaEventInteraction buttonUpEvent(this,DEVICE_BUTTON_UP);
   buttonsPadMouse->OnEvent(&buttonUpEvent);
 
   buttonsPadMouse->Delete();
