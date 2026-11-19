@@ -34,8 +34,8 @@ class albaGUIFloatSlider;
 class albaGUILutHistogramSwatch;
 class albaGUILutSlider;
 class albaGUIRollOut;
-class albaSegmentationEditTool;
-class albaSegmentationThresholdTool;
+class albaToolSegmentationEdit;
+class albaToolSegmentationThreshold;
 class albaMatrix;
 class albaVME;
 class albaVMEImage;
@@ -303,8 +303,8 @@ protected:
   albaMatrix m_Matrix;                   //<Volume initial matrix
 	albaVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
-  albaSegmentationThresholdTool *m_ThresholdTool; //<Tool of the threshold initialization
-  albaSegmentationEditTool *m_EditTool;           //<Tool of the editing
+  albaToolSegmentationThreshold *m_ThresholdTool; //<Tool of the threshold initialization
+  albaToolSegmentationEdit *m_EditTool;           //<Tool of the editing
   albaView *m_OldSelectedView;                    //<View selected before the operation
 
 	albaGUI* m_AppendingOpGui;

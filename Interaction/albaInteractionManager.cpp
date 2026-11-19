@@ -56,6 +56,7 @@
 #include "albaAction.h"
 #include "albaDeviceSet.h"
 #include "albaDeviceButtonsPadMouse.h"
+#include "albaToolFlyTo.h"
   
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
@@ -79,6 +80,7 @@ albaCxxTypeMacro(albaInteractionManager);
 //------------------------------------------------------------------------------
 albaInteractionManager::albaInteractionManager()
 {
+  m_FlyToTool = NULL;
   m_Gui = NULL;  //SIL. 07-jun-2006 : 
   m_Frame = NULL;  //SIL. 07-jun-2006 : 
   m_SelectedView      = NULL;
@@ -133,6 +135,9 @@ albaInteractionManager::albaInteractionManager()
 //------------------------------------------------------------------------------
 albaInteractionManager::~albaInteractionManager()
 {
+  if (m_FlyToTool)
+    m_PositionalEventRouter->PopTool(m_FlyToTool);
+  albaDEL(m_FlyToTool);
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
@@ -153,7 +158,7 @@ void albaInteractionManager::PopTool(albaInteractionTool *tool)
 //----------------------------------------------------------------------------
 bool albaInteractionManager::OnKey(int keyCode, bool pressed)
 {
-  return m_PositionalEventRouter->DispatchKey(keyCode, pressed);
+  return m_PositionalEventRouter->OnKey(keyCode, pressed);
 }
 //----------------------------------------------------------------------------
 void albaInteractionManager::SetEventTracing(bool enable)
@@ -174,10 +179,11 @@ void albaInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractionManager::CameraFlyToMode()   
+void albaInteractionManager::CameraFlyToMode()
 {
-  if(m_PositionalEventRouter)
-    m_PositionalEventRouter->FlyToMode();
+  if (m_FlyToTool == NULL)
+    albaNEW(m_FlyToTool);
+  PushTool(m_FlyToTool);
 }
 
 //------------------------------------------------------------------------------
@@ -276,13 +282,6 @@ void albaInteractionManager::ViewSelected(albaView *view)
   GetMouseDevice()->SetView(view);
 }
 
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::VmeSelected(albaVME *vme)
-{
-  if (vme)
-    m_PositionalEventRouter->OnVmeSelected(vme);
-}
 
 //------------------------------------------------------------------------------
 void albaInteractionManager::CameraUpdate(albaView *view)
@@ -602,9 +601,9 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
     return;
   }
   
-  if (id == VME_SELECT || id == VME_DCLICKED)
+  if (id == VME_SELECT)
   {
-    // event raised by PER to advise of VME selection or double click on a VME
+    // event raised by the select tool of the PER to advise of VME selection
     albaEventMacro(albaEvent(event->GetSender(), id, (albaVME *)event->GetData()));
   }
   else if (id == albaDeviceManager::DISPATCH_START)

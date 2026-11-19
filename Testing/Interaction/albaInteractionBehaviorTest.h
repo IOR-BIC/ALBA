@@ -27,18 +27,7 @@ public:
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestSetGetRenderer );
-  CPPUNIT_TEST( TestSetGetDevice );
-  CPPUNIT_TEST( TestSetGetIgnoreTriggerEvents );
-  CPPUNIT_TEST( TestSetGetStartInteractionEvent );
-  CPPUNIT_TEST( TestSetGetStopInteractionEvent );
-  CPPUNIT_TEST( TestSetGetStartButton );
-  CPPUNIT_TEST( TestSetGetModifiers );
-  CPPUNIT_TEST( TestGetCurrentButton );
-  CPPUNIT_TEST( TestGetCurrentModifier );
-  CPPUNIT_TEST( TestStartStopInteraction );
-  CPPUNIT_TEST( TestIsInteracting );
-  CPPUNIT_TEST( TestSetGetButtonMode );
-  CPPUNIT_TEST( TestButtonEventsKeepIncomingEvent );
+  CPPUNIT_TEST( TestButtonsNotUsed );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -46,18 +35,7 @@ protected:
   void TestFixture();
   void TestConstructorDestructor();
   void TestSetGetRenderer();
-  void TestSetGetDevice();
-  void TestSetGetIgnoreTriggerEvents();
-  void TestSetGetStartInteractionEvent();
-  void TestSetGetStopInteractionEvent();
-  void TestSetGetStartButton();
-  void TestSetGetModifiers();
-  void TestGetCurrentButton();
-  void TestGetCurrentModifier();
-  void TestStartStopInteraction();
-  void TestIsInteracting();
-  void TestSetGetButtonMode();
-  void TestButtonEventsKeepIncomingEvent();
+  void TestButtonsNotUsed();
 };
 
 #endif

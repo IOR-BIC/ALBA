@@ -453,7 +453,6 @@ wxString  albaIdString(int id)
      case VME_REMOVING:	        s="VME_REMOVING"; break; 
      case VME_SELECT:	          s="VME_SELECT"; break; 
      case VME_SELECTED:	        s="VME_SELECTED"; break;
-     case VME_DCLICKED:         s="VME_DCLICKED"; break;
      case VME_TRANSFORM:	      s="VME_TRANSFORM"; break; 
      case VME_CHOOSE:						s="VME_CHOOSE"; break; 
      case VME_REF_SYS_CHOOSED:  s="VME_REF_SYS_CHOOSED"; break;
@@ -500,9 +499,6 @@ wxString  albaIdString(int id)
      case CAMERA_RESET:	        s="CAMERA_RESET"; break; 
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 
 		 case CAMERA_FLYTO:					s="CAMERA_FLYTO"; break; 
-     case DEVICE_ADD:           s="DEVICE_ADD"; break; 
-     case DEVICE_REMOVE:        s="DEVICE_REMOVE"; break; 
-     case DEVICE_GET:           s="DEVICE_GET"; break; 
 
      case OP_RUN:	              s="OP_RUN"; break; 
      case OP_RUN_OK:	          s="OP_RUN_OK"; break; 
@@ -587,6 +583,12 @@ wxString  albaIdString(int id)
      case MINID:	              s="MINID"; break; 
      case MAXID:	              s="MAXID"; break; 
      case ID_GUI_UPDATE:	      s="ID_GUI_UPDATE"; break; 
+     case DEVICE_BUTTON_DOWN: s="DEVICE_BUTTON_DOWN"; break;
+     case DEVICE_BUTTON_UP: s="DEVICE_BUTTON_UP"; break;
+     case DEVICE_MOUSE_WHEEL: s="DEVICE_MOUSE_WHEEL"; break;
+     case DEVICE_MOUSE_2D_MOVE: s="DEVICE_MOUSE_2D_MOVE"; break;
+     case DEVICE_TRACKER_3D_MOVE: s="DEVICE_TRACKER_3D_MOVE"; break;
+     case DEVICE_TRACKER_BOUNDS_UPDATED: s="DEVICE_TRACKER_BOUNDS_UPDATED"; break;
      default:
       s << id;
      break;

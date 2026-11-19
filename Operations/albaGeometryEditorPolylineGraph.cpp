@@ -29,7 +29,7 @@
 #include "albaGUI.h"
 #include "albaVMEPolylineEditor.h"
 #include "albaVMEPolylineGraph.h"
-#include "albaPickerBehavior.h"
+#include "albaBehaviorPicker.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPolyData.h"
@@ -410,7 +410,7 @@ void albaGeometryEditorPolylineGraph::CreateISA()
 {
 	m_OldBehavior = m_InputVME->GetBehavior();
 
-	m_Picker = albaPickerBehavior::New();
+	m_Picker = albaBehaviorPicker::New();
 	m_Picker->SetListener(this);
 
 	m_InputVME->SetBehavior(m_Picker);

@@ -23,7 +23,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOp.h"
 #include <string>
 #include <vector>
-#include "alba2DMeasureTool.h"
+#include "albaTool2DMeasure.h"
 
 //----------------------------------------------------------------------------
 // Forward references :
@@ -31,8 +31,8 @@ PURPOSE. See the above copyright notice for more information.
 class albaEvent;
 class albaVMEImage;
 class albaVMEVolumeRGB;
-class alba2DMeasurePointTool;
-class alba2DMeasureDistanceTool;
+class albaTool2DMeasurePoint;
+class albaTool2DMeasureDistance;
 
 // Class Name: albaOpMeasure2D
 class ALBA_EXPORT albaOpMeasure2D: public albaOp
@@ -138,7 +138,7 @@ protected:
 
 	wxListBox *m_MeasureListBox;
 
-	std::vector<alba2DMeasureTool *> m_InteractorVector;
+	std::vector<albaTool2DMeasure *> m_InteractorVector;
 
 	int m_CurrentInteractor;
 	int m_SelectedInteractor;

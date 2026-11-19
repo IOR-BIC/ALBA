@@ -69,16 +69,6 @@ class ALBA_EXPORT albaDeviceButtonsPadTracker : public albaDeviceButtonsPad
 public:
   albaTypeMacro(albaDeviceButtonsPadTracker,albaDeviceButtonsPad);
 
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  /** @ingroup Events
-      Issued when the tracker is moved */
-  // ALBA_ID_DEC(TRACKER_3D_MOVE)
-  /** @ingroup Events
-      Issued when the tracked bounds is changed */
-  // ALBA_ID_DEC(TRACKER_BOUNDS_UPDATED)
-
   //----------------------------------------------------------------------------
   //    GUI Constants
   //----------------------------------------------------------------------------
@@ -94,11 +84,6 @@ public:
     ID_LAST
   };
 
-  /** return the tracker 3d move id */
-  static albaID GetTracker3DMoveId();
-
-  /** return th tracker bounds updated id */
-  static albaID GetTrackerBoundsUpdatedId();
   /**
     Reimplemented to manage fusion of move events. */
   virtual void OnEvent(albaEventBase *event);

@@ -45,37 +45,39 @@ SET(PROJECT_SRCS
   albaGizmoTranslateGUI.cpp  				albaGizmoTranslateGUI.h
   albaSaveRestorePoseGUI.cpp  				albaSaveRestorePoseGUI.h
   albaTransformInterfaceGUI.cpp  			albaTransformInterfaceGUI.h
-  albaTransformMouseGUI.cpp  				albaTransformMouseGUI.h
+  albaRotateTranslateGUI.cpp  				albaRotateTranslateGUI.h
   albaTransformTextEntriesGUI.cpp  			albaTransformTextEntriesGUI.h
   albaInteractionFactory.cpp  				albaInteractionFactory.h
   albaInteractionManager.cpp  				albaInteractionManager.h
   albaInteractionBehavior.cpp  						albaInteractionBehavior.h
   albaInteractionAgent.cpp  						albaInteractionAgent.h
   albaInteractionTool.cpp  						albaInteractionTool.h
-  albaCameraTool.cpp  						albaCameraTool.h
-  albaCameraMouseTool.cpp  						albaCameraMouseTool.h
-  albaSegmentationTool.cpp  					albaSegmentationTool.h
-  albaSegmentationThresholdTool.cpp  					albaSegmentationThresholdTool.h
-  albaSegmentationEditTool.cpp  					albaSegmentationEditTool.h
-  albaSelectCellTool.cpp  					albaSelectCellTool.h
-  albaSelectPointTool.cpp  					albaSelectPointTool.h
-  albaVTKPickerTool.cpp  					albaVTKPickerTool.h
-  albaExtractIsosurfaceTool.cpp  					albaExtractIsosurfaceTool.h
-  albaDICOMImporterTool.cpp  					albaDICOMImporterTool.h
-  albaCameraTrackerTool.cpp  						albaCameraTrackerTool.h
+  albaToolCamera.cpp  						albaToolCamera.h
+  albaToolCameraMouse.cpp  						albaToolCameraMouse.h
+  albaToolSegmentation.cpp  					albaToolSegmentation.h
+  albaToolSegmentationThreshold.cpp  					albaToolSegmentationThreshold.h
+  albaToolSegmentationEdit.cpp  					albaToolSegmentationEdit.h
+  albaToolSelectCell.cpp  					albaToolSelectCell.h
+  albaToolSelectPoint.cpp  					albaToolSelectPoint.h
+  albaToolVTKPicker.cpp  					albaToolVTKPicker.h
+  albaToolExtractIsosurface.cpp  					albaToolExtractIsosurface.h
+  albaToolDICOMImporter.cpp  					albaToolDICOMImporter.h
+  albaToolCameraTracker.cpp  						albaToolCameraTracker.h
   albaRefSys.cpp  							albaRefSys.h  
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
   albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
-  albaCompositorMouseBehavior.cpp  		albaCompositorMouseBehavior.h
-  albaTransformMouseBehavior.cpp  					albaTransformMouseBehavior.h
-  albaTransformMouseFreeBehavior.cpp  					albaTransformMouseFreeBehavior.h
+  albaBehaviorRotateTranslate.cpp  					albaBehaviorRotateTranslate.h
+  albaBehaviorProsthesis.cpp  					albaBehaviorProsthesis.h
+  albaBehaviorCutPlane.cpp  					albaBehaviorCutPlane.h
   albaInteractorConstraint.cpp  				albaInteractorConstraint.h
-  albaGenericMouseBehavior.cpp  			albaGenericMouseBehavior.h
+  albaBehaviorTransform.cpp  			albaBehaviorTransform.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
-  albaPickerBehavior.cpp  					albaPickerBehavior.h
+  albaBehaviorPicker.cpp  					albaBehaviorPicker.h
   albaStaticEventRouter.cpp  									albaStaticEventRouter.h  ######################
-  albaPickerTool.cpp  						albaPickerTool.h
+  albaToolPicker.cpp  						albaToolPicker.h
+  albaToolFlyTo.cpp  						albaToolFlyTo.h
+  albaToolSelect.cpp  						albaToolSelect.h
   albaPickHelper.cpp  											albaPickHelper.h
   albaGizmoPolylineGraph.cpp  						albaGizmoPolylineGraph.h
   albaGizmoCrossRotateTranslate.cpp  			albaGizmoCrossRotateTranslate.h	  
@@ -87,20 +89,19 @@ SET(PROJECT_SRCS
   albaGizmoCrossTranslatePlane.cpp  			albaGizmoCrossTranslatePlane.h
 	
 	albaActor2dStackHelper.cpp							albaActor2dStackHelper.h
-	alba2DMeasureTool.cpp							alba2DMeasureTool.h
-	alba2DMeasureAngleTool.cpp				alba2DMeasureAngleTool.h
-	alba2DMeasureAngleLineTool.cpp		alba2DMeasureAngleLineTool.h
-	alba2DMeasureCenterPointTool.cpp	alba2DMeasureCenterPointTool.h
-	alba2DMeasureDistanceTool.cpp 		alba2DMeasureDistanceTool.h
-	alba2DMeasureLineTool.cpp				alba2DMeasureLineTool.h
-	alba2DMeasureLineDistanceTool.cpp	alba2DMeasureLineDistanceTool.h
-	alba2DMeasureMidPointTool.cpp		alba2DMeasureMidPointTool.h
-	alba2DMeasurePointTool.cpp 			alba2DMeasurePointTool.h
-	alba2DMeasureSegmentTool.cpp			alba2DMeasureSegmentTool.h
-	alba2DMeasureTemplateTool.cpp		alba2DMeasureTemplateTool.h
+	albaTool2DMeasure.cpp							albaTool2DMeasure.h
+	albaTool2DMeasureAngle.cpp				albaTool2DMeasureAngle.h
+	albaTool2DMeasureAngleLine.cpp		albaTool2DMeasureAngleLine.h
+	albaTool2DMeasureCenterPoint.cpp	albaTool2DMeasureCenterPoint.h
+	albaTool2DMeasureDistance.cpp 		albaTool2DMeasureDistance.h
+	albaTool2DMeasureLine.cpp				albaTool2DMeasureLine.h
+	albaTool2DMeasureLineDistance.cpp	albaTool2DMeasureLineDistance.h
+	albaTool2DMeasureMidPoint.cpp		albaTool2DMeasureMidPoint.h
+	albaTool2DMeasurePoint.cpp 			albaTool2DMeasurePoint.h
+	albaTool2DMeasureSegment.cpp			albaTool2DMeasureSegment.h
+	albaTool2DMeasureTemplate.cpp		albaTool2DMeasureTemplate.h
 	
-	albaGenericMouseFreeTransformBehavior.cpp	albaGenericMouseFreeTransformBehavior.h
-	alba2DMeasureEllipseTool.cpp alba2DMeasureEllipseTool.h
+	albaTool2DMeasureEllipse.cpp albaTool2DMeasureEllipse.h
 )
 
 IF (ALBA_USE_P5_GLOVE)

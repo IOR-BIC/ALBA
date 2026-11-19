@@ -30,7 +30,8 @@
 #include "albaRefSys.h"
 
 #include "mmaMaterial.h"
-#include "albaCompositorMouseBehavior.h"
+#include "albaBehaviorCutPlane.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaVMEGizmo.h"
 #include "albaGizmoTranslate.h"
@@ -79,7 +80,7 @@ albaOp(label)
 	m_ClipperBoundingBox = NULL;
   
   m_ImplicitPlaneGizmo  = NULL;
-  m_IsaCompositor       = NULL;
+  m_PlaneBehavior       = NULL;
 
 	m_ResultPolyData = NULL;
 	m_ClippedPolyData = NULL;
@@ -119,7 +120,7 @@ albaOpClipSurface::~albaOpClipSurface()
 
 	vtkDEL(m_ResultPolyData);
 	vtkDEL(m_ClippedPolyData);
-  albaDEL(m_IsaCompositor);
+  albaDEL(m_PlaneBehavior);
 	albaDEL(m_ReverseClippedVME);
 	albaDEL(m_ClippedVME);
   vtkDEL(m_ClipperPlane);
@@ -293,8 +294,8 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 			break;
 		case ID_USE_GIZMO:
 			{
-				if(m_IsaCompositor && !m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+				if(m_PlaneBehavior && !m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
 				else if(m_UseGizmo)
 					m_ImplicitPlaneGizmo->SetBehavior(NULL);
 
@@ -748,7 +749,7 @@ void albaOpClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
+		if (arg == albaBehaviorTransform::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);
@@ -852,41 +853,20 @@ void albaOpClipSurface::ShowClipPlane(bool show)
 void albaOpClipSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-  albaNEW(m_IsaCompositor);
-
-  m_IsaRotate = m_IsaCompositor->CreateBehavior(MOUSE_LEFT);
-  m_IsaRotate->SetListener(this);
-  m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetPivotRefSys()->SetTypeToView();
-  m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_IsaRotate->EnableRotation(true);
-
-  m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
-  m_IsaTranslate->SetListener(this);
-  m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_IsaTranslate->EnableTranslation(true);
+  // left button rotates, middle button translates
+  albaNEW(m_PlaneBehavior);
+  m_PlaneBehavior->SetListener(this);
+  m_PlaneBehavior->SetVME(m_ImplicitPlaneGizmo);
 
 	if(!m_UseGizmo)
-		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+		m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
 }
 
 //----------------------------------------------------------------------------
 void albaOpClipSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
 {
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_PlaneBehavior->SetRefSysVME(m_ImplicitPlaneGizmo);
 }
 
 //----------------------------------------------------------------------------

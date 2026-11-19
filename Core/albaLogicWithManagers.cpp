@@ -647,9 +647,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case VME_SELECTED:
 			VmeSelected(e->GetVme());
 			break;
-		case VME_DCLICKED:
-			VmeDoubleClicked(*e);
-			break;
 		case VME_ADDED:
 			VmeAdded(e->GetVme());
 			break;
@@ -818,7 +815,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			if (m_ViewManager) m_ViewManager->CameraReset(true);
 			break;
 		case CAMERA_FLYTO:
-			if (m_ViewManager) m_ViewManager->CameraFlyToMode();
 			// currently albaInteraction is strictly dependent on VTK (marco)
 #ifdef ALBA_USE_VTK
 			if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
@@ -837,14 +833,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
-			break;
-		case DEVICE_ADD:
-			m_InteractionManager->AddDeviceToTree((albaDevice *)e->GetMafObject());
-			break;
-		case DEVICE_REMOVE:
-			m_InteractionManager->RemoveDeviceFromTree((albaDevice *)e->GetMafObject());
-			break;
-		case DEVICE_GET:
 			break;
 		case CREATE_STORAGE:
 			CreateStorage(e);
@@ -1318,27 +1306,12 @@ void albaLogicWithManagers::VmeVisualModeChanged(albaVME * vme)
 	}
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::VmeDoubleClicked(albaEvent &e)
-{
-	albaVME *node = e.GetVme();
-	if (node)
-	{
-		albaLogMessage("Double click on %s", node->GetName());
-	}
-}
-//----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)
 {
 	EnableCameraUpdateSkip();
 	if (vme != NULL && m_OpManager && m_OpManager->GetSelectedVme()!=vme)
 	{
 		m_OpManager->OpSelect(vme);
-
-		// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-		if (m_InteractionManager)
-			m_InteractionManager->VmeSelected(vme);
-#endif
 
 		EnableMenuAndToolbar();
 	}

@@ -373,7 +373,7 @@ void albaViewVTK::SetWindowSize(int w, int h)
 	GetRenderWindow()->SetSize(w,h);
 }
 //----------------------------------------------------------------------------
-bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp3D *&picked_prop,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
+bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
 {
   albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
   albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
@@ -396,7 +396,6 @@ bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,vtkProp
   if(picked_something)
   {
     picked_vme = GetPickedVme();
-    picked_prop = GetPickedProp();
     picked_behavior = picked_vme->GetBehavior();
     return true;
   }

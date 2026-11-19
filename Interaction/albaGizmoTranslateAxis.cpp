@@ -29,8 +29,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -55,7 +54,7 @@ albaGizmoTranslateAxis::albaGizmoTranslateAxis(albaVME *input, albaObserver *lis
   m_ConeLength = 0.5;
   m_CylinderLength = 0.5;
 
-  m_IsaComp[0] = m_IsaComp[1] = NULL;
+  m_IsaGen[0] = m_IsaGen[1] = NULL;
 
   m_Listener = listener;
   m_InputVme = input;
@@ -93,8 +92,8 @@ albaGizmoTranslateAxis::albaGizmoTranslateAxis(albaVME *input, albaObserver *lis
   m_ConeGizmo->SetMediator(m_Listener);
 
   // assign isa to cylinder and cone
-  m_CylGizmo->SetBehavior(m_IsaComp[CYLINDER]);
-  m_ConeGizmo->SetBehavior(m_IsaComp[CONE]);
+  m_CylGizmo->SetBehavior(m_IsaGen[CYLINDER]);
+  m_ConeGizmo->SetBehavior(m_IsaGen[CONE]);
 
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
   
@@ -128,7 +127,7 @@ albaGizmoTranslateAxis::~albaGizmoTranslateAxis()
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData[i]);
 	//----------------------
-    vtkDEL(m_IsaComp[i]); 
+    vtkDEL(m_IsaGen[i]); 
   }
 	m_CylGizmo->ReparentTo(NULL);
 	m_ConeGizmo->ReparentTo(NULL);
@@ -248,14 +247,12 @@ void albaGizmoTranslateAxis::CreatePipeline()
 void albaGizmoTranslateAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-  // create isa compositor and assign behaviors to IsaGen ivar
+  // create the transform behavior of the gizmo
   for (int i = 0; i < 2; i++)
   {
-    m_IsaComp[i] = albaCompositorMouseBehavior::New();
-
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
+    m_IsaGen[i] = albaBehaviorTransform::New();
 
     m_IsaGen[i]->SetVME(m_InputVme);
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

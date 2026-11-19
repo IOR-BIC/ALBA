@@ -30,7 +30,7 @@
 #include "albaGUIValidator.h"
 #include "albaRWI.h"
 #include "albaViewVTK.h"
-#include "albaSelectPointTool.h"
+#include "albaToolSelectPoint.h"
 #include "albaVMESurface.h"
 
 #include "vtkALBASmartPointer.h"

@@ -29,8 +29,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -53,7 +52,7 @@
 albaGizmoScaleIsotropic::albaGizmoScaleIsotropic(albaVME *input, albaObserver *listener)
 //----------------------------------------------------------------------------
 {
-  m_IsaComp = NULL;
+  m_IsaGen = NULL;
 
   m_Listener = listener;
   m_InputVme = input;
@@ -75,7 +74,7 @@ albaGizmoScaleIsotropic::albaGizmoScaleIsotropic(albaVME *input, albaObserver *l
   m_CubeGizmo->SetMediator(m_Listener);
 
   // assign isa to cube
-  m_CubeGizmo->SetBehavior(m_IsaComp); 
+  m_CubeGizmo->SetBehavior(m_IsaGen); 
 
 
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
@@ -92,7 +91,7 @@ albaGizmoScaleIsotropic::~albaGizmoScaleIsotropic()
 {
   m_CubeGizmo->SetBehavior(NULL);
   vtkDEL(m_Cube);
-  vtkDEL(m_IsaComp); 
+  vtkDEL(m_IsaGen); 
 
 	m_CubeGizmo->ReparentTo(NULL);
 }
@@ -130,12 +129,10 @@ void albaGizmoScaleIsotropic::CreateISA()
 //----------------------------------------------------------------------------
 {
   
-  // create isa compositor and assign behaviors to m_IsaGen ivar
-  m_IsaComp = albaCompositorMouseBehavior::New();
-
+  // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
+  m_IsaGen = albaBehaviorTransform::New();
 
   m_IsaGen->SetVME(m_InputVme);
   m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

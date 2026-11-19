@@ -170,19 +170,6 @@ void albaEventInteractionTest::TestSetButton_GetButton()
   cppDEL(eventA);
 }
 //----------------------------------------------------------------------------
-void albaEventInteractionTest::TestSetKey_GetKey()
-//----------------------------------------------------------------------------
-{
-  albaEventInteraction *eventA = new albaEventInteraction();
-  
-  eventA->SetKey(ID_KEY_1);
-  CPPUNIT_ASSERT(eventA->GetKey() == ID_KEY_1);
-  eventA->SetKey(ID_KEY_2);
-  CPPUNIT_ASSERT(eventA->GetKey() == ID_KEY_2);
-
-  cppDEL(eventA);
-}
-//----------------------------------------------------------------------------
 void albaEventInteractionTest::TestSetMatrix_GetMatrix()
 //----------------------------------------------------------------------------
 {
@@ -250,7 +237,6 @@ void albaEventInteractionTest::TestDeepCopy()
   eventA->Set2DPosition(10.,20.);
   eventA->SetXYFlag(true);
   eventA->SetButton(ID_BUTTON_RIGHT);
-  eventA->SetKey(ID_KEY_2);
   eventA->SetMatrix(mat);
   eventA->SetModifier(ID_MODIFIER_1, true);
   eventA->SetModifier(ID_MODIFIER_2, true);
@@ -264,7 +250,6 @@ void albaEventInteractionTest::TestDeepCopy()
   CPPUNIT_ASSERT(Position2dA[0] == Position2dB[0] && Position2dA[1] == Position2dB[1]);
   CPPUNIT_ASSERT(eventA->GetXYFlag() == eventB->GetXYFlag());
   CPPUNIT_ASSERT(eventA->GetButton() == eventB->GetButton());
-  CPPUNIT_ASSERT(eventA->GetKey() == eventB->GetKey());
   CPPUNIT_ASSERT(eventA->GetMatrix()->Equals(eventB->GetMatrix()));
   CPPUNIT_ASSERT(eventA->GetModifiers() == eventB->GetModifiers());
 

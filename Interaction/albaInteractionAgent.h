@@ -47,6 +47,13 @@ public:
   vtkRenderer *GetRenderer() {return m_Renderer;}
   albaView *GetView() {return m_View;}
 
+  /** Set the state of the modifier keys: the PER updates it from the mouse events and the keys,
+    for all the tools and for the behavior receiving the events */
+  virtual void SetModifierKeys(bool ctrlDown, bool altDown, bool shiftDown);
+  bool GetCtrlDown() {return m_CtrlDown;}
+  bool GetAltDown() {return m_AltDown;}
+  bool GetShiftDown() {return m_ShiftDown;}
+
 protected:
   /** Convert a display point to world coordinates using the current renderer */
   void ComputeDisplayToWorld(double x, double y, double z, double worldPt[4]);
@@ -61,6 +68,9 @@ protected:
 
   albaView *m_View; ///< the view this object is working on
   vtkALBASmartPointer<vtkRenderer> m_Renderer; ///< the renderer this object is working on
+  bool m_CtrlDown;  ///< true while CTRL is down
+  bool m_AltDown;   ///< true while ALT is down
+  bool m_ShiftDown; ///< true while SHIFT is down
 
 private:
   albaInteractionAgent(const albaInteractionAgent&);  // Not implemented.

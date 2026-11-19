@@ -320,37 +320,36 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoTranslateGUI.cpp  				../Interaction/albaGizmoTranslateGUI.h
   ../Interaction/albaSaveRestorePoseGUI.cpp  				../Interaction/albaSaveRestorePoseGUI.h
   ../Interaction/albaTransformInterfaceGUI.cpp  			../Interaction/albaTransformInterfaceGUI.h
-  ../Interaction/albaTransformMouseGUI.cpp  				../Interaction/albaTransformMouseGUI.h
+  ../Interaction/albaRotateTranslateGUI.cpp  				../Interaction/albaRotateTranslateGUI.h
   ../Interaction/albaTransformTextEntriesGUI.cpp  			../Interaction/albaTransformTextEntriesGUI.h
   ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractionBehavior.cpp  						../Interaction/albaInteractionBehavior.h
   ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h
   ../Interaction/albaInteractionTool.cpp  						../Interaction/albaInteractionTool.h
-  ../Interaction/albaCameraTool.cpp  						../Interaction/albaCameraTool.h
-  ../Interaction/albaCameraMouseTool.cpp  						../Interaction/albaCameraMouseTool.h
-  ../Interaction/albaSegmentationTool.cpp  					../Interaction/albaSegmentationTool.h
-  ../Interaction/albaSegmentationThresholdTool.cpp  					../Interaction/albaSegmentationThresholdTool.h
-  ../Interaction/albaSegmentationEditTool.cpp  					../Interaction/albaSegmentationEditTool.h
-  ../Interaction/albaSelectCellTool.cpp  					../Interaction/albaSelectCellTool.h
-  ../Interaction/albaSelectPointTool.cpp  					../Interaction/albaSelectPointTool.h
-  ../Interaction/albaVTKPickerTool.cpp  					../Interaction/albaVTKPickerTool.h
-  ../Interaction/albaExtractIsosurfaceTool.cpp  					../Interaction/albaExtractIsosurfaceTool.h
-  ../Interaction/albaDICOMImporterTool.cpp  					../Interaction/albaDICOMImporterTool.h
-  ../Interaction/albaCameraTrackerTool.cpp  						../Interaction/albaCameraTrackerTool.h
+  ../Interaction/albaToolCamera.cpp  						../Interaction/albaToolCamera.h
+  ../Interaction/albaToolCameraMouse.cpp  						../Interaction/albaToolCameraMouse.h
+  ../Interaction/albaToolSegmentation.cpp  					../Interaction/albaToolSegmentation.h
+  ../Interaction/albaToolSegmentationThreshold.cpp  					../Interaction/albaToolSegmentationThreshold.h
+  ../Interaction/albaToolSegmentationEdit.cpp  					../Interaction/albaToolSegmentationEdit.h
+  ../Interaction/albaToolSelectCell.cpp  					../Interaction/albaToolSelectCell.h
+  ../Interaction/albaToolSelectPoint.cpp  					../Interaction/albaToolSelectPoint.h
+  ../Interaction/albaToolVTKPicker.cpp  					../Interaction/albaToolVTKPicker.h
+  ../Interaction/albaToolExtractIsosurface.cpp  					../Interaction/albaToolExtractIsosurface.h
+  ../Interaction/albaToolDICOMImporter.cpp  					../Interaction/albaToolDICOMImporter.h
+  ../Interaction/albaToolCameraTracker.cpp  						../Interaction/albaToolCameraTracker.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
-  ../Interaction/albaCompositorMouseBehavior.cpp  		../Interaction/albaCompositorMouseBehavior.h
-  ../Interaction/albaTransformMouseBehavior.cpp  					../Interaction/albaTransformMouseBehavior.h
-  ../Interaction/albaTransformMouseFreeBehavior.cpp  					../Interaction/albaTransformMouseFreeBehavior.h
+  ../Interaction/albaBehaviorRotateTranslate.cpp  					../Interaction/albaBehaviorRotateTranslate.h
+  ../Interaction/albaBehaviorProsthesis.cpp  					../Interaction/albaBehaviorProsthesis.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
-  ../Interaction/albaGenericMouseBehavior.cpp  			../Interaction/albaGenericMouseBehavior.h
+  ../Interaction/albaBehaviorTransform.cpp  			../Interaction/albaBehaviorTransform.h
   ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h
-  ../Interaction/albaPickerBehavior.cpp  					../Interaction/albaPickerBehavior.h
+  ../Interaction/albaBehaviorPicker.cpp  					../Interaction/albaBehaviorPicker.h
   ../Interaction/albaStaticEventRouter.cpp  					../Interaction/albaStaticEventRouter.h  ######################
-  ../Interaction/albaPickerTool.cpp  				../Interaction/albaPickerTool.h
+  ../Interaction/albaToolPicker.cpp  				../Interaction/albaToolPicker.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h
   ../Interaction/albaGizmoCrossRotateTranslate.cpp  		../Interaction/albaGizmoCrossRotateTranslate.h	  

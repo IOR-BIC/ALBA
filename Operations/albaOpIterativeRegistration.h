@@ -30,7 +30,7 @@
 class albaVME;
 class albaEvent; 
 class albaInteractionBehavior;
-class albaPickerBehavior;
+class albaBehaviorPicker;
 class albaVMELandmark;
 class albaVMELandmarkCloud;
 class vtkPoints;
@@ -108,7 +108,7 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
     albaVME *m_SourceVME;
     albaVME *m_TargetVME;
  
-    albaPickerBehavior *m_Picker[2];           ///< pickers of the source and target VMEs
+    albaBehaviorPicker *m_Picker[2];           ///< pickers of the source and target VMEs
     albaInteractionBehavior *m_OldBehavior[2]; ///< behaviors of the source and target VMEs before the operation
     albaVMELandmarkCloud *m_Cloud[2];          ///< landmarks of the source and target VMEs
     albaVMELandmark *m_Landmark[2];            ///< current landmarks: a pick moves them, NULL after a registration

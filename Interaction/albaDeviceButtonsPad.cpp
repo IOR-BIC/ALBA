@@ -15,17 +15,9 @@
 =========================================================================*/
 
 #include "albaDeviceButtonsPad.h"
-#include "mmuIdFactory.h"
 
 #include "albaEventInteraction.h"
 #include "vtkTimerLog.h"
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-/** Event ID used to know if the VME should serialize itself as a single or multiple binary files.*/
-// ALBA_ID_IMP(albaDeviceButtonsPad::BUTTON_DOWN)
-// ALBA_ID_IMP(albaDeviceButtonsPad::BUTTON_UP)
 
 albaCxxTypeMacro(albaDeviceButtonsPad)
 
@@ -102,14 +94,14 @@ void albaDeviceButtonsPad::SetButtonState(int num, bool value, unsigned long mod
     case 1:
       {
         // issue OnButtonDown
-        albaEventInteraction e(this,GetButtonDownId(),num,modifiers);
+        albaEventInteraction e(this,DEVICE_BUTTON_DOWN,num,modifiers);
         SendButtonEvent(&e);
       }
       break;
     case -1:
       {
         // issue OnButtonUp
-        albaEventInteraction e(this,GetButtonUpId(),num,modifiers);
+        albaEventInteraction e(this,DEVICE_BUTTON_UP,num,modifiers);
         this->SendButtonEvent(&e);
       }
       break;
@@ -130,26 +122,4 @@ bool albaDeviceButtonsPad::GetButtonState(int num)
 //------------------------------------------------------------------------------
 {
   return (num>=0&&num<m_NumberOfButtons)?m_ButtonState[num]:false;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPad::GetButtonDownId()
-//------------------------------------------------------------------------------
-{
-  static const albaID buttonDownId = mmuIdFactory::GetNextId("BUTTON_DOWN");
-  return buttonDownId;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPad::GetButtonUpId()
-//------------------------------------------------------------------------------
-{
-  static const albaID buttonUpId = mmuIdFactory::GetNextId("BUTTON_UP");
-  return buttonUpId;
-}
-
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPad::GetWheelId()
-//------------------------------------------------------------------------------
-{
-	static const albaID buttonUpId = mmuIdFactory::GetNextId("MOUSE_WHEEL");
-	return buttonUpId;
 }

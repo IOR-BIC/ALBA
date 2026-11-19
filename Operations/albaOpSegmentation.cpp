@@ -35,8 +35,8 @@
 #include "albaGUIRollOut.h"
 #include "albaGUIValidator.h"
 #include "albaInteractionFactory.h"
-#include "albaSegmentationEditTool.h"
-#include "albaSegmentationThresholdTool.h"
+#include "albaToolSegmentationEdit.h"
+#include "albaToolSegmentationThreshold.h"
 #include "albaMatrix.h"
 #include "albaOpManager.h"
 #include "albaOpVolumeResample.h"
@@ -1114,7 +1114,7 @@ void albaOpSegmentation::OnEvent(albaEventBase *alba_event)
 			OnInitEvent(e);
 		else if (e->GetSender() == m_SegmentationOperationsGui[EDIT_SEGMENTATION])
 			OnEditSegmentationEvent(e);
-		else if (e->GetId() == albaSegmentationTool::KEY_PRESSED || e->GetId() == albaSegmentationTool::KEY_RELEASED)
+		else if (e->GetId() == albaToolSegmentation::KEY_PRESSED || e->GetId() == albaToolSegmentation::KEY_RELEASED)
 			OnKeyEvent(e);
 		//SWITCH
 		else switch (e->GetId())
@@ -2325,13 +2325,13 @@ int albaOpSegmentation::PressKey(int keyCode, bool ctrl, bool alt, bool shift)
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnKeyEvent(albaEvent *e)
 {
-	albaSegmentationTool *tool = (albaSegmentationTool *)e->GetSender();
+	albaToolSegmentation *tool = (albaToolSegmentation *)e->GetSender();
 	bool ctrl = tool->GetCtrlDown();
 	bool alt = tool->GetAltDown();
 	bool shift = tool->GetShiftDown();
 
 	int result;
-	if (e->GetId() == albaSegmentationTool::KEY_PRESSED)
+	if (e->GetId() == albaToolSegmentation::KEY_PRESSED)
 		result = PressKey(e->GetArg(), ctrl, alt, shift);
 	else
 		result = ReleaseKey(e->GetArg(), ctrl, alt, shift);

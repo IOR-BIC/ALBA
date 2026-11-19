@@ -43,7 +43,7 @@ class vtkPolyData;
 class vtkALBARemoveCellsFilter;
 class vtkTriangle;
 
-class albaSelectCellTool;
+class albaToolSelectCell;
 
 //----------------------------------------------------------------------------
 // albaOpRemoveCells :
@@ -127,7 +127,7 @@ protected:
 	albaView     *m_OldSelectedView; ///< view selected before the operation
   vtkPolyDataMapper *m_PolydataMapper;
   vtkActor          *m_PolydataActor;
-  albaSelectCellTool *m_SelectCellTool;
+  albaToolSelectCell *m_SelectCellTool;
   vtkALBARemoveCellsFilter *m_Rcf;
   vtkPolyData *m_Mesh;
   

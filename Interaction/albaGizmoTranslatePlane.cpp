@@ -29,8 +29,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -54,7 +53,7 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
 {
   this->SetIsActive(false);
   
-  m_IsaComp[0]  = m_IsaComp[1] =  NULL;
+  m_IsaGen[0]  = m_IsaGen[1] =  NULL;
   m_Listener  = listener;
   m_InputVme    = input;
   m_Length = 1;
@@ -91,8 +90,8 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
   }
 
   // assign isa to S1 and S2;
-  m_Gizmo[S1]->SetBehavior(m_IsaComp[S1]);
-  m_Gizmo[S2]->SetBehavior(m_IsaComp[S2]);
+  m_Gizmo[S1]->SetBehavior(m_IsaGen[S1]);
+  m_Gizmo[S2]->SetBehavior(m_IsaGen[S2]);
 
   albaMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
   SetAbsPose(absInputMatrix);
@@ -138,7 +137,7 @@ albaGizmoTranslatePlane::~albaGizmoTranslatePlane()
   for (i = 0; i < SQ; i++)
   {
     vtkDEL(m_LineTF[i]);
-    vtkDEL(m_IsaComp[i]); 
+    vtkDEL(m_IsaGen[i]); 
   }
 
   m_PivotTransform->Delete();
@@ -235,15 +234,13 @@ void albaGizmoTranslatePlane::CreatePipeline()
 void albaGizmoTranslatePlane::CreateISA()
 //----------------------------------------------------------------------------
 {
-  // Create isa compositor and assign behaviors to IsaGen ivar.
+  // create the transform behavior of the gizmo
   // Default isa is constrained to plane XZ.
   for (int i = 0; i < SQ; i++)
   {
-    m_IsaComp[i] = albaCompositorMouseBehavior::New();
-
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
+    m_IsaGen[i] = albaBehaviorTransform::New();
     m_IsaGen[i]->SetVME(m_InputVme);
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);     
     
@@ -394,7 +391,7 @@ void albaGizmoTranslatePlane::OnEvent(albaEventBase *alba_event)
     // mouse down change gizmo selection status
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
+      if (e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }

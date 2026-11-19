@@ -51,6 +51,7 @@ class mflXMLWriter;
 class vtkXMLDataElement;
 class vtkXMLDataParser;
 class albaStaticEventRouter;
+class albaToolFlyTo;
 class albaPositionalEventRouter;
 class albaInteractionTool;
 class albaVME;
@@ -141,9 +142,7 @@ public:
   /** Return the renderer of the currently selected view,
   if its a VTK based view otherwise return NULL.*/
   vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
-    
-  /** propagate VME_SELECTED event */
-  void  VmeSelected(albaVME *vme);
+
 
   /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
   int Store(const char *filename);
@@ -181,7 +180,7 @@ public:
   /** return the static event router */
   albaStaticEventRouter *GetSER() {return m_StaticEventRouter;}
 
-  /** Set the FlyTo mode for the selected view. */
+  /** Start the fly-to mode: push the fly-to tool, the next click flies to the clicked point */
   void CameraFlyToMode();
 
   /** return the minimum time to elapse between two subsequent renderings */
@@ -247,6 +246,7 @@ protected:
   albaDeviceManager*       m_DeviceManager; 
   albaPositionalEventRouter*                 m_PositionalEventRouter;
   albaStaticEventRouter*                 m_StaticEventRouter;
+  albaToolFlyTo*                          m_FlyToTool; ///< tool of the fly-to mode
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
 

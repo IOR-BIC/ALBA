@@ -35,7 +35,6 @@
 #include "vtkRendererCollection.h"
 #include "vtkAssemblyPath.h"
 #include "vtkAssemblyNode.h"
-#include "vtkProp3D.h"
 
 #define DEFAULT_BG_COLOR 0.28
 
@@ -66,7 +65,6 @@ albaView::albaView(const wxString &label)
   m_Picker2D          = NULL;
   m_Picker3D          = NULL;
   m_PickedVME         = NULL;
-  m_PickedProp        = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
 
 	m_BackgroundColor = wxColour(DEFAULT_BG_COLOR * 255, DEFAULT_BG_COLOR * 255, DEFAULT_BG_COLOR * 255);
@@ -186,7 +184,6 @@ bool albaView::FindPickedVme(vtkAssemblyPath *ap)
         {
           as = (vtkALBAAssembly*)p;
           m_PickedVME = as->GetVme();
-          m_PickedProp = vtkProp3D::SafeDownCast(p);
           return true;
           break;
         }

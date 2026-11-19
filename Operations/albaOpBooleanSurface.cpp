@@ -32,8 +32,8 @@
 #include "albaVMEGizmo.h"
 #include "albaTransform.h"
 #include "mmaMaterial.h"
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorCutPlane.h"
+#include "albaBehaviorTransform.h"
 #include "vtkALBASmartPointer.h"
 
 #include "vtkPolyData.h"
@@ -75,7 +75,7 @@ albaOp(label)
 	m_ClipperPlane  = NULL;
 	m_Arrow         = NULL;
 	m_PlaneSource		= NULL;
-	m_IsaCompositor = NULL;
+	m_PlaneBehavior = NULL;
 
 	m_PlaneCreated = false;
 
@@ -94,7 +94,7 @@ albaOpBooleanSurface::~albaOpBooleanSurface()
 	}
 	m_VTKResult.clear();
 
-	albaDEL(m_IsaCompositor);
+	albaDEL(m_PlaneBehavior);
 	vtkDEL(m_ClipperPlane);
 	vtkDEL(m_Arrow);
 	vtkDEL(m_PlaneSource);
@@ -361,11 +361,7 @@ void albaOpBooleanSurface::Clip()
 void albaOpBooleanSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
 {
-	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-
-	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+	m_PlaneBehavior->SetRefSysVME(m_ImplicitPlaneGizmo);
 }
 //----------------------------------------------------------------------------
 void albaOpBooleanSurface::Undo()
@@ -626,29 +622,12 @@ void albaOpBooleanSurface::ShowClipPlane(bool show)
 void albaOpBooleanSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-	albaNEW(m_IsaCompositor);
+	// left button rotates, middle button translates
+	albaNEW(m_PlaneBehavior);
+	m_PlaneBehavior->SetListener(this);
+	m_PlaneBehavior->SetVME(m_ImplicitPlaneGizmo);
 
-	m_IsaRotate = m_IsaCompositor->CreateBehavior(MOUSE_LEFT);
-	m_IsaRotate->SetListener(this);
-	m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
-	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetPivotRefSys()->SetTypeToView();
-	m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-	m_IsaRotate->EnableRotation(true);
-
-	m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
-	m_IsaTranslate->SetListener(this);
-	m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
-	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
-	m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-	m_IsaTranslate->EnableTranslation(true);
-
-	m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+	m_ImplicitPlaneGizmo->SetBehavior(m_PlaneBehavior);
 }
 //----------------------------------------------------------------------------
 void albaOpBooleanSurface::Difference()

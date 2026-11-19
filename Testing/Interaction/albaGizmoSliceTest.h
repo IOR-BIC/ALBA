@@ -43,6 +43,7 @@ class albaGizmoSliceTest : public albaTest
   CPPUNIT_TEST( TestSetGetModality );
   CPPUNIT_TEST( TestSetGetMovingModality );
   CPPUNIT_TEST( TestGetGui );
+  CPPUNIT_TEST( TestTransformEvents );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -54,6 +55,7 @@ class albaGizmoSliceTest : public albaTest
     void TestSetGetModality();
     void TestSetGetMovingModality();
     void TestGetGui();
+    void TestTransformEvents();
 	  void CreateTestData();
    
     albaVMESurface *m_GizmoInputSurface;
