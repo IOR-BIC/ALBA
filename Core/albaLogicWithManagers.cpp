@@ -1313,12 +1313,6 @@ void albaLogicWithManagers::VmeSelect(albaVME *vme)
 	{
 		m_OpManager->OpSelect(vme);
 
-		// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-		if (m_InteractionManager)
-			m_InteractionManager->VmeSelected(vme);
-#endif
-
 		EnableMenuAndToolbar();
 	}
 	DisableCameraUpdateSkip();

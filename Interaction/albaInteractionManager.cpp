@@ -284,13 +284,6 @@ void albaInteractionManager::ViewSelected(albaView *view)
 
 
 //------------------------------------------------------------------------------
-void albaInteractionManager::VmeSelected(albaVME *vme)
-{
-  if (vme)
-    m_PositionalEventRouter->OnVmeSelected(vme);
-}
-
-//------------------------------------------------------------------------------
 void albaInteractionManager::CameraUpdate(albaView *view)
 {
   if (m_LockRenderingFlag)

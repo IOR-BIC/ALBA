@@ -142,9 +142,7 @@ public:
   /** Return the renderer of the currently selected view,
   if its a VTK based view otherwise return NULL.*/
   vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
-    
-  /** propagate VME_SELECTED event */
-  void  VmeSelected(albaVME *vme);
+
 
   /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
   int Store(const char *filename);

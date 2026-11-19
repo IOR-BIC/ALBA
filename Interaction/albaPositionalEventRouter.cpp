@@ -3,7 +3,7 @@
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaPositionalEventRouter
  Authors: Marco Petrone
- 
+
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
 
@@ -15,7 +15,7 @@
 =========================================================================*/
 
 
-#include "albaDefines.h" 
+#include "albaDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the ALBA must include "albaDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -28,40 +28,29 @@
 
 #include "albaView.h"
 #include "albaDeviceButtonsPadTracker.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaInteractionBehavior.h"
-#include "albaAvatar3D.h"
 #include "albaCameraTool.h"
 #include "albaCameraMouseTool.h"
+#include "albaCameraTrackerTool.h"
 #include "albaSelectTool.h"
-
 #include "albaEventBase.h"
 #include "albaEventInteraction.h"
-
 #include "albaVME.h"
-#include "albaVMEGizmo.h"
-#include "albaTransform.h"
 
-#include "vtkALBAAssembly.h"
-#include "vtkCamera.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkMath.h"
-#include <map>
 #include <algorithm>
 #include <sstream>
-#include <assert.h>
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaPositionalEventRouter)
+
 //------------------------------------------------------------------------------
 albaPositionalEventRouter::albaPositionalEventRouter()
-//------------------------------------------------------------------------------
 {
-  m_EventTracing    = false;
-  m_VME             = NULL;
-
-  SetModeToSingleButton();
+  m_EventTracing = false;
+  m_Device = NULL;
+  m_Button = -1;
+  m_Handler = NULL;
+  m_HandlerIsBehavior = false;
 
   m_CameraTool = albaCameraTool::New();
   m_SelectTool = albaSelectTool::New();
@@ -70,13 +59,18 @@ albaPositionalEventRouter::albaPositionalEventRouter()
 
 //------------------------------------------------------------------------------
 albaPositionalEventRouter::~albaPositionalEventRouter()
-//------------------------------------------------------------------------------
 {
   while (!m_Tools.empty())
     PopTool(m_Tools.back());
 
   m_CameraTool->Delete();
   m_SelectTool->Delete();
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::EnableSelect(bool enable)
+{
+  m_SelectTool->EnableSelect(enable);
 }
 
 //------------------------------------------------------------------------------
@@ -100,13 +94,9 @@ void albaPositionalEventRouter::PopTool(albaInteractionTool *tool)
 
   m_Tools.erase(iter);
 
-  // the devices interacting with the tool go back to the default behavior
-  std::map<albaID, ToolInteraction>::iterator interaction = m_ToolInteractions.begin();
-  while (interaction != m_ToolInteractions.end())
-    if (interaction->second.Tool == tool)
-      interaction = m_ToolInteractions.erase(interaction);
-    else
-      ++interaction;
+  // the interaction of the tool goes on with the camera only, until the button is released
+  if (m_Handler == tool)
+    m_Handler = NULL;
 
   tool->OnPop();
   tool->UnRegister(this);
@@ -120,6 +110,10 @@ void albaPositionalEventRouter::SetModifierKeys(bool ctrlDown, bool altDown, boo
   m_SelectTool->SetModifierKeys(ctrlDown, altDown, shiftDown);
   for (int i = 0; i < m_Tools.size(); i++)
     m_Tools[i]->SetModifierKeys(ctrlDown, altDown, shiftDown);
+
+  // the behaviors are not on the stack
+  if (m_HandlerIsBehavior && m_Handler)
+    m_Handler->SetModifierKeys(ctrlDown, altDown, shiftDown);
 }
 
 //------------------------------------------------------------------------------
@@ -142,619 +136,474 @@ bool albaPositionalEventRouter::OnKey(int keyCode, bool pressed)
 }
 
 //------------------------------------------------------------------------------
-bool albaPositionalEventRouter::ToolButtonDown(albaInteractionTool *tool, albaEventInteraction *e)
+bool albaPositionalEventRouter::IsInteracting(albaDevice *device)
 {
-  albaDevice *device = (albaDevice *)e->GetSender();
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
-  if (tracker)
-    return tool->OnTrackerButtonDown(tracker, e->GetButton(), e->GetMatrix());
-
-  double pos[2];
-  e->Get2DPosition(pos);
-  switch (e->GetButton())
-  {
-    case ALBA_LEFT_BUTTON:   return tool->OnLeftButtonDown(device->GetView(), device->GetRenderer(), pos);
-    case ALBA_MIDDLE_BUTTON: return tool->OnMiddleButtonDown(device->GetView(), device->GetRenderer(), pos);
-    case ALBA_RIGHT_BUTTON:  return tool->OnRightButtonDown(device->GetView(), device->GetRenderer(), pos);
-  }
-  return false;
+  return device != NULL && device == m_Device;
 }
 
 //------------------------------------------------------------------------------
-bool albaPositionalEventRouter::ToolButtonUp(albaInteractionTool *tool, albaEventInteraction *e)
+albaInteractionTool *albaPositionalEventRouter::GetInteractingTool(albaDevice *device)
 {
-  albaDevice *device = (albaDevice *)e->GetSender();
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
-  if (tracker)
-    return tool->OnTrackerButtonUp(tracker, e->GetButton());
-
-  double pos[2];
-  e->Get2DPosition(pos);
-  switch (e->GetButton())
-  {
-    case ALBA_LEFT_BUTTON:   return tool->OnLeftButtonUp(device->GetView(), device->GetRenderer(), pos);
-    case ALBA_MIDDLE_BUTTON: return tool->OnMiddleButtonUp(device->GetView(), device->GetRenderer(), pos);
-    case ALBA_RIGHT_BUTTON:  return tool->OnRightButtonUp(device->GetView(), device->GetRenderer(), pos);
-  }
-  return false;
-}
-
-//------------------------------------------------------------------------------
-bool albaPositionalEventRouter::ToolDrag(albaInteractionTool *tool, albaEventInteraction *e)
-{
-  albaDevice *device = (albaDevice *)e->GetSender();
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
-  if (tracker)
-    return tool->OnTrackerDrag(tracker, e->GetMatrix());
-
-  double pos[2];
-  e->Get2DPosition(pos);
-  return tool->OnDrag(device->GetView(), device->GetRenderer(), pos);
-}
-
-//------------------------------------------------------------------------------
-bool albaPositionalEventRouter::ToolMove(albaInteractionTool *tool, albaEventInteraction *e)
-{
-  // the tools do not use the moves of the trackers without buttons pressed
-  albaDevice *device = (albaDevice *)e->GetSender();
-  if (albaDeviceButtonsPadTracker::SafeDownCast(device))
-    return false;
-
-  double pos[2];
-  e->Get2DPosition(pos);
-  return tool->OnMove(device->GetView(), device->GetRenderer(), pos);
-}
-
-//------------------------------------------------------------------------------
-bool albaPositionalEventRouter::ToolWheel(albaInteractionTool *tool, albaEventInteraction *e)
-{
-  albaDevice *device = (albaDevice *)e->GetSender();
-  double pos[2];
-  e->Get2DPosition(pos);
-  double rotation = e->GetData() ? *(double *)e->GetData() : 0;
-  return tool->OnWheel(device->GetView(), device->GetRenderer(), pos, rotation);
-}
-
-//------------------------------------------------------------------------------
-bool albaPositionalEventRouter::PickedVmeHasBehavior(albaEventInteraction *e, albaDevice *device)
-{
-  albaView *view = device->GetView();
-  vtkProp3D *pickedProp = NULL;
-  albaVME *pickedVme = NULL;
-  albaInteractionBehavior *pickedBehavior = NULL;
-
-  // the picking is cached into the event: the default behavior reuses it
-  return view && e->FindPokedVme(view, device, pickedProp, pickedVme, pickedBehavior) && pickedBehavior != NULL;
-}
-
-//------------------------------------------------------------------------------
-bool albaPositionalEventRouter::DispatchToTools(albaEventInteraction *e, albaDevice *device)
-{
-  albaID id = e->GetId();
-  std::map<albaID, ToolInteraction>::iterator interaction = m_ToolInteractions.find(device->GetID());
-  albaInteractionTool *interactingTool = (interaction != m_ToolInteractions.end()) ? interaction->second.Tool : NULL;
-
-  // a tool can push or pop tools while handling an event: iterate on a copy
-  std::vector<albaInteractionTool *> tools = m_Tools;
-
-  if (id == DEVICE_BUTTON_DOWN)
-  {
-    // the other buttons of a device interacting with a tool go to the same tool, and to the camera
-    if (interactingTool)
-    {
-      TraceHandler("Tool", interactingTool);
-      ToolButtonDown(interactingTool, e);
-      ToolButtonDown(m_CameraTool, e);
-      return true;
-    }
-
-    // a device already interacting with the default behavior stays there,
-    // and a VME with a behavior, e.g. a gizmo, comes before the tools
-    if (IsInteracting(device) || tools.empty() || PickedVmeHasBehavior(e, device))
-      return false;
-
-    for (int i = tools.size() - 1; i >= 0; i--)
-      if (ToolButtonDown(tools[i], e))
-      {
-        TraceHandler("Tool", tools[i]);
-        if (std::find(m_Tools.begin(), m_Tools.end(), tools[i]) != m_Tools.end())
-        {
-          ToolInteraction newInteraction = {tools[i], e->GetButton()};
-          m_ToolInteractions[device->GetID()] = newInteraction;
-        }
-
-        // the camera gets the button down too: it moves only with the drags the tool does not use
-        ToolButtonDown(m_CameraTool, e);
-        return true;
-      }
-    return false;
-  }
-
-  if (id == DEVICE_BUTTON_UP)
-  {
-    if (interactingTool == NULL)
-    {
-      // a camera started with a tool that has been popped meanwhile
-      if (!IsInteracting(device) && m_CameraTool->GetInteractingTool(device))
-      {
-        ToolButtonUp(m_CameraTool, e);
-        return true;
-      }
-      return false;
-    }
-
-    // the interaction ends when the button that started it is released
-    if (e->GetButton() == interaction->second.Button)
-      m_ToolInteractions.erase(interaction);
-
-    TraceHandler("Tool", interactingTool);
-    ToolButtonUp(interactingTool, e);
-    ToolButtonUp(m_CameraTool, e);
-    return true;
-  }
-
-  if (id == DEVICE_MOUSE_2D_MOVE || id == DEVICE_TRACKER_3D_MOVE)
-  {
-    if (interactingTool)
-    {
-      TraceHandler("Tool", interactingTool);
-      if (!ToolDrag(interactingTool, e))
-      {
-        // the drags the tool does not use move the camera
-        TraceHandler("Camera", m_CameraTool->GetInteractingTool(device));
-        ToolDrag(m_CameraTool, e);
-      }
-      return true;
-    }
-
-    // the drag of a button down used by the default behavior
-    if (IsInteracting(device))
-      return false;
-
-    for (int i = tools.size() - 1; i >= 0; i--)
-      if (ToolMove(tools[i], e))
-      {
-        TraceHandler("Tool", tools[i]);
-        return true;
-      }
-    return false;
-  }
-
-  if (id == DEVICE_MOUSE_WHEEL)
-  {
-    for (int i = tools.size() - 1; i >= 0; i--)
-      if (ToolWheel(tools[i], e))
-      {
-        TraceHandler("Tool", tools[i]);
-        return true;
-      }
-  }
-
-  return false;
-}
-
-//----------------------------------------------------------------------------
-bool albaPositionalEventRouter::IsMouseInputEvent(albaID id)
-{
-  return id == DEVICE_BUTTON_DOWN || id == DEVICE_BUTTON_UP || id == DEVICE_MOUSE_2D_MOVE ||
-    id == DEVICE_MOUSE_WHEEL;
-}
-
-//----------------------------------------------------------------------------
-bool albaPositionalEventRouter::IsInteracting(albaDevice *device, int button)
-//----------------------------------------------------------------------------
-{
-  std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-  if (iter!=m_Devices.end()&&(*iter).first==device->GetID())
-  {
-    if (m_Mode==SINGLE_BUTTON)
-    {
-      // if optional button parameter is positive report if interaction
-      // has been started by a specific button.
-      return (button<0)?true:(*iter).second.m_Button==button;
-    }
-    else
-    {
-      // simply check if one or more button has been pressed.
-      return (*iter).second.m_Button>0;
-    }
-  }
-  return false;
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::InsertDevice(albaDevice *device,int button)
-//----------------------------------------------------------------------------
-{
-  if (m_Mode == SINGLE_BUTTON)
-  {
-    m_Devices[device->GetID()].m_Button = button;
-    m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
-    m_Devices[device->GetID()].m_Behavior = NULL;
-  }
-  else
-  {
-    std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-    if (iter == m_Devices.end())
-    {
-//      if ((*iter).first==device->GetID())
-      m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
-      m_Devices[device->GetID()].m_Behavior = NULL;
-      m_Devices[device->GetID()].m_Button = 1;
-
-    }
-    else
-    {
-      //int prebuttonDevice = m_Devices[device->GetID()].Button;
-      m_Devices[device->GetID()].m_Button++;
-      //int postbuttonDevice = m_Devices[device->GetID()].Button;//only for debug
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::RemoveDevice(albaDevice *device)
-//----------------------------------------------------------------------------
-{
-  std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-
-  if (iter == m_Devices.end() || (*iter).first != device->GetID())
-  {
-    return;
-  }
-  
-  m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
-  
-  if(m_Mode == SINGLE_BUTTON)
-  {
-    m_Devices.erase(iter);
-  }
-  else
-  {
-    // decrease counter, if counter gets to zero delete the item
-    int cnt = (--m_Devices[device->GetID()].m_Button);
-    if (cnt <= 0)
-    {
-      m_Devices.erase(iter);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::SetPickedVME(albaDevice *device,albaVME *vme)
-//----------------------------------------------------------------------------
-{
-  if (device)
-  {
-    std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-    //assert(iter != m_Devices.end()); // check the device has started an interaction
-    if (iter != m_Devices.end())
-      (*iter).second.m_VME = vme;
-  }
-  else
-  {
-    m_VME = vme;
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::SetCurrentBehavior(albaDevice *device, albaInteractionBehavior *behavior)
-{
-  std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-  if (iter != m_Devices.end())
-    (*iter).second.m_Behavior = behavior;
-}
-
-//----------------------------------------------------------------------------
-albaInteractionBehavior *albaPositionalEventRouter::GetCurrentBehavior(albaDevice *device)
-{
-  std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-  return (iter != m_Devices.end()) ? (*iter).second.m_Behavior : NULL;
-}
-
-//----------------------------------------------------------------------------
-albaVME *albaPositionalEventRouter::GetPickedVME(albaDevice *device)
-//----------------------------------------------------------------------------
-{
-  if (device)
-  {
-    std::map<albaID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
-    //assert(iter != m_Devices.end()); // check the device has started an interaction
-    return (iter != m_Devices.end()) ? (*iter).second.m_VME : NULL;
-  }
-  else
-  {
-    return m_VME;
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnButtonDown(e);
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMiddleButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnButtonDown(e);
-}
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnButtonDown(e);
-}
-
-//------------------------------------------------------------------------------
-void albaPositionalEventRouter::EnableSelect(bool enable)
-{
-  m_SelectTool->EnableSelect(enable);
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnLeftButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnButtonUp(e);
-}
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMiddleButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnButtonUp(e);
-}
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnRightButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  // the right button released without dragging shows the context menu
-  if (ToolButtonUp(m_SelectTool, e))
-    TraceHandler("Context menu");
-
-  OnButtonUp(e);
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnButtonDown(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  albaDevice *device = albaDevice::SafeDownCast((albaDevice*)e->GetSender());
-
-  albaVME        *picked_vme  = NULL;
-  vtkProp3D     *picked_prop = NULL;
-  albaInteractionBehavior *picked_bh   = NULL;
-
-  // the mouse selected view or the tracker avatar view
-  albaView *v = device ? device->GetView() : NULL;
-
-  // the picking is cached into the event and shared with the behavior receiving it
-  double pickedPos[3] = {0, 0, 0};
-  bool picked = v && e->FindPokedVme(v, device, picked_prop, picked_vme, picked_bh);
-  if (picked)
-  {
-    SetPickedVME(device, picked_vme);
-    e->GetPickedPosition(pickedPos);
-  }
-
-  // the default actions of the click come first: selection and context menu
-  m_SelectTool->SetPickedVME(picked ? picked_vme : NULL, pickedPos);
-  if (ToolButtonDown(m_SelectTool, e))
-    TraceHandler("Select");
-
-  // the behavior of the picked VME interacts with the device until the button is released
-  if(picked_bh)
-  {
-    // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME
-    picked_bh->SetPickedPosition(pickedPos);
-    picked_bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
-    if (ToolButtonDown(picked_bh, e))
-    {
-      TraceHandler("Behavior", picked_bh);
-      SetCurrentBehavior(device, picked_bh);
-      return;
-    }
-  }
-
-  // if no behavior uses the button the camera tool moves the camera, if free
-  if (ToolButtonDown(m_CameraTool, e))
-  {
-    TraceHandler("Camera", m_CameraTool->GetInteractingTool(device));
-  }
-}
-
-//----------------------------------------------------------------------------
-void albaPositionalEventRouter::OnButtonUp(albaEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  // the release of the button ends the interaction of the behavior
-  albaDevice *device = (albaDevice *)e->GetSender();
-  albaInteractionBehavior *behavior = GetCurrentBehavior(device);
-  if (behavior)
-  {
-    TraceHandler("Behavior", behavior);
-    behavior->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
-    ToolButtonUp(behavior, e);
-    SetCurrentBehavior(device, NULL);
-  }
-}
-
-//------------------------------------------------------------------------------
-int albaPositionalEventRouter::StartInteraction(albaDevice *device, int button)
-//------------------------------------------------------------------------------
-{
-  // Check if already interacting with the same device: it could happen the user
-  // contemporary pressed another button...
-  if (m_Mode == SINGLE_BUTTON)
-  {
-    if (!IsInteracting(device,button))
-    {
-      InsertDevice(device,button); // add the device to the list of interacting devices
-      //device->Lock(); // it's the specific behavior which is locking the device!!!
-      return true;
-    }
-    return false;
-  }
-  else
-  {
-    InsertDevice(device,button);
-    return true;
-  }
-}
-
-//------------------------------------------------------------------------------
-int albaPositionalEventRouter::StopInteraction(albaDevice *device, int button)
-//------------------------------------------------------------------------------
-{
-  if (m_Mode == SINGLE_BUTTON)
-  {
-    if (IsInteracting(device, button))
-    {   
-      RemoveDevice(device); // remove from the list of interacting devices
-      //device->Unlock(); // it's the specific behavior which is locking the device!!!
-      return true;
-    }
-    return false;
-  }
-  else
-  {
-    RemoveDevice(device);
-    return true;
-  }
-}
-
-//------------------------------------------------------------------------------
-int albaPositionalEventRouter::OnStartInteraction(albaEventInteraction *e)
-//------------------------------------------------------------------------------
-{
-  albaDevice *device = albaDevice::SafeDownCast((albaDevice *)e->GetSender());
-  
-  assert(device);
-  int button = e->GetButton();
-  if (StartInteraction(device, button))
-  {
-    // standard action keys
-    switch (button)
-    {
-		case ALBA_LEFT_BUTTON:
-			OnLeftButtonDown(e);
-			break;
-		case ALBA_MIDDLE_BUTTON:
-			OnMiddleButtonDown(e);
-			break;
-		case ALBA_RIGHT_BUTTON:
-			OnRightButtonDown(e);
-			break;
-		default:
-			StopInteraction(device, button); // stop immediately and return false
-			return 0;
-    }
-    return 1;
-  }
-  return 0;
-}
-//------------------------------------------------------------------------------
-int albaPositionalEventRouter::OnStopInteraction(albaEventInteraction *e)
-//------------------------------------------------------------------------------
-{
-  albaDevice *device = albaDevice::SafeDownCast((albaDevice *)e->GetSender());
-  assert(device);
-
-  int button = e->GetButton();
-  if (m_Mode == MULTI_BUTTON || IsInteracting(device, button))
-  {
-    // standard action keys
-    switch (button)
-    {
-		case ALBA_LEFT_BUTTON:
-			OnLeftButtonUp(e);
-			break;
-		case ALBA_MIDDLE_BUTTON:
-			OnMiddleButtonUp(e);
-			break;
-		case ALBA_RIGHT_BUTTON:
-			OnRightButtonUp(e);
-			break;
-		default:
-			return -1;
-    }
-    StopInteraction(device, button);
-    return 1;
-  }
-  return 0;
+  return IsInteracting(device) ? m_Handler : NULL;
 }
 
 //------------------------------------------------------------------------------
 void albaPositionalEventRouter::OnEvent(albaEventBase *event)
-//------------------------------------------------------------------------------
 {
-  albaID ch = event->GetChannel();
-  
-  if (ch == MCH_INPUT)
+  if (event->GetChannel() != MCH_INPUT)
   {
-    albaID id = event->GetId();
-    albaDevice *device = (albaDevice *)event->GetSender();
-    assert(device);
-    m_EventTrace.clear();
+    Superclass::OnEvent(event); // the events of the other channels are forwarded
+    return;
+  }
 
-    // the mouse events carry the state of the modifier keys
-    albaEventInteraction *ei = albaEventInteraction::SafeDownCast(event);
-    if (ei && albaDeviceButtonsPadMouse::SafeDownCast(device) && IsMouseInputEvent(id))
-      SetModifierKeys(ei->GetModifier(ALBA_CTRL_KEY), ei->GetModifier(ALBA_ALT_KEY), ei->GetModifier(ALBA_SHIFT_KEY));
+  // one interaction at a time: the events of the other devices are ignored
+  albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
+  albaDevice *device = (albaDevice *)event->GetSender();
+  if (e == NULL || (m_Device && device != m_Device))
+    return;
 
-    // the tools come first
-    if (ei && DispatchToTools(ei, device))
+  m_EventTrace.clear();
+  bool tracker = albaDeviceButtonsPadTracker::SafeDownCast(device) != NULL;
+
+  // the mouse events carry the state of the modifier keys
+  if (!tracker)
+    SetModifierKeys(e->GetModifier(ALBA_CTRL_KEY), e->GetModifier(ALBA_ALT_KEY), e->GetModifier(ALBA_SHIFT_KEY));
+
+  switch (event->GetId())
+  {
+    case DEVICE_BUTTON_DOWN:
+      if (tracker)
+        OnTrackerButtonDown(e);
+      else
+        switch (e->GetButton())
+        {
+          case ALBA_LEFT_BUTTON:   OnLeftButtonDown(e);   break;
+          case ALBA_MIDDLE_BUTTON: OnMiddleButtonDown(e); break;
+          case ALBA_RIGHT_BUTTON:  OnRightButtonDown(e);  break;
+        }
+      break;
+    case DEVICE_BUTTON_UP:
+      // a button up without interaction, e.g. pressed outside the views, is ignored
+      if (m_Device == NULL)
+        return;
+      if (tracker)
+        OnTrackerButtonUp(e);
+      else
+        switch (e->GetButton())
+        {
+          case ALBA_LEFT_BUTTON:   OnLeftButtonUp(e);   break;
+          case ALBA_MIDDLE_BUTTON: OnMiddleButtonUp(e); break;
+          case ALBA_RIGHT_BUTTON:  OnRightButtonUp(e);  break;
+        }
+      break;
+    case DEVICE_MOUSE_2D_MOVE:   OnMouseMove(e);   break;
+    case DEVICE_TRACKER_3D_MOVE: OnTrackerMove(e); break;
+    case DEVICE_MOUSE_WHEEL:     OnMouseWheel(e);  break;
+    default: return;
+  }
+
+  WriteEventTrace(event);
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  if (m_Device == NULL)
+  {
+    // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
+    BeginInteraction(device, ALBA_LEFT_BUTTON);
+    albaInteractionBehavior *behavior = PickBehavior(e);
+
+    // a tool can push or pop tools while handling an event: iterate on a copy
+    albaInteractionTool *tool = NULL;
+    std::vector<albaInteractionTool *> tools = m_Tools;
+    for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
+      if (tools[i]->OnLeftButtonDown(view, ren, pos))
+        tool = tools[i];
+
+    if (tool)
+      SetHandler(tool, false);
+    else
     {
-      WriteEventTrace(event);
+      // the default actions of the click: selection and context menu
+      if (m_SelectTool->OnLeftButtonDown(view, ren, pos))
+        TraceHandler("Select");
+      if (behavior && behavior->OnLeftButtonDown(view, ren, pos))
+        SetHandler(behavior, true);
+    }
+  }
+  else if (m_Handler)
+  {
+    // the other buttons pressed during the interaction go to the same handler
+    TraceCurrentHandler();
+    m_Handler->OnLeftButtonDown(view, ren, pos);
+  }
+
+  // the camera gets the button too and moves with the drags the handler does not use
+  if (!m_HandlerIsBehavior && m_CameraTool->OnLeftButtonDown(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnMiddleButtonDown(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  if (m_Device == NULL)
+  {
+    // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
+    BeginInteraction(device, ALBA_MIDDLE_BUTTON);
+    albaInteractionBehavior *behavior = PickBehavior(e);
+
+    // a tool can push or pop tools while handling an event: iterate on a copy
+    albaInteractionTool *tool = NULL;
+    std::vector<albaInteractionTool *> tools = m_Tools;
+    for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
+      if (tools[i]->OnMiddleButtonDown(view, ren, pos))
+        tool = tools[i];
+
+    if (tool)
+      SetHandler(tool, false);
+    else
+    {
+      // the default actions of the click: selection and context menu
+      if (m_SelectTool->OnMiddleButtonDown(view, ren, pos))
+        TraceHandler("Select");
+      if (behavior && behavior->OnMiddleButtonDown(view, ren, pos))
+        SetHandler(behavior, true);
+    }
+  }
+  else if (m_Handler)
+  {
+    // the other buttons pressed during the interaction go to the same handler
+    TraceCurrentHandler();
+    m_Handler->OnMiddleButtonDown(view, ren, pos);
+  }
+
+  // the camera gets the button too and moves with the drags the handler does not use
+  if (!m_HandlerIsBehavior && m_CameraTool->OnMiddleButtonDown(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  if (m_Device == NULL)
+  {
+    // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
+    BeginInteraction(device, ALBA_RIGHT_BUTTON);
+    albaInteractionBehavior *behavior = PickBehavior(e);
+
+    // a tool can push or pop tools while handling an event: iterate on a copy
+    albaInteractionTool *tool = NULL;
+    std::vector<albaInteractionTool *> tools = m_Tools;
+    for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
+      if (tools[i]->OnRightButtonDown(view, ren, pos))
+        tool = tools[i];
+
+    if (tool)
+      SetHandler(tool, false);
+    else
+    {
+      // the default actions of the click: selection and context menu
+      if (m_SelectTool->OnRightButtonDown(view, ren, pos))
+        TraceHandler("Select");
+      if (behavior && behavior->OnRightButtonDown(view, ren, pos))
+        SetHandler(behavior, true);
+    }
+  }
+  else if (m_Handler)
+  {
+    // the other buttons pressed during the interaction go to the same handler
+    TraceCurrentHandler();
+    m_Handler->OnRightButtonDown(view, ren, pos);
+  }
+
+  // the camera gets the button too and moves with the drags the handler does not use
+  if (!m_HandlerIsBehavior && m_CameraTool->OnRightButtonDown(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnLeftButtonUp(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  if (m_Handler)
+  {
+    TraceCurrentHandler();
+    m_Handler->OnLeftButtonUp(view, ren, pos);
+  }
+  if (m_CameraTool->OnLeftButtonUp(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+
+  EndInteraction(ALBA_LEFT_BUTTON);
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnMiddleButtonUp(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  if (m_Handler)
+  {
+    TraceCurrentHandler();
+    m_Handler->OnMiddleButtonUp(view, ren, pos);
+  }
+  if (m_CameraTool->OnMiddleButtonUp(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+
+  EndInteraction(ALBA_MIDDLE_BUTTON);
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnRightButtonUp(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  if (m_Handler)
+  {
+    TraceCurrentHandler();
+    m_Handler->OnRightButtonUp(view, ren, pos);
+  }
+  if (m_CameraTool->OnRightButtonUp(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+
+  EndInteraction(ALBA_RIGHT_BUTTON);
+
+  // the right button released without dragging shows the context menu
+  if (m_SelectTool->OnRightButtonUp(view, ren, pos))
+    TraceHandler("Context menu");
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnTrackerButtonDown(albaEventInteraction *e)
+{
+  albaDeviceButtonsPadTracker *tracker = (albaDeviceButtonsPadTracker *)e->GetSender();
+  int button = e->GetButton();
+  albaMatrix *pose = e->GetMatrix();
+
+  if (m_Device == NULL)
+  {
+    // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
+    BeginInteraction(tracker, button);
+    albaInteractionBehavior *behavior = PickBehavior(e);
+
+    // a tool can push or pop tools while handling an event: iterate on a copy
+    albaInteractionTool *tool = NULL;
+    std::vector<albaInteractionTool *> tools = m_Tools;
+    for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
+      if (tools[i]->OnTrackerButtonDown(tracker, button, pose))
+        tool = tools[i];
+
+    if (tool)
+      SetHandler(tool, false);
+    else
+    {
+      // the default action of the click: selection
+      if (m_SelectTool->OnTrackerButtonDown(tracker, button, pose))
+        TraceHandler("Select");
+      if (behavior && behavior->OnTrackerButtonDown(tracker, button, pose))
+        SetHandler(behavior, true);
+    }
+  }
+  else if (m_Handler)
+  {
+    // the other buttons pressed during the interaction go to the same handler
+    TraceCurrentHandler();
+    m_Handler->OnTrackerButtonDown(tracker, button, pose);
+  }
+
+  // the camera gets the button too and moves with the drags the handler does not use
+  if (!m_HandlerIsBehavior && m_CameraTool->OnTrackerButtonDown(tracker, button, pose))
+    TraceHandler("Camera", m_CameraTool->GetTrackerTool());
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnTrackerButtonUp(albaEventInteraction *e)
+{
+  albaDeviceButtonsPadTracker *tracker = (albaDeviceButtonsPadTracker *)e->GetSender();
+  int button = e->GetButton();
+
+  if (m_Handler)
+  {
+    TraceCurrentHandler();
+    m_Handler->OnTrackerButtonUp(tracker, button);
+  }
+  if (m_CameraTool->OnTrackerButtonUp(tracker, button))
+    TraceHandler("Camera", m_CameraTool->GetTrackerTool());
+
+  EndInteraction(button);
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnMouseMove(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+
+  // the moves without buttons go to the tools, from the top of the stack
+  if (m_Device == NULL)
+  {
+    // a tool can push or pop tools while handling an event: iterate on a copy
+    std::vector<albaInteractionTool *> tools = m_Tools;
+    for (int i = tools.size() - 1; i >= 0; i--)
+      if (tools[i]->OnMove(view, ren, pos))
+      {
+        TraceHandler("Tool", tools[i]);
+        return;
+      }
+    return;
+  }
+
+  // a drag cancels the context menu
+  m_SelectTool->OnDrag(view, ren, pos);
+
+  if (m_Handler)
+  {
+    TraceCurrentHandler();
+    if (m_Handler->OnDrag(view, ren, pos))
+      return;
+  }
+
+  // the drags the handler does not use move the camera
+  if (m_CameraTool->OnDrag(view, ren, pos))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnTrackerMove(albaEventInteraction *e)
+{
+  // the moves of the trackers without buttons pressed are not used
+  if (m_Device == NULL)
+    return;
+
+  albaDeviceButtonsPadTracker *tracker = (albaDeviceButtonsPadTracker *)e->GetSender();
+  albaMatrix *pose = e->GetMatrix();
+
+  if (m_Handler)
+  {
+    TraceCurrentHandler();
+    if (m_Handler->OnTrackerDrag(tracker, pose))
+      return;
+  }
+
+  // the drags the handler does not use move the camera
+  if (m_CameraTool->OnTrackerDrag(tracker, pose))
+    TraceHandler("Camera", m_CameraTool->GetTrackerTool());
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::OnMouseWheel(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkRenderer *ren = device->GetRenderer();
+  double pos[2];
+  e->Get2DPosition(pos);
+  double rotation = e->GetData() ? *(double *)e->GetData() : 0;
+
+  // a tool can push or pop tools while handling an event: iterate on a copy
+  std::vector<albaInteractionTool *> tools = m_Tools;
+  for (int i = tools.size() - 1; i >= 0; i--)
+    if (tools[i]->OnWheel(view, ren, pos, rotation))
+    {
+      TraceHandler("Tool", tools[i]);
       return;
     }
 
-		if (id == DEVICE_MOUSE_WHEEL && !IsInteracting(device))
-		{
-			if (ToolWheel(m_CameraTool, ei))
-				TraceHandler("Camera", m_CameraTool->GetMouseTool());
-			WriteEventTrace(event);
-			return;
-		}
+  // the wheel moves the camera when no button is pressed
+  if (m_Device == NULL && m_CameraTool->OnWheel(view, ren, pos, rotation))
+    TraceHandler("Camera", m_CameraTool->GetMouseTool());
+}
 
-    // find if this device is one of those currently interacting
-    if (IsInteracting(device))
-    {
-      // a drag cancels the context menu
-      if (id == DEVICE_TRACKER_3D_MOVE || id == DEVICE_MOUSE_2D_MOVE)
-        ToolDrag(m_SelectTool, ei);
-      // the drags go to the behavior interacting with the device
-      albaInteractionBehavior *bh = GetCurrentBehavior(device);
-      if (bh && (id == DEVICE_TRACKER_3D_MOVE || id == DEVICE_MOUSE_2D_MOVE))
-      {
-        TraceHandler("Behavior", bh);
-        bh->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
-        ToolDrag(bh, ei);
-      }
-      // forward to the camera, if it is interacting with this device
-      albaInteractionTool *camera = m_CameraTool->GetInteractingTool(device);
-      if (camera)
-      {
-        TraceHandler("Camera", camera);
-        if (id == DEVICE_TRACKER_3D_MOVE || id == DEVICE_MOUSE_2D_MOVE)
-          ToolDrag(m_CameraTool, ei);
-        else if (id == DEVICE_BUTTON_UP)
-          ToolButtonUp(m_CameraTool, ei);
-      }
-    }
+//------------------------------------------------------------------------------
+albaInteractionBehavior *albaPositionalEventRouter::PickBehavior(albaEventInteraction *e)
+{
+  albaDevice *device = (albaDevice *)e->GetSender();
+  albaView *view = device->GetView();
+  vtkProp3D *pickedProp = NULL;
+  albaVME *pickedVme = NULL;
+  albaInteractionBehavior *behavior = NULL;
+  double pickedPos[3] = {0, 0, 0};
 
-    // start and stop the default interaction
-    if (id == DEVICE_BUTTON_DOWN)
-      OnStartInteraction(ei);
-    else if (id == DEVICE_BUTTON_UP)
-      OnStopInteraction(ei);
+  // the picking is cached into the event
+  if (view && e->FindPokedVme(view, device, pickedProp, pickedVme, behavior))
+    e->GetPickedPosition(pickedPos);
 
-    WriteEventTrace(event);
+  // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME
+  m_SelectTool->SetPickedVME(pickedVme, pickedPos);
+  if (behavior)
+  {
+    behavior->SetPickedPosition(pickedPos);
+    behavior->SetModifierKeys(m_CtrlDown, m_AltDown, m_ShiftDown);
   }
-  else
-    Superclass::OnEvent(event); // the events of the other channels are forwarded
+  return behavior;
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::BeginInteraction(albaDevice *device, int button)
+{
+  m_Device = device;
+  m_Button = button;
+  m_Handler = NULL;
+  m_HandlerIsBehavior = false;
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::EndInteraction(int button)
+{
+  if (button != m_Button)
+    return;
+
+  m_Device = NULL;
+  m_Button = -1;
+  m_Handler = NULL;
+  m_HandlerIsBehavior = false;
+}
+
+//------------------------------------------------------------------------------
+void albaPositionalEventRouter::SetHandler(albaInteractionTool *handler, bool isBehavior)
+{
+  TraceHandler(isBehavior ? "Behavior" : "Tool", handler);
+
+  // a tool that popped itself while handling the button does not interact
+  if (isBehavior || std::find(m_Tools.begin(), m_Tools.end(), handler) != m_Tools.end())
+  {
+    m_Handler = handler;
+    m_HandlerIsBehavior = isBehavior;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -771,6 +620,12 @@ void albaPositionalEventRouter::TraceHandler(const char *handler, albaObject *ob
     m_EventTrace += " ";
     m_EventTrace += obj->GetTypeName();
   }
+}
+
+//----------------------------------------------------------------------------
+void albaPositionalEventRouter::TraceCurrentHandler()
+{
+  TraceHandler(m_HandlerIsBehavior ? "Behavior" : "Tool", m_Handler);
 }
 
 //----------------------------------------------------------------------------
@@ -799,4 +654,3 @@ void albaPositionalEventRouter::WriteEventTrace(albaEventBase *event)
   m_LastEventTrace = trace.str();
   albaLogMessage("%s", m_LastEventTrace.c_str());
 }
-
