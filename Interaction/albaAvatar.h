@@ -48,12 +48,6 @@ class vtkAbstractPropPicker;
 class ALBA_EXPORT albaAvatar : public albaInteractionAgent, public albaStorable
 {
 public:
-  /** @ingroup Events
-  /** @{ */
-  ALBA_ID_DEC(AVATAR_SCREEN_PLANE_SETTINGS); ///< Issued to update all the avatar with the same screen plane
-  ALBA_ID_DEC(AVATAR_WORKING_BOX_SETTINGS);  ///< Issued to update all the avatar with the same working box 
-  /** @} */
-  
   //----------------------------------------------------------------------------
   //    GUI Constants
   //----------------------------------------------------------------------------

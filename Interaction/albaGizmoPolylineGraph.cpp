@@ -27,8 +27,7 @@
 #include "albaEvent.h"
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
@@ -66,7 +65,6 @@ albaGizmoPolylineGraph::albaGizmoPolylineGraph(albaVME* imputVme, albaObserver *
   
   m_VmeGizmo = NULL;
   m_CurvilinearAbscissaHelper = NULL;
-  m_GizmoInteractor = NULL;
   m_LeftMouseInteractor = NULL;
   m_SphereSource = NULL;
   m_AppendPolyData = NULL;
@@ -255,15 +253,14 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 {  
   m_RefSysVME = m_InputVME;
 
-  albaNEW(m_GizmoInteractor);
-  m_LeftMouseInteractor = m_GizmoInteractor->CreateBehavior(MOUSE_LEFT);
+  albaNEW(m_LeftMouseInteractor);
   m_LeftMouseInteractor->SetListener(this);
   m_LeftMouseInteractor->SetVME(m_InputVME);
   m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
   m_LeftMouseInteractor->EnableTranslation(true);    
 
-  m_VmeGizmo->SetBehavior(m_GizmoInteractor);
+  m_VmeGizmo->SetBehavior(m_LeftMouseInteractor);
 }
 
 //------------------------------------------------------------------------
@@ -272,7 +269,7 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 //------------------------------------------------------------------------
 {
   m_VmeGizmo->SetBehavior(NULL);
-  albaDEL(m_GizmoInteractor);
+  albaDEL(m_LeftMouseInteractor);
 }
 
 //------------------------------------------------------------------------
@@ -384,13 +381,13 @@ void albaGizmoPolylineGraph::LogTransformEvent( albaEvent *e )
   albaString mouseActionString;
   switch(mouseAction)
   {
-  case albaGenericMouseBehavior::MOUSE_DOWN:
+  case albaBehaviorTransform::MOUSE_DOWN:
     mouseActionString.Append("MOUSE DOWN");
     break;
-  case albaGenericMouseBehavior::MOUSE_MOVE:
+  case albaBehaviorTransform::MOUSE_MOVE:
     mouseActionString.Append("MOUSE MOVE");
     break;
-  case albaGenericMouseBehavior::MOUSE_UP:
+  case albaBehaviorTransform::MOUSE_UP:
     mouseActionString.Append("MOUSE UP");
     break;
   default:

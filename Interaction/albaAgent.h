@@ -50,14 +50,7 @@ class ALBA_EXPORT albaAgent: public albaReferenceCounted, public albaObserver, p
 {
 public:
   albaAbstractTypeMacro(albaAgent,albaReferenceCounted);
-  
-  //------------------------------------------------------------------------------
-  // Events
-  //------------------------------------------------------------------------------
-  /** @ingroup Events
-      Event used to force initialization of this object */
-  ALBA_ID_DEC(AGENT_INITIALIZE); 
-  
+
   /**
   Attach/Detach this object as event source for the specified listener. If the specified channel is 
   the MCH_UP, the SetListener(listener) is called. For all other channel more then 

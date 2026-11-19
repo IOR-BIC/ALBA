@@ -30,12 +30,8 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-ALBA_ID_IMP(albaDeviceSet::DEVICE_ADD);
-ALBA_ID_IMP(albaDeviceSet::DEVICE_REMOVE);
 ALBA_ID_IMP(albaDeviceSet::DEVICE_ADDED);
 ALBA_ID_IMP(albaDeviceSet::DEVICE_REMOVING);
-//ALBA_ID_IMP(albaDeviceSet::MCH_DEVICE_SETUP);
-//ALBA_ID_IMP(albaDeviceSet::MCH_DEVICE_SETDOWN);
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaDeviceSet)
@@ -369,23 +365,5 @@ void albaDeviceSet::OnEvent(albaEventBase *event)
 {
   assert(event&&event->GetSender());
 
-  int id = event->GetId();
-  int channel = event->GetChannel();
-
-  if (channel == MCH_UP)
-  {
-    if (id==DEVICE_ADD)
-    {
-      // this could create problems since there's no control on data to really be of the right type
-      AddDevice((albaDevice *)event->GetData());
-      return;
-    }
-    else if (id==DEVICE_REMOVE)
-    {
-      this->RemoveDevice((albaDevice *)event->GetData());
-      return;
-    }
-  }
-  
   Superclass::OnEvent(event);
 }

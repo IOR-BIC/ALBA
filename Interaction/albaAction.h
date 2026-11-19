@@ -37,9 +37,6 @@ public:
   /** @ingroup Events */
   /** @{ */
   ALBA_ID_DEC(DEVICE_BIND);            ///< force the action to bind to the device
-  ALBA_ID_DEC(QUERY_CONNECTED_DEVICES);///< Issued by interactors to query for connected devices. @sa ConnectedDeviceEvent
-  ALBA_ID_DEC(DEVICE_PLUGGED);         ///< Issued by devices when connected to actions or when queried.
-  ALBA_ID_DEC(DEVICE_UNPLUGGED);       ///< Issued by devices when connected to actions or when queried.
 
   enum ACTION_TYPE
   {

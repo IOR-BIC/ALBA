@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __albaGizmoInteractionDebugger_H__
-#define __albaGizmoInteractionDebugger_H__
+#ifndef __albaOpInteractionDebugger_H__
+#define __albaOpInteractionDebugger_H__
 
 //----------------------------------------------------------------------------
 // Include :

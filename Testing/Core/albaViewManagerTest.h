@@ -57,7 +57,6 @@ public:
   CPPUNIT_TEST( SetMouseTest );
   CPPUNIT_TEST( GetFromListTest );
   //CPPUNIT_TEST( VmeModifiedTest ); EMPTY METHOD not tested
-  //CPPUNIT_TEST( CameraFlyToModeTest ); EMPTY METHOD not tested
   //CPPUNIT_TEST( OnQuit ); EMPTY METHOD not tested
   CPPUNIT_TEST_SUITE_END();
 

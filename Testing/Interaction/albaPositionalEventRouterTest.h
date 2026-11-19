@@ -27,25 +27,20 @@ class albaPositionalEventRouterTest : public albaTest
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
   CPPUNIT_TEST(TestEnableSelect);
-  CPPUNIT_TEST(TestFlyToMode);
   CPPUNIT_TEST(TestIsInteracting);
-  CPPUNIT_TEST(TestStartInteraction);
-  CPPUNIT_TEST(TestStopInteraction);
   CPPUNIT_TEST(TestOnEvent);
-  CPPUNIT_TEST(TestOnVmeSelected);
-  CPPUNIT_TEST(TestSetGetMode);
-  CPPUNIT_TEST(TestSetModeToSingleButton);
-  CPPUNIT_TEST(TestSetModeToMultiButton);
   CPPUNIT_TEST(TestGetCameraTool);
   CPPUNIT_TEST(TestEventPickCache);
   CPPUNIT_TEST(TestButtonDownPicksOnce);
   CPPUNIT_TEST(TestGenericMouseUsesButtonDownPick);
+  CPPUNIT_TEST(TestTransformBehaviorButtons);
   CPPUNIT_TEST(TestEventTracing);
   CPPUNIT_TEST(TestPushPopTool);
   CPPUNIT_TEST(TestToolInteraction);
   CPPUNIT_TEST(TestToolOrder);
   CPPUNIT_TEST(TestBehaviorBeforeTools);
   CPPUNIT_TEST(TestToolGivesDragToCamera);
+  CPPUNIT_TEST(TestOneInteractionAtATime);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -54,25 +49,20 @@ class albaPositionalEventRouterTest : public albaTest
   void TestFixture();
   void TestConstructorDestructor();
   void TestEnableSelect();
-  void TestFlyToMode();
   void TestIsInteracting();
-  void TestStartInteraction();
-  void TestStopInteraction();
   void TestOnEvent();
-  void TestOnVmeSelected();
-  void TestSetGetMode();
-  void TestSetModeToSingleButton();
-  void TestSetModeToMultiButton();
   void TestGetCameraTool();
   void TestEventPickCache();
   void TestButtonDownPicksOnce();
   void TestGenericMouseUsesButtonDownPick();
+  void TestTransformBehaviorButtons();
   void TestEventTracing();
   void TestPushPopTool();
   void TestToolInteraction();
   void TestToolOrder();
   void TestBehaviorBeforeTools();
   void TestToolGivesDragToCamera();
+  void TestOneInteractionAtATime();
 
 };
 

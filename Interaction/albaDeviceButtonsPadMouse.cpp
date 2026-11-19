@@ -31,18 +31,10 @@
 #include "albaRWIBase.h"
 
 #include "albaEventInteraction.h"
-#include "mmuIdFactory.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-// ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_2D_MOVE)
-// ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
-// ALBA_ID_IMP(albaDeviceButtonsPadMouse::MOUSE_DCLICK)
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaDeviceButtonsPadMouse)
@@ -75,48 +67,34 @@ void albaDeviceButtonsPadMouse::OnEvent(albaEventBase *event)
 
   albaEventInteraction *e = albaEventInteraction::SafeDownCast(event);
 
-  if (id == GetMouse2DMoveId())
+  switch (id)
   {
-    double pos[2];
-    e->Get2DPosition(pos);
-    m_SelectedRWI = (albaRWIBase *)event->GetSender();
-    SetLastPosition(pos[0],pos[1],e->GetModifiers());
-  }
-	else if (id == GetWheelId())
-	{
-		double pos[2];
-		e->Get2DPosition(m_LastPosition);
-		m_SelectedRWI = (albaRWIBase *)event->GetSender();
-		e->SetSender(this);
-		InvokeEvent(e, (albaID)MCH_INPUT);
-	}
-  else if (id == GetButtonDownId() || id == GetMouseDClickId())
-  {
-    // store the Selected RWI is needed for compounded view
-    m_ButtonPressed = true;
-    e->Get2DPosition(m_LastPosition);
-    m_SelectedRWI = (albaRWIBase *)event->GetSender();
-    e->SetSender(this);
-    InvokeEvent(e,(albaID)MCH_INPUT);
-  }
-  else if (id == GetButtonUpId())
-  {
-    m_ButtonPressed = false;
-    e->Get2DPosition(m_LastPosition);
-    e->SetSender(this);
-    InvokeEvent(e,(albaID)MCH_INPUT);
-  }
-  else if (id == GetMouseCharEventId())
-  {
-    albaEvent *ev = albaEvent::SafeDownCast(event);
-    if (ev)
+    case DEVICE_MOUSE_2D_MOVE:
     {
-      unsigned char key = (unsigned char)ev->GetArg();
-      albaEventInteraction ei(this,GetMouseCharEventId());
-      ei.SetKey(key);
-      InvokeEvent(&ei,(albaID)MCH_INPUT);
+      double pos[2];
+      e->Get2DPosition(pos);
+      m_SelectedRWI = (albaRWIBase *)event->GetSender();
+      SetLastPosition(pos[0], pos[1], e->GetModifiers());
+      return;
     }
+    case DEVICE_BUTTON_DOWN:
+      m_ButtonPressed = true;
+      m_SelectedRWI = (albaRWIBase *)event->GetSender(); // the selected RWI is needed for compounded view
+      break;
+    case DEVICE_MOUSE_WHEEL:
+      m_SelectedRWI = (albaRWIBase *)event->GetSender();
+      break;
+    case DEVICE_BUTTON_UP:
+      m_ButtonPressed = false;
+      break;
+    default:
+      return;
   }
+
+  // the wheel and the buttons are forwarded to the listeners
+  e->Get2DPosition(m_LastPosition);
+  e->SetSender(this);
+  InvokeEvent(e, (albaID)MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------
@@ -127,7 +105,7 @@ void albaDeviceButtonsPadMouse::SetLastPosition(double x,double y,unsigned long 
   m_LastPosition[1] = y;
   
   // create a new event with last position
-  albaEventInteraction e(this,GetMouse2DMoveId(),x,y);
+  albaEventInteraction e(this,DEVICE_MOUSE_2D_MOVE,x,y);
   e.SetModifiers(modifiers);
   InvokeEvent(e,MCH_INPUT);
 }
@@ -209,25 +187,4 @@ void albaDeviceButtonsPadMouse::NormalizedDisplayToDisplay(double normalized[2])
   normalized[0] += (size[0]*.5);
   normalized[1] += (size[1]*.5);
   //  r->NormalizedDisplayToDisplay(normalized[0],normalized[1]);
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadMouse::GetMouse2DMoveId()
-//------------------------------------------------------------------------------
-{
-  static const albaID mouse2DMoveId = mmuIdFactory::GetNextId("MOUSE_2D_MOVE");
-  return mouse2DMoveId;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadMouse::GetMouseCharEventId()
-//------------------------------------------------------------------------------
-{
-  static const albaID mouseCharEventId = mmuIdFactory::GetNextId("MOUSE_CHAR_EVENT");
-  return mouseCharEventId;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadMouse::GetMouseDClickId()
-//------------------------------------------------------------------------------
-{
-  static const albaID mouseDClickId = mmuIdFactory::GetNextId("MOUSE_DCLICK");
-  return mouseDClickId;
 }

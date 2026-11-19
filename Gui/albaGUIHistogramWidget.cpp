@@ -249,7 +249,7 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
   }
   else if (albaEventInteraction *ei = albaEventInteraction::SafeDownCast(event))
   {
-    if (ei->GetId() == albaDeviceButtonsPadMouse::GetMouse2DMoveId())
+    if (ei->GetId() == DEVICE_MOUSE_2D_MOVE)
     {
       if(m_Histogram->GetInputData() == NULL) return;
 			if (m_ShowText)

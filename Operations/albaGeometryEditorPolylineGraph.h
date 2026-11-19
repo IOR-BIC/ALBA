@@ -36,7 +36,7 @@ class albaVMEPolylineEditor;
 class albaVMEPolylineGraph;
 class albaPolylineGraph;
 class albaGUI;
-class albaPickerBehavior;
+class albaBehaviorPicker;
 class albaInteractionBehavior;
 class vtkSphereSource;
 class vtkGlyph3D;
@@ -171,7 +171,7 @@ protected:
 	Register the event receiver object*/
 	albaObserver *m_Listener;
 
-	albaPickerBehavior *m_Picker;
+	albaBehaviorPicker *m_Picker;
 	albaInteractionBehavior *m_OldBehavior;
 
 	albaVMEPolylineEditor			*m_VMEPolylineEditor;

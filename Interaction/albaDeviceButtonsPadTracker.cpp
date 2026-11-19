@@ -23,7 +23,6 @@
 // general
 #include "albaSmartPointer.h"
 #include "albaEventInteraction.h"
-#include "mmuIdFactory.h"
 
 // I/O
 #include "albaStorageElement.h"
@@ -40,12 +39,6 @@
 
 // VTK
 #include "vtkTimerLog.h"
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-// ALBA_ID_IMP(albaDeviceButtonsPadTracker::TRACKER_3D_MOVE)
-// ALBA_ID_IMP(albaDeviceButtonsPadTracker::TRACKER_BOUNDS_UPDATED)
 
 albaCxxTypeMacro(albaDeviceButtonsPadTracker)
 
@@ -76,20 +69,6 @@ albaDeviceButtonsPadTracker::~albaDeviceButtonsPadTracker()
   SetDefaultAvatar(NULL);
   albaDEL(m_TrackerToCanonicalTransform);
   albaDEL(m_LastPoseMatrix);
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadTracker::GetTracker3DMoveId()
-//------------------------------------------------------------------------------
-{
-  static const albaID tracker3DModeId = mmuIdFactory::GetNextId("TRACKER_3D_MOVE");
-  return tracker3DModeId;
-}
-//------------------------------------------------------------------------------
-albaID albaDeviceButtonsPadTracker::GetTrackerBoundsUpdatedId()
-//------------------------------------------------------------------------------
-{
-  static const albaID trackerBoundsUpdatedId = mmuIdFactory::GetNextId("TRACKER_BOUNDS_UPDATED");
-  return trackerBoundsUpdatedId;
 }
 //------------------------------------------------------------------------------
 int albaDeviceButtonsPadTracker::InternalStore(albaStorageElement *node)
@@ -271,31 +250,6 @@ void albaDeviceButtonsPadTracker::SetLastPoseMatrix(const albaMatrix &matrix)
   // are doing this operation, since that event wouldn't be the last one.
   if (m_LastPose==1&&elapsed_time>m_MoveEventTimeOut)
   {
- /*   
-    int queue_size = GetQueueSize();
-    for (int i=0;i<queue_size;i++)
-    {
-      albaEventBase *temp;
-      albaID ch;
-
-      // check if for some reason queue is already empty (it shouldn't!)
-      if (!PopEvent(temp,ch))
-        break;
-      
-      if (temp->GetID()==mflThreadedAgent::AsyncDispatchEvent)
-      {
-        albaEventBase *event=albaEventBase::SafeDownCast((vtkObject*)temp->GetData());
-        assert(event);
-        if (event->GetID()==TRACKER_3D_MOVE)
-        {
-          temp->UnRegister(this); // simply unregister
-          continue;
-        }
-      }      
-      PushEvent(temp,ch); // re-push
-      // it has been already re-registered by Push
-      temp->UnRegister(this);
-    }*/
     m_LastPose = 0;
     m_Dispatched=true;
   }
@@ -310,7 +264,7 @@ void albaDeviceButtonsPadTracker::SetLastPoseMatrix(const albaMatrix &matrix)
     *m_LastPoseMatrix=matrix;
     m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetUniversalTime()); // set the time stamp to the current time
 
-    albaEventInteraction move_event(this,GetTracker3DMoveId(),m_LastPoseMatrix);    
+    albaEventInteraction move_event(this,DEVICE_TRACKER_3D_MOVE,m_LastPoseMatrix);    
 
     m_LastMoveTime=m_LastPoseMatrix->GetTimeStamp();
     AsyncInvokeEvent(&move_event,MCH_INPUT);
@@ -389,7 +343,7 @@ void albaDeviceButtonsPadTracker::ComputeTrackerToCanonicalTansform()
 	m_TrackerToCanonicalTransform->Scale(scale,scale,scale,POST_MULTIPLY);
   
   // inform consumers the m_CanonicalBounds has been recomputed
-  InvokeEvent(this,GetTrackerBoundsUpdatedId(),MCH_INPUT);
+  InvokeEvent(this,DEVICE_TRACKER_BOUNDS_UPDATED,MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------
@@ -611,7 +565,7 @@ void albaDeviceButtonsPadTracker::OnEvent(albaEventBase *event)
 
     m_LastPoseMutex.Lock();                     /// LOCK
     // if it was a move event clear the m_LastMoveEvent variable
-    if (id==GetTracker3DMoveId())
+    if (id==DEVICE_TRACKER_3D_MOVE)
       m_LastPose=0;
     m_LastPoseMutex.Unlock();                   /// UNLOCK
   }

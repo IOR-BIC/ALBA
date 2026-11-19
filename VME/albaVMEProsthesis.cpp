@@ -37,8 +37,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "wx/listctrl.h"
-#include "albaTransformMouseFreeBehavior.h"
-#include "albaGenericMouseFreeTransformBehavior.h"
+#include "albaBehaviorProsthesis.h"
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
@@ -58,7 +57,6 @@ albaVMEProsthesis::albaVMEProsthesis()
 	m_ContentGui = NULL;
 	m_GroupGui = NULL;
 	m_TransformBehavior = NULL;
-  m_GenericMouseFreeTransform = NULL;
 
 	m_RotCenterVME = NULL;
 	m_LockOnOpRun = true;
@@ -89,12 +87,8 @@ int albaVMEProsthesis::InternalInitialize()
 		// the prosthesis is moved freely with the mouse: the transforms come to OnEvent
 		albaNEW(m_TransformBehavior);
 		m_TransformBehavior->SetListener(this);
-		m_TransformBehavior->CreateTransformBehaviors(this);
+		m_TransformBehavior->SetVME(this);
 		SetBehavior(m_TransformBehavior);
-
-		m_GenericMouseFreeTransform = (albaGenericMouseFreeTransformBehavior *)m_TransformBehavior->CreateBehavior(MOUSE_LEFT_SHIFT);
-		m_GenericMouseFreeTransform->SetListener(this);
-		m_GenericMouseFreeTransform->SetVME(this);
 	}
 
 	if (Superclass::InternalInitialize() == ALBA_OK)
@@ -451,7 +445,7 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
 	
-	if (arg == albaGenericMouseBehavior::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
+	if (arg == albaBehaviorTransform::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events
@@ -614,8 +608,7 @@ void albaVMEProsthesis::GetZMinMax(double &zMin, double &zMax)
 //----------------------------------------------------------------------------
 void albaVMEProsthesis::Set2dModality(bool mod2d)
 {
-	albaGenericMouseFreeTransformBehavior* isaRotate = albaGenericMouseFreeTransformBehavior::SafeDownCast(m_TransformBehavior->GetRotateBehavior());
-	isaRotate->Set2DModality(mod2d);
+	m_TransformBehavior->Set2DModality(mod2d);
 }
 
 //-------------------------------------------------------------------------

@@ -28,8 +28,7 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "mmaMaterial.h"
 
 // vme stuff

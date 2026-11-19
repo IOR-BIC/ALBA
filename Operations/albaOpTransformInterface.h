@@ -29,10 +29,9 @@
 //----------------------------------------------------------------------------
 class albaGizmoTranslate;
 class albaGizmoRotate;
-class albaTransformMouseGUI;
+class albaRotateTranslateGUI;
 class albaInteractionBehavior;
-class albaCompositorMouseBehavior;
-class albaGenericMouseBehavior;
+class albaBehaviorTransform;
 class albaVME;
 class albaVME;
 

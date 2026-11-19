@@ -1,0 +1,67 @@
+/*=========================================================================
+
+ Program: ALBA (Agile Library for Biomedical Applications)
+ Module: albaToolSelectPoint
+ Authors: Gianluigi Crimi, from albaInteractorSelectPoint by Matteo Giacomoni, Stefano Perticoni
+
+ Copyright (c) BIC
+ All rights reserved. See Copyright.txt or
+
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifndef __albaToolSelectPoint_h
+#define __albaToolSelectPoint_h
+
+#include "albaInteractionTool.h"
+
+/** Tool picking the points of the render window of its renderer.
+  Left button picks a point, with CTRL if the CTRL modifier is on (default), and sends
+  albaEvent(this, VME_PICKED) with the picked point (GetVtkObj, a vtkPoints) and the point id (GetArg).
+  While picking the camera does not move; when no point is picked the tool does not use the button and the camera moves. */
+class ALBA_EXPORT albaToolSelectPoint : public albaInteractionTool
+{
+public:
+  albaTypeMacro(albaToolSelectPoint, albaInteractionTool);
+
+  /** Pick a point */
+  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
+
+  /** End picking */
+  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
+
+  /** While picking the camera does not move */
+  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
+
+  /** Set the CTRL modifier to On => picking performed on LeftButtonDown + CTRL */
+  void SetCtrlModifierOn() {m_UseCtrlModifier = true;}
+
+  /** Set the CTRL modifier to Off => pick performed on Left button down*/
+  void SetCtrlModifierOff() {m_UseCtrlModifier = false;}
+
+  /** Set the CTRL modifier: true => pick on Ctrl + LeftButtonDown, false => pick on LeftButtonDown only */
+  void SetCtrlModifier(bool useCtrlModifier) {m_UseCtrlModifier = useCtrlModifier;}
+
+  /** Get the CTRL modifier */
+  bool GetCtrlModifier() {return m_UseCtrlModifier;}
+
+protected:
+  albaToolSelectPoint();
+  virtual ~albaToolSelectPoint() {}
+
+  /** Pick the point under the mouse and send it to the listener; return true if a point was picked */
+  bool PickPoint(vtkRenderer *ren, double pos[2]);
+
+  bool m_IsPicking;       ///< true while the picking button is down
+  bool m_UseCtrlModifier; ///< true if the picking needs CTRL
+
+private:
+  albaToolSelectPoint(const albaToolSelectPoint&);  // Not implemented.
+  void operator=(const albaToolSelectPoint&);  // Not implemented.
+};
+
+#endif

@@ -45,7 +45,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMESurface.h"
 #include "albaVMEGroup.h"
 #include "albaVMEOutput.h"
-#include "albaExtractIsosurfaceTool.h"
+#include "albaToolExtractIsosurface.h"
 #include "mmaVolumeMaterial.h"
 
 #include "vtkLight.h"

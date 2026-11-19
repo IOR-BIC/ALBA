@@ -27,8 +27,7 @@
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaCompositorMouseBehavior;
-class albaGenericMouseBehavior;
+class albaBehaviorTransform;
 class albaVME;
 class albaVMEGizmo;
 class vtkPoints;
@@ -116,7 +115,6 @@ protected:
   albaString           m_Name;
   long                m_Id;
   albaVMEGizmo        *m_VmeGizmo;
-  albaCompositorMouseBehavior *m_GizmoBehavior;
 	vtkDoubleArray     *m_SnapArray;
 	double m_Bounds[6];
 
@@ -140,7 +138,7 @@ protected:
     SNAP,
     MOVING_MODALITY_NUMBERS,
   };
-  albaGenericMouseBehavior *m_MouseBH;
+  albaBehaviorTransform *m_MouseBH;
 
   bool m_InverseHandle;
 

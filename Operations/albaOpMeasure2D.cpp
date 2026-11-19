@@ -22,15 +22,15 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaOpMeasure2D.h"
 #include "albaDecl.h"
 
-#include "alba2DMeasurePointTool.h"
-#include "alba2DMeasureDistanceTool.h"
-#include "alba2DMeasureMidPointTool.h"
-#include "alba2DMeasureCenterPointTool.h"
-#include "alba2DMeasureLineTool.h"
-#include "alba2DMeasureLineDistanceTool.h"
-#include "alba2DMeasureAngleTool.h"
-#include "alba2DMeasureAngleLineTool.h"
-#include "alba2DMeasureEllipseTool.h"
+#include "albaTool2DMeasurePoint.h"
+#include "albaTool2DMeasureDistance.h"
+#include "albaTool2DMeasureMidPoint.h"
+#include "albaTool2DMeasureCenterPoint.h"
+#include "albaTool2DMeasureLine.h"
+#include "albaTool2DMeasureLineDistance.h"
+#include "albaTool2DMeasureAngle.h"
+#include "albaTool2DMeasureAngleLine.h"
+#include "albaTool2DMeasureEllipse.h"
 
 #include "albaEvent.h"
 #include "albaGUI.h"
@@ -145,63 +145,63 @@ albaView* albaOpMeasure2D::OpenImageView(int viewId)
 void albaOpMeasure2D::InitInteractors()
 {
 	// Create Interactor Point
-	alba2DMeasurePointTool *InteractorPoint = alba2DMeasurePointTool::New();
+	albaTool2DMeasurePoint *InteractorPoint = albaTool2DMeasurePoint::New();
 	InteractorPoint->Register(this);
 	InteractorPoint->SetListener(this);
 	InteractorPoint->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorPoint);
 	
 	// Create Interactor Distance
-	alba2DMeasureDistanceTool *InteractorDistance = alba2DMeasureDistanceTool::New();
+	albaTool2DMeasureDistance *InteractorDistance = albaTool2DMeasureDistance::New();
 	InteractorDistance->Register(this);
 	InteractorDistance->SetListener(this);
 	InteractorDistance->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorDistance);
 
 	// Create Interactor MidPoint
-	alba2DMeasureMidPointTool *InteractorMidPoint = alba2DMeasureMidPointTool::New();
+	albaTool2DMeasureMidPoint *InteractorMidPoint = albaTool2DMeasureMidPoint::New();
 	InteractorMidPoint->Register(this);
 	InteractorMidPoint->SetListener(this);
 	InteractorMidPoint->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorMidPoint);
 
 	// Create Interactor CenterPoint
-	alba2DMeasureCenterPointTool *InteractorCenterPoint = alba2DMeasureCenterPointTool::New();
+	albaTool2DMeasureCenterPoint *InteractorCenterPoint = albaTool2DMeasureCenterPoint::New();
 	InteractorCenterPoint->Register(this);
 	InteractorCenterPoint->SetListener(this);
 	InteractorCenterPoint->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorCenterPoint);
 
 	// Create Interactor Line
-	alba2DMeasureLineTool *InteractorLine = alba2DMeasureLineTool::New();
+	albaTool2DMeasureLine *InteractorLine = albaTool2DMeasureLine::New();
 	InteractorLine->Register(this);
 	InteractorLine->SetListener(this);
 	InteractorLine->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorLine);
 
 	// Create Interactor LineDistance
-	alba2DMeasureLineDistanceTool *InteractorLineDist = alba2DMeasureLineDistanceTool::New();
+	albaTool2DMeasureLineDistance *InteractorLineDist = albaTool2DMeasureLineDistance::New();
 	InteractorLineDist->Register(this);
 	InteractorLineDist->SetListener(this);
 	InteractorLineDist->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorLineDist);
 
 	// Create Interactor Angle
-	alba2DMeasureAngleTool *InteractorAngle = alba2DMeasureAngleTool::New();
+	albaTool2DMeasureAngle *InteractorAngle = albaTool2DMeasureAngle::New();
 	InteractorAngle->Register(this);
 	InteractorAngle->SetListener(this);
 	InteractorAngle->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorAngle);
 
 	// Create Interactor Angle by Line
-	alba2DMeasureAngleLineTool *InteractorAngleLine = alba2DMeasureAngleLineTool::New();
+	albaTool2DMeasureAngleLine *InteractorAngleLine = albaTool2DMeasureAngleLine::New();
 	InteractorAngleLine->Register(this);
 	InteractorAngleLine->SetListener(this);
 	InteractorAngleLine->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorAngleLine);
 
 	// Create Interactor Ellipse
-	alba2DMeasureEllipseTool *InteractorEllipse = alba2DMeasureEllipseTool::New();
+	albaTool2DMeasureEllipse *InteractorEllipse = albaTool2DMeasureEllipse::New();
 	InteractorEllipse->Register(this);
 	InteractorEllipse->SetListener(this);
 	InteractorEllipse->ShowText(m_ShowText);
@@ -336,7 +336,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		alba2DMeasureTool *currInter = m_InteractorVector[m_CurrentInteractor];
+		albaTool2DMeasure *currInter = m_InteractorVector[m_CurrentInteractor];
 		if (e->GetSender() == m_Gui) // FROM GUI
 		{
 			
@@ -435,7 +435,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 		{
 			switch (e->GetId()) // FROM INTERACTOR
 			{
-			case alba2DMeasureTool::ID_MEASURE_ADDED:
+			case albaTool2DMeasure::ID_MEASURE_ADDED:
 			{
 				// Update Measure Gui Entry
 				m_SelectedMeasure = currInter->GetSelectedMeasure();
@@ -451,7 +451,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				}
 			}
 			break;
- 			case alba2DMeasureTool::ID_MEASURE_CHANGED:
+ 			case albaTool2DMeasure::ID_MEASURE_CHANGED:
 			{
 				m_SelectedMeasure = currInter->GetSelectedMeasure();
 				m_Measure = currInter->GetMeasureText(m_SelectedMeasure);
@@ -462,7 +462,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				m_Gui->Update();
 			}
 			break;
-			case alba2DMeasureTool::ID_MEASURE_SELECTED:
+			case albaTool2DMeasure::ID_MEASURE_SELECTED:
 			{				
 				// Update Measure Gui Entry
 				m_SelectedMeasure = currInter->GetSelectedMeasure();

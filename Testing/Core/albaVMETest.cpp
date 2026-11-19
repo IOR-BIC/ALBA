@@ -26,7 +26,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaVMETest.h"
 
-#include "albaPickerBehavior.h"
+#include "albaBehaviorPicker.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"
@@ -262,9 +262,9 @@ void albaVMETest::TestSetBehavior()
   // default behavior
   result = vme1->GetBehavior() == NULL;
 
-  albaSmartPointer<albaPickerBehavior> bh;
+  albaSmartPointer<albaBehaviorPicker> bh;
   vme1->SetBehavior(bh);
-  result = vme1->GetBehavior()->IsALBAType(albaPickerBehavior);
+  result = vme1->GetBehavior()->IsALBAType(albaBehaviorPicker);
   TEST_RESULT;
 
   result = bh.GetPointer() == vme1->GetBehavior();

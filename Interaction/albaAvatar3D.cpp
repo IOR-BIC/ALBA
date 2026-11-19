@@ -689,13 +689,14 @@ void albaAvatar3D::OnEvent(albaEventBase* event)
     {
       albaEventInteraction *e = (albaEventInteraction *)event;
 
-      if (id==albaDeviceButtonsPadTracker::GetTracker3DMoveId()) // manage changes in the bounds of the tracker
+      switch (id)
       {
-        OnMove3DEvent(e);
-      }
-      else if (id==albaDeviceButtonsPadTracker::GetTrackerBoundsUpdatedId())
-      {
-        OnUpdateBoundsEvent(GetTracker());          
+        case DEVICE_TRACKER_3D_MOVE:
+          OnMove3DEvent(e);
+          break;
+        case DEVICE_TRACKER_BOUNDS_UPDATED: // manage changes in the bounds of the tracker
+          OnUpdateBoundsEvent(GetTracker());
+          break;
       }
     }
 

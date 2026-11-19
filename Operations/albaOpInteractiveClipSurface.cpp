@@ -33,8 +33,8 @@ bool DEBUG_MODE = true;
 #include "albaGUI.h"
 
 #include "mmaMaterial.h"
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorCutPlane.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaSmartPointer.h"
 #include "albaVMEGizmo.h"
@@ -84,7 +84,7 @@ albaOp(label)
 	m_ClipperBoundingBox = NULL;
   
   m_ImplicitPlaneVMEGizmo  = NULL;
-  m_IsaCompositor       = NULL;
+  m_PlaneBehavior       = NULL;
 
   m_OldSurface = NULL;
   
@@ -126,7 +126,7 @@ albaOpInteractiveClipSurface::~albaOpInteractiveClipSurface()
 	}
 	m_ResultPolyData.clear();
 
-  albaDEL(m_IsaCompositor);
+  albaDEL(m_PlaneBehavior);
 	albaDEL(m_ClippedVME);
   vtkDEL(m_ClipperPlane);
   vtkDEL(m_Clipper);
@@ -392,10 +392,8 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
 void albaOpInteractiveClipSurface::OnUseGizmo()
 //----------------------------------------------------------------------------
 {
-	if(m_IsaCompositor && !m_UseGizmo)
-	m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositor);
-	else if(m_IsaCompositorWithArrowGizmo && m_UseGizmo)
-	m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositorWithArrowGizmo);
+	if(m_PlaneBehavior)
+		m_PlaneBehavior->EnableTransform(!m_UseGizmo);
 	
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == albaOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);    				
 	ChangeGizmo();
@@ -519,46 +517,39 @@ void albaOpInteractiveClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
+		// SHIFT click changes the side of the arrow, CTRL click clips
+		if (e->GetId() == ID_CLICK_ON_VME)
+		{
+			if (e->GetArg() == ALBA_SHIFT_KEY)
+			{
+				if (m_Arrow)
+				{
+					m_ClipInside = m_ClipInside ? 0 : 1;
+					m_Gui->Update();
+					m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
+				}
+			}
+			else
+				Clip();
+			GetLogicManager()->CameraUpdate();
+			return;
+		}
+
 		switch(alba_event->GetId())
 		{
 		case ID_TRANSFORM:
 			{
-        
-				if(e->GetSender()==m_IsaChangeArrowWithoutGizmo || e->GetSender()==m_IsaChangeArrowWithGizmo)
-				{
-					if(m_Arrow) 
-					{
-						if(e->GetArg()==albaGenericMouseBehavior::MOUSE_DOWN)
-						{
-							m_ClipInside= m_ClipInside ? 0 : 1;
-							m_Gui->Update();
-							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-							GetLogicManager()->CameraUpdate();
-						}
-					}
-				}
-				else if(e->GetSender()==m_IsaClipWithoutGizmo || e->GetSender()==m_IsaClipWithGizmo)
-				{
-					if(e->GetArg()==albaGenericMouseBehavior::MOUSE_DOWN)
-					{
-						Clip();
-						GetLogicManager()->CameraUpdate();
-					}
-				}
-				else
-				{
-          m_CASH->MoveOnSkeleton(e);
+				m_CASH->MoveOnSkeleton(e);
 
-          if (DEBUG_MODE)
-            {
-              std::ostringstream stringStream;
-              stringStream  << "ABS Transform Matrix" << std::endl;
-              e->GetMatrix()->Print(stringStream);
-              albaLogMessage(stringStream.str().c_str());
-            }
-
-					GetLogicManager()->CameraUpdate();
+				if (DEBUG_MODE)
+				{
+					std::ostringstream stringStream;
+					stringStream  << "ABS Transform Matrix" << std::endl;
+					e->GetMatrix()->Print(stringStream);
+					albaLogMessage(stringStream.str().c_str());
 				}
+
+				GetLogicManager()->CameraUpdate();
 			}
 			break;
 		default:
@@ -655,8 +646,7 @@ void albaOpInteractiveClipSurface::OpStop(int result)
 		m_GizmoScale->Show(false);
 	}
 
-  albaDEL(m_IsaCompositor);
-  albaDEL(m_IsaCompositorWithArrowGizmo);
+  albaDEL(m_PlaneBehavior);
 
 	cppDEL(m_GizmoTranslate);
 	cppDEL(m_GizmoRotate);
@@ -825,7 +815,7 @@ void albaOpInteractiveClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_e
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaGenericMouseBehavior::MOUSE_MOVE)
+		if (arg == albaBehaviorTransform::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneVMEGizmo->SetAbsMatrix(absPose);
@@ -944,45 +934,21 @@ void albaOpInteractiveClipSurface::ShowClipPlane(bool show)
 void albaOpInteractiveClipSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-  albaNEW(m_IsaCompositor);
-
-  m_IsaTranslate = m_IsaCompositor->CreateBehavior( MOUSE_LEFT );
-  m_IsaTranslate->SetListener(this);
-  m_IsaTranslate->SetVME(m_ImplicitPlaneVMEGizmo);
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_IsaTranslate->EnableTranslation(true);
-  
-	m_IsaChangeArrowWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_SHIFT);
-	m_IsaChangeArrowWithoutGizmo->SetListener(this);
-	m_IsaChangeArrowWithoutGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
-
-	m_IsaClipWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_CONTROL);
-	m_IsaClipWithoutGizmo->SetListener(this);
-	m_IsaClipWithoutGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
-
-	albaNEW(m_IsaCompositorWithArrowGizmo);
-
-	m_IsaChangeArrowWithGizmo = m_IsaCompositorWithArrowGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
-	m_IsaChangeArrowWithGizmo->SetListener(this);
-	m_IsaChangeArrowWithGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
-
-	m_IsaClipWithGizmo = m_IsaCompositorWithArrowGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
-	m_IsaClipWithGizmo->SetListener(this);
-	m_IsaClipWithGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
-
-	if(!m_UseGizmo)
-		m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositor);
-	else
-		m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositorWithArrowGizmo);
+  // left button rotates, middle button translates, SHIFT and CTRL clicks change the arrow and clip;
+  // with gizmo the gizmo moves the plane: only the SHIFT and CTRL clicks
+  albaNEW(m_PlaneBehavior);
+  m_PlaneBehavior->SetListener(this);
+  m_PlaneBehavior->SetVME(m_ImplicitPlaneVMEGizmo);
+  m_PlaneBehavior->EnableModifierClicks(true);
+  m_PlaneBehavior->EnableTransform(!m_UseGizmo);
+  m_ImplicitPlaneVMEGizmo->SetBehavior(m_PlaneBehavior);
 }
 
 //----------------------------------------------------------------------------
 void albaOpInteractiveClipSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
 {  
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneVMEGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneVMEGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_PlaneBehavior->SetRefSysVME(m_ImplicitPlaneVMEGizmo);
 }
 //----------------------------------------------------------------------------
 void albaOpInteractiveClipSurface::SetClippingModality(int mode)

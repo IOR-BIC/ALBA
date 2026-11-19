@@ -53,7 +53,7 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventMouse2DMove()
   CPPUNIT_ASSERT(buttonsPadMouse);
 
   // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction mouse2DMoveEvent(this,albaDeviceButtonsPadMouse::GetMouse2DMoveId(),10,20);
+  albaEventInteraction mouse2DMoveEvent(this,DEVICE_MOUSE_2D_MOVE,10,20);
   buttonsPadMouse->OnEvent(&mouse2DMoveEvent);
   
   buttonsPadMouse->Delete();
@@ -68,25 +68,10 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonDown()
 
   // dummy event sending in order to test for leaks and/or crashes
   
-  albaEventInteraction buttonDownEvent(this,albaDeviceButtonsPadMouse::GetButtonDownId());
+  albaEventInteraction buttonDownEvent(this,DEVICE_BUTTON_DOWN);
   buttonsPadMouse->OnEvent(&buttonDownEvent);
 
   buttonsPadMouse->Delete();  
-}
-
-//----------------------------------------------------------------------------
-void albaDeviceButtonsPadMouseRemoteTest::TestOnEventMouseDClick()
-{
-  albaDeviceButtonsPadMouseRemote *buttonsPadMouse = albaDeviceButtonsPadMouseRemote::New();
-  
-  CPPUNIT_ASSERT(buttonsPadMouse);
-
-  // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction mouseDClickEvent(this,albaDeviceButtonsPadMouse::GetMouseDClickId());
-  buttonsPadMouse->OnEvent(&mouseDClickEvent);
-
-  buttonsPadMouse->Delete();
-
 }
 
 //----------------------------------------------------------------------------
@@ -97,7 +82,7 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonUp()
   CPPUNIT_ASSERT(buttonsPadMouse);
 
   // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction buttonUpEvent(this,albaDeviceButtonsPadMouse::GetButtonUpId());
+  albaEventInteraction buttonUpEvent(this,DEVICE_BUTTON_UP);
   buttonsPadMouse->OnEvent(&buttonUpEvent);
 
   buttonsPadMouse->Delete();
@@ -131,20 +116,6 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventViewDelete()
   albaEventInteraction viewDeleteEvent(this,VIEW_DELETE);
   buttonsPadMouse->OnEvent(&viewDeleteEvent);
 
-  buttonsPadMouse->Delete();
-}
-
-//----------------------------------------------------------------------------
-void albaDeviceButtonsPadMouseRemoteTest::TestOnEventMouseCharEvent()
-{
-  albaDeviceButtonsPadMouseRemote *buttonsPadMouse = albaDeviceButtonsPadMouseRemote::New();
-  
-  CPPUNIT_ASSERT(buttonsPadMouse);
-
-  // dummy event sending in order to test for leaks and/or crashes
-  albaEventInteraction mouseCharEvent(this,albaDeviceButtonsPadMouse::GetMouseCharEventId());
-  buttonsPadMouse->OnEvent(&mouseCharEvent);
-  
   buttonsPadMouse->Delete();
 }
 

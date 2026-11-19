@@ -31,8 +31,7 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -59,7 +58,7 @@ albaGizmoRotateCircle::albaGizmoRotateCircle(albaVME *input, albaObserver *liste
   
   // default axis is X
   m_ActiveAxis = X;
-  m_IsaComp = NULL;
+  m_IsaGen = NULL;
   m_Radius = -1;
 
   m_Listener = listener;
@@ -85,7 +84,7 @@ albaGizmoRotateCircle::albaGizmoRotateCircle(albaVME *input, albaObserver *liste
   m_GizmoCircle->SetMediator(m_Listener);
 
   // assign isa to S1 and S2;
-  m_GizmoCircle->SetBehavior(m_IsaComp);
+  m_GizmoCircle->SetBehavior(m_IsaGen);
   
   // set the axis to X axis
   this->SetAxis(m_ActiveAxis);
@@ -118,7 +117,7 @@ albaGizmoRotateCircle::~albaGizmoRotateCircle()
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
-  vtkDEL(m_IsaComp); 
+  vtkDEL(m_IsaGen); 
   
 	m_GizmoCircle->ReparentTo(NULL);
 }
@@ -171,13 +170,11 @@ void albaGizmoRotateCircle::CreatePipeline()
 void albaGizmoRotateCircle::CreateISA()
 //----------------------------------------------------------------------------
 {
-  // Create isa compositor and assign behaviors to IsaGen ivar.
+  // create the transform behavior of the gizmo
   // Default isa constrain rotation around X axis.
-  m_IsaComp = albaCompositorMouseBehavior::New();
-
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
+  m_IsaGen = albaBehaviorTransform::New();
   m_IsaGen->SetVME(m_InputVme);
   m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK); 
   m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
@@ -280,7 +277,7 @@ void albaGizmoRotateCircle::OnEvent(albaEventBase *alba_event)
   {
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == albaGenericMouseBehavior::MOUSE_DOWN)
+      if (e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }
@@ -348,7 +345,7 @@ void albaGizmoRotateCircle::SetInput(albaVME *vme)
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-albaGenericMouseBehavior *albaGizmoRotateCircle::GetInteractor()
+albaBehaviorTransform *albaGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
   return m_IsaGen;

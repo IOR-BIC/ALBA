@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGUIWizardPageNew.h"
 #include "albaGUIValidator.h"
 #include "albaDeviceButtonsPadMouse.h"
-#include "albaDICOMImporterTool.h"
+#include "albaToolDICOMImporter.h"
 #include "albaViewVTK.h"
 #include "albaTagArray.h"
 #include "albaVMERoot.h"

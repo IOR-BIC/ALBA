@@ -29,8 +29,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -52,7 +51,7 @@
 albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
 //----------------------------------------------------------------------------
 {
-  m_IsaComp[0] = m_IsaComp[1] = NULL;
+  m_IsaGen[0] = m_IsaGen[1] = NULL;
 
   m_Listener = listener;
   m_InputVme = input;
@@ -83,8 +82,8 @@ albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
   m_CubeGizmo->SetMediator(m_Listener);
 
   // assign isa to cylinder and cube
-  m_CylGizmo->SetBehavior(m_IsaComp[0]);
-  m_CubeGizmo->SetBehavior(m_IsaComp[1]);
+  m_CylGizmo->SetBehavior(m_IsaGen[0]);
+  m_CubeGizmo->SetBehavior(m_IsaGen[1]);
 
   m_InputVme->Update();
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
@@ -119,7 +118,7 @@ albaGizmoScaleAxis::~albaGizmoScaleAxis()
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData[i]);
 	//----------------------
-    vtkDEL(m_IsaComp[i]); 
+    vtkDEL(m_IsaGen[i]); 
   }
 	m_CylGizmo->ReparentTo(NULL);
 	m_CubeGizmo->ReparentTo(NULL);
@@ -245,14 +244,12 @@ void albaGizmoScaleAxis::CreatePipeline()
 void albaGizmoScaleAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-  // create isa compositor and assign behaviors to IsaGen ivar
+  // create the transform behavior of the gizmo
   for (int i = 0; i < 2; i++)
   {
-    m_IsaComp[i] = albaCompositorMouseBehavior::New();
-
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
+    m_IsaGen[i] = albaBehaviorTransform::New();
 
     m_IsaGen[i]->SetVME(m_InputVme);
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

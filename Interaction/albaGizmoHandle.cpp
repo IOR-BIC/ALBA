@@ -31,8 +31,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaCompositorMouseBehavior.h"
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "albaVME.h"
@@ -62,7 +61,7 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
 //----------------------------------------------------------------------------
 {
 	m_ConstraintModality = constraintModality;
-  m_IsaComp = NULL;
+  m_IsaGen = NULL;
   m_Cube = NULL;
   
   m_ShowShadingPlane = showShadingPlane;
@@ -123,12 +122,10 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
   //-----------------
   // create isa stuff
   //-----------------
-  // create isa compositor and assign behaviors to m_IsaGen ivar
-  m_IsaComp  = albaCompositorMouseBehavior::New();
-
+  // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
+  m_IsaGen = albaBehaviorTransform::New();
 
   //isa will send events to this
 	if(m_ConstraintModality==BOUNDS)
@@ -147,7 +144,7 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
 	}
 
   // assign isa to cylinder and cone
-  m_BoxGizmo->SetBehavior(m_IsaComp);
+  m_BoxGizmo->SetBehavior(m_IsaGen);
 
    // default axis is X
   SetType(albaGizmoHandle::XMIN);
@@ -181,7 +178,7 @@ albaGizmoHandle::~albaGizmoHandle()
 
   vtkDEL(m_PlaneSource);
 	
-  albaDEL(m_IsaComp);	//m_IsaGen is released automatically
+  albaDEL(m_IsaGen);
 
   GetLogicManager()->VmeRemove(m_BoxGizmo); //m_BoxGizmo is released
   GetLogicManager()->VmeRemove(m_ShadingPlaneGizmo); //m_ShadingPlaneGizmo is released

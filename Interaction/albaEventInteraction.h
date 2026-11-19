@@ -27,7 +27,6 @@ class albaView;
 class albaDevice;
 class albaVME;
 class albaInteractionBehavior;
-class vtkProp3D;
 
 /** Event class to transport a triggering button and a position from pointing devices.
   Evant issue by 2D and 3D tracking devices in correspondace to
@@ -63,11 +62,6 @@ public:
   /** Get the triggering button */
   int GetButton() {return m_Button;}
 
-  /** Set the optional key argument */
-  void SetKey(unsigned char key);
-  /** Get the optional key argument */
-  unsigned char GetKey() {return m_Key;}
-
   /** Get the pose matrix, for 3D tracking devices */
   albaMatrix *GetMatrix();
   /** Set the pose matrix, for 3D tracking devices */
@@ -89,7 +83,7 @@ public:
     Find the VME picked by the device at the event position on the given view.
     The picking is performed only the first time, then the result is cached into the event
     and shared by all the interactors receiving it. Return true if a VME has been picked. */
-  bool FindPokedVme(albaView *view, albaDevice *device, vtkProp3D *&pickedProp, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior);
+  bool FindPokedVme(albaView *view, albaDevice *device, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior);
 
   /** Return the position picked by FindPokedVme, meaningful only if a VME has been picked */
   void GetPickedPosition(double pos[3]);
@@ -99,15 +93,15 @@ public:
 
   /** overloaded constructor */
   albaEventInteraction(void *sender=NULL,albaID id=-1,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,albaMatrix *matrix,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,double x,double y,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers),m_Key(0) {ResetPick();}
+  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers) {ResetPick();}
   virtual ~albaEventInteraction() {}
 
 protected:
@@ -116,14 +110,12 @@ protected:
   bool            m_Picked;             ///< True if the cached picking found a VME
   albaView       *m_PickView;           ///< View used by the cached picking
   albaDevice     *m_PickDevice;         ///< Device used by the cached picking
-  vtkProp3D      *m_PickedProp;         ///< Cached picked prop
   albaVME        *m_PickedVme;          ///< Cached picked VME
   albaInteractionBehavior *m_PickedBehavior;     ///< Cached behavior of the picked VME
   double          m_PickedPosition[3];  ///< Cached picked position
 
   int           m_Button;     ///< Optional button which triggered the event
   unsigned long m_Modifiers;  ///< Optional modifiers for the button 
-  unsigned char m_Key;        ///< Optional Key 
   double        m_X;          ///< X coordinate, used by mouse device
   double        m_Y;          ///< Y coordinate, used by mouse device
   bool          m_XYFlag;     ///< Used to signal a 2D coordinate is present

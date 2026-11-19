@@ -33,11 +33,11 @@
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
-#include "albaTransformMouseGUI.h"
+#include "albaRotateTranslateGUI.h"
 #include "albaSaveRestorePoseGUI.h"
 #include "albaTransformTextEntriesGUI.h"
 
-#include "albaGenericMouseBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaSmartPointer.h"
 #include "albaTransform.h"
@@ -457,7 +457,7 @@ void albaOpTransformOld::OnEventGuiTransform(albaEventBase *alba_event)
 {
   switch(alba_event->GetId())
 	{
-    case ID_TRANSFORM: // from albaTransformMouseGUI
+    case ID_TRANSFORM: // from albaRotateTranslateGUI
     {
       PostMultiplyEventMatrix(alba_event);
 
@@ -574,7 +574,7 @@ void albaOpTransformOld::CreateGui()
   // Transform Gui
   //---------------------------------
   // create the transform Gui
-  m_GuiTransform = new albaTransformMouseGUI(m_Input, this);
+  m_GuiTransform = new albaRotateTranslateGUI(m_Input, this);
 
   // add transform gui to operation
   m_Gui->AddGui(m_GuiTransform->GetGui());
