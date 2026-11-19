@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "mmaMaterial.h"
 
 // vme stuff

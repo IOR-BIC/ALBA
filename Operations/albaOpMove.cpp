@@ -38,7 +38,7 @@
 #include "albaTransformTextEntriesGUI.h"
 #include "albaVMELandmark.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaSmartPointer.h"
 #include "albaTransform.h"

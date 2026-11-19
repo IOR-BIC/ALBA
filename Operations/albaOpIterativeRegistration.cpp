@@ -26,7 +26,7 @@
 #include <albaGUIBusyInfo.h>
 
 #include "albaOpIterativeRegistration.h"
-#include "albaPickerBehavior.h"
+#include "albaBehaviorPicker.h"
 #include "mmaMaterial.h"
 #include "vtkProperty.h"
 #include <vector>

@@ -37,7 +37,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "wx/listctrl.h"
-#include "albaProsthesisBehavior.h"
+#include "albaBehaviorProsthesis.h"
 #include "vtkSphereSource.h"
 #include "albaVME.h"
 #include "albaTagArray.h"
@@ -445,7 +445,7 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
 	
-	if (arg == albaTransformBehavior::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
+	if (arg == albaBehaviorTransform::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events

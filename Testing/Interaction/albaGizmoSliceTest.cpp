@@ -41,7 +41,7 @@
 #include "albaMatrix.h"
 #include "albaEvent.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPoints.h"
@@ -203,16 +203,16 @@ void albaGizmoSliceTest::TestTransformEvents()
   transform.SetMatrix(identity);
 
   // the button down sends nothing, each drag sends MOUSE_MOVE, the release only MOUSE_UP
-  transform.SetArg(albaTransformBehavior::MOUSE_DOWN);
+  transform.SetArg(albaBehaviorTransform::MOUSE_DOWN);
   gizmoSlice->OnEvent(&transform);
   CPPUNIT_ASSERT(listener.m_MoveCount == 0 && listener.m_UpCount == 0);
 
-  transform.SetArg(albaTransformBehavior::MOUSE_MOVE);
+  transform.SetArg(albaBehaviorTransform::MOUSE_MOVE);
   gizmoSlice->OnEvent(&transform);
   gizmoSlice->OnEvent(&transform);
   CPPUNIT_ASSERT(listener.m_MoveCount == 2 && listener.m_UpCount == 0);
 
-  transform.SetArg(albaTransformBehavior::MOUSE_UP);
+  transform.SetArg(albaBehaviorTransform::MOUSE_UP);
   gizmoSlice->OnEvent(&transform);
   CPPUNIT_ASSERT(listener.m_MoveCount == 2 && listener.m_UpCount == 1);
 

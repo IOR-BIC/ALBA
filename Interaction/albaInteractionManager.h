@@ -51,7 +51,7 @@ class mflXMLWriter;
 class vtkXMLDataElement;
 class vtkXMLDataParser;
 class albaStaticEventRouter;
-class albaFlyToTool;
+class albaToolFlyTo;
 class albaPositionalEventRouter;
 class albaInteractionTool;
 class albaVME;
@@ -246,7 +246,7 @@ protected:
   albaDeviceManager*       m_DeviceManager; 
   albaPositionalEventRouter*                 m_PositionalEventRouter;
   albaStaticEventRouter*                 m_StaticEventRouter;
-  albaFlyToTool*                          m_FlyToTool; ///< tool of the fly-to mode
+  albaToolFlyTo*                          m_FlyToTool; ///< tool of the fly-to mode
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
 

@@ -27,8 +27,8 @@ class albaDevice;
 class albaEventInteraction;
 class albaInteractionBehavior;
 class albaInteractionTool;
-class albaCameraTool;
-class albaSelectTool;
+class albaToolCamera;
+class albaToolSelect;
 
 /** Router of the input events of the devices (mouse and trackers).
   One device at a time interacts: while a device has a button pressed, the events of the other devices are ignored.
@@ -45,7 +45,7 @@ class ALBA_EXPORT albaPositionalEventRouter : public albaInteractionAgent
 public:
   albaTypeMacro(albaPositionalEventRouter,albaInteractionAgent);
 
-  /** Enable/disable the selection of the picked VME with a click (see albaSelectTool) */
+  /** Enable/disable the selection of the picked VME with a click (see albaToolSelect) */
   virtual void EnableSelect(bool enable);
 
   /** Return true if a button of the device is pressed, from the button down to the release of the button that started the interaction */
@@ -57,10 +57,10 @@ public:
   virtual void OnEvent(albaEventBase *event);
 
   /** Return the tool moving the camera, always at the bottom of the tool stack */
-  albaCameraTool *GetCameraTool() {return m_CameraTool;}
+  albaToolCamera *GetCameraTool() {return m_CameraTool;}
 
   /** Return the tool of the default actions of the clicks: selection and context menu */
-  albaSelectTool *GetSelectTool() {return m_SelectTool;}
+  albaToolSelect *GetSelectTool() {return m_SelectTool;}
 
   /** Push a tool on top of the tool stack: it receives the events before the tools
   below it and before the default actions. The PER keeps a reference to the tool. */
@@ -139,8 +139,8 @@ protected:
   std::string     m_EventTrace;     ///< who handled the current event
   std::string     m_LastEventTrace; ///< last trace written in the log
 
-  albaCameraTool *m_CameraTool; ///< tool moving the camera, at the bottom of the stack
-  albaSelectTool *m_SelectTool; ///< default actions of the clicks: selection and context menu
+  albaToolCamera *m_CameraTool; ///< tool moving the camera, at the bottom of the stack
+  albaToolSelect *m_SelectTool; ///< default actions of the clicks: selection and context menu
   std::vector<albaInteractionTool *> m_Tools; ///< the tool stack, the top is the last one
 
   albaDevice          *m_Device;             ///< the device interacting, NULL if none

@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class albaGUI;
 class albaGUIButton;
-class albaTransformBehavior;
+class albaBehaviorTransform;
 class albaInteractionBehavior;
 class albaVME;
 class albaMatrix;

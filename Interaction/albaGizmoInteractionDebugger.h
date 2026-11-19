@@ -29,7 +29,7 @@
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class albaTransformBehavior;
+class albaBehaviorTransform;
 
 
 class albaEvent;
@@ -105,7 +105,7 @@ protected:
 
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;
-  albaTransformBehavior *m_LeftMouseInteractor;
+  albaBehaviorTransform *m_LeftMouseInteractor;
   
   vtkLineSource *m_LineSource;
   vtkSphereSource  *m_SphereSource;

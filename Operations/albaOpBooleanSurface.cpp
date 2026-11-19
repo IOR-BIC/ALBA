@@ -32,8 +32,8 @@
 #include "albaVMEGizmo.h"
 #include "albaTransform.h"
 #include "mmaMaterial.h"
-#include "albaCutPlaneBehavior.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorCutPlane.h"
+#include "albaBehaviorTransform.h"
 #include "vtkALBASmartPointer.h"
 
 #include "vtkPolyData.h"

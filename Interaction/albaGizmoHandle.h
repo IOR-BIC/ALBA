@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaTransformBehavior;
+class albaBehaviorTransform;
 class albaVME;
 class vtkCubeSource;
 class vtkCylinderSource;
@@ -220,7 +220,7 @@ protected:
   void CreatePipeline();
 
 
-  albaTransformBehavior *m_IsaGen; ///< Generic Interactor style
+  albaBehaviorTransform *m_IsaGen; ///< Generic Interactor style
 
   /** Set the gizmo color */
   void SetColor(double col[3]);

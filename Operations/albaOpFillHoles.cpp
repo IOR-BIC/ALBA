@@ -29,7 +29,7 @@
 #include "albaRWIBase.h"
 #include "albaRWI.h"
 #include "albaViewVTK.h"
-#include "albaSelectPointTool.h"
+#include "albaToolSelectPoint.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"

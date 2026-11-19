@@ -33,8 +33,8 @@ bool DEBUG_MODE = true;
 #include "albaGUI.h"
 
 #include "mmaMaterial.h"
-#include "albaCutPlaneBehavior.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorCutPlane.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaSmartPointer.h"
 #include "albaVMEGizmo.h"
@@ -815,7 +815,7 @@ void albaOpInteractiveClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_e
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaTransformBehavior::MOUSE_MOVE)
+		if (arg == albaBehaviorTransform::MOUSE_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneVMEGizmo->SetAbsMatrix(absPose);

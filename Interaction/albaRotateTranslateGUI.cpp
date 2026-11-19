@@ -27,7 +27,7 @@
 #include "albaRotateTranslateGUI.h"
 #include "albaDecl.h"
 #include "albaGUI.h"
-#include "albaRotateTranslateBehavior.h"
+#include "albaBehaviorRotateTranslate.h"
 #include "albaVME.h"
 
 //----------------------------------------------------------------------------
@@ -39,8 +39,8 @@ albaRotateTranslateGUI::albaRotateTranslateGUI(albaVME *input, albaObserver *lis
   m_InputVME = input;
   m_TestMode = testMode;
   m_Gui = NULL;
-  m_RotationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
-  m_TranslationConstraintId = albaRotateTranslateBehavior::VIEW_PLANE;
+  m_RotationConstraintId = albaBehaviorRotateTranslate::VIEW_PLANE;
+  m_TranslationConstraintId = albaBehaviorRotateTranslate::VIEW_PLANE;
   m_RefSysVME = m_InputVME;
 
   m_OldBehavior = m_InputVME->GetBehavior();

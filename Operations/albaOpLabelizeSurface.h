@@ -32,7 +32,7 @@ class albaGizmoRotate;
 class albaGizmoScale;
 class albaVMESurface;
 class albaVMESurfaceEditor;
-class albaCutPlaneBehavior;
+class albaBehaviorCutPlane;
 class vtkPlane;
 class vtkPlaneSource;
 class vtkArrowSource;
@@ -101,7 +101,7 @@ protected:
 
 	void SetPlaneDimension();
 
-	albaCutPlaneBehavior *m_PlaneBehavior; ///< behavior of the plane: with gizmo only the SHIFT and CTRL clicks
+	albaBehaviorCutPlane *m_PlaneBehavior; ///< behavior of the plane: with gizmo only the SHIFT and CTRL clicks
 
 	int		m_LabelInside;
 

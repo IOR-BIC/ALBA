@@ -29,10 +29,10 @@
 #include "albaView.h"
 #include "albaDeviceButtonsPadTracker.h"
 #include "albaInteractionBehavior.h"
-#include "albaCameraTool.h"
-#include "albaCameraMouseTool.h"
-#include "albaCameraTrackerTool.h"
-#include "albaSelectTool.h"
+#include "albaToolCamera.h"
+#include "albaToolCameraMouse.h"
+#include "albaToolCameraTracker.h"
+#include "albaToolSelect.h"
 #include "albaEventBase.h"
 #include "albaEventInteraction.h"
 #include "albaVME.h"
@@ -52,8 +52,8 @@ albaPositionalEventRouter::albaPositionalEventRouter()
   m_Handler = NULL;
   m_HandlerIsBehavior = false;
 
-  m_CameraTool = albaCameraTool::New();
-  m_SelectTool = albaSelectTool::New();
+  m_CameraTool = albaToolCamera::New();
+  m_SelectTool = albaToolSelect::New();
   m_SelectTool->SetListener(this);
 }
 

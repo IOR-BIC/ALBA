@@ -29,7 +29,7 @@ const bool DEBUG_MODE = true;
 #include "albaEvent.h"
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
@@ -260,13 +260,13 @@ void albaGizmoInteractionDebugger::LogTransformEvent( albaEvent *e )
   albaString mouseActionString;
   switch(mouseAction)
   {
-  case albaTransformBehavior::MOUSE_DOWN:
+  case albaBehaviorTransform::MOUSE_DOWN:
     mouseActionString.Append("MOUSE DOWN");
     break;
-  case albaTransformBehavior::MOUSE_MOVE:
+  case albaBehaviorTransform::MOUSE_MOVE:
     mouseActionString.Append("MOUSE MOVE");
     break;
-  case albaTransformBehavior::MOUSE_UP:
+  case albaBehaviorTransform::MOUSE_UP:
     mouseActionString.Append("MOUSE UP");
     break;
   default:

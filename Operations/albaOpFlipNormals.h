@@ -33,7 +33,7 @@ class albaView;
 class albaViewVTK;
 class albaVME;
 class albaGUIDialog;
-class albaSelectCellTool;
+class albaToolSelectCell;
 
 class vtkActor;
 class vtkPolyData;
@@ -133,7 +133,7 @@ protected:
 	albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;
-	albaSelectCellTool				*m_SelectCellTool;
+	albaToolSelectCell				*m_SelectCellTool;
 	vtkALBACellsFilter			*m_CellFilter;
 	vtkPolyData					*m_Mesh;
 

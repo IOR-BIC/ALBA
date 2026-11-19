@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaGizmoScaleAxis.h"
 #include "albaGizmoScaleIsotropic.h"
 #include "albaSmartPointer.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vtk includes
 #include "vtkALBASmartPointer.h"
@@ -158,7 +158,7 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 			{
 				// if a gizmo has been picked register the active component; the sender is the component
 				// to be activated
-				if (arg == albaTransformBehavior::MOUSE_DOWN)
+				if (arg == albaBehaviorTransform::MOUSE_DOWN)
 				{
 					if (sender == m_GSAxis[X])
 					{
@@ -214,7 +214,7 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 
 					m_CurrentDist = 0;
 				}
-				else if (arg == albaTransformBehavior::MOUSE_MOVE)
+				else if (arg == albaBehaviorTransform::MOUSE_MOVE)
 				{               
 					if (m_ActiveGizmoComponent == X_AXIS || m_ActiveGizmoComponent == Y_AXIS || m_ActiveGizmoComponent == Z_AXIS)
 					{
@@ -361,7 +361,7 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 
 					if (m_BuildGUI) m_GuiGizmoScale->SetAbsScaling(scaleMat);
 				}
-				else if (arg == albaTransformBehavior::MOUSE_UP)
+				else if (arg == albaBehaviorTransform::MOUSE_UP)
 				{
 					// put the gizmo back in the initial pose  
 					SetAbsPose(m_InitialGizmoPose);
@@ -538,7 +538,7 @@ void albaGizmoScale::SendTransformMatrixFromGui(albaEventBase *alba_event)
 	refSysVMEAbsMatrix->Delete();
 
 	// notify the listener about changed vme pose
-	SendTransformMatrix(&newAbsPose, ID_TRANSFORM, albaTransformBehavior::MOUSE_MOVE);   
+	SendTransformMatrix(&newAbsPose, ID_TRANSFORM, albaBehaviorTransform::MOUSE_MOVE);   
 
 	albaSmartPointer<albaMatrix> identity;
 	identity->Identity();

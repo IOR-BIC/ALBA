@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaTransformBehavior;
+class albaBehaviorTransform;
 class albaVMEGizmo;
 class albaMatrix;
 class albaVME;
@@ -164,7 +164,7 @@ protected:
 
 
   /** isa generic*/
-  albaTransformBehavior *m_IsaGen[2];
+  albaBehaviorTransform *m_IsaGen[2];
 
   /** Gizmo color setting facilities; part can be CYLINDER or CONE*/
   void SetColor(int part, double col[3]);

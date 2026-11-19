@@ -35,7 +35,7 @@
 #include "albaVMEOutput.h"
 #include "albaVMEGizmo.h"
 #include "albaTagArray.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "albaRefSys.h"
 
 
@@ -279,7 +279,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 void albaGizmoCrossTranslateAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-	m_IsaGen = albaTransformBehavior::New();
+	m_IsaGen = albaBehaviorTransform::New();
 
 	m_IsaGen->SetVME(m_InputVme);
 	m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class albaEvent;
 
-class albaCutPlaneBehavior;
+class albaBehaviorCutPlane;
 class albaVMEGizmo;
 class albaGizmoTranslate;
 class albaGizmoRotate;
@@ -166,7 +166,7 @@ protected:
 	vtkALBAClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
-  albaCutPlaneBehavior *m_PlaneBehavior; ///< left button rotates the plane, middle button translates it
+  albaBehaviorCutPlane *m_PlaneBehavior; ///< left button rotates the plane, middle button translates it
 
 	vtkPolyData *m_ResultPolyData;
 	vtkPolyData *m_ClippedPolyData;

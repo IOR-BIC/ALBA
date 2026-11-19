@@ -27,7 +27,7 @@
 #include "albaDecl.h"
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"

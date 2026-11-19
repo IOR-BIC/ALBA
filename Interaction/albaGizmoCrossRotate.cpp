@@ -29,7 +29,7 @@
 #include "albaGizmoRotateGUI.h"
 #include "albaSmartPointer.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaMatrix.h"
 #include "albaTransform.h"
@@ -132,14 +132,14 @@ void albaGizmoCrossRotate::OnEventGizmoComponents(albaEventBase *alba_event)
 				long arg = e->GetArg();
 
 				// if a gizmo circle has been picked
-				if (arg == albaTransformBehavior::MOUSE_DOWN)
+				if (arg == albaBehaviorTransform::MOUSE_DOWN)
 				{
 					if (sender == m_GizmoCrossRotateFan)
 					{
 						this->Highlight(true);
 					}
 				}  
-				else if (arg == albaTransformBehavior::MOUSE_MOVE)
+				else if (arg == albaBehaviorTransform::MOUSE_MOVE)
 				{
 					// gizmo mode == local; gizmo is rotating during mouse move events
 					if (m_Modality == G_LOCAL)
@@ -160,7 +160,7 @@ void albaGizmoCrossRotate::OnEventGizmoComponents(albaEventBase *alba_event)
 						currTr->Delete();
 					}
 				}
-				else if (arg == albaTransformBehavior::MOUSE_UP)
+				else if (arg == albaBehaviorTransform::MOUSE_UP)
 				{
 					this->Highlight(false);
 					// gizmo mode == local
@@ -300,7 +300,7 @@ void albaGizmoCrossRotate::SetInput(albaVME *input)
 }
 
 //----------------------------------------------------------------------------  
-albaTransformBehavior *albaGizmoCrossRotate::GetInteractor(int axis)
+albaBehaviorTransform *albaGizmoCrossRotate::GetInteractor(int axis)
 //----------------------------------------------------------------------------  
 {
 	return m_GizmoCrossRotateAxisNS->GetInteractor();
@@ -335,7 +335,7 @@ void albaGizmoCrossRotate::SendTransformMatrixFromGui(albaEventBase *alba_event)
 		this->SetAbsPose(newAbsPose, true);
 
 		// send transfrom to postmultiply to the listener. Events is sent as a transform event
-		SendTransformMatrix(M, ID_TRANSFORM, albaTransformBehavior::MOUSE_MOVE);
+		SendTransformMatrix(M, ID_TRANSFORM, albaBehaviorTransform::MOUSE_MOVE);
 	}
 }
 

@@ -44,8 +44,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaTransformBehavior;
-class albaTransformBehavior;
+class albaBehaviorTransform;
+class albaBehaviorTransform;
 class albaVMEGizmo;
 class albaMatrix;
 class albaVME;
@@ -146,7 +146,7 @@ public:
 
   /**
   Get the gizmo interactor*/
-  albaTransformBehavior *GetInteractor();
+  albaBehaviorTransform *GetInteractor();
 
   /** Gizmo color setting facilities for gizmo segments;*/
   void SetColor(double col[3]);
@@ -218,7 +218,7 @@ protected:
 
 
   /** isa generic*/
-  albaTransformBehavior *m_IsaGen;
+  albaBehaviorTransform *m_IsaGen;
   
   /**
   Register the event receiver object*/

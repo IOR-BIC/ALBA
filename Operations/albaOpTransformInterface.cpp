@@ -32,7 +32,7 @@
 #include "albaGizmoRotate.h"
 #include "albaRotateTranslateGUI.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
@@ -98,7 +98,7 @@ void albaOpTransformInterface::PostMultiplyEventMatrix(albaEventBase *alba_event
     absPose.DeepCopy(tr->GetMatrix());
     absPose.SetTimeStamp(m_CurrentTime);
 
-    if (arg == albaTransformBehavior::MOUSE_MOVE)
+    if (arg == albaBehaviorTransform::MOUSE_MOVE)
     {
       // move vme
       m_Input->SetAbsMatrix(absPose);

@@ -31,7 +31,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "albaVME.h"
@@ -125,7 +125,7 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
   // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = albaTransformBehavior::New();
+  m_IsaGen = albaBehaviorTransform::New();
 
   //isa will send events to this
 	if(m_ConstraintModality==BOUNDS)

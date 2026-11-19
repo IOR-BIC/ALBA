@@ -31,7 +31,7 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -174,7 +174,7 @@ void albaGizmoRotateCircle::CreateISA()
   // Default isa constrain rotation around X axis.
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = albaTransformBehavior::New();
+  m_IsaGen = albaBehaviorTransform::New();
   m_IsaGen->SetVME(m_InputVme);
   m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK); 
   m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
@@ -277,7 +277,7 @@ void albaGizmoRotateCircle::OnEvent(albaEventBase *alba_event)
   {
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
+      if (e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }
@@ -345,7 +345,7 @@ void albaGizmoRotateCircle::SetInput(albaVME *vme)
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-albaTransformBehavior *albaGizmoRotateCircle::GetInteractor()
+albaBehaviorTransform *albaGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
   return m_IsaGen;

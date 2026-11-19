@@ -31,7 +31,7 @@
 #include "albaDecl.h"
 
 // isa stuff
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -244,7 +244,7 @@ void albaGizmoCrossRotateFan::OnEvent(albaEventBase *alba_event)
         assert(e->GetString() == NULL);
         e->SetString(&activeAxisStringToSend);
 
-        if (e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
+        if (e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
         {
           //----------------------------------------
           // compute start theta for the sphere
@@ -276,7 +276,7 @@ void albaGizmoCrossRotateFan::OnEvent(albaEventBase *alba_event)
           e->SetSender(this);
           albaEventMacro(*e);
         }
-        else if (e->GetArg() == albaTransformBehavior::MOUSE_MOVE)
+        else if (e->GetArg() == albaBehaviorTransform::MOUSE_MOVE)
         {
           double dTheta = e->GetDouble();
         
@@ -319,7 +319,7 @@ void albaGizmoCrossRotateFan::OnEvent(albaEventBase *alba_event)
           
           albaEventMacro(*e);
         }
-        else if (e->GetArg() == albaTransformBehavior::MOUSE_UP)
+        else if (e->GetArg() == albaBehaviorTransform::MOUSE_UP)
         {
 
           // reset m_StartTheta and m_EndTheta

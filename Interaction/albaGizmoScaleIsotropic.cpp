@@ -29,7 +29,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -132,7 +132,7 @@ void albaGizmoScaleIsotropic::CreateISA()
   // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = albaTransformBehavior::New();
+  m_IsaGen = albaBehaviorTransform::New();
 
   m_IsaGen->SetVME(m_InputVme);
   m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

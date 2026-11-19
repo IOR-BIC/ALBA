@@ -32,11 +32,11 @@
 #include "albaView.h"
 #include "albaEvent.h"
 #include "albaDeviceButtonsPad.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "albaTransform.h"
 #include "albaInteractionTool.h"
-#include "albaCameraTool.h"
-#include "albaSelectTool.h"
+#include "albaToolCamera.h"
+#include "albaToolSelect.h"
 #include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public:
   virtual void OnEvent(albaEventBase *event)
   {
     albaEvent *e = albaEvent::SafeDownCast(event);
-    if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
+    if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
     {
       m_MouseDownCount++;
       albaTransform::GetPosition(*albaMatrix::SafeDownCast(e->GetMafObject()), m_PickedPosition);
@@ -232,7 +232,7 @@ void albaPositionalEventRouterTest::TestGetCameraTool()
 {
   albaPositionalEventRouter *mip = albaPositionalEventRouter::New();
 
-  albaCameraTool *camera = mip->GetCameraTool();
+  albaToolCamera *camera = mip->GetCameraTool();
   CPPUNIT_ASSERT(camera != NULL);
   CPPUNIT_ASSERT(camera->GetMouseTool() != NULL);
   CPPUNIT_ASSERT(camera->GetTrackerTool() != NULL);
@@ -368,7 +368,7 @@ void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
   albaVMESurface *vme = albaVMESurface::New();
   view->m_FakeVme = vme;
 
-  albaTransformBehavior *generic = albaTransformBehavior::New();
+  albaBehaviorTransform *generic = albaBehaviorTransform::New();
   albaPERTestTransformListener listener;
   generic->SetListener(&listener);
   generic->SetRendererAndView(NULL, view);
@@ -397,7 +397,7 @@ void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
 
 void albaPositionalEventRouterTest::TestTransformBehaviorButtons()
 {
-  albaTransformBehavior *transform = albaTransformBehavior::New();
+  albaBehaviorTransform *transform = albaBehaviorTransform::New();
   double pos[2] = {10, 20};
 
   // without a renderer the transform does not start, and drags and button up are not used
@@ -677,7 +677,7 @@ void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
   albaNEW(tool);
   tool->m_UseLeft = true;
   per->PushTool(tool);
-  albaCameraTool *camera = per->GetCameraTool();
+  albaToolCamera *camera = per->GetCameraTool();
 
   // the camera gets the button down of the tool too, ready to move with the drags the tool does not use
   tool->m_UseDrag = false;
@@ -686,7 +686,7 @@ void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
   CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == tool);
   per->SetEventTracing(true);
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
-  CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("Tool albaPERTestTool, Camera albaCameraMouseTool") != std::string::npos);
+  CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("Tool albaPERTestTool, Camera albaToolCameraMouse") != std::string::npos);
   per->SetEventTracing(false);
 
   // the button up goes to the tool and ends the camera motion

@@ -42,7 +42,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaTransformBehavior;
+class albaBehaviorTransform;
 class albaVME;
 class albaVMEGizmo;
 class albaMatrix;
@@ -202,9 +202,9 @@ protected:
 
 
   /** isa generic*/
-  albaTransformBehavior *m_IsaGen[2];
+  albaBehaviorTransform *m_IsaGen[2];
 
-  /** Used by albaTransformBehavior */
+  /** Used by albaBehaviorTransform */
   vtkTransform *m_PivotTransform;
 
   /**

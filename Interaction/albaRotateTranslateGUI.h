@@ -26,10 +26,10 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class albaInteractionBehavior;
-class albaRotateTranslateBehavior;
+class albaBehaviorRotateTranslate;
 class albaVME;
 
-/** GUI of the transform mouse behavior: it creates an albaRotateTranslateBehavior for the VME, assigns it to
+/** GUI of the transform mouse behavior: it creates an albaBehaviorRotateTranslate for the VME, assigns it to
   the VME while the widgets are enabled, and lets the user choose the rotation and translation constraints.
   The transforms of the behavior are forwarded to the listener (ID_TRANSFORM, sent by this object). */
 class ALBA_EXPORT albaRotateTranslateGUI : public albaTransformInterfaceGUI
@@ -57,12 +57,12 @@ public:
   void AttachInteractorToVme();
   void DetachInteractorFromVme();
 
-  /** Set the constraints, as albaRotateTranslateBehavior::TRANSFORM_CONSTRAINT */
+  /** Set the constraints, as albaBehaviorRotateTranslate::TRANSFORM_CONSTRAINT */
   void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
   /** Return the behavior moving the VME */
-  albaRotateTranslateBehavior *GetBehavior() {return m_Behavior;}
+  albaBehaviorRotateTranslate *GetBehavior() {return m_Behavior;}
 
 protected:
   /** Override superclass */
@@ -71,7 +71,7 @@ protected:
   /** Override superclass */
   void RefSysVmeChanged();
 
-  albaRotateTranslateBehavior *m_Behavior;  ///< the behavior moving the VME
+  albaBehaviorRotateTranslate *m_Behavior;  ///< the behavior moving the VME
   albaInteractionBehavior *m_OldBehavior;  ///< the behavior of the VME before this one
 
   int m_RotationConstraintId;

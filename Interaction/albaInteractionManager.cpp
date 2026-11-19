@@ -56,7 +56,7 @@
 #include "albaAction.h"
 #include "albaDeviceSet.h"
 #include "albaDeviceButtonsPadMouse.h"
-#include "albaFlyToTool.h"
+#include "albaToolFlyTo.h"
   
 #include "albaVME.h"
 #include "albaVMEGizmo.h"

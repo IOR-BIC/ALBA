@@ -40,9 +40,9 @@
 #include "albaSaveRestorePoseGUITest.h"
 #include "albaTransformInterfaceGUITest.h"
 #include "albaRotateTranslateGUITest.h"
-#include "albaRotateTranslateBehaviorTest.h"
-#include "albaFlyToToolTest.h"
-#include "albaSelectToolTest.h"
+#include "albaBehaviorRotateTranslateTest.h"
+#include "albaToolFlyToTest.h"
+#include "albaToolSelectTest.h"
 #include "albaTransformTextEntriesGUITest.h"
 #include "albaGizmoBoundingBoxTest.h"
 #include "albaGizmoHandleTest.h"
@@ -64,19 +64,19 @@
 #include "albaGizmoTranslateTest.h"
 #include "albaInteractionFactoryTest.h"
 #include "albaInteractorConstraintTest.h"
-#include "albaExtractIsosurfaceToolTest.h"
+#include "albaToolExtractIsosurfaceTest.h"
 #include "albaPositionalEventRouterTest.h"
 #include "albaStaticEventRouterTest.h"
-#include "albaSelectCellToolTest.h"
+#include "albaToolSelectCellTest.h"
 #include "albaInteractionBehaviorTest.h"
 #include "albaRefSysTest.h"
 #include "albaServiceLocator.h"
 
-#include "albaVTKPickerToolTest.h"
-#include "albaSelectPointToolTest.h"
+#include "albaToolVTKPickerTest.h"
+#include "albaToolSelectPointTest.h"
 #include "albaPickHelperTest.h"
 #include "albaInteractionRoutingTest.h"
-#include "albaDICOMImporterToolTest.h"
+#include "albaToolDICOMImporterTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -130,7 +130,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoRotateFanTest::suite()); 
 	runner.addTest(albaGizmoPathTest::suite());
 	runner.addTest(albaGizmoPathRulerTest::suite());
-	runner.addTest(albaSelectCellToolTest::suite());
+	runner.addTest(albaToolSelectCellTest::suite());
 	runner.addTest(albaGizmoTranslateAxisTest::suite());
 	runner.addTest(albaGizmoTranslatePlaneTest::suite());
 	runner.addTest(albaGizmoBoundingBoxTest::suite());
@@ -162,7 +162,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaDeviceTest::suite());
 	runner.addTest(albaGizmoScaleAxisTest::suite());
 	runner.addTest(albaGizmoScaleTest::suite());
-	runner.addTest(albaExtractIsosurfaceToolTest::suite());
+	runner.addTest(albaToolExtractIsosurfaceTest::suite());
 	runner.addTest(albaInteractionBehaviorTest::suite());
 	runner.addTest(albaAvatarTest::suite());
 	runner.addTest(albaStaticEventRouterTest::suite());
@@ -170,15 +170,15 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaTransformInterfaceGUITest::suite());
 	runner.addTest(albaAvatar3DConeTest::suite());
 	runner.addTest(albaRotateTranslateGUITest::suite());
-	runner.addTest(albaRotateTranslateBehaviorTest::suite());
-	runner.addTest(albaFlyToToolTest::suite());
-	runner.addTest(albaSelectToolTest::suite());
+	runner.addTest(albaBehaviorRotateTranslateTest::suite());
+	runner.addTest(albaToolFlyToTest::suite());
+	runner.addTest(albaToolSelectTest::suite());
 	runner.addTest(albaGizmoPolylineGraphTest::suite());
-	runner.addTest(albaVTKPickerToolTest::suite());
-	runner.addTest(albaSelectPointToolTest::suite());
+	runner.addTest(albaToolVTKPickerTest::suite());
+	runner.addTest(albaToolSelectPointTest::suite());
 	runner.addTest(albaPickHelperTest::suite());
 	runner.addTest(albaInteractionRoutingTest::suite());
-	runner.addTest(albaDICOMImporterToolTest::suite());
+	runner.addTest(albaToolDICOMImporterTest::suite());
 
 	runner.run( controller );
 

@@ -32,7 +32,7 @@ const bool DEBUG_MODE = true;
 #include "albaEvent.h"
 #include "mmaMaterial.h"
 #include "albaGUIMaterialButton.h"
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"

@@ -40,7 +40,7 @@
 #include "albaObserver.h"
 #include "albaTransform.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "vtkDiskSource.h"
 #include "vtkALBASmartPointer.h"

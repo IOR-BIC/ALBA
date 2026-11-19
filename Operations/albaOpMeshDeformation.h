@@ -19,7 +19,7 @@
 
 #include "albaDefines.h"
 #include "albaOp.h"
-#include "albaVTKPickerTool.h"
+#include "albaToolVTKPicker.h"
 
 #define DEBUG_albaOpMeshDeformation
 //----------------------------------------------------------------------------
@@ -408,7 +408,7 @@ protected:
   albaRWI *m_Rwi;	       //<rendering window
   albaViewVTK *m_View = NULL;            ///< the view of the dialog: the mouse and the interaction work on it
   albaView *m_OldSelectedView = NULL;  ///< view selected before the operation
-  albaVTKPickerTool					  *m_Picker;     //<picks VTK objects
+  albaToolVTKPicker					  *m_Picker;     //<picks VTK objects
 
   vtkSphereSource* m_Spheres[2];        //<this is the source for glyph of vertices
   double m_SphereRadius[2];             //<this is its radius

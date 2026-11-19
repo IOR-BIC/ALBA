@@ -37,7 +37,7 @@
 
 #include "albaVME.h"
 #include "albaVMESurface.h"
-#include "albaSelectCellTool.h"
+#include "albaToolSelectCell.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"

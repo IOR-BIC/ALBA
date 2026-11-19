@@ -35,7 +35,7 @@
 #include "albaSaveRestorePoseGUI.h"
 #include "albaTransformTextEntriesGUI.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "albaSmartPointer.h"
 #include "albaTransform.h"

@@ -39,7 +39,7 @@
 #include "albaObserver.h"
 #include "albaTransform.h"
 
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPoints.h"

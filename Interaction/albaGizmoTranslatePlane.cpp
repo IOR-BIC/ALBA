@@ -29,7 +29,7 @@
 #include "albaRefSys.h"
 
 // isa stuff
-#include "albaTransformBehavior.h"
+#include "albaBehaviorTransform.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -240,7 +240,7 @@ void albaGizmoTranslatePlane::CreateISA()
   {
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    m_IsaGen[i] = albaTransformBehavior::New();
+    m_IsaGen[i] = albaBehaviorTransform::New();
     m_IsaGen[i]->SetVME(m_InputVme);
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);     
     
@@ -391,7 +391,7 @@ void albaGizmoTranslatePlane::OnEvent(albaEventBase *alba_event)
     // mouse down change gizmo selection status
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == albaTransformBehavior::MOUSE_DOWN)
+      if (e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }
