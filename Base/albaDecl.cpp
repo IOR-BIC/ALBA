@@ -420,7 +420,6 @@ wxString  albaIdString(int id)
      case ID_APP_SETTINGS:	    s="ID_APP_SETTINGS"; break; 
 
      case UPDATE_UI:	          s="UPDATE_UI"; break; 
-     case UPDATE_PROPERTY:      s="UPDATE_PROPERTY"; break; 
 
      case VME_ADDED:	          s="VME_ADDED"; break; 
      case VME_REMOVING:	        s="VME_REMOVING"; break; 

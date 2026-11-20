@@ -123,7 +123,7 @@ void albaGUIMaterialButton::OnEvent(albaEventBase *alba_event)
         albaGUIMaterialChooser chooser;
         if (chooser.ShowChooserDialog(m_Vme))
         {
-          GetViewManager()->PropertyUpdate();
+          GetViewManager()->PropertyUpdate(m_Vme);
           GetLogicManager()->VmeModified(m_Vme);
           albaEventMacro(albaEvent(this, VME_MATERIAL_CHANGED, m_Vme));
         }
@@ -135,9 +135,10 @@ void albaGUIMaterialButton::OnEvent(albaEventBase *alba_event)
 			case ID_OPACITY:
 				m_Material->m_Prop->SetOpacity(m_Material->m_Opacity);
 				UpdateMaterialIcon();
-				GetViewManager()->PropertyUpdate();
+				GetViewManager()->PropertyUpdate(m_Vme);
 
 				GetViewManager()->CameraUpdate();
+      break;
       default:
         e->Log();
     }

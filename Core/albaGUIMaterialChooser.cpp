@@ -447,7 +447,7 @@ void albaGUIMaterialChooser::OnEvent(albaEventBase *alba_event)
         assert(m_VmeMaterial);
         m_VmeMaterial->DeepCopy(m_ChoosedMaterial);
         m_VmeMaterial->m_Prop->DeepCopy(m_Property);
-				GetViewManager()->PropertyUpdate();
+				GetViewManager()->PropertyUpdate(m_Vme);
 				GetViewManager()->CameraUpdate();
       break;
       //case wxCANCEL:

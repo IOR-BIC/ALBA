@@ -20,6 +20,7 @@
 #include "albaConfigure.h"
 
 class albaView;
+class albaVME;
 
 /** Services of the view manager, reached through albaServiceClient::GetViewManager() */
 class ALBA_EXPORT albaAbsViewManager
@@ -37,8 +38,8 @@ public:
 	/** End a camera update skip: the outermost one updates the cameras if an update was requested meanwhile */
 	virtual void DisableCameraUpdateSkip() = 0;
 
-	/** Update the visual properties of all the views (from the VMEs tags if fromTag is true) */
-	virtual void PropertyUpdate(bool fromTag = false) = 0;
+	/** Update the visual properties of vme (the selected VME if NULL) in all the views, from its tags if fromTag is true */
+	virtual void PropertyUpdate(albaVME *vme = NULL, bool fromTag = false) = 0;
 
 	/** Return the open view with the given label, NULL if none */
 	virtual albaView *GetFromOpenedViews(const char *label) = 0;

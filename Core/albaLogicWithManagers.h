@@ -382,9 +382,6 @@ protected:
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
-	//Update Vme Visual Properties
-	virtual void VmeUpdateProperties(albaVME *vme, bool updatePropertyFromTag);
-
 	/** Called when an operation starts. Disable all menu and lock the Selection */
 	virtual void OpRunStarting();
 	/** Called when an operation stops. Re-enable all menu and unlock the Selection */

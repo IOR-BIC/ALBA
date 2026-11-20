@@ -173,7 +173,8 @@ void albaOpDecimateSurface::OnEvent(albaEventBase *alba_event)
           else
             surface->GetMaterial()->m_Prop->SetRepresentationToSurface();
 
-          albaEventMacro(albaEvent(this,UPDATE_PROPERTY,m_Input, true));
+          GetViewManager()->PropertyUpdate(m_Input, true);
+          GetLogicManager()->VmeModified(m_Input);
 					GetViewManager()->CameraUpdate();
         }
       break;
@@ -206,7 +207,9 @@ void albaOpDecimateSurface::OpStop(int result)
   albaVMESurface *surface;
   surface = albaVMESurface::SafeDownCast(m_Input);
   surface->GetMaterial()->m_Prop->SetRepresentationToSurface();
-  albaEventMacro(albaEvent(this,UPDATE_PROPERTY,m_Input, true));
+  GetViewManager()->PropertyUpdate(m_Input, true);
+  GetLogicManager()->VmeModified(m_Input);
+  GetViewManager()->CameraUpdate();
 
 	HideGui();
 	albaEventMacro(albaEvent(this,result));

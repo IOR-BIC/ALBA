@@ -330,10 +330,13 @@ void albaViewManager::VmeShow(albaVME *vme, bool show)
     m_SelectedView->VmeShow(vme, show); // show the vme in the selected view
 }
 //----------------------------------------------------------------------------
-void albaViewManager::PropertyUpdate(bool fromTag)
+void albaViewManager::PropertyUpdate(albaVME *vme, bool fromTag)
 {
-  for(albaView* v = m_ViewList; v; v=v->m_Next) 
-		v->VmeUpdateProperty(this->m_SelectedVme, fromTag); // update the vme properties in all views
+	if (vme == NULL)
+		vme = m_SelectedVme;
+
+  for(albaView* v = m_ViewList; v; v=v->m_Next)
+		v->VmeUpdateProperty(vme, fromTag); // update the vme properties in all views
 }
 //----------------------------------------------------------------------------
 void albaViewManager::CameraReset(bool sel)   

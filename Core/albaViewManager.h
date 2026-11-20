@@ -124,8 +124,8 @@ public:
 	/** End a camera update skip: the outermost one updates the cameras if an update was requested meanwhile */
 	virtual void DisableCameraUpdateSkip() override;
 
-	/** Call PropertyUpdate for all views. */
-	virtual void PropertyUpdate(bool fromTag = false) override;
+	/** Update the visual properties of vme (the selected VME if NULL) in all the views, from its tags if fromTag is true */
+	virtual void PropertyUpdate(albaVME *vme = NULL, bool fromTag = false) override;
 
   /** Return the selected view. */
 	albaView *GetSelectedView();

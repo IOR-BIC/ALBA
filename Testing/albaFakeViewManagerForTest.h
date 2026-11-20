@@ -27,7 +27,7 @@ public:
 	virtual void CameraReset(bool fitSelectedVme = false) override {}
 	virtual void EnableCameraUpdateSkip() override {}
 	virtual void DisableCameraUpdateSkip() override {}
-	virtual void PropertyUpdate(bool fromTag = false) override {}
+	virtual void PropertyUpdate(albaVME *vme = NULL, bool fromTag = false) override {}
 	virtual albaView *GetFromOpenedViews(const char *label) override { return NULL; }
 	virtual albaView *ViewCreate(int id) override { return NULL; }
 };

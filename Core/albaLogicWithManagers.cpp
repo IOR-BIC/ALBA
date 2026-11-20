@@ -653,9 +653,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case VME_REMOVING:
 			VmeRemoving(e->GetVme());
 			break;
-		case UPDATE_PROPERTY:
-			VmeUpdateProperties(e->GetVme(), e->GetBool());
-			break;
 		case SHOW_TREE_CONTEXTUAL_MENU:
 			TreeContextualMenu(*e);
 			break;
@@ -1311,13 +1308,6 @@ void albaLogicWithManagers::VmeSelected(albaVME *vme)
 	EnableMenuAndToolbar();
 }
 
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::VmeUpdateProperties(albaVME *vme, bool updatePropertyFromTag)
-{
-	this->m_ViewManager->PropertyUpdate(updatePropertyFromTag);
-	this->m_ViewManager->CameraUpdate();
-	this->m_VMEManager->MSFModified(true);
-}
 
 
 //----------------------------------------------------------------------------

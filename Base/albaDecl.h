@@ -148,7 +148,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	HELP_HOME,
 
 	UPDATE_UI,           // update menu and toolbar widgets
-	UPDATE_PROPERTY,     // update vme property widgets
 											 // connect a vtkObject to the ProgressBar
 											 BIND_TO_PROGRESSBAR,
 											 // manually set the ProgressBar status
