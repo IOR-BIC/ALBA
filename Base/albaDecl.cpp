@@ -440,24 +440,12 @@ wxString  albaIdString(int id)
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
 
      case CAMERA_FRONT:	        s="CAMERA_FRONT"; break; 
-     case CAMERA_BACK:	        s="CAMERA_BACK"; break; 
-     case CAMERA_LEFT:	        s="CAMERA_LEFT"; break; 
-     case CAMERA_RIGHT:	        s="CAMERA_RIGHT"; break; 
-     case CAMERA_TOP:	          s="CAMERA_TOP"; break; 
-     case CAMERA_BOTTOM:	      s="CAMERA_BOTTOM"; break; 
      case CAMERA_PERSPECTIVE:	  s="CAMERA_PERSPECTIVE"; break; 
      case CAMERA_RX_FRONT:	    s="CAMERA_RX_FRONT"; break; 
      case CAMERA_RX_LEFT:	      s="CAMERA_RX_LEFT"; break; 
      case CAMERA_RX_RIGHT:	    s="CAMERA_RX_RIGHT"; break; 
     // modified by Stefano 21-9-2004 (begin)
-    case CAMERA_RXFEM_XNEG:     s="CAMERA_RXFEM_XNEG";break;
-    case CAMERA_RXFEM_XPOS:     s="CAMERA_RXFEM_XPOS";break;
-    case CAMERA_RXFEM_YNEG:     s="CAMERA_RXFEM_YNEG";break;
-    case CAMERA_RXFEM_YPOS:     s="CAMERA_RXFEM_YPOS";break;
-    case CAMERA_RXFEM_ZNEG:     s="CAMERA_RXFEM_ZNEG";break;
-    case CAMERA_RXFEM_ZPOS:     s="CAMERA_RXFEM_ZPOS";break;
     // modified by Stefano 21-9-2004 (end)
-		 case CAMERA_BLEND:					s="CAMERA_BLEND";break;
      case CAMERA_CT:						s="CAMERA_CT"; break; 
      case CAMERA_OS_X:	        s="CAMERA_OS_X"; break; 
      case CAMERA_OS_Y:	        s="CAMERA_OS_Y"; break; 

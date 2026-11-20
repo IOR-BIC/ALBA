@@ -178,29 +178,15 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VIEW_RESIZE,   // from anyone that want to block the view's size.
 
 											 CAMERA_FRONT,  // constant used in albaRWIxxx to initialize Camera pos
-											 CAMERA_BACK,
-											 CAMERA_LEFT,
-											 CAMERA_RIGHT,
-											 CAMERA_TOP,
-											 CAMERA_BOTTOM,
 											 CAMERA_PERSPECTIVE,
 											 CAMERA_RX_FRONT,
 											 CAMERA_RX_LEFT,
 											 CAMERA_RX_RIGHT,
-											 CAMERA_DRR_FRONT,
-											 CAMERA_DRR_LEFT,
-											 CAMERA_DRR_RIGHT,
 											 CAMERA_CT,
 											 CAMERA_OS_X,
 											 CAMERA_OS_Y,
 											 CAMERA_OS_Z,
 											 CAMERA_OS_P,
-											 CAMERA_PERSPECTIVE_FRONT,
-											 CAMERA_PERSPECTIVE_BACK,
-											 CAMERA_PERSPECTIVE_LEFT,
-											 CAMERA_PERSPECTIVE_RIGHT,
-											 CAMERA_PERSPECTIVE_TOP,
-											 CAMERA_PERSPECTIVE_BOTTOM,
 											 CAMERA_ARB, //Camera with arbitrary look vector
 
 											 CAMERA_SYNCHRONOUS_UPDATE, // from Interaction Manager to perform a view update
@@ -209,16 +195,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 CAMERA_FIT,
 											 CAMERA_FLYTO,
 
-																		 // modified by Stefano 21-9-2004 (begin)
-																		 CAMERA_RXFEM_XNEG, //(to be moved elsewhere Marco)
-																		 CAMERA_RXFEM_XPOS, //(to be moved elsewhere Marco)
-																		 CAMERA_RXFEM_YNEG, //(to be moved elsewhere Marco)
-																		 CAMERA_RXFEM_YPOS, //(to be moved elsewhere Marco)
-																		 CAMERA_RXFEM_ZNEG, //(to be moved elsewhere Marco)
-																		 CAMERA_RXFEM_ZPOS, //(to be moved elsewhere Marco)
-																												//  //modified by Stefano 21-9-2004 (end)
 
-																												CAMERA_BLEND,
 
 																												OP_RUN_OK,
 																												OP_RUN_CANCEL,

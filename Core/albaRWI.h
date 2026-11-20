@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "albaDecl.h"
 #include "albaRWIBase.h"
 #include "albaObserver.h"
 #include "albaAxes.h"
@@ -45,6 +46,33 @@ enum RWI_LAYERS
 {
 	ONE_LAYER = 0,
 	TWO_LAYER
+};
+
+/** Camera positions used only inside albaRWI (the ones the views pass to albaRWI are in albaDecl.h).
+They start after ALBA_BASE_ID, so they never take the value of a camera position of albaDecl.h handled by the same switch. */
+enum RWI_CAMERA_POSITIONS
+{
+	CAMERA_BACK = ALBA_BASE_ID + 1,
+	CAMERA_LEFT,
+	CAMERA_RIGHT,
+	CAMERA_TOP,
+	CAMERA_BOTTOM,
+	CAMERA_DRR_FRONT,
+	CAMERA_DRR_LEFT,
+	CAMERA_DRR_RIGHT,
+	CAMERA_PERSPECTIVE_FRONT,
+	CAMERA_PERSPECTIVE_BACK,
+	CAMERA_PERSPECTIVE_LEFT,
+	CAMERA_PERSPECTIVE_RIGHT,
+	CAMERA_PERSPECTIVE_TOP,
+	CAMERA_PERSPECTIVE_BOTTOM,
+	CAMERA_RXFEM_XNEG,
+	CAMERA_RXFEM_XPOS,
+	CAMERA_RXFEM_YNEG,
+	CAMERA_RXFEM_YPOS,
+	CAMERA_RXFEM_ZNEG,
+	CAMERA_RXFEM_ZPOS,
+	CAMERA_BLEND,
 };
 //----------------------------------------------------------------------------
 // albaRWI :
