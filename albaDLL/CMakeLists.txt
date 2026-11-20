@@ -86,7 +86,6 @@ SET(CORE_SRCS
   ../Core/albaAttributeTraceability.cpp  ../Core/albaAttributeTraceability.h
   ../Core/albaCoreFactory.cpp  			../Core/albaCoreFactory.h
   ../Core/albaDataPipe.cpp  				../Core/albaDataPipe.h
-  ../Core/albaEventIO.cpp  				../Core/albaEventIO.h
   ../Core/albaMatrixPipe.cpp  			../Core/albaMatrixPipe.h
   ../Core/albaVMEIterator.cpp  			../Core/albaVMEIterator.h
   ../Core/albaOp.cpp  ../Core/albaOp.h

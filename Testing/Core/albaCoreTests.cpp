@@ -27,7 +27,6 @@
 #include "albaAxesTest.h"
 #include "albaCoreFactoryTest.h"
 #include "albaDataPipeTest.h"
-#include "albaEventIOTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaGUITreeContextualMenuTest.h"
 #include "albaMatrixPipeTest.h"
@@ -212,7 +211,6 @@ int main(int argc, char* argv[])
 	runner.addTest(albaVMEFactoryTest::suite());
 	runner.addTest(albaMatrixPipeTest::suite());
 	runner.addTest(albaGUITreeContextualMenuTest::suite());
-	runner.addTest(albaEventIOTest::suite());
 	runner.addTest(albaDataPipeTest::suite());
 	runner.addTest(albaAxesTest::suite());
 	runner.addTest(albaAttributeTraceabilityTest::suite());

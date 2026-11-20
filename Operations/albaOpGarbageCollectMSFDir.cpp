@@ -29,7 +29,6 @@
 #include "albaGUI.h"
 
 #include "albaVMEStorage.h"
-#include "albaEventIO.h"
 #include "albaDataVector.h"
 #include "albaVMEItem.h"
 #include "albaVMEGenericAbstract.h"

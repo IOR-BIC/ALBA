@@ -27,7 +27,6 @@
 
 #include "albaOpImporterRAWImages.h"
 #include "albaEvent.h"
-#include "albaEventIO.h"
 #include "albaStorage.h"
 #include "albaGUI.h"
 #include "albaOp.h"
