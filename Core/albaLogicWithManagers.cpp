@@ -317,6 +317,7 @@ void albaLogicWithManagers::Configure()
 	if (m_UseOpManager)
 	{
 		m_OpManager = new albaOpManager();
+		albaServiceLocator::SetOpManager(m_OpManager);
 		m_OpManager->SetListener(this);
 		m_OpManager->SetMouse(m_Mouse);
 		m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
@@ -507,6 +508,8 @@ void albaLogicWithManagers::OnQuit()
 #ifdef ALBA_USE_VTK
 	cppDEL(m_InteractionManager);
 #endif
+	if (albaServiceLocator::GetOpManager() == m_OpManager)
+		albaServiceLocator::SetOpManager(NULL);
 	cppDEL(m_OpManager);
 
 	// must be deleted after m_VMEManager
@@ -685,12 +688,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			if (m_OpManager)
 			{
 				m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
-			}
-			break;
-		case CLEAR_UNDO_STACK:
-			if (!m_OpManager->Running())
-			{
-				m_OpManager->ClearUndoStack();
 			}
 			break;
 		case OP_RUN_STARTING:
@@ -1467,6 +1464,12 @@ void albaLogicWithManagers::ViewCreated(albaView *v)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::SelectView(albaView *view)
 {
+	if (m_ViewManager && view)
+		m_ViewManager->ViewSelected(view);
+
+	if (view == m_SelectedView)
+		return;
+
 	m_SelectedView = view;
 
 	if (m_SideBar)

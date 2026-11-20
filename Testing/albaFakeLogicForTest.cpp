@@ -137,10 +137,6 @@ void albaFakeLogicForTest::PrintImage(albaVMEImage *img)
 }
 
 //----------------------------------------------------------------------------
-albaOpManager * albaFakeLogicForTest::GetOpManager() const
-{
-	return NULL;
-}
 
 //----------------------------------------------------------------------------
 albaProsthesesDBManager * albaFakeLogicForTest::GetProsthesesDBManager()

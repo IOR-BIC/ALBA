@@ -59,7 +59,7 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,albaOp*);
 // albaOpManager :
 //----------------------------------------------------------------------------
 /**  */
-class ALBA_EXPORT albaOpManager: public albaObserver, public albaServiceClient
+class ALBA_EXPORT albaOpManager: public albaObserver, public albaServiceClient, public albaAbsOpManager
 {
 public:
 	         albaOpManager();
@@ -129,8 +129,8 @@ public:
 	/** return true if there is a running operation. */
   virtual bool Running()								 {return m_Context.Caller() != NULL;};
 
-	/** Clear the stack of executed operation. */
-  virtual void ClearUndoStack(); 
+	/** Clear the stack of executed operation and the clipboard; ignored while an operation is running. */
+  virtual void ClearUndoStack() override;
 
 	/** Try to Stop the Current operation with OK condition. */
 	virtual bool ForceStopWithOk();
@@ -163,7 +163,7 @@ public:
   albaUser* GetMafUser(){return m_User;};
 
 	/** Enable/Disable the men items operation. */
-	virtual void EnableOp(bool CanEnable = true);
+	virtual void EnableOp(bool CanEnable = true) override;
 
 
 	/**Set Build Num*/

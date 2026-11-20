@@ -169,7 +169,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VIEW_CREATE,   // from menu to albaViewManager
 											 VIEW_CREATED,  // from albaViewManager to Logic
 											 VIEW_DELETE,   // from albaGUIMDIChild to albaViewManager
-											 VIEW_SELECT,   // from albaGUIMDIChild and albaGUIViewPanel to albaViewManager
 											 VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
 											 VIEW_MAXIMIZE, // from albaGUI to albaGUICrossSplitter
 											 VIEW_RESIZE,   // from anyone that want to block the view's size.
@@ -203,7 +202,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 																												IMPORT_FILE, // used when drag a non msf or zmsf file into the application as a VTK file.
 
-																												CLEAR_UNDO_STACK, // used by albaGUIMDIFrame to clear UnDo stack when the application is running in low memory
 
 
 																												//used by albaISATransform to talk with albaOpTransform 

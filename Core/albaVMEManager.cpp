@@ -190,7 +190,8 @@ void albaVMEManager::MSFNew()
   if (m_Storage)
   {
     m_Storage->GetRoot()->CleanTree();
-    albaEventMacro(albaEvent(this,CLEAR_UNDO_STACK)); // ask logic to clear the undo stack
+    if (albaServiceLocator::GetOpManager())
+      albaServiceLocator::GetOpManager()->ClearUndoStack();
   }
 
   RemoveTempDirectory(); // remove the temporary directory

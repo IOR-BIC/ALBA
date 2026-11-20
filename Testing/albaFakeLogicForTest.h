@@ -89,8 +89,6 @@ public:
 	
 	virtual void PrintImage(albaVMEImage *img) override;
 
-	virtual albaOpManager * GetOpManager() const override;
-
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() override;
 
 	virtual bool IsVMEExpanded(albaVME *vme) override;

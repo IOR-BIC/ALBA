@@ -27,6 +27,7 @@
 
 
 #include "albaGUIViewFrame.h"
+#include "albaServiceLocator.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaView.h"
@@ -98,8 +99,7 @@ void albaGUIViewFrame::OnSize(wxSizeEvent &event)
 void albaGUIViewFrame::OnSelect(wxCommandEvent &event) 
 //----------------------------------------------------------------------------
 {
-  wxWindow *rwi = (wxWindow*)event.GetEventObject();
-  albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,rwi));
+  albaServiceLocator::GetLogicManager()->SelectView(m_View);
 }
 //----------------------------------------------------------------------------
 void albaGUIViewFrame::OnActivate(wxActivateEvent& event)
@@ -107,7 +107,7 @@ void albaGUIViewFrame::OnActivate(wxActivateEvent& event)
 { 
 	if( event.GetActive() && !m_Quitting )
   {
-		albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
+		albaServiceLocator::GetLogicManager()->SelectView(m_View);
 	  Layout();
 	}
 }

@@ -29,7 +29,6 @@ class albaDeviceButtonsPadMouseRemoteTest : public albaTest
     CPPUNIT_TEST(TestOnEventMouse2DMove);
     CPPUNIT_TEST(TestOnEventButtonDown);
     CPPUNIT_TEST(TestOnEventButtonUp);
-    CPPUNIT_TEST(TestOnEventViewSelect);
     CPPUNIT_TEST(TestOnEventViewDelete);
   CPPUNIT_TEST_SUITE_END();
 
@@ -40,7 +39,6 @@ class albaDeviceButtonsPadMouseRemoteTest : public albaTest
   void TestOnEventMouse2DMove();
   void TestOnEventButtonDown();
   void TestOnEventButtonUp();
-  void TestOnEventViewSelect();
   void TestOnEventViewDelete();
 };
 

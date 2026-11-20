@@ -25,6 +25,7 @@
 
 
 #include "albaGUIMDIChild.h"
+#include "albaServiceLocator.h"
 #include "albaGUIFrame.h"
 #include "albaDecl.h"
 #include "albaView.h"
@@ -131,7 +132,7 @@ void albaGUIMDIChild::OnActivate(wxActivateEvent& event)
 { 
   if( event.GetActive() && m_View && !m_Quitting )
   {
-    albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
+    albaServiceLocator::GetLogicManager()->SelectView(m_View);
   }
 }
 //----------------------------------------------------------------------------

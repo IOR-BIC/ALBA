@@ -89,7 +89,7 @@ public:
 	virtual void ViewAdd(albaView *view, bool visibleInMenu = true);
   
 	/** Pass the selected render window to the mouse device. */
-  void ViewSelected(albaView *view /*, albaRWIBase *rwi*/);
+  void ViewSelected(albaView *view);
   
   /** Activate the view from software to simulate the click on the view (used by remote). */
   void Activate(albaView *view);

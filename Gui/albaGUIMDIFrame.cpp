@@ -349,7 +349,8 @@ void albaGUIMDIFrame::OnIdle(wxIdleEvent& event)
     if (answere == wxYES)
     {
       // Clear UnDo stack to gain memory.
-      albaEventMacro(albaEvent(this, CLEAR_UNDO_STACK));
+      if (GetOpManager())
+        GetOpManager()->ClearUndoStack();
     }
   }
 #endif
@@ -411,7 +412,8 @@ void albaGUIMDIFrame::FreeMemorySizeOnIdle(wxIdleEvent& event)
     if (answere == wxYES)
     {
       // Clear UnDo stack to gain memory.
-      albaEventMacro(albaEvent(this, CLEAR_UNDO_STACK));
+      if (GetOpManager())
+        GetOpManager()->ClearUndoStack();
     }
   }
 #endif

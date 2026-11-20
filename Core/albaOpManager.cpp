@@ -380,6 +380,9 @@ void albaOpManager::OpSelect(albaVME* vme)
 //----------------------------------------------------------------------------
 void albaOpManager::ClearUndoStack()
 {
+   if (Running())
+     return;
+
    m_Context.Clear();
    m_OpCut->ClipboardClear();
 	 EnableOp();

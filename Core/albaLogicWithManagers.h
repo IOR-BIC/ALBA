@@ -214,7 +214,7 @@ public:
 	virtual const char* GetMsfFileExtension() { return m_Extension.GetCStr(); }
 		
 	/* Return the Operation Manager */
-	virtual albaOpManager * GetOpManager() const { return m_OpManager; }
+	albaOpManager * GetOpManager() const { return m_OpManager; }
 
 	virtual albaViewManager *GetViewManager() { return m_ViewManager; }
 

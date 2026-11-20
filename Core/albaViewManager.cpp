@@ -185,20 +185,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
       case VIEW_DELETE:
         ViewDelete(e->GetView());
       break;
-      case VIEW_SELECT:
-      {
-        albaView *view = e->GetView();
-        //		albaRWIBase* rwi = (albaRWIBase*) e->GetWin();   
-        //		if(!rwi) rwi = view->GetDefaultRWI();
-
-        bool notifylogic = (view != m_SelectedView);
-
-        ViewSelected(view/*, rwi*/);
-
-        if (notifylogic && GetLogicManager())
-          GetLogicManager()->SelectView(view);
-      }
-      break;
 
 			case ID_VIEW_SETTING_MAXIMIZE:
 			{
@@ -255,13 +241,9 @@ void albaViewManager::ViewAdd(albaView *view, bool visibleInMenu)
   m_TemplateNum++;
 }
 //----------------------------------------------------------------------------
-void albaViewManager::ViewSelected(albaView *view/*, albaRWIBase *rwi*/)
+void albaViewManager::ViewSelected(albaView *view)
 {
   m_SelectedView = view;
-
-//  if(m_SelectedRWI)
-//    m_SelectedRWI->SetInteractorStyle(NULL);
-
   m_SelectedRWI = view->GetRWI();
 }
 //----------------------------------------------------------------------------

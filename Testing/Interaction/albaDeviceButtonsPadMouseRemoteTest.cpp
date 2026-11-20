@@ -89,20 +89,6 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventButtonUp()
 
 }
 
-//----------------------------------------------------------------------------
-void albaDeviceButtonsPadMouseRemoteTest::TestOnEventViewSelect()
-{
-  albaDeviceButtonsPadMouseRemote *buttonsPadMouse = albaDeviceButtonsPadMouseRemote::New();
-  
-  CPPUNIT_ASSERT(buttonsPadMouse);
-
-  // sending some dummy events and testing for leaks
-
-  albaEventInteraction viewSelectEvent(this,VIEW_SELECT);
-  buttonsPadMouse->OnEvent(&viewSelectEvent);
-
-  buttonsPadMouse->Delete();
-}
 
 //----------------------------------------------------------------------------
 void albaDeviceButtonsPadMouseRemoteTest::TestOnEventViewDelete()

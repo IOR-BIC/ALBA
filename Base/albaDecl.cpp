@@ -433,7 +433,6 @@ wxString  albaIdString(int id)
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 
      case VIEW_CREATED:         s="VIEW_CREATED"; break; 
      case VIEW_DELETE:          s="VIEW_DELETE"; break; 
-     case VIEW_SELECT:          s="VIEW_SELECT"; break; 
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
      case VIEW_MAXIMIZE:        s="VIEW_MAXIMIZE"; break; 
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
@@ -481,7 +480,6 @@ wxString  albaIdString(int id)
      case ID_CLOSE_SASH:	      s="ID_CLOSE_SASH"; break; 
 
      case IMPORT_FILE:          s="IMPORT_FILE"; break;
-     case CLEAR_UNDO_STACK:     s="CLEAR_UNDO_STACK"; break;
 
      case WIDGETS_END:	        s="WIDGETS_END"; break; 
      case PIC_START:	          s="PIC_START"; break; 

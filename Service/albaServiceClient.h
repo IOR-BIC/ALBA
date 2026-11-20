@@ -33,5 +33,8 @@ public:
 
 	/** Return the registered help manager, NULL if the application has no help */
 	albaAbsHelpManager* GetHelpManager() { return albaServiceLocator::GetHelpManager(); }
+
+	/** Return the registered operation manager, NULL if the application has none */
+	albaAbsOpManager* GetOpManager() { return albaServiceLocator::GetOpManager(); }
 };
 #endif

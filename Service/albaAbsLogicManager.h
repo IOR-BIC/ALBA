@@ -23,7 +23,6 @@
 
 class albaVME;
 class albaVMEImage;
-class albaOpManager;
 class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
@@ -76,7 +75,8 @@ public:
 	virtual void ExpandVME(albaVME *vme) = 0;
 
 	//Views
-	/** Select a view: the side bar, the interaction and the operations work on it */
+	/** Select a view (also called by the view frames when they are activated or clicked): the view manager,
+	the side bar, the interaction and the operations work on it. Nothing else happens if it is already selected */
 	virtual void SelectView(albaView *view) = 0;
 	/** Return the selected view, NULL if none */
 	virtual albaView *GetSelectedView() = 0;
@@ -88,8 +88,6 @@ public:
 	virtual void PopTool(albaInteractionTool *tool) = 0;
 	
 	//Managers
-	/** Get the Operation Manager */
-	virtual albaOpManager * GetOpManager() const = 0;
 	/** Get the Prostheses DB Manager */
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() = 0;
 

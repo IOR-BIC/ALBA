@@ -19,6 +19,7 @@
 
 #include "albaAbsViewManager.h"
 #include "albaAbsHelpManager.h"
+#include "albaAbsOpManager.h"
 
 class albaAbsLogicManager;
 
@@ -44,9 +45,16 @@ public:
 	/** Register the help manager used by all the service clients */
 	static void SetHelpManager(albaAbsHelpManager* helpManager) { m_HelpManager = helpManager; }
 
+	/** Return the registered operation manager, NULL if the application has none */
+	static albaAbsOpManager* GetOpManager() { return m_OpManager; }
+
+	/** Register the operation manager used by all the service clients */
+	static void SetOpManager(albaAbsOpManager* opManager) { m_OpManager = opManager; }
+
 protected:
 	static albaAbsLogicManager* m_LogicManager; ///< the registered logic manager
 	static albaAbsViewManager* m_ViewManager;   ///< the registered view manager
 	static albaAbsHelpManager* m_HelpManager;   ///< the registered help manager
+	static albaAbsOpManager* m_OpManager;       ///< the registered operation manager
 };
 #endif

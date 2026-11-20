@@ -294,7 +294,8 @@ int albaOpGarbageCollectMSFDir::GarbageCollect()
   }
  
   // Clear UnDo stack if successful
-  albaEventMacro(albaEvent(this, CLEAR_UNDO_STACK));
+  if (GetOpManager())
+    GetOpManager()->ClearUndoStack();
 
   return ALBA_OK;
 }
