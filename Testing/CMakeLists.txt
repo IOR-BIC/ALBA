@@ -23,6 +23,7 @@ DBG_MESSAGE("Configuring project albaTESTS")
 SET(PROJECT_SRCS
   albaTest.cpp 				albaTest.h
   albaFakeLogicForTest.cpp 	albaFakeLogicForTest.h
+  albaFakeViewManagerForTest.h
 	)
 
 # List libraries that are needed by this project.

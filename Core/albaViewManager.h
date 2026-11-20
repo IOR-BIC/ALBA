@@ -55,7 +55,7 @@ enum VieweSettingsEvents
 // albaViewManager :
 //----------------------------------------------------------------------------
 /** An implementation of albaViewManager with [D]ynamic view [C]reation feature */
-class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings, public albaServiceClient
+class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings, public albaServiceClient, public albaAbsViewManager
 {
 
 public:
@@ -95,7 +95,7 @@ public:
   void Activate(albaView *view);
 
 	/** Create a view at index 'id' of the view-list. */
-  virtual albaView *ViewCreate(int id);
+  virtual albaView *ViewCreate(int id) override;
   
 	/** Create a view given the type. */
   virtual albaView *ViewCreate(wxString label);
@@ -110,16 +110,22 @@ public:
   virtual void ViewDeleteAll();
 
 	/** Reset the camera to fit the selected vme (if sel = true) or all (if sel = false). apply to the selected view only. */
-  void CameraReset(bool sel = false);
+  virtual void CameraReset(bool sel = false) override;
 
 	/** Reset the camera to fit the specified vme. apply to the selected view only. */
   void CameraReset(albaVME *vme);   
 
 	/** Update the camera for all opened views; optionally the Update can be limited for the selected view. */
-  void CameraUpdate(bool only_selected = false);
+  virtual void CameraUpdate(bool only_selected = false) override;
+
+	/** Postpone the camera updates until the matching DisableCameraUpdateSkip; calls can be nested */
+	virtual void EnableCameraUpdateSkip() override;
+
+	/** End a camera update skip: the outermost one updates the cameras if an update was requested meanwhile */
+	virtual void DisableCameraUpdateSkip() override;
 
 	/** Call PropertyUpdate for all views. */
-	void PropertyUpdate(bool fromTag = false);
+	virtual void PropertyUpdate(bool fromTag = false) override;
 
   /** Return the selected view. */
 	albaView *GetSelectedView();
@@ -131,7 +137,7 @@ public:
   albaView *GetList() {return m_ViewList;};
 
   /** Return a view (defined by label) if is present on open wiews list*/
-  albaView *GetFromList(const char *label);
+  virtual albaView *GetFromOpenedViews(const char *label) override;
 
   /** Return the plugged view-list. */
   albaView **GetListTemplate() {return m_ViewTemplate;};
@@ -178,6 +184,8 @@ protected:
 	wxColour m_ViewColorBackground;
 	int m_ViewMaximize;
 	int m_ViewOpenOnlyOne;
+	int m_SkipCameraUpdate; ///< nesting level of EnableCameraUpdateSkip
+	bool m_CameraUpdateRequested; ///< true when a camera update arrived during a skip
 
   /** test friend */
   friend class albaViewManagerTest;

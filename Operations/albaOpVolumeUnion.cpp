@@ -117,7 +117,7 @@ void albaOpVolumeUnion::OpRun()
 	if(!m_TestMode)
 	{
 		CreateGui();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

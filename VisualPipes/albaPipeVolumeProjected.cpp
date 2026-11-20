@@ -264,7 +264,7 @@ void albaPipeVolumeProjected::EnableRangeProjection(bool enabled)
 	if(m_ProjectFilter)
 		m_ProjectFilter->SetProjectSubRange(enabled);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -277,7 +277,7 @@ void albaPipeVolumeProjected::SetProjectionRange(int range[2])
 		m_ProjectFilter->SetProjectionRange(range);
 
 	if(m_RangeProjectionEnabled)
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeProjected::GetProjectionRange(int *range)
@@ -322,7 +322,7 @@ void albaPipeVolumeProjected::SetActorPicking(int enable)
   m_RXActor->SetPickable(enable);
   m_RXActor->Modified();
 	
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

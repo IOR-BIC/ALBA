@@ -24,7 +24,6 @@
 class albaVME;
 class albaVMEImage;
 class albaOpManager;
-class albaViewManager;
 class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
@@ -57,15 +56,6 @@ public:
 
 	/** Same as ChooseVME, but the user can choose more VMEs; returns an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
-
-	//Camera
-	virtual void CameraUpdate() = 0;
-
-	virtual void CameraReset() = 0;
-
-	virtual void EnableCameraUpdateSkip() = 0;
-
-	virtual void DisableCameraUpdateSkip() = 0;
 
 	//Logic
 	/** Returns true if there is a Running Operation */
@@ -100,8 +90,6 @@ public:
 	//Managers
 	/** Get the Operation Manager */
 	virtual albaOpManager * GetOpManager() const = 0;
-	/** Get the View Manager */
-	virtual albaViewManager *GetViewManager() = 0;
 	/** Get the Prostheses DB Manager */
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() = 0;
 

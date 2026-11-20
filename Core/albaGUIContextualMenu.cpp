@@ -342,5 +342,5 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		}
 		break;
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

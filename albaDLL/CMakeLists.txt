@@ -178,7 +178,7 @@ SET(COMMON_SRCS
 ###############################################
 SET(SERVICE_SRCS
 	../Service/albaServiceLocator.cpp 	../Service/albaServiceLocator.h
-	../Service/albaServiceClient.cpp 	../Service/albaServiceClient.h
+	../Service/albaServiceClient.h
 	../Service/albaAbsLogicManager.h
 )
 

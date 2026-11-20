@@ -184,8 +184,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_SelectedView = NULL;
 
-	m_SkipCameraUpdate = false;
-
 	m_OpeningMSF = false;
 
 	m_AppLayout = NULL;
@@ -312,6 +310,7 @@ void albaLogicWithManagers::Configure()
 	if (m_UseViewManager)
 	{
 		m_ViewManager = new albaViewManager();
+		albaServiceLocator::SetViewManager(m_ViewManager);
 		m_ViewManager->SetListener(this);
 		m_ViewManager->SetMouse(m_Mouse);
 
@@ -502,6 +501,8 @@ void albaLogicWithManagers::OnQuit()
 	cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
 
+	if (albaServiceLocator::GetViewManager() == m_ViewManager)
+		albaServiceLocator::SetViewManager(NULL);
 	cppDEL(m_ViewManager);
 
 #ifdef ALBA_USE_VTK
@@ -744,7 +745,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		{
 			albaView *view = NULL;
 			const char *viewStr = e->GetString()->GetCStr();
-			view = m_ViewManager->GetFromList(viewStr);
+			view = m_ViewManager->GetFromOpenedViews(viewStr);
 			if (view)
 			{
 				view->GetFrame()->SetSize(e->GetWidth(), e->GetHeight());
@@ -778,7 +779,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		break;
 		case CAMERA_RESET:
-			CameraReset();
+			if (m_ViewManager) m_ViewManager->CameraReset();
 			break;
 		case CAMERA_FIT:
 			if (m_ViewManager) m_ViewManager->CameraReset(true);
@@ -798,7 +799,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			m_SettingsDialog->ShowModal();
 			break;
 		case CAMERA_UPDATE:
-			CameraUpdate();
+			if (m_ViewManager) m_ViewManager->CameraUpdate();
 			break;
 		case CAMERA_SYNCHRONOUS_UPDATE:
 			m_ViewManager->CameraUpdate();
@@ -900,7 +901,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			albaView *view;
 			const char *viewStr = e->GetString()->GetCStr();
 
-			view = m_ViewManager->GetFromList(viewStr);
+			view = m_ViewManager->GetFromOpenedViews(viewStr);
 			if (view)
 				m_ViewManager->Activate(view);
 			else
@@ -912,7 +913,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			albaView *view;
 			const char *viewStr = e->GetString()->GetCStr();
 
-			view = m_ViewManager->GetFromList(viewStr);
+			view = m_ViewManager->GetFromOpenedViews(viewStr);
 			if (view)
 			{
 				albaGUIMDIChild *c = (albaGUIMDIChild *)view->GetFrame();
@@ -1137,7 +1138,8 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 	if (!vme)
 		return;
 
-	EnableCameraUpdateSkip();
+	if (m_ViewManager)
+		m_ViewManager->EnableCameraUpdateSkip();
 
 	if (m_ViewManager)
 	{
@@ -1157,7 +1159,11 @@ void albaLogicWithManagers::VmeShow(albaVME *vme, bool visibility)
 
 	ShowInSideBar(vme, visibility);
 
-	DisableCameraUpdateSkip();
+	if (m_ViewManager)
+	{
+		m_ViewManager->CameraUpdate();
+		m_ViewManager->DisableCameraUpdateSkip();
+	}
 	
 	albaYield();
 }
@@ -1289,14 +1295,19 @@ std::vector<albaVME*> albaLogicWithManagers::ChooseVMEs(albaString title, void *
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)
 {
-	EnableCameraUpdateSkip();
+	if (m_ViewManager)
+		m_ViewManager->EnableCameraUpdateSkip();
 	if (vme != NULL && m_OpManager && m_OpManager->GetSelectedVme()!=vme)
 	{
 		m_OpManager->OpSelect(vme);
 
 		EnableMenuAndToolbar();
+
+		if (m_ViewManager)
+			m_ViewManager->CameraUpdate();
 	}
-	DisableCameraUpdateSkip();
+	if (m_ViewManager)
+		m_ViewManager->DisableCameraUpdateSkip();
 }
 
 //----------------------------------------------------------------------------
@@ -1547,35 +1558,6 @@ void albaLogicWithManagers::ViewContextualMenu(bool vme_menu)
 	if (c != NULL)
 		contextMenu->ShowContextualMenu(c, v, vme_menu);
 	cppDEL(contextMenu);
-}
-
-// CAMERA ////////////////////////////////////////////////////////////////////
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::CameraUpdate()
-{
-	if (m_ViewManager && !m_SkipCameraUpdate)
-		m_ViewManager->CameraUpdate();
-}
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::CameraReset()
-{
-	if (m_ViewManager) 
-		m_ViewManager->CameraReset();
-}
-
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::EnableCameraUpdateSkip()
-{
-	m_SkipCameraUpdate++;
-}
-
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::DisableCameraUpdateSkip()
-{
-	assert(m_SkipCameraUpdate);
-	m_SkipCameraUpdate--;
-	if (m_SkipCameraUpdate == 0)
-		CameraUpdate();
 }
 
 // WIZARD ////////////////////////////////////////////////////////////////////

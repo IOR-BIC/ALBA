@@ -164,12 +164,12 @@ void albaOpMove::OnEvent(albaEventBase *alba_event)
   else if (alba_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(alba_event); 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 	else if (alba_event->GetSender() == this->m_GuiTransformTextEntries)
 	{
 		OnEventGuiTransformTextEntries(alba_event);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
   else
   {
@@ -195,7 +195,7 @@ void albaOpMove::OpUndo()
 //----------------------------------------------------------------------------
 {  
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpMove::OpStop(int result)
@@ -213,7 +213,7 @@ void albaOpMove::OpStop(int result)
 
     m_GuiTransformMouse->DetachInteractorFromVme();
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   albaEventMacro(albaEvent(this,result));  
 }
@@ -257,7 +257,7 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
           m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
         }
       }
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     }
     break;
     
@@ -280,7 +280,7 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
         m_GizmoTranslate->Show(false);
         m_GizmoRotate->Show(false);
       }
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     }
     break;
 
@@ -598,7 +598,7 @@ void albaOpMove::Reset()
   {
     m_GuiTransformTextEntries->Reset();
     SetRefSysVME(m_Input); 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 

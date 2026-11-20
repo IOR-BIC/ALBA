@@ -155,7 +155,7 @@ void albaOpImporterSTL::OpDo()
       m_ImportedSTLs[i]->ReparentTo(m_Input);
     }
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void albaOpImporterSTL::OpUndo()
       GetLogicManager()->VmeRemove(m_ImportedSTLs[i]);
     }
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

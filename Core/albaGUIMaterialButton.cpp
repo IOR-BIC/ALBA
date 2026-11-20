@@ -29,7 +29,6 @@
 #include "albaGUIValidator.h"
 #include "mmaMaterial.h"
 #include "albaGUIPicButton.h"
-#include "albaViewManager.h"
 
 
 #include "albaVME.h"
@@ -122,14 +121,14 @@ void albaGUIMaterialButton::OnEvent(albaEventBase *alba_event)
         albaEventMacro(albaEvent(this,VME_CHOOSE_MATERIAL,m_Vme));
         m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
         UpdateMaterialIcon();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       break;
 			case ID_OPACITY:
 				m_Material->m_Prop->SetOpacity(m_Material->m_Opacity);
 				UpdateMaterialIcon();
-				GetLogicManager()->GetViewManager()->PropertyUpdate();
+				GetViewManager()->PropertyUpdate();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       default:
         e->Log();
     }

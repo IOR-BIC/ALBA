@@ -211,7 +211,7 @@ void albaOpMeshDeformation::OpDo()
     }
   }
   
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -240,7 +240,7 @@ void albaOpMeshDeformation::OpUndo()
     }
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

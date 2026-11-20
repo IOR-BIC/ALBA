@@ -470,7 +470,7 @@ int albaCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType b
     m_Gui->Update();
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
   return ALBA_OK;
 }
 

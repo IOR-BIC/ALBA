@@ -274,7 +274,7 @@ void albaOpClassicICPRegistration::OpDo()
 
 	m_Output = m_Registered;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   wxString regString;
   regString = _("Registration done!");

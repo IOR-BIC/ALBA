@@ -160,7 +160,7 @@ void albaOpTransform::OpRun()
 {
 	assert(m_Input);
 
-	GetLogicManager()->EnableCameraUpdateSkip();
+	GetViewManager()->EnableCameraUpdateSkip();
 
 	GLO_TransformInput = m_Input;
 
@@ -219,7 +219,7 @@ void albaOpTransform::OpRun()
 	SelectRefSys();
 	UpdateTransformTextEntries();
 
-	GetLogicManager()->DisableCameraUpdateSkip();
+	GetViewManager()->DisableCameraUpdateSkip();
 }
 
 //----------------------------------------------------------------------------
@@ -233,7 +233,7 @@ void albaOpTransform::OpUndo()
 {
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -241,11 +241,11 @@ void albaOpTransform::OpStop(int result)
 {
 	if (!m_TestMode)
 	{
-		GetLogicManager()->EnableCameraUpdateSkip();
+		GetViewManager()->EnableCameraUpdateSkip();
 		m_GizmoTranslate->Show(false);
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
-		GetLogicManager()->DisableCameraUpdateSkip();
+		GetViewManager()->DisableCameraUpdateSkip();
 	}
 
 	m_TransformVME->ReparentTo(NULL);
@@ -386,7 +386,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 			m_TransformEntries[0] = m_TransformEntries[1] = m_TransformEntries[2] = 0.0;
 
 		m_Gui->Update();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -399,7 +399,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	case ID_TRANSFORM: // Transform by gizmo
 	{
 		OnEventTransformGizmo(alba_event);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -408,7 +408,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 		OnEventTransformText();
 		UpdateReferenceSystem();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -419,7 +419,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 		OnEventPoseTextEntries(alba_event);
 		UpdateReferenceSystem();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -427,7 +427,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	{
 		SelectRefSys();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -436,7 +436,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 		ChooseRelativeRefSys();
 		SelectRefSys();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 	
@@ -458,14 +458,14 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 			SelectRefSys();
 
 			UpdateTransformTextEntries();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		else if (m_RefSystemMode == REF_ARBITRARY)
 		{
 			m_ArbitraryRefSysVME->SetAbsPose(m_OriginRefSysPosition[0], m_OriginRefSysPosition[1], m_OriginRefSysPosition[2], m_OriginRefSysOrientation[0], m_OriginRefSysOrientation[1], m_OriginRefSysOrientation[2], m_CurrentTime);
 			SetRefSysVME(m_ArbitraryRefSysVME);
 			UpdateTransformTextEntries();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 	}
 	break;
@@ -474,7 +474,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	{
 		Reset();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -482,7 +482,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	{
 		Identity();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -490,7 +490,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	{
 		LoadFrom();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -498,7 +498,7 @@ void albaOpTransform::OnEvent(albaEventBase *alba_event)
 	{
 		LoadFromFile();
 		UpdateTransformTextEntries();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	break;
 
@@ -718,7 +718,7 @@ void albaOpTransform::PostMultiplyMatrix(albaMatrix *matrix)
 	// update matrix for OpDo()
 	m_NewAbsMatrix = absPose;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	// clean up
 	tr->Delete();

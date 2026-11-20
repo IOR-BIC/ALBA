@@ -740,7 +740,7 @@ void albaOpManager::RunOpDelete()
 		Notify(OP_RUN_TERMINATED, true);
 
 		ClearUndoStack();
-    GetLogicManager()->CameraUpdate();
+    GetViewManager()->CameraUpdate();
   }
 	else
 		Notify(OP_RUN_TERMINATED, false);

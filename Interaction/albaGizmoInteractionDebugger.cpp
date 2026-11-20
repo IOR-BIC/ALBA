@@ -174,7 +174,7 @@ void albaGizmoInteractionDebugger::OnEvent(albaEventBase *alba_event)
           m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
         }
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
 

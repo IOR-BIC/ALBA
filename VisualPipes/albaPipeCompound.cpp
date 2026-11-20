@@ -217,7 +217,7 @@ void albaPipeCompound::OnEvent(albaEventBase *alba_event)
         break;
       }
 
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
       return;
     }    
 

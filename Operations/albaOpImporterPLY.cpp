@@ -108,7 +108,7 @@ void albaOpImporterPLY::OpDo()
       m_ImportedPLYs[i]->ReparentTo(m_Input);
     }
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ void albaOpImporterPLY::OpUndo()
       GetLogicManager()->VmeRemove(m_ImportedPLYs[i]);
     }
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

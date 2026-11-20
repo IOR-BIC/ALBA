@@ -331,7 +331,7 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_Tube->SetRadius(m_TubeRadius);
 			albaTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
 			item->SetValue(m_TubeRadius);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_SHOW_SPHERES:
@@ -344,7 +344,7 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_Tube->SetCapping(m_Capping);
 			albaTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
 			item->SetValue(m_Capping);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_TUBE_RESOLUTION:
@@ -352,7 +352,7 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_Tube->SetNumberOfSides(m_TubeResolution);
 			albaTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
 			item->SetValue(m_TubeResolution);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_SPHERE_RADIUS:
@@ -360,7 +360,7 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_Sphere->SetRadius(m_SphereRadius);
 			albaTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
 			item->SetValue(m_SphereRadius);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_SPHERE_RESOLUTION:
@@ -369,12 +369,12 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_Sphere->SetThetaResolution(m_SphereResolution);
 			albaTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RESOLUTION");
 			item->SetValue(m_SphereResolution);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_SCALAR_DIMENSION:
 			UpdateProperty();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			break;
 		case ID_SPLINE:
 		{
@@ -382,7 +382,7 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			item->SetValue(m_SplineMode);
 			UpdateProperty();
 			EnableDisableGui();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_SPLINE_PARAMETERS:
@@ -395,7 +395,7 @@ void albaPipePolyline::OnEvent(albaEventBase *alba_event)
 			m_SplineFilter->Modified();
 			m_SplineFilter->Update();
 			UpdateProperty();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_CREATE_VME:
@@ -583,7 +583,7 @@ void albaPipePolyline::SetRepresentation(int representation)
 	albaTagItem *item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
 	item->SetValue(m_Representation);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipePolyline::SetShowSphere(bool show)
@@ -595,7 +595,7 @@ void albaPipePolyline::SetShowSphere(bool show)
 	albaTagItem *item = m_Vme->GetTagArray()->GetTag("SHOW_SPHERES");
 	item->SetValue(m_ShowSpheres);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipePolyline::SetRadius(double radius)
@@ -611,7 +611,7 @@ void albaPipePolyline::SetRadius(double radius)
   item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
   item->SetValue(m_TubeRadius);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipePolyline::SetColor(double color[3])

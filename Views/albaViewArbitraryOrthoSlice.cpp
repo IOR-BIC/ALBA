@@ -937,7 +937,7 @@ void albaViewArbitraryOrthoSlice::OnLUTRangeModified()
 		double low, hi;
 		m_LutSlider->GetSubRange(&low, &hi);
 		m_ColorLUT->SetTableRange(low, hi);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

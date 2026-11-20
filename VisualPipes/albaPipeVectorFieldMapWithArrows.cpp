@@ -396,7 +396,7 @@ void albaPipeVectorFieldMapWithArrows::OnEvent(albaEventBase *alba_event)
           
           m_Gui->Update();
           UpdateVTKPipe(); 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
           return;
         }
       break;
@@ -428,7 +428,7 @@ void albaPipeVectorFieldMapWithArrows::OnEvent(albaEventBase *alba_event)
 
           m_Gui->Update();
           UpdateVTKPipe(); 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
           return;
         }
       break;
@@ -448,14 +448,14 @@ void albaPipeVectorFieldMapWithArrows::OnEvent(albaEventBase *alba_event)
             m_EdLength->Enable(true);
           }
           UpdateVTKPipe(); 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
           return;
         }
       break;
       default:
         {
           UpdateVTKPipe(); 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
           return;
         }
       }

@@ -75,11 +75,6 @@ public:
 	/** Return the number of ChooseVME and ChooseVMEs calls since the last ClearCalls */
 	int GetNumberOfChooseCalls() { return m_ChooseCalls; }
 
-	// Camera
-	virtual void CameraUpdate();
-
-	virtual void CameraReset();
-
 	void ClearCalls();
 
 	calls GetCall(int callNum);
@@ -96,13 +91,7 @@ public:
 
 	virtual albaOpManager * GetOpManager() const override;
 
-	virtual albaViewManager *GetViewManager() override;
-
 	virtual albaProsthesesDBManager * GetProsthesesDBManager() override;
-
-	virtual void EnableCameraUpdateSkip() override;
-
-	virtual void DisableCameraUpdateSkip() override;
 
 	virtual bool IsVMEExpanded(albaVME *vme) override;
 

@@ -157,7 +157,7 @@ void albaOpFillHoles::OpDo()
   ((albaVMESurface*)m_Input)->SetData(m_VTKResult[m_VTKResult.size()-1],m_Input->GetTimeStamp());
   ((albaVMESurface*)m_Input)->Modified();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpFillHoles::OpUndo()
@@ -166,7 +166,7 @@ void albaOpFillHoles::OpUndo()
 	((albaVMESurface*)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	((albaVMESurface*)m_Input)->Modified();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpFillHoles::OnEvent(albaEventBase *alba_event)

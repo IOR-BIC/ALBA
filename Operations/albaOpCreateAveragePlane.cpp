@@ -134,7 +134,7 @@ void albaOpCreateAveragePlane::OpDo()
 	albaDEL(outPlane);
 			
 	GetLogicManager()->VmeShow(m_Output, true);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	return;
 }
@@ -146,5 +146,5 @@ void albaOpCreateAveragePlane::OpUndo()
 
 	//Restore previous selection
 	GetLogicManager()->VmeSelect(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

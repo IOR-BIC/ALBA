@@ -55,7 +55,7 @@ public:
   CPPUNIT_TEST( GetListTemplateTest );
   CPPUNIT_TEST( GetViewTest );
   CPPUNIT_TEST( SetMouseTest );
-  CPPUNIT_TEST( GetFromListTest );
+  CPPUNIT_TEST( GetFromOpenedViewsTest );
   //CPPUNIT_TEST( VmeModifiedTest ); EMPTY METHOD not tested
   //CPPUNIT_TEST( OnQuit ); EMPTY METHOD not tested
   CPPUNIT_TEST_SUITE_END();
@@ -82,7 +82,7 @@ private:
   void GetListTemplateTest();
   void GetViewTest();
   void SetMouseTest();
-  void GetFromListTest();
+  void GetFromOpenedViewsTest();
 
   void OnEvent(albaEventBase *alba_event); // This method trap the events coming from the view manager
 

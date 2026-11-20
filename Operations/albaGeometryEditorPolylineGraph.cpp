@@ -171,7 +171,7 @@ void albaGeometryEditorPolylineGraph::Show(bool show)
 	if(show==false)
 		GetLogicManager()->VmeShow(m_VMEPolylineSelection, show);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
@@ -190,7 +190,7 @@ void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
           vtkALBASmartPointer<vtkPolyData> poly_new;
           m_PolylineGraph->CopyToPolydata(poly_new);
           UpdateVMEEditorData(poly_new);
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
         }
       break;
 			case ID_ACTION:
@@ -225,7 +225,7 @@ void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
 						if(!m_TestMode)
 							GetLogicManager()->VmeShow(m_VMEPolylineSelection, false);
 
-						GetLogicManager()->CameraUpdate();
+						GetViewManager()->CameraUpdate();
 					}
 					else
 						albaLogMessage("It's impossible to delete a point of degree > 2");
@@ -245,7 +245,7 @@ void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
 
 					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineEditor);
 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 
 				}
 		default:
@@ -557,7 +557,7 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 			}
 		}
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 	//albaLogMessage(albaString::Format("current branch %d di %d",m_CurrentBranch,m_PolylineGraph->GetNumberOfBranches()));
 }
 //----------------------------------------------------------------------------

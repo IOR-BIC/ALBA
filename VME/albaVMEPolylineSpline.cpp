@@ -273,7 +273,7 @@ int albaVMEPolylineSpline::InternalRestore(albaStorageElement *node)
 			node->RestoreInteger("AxisReorder", m_OrderByAxisMode);
 			node->RestoreInteger("ClosePolyline", m_ClosePolyline);
       m_Transform->SetMatrix(matrix);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
       return ALBA_OK;
     }
   }
@@ -350,7 +350,7 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
 					InternalUpdate();
           GetPolylineOutput()->Update();
 					m_Gui->Update();
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
         }
       }
       break;
@@ -360,7 +360,7 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
 					InternalUpdate();
           GetPolylineOutput()->Update();
 					Update();
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 				break;
       default:

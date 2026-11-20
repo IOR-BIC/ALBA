@@ -179,14 +179,14 @@ void albaOpFlipNormals::OpDo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpFlipNormals::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 // widget ID's

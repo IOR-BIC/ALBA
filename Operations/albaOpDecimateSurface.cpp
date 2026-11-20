@@ -146,14 +146,14 @@ void albaOpDecimateSurface::OpDo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpDecimateSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
   ((albaVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpDecimateSurface::OnEvent(albaEventBase *alba_event)
@@ -174,7 +174,7 @@ void albaOpDecimateSurface::OnEvent(albaEventBase *alba_event)
             surface->GetMaterial()->m_Prop->SetRepresentationToSurface();
 
           albaEventMacro(albaEvent(this,UPDATE_PROPERTY,m_Input, true));
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
         }
       break;
       case ID_DECIMATE:
@@ -268,7 +268,7 @@ void albaOpDecimateSurface::OnPreview()
 	m_ClearInterfaceFlag	= true;
 
 	if(!m_TestMode)
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpDecimateSurface::OnClear()  
@@ -301,5 +301,5 @@ void albaOpDecimateSurface::OnClear()
   
   m_Gui->Update();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

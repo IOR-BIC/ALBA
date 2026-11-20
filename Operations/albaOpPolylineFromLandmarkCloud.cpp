@@ -94,7 +94,7 @@ void albaOpPolylineFromLandmarkCloud::OpDo()
 {
 	// A landmark cloud cannot be the root, so it always has a parent
 	m_Polyline->ReparentTo(m_Input->GetParent());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

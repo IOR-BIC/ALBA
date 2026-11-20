@@ -302,7 +302,7 @@ void albaOpSegmentation::OpUndo()
     albaDEL(m_OutputSurface);
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OpStop(int result)

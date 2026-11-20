@@ -418,7 +418,7 @@ void albaVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
     output0->GetCellData()->SetActiveScalars("CONTACT");
     m_Mapper->SetInputData(output0);
     m_Mapper->Update();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

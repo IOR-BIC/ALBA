@@ -302,7 +302,7 @@ void albaOpImageCalibration::OpDo()
 	m_Input->GetOutput()->Update();
 
 	GetLogicManager()->VmeVisualModeChanged(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -320,5 +320,5 @@ void albaOpImageCalibration::OpUndo()
 	m_Input->GetOutput()->Update();
 	
 	GetLogicManager()->VmeVisualModeChanged(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

@@ -326,7 +326,7 @@ void albaVMEProsthesis::SelectComponent(int compGroup, int compId)
 	m_AppendPolydata->Update();
 	GetOutput()->Update();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //-------------------------------------------------------------------------
 void albaVMEProsthesis::ShowComponent(int compGroup, bool show)
@@ -343,7 +343,7 @@ void albaVMEProsthesis::ShowComponent(int compGroup, bool show)
 		if (m_ShowComponents[i])
 			nShow++;
 	
-	GetLogicManager()->CameraUpdate(); 
+	GetViewManager()->CameraUpdate(); 
 }
 
 //----------------------------------------------------------------------------
@@ -460,7 +460,7 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 
 		tr->Delete();
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 
@@ -630,7 +630,7 @@ void albaVMEProsthesis::SetRotCenter(double center[3])
 	}
 
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //-------------------------------------------------------------------------

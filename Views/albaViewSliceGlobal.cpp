@@ -309,7 +309,7 @@ void albaViewSliceGlobal::OnEvent(albaEventBase *alba_event)
     case ID_OPACITY_SLIDER:
       {
 					albaPipeVolumeOrthoSlice::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
           m_OpacitySlider->SetValue(m_Opacity);
       }
       break;

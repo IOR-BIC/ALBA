@@ -207,7 +207,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
 		case ID_CLIP:
 			{
 				Clip();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_UNION:
@@ -219,7 +219,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
           return;
         }
 				Union();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_INTERSECTION:
@@ -232,7 +232,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
         }
 				Intersection();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_DIFFERENCE:
@@ -244,21 +244,21 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
           return;
         }
 				Difference();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_INSIDE:
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_UNDO:
 			{
 				Undo();
 				ShowClipPlane(m_Modality != MODE_SURFACE);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_MODALITY:
@@ -273,7 +273,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
 
 				m_Gui->Update();
 				ShowClipPlane(m_Modality == MODE_IMPLICIT_FUNCTION);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_TRANSFORM:
@@ -292,7 +292,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case wxOK:

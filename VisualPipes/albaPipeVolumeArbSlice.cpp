@@ -598,21 +598,21 @@ void albaPipeVolumeArbSlice::OnEvent(albaEventBase *alba_event)
       {
         mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
         material->UpdateFromTables();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
 			case ID_OPACITY_SLIDER:
 				SetSliceOpacity(m_SliceOpacity);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
 			break;
       case ID_ENABLE_GPU:
         UpdateSlice();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
       case ID_ENABLE_TRILINEAR_INTERPOLATION:
         UpdateSlice();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
       default:
       break;
@@ -645,7 +645,7 @@ void albaPipeVolumeArbSlice::SetColorLookupTable(vtkLookupTable *lut)
   if(m_Texture)
     m_Texture->SetLookupTable(m_CustomColorLUT);
   
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeArbSlice::Select(bool sel)

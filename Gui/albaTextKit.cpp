@@ -149,7 +149,7 @@ void albaTextKit::OnEvent(albaEventBase *alba_event)
 			SetTextSize(m_TextSize);
 			break;
 		}
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

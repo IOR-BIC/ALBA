@@ -149,7 +149,7 @@ void albaOpTransformAtoB::OpDo()
 
 	m_Input->SetAbsMatrix(resultMatrix);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ void albaOpTransformAtoB::OpUndo()
 {
 	m_Input->SetAbsMatrix(m_InputMatrix);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 }
 

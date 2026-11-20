@@ -65,6 +65,8 @@ albaViewManager::albaViewManager() :	albaGUISettings(this, _("View Manager"))
   m_Listener          = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
+  m_SkipCameraUpdate  = 0;
+  m_CameraUpdateRequested = false;
 	m_RootVme           = NULL;
   m_ViewBeingCreated  = NULL; 
   m_TemplateNum       = 0;
@@ -346,6 +348,12 @@ void albaViewManager::CameraReset(albaVME *vme)
 //----------------------------------------------------------------------------
 void albaViewManager::CameraUpdate(bool only_selected)   
 {
+  if (m_SkipCameraUpdate)
+  {
+    m_CameraUpdateRequested = true;
+    return;
+  }
+
   if (only_selected && m_SelectedView != NULL)
   {
     m_SelectedView->CameraUpdate(); // Update only the selected view
@@ -353,6 +361,22 @@ void albaViewManager::CameraUpdate(bool only_selected)
   }
   for(albaView* v = m_ViewList; v; v=v->m_Next) // Update all views
     v->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void albaViewManager::EnableCameraUpdateSkip()
+{
+	m_SkipCameraUpdate++;
+}
+//----------------------------------------------------------------------------
+void albaViewManager::DisableCameraUpdateSkip()
+{
+	assert(m_SkipCameraUpdate);
+	m_SkipCameraUpdate--;
+	if (m_SkipCameraUpdate == 0 && m_CameraUpdateRequested)
+	{
+		m_CameraUpdateRequested = false;
+		CameraUpdate();
+	}
 }
 //----------------------------------------------------------------------------
 void albaViewManager::OnQuit()
@@ -585,7 +609,7 @@ void albaViewManager::Activate(albaView *view)
 }
 
 //----------------------------------------------------------------------------
-albaView * albaViewManager::GetFromList( const char *label )
+albaView * albaViewManager::GetFromOpenedViews( const char *label )
 {
   albaView *view;
   for(view = GetList(); view; view=view->m_Next)

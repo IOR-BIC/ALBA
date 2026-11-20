@@ -193,7 +193,7 @@ void albaOpApplyTrajectory::OpUndo()
   oldVme->Modified();
  
 	GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpApplyTrajectory::OnEvent(albaEventBase *alba_event) 
@@ -306,7 +306,7 @@ int albaOpApplyTrajectory::Read()
   } while (!inputFile.Eof());
 
   GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   return ALBA_OK;
 }
@@ -336,6 +336,6 @@ int albaOpApplyTrajectory::ApplyTrajectoriesFromVME()
   }
 
   GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
   return ALBA_OK;
 }

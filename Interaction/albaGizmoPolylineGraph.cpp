@@ -350,7 +350,7 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 //------------------------------------------------------------------------
 {
   m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   // forward isa transform events to the listener op
   // instanciating the gizmo; the sender is changed to "this" so that the operation can check for

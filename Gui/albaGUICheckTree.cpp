@@ -227,7 +227,7 @@ void albaGUICheckTree::OnIconClick(wxTreeItemId item)
     }
 
 		GetLogicManager()->VmeShow(vme, show);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

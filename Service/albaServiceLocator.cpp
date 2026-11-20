@@ -24,16 +24,5 @@
 
 #include "albaServiceLocator.h"
 
-static albaAbsLogicManager* glo_logic = NULL;
-
-//-------------------------------------------------------------------------
-albaAbsLogicManager* albaServiceLocator::GetLogicManager()
-{
-	return glo_logic;
-}
-
-//-------------------------------------------------------------------------
-void albaServiceLocator::SetLogicManager(albaAbsLogicManager* logic)
-{
-	glo_logic = logic;
-}
+albaAbsLogicManager* albaServiceLocator::m_LogicManager = NULL;
+albaAbsViewManager* albaServiceLocator::m_ViewManager = NULL;

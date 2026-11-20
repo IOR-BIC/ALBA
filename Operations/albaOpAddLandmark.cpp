@@ -238,7 +238,7 @@ void albaOpAddLandmark::OpRun()
 		LoadDictionary(m_Dictionary.GetCStr());
 
 	GetLogicManager()->VmeShow(m_AuxLandmarkCloud, false);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::OpStop(int result)
@@ -286,7 +286,7 @@ void albaOpAddLandmark::OpStop(int result)
 		HideGui();
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	albaEventMacro(albaEvent(this, result));
 }
@@ -512,7 +512,7 @@ void albaOpAddLandmark::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::VmePicked(albaEvent *e)
 {
-	GetLogicManager()->EnableCameraUpdateSkip();
+	GetViewManager()->EnableCameraUpdateSkip();
 	double point[3];
 	bool hasPoint = false;
 	vtkPoints *pts = vtkPoints::SafeDownCast(e->GetVtkObj());
@@ -537,7 +537,7 @@ void albaOpAddLandmark::VmePicked(albaEvent *e)
 			SetLandmarkPosition(point);
 		}
 	}
-	GetLogicManager()->DisableCameraUpdateSkip();
+	GetViewManager()->DisableCameraUpdateSkip();
 }
 
 //--------------------------------------------------------------------------
@@ -578,7 +578,7 @@ void albaOpAddLandmark::RestoreLandmarkVect(std::vector<albaVMELandmark*> &landm
 		GetLogicManager()->VmeShow(newLandmark, true);
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 /// LANDMARK MANAGER
@@ -603,14 +603,14 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
 			else
 			{
 				albaWarningMessageMacro("There is already a landmatk with this name in the cloud");
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 				UpdateGui();
 				return;
 			}
 		}
 		else
 		{
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			UpdateGui();
 			return;
 		}
@@ -651,7 +651,7 @@ void albaOpAddLandmark::AddLandmark(double pos[3])
 		SelectLandmarkByName("NONE");
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 	UpdateGui(true);
 }
 //----------------------------------------------------------------------------
@@ -676,13 +676,13 @@ void albaOpAddLandmark::RemoveLandmark()
 		SelectLandmarkByName("NONE");
 
 		UpdateGui(true);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 {
-	GetLogicManager()->EnableCameraUpdateSkip();
+	GetViewManager()->EnableCameraUpdateSkip();
 
 	if (m_SelectedLandmark)
 	{
@@ -738,7 +738,7 @@ void albaOpAddLandmark::SelectLandmarkByName(albaString name)
 		UpdateGui();
 	}
 
-	GetLogicManager()->DisableCameraUpdateSkip();
+	GetViewManager()->DisableCameraUpdateSkip();
 
 }
 //----------------------------------------------------------------------------
@@ -794,7 +794,7 @@ void albaOpAddLandmark::SetLandmarkPosition(double pos[3])
 		m_AuxLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 		m_AuxLandmark->Update();
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -808,7 +808,7 @@ void albaOpAddLandmark::SetLandmarkRadius(double radius)
 		if (m_AuxLandmarkCloud)
 			m_AuxLandmarkCloud->SetRadius(m_LandmarkRadius + 0.01);
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -831,7 +831,7 @@ void albaOpAddLandmark::SelectGroup(int index, int item)
 	if (index >= 0 && index < m_LandmarkGroupVect.size())
 	{
 
-		GetLogicManager()->EnableCameraUpdateSkip();
+		GetViewManager()->EnableCameraUpdateSkip();
 		m_SelectedGroup = index;
 		SelectLandmarkByName(m_LandmarkGroupVect[m_SelectedGroup][0]);
 
@@ -855,7 +855,7 @@ void albaOpAddLandmark::SelectGroup(int index, int item)
 		}
 
 		UpdateGui(true);
-		GetLogicManager()->DisableCameraUpdateSkip();
+		GetViewManager()->DisableCameraUpdateSkip();
 	}	
 }
 

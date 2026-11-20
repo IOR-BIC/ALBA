@@ -108,7 +108,7 @@ void albaOpCreateAverageLandmark::OpDo()
 
 	
 	GetLogicManager()->VmeShow(m_LimbCloud->GetLandmark(newLMName), true); 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	return;
 }
@@ -121,5 +121,5 @@ void albaOpCreateAverageLandmark::OpUndo()
 
 	//Restore previous selection
 	GetLogicManager()->VmeSelect(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

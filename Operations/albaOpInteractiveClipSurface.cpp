@@ -201,7 +201,7 @@ void albaOpInteractiveClipSurface::OpRun()
     CreateGui();
     ShowGui();
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   // Added facility for test case
   else
@@ -309,7 +309,7 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_BY:
@@ -322,7 +322,7 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
 			m_Gui->Update();
 			ShowClipPlane(m_ClipModality != albaOpInteractiveClipSurface::MODE_SURFACE);
 			ChangeGizmo();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			break;
 		case ID_PLANE_WIDTH:
 		case ID_PLANE_HEIGHT:
@@ -333,14 +333,14 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->Update();
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 			}
 			break;
 		case ID_CHOOSE_GIZMO:
 			{
 				ChangeGizmo();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_USE_GIZMO:
@@ -355,13 +355,13 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
 				{
 					wxMessageBox("Error while clipping surface!!", "Clipping Error");
 				}
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_UNDO:
 			{
 				Undo();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case wxOK:
@@ -391,7 +391,7 @@ void albaOpInteractiveClipSurface::OnUseGizmo()
 	m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
 	m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainalbaVMEPolylineGraph ? true : false);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -492,7 +492,7 @@ void albaOpInteractiveClipSurface::OnEventGizmoScale(albaEventBase *alba_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 		}
 		break;
 
@@ -522,7 +522,7 @@ void albaOpInteractiveClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 			}
 			else
 				Clip();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			return;
 		}
 
@@ -540,7 +540,7 @@ void albaOpInteractiveClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 					albaLogMessage(stringStream.str().c_str());
 				}
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		default:
@@ -670,7 +670,7 @@ void albaOpInteractiveClipSurface::OpDo()
 
 	((albaVMESurface *)m_Input)->SetData(transform_output->GetOutput(),m_Input->GetTimeStamp());
 	
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpInteractiveClipSurface::OpUndo()
@@ -678,7 +678,7 @@ void albaOpInteractiveClipSurface::OpUndo()
 {
   ((albaVMESurface *)m_Input)->SetData(m_OldSurface,m_Input->GetTimeStamp());
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 int albaOpInteractiveClipSurface::Clip()
@@ -813,7 +813,7 @@ void albaOpInteractiveClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_e
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -974,7 +974,7 @@ void albaOpInteractiveClipSurface::OnChooseConstrainVme( albaVME *vme )
   m_CASH->SetConstraintPolylineGraph(albaVMEPolylineGraph::SafeDownCast(m_ConstrainalbaVMEPolylineGraph));
   m_CASH->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_CASH->EnableWidgets(true)  ;
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 void albaOpInteractiveClipSurface::GuiEnable()

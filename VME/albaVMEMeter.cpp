@@ -787,7 +787,7 @@ void albaVMEMeter::OnEvent(albaEventBase *alba_event)
             m_EndVme2Name = n->GetName();
           }
 					GetOutput()->Update();
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
           m_Gui->Update();
         }
       }
@@ -824,7 +824,7 @@ void albaVMEMeter::OnEvent(albaEventBase *alba_event)
       m_Gui->Enable(ID_PLOT_PROFILE,GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
       m_Gui->Enable(ID_PLOTTED_VME_LINK, GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
       this->Modified();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 	  }
 	  break;
     case ID_PLOT_PROFILE:

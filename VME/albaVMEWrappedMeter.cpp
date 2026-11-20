@@ -1793,7 +1793,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 				Modified();
 
 				InternalUpdate();
-				GetLogicManager()->CameraReset();
+				GetViewManager()->CameraReset();
 				ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
 
 				m_Gui->Update();

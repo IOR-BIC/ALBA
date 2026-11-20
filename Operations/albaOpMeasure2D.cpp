@@ -37,9 +37,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUIValidator.h"
 #include "albaTagArray.h"
 #include "albaVME.h"
-#include "albaLogicWithManagers.h"
 #include "albaServiceClient.h"
-#include "albaViewManager.h"
 #include "albaView.h"
 
 //----------------------------------------------------------------------------
@@ -92,7 +90,7 @@ char ** albaOpMeasure2D::GetIcon()
 //----------------------------------------------------------------------------
 void albaOpMeasure2D::OpRun()
 {
-	albaView *view = GetLogicManager()->GetViewManager()->GetSelectedView();
+	albaView *view = GetLogicManager()->GetSelectedView();
 
 	if(view==NULL)
 		view = OpenImageView(VIEW_START + 8); // Open View if necessary
@@ -128,11 +126,11 @@ albaView* albaOpMeasure2D::OpenImageView(int viewId)
 	albaView *currentView = NULL;
 	albaString viewLabel = "Image";
 
-	currentView = ((albaLogicWithManagers*)GetLogicManager())->GetViewManager()->GetFromList(viewLabel);;
+	currentView = GetViewManager()->GetFromOpenedViews(viewLabel);
 
 	if (!currentView)
 	{
-		currentView = ((albaLogicWithManagers*)GetLogicManager())->GetViewManager()->ViewCreate(viewId);
+		currentView = GetViewManager()->ViewCreate(viewId);
 		currentView->GetFrame()->SetMaxSize(currentView->GetFrame()->GetSize());
 	}
 
@@ -355,7 +353,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				int selection = m_MeasureListBox->GetSelection();
 				currInter->SelectMeasure(selection);
 				m_Gui->Update();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 
@@ -392,7 +390,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				currInter->EnableMoveMeasure(m_Move);
 				for(int i=0;i<m_InteractorVector.size();i++)
 					m_InteractorVector[i]->ShowText(m_ShowText);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 
@@ -521,7 +519,7 @@ void albaOpMeasure2D::UpdateMeasureList()
 
 		m_Gui->Enable(ID_REMOVE_MEASURE, m_MeasureListBox->GetCount() != 0);
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 

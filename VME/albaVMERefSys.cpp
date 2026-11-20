@@ -460,7 +460,7 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
 
 				//Workaround to update accept on move operations
 				GetLogicManager()->VmeModified(this);
-        GetLogicManager()->CameraUpdate();
+        GetViewManager()->CameraUpdate();
 				m_Gui->Update();
 			}
 			break;

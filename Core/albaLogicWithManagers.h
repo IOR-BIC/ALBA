@@ -409,16 +409,6 @@ protected:
 	/** A new View has Been Created - Logic must create the View Frame */
 	virtual void ViewCreated(albaView *v);
 
-	virtual void CameraUpdate();
-
-	virtual void CameraReset();
-
-	/** enter in Camera Update Skip Modality, useful to avoid flickering or incomplete visualizations */
-	virtual void EnableCameraUpdateSkip();
-
-	/** exit the Camera Update Skip Modality */
-	virtual void DisableCameraUpdateSkip();
-
 	/** Called when user change the measure unit from menù Options.*/
 	void UpdateMeasureUnit();
 
@@ -511,7 +501,6 @@ protected:
 	albaWXLog          *m_Logger;
 	albaVTKLog         *m_VtkLog;
 
-	int				m_SkipCameraUpdate;
 	
 	albaGUIApplicationSettings *m_ApplicationSettings;
 	albaGUISettingsTimeBar  *m_TimeBarSettings;

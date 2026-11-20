@@ -613,7 +613,7 @@ void albaViewManagerTest::SetMouseTest()
 }
 
 //----------------------------------------------------------------------------
-void albaViewManagerTest::GetFromListTest()
+void albaViewManagerTest::GetFromOpenedViewsTest()
 //----------------------------------------------------------------------------
 {
   // insert some views in the manager views list
@@ -628,11 +628,11 @@ void albaViewManagerTest::GetFromListTest()
   m_Manager->ViewInsert(viewB);
   m_Manager->ViewInsert(viewC);
 
-  curView = m_Manager->GetFromList("viewA");
+  curView = m_Manager->GetFromOpenedViews("viewA");
   CPPUNIT_ASSERT(curView == viewA); 
-  curView = m_Manager->GetFromList("viewB");
+  curView = m_Manager->GetFromOpenedViews("viewB");
   CPPUNIT_ASSERT(curView == viewB); 
-  curView = m_Manager->GetFromList("viewC");
+  curView = m_Manager->GetFromOpenedViews("viewC");
   CPPUNIT_ASSERT(curView == viewC); 
 
 }

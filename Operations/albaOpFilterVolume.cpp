@@ -171,7 +171,7 @@ void albaOpFilterVolume::OpDo()
 			m_OutputVolumeRegistered = false;
 		}
 		m_OutputVolume->ReparentTo(m_Input);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 
@@ -184,7 +184,7 @@ void albaOpFilterVolume::OpUndo()
 		m_OutputVolumeRegistered = true;
 		m_OutputVolume->Register(this);
 		m_OutputVolume->ReparentTo(NULL);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 
@@ -262,7 +262,7 @@ void albaOpFilterVolume::OnSmooth()
 
   m_OutputVolume->SetData(smoothFilter->GetOutput(),m_Input->GetTimeStamp());
 	m_OutputVolume->GetOutput()->Update();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   if (!m_TestMode)
   {
@@ -302,7 +302,7 @@ void albaOpFilterVolume::OnMedian()
 
 	m_OutputVolume->SetData(medianFilter->GetOutput(), m_Input->GetTimeStamp());
 	m_OutputVolume->GetOutput()->Update();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	if (!m_TestMode)
 	{
@@ -376,7 +376,7 @@ void albaOpFilterVolume::OnReplace()
 		m_OutputVolume->SetData(outputDataSP, m_Input->GetTimeStamp());
 	}
 	m_OutputVolume->GetOutput()->Update();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 
 	if (!m_TestMode)
@@ -411,5 +411,5 @@ void albaOpFilterVolume::OnReset()
 		m_Gui->Update();
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

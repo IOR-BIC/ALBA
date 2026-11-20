@@ -137,7 +137,7 @@ void albaOpInteractionDebugger::OnEvent(albaEventBase *alba_event)
       {
         m_ActiveBranchId = 0;
         m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
       case ID_CHOOSE:
@@ -399,7 +399,7 @@ void albaOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
   
   // Create the output vtk data...
   GetLogicManager()->VmeShow(constraint, true);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   // build constrained gizmo
   m_GizmoDebugger = new albaGizmoInteractionDebugger(vmeRoot, this, "test gizmo path");
@@ -419,7 +419,7 @@ void albaOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
   m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_GizmoDebugger->Show(true);
   
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 void albaOpInteractionDebugger::OnChooseConstrainVme( albaVME *vme )
@@ -434,7 +434,7 @@ void albaOpInteractionDebugger::OnChooseConstrainVme( albaVME *vme )
   m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_GizmoDebugger->Show(true);
   
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 void albaOpInteractionDebugger::BuildGraph1( vtkPolyData *inputPolyData )

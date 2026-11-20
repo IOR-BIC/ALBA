@@ -213,7 +213,7 @@ void albaLightKit::OnEvent(albaEventBase *alba_event)
       break;
     }
     
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

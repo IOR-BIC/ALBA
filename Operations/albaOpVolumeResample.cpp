@@ -235,7 +235,7 @@ void albaOpVolumeResample::CreateGizmos()
 		m_GizmoRotate->SetRefSys(m_Input);
 		m_GizmoRotate->SetAbsPose(m_CenterVolumeRefSysMatrix);
 		m_GizmoRotate->Show(false);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ void albaOpVolumeResample::GizmoDelete()
     cppDEL(m_GizmoROI);
   }	
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 albaOp *albaOpVolumeResample::Copy()
@@ -376,7 +376,7 @@ void albaOpVolumeResample::OpRun()
 	if(!this->m_TestMode)
 		CreateGui();
 	UpdateGui();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeResample::OpDo()
@@ -707,7 +707,7 @@ void albaOpVolumeResample::CreateGui()
 
 	ShowGui();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeResample::OnEvent(albaEventBase *alba_event)
@@ -782,14 +782,14 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
 		case ID_SHOW_HANDLE:
 			{
 				m_GizmoROI->ShowHandles(m_ShowHandle != 0);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_SHOW_GIZMO_TRANSFORM:
 			{
 				m_GizmoRotate->Show(m_ShowGizmoTransform&&(m_GizmoChoose==ID_GIZMO_ROTATE));
 				m_GizmoTranslate->Show(m_ShowGizmoTransform&&(m_GizmoChoose==ID_GIZMO_TRANSLATE));
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_VOLUME_ORIENTATION:
@@ -798,7 +798,7 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
 
 					UpdateGizmoData(e);
 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 				break;
 			case ID_VOLUME_ORIGIN:
@@ -816,7 +816,7 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
 
 					UpdateGizmoData(e);
 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 				break;
       case ID_VOLUME_DIR_X:		
@@ -835,7 +835,7 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
 					m_VolumeBounds[5] = inputVolumeBBCentre[2] + (m_MaxBoundZ/2);
 					m_GizmoROI->SetBounds(m_VolumeBounds);
 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 				break;
       case ID_VOLUME_SPACING:
@@ -844,19 +844,19 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
         SetBoundsToVMEBounds();
         //UpdateGizmoData();
         UpdateGui();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       break;
       case ID_VOLUME_4DBOUNDS:
         SetBoundsToVME4DBounds();
         //UpdateGizmoData();
         UpdateGui();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       break;
       case ID_VOLUME_VMELOCALBOUNDS:
         SetBoundsToVMELocalBounds();
         //UpdateGizmoData();
         UpdateGui();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       break;
       case ID_VOLUME_AUTOSPACING:
         AutoSpacing();
@@ -887,7 +887,7 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
       p->GetPoint(0,pos);
       UpdateGizmo(handle_id, pos);
       UpdateGui();
-      GetLogicManager()->CameraUpdate();
+      GetViewManager()->CameraUpdate();
 
       }
       break;
@@ -915,7 +915,7 @@ void albaOpVolumeResample::OnEventThis(albaEventBase *alba_event)
 						m_GizmoRotate->Show(m_ShowGizmoTransform&&(m_GizmoChoose==ID_GIZMO_ROTATE));
 					}
 
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 				break;
       default:
@@ -1042,7 +1042,7 @@ void albaOpVolumeResample::PostMultiplyEventMatrix(albaEventBase *alba_event)
 
 		m_VMEDummy->SetAbsMatrix(*newAbsMatrBox);
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

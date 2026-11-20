@@ -17,13 +17,28 @@
 #ifndef _albaServiceLocator_H
 #define _albaServiceLocator_H
 
+#include "albaAbsViewManager.h"
+
 class albaAbsLogicManager;
 
 class ALBA_EXPORT albaServiceLocator
 {
 public:
 
-	static albaAbsLogicManager* GetLogicManager();
-	static void SetLogicManager(albaAbsLogicManager* logic);
+	/** Return the registered logic manager, NULL if none */
+	static albaAbsLogicManager* GetLogicManager() { return m_LogicManager; }
+
+	/** Register the logic manager used by all the service clients */
+	static void SetLogicManager(albaAbsLogicManager* logic) { m_LogicManager = logic; }
+
+	/** Return the registered view manager, NULL if none */
+	static albaAbsViewManager* GetViewManager() { return m_ViewManager; }
+
+	/** Register the view manager used by all the service clients */
+	static void SetViewManager(albaAbsViewManager* viewManager) { m_ViewManager = viewManager; }
+
+protected:
+	static albaAbsLogicManager* m_LogicManager; ///< the registered logic manager
+	static albaAbsViewManager* m_ViewManager;   ///< the registered view manager
 };
 #endif

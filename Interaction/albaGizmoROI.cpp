@@ -334,7 +334,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
         else if (arg == albaBehaviorTransform::MOUSE_UP)
         {
         }
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         // forward isa transform events to the listener op
         albaEventMacro(*e);
       }

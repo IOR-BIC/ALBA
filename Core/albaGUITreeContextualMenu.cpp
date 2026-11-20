@@ -370,7 +370,7 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 	}
 
   if(m_ViewActive != NULL)
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaGUITreeContextualMenu::CryptSubTree(bool crypt)

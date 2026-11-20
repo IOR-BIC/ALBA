@@ -125,7 +125,7 @@ void albaOpCrop::OpRun()
 	if(!m_TestMode)
 	{
 		CreateGui();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -304,7 +304,7 @@ void albaOpCrop::OpDo()
 	GetLogicManager()->VmeVisualModeChanged(m_Input);
 	///////
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpCrop::OpUndo()
@@ -322,7 +322,7 @@ void albaOpCrop::OpUndo()
 	GetLogicManager()->VmeVisualModeChanged(m_Input);
 	///////
 
-	GetLogicManager()->CameraUpdate();;
+	GetViewManager()->CameraUpdate();;
 }
 //----------------------------------------------------------------------------
 void albaOpCrop::UpdateGui()
@@ -397,13 +397,13 @@ void albaOpCrop::OnEvent(albaEventBase *alba_event)
 			case ID_SHOW_HANDLES:
 			{
 				m_GizmoROI->ShowHandles(m_ShowHandles != 0);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_SHOW_ROI:      
 			{
 				m_GizmoROI->ShowROI(m_ShowROI != 0);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_CROP_DIR_X:
@@ -412,7 +412,7 @@ void albaOpCrop::OnEvent(albaEventBase *alba_event)
 				bb[1] = m_XminXmax[1];
 				m_Gui->Update();
 				m_GizmoROI->SetBounds(bb);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			break;
 			case ID_CROP_DIR_Y:
 				m_GizmoROI->GetBounds(bb);
@@ -420,7 +420,7 @@ void albaOpCrop::OnEvent(albaEventBase *alba_event)
 				bb[3] = m_YminYmax[1];
 				m_Gui->Update();
 				m_GizmoROI->SetBounds(bb);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			break;
 			case ID_CROP_DIR_Z:
 				m_GizmoROI->GetBounds(bb);
@@ -428,12 +428,12 @@ void albaOpCrop::OnEvent(albaEventBase *alba_event)
 				bb[5] = m_ZminZmax[1];
 				m_Gui->Update();
 				m_GizmoROI->SetBounds(bb);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			break;
 			case ID_RESET_CROPPING_AREA:
 				m_GizmoROI->Reset();
 				UpdateGui();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			break;    
 			case wxOK:
 				Crop();

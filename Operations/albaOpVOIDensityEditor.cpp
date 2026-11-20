@@ -228,7 +228,7 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
   m_Input->GetOutput()->Update();
   
 	GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -260,6 +260,6 @@ void albaOpVOIDensityEditor::OpUndo()
     }
     ((albaVMEVolumeGray *)m_Input)->Update();
     vtkDEL(m_OldData);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }

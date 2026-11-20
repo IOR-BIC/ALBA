@@ -105,7 +105,7 @@ void albaOpTransformInterface::PostMultiplyEventMatrix(albaEventBase *alba_event
       // update matrix for OpDo()
       m_NewAbsMatrix = absPose;
     } 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 
     // clean up
     tr->Delete();
@@ -275,7 +275,7 @@ void albaOpTransformInterface::OpDo()
   
   m_Input->GetOutput()->Update();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -288,6 +288,6 @@ void albaOpTransformInterface::SetRefSysVME(albaVME* refSysVME)
 
   m_RefSysVME = refSysVME;
   RefSysVmeChanged();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 }

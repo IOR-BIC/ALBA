@@ -347,7 +347,7 @@ void albaAnimate::FlyTo()
       camera->SetViewUp(fly[6],fly[7],fly[8]);
       camera->SetParallelScale(fly[9]);
 
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     }
   }
   else
@@ -357,7 +357,7 @@ void albaAnimate::FlyTo()
     camera->SetViewUp(fly1[6],fly1[7],fly1[8]);
     camera->SetParallelScale(fly1[9]);
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaAnimate::StoreViewPoint()

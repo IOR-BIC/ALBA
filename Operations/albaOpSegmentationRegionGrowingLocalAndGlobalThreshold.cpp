@@ -667,7 +667,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
 	    m_SurfaceOutput->ReparentTo(NULL);
 	  }
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 
   if (m_Gui)
@@ -696,7 +696,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
   {
     return;
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
@@ -718,5 +718,5 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
   {
     return;
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

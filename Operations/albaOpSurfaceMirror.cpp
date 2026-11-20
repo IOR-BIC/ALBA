@@ -153,7 +153,7 @@ void albaOpSurfaceMirror::OpDo()
   assert(m_OutputPolydata);
 
 	((albaVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSurfaceMirror::OpUndo()
@@ -162,7 +162,7 @@ void albaOpSurfaceMirror::OpUndo()
   assert(m_InputPolydata);
 
 	((albaVMESurface *)m_Input)->SetData(m_InputPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSurfaceMirror::OnEvent(albaEventBase *alba_event)
@@ -223,7 +223,7 @@ void albaOpSurfaceMirror::Preview()
   m_OutputPolydata->DeepCopy(m_MirrorFilter->GetOutput());
   ((albaVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	if (wait)
 		delete wait;

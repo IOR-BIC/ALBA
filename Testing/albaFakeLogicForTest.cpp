@@ -88,11 +88,6 @@ std::vector<albaVME*> albaFakeLogicForTest::ChooseVMEs(albaString title, void *a
 	return accepted;
 }
 
-// Camera /////////////////////////////////////////////////////////////////
-//-------------------------------------------------------------------------
-void albaFakeLogicForTest::CameraUpdate(){}
-//-------------------------------------------------------------------------
-void albaFakeLogicForTest::CameraReset(){}
 
 
 // UTILS /////////////////////////////////////////////////////////////////
@@ -148,28 +143,11 @@ albaOpManager * albaFakeLogicForTest::GetOpManager() const
 }
 
 //----------------------------------------------------------------------------
-albaViewManager * albaFakeLogicForTest::GetViewManager()
-{
-	return NULL;
-}
-
-//----------------------------------------------------------------------------
 albaProsthesesDBManager * albaFakeLogicForTest::GetProsthesesDBManager()
 {
 	return NULL;
 }
 
-//----------------------------------------------------------------------------
-void albaFakeLogicForTest::EnableCameraUpdateSkip()
-{
-	return;
-}
-
-//----------------------------------------------------------------------------
-void albaFakeLogicForTest::DisableCameraUpdateSkip()
-{
-	return;
-}
 
 //----------------------------------------------------------------------------
 bool albaFakeLogicForTest::IsVMEExpanded(albaVME *vme)

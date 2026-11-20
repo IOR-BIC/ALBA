@@ -247,7 +247,7 @@ void albaOpSplitSurface::OnEventThis(albaEventBase *alba_event)
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_BY:
@@ -270,7 +270,7 @@ void albaOpSplitSurface::OnEventThis(albaEventBase *alba_event)
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->Update();
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -301,7 +301,7 @@ void albaOpSplitSurface::OnEventThis(albaEventBase *alba_event)
 				else
 					OpStop(OP_RUN_OK);
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case wxCANCEL:
@@ -396,7 +396,7 @@ void albaOpSplitSurface::OnEventGizmoScale(albaEventBase *alba_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 		}
 		break;
 
@@ -430,7 +430,7 @@ void albaOpSplitSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 				currTr->Delete();
 			}
 			break;
@@ -498,7 +498,7 @@ void albaOpSplitSurface::ChangeGizmo()
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSplitSurface::OpStop(int result)
@@ -551,7 +551,7 @@ void albaOpSplitSurface::OpDo()
 
 		m_ClippedVME->ReparentTo(m_Input->GetParent());
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSplitSurface::OpUndo()
@@ -563,7 +563,7 @@ void albaOpSplitSurface::OpUndo()
 		m_ClippedVME->ReparentTo(NULL);
 		albaDEL(m_ClippedVME);
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 int albaOpSplitSurface::Clip()
@@ -677,7 +677,7 @@ void albaOpSplitSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -768,7 +768,7 @@ void albaOpSplitSurface::ShowClipPlane(bool show)
     }
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSplitSurface::AttachInteraction()

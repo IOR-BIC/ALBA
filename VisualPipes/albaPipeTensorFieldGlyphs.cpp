@@ -1400,7 +1400,7 @@ void albaPipeTensorFieldGlyphs::OnEvent(albaEventBase *alba_event)
         
       UpdateVTKPipe(); 
     
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
       return;
     }     
   }

@@ -116,7 +116,7 @@ void albaOp::OpDo()
   if (m_Output)
   {
     m_Output->ReparentTo(m_Input);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ void albaOp::OpUndo()
   if (m_Output)
   {
     GetLogicManager()->VmeRemove(m_Output);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

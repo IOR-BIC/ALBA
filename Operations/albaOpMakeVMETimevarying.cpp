@@ -208,7 +208,7 @@ void albaOpMakeVMETimevarying::CreateGui()
   //--------------------------//
 
 	ShowGui();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
