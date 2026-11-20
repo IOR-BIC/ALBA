@@ -58,7 +58,6 @@
 #include "albaGUIMDIChild.h"
 #include "albaGUICheckTree.h"
 #include "albaGUITimeBar.h"
-#include "albaGUIMaterialChooser.h"
 #include "albaGUIViewFrame.h"
 #include "albaGUIApplicationSettings.h"
 #include "albaGUISettingsTimeBar.h"
@@ -160,8 +159,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_OpMenu = NULL;
 	m_ViewMenu = NULL;
 	m_RecentFileMenu = NULL;
-
-	m_MaterialChooser = NULL;
 
 	m_PrintSupport = new albaPrintManager();
 
@@ -498,7 +495,6 @@ void albaLogicWithManagers::OnQuit()
 		cppDEL(m_SnapshotManager);
 
 	cppDEL(m_VMEManager);
-	cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
 
 	if (albaServiceLocator::GetViewManager() == m_ViewManager)
@@ -654,9 +650,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case VME_REMOVING:
 			VmeRemoving(e->GetVme());
 			break;
-		case VME_CHOOSE_MATERIAL:
-			VmeChooseMaterial(e->GetVme(), e->GetBool());
-			break;
 		case UPDATE_PROPERTY:
 			VmeUpdateProperties(e->GetVme(), e->GetBool());
 			break;
@@ -798,7 +791,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case ID_APP_SETTINGS:
 			m_SettingsDialog->ShowModal();
 			break;
-case CREATE_STORAGE:
+		case CREATE_STORAGE:
 			CreateStorage(e);
 			break;
 		case ABOUT_APPLICATION:
@@ -1339,20 +1332,6 @@ void albaLogicWithManagers::VmeSelected(albaVME *vme)
 	EnableMenuAndToolbar();
 }
 
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::VmeChooseMaterial(albaVME *vme, bool updateProperty)
-{
-	if (m_MaterialChooser == NULL)
-	{
-		m_MaterialChooser = new albaGUIMaterialChooser();
-	}
-	if (m_MaterialChooser->ShowChooserDialog(vme))
-	{
-		this->m_ViewManager->PropertyUpdate(updateProperty);
-		this->m_ViewManager->CameraUpdate();
-		this->m_VMEManager->MSFModified(true);
-	}
-}
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeUpdateProperties(albaVME *vme, bool updatePropertyFromTag)
 {

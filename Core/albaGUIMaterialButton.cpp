@@ -29,6 +29,7 @@
 #include "albaGUIValidator.h"
 #include "mmaMaterial.h"
 #include "albaGUIPicButton.h"
+#include "albaGUIMaterialChooser.h"
 
 
 #include "albaVME.h"
@@ -118,7 +119,15 @@ void albaGUIMaterialButton::OnEvent(albaEventBase *alba_event)
     switch(e->GetId())
     {
       case ID_MATERIAL:
-        albaEventMacro(albaEvent(this,VME_CHOOSE_MATERIAL,m_Vme));
+      {
+        albaGUIMaterialChooser chooser;
+        if (chooser.ShowChooserDialog(m_Vme))
+        {
+          GetViewManager()->PropertyUpdate();
+          GetLogicManager()->VmeModified(m_Vme);
+          albaEventMacro(albaEvent(this, VME_MATERIAL_CHANGED, m_Vme));
+        }
+      }
         m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
         UpdateMaterialIcon();
 				GetViewManager()->CameraUpdate();

@@ -1724,7 +1724,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 				Modified();
 				InternalUpdate();
 				GetViewManager()->CameraUpdate();
-}
+			}
 			break;
 			case ID_WRAPPED_METER_MODE:
 			{
@@ -1738,7 +1738,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 				Modified();
 				InternalUpdate();
 				GetViewManager()->CameraUpdate();
-}
+			}
 			break;
 			case ID_WRAPPED_SIDE:
 			case ID_WRAPPED_REVERSE:

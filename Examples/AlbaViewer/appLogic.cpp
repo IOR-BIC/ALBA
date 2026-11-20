@@ -209,7 +209,6 @@ void appLogic::OnQuit()
 		cppDEL(m_SnapshotManager);
 
 	cppDEL(m_VMEManager);
-	cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
 	cppDEL(m_ViewManager);
 	cppDEL(m_InteractionManager);

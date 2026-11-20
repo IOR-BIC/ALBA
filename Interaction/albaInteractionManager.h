@@ -174,7 +174,7 @@ public:
   /** Start the fly-to mode: push the fly-to tool, the next click flies to the clicked point */
   void CameraFlyToMode();
 
-/** Open a dialog to choose among available devices */
+  /** Open a dialog to choose among available devices */
   int DeviceChooser(wxString &dev_name,wxString &dev_type);
 
   /** This is used to allow also external objects to add devices */
@@ -206,7 +206,7 @@ protected:
   /** The camera updates requested while the device events are dispatched are fused into one at the end of the dispatching */
   virtual void OnStartDispatching();
   virtual void OnEndDispatching();
-virtual void OnDeviceAdded(albaEventBase *event);
+  virtual void OnDeviceAdded(albaEventBase *event);
   virtual void OnDeviceRemoving(albaEventBase *event);
   virtual void OnDeviceNameChanged(albaEventBase *event);
   virtual void OnBindDeviceToAction(albaEvent *e);
@@ -236,7 +236,7 @@ virtual void OnDeviceAdded(albaEventBase *event);
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
 
-albaView*                            m_SelectedView;     ///< the view currently selected
+  albaView*                            m_SelectedView;     ///< the view currently selected
   vtkRenderer*                        m_CurrentRenderer;  ///< the renderer of selected view: to be removed!
 
 private:

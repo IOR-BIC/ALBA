@@ -165,7 +165,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VME_SELECTED,  // from albaOpSelect
 											 VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
 											 VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
-											 VME_CHOOSE_MATERIAL,
+											 VME_MATERIAL_CHANGED, // from albaGUIMaterialButton to its listener, after the user chose a new material
 											 CREATE_STORAGE,
 
 											 // events about views

@@ -533,7 +533,7 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
   {
     OnEndDispatching();
   }
-else if (id == SHOW_VIEW_CONTEXTUAL_MENU)
+  else if (id == SHOW_VIEW_CONTEXTUAL_MENU)
   {
     albaVME *vme = (albaVME *)event->GetData();
     bool vme_context_menu = (vme != NULL) && !vme->IsA("albaVMEGizmo");

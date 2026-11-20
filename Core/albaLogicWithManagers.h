@@ -32,7 +32,6 @@
 // forward reference
 class albaViewManager;
 class albaOpManager;
-class albaGUIMaterialChooser;
 class albaVME;
 class albaVMELandmark;
 class albaVMELandmarkCloud;
@@ -383,9 +382,6 @@ protected:
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
-	/** Build a dialog to show all available materials. */
-	virtual void VmeChooseMaterial(albaVME *vme, bool updateProperty);
-
 	//Update Vme Visual Properties
 	virtual void VmeUpdateProperties(albaVME *vme, bool updatePropertyFromTag);
 
@@ -446,7 +442,6 @@ protected:
 	albaProsthesesDBManager *m_ProsthesisDBManager;
 
 
-	albaGUIMaterialChooser  *m_MaterialChooser;
 	albaPrintManager     *m_PrintSupport;
 
 	albaDeviceButtonsPadMouse            *m_Mouse;

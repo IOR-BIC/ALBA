@@ -367,9 +367,8 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 					}
 				}
 				break;
-			case VME_CHOOSE_MATERIAL:
+			case VME_MATERIAL_CHANGED:
 				{
-					albaEventMacro(*e);
 					mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 					if (material && material->m_Prop)
 					{

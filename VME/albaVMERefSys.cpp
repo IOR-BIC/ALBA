@@ -281,7 +281,7 @@ void albaVMERefSys::SetScaleFactor(double scale)
   m_ScaleAxisTransform->Update();
   m_ScaleAxis->Update();
   GetViewManager()->CameraUpdate();
-Modified();
+  Modified();
 }
 
 //-------------------------------------------------------------------------
