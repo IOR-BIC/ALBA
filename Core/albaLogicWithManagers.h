@@ -376,6 +376,12 @@ protected:
 	virtual void VmeRemoved();
 
 	virtual void VmeVisualModeChanged(albaVME * vme);
+
+	/** Show the tree in a dialog and return the VME chosen by the user, NULL on cancel. */
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+
+	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
 	/** Build a dialog to show all available materials. */
 	virtual void VmeChooseMaterial(albaVME *vme, bool updateProperty);

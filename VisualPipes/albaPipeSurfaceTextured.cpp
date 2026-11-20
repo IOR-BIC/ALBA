@@ -402,12 +402,7 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 			break;
 		case ID_CHOOSE_TEXTURE:
 		{
-			albaString title = "Choose texture";
-			e->SetId(VME_CHOOSE);
-			e->SetPointer(&albaPipeSurfaceTextured::ImageAccept);
-			e->SetString(&title);
-			albaEventMacro(*e);
-			albaVME *n = e->GetVme();
+			albaVME *n = GetLogicManager()->ChooseVME("Choose texture", &albaPipeSurfaceTextured::ImageAccept);
 			if (n != NULL)
 			{
 				vtkImageData *image = vtkImageData::SafeDownCast(n->GetOutput()->GetVTKData());

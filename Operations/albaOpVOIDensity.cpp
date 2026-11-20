@@ -516,12 +516,7 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 		{
 			case ID_CHOOSE_SURFACE:
 			{
-				albaString title = _("VOI surface");
-        albaEvent event(this,VME_CHOOSE,&title);
-				event.SetPointer(&albaOpVOIDensity::OutputSurfaceAccept);
-				albaEventMacro(event);
-
-				if (SetSurface(event.GetVme()) != ALBA_ERROR)
+        if (SetSurface(GetLogicManager()->ChooseVME(_("VOI surface"), &albaOpVOIDensity::OutputSurfaceAccept)) != ALBA_ERROR)
 				{
 					EvaluateSurface();
 					EnableDisableGUI(true);

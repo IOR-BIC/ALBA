@@ -98,7 +98,7 @@ public:
 	bool IsShown() {return m_Notebook->IsShown();};
   void Show(bool show) {m_Notebook->Show(show);};
 
-	// Respond to a VME_CHOOSE event. Build a dialog containing the vme tree and return the vme choosed from the user.
+	// Build a dialog containing the vme tree and return the vmes chosen by the user (used by the logic ChooseVME/ChooseVMEs).
 	std::vector<albaVME*> VmeChoose(void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, albaString title = "Choose Node", bool multiSelect = false, albaVME *vme = NULL);
 
 	// Open a Find VME dialog.

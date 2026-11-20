@@ -237,12 +237,7 @@ void albaOpSplitSurface::OnEventThis(albaEventBase *alba_event)
 		{
 		case ID_CHOOSE_SURFACE:
 			{
-				albaString title = "Choose Clipper Surface";
-        e->SetPointer(&albaOpSplitSurface::SurfaceAccept);
-				e->SetString(&title);
-				e->SetId(VME_CHOOSE);
-				albaEventMacro(*e);
-				m_ClipperVME = albaVMESurface::SafeDownCast(e->GetVme());
+        m_ClipperVME = albaVMESurface::SafeDownCast(GetLogicManager()->ChooseVME("Choose Clipper Surface", &albaOpSplitSurface::SurfaceAccept));
 				if(m_ClipperVME == NULL)
 					return;
 				m_Gui->Enable(wxOK,true);

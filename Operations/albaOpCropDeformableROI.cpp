@@ -293,13 +293,5 @@ void albaOpCropDeformableROI::EnableDisableGui()
 
 void albaOpCropDeformableROI::MaskSelection()
 {
-	albaEvent *e; 
-	e = new albaEvent();
-	albaString title = _("Choose mask");
-	e->SetId(VME_CHOOSE);
-	e->SetPointer(&albaOpCropDeformableROI::OutputSurfaceAccept);
-	e->SetString(&title);
-	albaEventMacro(*e);
-	m_PNode = e->GetVme();
-	delete e;
+	m_PNode = GetLogicManager()->ChooseVME(_("Choose mask"), &albaOpCropDeformableROI::OutputSurfaceAccept);
 }

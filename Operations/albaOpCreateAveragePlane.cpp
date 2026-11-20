@@ -73,15 +73,9 @@ bool albaOpCreateAveragePlane::InternalAccept(albaVME *node)
 //----------------------------------------------------------------------------
 void albaOpCreateAveragePlane::OpRun()
 {
-	albaString title = _("Choose Plane");
-	albaEvent e(this, VME_CHOOSE, &title);
-	e.SetPointer(&PlaneAccept);
-
 	glo_CurrentVME = m_Input;
-	albaEventMacro(e);
+	m_SelVME = GetLogicManager()->ChooseVME(_("Choose Plane"), &PlaneAccept);
 	glo_CurrentVME = NULL;
-	
-	m_SelVME = e.GetVme();
 
 	if (m_SelVME)
 	{

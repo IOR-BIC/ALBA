@@ -385,7 +385,7 @@ protected:
   Returns NULL, if the user cancels the selection. */
   virtual albaVME* SelectCurveVME();
 
-  /** Callback for VME_CHOOSE that accepts polylines only */
+  /** Callback for ChooseVME that accepts polylines only */
   static bool SelectCurveVMECallback(albaVME *vme);
 
   /** Creates albaPolyLineGraph for the given vme */

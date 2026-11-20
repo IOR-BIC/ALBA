@@ -305,12 +305,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			break;
 			case ID_SELECT_PROBE_VME:
 			{
-				albaString s(_("Choose Probe Map Volume"));
-				albaEvent e(this, VME_CHOOSE, &s);
-				e.SetPointer(&albaPipeWithScalar::VolumeAccept);
-				albaEventMacro(e);
-
-				albaVME *vme = e.GetVme();
+				albaVME *vme = GetLogicManager()->ChooseVME(_("Choose Probe Map Volume"), &albaPipeWithScalar::VolumeAccept);
 				if (vme == NULL)
 					return;
 

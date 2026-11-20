@@ -66,6 +66,28 @@ void albaFakeLogicForTest::VmeVisualModeChanged(albaVME * vme)
 	AddCall(albaFakeLogicForTest::FKL_VME_VISUAL_MODE_CHANGED, vme);
 }
 
+//-------------------------------------------------------------------------
+albaVME *albaFakeLogicForTest::ChooseVME(albaString title, void *acceptFunction, albaVME *selected)
+{
+	std::vector<albaVME*> accepted = ChooseVMEs(title, acceptFunction, selected);
+	return accepted.empty() ? NULL : accepted[0];
+}
+
+//-------------------------------------------------------------------------
+std::vector<albaVME*> albaFakeLogicForTest::ChooseVMEs(albaString title, void *acceptFunction, albaVME *selected)
+{
+	typedef bool(*AcceptFunction)(albaVME *);
+	AcceptFunction accept = (AcceptFunction)acceptFunction;
+
+	m_ChooseCalls++;
+	std::vector<albaVME*> accepted;
+	for (int i = 0; i < m_ChooseCandidates.size(); i++)
+		if (accept == NULL || accept(m_ChooseCandidates[i]))
+			accepted.push_back(m_ChooseCandidates[i]);
+
+	return accepted;
+}
+
 // Camera /////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------
 void albaFakeLogicForTest::CameraUpdate(){}
@@ -79,6 +101,7 @@ void albaFakeLogicForTest::CameraReset(){}
 void albaFakeLogicForTest::ClearCalls()
 {
 	m_Calls.clear();
+	m_ChooseCalls = 0;
 }
 
 //-------------------------------------------------------------------------

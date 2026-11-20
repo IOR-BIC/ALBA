@@ -653,34 +653,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case VME_REMOVING:
 			VmeRemoving(e->GetVme());
 			break;
-		case VME_CHOOSE:
-		{
-			albaString *s = e->GetString();
-			albaString str;
-
-			if (s != NULL)
-				str = *s;
-			else
-				str = "Choose Node";
-
-			std::vector<albaVME*> nodeVector = m_SideBar->VmeChoose(e->GetPointer(), REPRESENTATION_AS_TREE, str, e->GetBool(), e->GetVme());
-			if (!e->GetBool())
-			{
-				if (nodeVector.size() != 0)
-				{
-					e->SetVme(nodeVector[0]);
-				}
-				else
-				{
-					e->SetVme(NULL);
-				}
-			}
-			else
-			{
-				e->SetVmeVector(nodeVector);
-			}
-		}
-		break;
 		case VME_CHOOSE_MATERIAL:
 			VmeChooseMaterial(e->GetVme(), e->GetBool());
 			break;
@@ -1304,6 +1276,23 @@ void albaLogicWithManagers::VmeVisualModeChanged(albaVME * vme)
 		VmeShow(vme, false);
 		VmeShow(vme, true);
 	}
+}
+//----------------------------------------------------------------------------
+albaVME *albaLogicWithManagers::ChooseVME(albaString title, void *acceptFunction, albaVME *selected)
+{
+	if (m_SideBar == NULL)
+		return NULL;
+
+	std::vector<albaVME*> chosen = m_SideBar->VmeChoose(acceptFunction, REPRESENTATION_AS_TREE, title, false, selected);
+	return chosen.empty() ? NULL : chosen[0];
+}
+//----------------------------------------------------------------------------
+std::vector<albaVME*> albaLogicWithManagers::ChooseVMEs(albaString title, void *acceptFunction, albaVME *selected)
+{
+	if (m_SideBar == NULL)
+		return std::vector<albaVME*>();
+
+	return m_SideBar->VmeChoose(acceptFunction, REPRESENTATION_AS_TREE, title, true, selected);
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::VmeSelect(albaVME *vme)

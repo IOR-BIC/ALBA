@@ -87,10 +87,7 @@ void albaOpReparentTo::OpRun()
 
   if (m_TargetVme == NULL)
   {
-    albaEvent e(this,VME_CHOOSE);
-		e.SetPointer(&VMEAcceptForReparent);
-    albaEventMacro(e);
-    m_TargetVme = e.GetVme();
+    m_TargetVme = GetLogicManager()->ChooseVME("Choose Node", &VMEAcceptForReparent);
   }
 	
 	int result = OP_RUN_CANCEL;

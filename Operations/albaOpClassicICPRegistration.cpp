@@ -292,9 +292,7 @@ void albaOpClassicICPRegistration::OpDo()
 void albaOpClassicICPRegistration::OnChooseTarget()   
 //----------------------------------------------------------------------------
 {
-	albaEvent e(this,VME_CHOOSE);
-	albaEventMacro(e);
-	albaVME *vme = e.GetVme();
+	albaVME *vme = GetLogicManager()->ChooseVME();
 
 	if(!vme) return; // the user choosed cancel - keep previous target
   if(!InternalAccept(vme)) // the user choosed ok     - check if it is a valid vme

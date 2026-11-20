@@ -339,11 +339,7 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
     // move this to opgui; both gizmos and gui should know ref sys
     case ID_AUX_REF_SYS:
     {
-      albaString s;
-      s << "Choose VME ref sys";
-			albaEvent e(this,VME_CHOOSE, &s);
-			albaEventMacro(e);
-      SetRefSysVME(e.GetVme());
+			SetRefSysVME(GetLogicManager()->ChooseVME("Choose VME ref sys"));
     }
     break;
 

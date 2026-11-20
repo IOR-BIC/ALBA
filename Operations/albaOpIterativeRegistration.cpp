@@ -256,11 +256,7 @@ void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
   {
     case ID_CHOOSE_TARGET:
     {
-      albaString title = _("Choose target vme");
-      albaEvent e(this,VME_CHOOSE,&title);
-			e.SetPointer(&albaOpIterativeRegistration::VmeAccept);
-      albaEventMacro(e); 
-      m_TargetVME = e.GetVme();
+      m_TargetVME = GetLogicManager()->ChooseVME(_("Choose target vme"), &albaOpIterativeRegistration::VmeAccept);
       if (m_TargetVME)
       {
         AttachPicker(TARGET, m_TargetVME);

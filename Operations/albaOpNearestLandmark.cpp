@@ -79,12 +79,7 @@ void albaOpNearestLandmark::OpRun()
 	albaVMELandmark *lm = albaVMELandmark::SafeDownCast(m_Input);
 	if (lm == NULL)
 	{
-		albaString lmTitle = albaString("Select a landmark:");
-		albaEvent lmEvent(this, VME_CHOOSE);
-		lmEvent.SetString(&lmTitle);
-		lmEvent.SetPointer(&LandmarkAccept);
-		albaEventMacro(lmEvent);
-		lm = albaVMELandmark::SafeDownCast(lmEvent.GetVme());
+		lm = albaVMELandmark::SafeDownCast(GetLogicManager()->ChooseVME("Select a landmark:", &LandmarkAccept));
 
 		if (lm == NULL)
 		{
@@ -93,12 +88,7 @@ void albaOpNearestLandmark::OpRun()
 		}
 	}
 
-	albaString title = albaString("Select a surface:");
-	albaEvent e(this, VME_CHOOSE);
-	e.SetString(&title);
-	e.SetPointer(&SurfaceAccept);
-	albaEventMacro(e);
-	albaVME *surface = (albaVME *)e.GetVme();
+	albaVME *surface = GetLogicManager()->ChooseVME("Select a surface:", &SurfaceAccept);
 
 	if (surface == NULL)
 	{

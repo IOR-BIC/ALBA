@@ -142,11 +142,7 @@ void albaOpInteractionDebugger::OnEvent(albaEventBase *alba_event)
       break;
       case ID_CHOOSE:
       {
-        albaString s(_("Choose Constrain"));
-        albaEvent e(this,VME_CHOOSE, &s);
-				e.SetPointer(&albaOpInteractionDebugger::ConstrainAccept);
-        albaEventMacro(e);
-        albaVME *vme = e.GetVme();
+        albaVME *vme = GetLogicManager()->ChooseVME(_("Choose Constrain"), &albaOpInteractionDebugger::ConstrainAccept);
         if(vme != NULL)
         {
           OnChooseConstrainVme(vme);

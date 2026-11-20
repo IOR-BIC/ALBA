@@ -288,11 +288,7 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
         {
           return;
         }
-        albaString s(_("Choose Constrain"));
-        albaEvent e(this,VME_CHOOSE, &s);
-				e.SetPointer(&albaOpInteractiveClipSurface::ConstrainAccept);
-        albaEventMacro(e);
-        albaVME *vme = e.GetVme();
+        albaVME *vme = GetLogicManager()->ChooseVME(_("Choose Constrain"), &albaOpInteractiveClipSurface::ConstrainAccept);
         if(vme != NULL)
         {
           OnChooseConstrainVme(vme);
@@ -303,12 +299,7 @@ void albaOpInteractiveClipSurface::OnEventThis(albaEventBase *alba_event)
       break;
 		case ID_CHOOSE_SURFACE:
 			{
-				albaString title = "Choose m_Clipper Surface";
-				e->SetPointer(&albaOpInteractiveClipSurface::SurfaceAccept);
-				e->SetString(&title);
-				e->SetId(VME_CHOOSE);
-				albaEventMacro(*e);
-				m_ClipperVME = albaVMESurface::SafeDownCast(e->GetVme());
+				m_ClipperVME = albaVMESurface::SafeDownCast(GetLogicManager()->ChooseVME("Choose m_Clipper Surface", &albaOpInteractiveClipSurface::SurfaceAccept));
 				if(m_ClipperVME == NULL)
 					return;
 				m_Gui->Enable(wxOK,true);

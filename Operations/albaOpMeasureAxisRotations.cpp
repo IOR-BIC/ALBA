@@ -170,15 +170,11 @@ bool albaOpMeasureAxisRotations::AcceptRelative(albaVME* node)
 //----------------------------------------------------------------------------
 void albaOpMeasureAxisRotations::ChooseRelativeVME()
 {
-	albaString s;
-	s << "Choose VME Reference System";
-	albaEvent e(this, VME_CHOOSE, &s);
-	e.SetPointer(&AcceptRelative);
-	albaEventMacro(e);
+	albaVME *chosenVME = GetLogicManager()->ChooseVME("Choose VME Reference System", &AcceptRelative);
 
-	if (e.GetVme())
+	if (chosenVME)
 	{
-		m_RelativeVME = e.GetVme();
+		m_RelativeVME = chosenVME;
 		m_RelativeVMEName = m_RelativeVME->GetName();
 	}
 }

@@ -236,13 +236,8 @@ void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
       //------------------------------------------//
       case ID_ADD_VME_BUTTON:
       {
-        albaString title = _("Choose VME");
-        albaEvent e(this,VME_CHOOSE,&title);
-				e.SetPointer(&albaOpMakeVMETimevarying::DialogAcceptVME);
-        albaEventMacro(e);
-        
         //albaNEW(m_CurrentVME);
-        m_CurrentVME = e.GetVme();
+        m_CurrentVME = GetLogicManager()->ChooseVME(_("Choose VME"), &albaOpMakeVMETimevarying::DialogAcceptVME);
         bool VMEOk = AcceptVME(m_CurrentVME);
         if(m_CurrentVME)
         {

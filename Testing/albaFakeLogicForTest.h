@@ -63,6 +63,18 @@ public:
 
 	virtual void VmeVisualModeChanged(albaVME * vme);
 
+	/** Return the first candidate accepted by acceptFunction (see SetChooseCandidates), NULL if none: no dialog is shown */
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+
+	/** Return all the candidates accepted by acceptFunction (see SetChooseCandidates): no dialog is shown */
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+
+	/** Set the VMEs offered to ChooseVME and ChooseVMEs, in the order the user would find them */
+	void SetChooseCandidates(std::vector<albaVME*> candidates) { m_ChooseCandidates = candidates; }
+
+	/** Return the number of ChooseVME and ChooseVMEs calls since the last ClearCalls */
+	int GetNumberOfChooseCalls() { return m_ChooseCalls; }
+
 	// Camera
 	virtual void CameraUpdate();
 
@@ -132,5 +144,7 @@ protected:
 	std::vector<calls> m_Calls;
 	std::vector<albaInteractionTool *> m_PushedTools;
 	albaView *m_SelectedView = NULL;
+	std::vector<albaVME*> m_ChooseCandidates;
+	int m_ChooseCalls = 0;
 };
 #endif

@@ -890,12 +890,7 @@ void albaOpAddLandmark::LoaDictionaryFromCloud(albaVMELandmarkCloud *cloud)
 {
 	if (cloud == NULL)
 	{
-		albaString title = _("Choose Landmark Cloud");
-		albaEvent e(this, VME_CHOOSE, &title);
-		e.SetPointer(&albaOpAddLandmark::LandmarkCloudAccept);
-		albaEventMacro(e);
-
-		cloud = (albaVMELandmarkCloud *)e.GetVme();
+		cloud = (albaVMELandmarkCloud *)GetLogicManager()->ChooseVME(_("Choose Landmark Cloud"), &albaOpAddLandmark::LandmarkCloudAccept);
 	}
 
 	if (cloud)

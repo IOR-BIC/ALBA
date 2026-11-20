@@ -342,12 +342,7 @@ void albaVMEPolylineSpline::OnEvent(albaEventBase *alba_event)
       case ID_LINK_POLYLINE:
       {
         albaID button_id = e->GetId();
-        albaString title = _("Choose vme");
-        e->SetId(VME_CHOOSE);
-        e->SetPointer(&albaVMEPolylineSpline::PolylineAccept);
-        e->SetString(&title);
-        ForwardUpEvent(e);
-        albaVME *n = e->GetVme();
+        albaVME *n = GetLogicManager()->ChooseVME(_("Choose vme"), &albaVMEPolylineSpline::PolylineAccept);
         if (n != NULL)
         {
 					SetPolylineLink(n);

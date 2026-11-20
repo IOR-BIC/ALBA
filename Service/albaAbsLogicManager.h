@@ -19,6 +19,7 @@
 
 #include "albaConfigure.h"
 #include "albaString.h"
+#include <vector>
 
 class albaVME;
 class albaVMEImage;
@@ -49,6 +50,13 @@ public:
 	virtual void VmeModified(albaVME* vme) = 0;
 
 	virtual void VmeVisualModeChanged(albaVME * vme) = 0;
+
+	/** Show the tree in a dialog titled title and return the VME chosen by the user, NULL on cancel.
+	acceptFunction is a bool (*)(albaVME *) that tells which VMEs can be chosen (all if NULL), selected is the VME selected when the dialog opens. */
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
+
+	/** Same as ChooseVME, but the user can choose more VMEs; returns an empty vector on cancel. */
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
 
 	//Camera
 	virtual void CameraUpdate() = 0;

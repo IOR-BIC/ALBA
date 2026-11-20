@@ -1692,14 +1692,11 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 			{
 				albaID button_id = e->GetId();
 				albaString title = _("Choose meter vme link");
-				e->SetId(VME_CHOOSE);
+				albaVME *n;
 				if (button_id == ID_WRAPPED_METER_LINK)
-					e->SetPointer(&albaVMEWrappedMeter::VMESurfaceParametricAccept);
+					n = GetLogicManager()->ChooseVME(title, &albaVMEWrappedMeter::VMESurfaceParametricAccept);
 				else
-					e->SetPointer(&albaVMEWrappedMeter::VMEAccept);
-				e->SetString(&title);
-				ForwardUpEvent(e);
-				albaVME *n = e->GetVme();
+					n = GetLogicManager()->ChooseVME(title, &albaVMEWrappedMeter::VMEAccept);
 				if (n != NULL)
 				{
 					if (button_id == ID_START_METER_LINK)
@@ -1759,12 +1756,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 				wxMessageBox("Current max point number is one!");
 				return;
 				}*/
-				albaString title = _("Choose a vme");
-				e->SetId(VME_CHOOSE);
-				e->SetPointer(&albaVMEWrappedMeter::VMEAccept);
-				e->SetString(&title);
-				ForwardUpEvent(e);
-				albaVME *n = e->GetVme();
+				albaVME *n = GetLogicManager()->ChooseVME(_("Choose a vme"), &albaVMEWrappedMeter::VMEAccept);
 
 				if (n == NULL) return;
 

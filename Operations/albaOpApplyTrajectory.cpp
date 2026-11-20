@@ -233,15 +233,9 @@ void albaOpApplyTrajectory::OnEvent(albaEventBase *alba_event)
       break;
     case ID_SELECT_VME:
       {
-        albaString title = albaString("Select a VME:");
-        albaEvent e(this,VME_CHOOSE);
-        e.SetString(&title);
-        e.SetPointer(&albaOpApplyTrajectory::AcceptInputVME); // accept only time-varying VME
-        albaEventMacro(e);
-        if (e.GetVme())
-        {
-          m_VME = e.GetVme();
-        }
+        albaVME *chosenVME = GetLogicManager()->ChooseVME("Select a VME:", &albaOpApplyTrajectory::AcceptInputVME); // accept only time-varying VME
+        if (chosenVME)
+          m_VME = chosenVME;
 
         if (!m_TestMode)
         {

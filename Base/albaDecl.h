@@ -163,7 +163,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VME_REMOVING,  // from albaVmeManager to albaLogic 
 											 VME_SELECT,    // from albaGUITree or albaISV - run albaOpSelect
 											 VME_SELECTED,  // from albaOpSelect
-											 VME_CHOOSE,    // from a albaOp to receive more operands
 											 VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
 											 VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
 											 VME_CHOOSE_MATERIAL,

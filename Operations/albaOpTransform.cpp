@@ -623,13 +623,7 @@ void albaOpTransform::SelectRefSys()
 //----------------------------------------------------------------------------
 void albaOpTransform::ChooseRelativeRefSys()
 {
-	albaString s;
-	s << "Choose VME Reference System";
-	albaEvent e(this, VME_CHOOSE, &s);
-	e.SetPointer(&AcceptRefSys);
-	albaEventMacro(e);
-
-	SetRefSysVME(e.GetVme());
+	SetRefSysVME(GetLogicManager()->ChooseVME("Choose VME Reference System", &AcceptRefSys));
 
 	m_RelativeRefSysVME = (albaVMEPolyline *)m_RefSysVME;
 	m_RefSysVMEName = m_RefSysVME->GetName();
@@ -820,15 +814,11 @@ void albaOpTransform::Identity()
 //----------------------------------------------------------------------------
 void albaOpTransform::LoadFrom()
 {
-	albaString s;
-	s << "Choose VME";
-	albaEvent e(this, VME_CHOOSE, &s);
-	e.SetPointer(&AcceptRefSys);
-	albaEventMacro(e);
+	albaVME *chosenVME = GetLogicManager()->ChooseVME("Choose VME", &AcceptRefSys);
 
 	albaMatrix targetMtr;
-	if(e.GetVme())
-	 targetMtr.DeepCopy(e.GetVme()->GetOutput()->GetAbsMatrix());
+	if(chosenVME)
+		targetMtr.DeepCopy(chosenVME->GetOutput()->GetAbsMatrix());
 
 	m_Input->SetAbsMatrix(targetMtr, m_CurrentTime);
 	m_TransformVME->SetAbsMatrix(targetMtr, m_CurrentTime);

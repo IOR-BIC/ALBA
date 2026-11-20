@@ -106,30 +106,24 @@ void albaOpTransformAtoB::OpRun()
 
 	m_InputMatrix.DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 
-	albaString s = "Choose VME Base Transform VME";
-	albaEvent e(this, VME_CHOOSE, &s);
-	e.SetPointer(&AcceptA);
-	albaEventMacro(e);
+	albaVME *chosenVME = GetLogicManager()->ChooseVME("Choose VME Base Transform VME", &AcceptA);
 
-	if (e.GetVme() == NULL)
+	if (chosenVME == NULL)
 	{
 		OpStop(OP_RUN_CANCEL);
 		return;
 	}
-	m_BaseVME= GLO_TransformAtoBBase = e.GetVme();
+	m_BaseVME= GLO_TransformAtoBBase = chosenVME;
 
-	albaString s2 = "Choose VME Target Transform VME";
-	albaEvent e2(this, VME_CHOOSE, &s);
-	e2.SetPointer(&AcceptB);
-	albaEventMacro(e2);
+	chosenVME = GetLogicManager()->ChooseVME("Choose VME Target Transform VME", &AcceptB);
 
-	if (e2.GetVme() == NULL)
+	if (chosenVME == NULL)
 	{
 		OpStop(OP_RUN_CANCEL);
 		return;
 	}
 
-	m_TargerVME = e2.GetVme();
+	m_TargerVME = chosenVME;
 
 	OpStop(OP_RUN_OK);
 }

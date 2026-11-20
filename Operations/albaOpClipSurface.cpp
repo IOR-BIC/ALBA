@@ -332,13 +332,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 void albaOpClipSurface::ChooseSurface()
 {
 	currentVME = m_Input;
-	albaEvent e;
-	albaString title = "Choose m_Clipper Surface";
-	e.SetPointer(&albaOpClipSurface::SurfaceAccept);
-	e.SetString(&title);
-	e.SetId(VME_CHOOSE);
-	albaEventMacro(e);
-	m_ClipperVME = e.GetVme();
+	m_ClipperVME = GetLogicManager()->ChooseVME("Choose m_Clipper Surface", &albaOpClipSurface::SurfaceAccept);
 	currentVME = NULL;
 	if (m_ClipperVME == NULL)
 		return;

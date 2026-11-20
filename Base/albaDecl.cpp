@@ -426,7 +426,6 @@ wxString  albaIdString(int id)
      case VME_REMOVING:	        s="VME_REMOVING"; break; 
      case VME_SELECT:	          s="VME_SELECT"; break; 
      case VME_SELECTED:	        s="VME_SELECTED"; break;
-     case VME_CHOOSE:						s="VME_CHOOSE"; break; 
      case VME_PICKED:	          s="VME_PICKED"; break; 
      case VME_PICKING:	        s="VME_PICKING"; break; 
 

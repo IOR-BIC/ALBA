@@ -152,18 +152,6 @@ albaVMEOutput *DummyVme::GetOutput()
 }
 
 //----------------------------------------------------------------------------
-void DummyObserver::OnEvent(albaEventBase *alba_event)
-{
-	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-	{
-		if (e->GetId() == VME_CHOOSE)
-		{
-			e->SetVme(m_DummyVme);
-		}
-	}
-}
-
-//----------------------------------------------------------------------------
 //Main Test Executor
 int	main( int argc, char* argv[] )
 {
