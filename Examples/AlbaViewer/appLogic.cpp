@@ -163,11 +163,6 @@ void appLogic::OnEvent(albaEventBase *alba_event)
 			ShowVMEOnView();
 		}
 		break;
-		case ID_GET_FILENAME:
-		{
-			e->SetString(&(m_VMEManager->GetFileName()));
-		}
-		break;
 
 		default:
 			albaLogicWithManagers::OnEvent(alba_event);

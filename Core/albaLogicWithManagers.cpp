@@ -841,11 +841,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		}
 		break;
 		//-----from medLogic
-		case ID_GET_FILENAME:
-		{
-			e->SetString(&(m_VMEManager->GetFileName()));
-		}
-		break;
 		case MENU_FILE_SNAPSHOT:
 		{
 			if (m_SnapshotManager && m_VMEManager && m_ViewManager)

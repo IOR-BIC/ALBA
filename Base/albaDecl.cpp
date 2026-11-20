@@ -493,7 +493,6 @@ wxString  albaIdString(int id)
      case WIDGETS_START:	      s="WIDGETS_START"; break; 
      case ID_LAYOUT:	          s="ID_LAYOUT"; break; 
      case ID_CLOSE_SASH:	      s="ID_CLOSE_SASH"; break; 
-     case ID_LABEL_CLICK:	      s="ID_LABEL_CLICK"; break; 
 
      case IMPORT_FILE:          s="IMPORT_FILE"; break;
      case CLEAR_UNDO_STACK:     s="CLEAR_UNDO_STACK"; break;

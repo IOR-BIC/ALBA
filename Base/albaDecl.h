@@ -294,7 +294,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												WIDGETS_START,
 																												ID_LAYOUT,         //sent from a albaGUISashPanel to albaGUIFrame
 																												ID_CLOSE_SASH,     //sent from a albaGUIButton		to albaGUISashPanel 
-																												ID_LABEL_CLICK,    //sent from a albaGUILabel			to albaGUIViewPanel
 																												ID_RANGE_MODIFIED, //sent from a albaGUILutSlider	to albaGUIMDIChild  - ask to Views
 																												WIDGETS_END,
 
@@ -346,7 +345,6 @@ enum MED_MAIN_EVENT_ID
 {
 	MENU_FILE_SNAPSHOT = EVT_USER_START,
 	MENU_FILE_MANAGE_SNAPSHOT,
-	ID_GET_FILENAME,
 	WIZARD_RUN_STARTING,
 	WIZARD_RUN_CONTINUE,
 	WIZARD_RUN_TERMINATED,

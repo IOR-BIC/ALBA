@@ -60,7 +60,7 @@ albaGUINamedPanel::albaGUINamedPanel( wxWindow* parent,wxWindowID id,bool CloseB
 
     m_TopSizer =  new wxBoxSizer( wxHORIZONTAL );
 
-	  m_Label = new albaGUILab( m_Top, ID_LABEL_CLICK, " Panel Title:");
+	  m_Label = new albaGUILab( m_Top, -1, " Panel Title:");
 
 	  wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 #if WIN32
