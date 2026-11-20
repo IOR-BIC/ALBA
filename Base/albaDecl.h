@@ -189,8 +189,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 CAMERA_OS_P,
 											 CAMERA_ARB, //Camera with arbitrary look vector
 
-											 CAMERA_SYNCHRONOUS_UPDATE, // from Interaction Manager to perform a view update
-											 CAMERA_UPDATE, // events from the toolbar 
 											 CAMERA_RESET,
 											 CAMERA_FIT,
 											 CAMERA_FLYTO,

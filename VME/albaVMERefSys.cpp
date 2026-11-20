@@ -280,9 +280,8 @@ void albaVMERefSys::SetScaleFactor(double scale)
   m_ScaleAxisTransform->Scale(m_ScaleFactor,m_ScaleFactor,m_ScaleFactor);
   m_ScaleAxisTransform->Update();
   m_ScaleAxis->Update();
-  albaEvent cam_event(this,CAMERA_UPDATE);
-  this->ForwardUpEvent(cam_event);
-  Modified();
+  GetViewManager()->CameraUpdate();
+Modified();
 }
 
 //-------------------------------------------------------------------------

@@ -105,7 +105,7 @@ void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
 		  case ID_CONTOUR_VALUE:
 			{
 				SetContourValue((float)m_ContourValue);
-				m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+				GetViewManager()->CameraUpdate();
 				m_Gui->Update();
 			}
 			break;

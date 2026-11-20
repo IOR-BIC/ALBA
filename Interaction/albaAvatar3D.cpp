@@ -16,6 +16,7 @@
 
 // base includes
 #include "albaAvatar3D.h"
+#include "albaServiceLocator.h"
 
 // interactors & devices
 #include "albaDeviceButtonsPadTracker.h"
@@ -589,7 +590,7 @@ void albaAvatar3D::OnMove3DEvent(albaEventInteraction *e)
       // ask a rendering only if it has never rendered
       vtkRenderWindow *rw=m_Renderer->GetRenderWindow();
       if (rw&&!rw->GetNeverRendered())
-        InvokeEvent(this,CAMERA_UPDATE,MCH_UP,m_View);
+        albaServiceLocator::GetViewManager()->CameraUpdate();
     }
   }
 }

@@ -65,14 +65,12 @@
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-#include "vtkTimerLog.h"
 
 #include <set>
 #include <assert.h>
 
 #define MIS_VERSION "2.0"
 
-#define DEFAULT_INTRA_FRAME_TIME 0.02 
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractionManager);
@@ -84,9 +82,6 @@ albaInteractionManager::albaInteractionManager()
   m_Gui = NULL;  //SIL. 07-jun-2006 : 
   m_Frame = NULL;  //SIL. 07-jun-2006 : 
   m_SelectedView      = NULL;
-  m_LockRenderingFlag = false;
-  m_LockRenderingFlag = 0;
-  m_IntraFrameTime    = DEFAULT_INTRA_FRAME_TIME;
 
   m_Devices           = NULL;
   m_DeviceTree        = NULL;
@@ -284,35 +279,6 @@ void albaInteractionManager::ViewSelected(albaView *view)
 
 
 //------------------------------------------------------------------------------
-void albaInteractionManager::CameraUpdate(albaView *view)
-{
-  if (m_LockRenderingFlag)
-  {
-    m_CameraUpdateRequests.insert(view);
-  }
-  else
-  {
-    if (view)
-    {
-      // avoid too much renderings which would trash the CPU
-      if((vtkTimerLog::GetUniversalTime()-m_LastRenderTime)>m_IntraFrameTime)
-      {
-        // render requested view
-        view->CameraUpdate();
-        m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
-      }
-      
-    }
-    else
-    {
-      // ask logic->view_mgr to perform a global update
-      albaEventMacro(albaEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
-    }
-  }
-}
-
-//------------------------------------------------------------------------------
 void albaInteractionManager::OnDeviceAdded(albaEventBase *event)
 {
   albaDevice *device=(albaDevice *)event->GetData(); 
@@ -368,61 +334,14 @@ void albaInteractionManager::OnRemoveAvatar(albaEventBase *event)
 //------------------------------------------------------------------------------
 void albaInteractionManager::OnStartDispatching()
 {
-  m_LockRenderingFlag = true;
+	if (GetViewManager())
+		GetViewManager()->EnableCameraUpdateSkip();
 }
 //------------------------------------------------------------------------------
 void albaInteractionManager::OnEndDispatching()
 {
-  m_LockRenderingFlag = false;
-
-  if (m_CameraUpdateRequests.empty())
-    return;
-
-  // Dispatch pending rendering requests.
-  if (*(m_CameraUpdateRequests.begin())==NULL)
-  {
-    // perform a global update and free the queue
-    m_CameraUpdateRequests.clear();
-    
-    // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetUniversalTime()-m_LastRenderTime)>m_IntraFrameTime)
-    {
-      // ask logic->view_mgr to perform a global update
-      albaEventMacro(albaEvent(this,CAMERA_SYNCHRONOUS_UPDATE));
-      m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
-    }
-    
-  }
-  else
-  {
-    // avoid too much renderings which would trash the CPU
-    if((vtkTimerLog::GetUniversalTime()-m_LastRenderTime)>m_IntraFrameTime)
-    {
-      // traverse the list and perform all requested updates
-      for (std::set<albaView *>::iterator it=m_CameraUpdateRequests.begin(); \
-      it!=m_CameraUpdateRequests.end();it++)
-      {
-        assert(*it!=NULL); // for DEBUGGING 
-        (*it)->CameraUpdate();          
-      }
-      // clear the queue
-      m_CameraUpdateRequests.clear();
-      m_LastRenderTime=vtkTimerLog::GetUniversalTime(); // store time at end of rendering
-    }
-  }
-}
-//------------------------------------------------------------------------------
-void albaInteractionManager::OnCameraUpdate(albaEventBase *event)
-{
-  if (albaEvent *e=albaEvent::SafeDownCast(event))
-  {
-    CameraUpdate(e->GetView());
-  }
-  else
-  {
-    CameraUpdate(NULL);
-  }
-
+	if (GetViewManager())
+		GetViewManager()->DisableCameraUpdateSkip();
 }
 //----------------------------------------------------------------------------
 // constants :
@@ -614,11 +533,7 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
   {
     OnEndDispatching();
   }
-  else if (id == CAMERA_UPDATE)
-  {
-    OnCameraUpdate(e);
-  }
-  else if (id == SHOW_VIEW_CONTEXTUAL_MENU)
+else if (id == SHOW_VIEW_CONTEXTUAL_MENU)
   {
     albaVME *vme = (albaVME *)event->GetData();
     bool vme_context_menu = (vme != NULL) && !vme->IsA("albaVMEGizmo");

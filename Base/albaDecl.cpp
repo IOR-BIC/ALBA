@@ -451,7 +451,6 @@ wxString  albaIdString(int id)
      case CAMERA_OS_Y:	        s="CAMERA_OS_Y"; break; 
      case CAMERA_OS_Z:	        s="CAMERA_OS_Z"; break; 
      case CAMERA_OS_P:	        s="CAMERA_OS_P"; break; 
-     case CAMERA_UPDATE:	      s="CAMERA_UPDATE"; break; 
      case CAMERA_RESET:	        s="CAMERA_RESET"; break; 
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 
 		 case CAMERA_FLYTO:					s="CAMERA_FLYTO"; break; 

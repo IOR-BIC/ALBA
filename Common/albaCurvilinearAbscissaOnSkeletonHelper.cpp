@@ -31,7 +31,6 @@ const bool DEBUG_MODE = true;
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "mmaMaterial.h"
-#include "albaGUIMaterialButton.h"
 #include "albaBehaviorTransform.h"
 #include "albaSmartPointer.h"
 #include "albaVME.h"

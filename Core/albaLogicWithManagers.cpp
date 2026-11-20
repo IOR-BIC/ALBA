@@ -798,13 +798,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case ID_APP_SETTINGS:
 			m_SettingsDialog->ShowModal();
 			break;
-		case CAMERA_UPDATE:
-			if (m_ViewManager) m_ViewManager->CameraUpdate();
-			break;
-		case CAMERA_SYNCHRONOUS_UPDATE:
-			m_ViewManager->CameraUpdate();
-			break;
-		case CREATE_STORAGE:
+case CREATE_STORAGE:
 			CreateStorage(e);
 			break;
 		case ABOUT_APPLICATION:

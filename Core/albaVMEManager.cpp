@@ -25,6 +25,7 @@
 
 
 #include "albaVMEManager.h"
+#include "albaServiceLocator.h"
 
 #include <albaGUIBusyInfo.h>
 #include <wx/zipstrm.h>
@@ -403,8 +404,9 @@ int albaVMEManager::MSFOpen(albaString filename)
   NotifyAdd(root_node); // add the storage root (the tree) with events notification
 
 	albaEventMacro(albaEvent(this,VME_SELECTED, root_node)); // raise notification events (to logic)
-  albaEventMacro(albaEvent(this,CAMERA_RESET));
-  
+  if (albaServiceLocator::GetViewManager())
+    albaServiceLocator::GetViewManager()->CameraReset();
+
 	if (m_TmpDir != "")
 	{
     m_FileHistory.AddFileToHistory(m_ZipFile.GetCStr()); // add the zmsf file to the history

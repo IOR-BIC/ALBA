@@ -135,7 +135,7 @@ void albaOpVolumeMirror::OpDo()
   assert(m_OutputImageData);
 
 	((albaVMEVolumeGray *)m_Input)->SetData(m_OutputImageData,m_Input->GetTimeStamp());
-	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeMirror::OpUndo()
@@ -144,7 +144,7 @@ void albaOpVolumeMirror::OpUndo()
   assert(m_InputImageData);
 
 	((albaVMEVolumeGray *)m_Input)->SetData(m_InputImageData,m_Input->GetTimeStamp());
-	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeMirror::OnEvent(albaEventBase *alba_event)
@@ -228,7 +228,7 @@ void albaOpVolumeMirror::Preview()
 
   ((albaVMEVolumeGray *)m_Input)->SetData(m_OutputImageData,m_Input->GetTimeStamp());
 
-  albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+  GetViewManager()->CameraUpdate();
 
 	if (wait)
 		delete wait;

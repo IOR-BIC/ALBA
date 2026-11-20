@@ -1723,10 +1723,8 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 			{
 				Modified();
 				InternalUpdate();
-				albaID button_id = e->GetId();
-				e->SetId(CAMERA_UPDATE);
-				ForwardUpEvent(e);
-			}
+				GetViewManager()->CameraUpdate();
+}
 			break;
 			case ID_WRAPPED_METER_MODE:
 			{
@@ -1739,15 +1737,13 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 
 				Modified();
 				InternalUpdate();
-				albaID button_id = e->GetId();
-				e->SetId(CAMERA_UPDATE);
-				ForwardUpEvent(e);
-			}
+				GetViewManager()->CameraUpdate();
+}
 			break;
 			case ID_WRAPPED_SIDE:
 			case ID_WRAPPED_REVERSE:
 				InternalUpdate();
-				ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
+				GetViewManager()->CameraUpdate();
 				break;
 			case ID_ADD_POINT:
 			{
@@ -1794,7 +1790,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 
 				InternalUpdate();
 				GetViewManager()->CameraReset();
-				ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
+				GetViewManager()->CameraUpdate();
 
 				m_Gui->Update();
 			}
@@ -1816,7 +1812,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 
 					Modified();
 					InternalUpdate();
-					ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
+					GetViewManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -1845,7 +1841,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 					Modified();
 					m_Gui->Update();
 					InternalUpdate();
-					ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
+					GetViewManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -1874,7 +1870,7 @@ void albaVMEWrappedMeter::OnEvent(albaEventBase *alba_event)
 
 					Modified();
 					InternalUpdate();
-					ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
+					GetViewManager()->CameraUpdate();
 				}
 			}
 			break;

@@ -112,7 +112,7 @@ albaTool2DMeasure::~albaTool2DMeasure()
 //----------------------------------------------------------------------------
 void albaTool2DMeasure::InitRenderer(albaView *view, vtkRenderer *ren)
 {
-	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+	GetViewManager()->CameraUpdate();
 
 		albaRWIBase *rwi = view ? view->GetRWI() : NULL;
 
@@ -185,7 +185,7 @@ void albaTool2DMeasure::Render()
 			m_AllRenderersVector[i]->GetRenderWindow()->Render();
 	}
 
-	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+	GetViewManager()->CameraUpdate();
 }
 
 
@@ -203,7 +203,7 @@ bool albaTool2DMeasure::OnLeftButtonDown(albaView *view, vtkRenderer *ren, doubl
 	if (!m_IsEnabled)
 		return false;
 
-	albaEventMacro(albaEvent(this, CAMERA_UPDATE));
+	GetViewManager()->CameraUpdate();
 
 	InitRenderer(view, ren);
 	m_CurrentRenderer = m_Renderer;
