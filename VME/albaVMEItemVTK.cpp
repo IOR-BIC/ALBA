@@ -26,7 +26,7 @@
 
 #include "albaVMEItemVTK.h"
 
-#include "albaEventIO.h"
+#include "albaVMEStorage.h"
 #include "albaIndent.h"
 #include "albaStorage.h"
 #include "albaStorageElement.h"
@@ -332,9 +332,7 @@ int albaVMEItemVTK::InternalRestoreData()
       return ALBA_NO_IO;
     }
     
-    albaEventIO e(this,NODE_GET_STORAGE);
-    albaEventMacro(e);
-    albaStorage *storage = e.GetStorage();
+    albaStorage *storage = GetStorage();
     
 		if (!storage)
 			return ALBA_NO_IO;
@@ -510,9 +508,7 @@ int albaVMEItemVTK::InternalStoreData(const char *url)
     bool found = false;
     albaString filename;
           
-    albaEventIO e(this,NODE_GET_STORAGE);
-    albaEventMacro(e);
-    albaStorage *storage=e.GetStorage();
+    albaStorage *storage = GetStorage();
     assert(storage);
 
     switch (m_IOMode)

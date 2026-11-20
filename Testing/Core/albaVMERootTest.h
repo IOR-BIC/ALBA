@@ -44,7 +44,7 @@ public:
 	CPPUNIT_TEST(ResetMaxNodeIdTest);
 	CPPUNIT_TEST(CanReparentToTest);
 	CPPUNIT_TEST(SafeDownCastTest);
-	CPPUNIT_TEST(OnRootEventTest);
+	CPPUNIT_TEST(VMEGetStorageTest);
 	CPPUNIT_TEST(GetStorageTest);
   CPPUNIT_TEST_SUITE_END();
 
@@ -66,7 +66,7 @@ private:
 	void ResetMaxNodeIdTest();
 	void CanReparentToTest();
 	void SafeDownCastTest();
-	void OnRootEventTest();
+	void VMEGetStorageTest();
 	void GetStorageTest();
   bool result;
 };

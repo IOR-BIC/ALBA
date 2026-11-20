@@ -49,6 +49,7 @@ class albaInteractionBehavior;
 class albaVMEIterator;
 class albaTagArray;
 class albaGUI;
+class albaVMEStorage;
 
 
 typedef enum LinkType
@@ -298,6 +299,9 @@ public:
 
 	/** Return the root of the tree this node owns to. */
 	albaVME *GetRoot();
+
+	/** Return the storage of the tree this node owns to, NULL if the tree root is not an albaVMERoot or has no storage. */
+	albaVMEStorage *GetStorage();
 
 	bool IsEmpty() const { return GetNumberOfChildren() == 0; }
 

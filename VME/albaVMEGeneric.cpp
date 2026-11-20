@@ -39,6 +39,7 @@ albaVMEGeneric::albaVMEGeneric()
   m_DataVector = albaDataVector::New();
   m_DataVector->SetItemTypeName(albaVMEItemVTK::GetStaticTypeName());  
   m_DataVector->SetListener(this);
+  m_DataVector->SetVME(this);
   SetDataPipe(albaDataPipeInterpolatorVTK::New()); // interpolator data pipe
 
   // The output is created on demand in GetOutput() to avoid

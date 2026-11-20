@@ -32,7 +32,6 @@
 #include "albaAbsMatrixPipe.h"
 #include "albaMatrixPipe.h"
 #include "albaDataPipe.h"
-#include "albaEventIO.h"
 #include "albaEvent.h"
 #include "albaTagArray.h"
 #include "albaOBB.h"
@@ -1386,6 +1385,13 @@ albaVME *albaVME::GetRoot()
 }
 
 //-------------------------------------------------------------------------
+albaVMEStorage *albaVME::GetStorage()
+{
+	albaVMERoot *root = albaVMERoot::SafeDownCast(GetRoot());
+	return root ? root->GetStorage() : NULL;
+}
+
+//-------------------------------------------------------------------------
 bool albaVME::IsInTree(albaVME *a)
 {
 	for (albaVME* node = a; node; node = node->GetParent())
@@ -1952,19 +1958,7 @@ void albaVME::NodeOnEvent(albaEventBase *e)
 				ForwardUpEvent(e);
 		}
 		else
-		{
-			switch (e->GetId())
-			{
-			case NODE_GET_ROOT:
-			{
-				albaEventIO *alba_event = albaEventIO::SafeDownCast(e);
-				alba_event->SetRoot(GetRoot());
-			}
-			break;
-			default:
-				ForwardUpEvent(e);
-			}
-		}
+			ForwardUpEvent(e);
 		//    return;
 	}
 	else if (e->GetChannel() == MCH_DOWN)

@@ -29,7 +29,7 @@
 #include "albaGUI.h"
 
 #include "albaStorage.h"
-#include "albaEventIO.h"
+#include "albaVMEStorage.h"
 #include "albaDataVector.h"
 #include "albaVMEItem.h"
 #include "albaVMEGenericAbstract.h"
@@ -163,9 +163,7 @@ int albaOpValidateTree::ValidateTree()
 
         if (m_MSFPath.IsEmpty())
         {
-          albaEventIO e(this,NODE_GET_STORAGE);
-          vme->ForwardUpEvent(e);
-          albaStorage *storage = e.GetStorage();
+          albaStorage *storage = vme->GetStorage();
           if (storage != NULL)
           {
             m_MSFPath = storage->GetURL();
@@ -201,9 +199,7 @@ int albaOpValidateTree::ValidateTree()
           {
             if (m_MSFPath.IsEmpty())
             {
-              albaEventIO e(this,NODE_GET_STORAGE);
-              vme->ForwardUpEvent(e);
-              albaStorage *storage = e.GetStorage();
+              albaStorage *storage = vme->GetStorage();
               if (storage != NULL)
               {
                 m_MSFPath = storage->GetURL();

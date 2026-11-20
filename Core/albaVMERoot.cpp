@@ -36,7 +36,6 @@
 #include "albaIndent.h"
 #include "albaVMEStorage.h"
 #include "albaStorageElement.h"
-#include "albaEventIO.h"
 
 //-------------------------------------------------------------------------
 albaCxxTypeMacro(albaVMERoot)
@@ -146,25 +145,8 @@ void albaVMERoot::OnEvent(albaEventBase *alba_event)
   }
   else if (alba_event->GetChannel()==MCH_UP)
   {
-    switch (alba_event->GetId())
-    {
-      case VME_GET_NEWITEM_ID:
-        if (albaEventIO *event_io=albaEventIO::SafeDownCast(alba_event))
-        {
-          event_io->SetItemId(albaVMERoot::SafeDownCast(GetRoot())->GetNextItemId()); // retrieve and return an item ID
-        }
-      break;
-			case NODE_GET_STORAGE : 
-				{
-					// return the storage pointer: here the hypothesis sis the root node listener is a storage.
-					albaEventIO *io_event = albaEventIO::SafeDownCast(alba_event);
-					io_event->SetStorage(GetStorage());
-				}
-				break;
-			default:
-				if(m_Storage)
-					m_Storage->OnEvent(alba_event);
-    };
+		if(m_Storage)
+			m_Storage->OnEvent(alba_event);
   }
   else
   {

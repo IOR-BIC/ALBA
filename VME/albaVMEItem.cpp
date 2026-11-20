@@ -35,8 +35,7 @@
 #include "albaIndent.h"
 #include "albaStorageElement.h"
 #include "mmuIdFactory.h"
-#include "albaEventIO.h"
-#include "albaStorage.h"
+#include "albaVMEStorage.h"
 #include <math.h>
 #include <assert.h>
 
@@ -53,7 +52,7 @@ albaVMEItem::albaVMEItem()
 //-------------------------------------------------------------------------
 {
   m_DataModified  = false;
-  //m_VME=NULL;
+  m_VME           = NULL;
   albaNEW(m_TagArray);
   
   m_Id            = -1;
@@ -248,9 +247,7 @@ void albaVMEItem::SetURL(const char *name)
 {
   if (!m_URL.IsEmpty()&&m_URL!=name)
   {
-    albaEventIO e(this,NODE_GET_STORAGE);
-    albaEventMacro(e);
-    albaStorage *storage=e.GetStorage();
+    albaStorage *storage = GetStorage();
     if (storage)
     {
       if (m_ReleaseOldFile)
@@ -357,14 +354,16 @@ void albaVMEItem::SetInputMemory(const char *int_str,unsigned long size)
 }
 
 //-------------------------------------------------------------------------
+albaVMEStorage *albaVMEItem::GetStorage()
+{
+  return m_VME ? m_VME->GetStorage() : NULL;
+}
+
+//-------------------------------------------------------------------------
 void albaVMEItem::UpdateItemId()
 //-------------------------------------------------------------------------
 {
-  // retrieve the tree root
-  albaEventIO e(this,NODE_GET_ROOT);
-  InvokeEvent(e);
-
-  albaVMERoot *root = albaVMERoot::SafeDownCast(e.GetRoot());
+  albaVMERoot *root = m_VME ? albaVMERoot::SafeDownCast(m_VME->GetRoot()) : NULL;
   albaID itemId = root ? root->GetNextItemId():-1;
 
   SetId(itemId);

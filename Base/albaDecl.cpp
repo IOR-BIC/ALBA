@@ -524,15 +524,12 @@ wxString  albaIdString(int id)
      case NODE_DETACHED_FROM_TREE:  s="NODE_DETACHED_FROM_TREE"; break;
      case NODE_ATTACHED_TO_TREE:    s="NODE_ATTACHED_TO_TREE"; break;
      case NODE_DESTROYED:           s="NODE_DESTROYED"; break;
-     case NODE_GET_STORAGE:         s="NODE_GET_STORAGE"; break;
-     case NODE_GET_ROOT:            s="NODE_GET_ROOT"; break;
      case VME_TIME_SET:             s="VME_TIME_SET"; break;
      case VME_MATRIX_CHANGED:       s="VME_MATRIX_CHANGED"; break;
      case VME_ABSMATRIX_UPDATE:     s="VME_ABSMATRIX_UPDATE"; break;
      case VME_OUTPUT_DATA_PREUPDATE:s="VME_OUTPUT_DATA_PREUPDATE"; break;
      case VME_OUTPUT_DATA_UPDATE:   s="VME_OUTPUT_DATA_UPDATE"; break;
      case VME_OUTPUT_DATA_CHANGED:  s="VME_OUTPUT_DATA_CHANGED"; break;
-     case VME_GET_NEWITEM_ID:       s="VME_GET_NEWITEM_ID"; break;
 
      case AVATAR_ADDED:         s="AVATAR_ADDED"; break;
      case AVATAR_REMOVED:       s="AVATAR_REMOVED"; break;
