@@ -944,14 +944,8 @@ albaGUI *albaVME::CreateGui()
 
 	albaString type = GetTypeName();
 	albaString typeName = GetTypeNameFromType(type);
-	albaEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetString(&type);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	ForwardUpEvent(buildHelpGui);
 
-	
-	if (buildHelpGui.GetArg() == true)
+	if (GetHelpManager() && GetHelpManager()->HasHelpEntry(type))
 		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, typeName, "Print node debug information");
 	else
 		m_Gui->Button(ID_PRINT_INFO, typeName, "", "Print node debug information");
@@ -1912,12 +1906,8 @@ void albaVME::NodeOnEvent(albaEventBase *e)
 
 				case ID_HELP:
 				{
-					albaEvent helpEvent;
-					helpEvent.SetSender(this);
-					albaString vmeTypeName = this->GetTypeName();
-					helpEvent.SetString(&vmeTypeName);
-					helpEvent.SetId(OPEN_HELP_PAGE);
-					ForwardUpEvent(helpEvent);
+					if (GetHelpManager())
+						GetHelpManager()->ShowHelpEntry(GetTypeName());
 				}
 				break;
 

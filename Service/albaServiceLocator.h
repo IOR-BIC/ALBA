@@ -18,6 +18,7 @@
 #define _albaServiceLocator_H
 
 #include "albaAbsViewManager.h"
+#include "albaAbsHelpManager.h"
 
 class albaAbsLogicManager;
 
@@ -37,8 +38,15 @@ public:
 	/** Register the view manager used by all the service clients */
 	static void SetViewManager(albaAbsViewManager* viewManager) { m_ViewManager = viewManager; }
 
+	/** Return the registered help manager, NULL if the application has no help */
+	static albaAbsHelpManager* GetHelpManager() { return m_HelpManager; }
+
+	/** Register the help manager used by all the service clients */
+	static void SetHelpManager(albaAbsHelpManager* helpManager) { m_HelpManager = helpManager; }
+
 protected:
 	static albaAbsLogicManager* m_LogicManager; ///< the registered logic manager
 	static albaAbsViewManager* m_ViewManager;   ///< the registered view manager
+	static albaAbsHelpManager* m_HelpManager;   ///< the registered help manager
 };
 #endif

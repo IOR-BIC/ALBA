@@ -325,6 +325,7 @@ void albaLogicWithManagers::Configure()
 	if (m_UseHelpManager)
 	{
 		m_HelpManager = new albaHelpManager();
+		albaServiceLocator::SetHelpManager(m_HelpManager);
 		//m_HelpManager->SetListener(this);
 	}
 
@@ -495,6 +496,8 @@ void albaLogicWithManagers::OnQuit()
 		cppDEL(m_SnapshotManager);
 
 	cppDEL(m_VMEManager);
+	if (albaServiceLocator::GetHelpManager() == m_HelpManager)
+		albaServiceLocator::SetHelpManager(NULL);
 	cppDEL(m_HelpManager);
 
 	if (albaServiceLocator::GetViewManager() == m_ViewManager)
@@ -802,30 +805,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case HELP_HOME:
 		{
 			m_HelpManager->ShowHelp();
-		}
-		break;
-		case GET_BUILD_HELP_GUI:
-		{
-			if (e->GetString())
-			{
-				albaString typeName = e->GetString()->GetCStr();
-				bool res = m_HelpManager && m_HelpManager->HasHelpEntry(typeName);
-				e->SetArg(m_HelpManager && m_HelpManager->HasHelpEntry(typeName));
-			}
-			else
-			{
-				e->SetArg(false);
-			}
-		}
-		break;
-		case OPEN_HELP_PAGE:
-		{
-			// open help for entity
-			if (e->GetString())
-			{
-				wxString typeName = e->GetString()->GetCStr();
-				m_HelpManager->ShowHelpEntry(typeName);
-			}
 		}
 		break;
 		//-----from medLogic

@@ -82,12 +82,8 @@ void albaOp::OnEvent(albaEventBase *alba_event)
 	albaEvent *event = albaEvent::SafeDownCast(alba_event);
 	if (event	&& event->GetId() == ID_HELP)
 	{
-		albaEvent helpEvent;
-		helpEvent.SetSender(this);
-		albaString opTypeName = this->GetTypeName();
-		helpEvent.SetString(&opTypeName);
-		helpEvent.SetId(OPEN_HELP_PAGE);
-		albaEventMacro(helpEvent);
+		if (GetHelpManager())
+			GetHelpManager()->ShowHelpEntry(GetTypeName());
 	}
 	else
 		albaEventMacro(*alba_event);
@@ -158,14 +154,7 @@ void albaOp::ShowGui()
 	wxBoxSizer * topSizer = m_Guih->GetTopSizer();
 	wxPanel * topPanel = m_Guih->GetTopPanel();
 
-	albaString type_name = GetTypeName();
-	albaEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetString(&type_name);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	albaEventMacro(buildHelpGui);
-
-	if (buildHelpGui.GetArg() == true)
+	if (GetHelpManager() && GetHelpManager()->HasHelpEntry(GetTypeName()))
 	{
 		albaGUIPicButton *b = new albaGUIPicButton(topPanel, "OP_HELP", ID_HELP);
 		b->SetEventId(ID_HELP);  //SIL. 7-4-2005: 

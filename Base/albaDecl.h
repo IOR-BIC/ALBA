@@ -146,8 +146,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	REGISTER_PRODUCT,
 	GENERATE_LICENCE,
 	HELP_HOME,
-	GET_BUILD_HELP_GUI, // sent from op, views or vme's to know if we are building the help gui in the application
-	OPEN_HELP_PAGE, // sent from an op, a view or a vme to open the corresponding help page
 
 	UPDATE_UI,           // update menu and toolbar widgets
 	UPDATE_PROPERTY,     // update vme property widgets

@@ -26,3 +26,4 @@
 
 albaAbsLogicManager* albaServiceLocator::m_LogicManager = NULL;
 albaAbsViewManager* albaServiceLocator::m_ViewManager = NULL;
+albaAbsHelpManager* albaServiceLocator::m_HelpManager = NULL;

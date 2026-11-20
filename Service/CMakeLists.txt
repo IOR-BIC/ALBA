@@ -13,6 +13,7 @@ SET(PROJECT_SRCS
 	albaServiceClient.h
 	albaAbsLogicManager.h
 	albaAbsViewManager.h
+	albaAbsHelpManager.h
 )
 
 SET(PROJECT_LIBS ${wxWidgets_LIBRARIES})

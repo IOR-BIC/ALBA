@@ -30,5 +30,8 @@ public:
 
 	/** Return the registered view manager, NULL if none */
 	albaAbsViewManager* GetViewManager() { return albaServiceLocator::GetViewManager(); }
+
+	/** Return the registered help manager, NULL if the application has no help */
+	albaAbsHelpManager* GetHelpManager() { return albaServiceLocator::GetHelpManager(); }
 };
 #endif
