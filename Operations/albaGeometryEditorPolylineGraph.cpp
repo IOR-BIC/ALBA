@@ -289,8 +289,6 @@ void albaGeometryEditorPolylineGraph::BehaviorUpdate()
 			m_InputVME->SetBehavior(m_Picker);
 		}
 	}
-
-  albaEventMacro(albaEvent(this,ID_VME_BEHAVIOR_UPDATE,m_InputVME));
 }
 //----------------------------------------------------------------------------
 void albaGeometryEditorPolylineGraph::CreateGui()
@@ -415,8 +413,6 @@ void albaGeometryEditorPolylineGraph::CreateISA()
 
 	m_InputVME->SetBehavior(m_Picker);
 	m_VMEPolylineEditor->SetBehavior(m_Picker);
-
-  albaEventMacro(albaEvent(this,ID_VME_BEHAVIOR_UPDATE,m_InputVME));
 }
 //----------------------------------------------------------------------------
 vtkPolyData* albaGeometryEditorPolylineGraph::GetOutput()

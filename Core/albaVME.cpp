@@ -629,8 +629,6 @@ int albaVME::SetMatrixPipe(albaMatrixPipe *mpipe)
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
 
-      InvokeEvent(this, VME_MATRIX_CHANGED);
-
       return ALBA_OK;
     }
     else
@@ -703,9 +701,6 @@ int albaVME::SetDataPipe(albaDataPipe *dpipe)
       m_DataPipe->SetVME(this);
       m_DataPipe->SetTimeStamp(m_CurrentTime);
     }
-
-    // advise listeners the data pipe has changed
-    InvokeEvent(this, VME_OUTPUT_DATA_CHANGED);
 
     return ALBA_OK;
   }

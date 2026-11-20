@@ -162,16 +162,6 @@ void albaOpManager::OnEvent(albaEventBase *alba_event)
   {
     switch (e->GetId())
     {
-      case OP_EXEC:
-        o = e->GetOp();
-        if(o) 
-          OpExec(o);
-      break; 
-      case OP_RUN:
-        o = e->GetOp();
-        if(o) 
-          OpRun(o);
-      break; 
       case OP_RUN_OK:
         o = (albaOp*) e->GetSender();
         assert(o == m_Context.Caller());
@@ -581,9 +571,6 @@ void albaOpManager::OpRun(int op_id)
 		OpRedo();
 		break;
 
-	case OP_ADD_GROUP:
-		RunOpAddGroup();
-		break;
 	case OP_DELETE:
 		RunOpDelete();
 		break;

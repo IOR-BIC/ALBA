@@ -247,14 +247,6 @@ void albaVisualPipeCollisionDetection::OnEvent(albaEventBase *alba_event)
       break;
     }
   }
-  else if (alba_event->GetId() == VME_ABSMATRIX_UPDATE)
-  {
-    //Update the pipeline of visualization
-    if (m_EnablePipeUpdate)
-    {
-    	UpdatePipeline();
-    }
-  }
 }
 //----------------------------------------------------------------------------
 void albaVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)

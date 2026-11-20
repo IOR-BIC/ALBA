@@ -431,7 +431,6 @@ wxString  albaIdString(int id)
 
      case CREATE_STORAGE:       s="CREATE_STORAGE"; break; 
 
-     case VIEW_QUIT:            s="VIEW_QUIT"; break;
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 
      case VIEW_CREATED:         s="VIEW_CREATED"; break; 
      case VIEW_DELETE:          s="VIEW_DELETE"; break; 
@@ -469,14 +468,12 @@ wxString  albaIdString(int id)
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 
 		 case CAMERA_FLYTO:					s="CAMERA_FLYTO"; break; 
 
-     case OP_RUN:	              s="OP_RUN"; break; 
      case OP_RUN_OK:	          s="OP_RUN_OK"; break; 
      case OP_RUN_CANCEL:	      s="OP_RUN_CANCEL"; break; 
      case OP_RUN_STARTING:	    s="OP_RUN_STARTING"; break; 
      case OP_RUN_TERMINATED:	  s="OP_RUN_TERMINATED"; break; 
      case OP_SHOW_GUI:	        s="OP_SHOW_GUI"; break; 
      case OP_HIDE_GUI:	        s="OP_HIDE_GUI"; break; 
-     case OP_FORCE_STOP:	      s="OP_FORCE_STOP"; break; 
 
      case MENU_END:	            s="MENU_END"; break; 
 
@@ -524,21 +521,16 @@ wxString  albaIdString(int id)
      case NODE_ATTACHED_TO_TREE:    s="NODE_ATTACHED_TO_TREE"; break;
      case NODE_DESTROYED:           s="NODE_DESTROYED"; break;
      case VME_TIME_SET:             s="VME_TIME_SET"; break;
-     case VME_MATRIX_CHANGED:       s="VME_MATRIX_CHANGED"; break;
-     case VME_ABSMATRIX_UPDATE:     s="VME_ABSMATRIX_UPDATE"; break;
      case VME_OUTPUT_DATA_PREUPDATE:s="VME_OUTPUT_DATA_PREUPDATE"; break;
      case VME_OUTPUT_DATA_UPDATE:   s="VME_OUTPUT_DATA_UPDATE"; break;
-     case VME_OUTPUT_DATA_CHANGED:  s="VME_OUTPUT_DATA_CHANGED"; break;
 
      case AVATAR_ADDED:         s="AVATAR_ADDED"; break;
      case AVATAR_REMOVED:       s="AVATAR_REMOVED"; break;
 
-     case MATRIX_UPDATED:       s="MATRIX_UPDATED"; break;
 
 // const used by albaGUI and albaGUIValidator
      case MINID:	              s="MINID"; break; 
      case MAXID:	              s="MAXID"; break; 
-     case ID_GUI_UPDATE:	      s="ID_GUI_UPDATE"; break; 
      case DEVICE_BUTTON_DOWN: s="DEVICE_BUTTON_DOWN"; break;
      case DEVICE_BUTTON_UP: s="DEVICE_BUTTON_UP"; break;
      case DEVICE_MOUSE_WHEEL: s="DEVICE_MOUSE_WHEEL"; break;

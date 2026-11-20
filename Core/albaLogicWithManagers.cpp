@@ -732,9 +732,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case OP_HIDE_GUI:
 			OpHideGui(e->GetBool());
 			break;
-		case OP_FORCE_STOP:
-			m_OpManager->StopCurrentOperation();
-			break;
 			// ###############################################################
 			// commands related to VIEWS
 		case VIEW_CREATE:

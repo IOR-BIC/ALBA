@@ -126,18 +126,7 @@ void albaGUIViewFrame::SetView(albaView *view)
 void albaGUIViewFrame::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
+  // forward to ViewManager
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-    {
-    case VIEW_QUIT:
-      albaEventMacro(albaEvent(this,VIEW_DELETE,m_View));
-      Destroy();
-      break;
-    default:
-      // forward to ViewManager
-      albaEventMacro(*e);
-      break;
-    }
-  }
+    albaEventMacro(*e);
 }

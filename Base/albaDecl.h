@@ -169,7 +169,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 CREATE_STORAGE,
 
 											 // events about views
-											 VIEW_QUIT,		 // from keyboard, used specially to close external views.
 											 VIEW_CREATE,   // from menu to albaViewManager
 											 VIEW_CREATED,  // from albaViewManager to Logic
 											 VIEW_DELETE,   // from albaGUIMDIChild to albaViewManager
@@ -221,15 +220,12 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 																												CAMERA_BLEND,
 
-																												OP_EXEC,
-																												OP_RUN,
 																												OP_RUN_OK,
 																												OP_RUN_CANCEL,
 																												OP_RUN_STARTING,
 																												OP_RUN_TERMINATED,
 																												OP_SHOW_GUI,
 																												OP_HIDE_GUI,
-																												OP_FORCE_STOP,
 
 																												ITEM_SELECTED, //used by albaGUIListCtrl and Dictionary
 
@@ -285,7 +281,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												OP_PASTE,
 																												OP_RENAME,
 																												OP_REPARENT,
-																												OP_ADD_GROUP,
 																												OP_USER,
 																												OP_END = OP_START + MAXOP,
 
@@ -331,31 +326,25 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
 	NODE_DESTROYED,         ///< issued when the node is destroyed
 	VME_TIME_SET,           ///< used either to set or to advise of time changes
-	VME_MATRIX_CHANGED,     ///< issued when the matrix in the output has changed (e.g. when matrix pipe is changed at runtime)
-	VME_ABSMATRIX_UPDATE,   ///< issued when absolute pose matrix is updated
 	VME_OUTPUT_DATA_PREUPDATE, ///< issued by albaDataPipe before the output data is actually updated
 	VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
-	VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
 
 	AVATAR_ADDED,     ///< used to advise the InteractionManager an avatar has been added (issued by mmdTracker's)
 	AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been removed (issued by mmdTracker's)
 
-	MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
 
 									// const used by albaGUI and albaGUIValidator
 									MINID,
 									MAXID = MINID + MAXWIDGET,
 
 
-									ID_GUI_UPDATE,
 
 									ALBA_BASE_ID ///< base numeric ID used by albaIdFactory. This must be the LAST ONE!!!
 };
 
 enum MED_MAIN_EVENT_ID
 {
-	ID_VME_BEHAVIOR_UPDATE = EVT_USER_START,
-	MENU_FILE_SNAPSHOT,
+	MENU_FILE_SNAPSHOT = EVT_USER_START,
 	MENU_FILE_MANAGE_SNAPSHOT,
 	ID_GET_FILENAME,
 	WIZARD_RUN_STARTING,

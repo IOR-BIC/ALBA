@@ -978,8 +978,6 @@ void albaGUIDialogTransferFunction2D::OnEvent(albaEventBase *alba_event)
         this->UpdatePreview();
       }
     break;
-    case ID_GUI_UPDATE:
-    break;
     default:
       albaEventMacro(*alba_event);
     break; 

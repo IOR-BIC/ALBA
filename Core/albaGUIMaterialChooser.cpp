@@ -455,8 +455,6 @@ void albaGUIMaterialChooser::OnEvent(albaEventBase *alba_event)
       case ID_CANCEL:
         m_Dialog->EndModal(wxCANCEL); 
       break;
-      case ID_GUI_UPDATE:
-      break;
       default:
         e->Log();
       break; 
