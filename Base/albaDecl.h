@@ -120,26 +120,18 @@ Constants are grouped by bracket xx_START, xx_END as needed by albaGUIFrame
 enum ALBA_EXPORT MAIN_EVENT_ID
 {
 	MENU_START = 10000,
-	MENU_FILE_START,
 	MENU_FILE_NEW,
 	MENU_FILE_OPEN,
 	MENU_FILE_SAVE,
 	MENU_FILE_SAVEAS,
 	MENU_FILE_SAVEAS_LEGACY,
-	MENU_FILE_MERGE,
 	MENU_FILE_PRINT,
 	MENU_FILE_PRINT_PREVIEW,
 	MENU_FILE_PRINT_SETUP,
 	MENU_FILE_PRINT_PAGE_SETUP,
 	MENU_FILE_QUIT,
-	MENU_FILE_END,
-	MENU_EDIT_START,
 	MENU_EDIT_FIND_VME,
 	MENU_OP,
-	MENU_EDIT_END,
-	MENU_VIEW_START,
-	MENU_VIEW_LAYOUT,        // call the Load/Save Layout Dialog
-	MENU_VIEW_LAYOUT_MSF,    // call the Load/Save Layout_Msf Dialog 
 	SASH_START,                // ids of albaGUISashPanel/ ids of Dockable Panes - must be Menu events too
 	MENU_VIEW_TOOLBAR,
 	MENU_VIEW_LOGBAR,
@@ -148,41 +140,15 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MENU_VIEW_USER_FIRST,
 	MENU_VIEW_USER_LAST = MENU_VIEW_USER_FIRST + 20,
 	SASH_END,
-	MENU_LAYOUT_START,     // used by albaGUICrossSplitter
-	LAYOUT_ONE,
-	LAYOUT_TWO_VERT,
-	LAYOUT_TWO_HORZ,
-	LAYOUT_THREE_UP,
-	LAYOUT_THREE_DOWN,
-	LAYOUT_THREE_LEFT,
-	LAYOUT_THREE_RIGHT,
-	LAYOUT_FOUR,
-	LAYOUT_LOAD,
-	LAYOUT_SAVE,
-	MENU_LAYOUT_END,
-	MENU_VIEW_END,
-	MENU_SETTINGS_START,
 	MENU_OPTION_APPLICATION_SETTINGS,
-	MENU_OPTION_DEVICE_SETTINGS,
-	MENU_OPTION_LOCALE_SETTINGS,
-	MENU_OPTION_MEASURE_UNIT_SETTINGS,
-	PRINT_TREE,
 	ID_APP_SETTINGS,     // calls the Application-Settings-Panel - not implemented yet
-	ID_TIMEBAR_SETTINGS, // calls the TimeBar-Settings-Panel
-	ID_VIEW_SETTINGS,    // calls the Selected-View-Settings-Panel
-	MENU_SETTINGS_END,
-	MENU_HELP_START,
 	ABOUT_APPLICATION,
 	REGISTER_PRODUCT,
 	GENERATE_LICENCE,
 	HELP_HOME,
-	MENU_HELP_END,
-	GUI_HELP_START,
 	GET_BUILD_HELP_GUI, // sent from op, views or vme's to know if we are building the help gui in the application
 	OPEN_HELP_PAGE, // sent from an op, a view or a vme to open the corresponding help page
-	GUI_HELP_END,
 
-	EVT_START,
 	UPDATE_UI,           // update menu and toolbar widgets
 	UPDATE_PROPERTY,     // update vme property widgets
 											 // connect a vtkObject to the ProgressBar
@@ -197,15 +163,10 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VME_REMOVING,  // from albaVmeManager to albaLogic 
 											 VME_SELECT,    // from albaGUITree or albaISV - run albaOpSelect
 											 VME_SELECTED,  // from albaOpSelect
-											 VME_TRANSFORM, // from albaISV to albaLogic
 											 VME_CHOOSE,    // from a albaOp to receive more operands
 											 VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
 											 VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
 											 VME_CHOOSE_MATERIAL,
-											 VME_CHOOSE_TRANSFER_FUNCTION,
-											 VME_CHOOSE_FEM_PROPERTY,
-											 VME_REF_SYS_CHOOSED,  //from albaGUIVMERefSysChooser to a albaOp (to be moved elsewhere Marco)
-											 VME_FEM_DATA_CHOOSED, //from albaGUIVMEFEMDataChooser to a albaOp (to be moved elsewhere Marco)
 											 CREATE_STORAGE,
 
 											 // events about views
@@ -261,9 +222,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 																												CAMERA_BLEND,
 
-																												OP_ADD,       // events used by albaOpManager, albaOp and albaLogic
-																												OP_REMOVE,
-																												OP_ENABLE,
 																												OP_EXEC,
 																												OP_RUN,
 																												OP_RUN_OK,
@@ -280,8 +238,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 																												CLEAR_UNDO_STACK, // used by albaGUIMDIFrame to clear UnDo stack when the application is running in low memory
 
-																												LOG_ALL_EVENT,
-																												LOG_TO_FILE,
 
 																												//used by albaISATransform to talk with albaOpTransform 
 																												MOUSE_DOWN, //(to be removed Marco)
@@ -313,7 +269,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												EVT_USER_START, // to be used from vertical applications
 																												EVT_USER_END = EVT_USER_START + 1000,
 
-																												EVT_END,
 
 																												MENU_USER_START,// to be used from vertical applications
 																												MENU_USER_END = MENU_USER_START + 1000,
@@ -332,8 +287,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												OP_RENAME,
 																												OP_REPARENT,
 																												OP_ADD_GROUP,
-																												OP_SELECT,
-																												OP_TRANSFORM,
 																												OP_USER,
 																												OP_END = OP_START + MAXOP,
 
@@ -348,8 +301,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												ID_LAYOUT,         //sent from a albaGUISashPanel to albaGUIFrame
 																												ID_CLOSE_SASH,     //sent from a albaGUIButton		to albaGUISashPanel 
 																												ID_LABEL_CLICK,    //sent from a albaGUILabel			to albaGUIViewPanel
-																												ID_DISPLAY_LIST,   //sent from a albaGUIButton		to albaGUIMDIChild  - ask for display list menu
-																												ID_SETTINGS,       //sent from a albaGUIButton		to albaGUIMDIChild  - ask to display a view-settings-panel
 																												ID_RANGE_MODIFIED, //sent from a albaGUILutSlider	to albaGUIMDIChild  - ask to Views
 																												WIDGETS_END,
 
@@ -363,24 +314,11 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												TIME_BEGIN,
 																												TIME_END,
 																												MOVIE_RECORD,
-																												/*
-																												APP_ICON,
-																												PIC_NODE_BLUE,   //picture used by the tree
-																												PIC_NODE_YELLOW,
-																												PIC_NODE_RED,
-																												PIC_NODE_GRAY,
-																												PIC_ZOOM_ALL,    //picture used by the toolbar
-																												PIC_ZOOM_SEL,
-																												*/
 	PIC_END,
-	PIC_USER_START = PIC_START + 500,// to be used from vertical applications
-	PIC_USER_END = PIC_USER_START + 100,// to be used from vertical applications
 
 	PARSE_STRING,	//Added by Paolo 16-9-2003 execute the operation passed as a string
-	APPSTAMP,
 
 	// ids for event channels
-	MCH_START,
 	MCH_UP,     ///< channel used to send events up in the tree
 	MCH_DOWN,   ///< channel used to send events down in the tree
 	MCH_INPUT,  ///< channel used for events coming from an input device
@@ -388,10 +326,8 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MCH_NODE,   ///< channel used by nodes for sending events to observers
 	MCH_ANY,    ///< Id used by albaAgent to identify any channel connected to it
 	MCH_VTK,    ///< channel used to as a bridge from VTK objects
-	MCH_END,
 
 	// ids issued/observed by albaVME and albaVME
-	NODE_START,
 	NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
 	NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
 	NODE_DESTROYED,         ///< issued when the node is destroyed
@@ -399,13 +335,11 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	NODE_GET_ROOT,          ///< issued by subnode components to extract ROOT node
 	VME_TIME_SET,           ///< used either to set or to advise of time changes
 	VME_MATRIX_CHANGED,     ///< issued when the matrix in the output has changed (e.g. when matrix pipe is changed at runtime)
-	VME_MATRIX_PREUPDATE,  ///< issued by albaMatrixPipe before updating the matrix 
 	VME_ABSMATRIX_UPDATE,   ///< issued when absolute pose matrix is updated
 	VME_OUTPUT_DATA_PREUPDATE, ///< issued by albaDataPipe before the output data is actually updated
 	VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
 	VME_OUTPUT_DATA_CHANGED,///< issued when the output data object has changed (i.e. object pointer changed)
 	VME_GET_NEWITEM_ID,     ///< issued by VMEItems or DataVector to retrieve a new item-ID (served by albaVMERoot)
-	NODE_END,
 
 	AVATAR_ADDED,     ///< used to advise the InteractionManager an avatar has been added (issued by mmdTracker's)
 	AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been removed (issued by mmdTracker's)

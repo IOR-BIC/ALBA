@@ -2053,7 +2053,6 @@ void albaLogicWithManagers::EnableMenuAndToolbar()
 	EnableItem(MENU_FILE_SAVE, enable);
 	EnableItem(MENU_FILE_SAVEAS, enable);
 	EnableItem(MENU_FILE_SAVEAS_LEGACY, enable);
-	EnableItem(MENU_FILE_MERGE, enable);
 	EnableItem(MENU_FILE_QUIT, enable);
 	EnableItem(wxID_FILE1, enable);
 	EnableItem(wxID_FILE2, enable);

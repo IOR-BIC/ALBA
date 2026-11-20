@@ -391,22 +391,16 @@ wxString  albaIdString(int id)
     switch(id)
     {
      case MENU_START:           s="MENU_START"; break; 
-     case MENU_FILE_START:      s="MENU_FILE_START"; break; 
      case MENU_FILE_NEW:        s="MENU_FILE_NEW"; break; 
      case MENU_FILE_OPEN:       s="MENU_FILE_OPEN"; break; 
      case MENU_FILE_SAVE:       s="MENU_FILE_SAVE"; break; 
      case MENU_FILE_SAVEAS:     s="MENU_FILE_SAVEAS"; break;
-     case MENU_FILE_MERGE:      s="MENU_FILE_MERGE"; break; 
      case MENU_FILE_PRINT:      s="MENU_FILE_PRINT"; break;
      case MENU_FILE_PRINT_PREVIEW:s="MENU_FILE_PRINT_PREVIEW"; break;
      case MENU_FILE_PRINT_SETUP:s="MENU_FILE_PRINT_SETUP"; break;
      case MENU_FILE_PRINT_PAGE_SETUP:s="MENU_FILE_PRINT_PAGE_SETUP"; break;
      case MENU_FILE_QUIT:       s="MENU_FILE_QUIT"; break; 
-     case MENU_FILE_END:        s="MENU_FILE_END"; break; 
-     case MENU_EDIT_START:      s="MENU_EDIT_START"; break; 
      case MENU_OP:              s="MENU_OP"; break; 
-     case MENU_OPTION_DEVICE_SETTINGS: s="MENU_OPTION_DEVICE_SETTINGS"; break;
-     case MENU_OPTION_LOCALE_SETTINGS: s="MENU_OPTION_LOCALE_SETTINGS"; break;
      //case MENU_EDIT_UNDO:	      s="MENU_EDIT_UNDO"; break; 
      //case MENU_EDIT_REDO:	      s="MENU_EDIT_REDO"; break; 
      //case MENU_EDIT_DELETE:	    s="MENU_EDIT_DELETE"; break; 
@@ -414,38 +408,17 @@ wxString  albaIdString(int id)
      //case MENU_EDIT_COPY:	      s="MENU_EDIT_COPY"; break; 
      //case MENU_EDIT_PASTE:	    s="MENU_EDIT_PASTE"; break; 
      case MENU_EDIT_FIND_VME:   s="MENU_EDIT_FIND_VME"; break; 
-     case MENU_EDIT_END:	      s="MENU_EDIT_END"; break; 
 
-     case MENU_VIEW_START:	    s="MENU_VIEW_START"; break; 
      case SASH_START:	          s="SASH_START"; break; 
      case MENU_VIEW_TOOLBAR:	  s="MENU_VIEW_TOOLBAR"; break; 
      case MENU_VIEW_LOGBAR:	    s="MENU_VIEW_LOGBAR"; break; 
      case MENU_VIEW_SIDEBAR:	  s="MENU_VIEW_SIDEBAR"; break; 
      case MENU_VIEW_TIMEBAR:	  s="MENU_VIEW_TIMEBAR"; break; 
      case MENU_OPTION_APPLICATION_SETTINGS: s = "MENU_OPTION_APPLICATION_SETTINGS"; break;
-     case MENU_OPTION_MEASURE_UNIT_SETTINGS: s = "MENU_OPTION_MEASURE_UNIT_SETTINGS"; break;
      case SASH_END:	            s="SASH_END"; break; 
-     case MENU_LAYOUT_START:	  s="MENU_LAYOUT_START"; break; 
-     case LAYOUT_ONE:	          s="LAYOUT_ONE"; break; 
-     case LAYOUT_TWO_VERT:	    s="LAYOUT_TWO_VERT"; break; 
-     case LAYOUT_TWO_HORZ:	    s="LAYOUT_TWO_HORZ"; break; 
-     case LAYOUT_THREE_UP:	    s="LAYOUT_THREE_UP"; break; 
-     case LAYOUT_THREE_DOWN:	  s="LAYOUT_THREE_DOWN"; break; 
-     case LAYOUT_THREE_LEFT:	  s="LAYOUT_THREE_LEFT"; break; 
-     case LAYOUT_THREE_RIGHT:	  s="LAYOUT_THREE_RIGHT"; break; 
-     case LAYOUT_FOUR:	        s="LAYOUT_FOUR"; break; 
-     case LAYOUT_LOAD:	        s="LAYOUT_LOAD"; break; 
-     case LAYOUT_SAVE:	        s="LAYOUT_SAVE"; break; 
-     case MENU_LAYOUT_END:	    s="MENU_LAYOUT_END"; break; 
-     case MENU_VIEW_END:	      s="MENU_VIEW_END"; break; 
 
-     case MENU_SETTINGS_START:	s="MENU_SETTINGS_START"; break; 
      case ID_APP_SETTINGS:	    s="ID_APP_SETTINGS"; break; 
-     case ID_TIMEBAR_SETTINGS:	s="ID_TIMEBAR_SETTINGS"; break; 
-     case ID_VIEW_SETTINGS:	    s="ID_VIEW_SETTINGS"; break; 
-     case MENU_SETTINGS_END:	  s="MENU_SETTINGS_END"; break; 
 
-     case EVT_START:	          s="EVT_START"; break; 
      case UPDATE_UI:	          s="UPDATE_UI"; break; 
      case UPDATE_PROPERTY:      s="UPDATE_PROPERTY"; break; 
 
@@ -453,10 +426,7 @@ wxString  albaIdString(int id)
      case VME_REMOVING:	        s="VME_REMOVING"; break; 
      case VME_SELECT:	          s="VME_SELECT"; break; 
      case VME_SELECTED:	        s="VME_SELECTED"; break;
-     case VME_TRANSFORM:	      s="VME_TRANSFORM"; break; 
      case VME_CHOOSE:						s="VME_CHOOSE"; break; 
-     case VME_REF_SYS_CHOOSED:  s="VME_REF_SYS_CHOOSED"; break;
-     case VME_FEM_DATA_CHOOSED: s="VME_FEM_DATA_CHOOSED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
      case VME_PICKING:	        s="VME_PICKING"; break; 
 
@@ -509,7 +479,6 @@ wxString  albaIdString(int id)
      case OP_HIDE_GUI:	        s="OP_HIDE_GUI"; break; 
      case OP_FORCE_STOP:	      s="OP_FORCE_STOP"; break; 
 
-     case EVT_END:	            s="EVT_END"; break; 
      case MENU_END:	            s="MENU_END"; break; 
 
 		 case SHOW_VIEW_CONTEXTUAL_MENU: s = "SHOW_VIEW_CONTEXTUAL_MENU"; break;
@@ -523,16 +492,12 @@ wxString  albaIdString(int id)
      case OP_COPY:							s="OP_COPY"; break; 
      case OP_PASTE:							s="OP_PASTE"; break; 
 	 case OP_RENAME:						s = "OP_RENAME"; break;
-     case OP_SELECT:						s="OP_SELECT"; break; 
-     case OP_TRANSFORM:					s="OP_TRANSFORM"; break; 
      case OP_END:								s="OP_END"; break; 
 
      case WIDGETS_START:	      s="WIDGETS_START"; break; 
      case ID_LAYOUT:	          s="ID_LAYOUT"; break; 
      case ID_CLOSE_SASH:	      s="ID_CLOSE_SASH"; break; 
      case ID_LABEL_CLICK:	      s="ID_LABEL_CLICK"; break; 
-     case ID_DISPLAY_LIST:	    s="ID_DISPLAY_LIST"; break; 
-     case ID_SETTINGS:					s="ID_SETTINGS"; break; 
 
      case IMPORT_FILE:          s="IMPORT_FILE"; break;
      case CLEAR_UNDO_STACK:     s="CLEAR_UNDO_STACK"; break;
@@ -548,7 +513,6 @@ wxString  albaIdString(int id)
      case TIME_END:	            s="TIME_END"; break; 
      case MOVIE_RECORD:         s="MOVIE_RECORD"; break; 
         
-     case MCH_START:            s="MCH_START"; break;
      case MCH_UP:               s="MCH_UP"; break;
      case MCH_DOWN:             s="MCH_DOWN"; break;
      case MCH_INPUT:            s="MCH_INPUT"; break;
@@ -556,9 +520,7 @@ wxString  albaIdString(int id)
      case MCH_NODE:             s="MCH_NODE"; break;
      case MCH_ANY:              s="MCH_ANY"; break;
      case MCH_VTK:              s="MCH_VTK"; break;
-     case MCH_END:              s="MCH_END"; break;
 
-     case NODE_START:               s="NODE_START"; break;
      case NODE_DETACHED_FROM_TREE:  s="NODE_DETACHED_FROM_TREE"; break;
      case NODE_ATTACHED_TO_TREE:    s="NODE_ATTACHED_TO_TREE"; break;
      case NODE_DESTROYED:           s="NODE_DESTROYED"; break;
@@ -566,13 +528,11 @@ wxString  albaIdString(int id)
      case NODE_GET_ROOT:            s="NODE_GET_ROOT"; break;
      case VME_TIME_SET:             s="VME_TIME_SET"; break;
      case VME_MATRIX_CHANGED:       s="VME_MATRIX_CHANGED"; break;
-     case VME_MATRIX_PREUPDATE:     s="VME_MATRIX_PREUPDATE"; break;
      case VME_ABSMATRIX_UPDATE:     s="VME_ABSMATRIX_UPDATE"; break;
      case VME_OUTPUT_DATA_PREUPDATE:s="VME_OUTPUT_DATA_PREUPDATE"; break;
      case VME_OUTPUT_DATA_UPDATE:   s="VME_OUTPUT_DATA_UPDATE"; break;
      case VME_OUTPUT_DATA_CHANGED:  s="VME_OUTPUT_DATA_CHANGED"; break;
      case VME_GET_NEWITEM_ID:       s="VME_GET_NEWITEM_ID"; break;
-     case NODE_END:                 s="NODE_END"; break;
 
      case AVATAR_ADDED:         s="AVATAR_ADDED"; break;
      case AVATAR_REMOVED:       s="AVATAR_REMOVED"; break;
