@@ -18,8 +18,11 @@ Always use exactly these commands. Never invent, replace, or bypass them.
 - Build: `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/build.ps1`
   After the first successful build it sets `COMPILE_LIBRARIES=OFF`, so the
   external libraries (VTK, GDCM, XercesC, CURL, CRYPTO) are not rebuilt again.
-  Optional parameters: `-Configuration Debug` (default `Release`) and
-  `-Target <project>` to build a single project with its dependencies.
+  Optional parameters: `-Configuration Debug` (default `Release`),
+  `-Target <project>` to build a single project with its dependencies, and
+  `-MaxCompilers <n>` (default: the number of logical processors), the compiler
+  processes running at once in the whole build, as the Visual Studio IDE does,
+  so the build does not run out of memory.
 - Rebuild the external libraries (only if asked, or if something under `Libs/`
   changed): `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1 -CompileLibraries`,
   then the build.
