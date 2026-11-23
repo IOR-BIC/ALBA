@@ -77,7 +77,7 @@ protected:
 	virtual void CreateMenu();
 
 	/** Show contextual menu for views when right mouse click arrives */
-	virtual void ViewContextualMenu(bool vme_menu) {};
+	virtual void ShowViewContextualMenu(bool vmeMenu) override {};
 
 	/* Initialize About Dialog */
 	void InitAboutDialog();

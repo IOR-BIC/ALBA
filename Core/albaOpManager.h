@@ -118,7 +118,7 @@ public:
   virtual void OpSelect(albaVME* v);
 
 	/** Set the flag for warning the user if the operation is undoable. */
-  virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
+  virtual void WarningIfCantUndo (bool warn) override {m_Warn = warn;};
 
 	/** Set a reference to the main toolbar. */
   virtual void SetToolbar(wxToolBar *tb) {m_ToolBar = tb;};

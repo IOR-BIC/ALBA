@@ -178,6 +178,14 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
   
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
+    // the frame changed by the movie ctrl (its ids can be the same as the ones of this gui)
+    if (e->GetSender() == m_AnimatePlayer && e->GetId() == albaGUIMovieCtrl::ID_FRAME_SET)
+    {
+      SetCurrentSelection((int)e->GetDouble());
+      FlyTo();
+      return;
+    }
+
     wxString wildcard = "xml file (*.xml)|*.xml|all files (*.*)|*.*";
     albaString fileName = "";
     wxString lastFolder = albaGetLastUserFolder().ToAscii();
@@ -220,10 +228,6 @@ void albaAnimate::OnEvent(albaEventBase *alba_event)
         fileName = albaGetSaveFile(lastFolder, wildcard);
         if (fileName != "")
           StorePoseToFile(fileName);
-      break;
-      case TIME_SET:
-        SetCurrentSelection((int)e->GetDouble());
-        FlyTo();
       break;
     }
   }

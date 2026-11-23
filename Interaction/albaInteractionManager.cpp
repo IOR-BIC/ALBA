@@ -528,12 +528,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
   {
     OnEndDispatching();
   }
-  else if (id == SHOW_VIEW_CONTEXTUAL_MENU)
-  {
-    albaVME *vme = (albaVME *)event->GetData();
-    bool vme_context_menu = (vme != NULL) && !vme->IsA("albaVMEGizmo");
-    albaEventMacro(albaEvent(event->GetSender(), SHOW_VIEW_CONTEXTUAL_MENU, vme_context_menu));
-  }
   else if (id == albaDevice::DEVICE_NAME_CHANGED) 
   {
     OnDeviceNameChanged(event);

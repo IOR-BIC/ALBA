@@ -261,7 +261,7 @@ void albaOpExporterMeters::ExportMeter()
   for(int j=0; j< m_Times.size(); j++)
   {
     m_CurrentTime = m_Times[j];
-    albaEventMacro(albaEvent(this, TIME_SET, m_CurrentTime, 0));
+    GetLogicManager()->TimeSet(m_CurrentTime);
 
     for(int i=0;i< m_Meters.size();i++)
     {

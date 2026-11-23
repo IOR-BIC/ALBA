@@ -143,7 +143,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MENU_VIEW_USER_FIRST,
 	MENU_VIEW_USER_LAST = MENU_VIEW_USER_FIRST + 20,
 	SASH_END,
-	MENU_OPTION_APPLICATION_SETTINGS,
 	ID_APP_SETTINGS,     // calls the Application-Settings-Panel - not implemented yet
 	ABOUT_APPLICATION,
 	REGISTER_PRODUCT,
@@ -185,8 +184,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	ID_TRANSFORM, //added by Stefano. 30-11-2003
 
 	ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY
-	SHOW_VIEW_CONTEXTUAL_MENU,
-	SHOW_TREE_CONTEXTUAL_MENU,
 
 	// resize window
 	TILE_WINDOW_CASCADE,
@@ -234,7 +231,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 	// id of pictures - used in albaGUIBitmaps
 	PIC_START,
-	TIME_SET, //also sent by albaGUITimeBar to albaLogic
 	TIME_PLAY,       //pictures used by the timebar
 	TIME_STOP,
 	TIME_PREV,
@@ -243,8 +239,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	TIME_END,
 	MOVIE_RECORD,
 	PIC_END,
-
-	PARSE_STRING, //Added by Paolo 16-9-2003 execute the operation passed as a string
 
 	// ids issued/observed by albaVME and albaVME
 	NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree

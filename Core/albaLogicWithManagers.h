@@ -285,7 +285,7 @@ protected:
 
 	// Description:
 	// Set the time to update the time bar.
-	virtual void TimeSet(double t);
+	virtual void TimeSet(double t) override;
 	//---------------------------------------------------------
 
 	/** Redefined to add View,Op,Import,Export menu */
@@ -410,11 +410,11 @@ protected:
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
 
-	/** Show contextual menu for tree when right mouse click arrives.*/
-	virtual void TreeContextualMenu(albaEvent &e);
+	/** Show the contextual menu of the tree, with the items of vme if vmeMenu is true */
+	virtual void ShowTreeContextualMenu(albaGUIVMETree *tree, albaVME *vme, bool vmeMenu) override;
 
-	/** Show contextual menu for views when right mouse click arrives.*/
-	virtual void ViewContextualMenu(bool vme_menu);
+	/** Show the contextual menu of the selected view, with the VME items if vmeMenu is true */
+	virtual void ShowViewContextualMenu(bool vmeMenu) override;
 
 	/** Create a new view. */
 	virtual void ViewCreate(int viewId);

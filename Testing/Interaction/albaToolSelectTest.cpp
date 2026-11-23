@@ -32,26 +32,6 @@
 #include "albaFakeLogicForTest.h"
 
 //----------------------------------------------------------------------------
-class albaToolSelectTestListener : public albaObserver // stores the events of the select tool (the selection goes to the logic manager)
-//----------------------------------------------------------------------------
-{
-public:
-  albaToolSelectTestListener() {Clear();};
-  void Clear() {m_MenuCount = 0; m_Data = NULL; m_Channel = -1;};
-  virtual void OnEvent(albaEventBase *event)
-  {
-    if (event->GetId() == SHOW_VIEW_CONTEXTUAL_MENU)
-      m_MenuCount++;
-    m_Data = event->GetData();
-    m_Channel = event->GetChannel();
-  };
-
-  int    m_MenuCount;
-  void  *m_Data;
-  albaID m_Channel;
-};
-
-//----------------------------------------------------------------------------
 void albaToolSelectTest::TestSelect()
 //----------------------------------------------------------------------------
 {
@@ -120,28 +100,34 @@ void albaToolSelectTest::TestContextMenu()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> vme;
+  albaSmartPointer<albaVMEGizmo> gizmo;
   albaToolSelect *tool;
   albaNEW(tool);
-  albaToolSelectTestListener listener;
-  tool->SetListener(&listener);
+  albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+  logic->ClearCalls();
   double pos[2] = {10, 20};
+  albaFakeLogicForTest::testFunctions menu = albaFakeLogicForTest::FKL_SHOW_VIEW_CONTEXTUAL_MENU;
 
-  // the right click shows the context menu with the picked VME, also when nothing is picked
+  // the right click shows the context menu of the view, with the VME items only for a selectable VME
   tool->SetPickedVME(vme, NULL);
   tool->OnRightButtonDown(NULL, NULL, pos);
   CPPUNIT_ASSERT(tool->OnRightButtonUp(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_MenuCount == 1 && listener.m_Data == vme.GetPointer());
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 1 && logic->GetViewContextualMenuWithVME());
   tool->SetPickedVME(NULL, NULL);
   tool->OnRightButtonDown(NULL, NULL, pos);
   CPPUNIT_ASSERT(tool->OnRightButtonUp(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_MenuCount == 2 && listener.m_Data == NULL);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 2 && !logic->GetViewContextualMenuWithVME());
+  tool->SetPickedVME(gizmo, NULL);
+  tool->OnRightButtonDown(NULL, NULL, pos);
+  CPPUNIT_ASSERT(tool->OnRightButtonUp(NULL, NULL, pos));
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 3 && !logic->GetViewContextualMenuWithVME());
 
   // a drag cancels it, and a release without the right button down does not show it
   tool->OnRightButtonDown(NULL, NULL, pos);
   CPPUNIT_ASSERT(!tool->OnDrag(NULL, NULL, pos));
   CPPUNIT_ASSERT(!tool->OnRightButtonUp(NULL, NULL, pos));
   CPPUNIT_ASSERT(!tool->OnRightButtonUp(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_MenuCount == 2);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 3);
 
   albaDEL(tool);
 }

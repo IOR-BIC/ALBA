@@ -34,6 +34,8 @@
 #include "albaGUIValidator.h"
 #include "albaGUIFloatSlider.h"
 #include "albaGUISettingsTimeBar.h"
+#include "albaServiceLocator.h"
+#include "albaAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // constant
@@ -237,7 +239,7 @@ void albaGUITimeBar::OnEvent(albaEventBase *alba_event)
       }
 
       if(e->GetId() != TIME_STOP )
-        albaEventMacro(albaEvent(this,TIME_SET,m_Time));
+        SetLogicTime();
       Update();
     }
   }
@@ -278,8 +280,15 @@ void albaGUITimeBar::OnTimer(wxTimerEvent &event)
     }
   }
 
-  albaEventMacro(albaEvent(this, TIME_SET, m_Time, 0));
+  SetLogicTime();
   Update();
+}
+//----------------------------------------------------------------------------
+void albaGUITimeBar::SetLogicTime()
+//----------------------------------------------------------------------------
+{
+  if (albaServiceLocator::GetLogicManager())
+    albaServiceLocator::GetLogicManager()->TimeSet(m_Time);
 }
 //----------------------------------------------------------------------------
 void albaGUITimeBar::Update()
@@ -309,12 +318,12 @@ void albaGUITimeBar::SetBounds(double min, double max)
   if(m_Time < min) 
   {
     m_Time = min;
-    albaEventMacro(albaEvent(this,TIME_SET,m_Time,0));
+    SetLogicTime();
   }
   if(m_Time > max) 
   {
     m_Time = max;
-    albaEventMacro(albaEvent(this,TIME_SET,m_Time,0));
+    SetLogicTime();
   }
 
   m_TimeBarSlider->SetRange(min,max,m_Time);

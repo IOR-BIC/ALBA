@@ -123,14 +123,8 @@ void albaGUIVMETree::ShowContextualMenu(wxMouseEvent& event)
   vmeMenu = i.IsOk();
 #endif
 
-  albaEvent e;
-  e.SetSender(this);
-  e.SetId(SHOW_TREE_CONTEXTUAL_MENU);
-  e.SetBool(vmeMenu);
-  e.SetArg(m_Autosort);
-  if(vmeMenu)
-    e.SetVme((albaVME *)NodeFromItem(i));
-  albaEventMacro(e);
+  albaVME *vme = vmeMenu ? (albaVME *)NodeFromItem(i) : NULL;
+  GetLogicManager()->ShowTreeContextualMenu(this, vme, vmeMenu);
 }
 //----------------------------------------------------------------------------
 void albaGUIVMETree::EnableSelect(bool enable)

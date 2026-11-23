@@ -30,6 +30,7 @@ class albaObserver;
 class albaInteractionTool;
 class albaGUIPanel;
 class albaOp;
+class albaGUIVMETree;
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -98,6 +99,9 @@ public:
 	/** Expand the VME on the Tree  */
 	virtual void ExpandVME(albaVME *vme) = 0;
 
+	/** Called by the tree on the right click: show its contextual menu, with the items of vme if vmeMenu is true */
+	virtual void ShowTreeContextualMenu(albaGUIVMETree *tree, albaVME *vme, bool vmeMenu) = 0;
+
 	//Views
 	/** Select a view (also called by the view frames when they are activated or clicked): the view manager,
 	the side bar, the interaction and the operations work on it. Nothing else happens if it is already selected */
@@ -119,6 +123,13 @@ public:
 
 	/** Cascade the view frames */
 	virtual void CascadeViewFrames() = 0;
+
+	/** Called on the right click in a view: show the contextual menu of the selected view, with the VME items if vmeMenu is true */
+	virtual void ShowViewContextualMenu(bool vmeMenu) = 0;
+
+	//Time
+	/** Set the current time of the application: the VMEs and the views are updated */
+	virtual void TimeSet(double t) = 0;
 
 	//Files
 	/** Create a new project, asking to save the opened one: return ALBA_OK if created */

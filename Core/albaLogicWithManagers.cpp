@@ -583,7 +583,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 				FileOpen((*filename).GetCStr());
 			else
 				FileOpen();
-			UpdateFrameTitle();
 		}
 		break;
 		case IMPORT_FILE:
@@ -639,38 +638,12 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case MENU_EDIT_FIND_VME:
 			m_SideBar->FindVME();
 			break;
-		case SHOW_TREE_CONTEXTUAL_MENU:
-			TreeContextualMenu(*e);
-			break;
-		case SHOW_VIEW_CONTEXTUAL_MENU:
-			ViewContextualMenu(e->GetBool());
-			break;
 			// ###############################################################
 			// commands related to OP
 		case MENU_OP:
 			if (m_OpManager)
 			{
 				m_OpManager->OpRun(e->GetArg());
-			}
-			break;
-		case PARSE_STRING:
-		{
-			if (this->m_OpManager->Running())
-			{
-				wxMessageBox("There is an other operation running!!");
-				return;
-			}
-			int menuId, opId;
-			albaString *s = e->GetString();
-			menuId = m_MenuBar->FindMenu(_("Operations"));
-			opId = m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
-			m_OpManager->OpRun(opId);
-		}
-		break;
-		case MENU_OPTION_APPLICATION_SETTINGS:
-			if (m_OpManager)
-			{
-				m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 			}
 			break;
 			// ###############################################################
@@ -689,9 +662,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 #ifdef ALBA_USE_VTK
 			if (m_InteractionManager) m_InteractionManager->CameraFlyToMode();  //modified by Marco. 15-9-2004 fly to with devices.
 #endif
-			break;
-		case TIME_SET:
-			TimeSet(e->GetDouble());
 			break;
 			// ###############################################################
 			// commands related to interaction manager
@@ -794,6 +764,7 @@ int albaLogicWithManagers::FileOpen(const char *file_to_open)
 				opened = m_VMEManager->MSFOpen(file);
 		}
 		m_OpeningMSF = false;
+		UpdateFrameTitle();
 	}
 	return opened;
 }
@@ -1313,14 +1284,13 @@ void albaLogicWithManagers::SelectView(albaView *view)
 	EnableMenuAndToolbar();
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ViewContextualMenu(bool vme_menu)
+void albaLogicWithManagers::ShowViewContextualMenu(bool vmeMenu)
 {
 	albaGUIContextualMenu *contextMenu = new albaGUIContextualMenu();
-	contextMenu->SetListener(this);
 	albaView *v = m_ViewManager->GetSelectedView();
 	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
 	if (c != NULL)
-		contextMenu->ShowContextualMenu(c, v, vme_menu);
+		contextMenu->ShowContextualMenu(c, v, vmeMenu);
 	cppDEL(contextMenu);
 }
 
@@ -1869,18 +1839,14 @@ void albaLogicWithManagers::EnableItem(int item, bool enable)
 }
 
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::TreeContextualMenu(albaEvent &e)
+void albaLogicWithManagers::ShowTreeContextualMenu(albaGUIVMETree *tree, albaVME *vme, bool vmeMenu)
 {
 	albaGUITreeContextualMenu *contextMenu = new albaGUITreeContextualMenu();
 	contextMenu->SetListener(this);
 	contextMenu->SetOpManager(m_OpManager);
 
 	albaView *v = m_ViewManager->GetSelectedView();
-	albaVME  *vme = e.GetVme();
-	bool vme_menu = e.GetBool();
-	bool autosort = e.GetArg() != 0;
-
-	contextMenu->CreateContextualMenu((albaGUIVMETree *)e.GetSender(), v, vme, vme_menu);
+	contextMenu->CreateContextualMenu(tree, v, vme, vmeMenu);
 	contextMenu->ShowContextualMenu();
 
 	cppDEL(contextMenu);

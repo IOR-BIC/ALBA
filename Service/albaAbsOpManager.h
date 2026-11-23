@@ -36,5 +36,8 @@ public:
 
 	/** Called by the running operation when it ends with CANCEL: the operation is deleted */
 	virtual void OpRunCancel(albaOp *op) = 0;
+
+	/** Set if the user is warned before running an operation that cannot be undone */
+	virtual void WarningIfCantUndo(bool warn) = 0;
 };
 #endif

@@ -108,6 +108,15 @@ albaFakeLogicForTest::calls albaFakeLogicForTest::GetCall(int callNum)
 }
 
 //-------------------------------------------------------------------------
+int albaFakeLogicForTest::GetNumberOfCalls(testFunctions func)
+{
+	int count = 0;
+	for (int i = 0; i < m_Calls.size(); i++)
+		if (m_Calls[i].testFunction == func)
+			count++;
+	return count;
+}
+//-------------------------------------------------------------------------
 void albaFakeLogicForTest::AddCall(testFunctions func, albaVME* vme)
 {
 	calls call;

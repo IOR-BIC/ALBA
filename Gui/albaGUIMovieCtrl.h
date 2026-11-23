@@ -45,6 +45,13 @@ class albaGUIMovieCtrl: public albaGUIPanel , public albaObserver
 public:
   albaGUIMovieCtrl(wxWindow* parent,wxWindowID id = -1);
   virtual ~albaGUIMovieCtrl();
+
+  /** Id of the event sent to the listener when the frame changes (the frame is the double of the event) */
+  enum MOVIECTRL_EVENT_ID
+  {
+    ID_FRAME_SET = MINID,
+  };
+
   void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 
   void OnEvent(albaEventBase *alba_event);
@@ -85,7 +92,7 @@ protected:
   /** Update the movie ctrl interface. */
   void Update();
 
-  /** Update the time and send the TIME_SET event to synchronize all the application. */
+  /** Update the frame and send ID_FRAME_SET to the listener. */
 	void OnTimer(wxTimerEvent &event);
 DECLARE_EVENT_TABLE()
 };

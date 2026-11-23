@@ -180,7 +180,7 @@ void albaGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
 		//Accept msf, zmsf and specific app extensions 
     if (ext == "msf" || ext == "zmsf" || ext == archExt || ext == zippedExt.GetCStr())
     {
-      albaEventMacro(albaEvent(this,MENU_FILE_OPEN,&file_to_open));
+      GetLogicManager()->FileOpen(file_to_open.GetCStr());
       return;
     }
     else

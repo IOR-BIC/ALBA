@@ -30,8 +30,8 @@ class albaVME;
   click (NULL if none) and the picked position. Gizmos are never selected.
   - a button down on a VME asks the logic manager to select it (for a landmark cloud, its landmark
     nearest to the picked position), if the selection is enabled;
-  - the right button released without dragging sends SHOW_VIEW_CONTEXTUAL_MENU with the picked VME
-    to the listener on MCH_UP. */
+  - the right button released without dragging asks the logic manager to show the context menu of
+    the view, with the VME items if the picked VME can be selected. */
 class ALBA_EXPORT albaToolSelect : public albaInteractionTool
 {
 public:
@@ -57,7 +57,7 @@ public:
   /** A drag cancels the context menu */
   virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
 
-  /** The right button released without dragging sends SHOW_VIEW_CONTEXTUAL_MENU; return true if sent */
+  /** The right button released without dragging shows the context menu of the view; return true if shown */
   virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
 
 protected:

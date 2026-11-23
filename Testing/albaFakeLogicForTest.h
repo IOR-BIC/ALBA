@@ -36,7 +36,8 @@ public:
 		FKL_VME_SHOW,
 		FKL_VME_VISUAL_MODE_CHANGED,
 		FKL_VME_REMOVED,
-		FKL_PRINT_IMAGE
+		FKL_PRINT_IMAGE,
+		FKL_SHOW_VIEW_CONTEXTUAL_MENU
 	};
 
 	struct calls
@@ -88,6 +89,9 @@ public:
 
 	/** Return the number of calls stored since the last ClearCalls */
 	int GetNumberOfCalls() { return m_Calls.size(); }
+
+	/** Return the number of calls of func stored since the last ClearCalls */
+	int GetNumberOfCalls(testFunctions func);
 	
 	void AddCall(testFunctions func, albaVME* vme);
 
@@ -98,6 +102,16 @@ public:
 	virtual void OpRunTerminated(bool runOk) override {}
 
 	virtual void OpShowGui(albaGUIPanel *panel) override {}
+
+	virtual void ShowTreeContextualMenu(albaGUIVMETree *tree, albaVME *vme, bool vmeMenu) override {}
+
+	/** Store a FKL_SHOW_VIEW_CONTEXTUAL_MENU call (see GetViewContextualMenuWithVME) */
+	virtual void ShowViewContextualMenu(bool vmeMenu) override { AddCall(FKL_SHOW_VIEW_CONTEXTUAL_MENU, NULL); m_ViewContextualMenuWithVME = vmeMenu; }
+
+	/** Return the vmeMenu of the last ShowViewContextualMenu call */
+	bool GetViewContextualMenuWithVME() { return m_ViewContextualMenuWithVME; }
+
+	virtual void TimeSet(double t) override {}
 
 	virtual void OpHideGui() override {}
 
@@ -183,5 +197,6 @@ protected:
 	albaView *m_SelectedView = NULL;
 	std::vector<albaVME*> m_ChooseCandidates;
 	int m_ChooseCalls = 0;
+	bool m_ViewContextualMenuWithVME = false;
 };
 #endif

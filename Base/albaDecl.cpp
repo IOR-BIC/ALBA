@@ -414,7 +414,6 @@ wxString  albaIdString(int id)
      case MENU_VIEW_LOGBAR:	    s="MENU_VIEW_LOGBAR"; break; 
      case MENU_VIEW_SIDEBAR:	  s="MENU_VIEW_SIDEBAR"; break; 
      case MENU_VIEW_TIMEBAR:	  s="MENU_VIEW_TIMEBAR"; break; 
-     case MENU_OPTION_APPLICATION_SETTINGS: s = "MENU_OPTION_APPLICATION_SETTINGS"; break;
      case SASH_END:	            s="SASH_END"; break; 
 
      case ID_APP_SETTINGS:	    s="ID_APP_SETTINGS"; break; 
@@ -436,8 +435,6 @@ wxString  albaIdString(int id)
 
      case MENU_END:	            s="MENU_END"; break; 
 
-		 case SHOW_VIEW_CONTEXTUAL_MENU: s = "SHOW_VIEW_CONTEXTUAL_MENU"; break;
-		 case SHOW_TREE_CONTEXTUAL_MENU: s = "SHOW_TREE_CONTEXTUAL_MENU"; break;
 
      case OP_START:							s="OP_START"; break; 
      case OP_UNDO:							s="OP_UNDO"; break; 
@@ -457,7 +454,6 @@ wxString  albaIdString(int id)
 
      case WIDGETS_END:	        s="WIDGETS_END"; break; 
      case PIC_START:	          s="PIC_START"; break; 
-     case TIME_SET:	            s="TIME_SET"; break; 
      case TIME_PLAY:	          s="TIME_PLAY"; break; 
      case TIME_STOP:	          s="TIME_STOP"; break; 
      case TIME_PREV:	          s="TIME_PREV"; break; 

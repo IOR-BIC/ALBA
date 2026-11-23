@@ -62,8 +62,6 @@ enum VIEW_CONTEXTUAL_MENU_ID
   CONTEXTUAL_VIEW_MENU_START = MINID,	
 		CONTEXTUAL_MENU_RENAME_VIEW,				
 		CONTEXTUAL_MENU_HIDE_VME,				
-		CONTEXTUAL_MENU_DELETE_VME,
-		CONTEXTUAL_MENU_TRANSFORM,
     CONTEXTUAL_MENU_VME_PIPE,
 		CONTEXTUAL_MENU_QUIT_CHILD_VIEW,
 		CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW,
@@ -91,7 +89,6 @@ albaGUIContextualMenu::albaGUIContextualMenu()
 {
 	m_ChildViewActive = NULL;
 	m_ViewActive      = NULL;
-  m_Listener        = NULL;
 }
 //----------------------------------------------------------------------------
 albaGUIContextualMenu::~albaGUIContextualMenu()
@@ -115,8 +112,6 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
 	if(vme_menu)
 	{
 		this->Append(CONTEXTUAL_MENU_HIDE_VME, "Hide");
-		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
-		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Transform  \tCtrl+T");
     this->AppendSeparator();
     this->Append(CONTEXTUAL_MENU_VME_PIPE,"Visual Props");
     this->AppendSeparator();
@@ -234,16 +229,6 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
       }
     }
     break;
-		case CONTEXTUAL_MENU_DELETE_VME:
-			//send the event to simulate the cut started by the menu button.
-			albaEventMacro(albaEvent(this, MENU_OP, (long)OP_CUT));
-		break;
-		case CONTEXTUAL_MENU_TRANSFORM:
-		{
-			albaString s = "Transform  \tCtrl+T";
-			albaEventMacro(albaEvent(this, PARSE_STRING, &s));
-		}
-		break;
 		case CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW:
 			m_ChildViewActive->Maximize(true);
 		break;
