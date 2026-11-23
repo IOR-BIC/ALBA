@@ -33,8 +33,21 @@
 #include "albaVMERoot.h"
 #include "albaVMEGeneric.h"
 #include "albaDeviceButtonsPadMouse.h"
+#include "albaFakeLogicForTest.h"
+#include "albaServiceLocator.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
+
+/** Logic that records the views created and deleted by the view manager, and gives them a frame like the real logic */
+class albaViewManagerTestLogic : public albaFakeLogicForTest
+{
+public:
+	virtual void CreateViewFrame(albaView *view) override { m_CreateViewFrameCalls++; view->SetFrame(new wxFrame()); }
+	virtual void ViewDeleted(albaView *view) override { m_ViewDeletedCalls++; }
+
+	int m_CreateViewFrameCalls = 0;
+	int m_ViewDeletedCalls = 0;
+};
 
 class albaViewDummy : public albaView // Dummy class for testing
 {
@@ -141,28 +154,6 @@ void albaViewDummy::SetMouse(albaDeviceButtonsPadMouse *mouse)
 }
 
 //----------------------------------------------------------------------------
-void albaViewManagerTest::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
-{
-  if(albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-    {
-      case VIEW_CREATED: // Logic addressed event
-        {
-          m_EventResult = VIEW_CREATED;
-          e->GetView()->SetFrame(new wxFrame());
-        }
-        break;
-      case VIEW_DELETE: // Sidebar addressed event
-        {
-          m_EventResult = VIEW_DELETE;
-        }
-        break;
-    }
-  }
-}
-//----------------------------------------------------------------------------
 void albaViewManagerTest::TestFixture()
 //----------------------------------------------------------------------------
 {
@@ -171,14 +162,18 @@ void albaViewManagerTest::TestFixture()
 void albaViewManagerTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
+  m_OldLogic = albaServiceLocator::GetLogicManager();
+  m_Logic = new albaViewManagerTestLogic();
+  albaServiceLocator::SetLogicManager(m_Logic);
   m_Manager = new albaViewManager();
-  m_Manager->SetListener(this);
 }
 //----------------------------------------------------------------------------
 void albaViewManagerTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_Manager);
+  albaServiceLocator::SetLogicManager(m_OldLogic);
+  cppDEL(m_Logic);
 }
 //----------------------------------------------------------------------------
 void albaViewManagerTest::TestDynamicAllocation()
@@ -237,7 +232,7 @@ void albaViewManagerTest::ViewCreateTest()
   albaView *createdView1 = m_Manager->ViewCreate(vID);
   CPPUNIT_ASSERT(createdView1->IsA(tempView->GetTypeName())); // check if is of the same type of the template view
   CPPUNIT_ASSERT(m_Manager->GetList() == createdView1); // check if the created view is inside the view list
-  CPPUNIT_ASSERT(m_EventResult == VIEW_CREATED); // check if the raised event is view creation
+  CPPUNIT_ASSERT(m_Logic->m_CreateViewFrameCalls == 1); // check if the logic was asked to create the view frame
 
 
   // Test create by view type name
@@ -245,7 +240,7 @@ void albaViewManagerTest::ViewCreateTest()
   albaView *createdView2 = m_Manager->ViewCreate("viewDummy");
   CPPUNIT_ASSERT(createdView2->IsA(tempView->GetTypeName())); // check if is of the same type of the template view
   CPPUNIT_ASSERT(m_Manager->GetList()->m_Next == createdView2); // check if the created view is inside the view list
-  CPPUNIT_ASSERT(m_EventResult == VIEW_CREATED); // check if the raised event is view creation
+  CPPUNIT_ASSERT(m_Logic->m_CreateViewFrameCalls == 2); // check if the logic was asked to create the view frame
 
 }
 //----------------------------------------------------------------------------
@@ -265,7 +260,7 @@ void albaViewManagerTest::ViewDeleteTest()
 
   //CPPUNIT_ASSERT(view1 == NULL); // check if the view has been deleted  
   CPPUNIT_ASSERT(m_Manager->GetList() != view1); // check if the view has been removed from the view list
-  CPPUNIT_ASSERT(m_EventResult == VIEW_DELETE); // check if the raised event is view delete
+  CPPUNIT_ASSERT(m_Logic->m_ViewDeletedCalls == 1); // check if the logic was told of the view deletion
 }
 //----------------------------------------------------------------------------
 void albaViewManagerTest::GetViewTest()

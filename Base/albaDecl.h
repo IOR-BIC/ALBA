@@ -170,11 +170,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 											 // events about views
 											 VIEW_CREATE,   // from menu to albaViewManager
-											 VIEW_CREATED,  // from albaViewManager to Logic
-											 VIEW_DELETE,   // from albaGUIMDIChild to albaViewManager
 											 VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
-											 VIEW_MAXIMIZE, // from albaGUI to albaGUICrossSplitter
-											 VIEW_RESIZE,   // from anyone that want to block the view's size.
 
 											 CAMERA_RESET,
 											 CAMERA_FIT,

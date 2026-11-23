@@ -391,6 +391,18 @@ protected:
 	/** Called by an operation to remove its gui from the side bar */
 	virtual void OpHideGui() override;
 
+	/** Called by the view manager when it creates a view: create the frame of the view and attach the view to it */
+	virtual void CreateViewFrame(albaView *v) override;
+
+	/** Called by the view manager when it deletes a view: update side bar, interaction and menus */
+	virtual void ViewDeleted(albaView *view) override;
+
+	/** Tile the view frames horizontally or vertically */
+	virtual void TileViewFrames(bool horizontally) override;
+
+	/** Cascade the view frames */
+	virtual void CascadeViewFrames() override;
+
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
@@ -403,8 +415,6 @@ protected:
 
 	/** Create a new view. */
 	virtual void ViewCreate(int viewId);
-	/** A new View has Been Created - Logic must create the View Frame */
-	virtual void ViewCreated(albaView *v);
 
 	/** Called when user change the measure unit from menù Options.*/
 	void UpdateMeasureUnit();

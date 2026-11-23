@@ -94,6 +94,18 @@ public:
 	/** Return the selected view, NULL if none */
 	virtual albaView *GetSelectedView() = 0;
 
+	/** Called by the view manager when it creates a view: create the frame of the view and attach the view to it */
+	virtual void CreateViewFrame(albaView *view) = 0;
+
+	/** Called by the view manager when it deletes a view */
+	virtual void ViewDeleted(albaView *view) = 0;
+
+	/** Tile the view frames horizontally or vertically */
+	virtual void TileViewFrames(bool horizontally) = 0;
+
+	/** Cascade the view frames */
+	virtual void CascadeViewFrames() = 0;
+
 	//Interaction
 	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */
 	virtual void PushTool(albaInteractionTool *tool) = 0;

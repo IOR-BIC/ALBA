@@ -28,6 +28,7 @@
 
 #include "albaGUIViewFrame.h"
 #include "albaServiceLocator.h"
+#include "albaAbsViewManager.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaView.h"
@@ -69,7 +70,8 @@ albaGUIViewFrame::~albaGUIViewFrame( )
 void albaGUIViewFrame::OnCloseWindow(wxCloseEvent &event)
 //----------------------------------------------------------------------------
 { 
-	albaEventMacro(albaEvent(this,VIEW_DELETE,m_View));
+	if (albaServiceLocator::GetViewManager())
+		albaServiceLocator::GetViewManager()->ViewDelete(m_View);
 	Destroy();
 }
 //----------------------------------------------------------------------------

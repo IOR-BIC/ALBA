@@ -103,8 +103,11 @@ public:
 	/** Insert the view into the view-list, fill the view with the vme tree and select the selected vme. */
   void ViewInsert(albaView *view);
   
-	/** Remove the view from the view-list and delete it. */
-  virtual void ViewDelete(albaView *view);
+	/** Remove the view from the view-list and delete it (called by its frame when it is closed) */
+  virtual void ViewDelete(albaView *view) override;
+
+	/** Move and resize the frame of the open view with the given label */
+  virtual void ViewResize(const char *label, int x, int y, int width, int height) override;
   
 	/** Delete all view. */
   virtual void ViewDeleteAll();

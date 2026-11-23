@@ -147,21 +147,21 @@ void albaWizardBlockOperation::ExcutionBegin()
 		int width = m_width*albaframesize.GetWidth();
 		int height = m_height*albaframesize.GetHeight();
 
-	    albaEventMacro(albaEvent(this,VIEW_RESIZE,&tmpStr,x,y,width,height));	
+	    GetViewManager()->ViewResize(tmpStr, x, y, width, height);
 	}
 	if(m_windowhastobetiled)
 	{
 		if(!m_tile_windows.Compare("Tile_window_horizontally")) 
 		{
-	        albaEventMacro(albaEvent(this,TILE_WINDOW_HORIZONTALLY));
+	        GetLogicManager()->TileViewFrames(true);
 		}
 		else if (!m_tile_windows.Compare("Tile_window_vertically")) 
 		{
-			albaEventMacro(albaEvent(this,TILE_WINDOW_VERTICALLY));
+			GetLogicManager()->TileViewFrames(false);
 		}
 		else if (!m_tile_windows.Compare("Tile_window_cascade"))
 		{
-			albaEventMacro(albaEvent(this,TILE_WINDOW_CASCADE));
+			GetLogicManager()->CascadeViewFrames();
 		}
 		else 
 		{

@@ -543,13 +543,13 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		{
 			//resize view
 		case TILE_WINDOW_CASCADE:
-			m_Win->Cascade();
+			CascadeViewFrames();
 			break;
 		case TILE_WINDOW_HORIZONTALLY:
-			m_Win->Tile(wxHORIZONTAL);
+			TileViewFrames(true);
 			break;
 		case TILE_WINDOW_VERTICALLY:
-			m_Win->Tile(wxVERTICAL);
+			TileViewFrames(false);
 			break;
 			// ###############################################################
 			// commands related to the Dockable Panes
@@ -695,46 +695,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case VIEW_CREATE:
 			ViewCreate(e->GetArg());
 			break;
-		case VIEW_CREATED:
-			ViewCreated(e->GetView());
-			break;
-		case VIEW_RESIZE:
-		{
-			albaView *view = NULL;
-			const char *viewStr = e->GetString()->GetCStr();
-			view = m_ViewManager->GetFromOpenedViews(viewStr);
-			if (view)
-			{
-				view->GetFrame()->SetSize(e->GetWidth(), e->GetHeight());
-				view->GetFrame()->SetPosition(wxPoint(e->GetX(), e->GetY()));
-			}
-		}
-		break;
-		case VIEW_DELETE:
-		{
-
-			if (m_PlugControlPanel)
-				this->m_SideBar->ViewDeleted(e->GetView());
-
-			if (e->GetView() == m_SelectedView)
-				m_SelectedView = NULL;
-
-#ifdef ALBA_USE_VTK
-			// currently albaInteraction is strictly dependent on VTK (marco)
-			if (m_InteractionManager)
-				m_InteractionManager->ViewSelected(NULL);
-#endif
-
-			EnableMenuAndToolbar();
-		}
-		if (m_OpManager)
-		{
-			m_OpManager->RefreshMenu();
-		}
-		break;
-		case VIEW_MAXIMIZE:
-			break;
-		break;
 		case CAMERA_RESET:
 			if (m_ViewManager) m_ViewManager->CameraReset();
 			break;
@@ -1435,7 +1395,7 @@ void albaLogicWithManagers::ViewCreate(int viewId)
   }
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::ViewCreated(albaView *v)
+void albaLogicWithManagers::CreateViewFrame(albaView *v)
 {
 	// removed temporarily support for external Views
 	if (v)
@@ -1446,6 +1406,33 @@ void albaLogicWithManagers::ViewCreated(albaView *v)
 		c->SetListener((albaObserver*)m_ViewManager);
 		v->SetFrame(c);
 	}
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::ViewDeleted(albaView *view)
+{
+	if (m_PlugControlPanel)
+		m_SideBar->ViewDeleted(view);
+	if (view == m_SelectedView)
+		m_SelectedView = NULL;
+#ifdef ALBA_USE_VTK
+	// currently albaInteraction is strictly dependent on VTK (marco)
+	if (m_InteractionManager)
+		m_InteractionManager->ViewSelected(NULL);
+#endif
+	EnableMenuAndToolbar();
+
+	if (m_OpManager)
+		m_OpManager->RefreshMenu();
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::TileViewFrames(bool horizontally)
+{
+	m_Win->Tile(horizontally ? wxHORIZONTAL : wxVERTICAL);
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::CascadeViewFrames()
+{
+	m_Win->Cascade();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::SelectView(albaView *view)

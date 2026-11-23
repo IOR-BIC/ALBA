@@ -30,5 +30,7 @@ public:
 	virtual void PropertyUpdate(albaVME *vme = NULL, bool fromTag = false) override {}
 	virtual albaView *GetFromOpenedViews(const char *label) override { return NULL; }
 	virtual albaView *ViewCreate(int id) override { return NULL; }
+	virtual void ViewDelete(albaView *view) override {}
+	virtual void ViewResize(const char *label, int x, int y, int width, int height) override {}
 };
 #endif

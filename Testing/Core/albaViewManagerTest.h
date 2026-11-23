@@ -20,11 +20,13 @@
 #include "albaTest.h"
 
 class albaViewManager;
+class albaAbsLogicManager;
+class albaViewManagerTestLogic;
 
 /** albaViewManagerTest:
 Test class for albaViewManager
 */
-class albaViewManagerTest : public albaTest, public albaObserver
+class albaViewManagerTest : public albaTest
 {
 public: 
   // Executed before each test
@@ -84,9 +86,8 @@ private:
   void SetMouseTest();
   void GetFromOpenedViewsTest();
 
-  void OnEvent(albaEventBase *alba_event); // This method trap the events coming from the view manager
-
-  int m_EventResult;
+  albaViewManagerTestLogic *m_Logic; ///< records the calls of the view manager to the logic
+  albaAbsLogicManager *m_OldLogic;
   albaViewManager *m_Manager;
 
 };

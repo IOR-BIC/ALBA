@@ -179,13 +179,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 	{
     switch(e->GetId())
     {
-      case VIEW_CREATE:
-        ViewCreate(e->GetId());
-      break;
-      case VIEW_DELETE:
-        ViewDelete(e->GetView());
-      break;
-
 			case ID_VIEW_SETTING_MAXIMIZE:
 			{
 				m_Config->Write("View_Maximize", m_ViewMaximize);
@@ -435,7 +428,7 @@ albaView *albaViewManager::ViewCreate(int id)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  albaEventMacro(albaEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
+  GetLogicManager()->CreateViewFrame(new_view);
 
 	if (m_ViewMaximize)
 		new_view->GetFrame()->Maximize();
@@ -493,7 +486,7 @@ albaView *albaViewManager::ViewCreate(wxString label)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  albaEventMacro(albaEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
+  GetLogicManager()->CreateViewFrame(new_view);
   
   new_view->GetFrame()->Show(true); // show the view's frame
 	new_view->SetBackgroundColor(m_ViewColorBackground);
@@ -526,6 +519,16 @@ void albaViewManager::ViewInsert(albaView *view)
   }
 }
 //----------------------------------------------------------------------------
+void albaViewManager::ViewResize(const char *label, int x, int y, int width, int height)
+{
+	albaView *view = GetFromOpenedViews(label);
+	if (view)
+	{
+		view->GetFrame()->SetSize(width, height);
+		view->GetFrame()->SetPosition(wxPoint(x, y));
+	}
+}
+//----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
 {
   if(m_SelectedView)
@@ -536,7 +539,7 @@ void albaViewManager::ViewDelete(albaView *view)
     m_SelectedView = NULL;
   }
 
-  albaEventMacro(albaEvent(this,VIEW_DELETE,view)); // inform the sidebar
+  GetLogicManager()->ViewDeleted(view);
 	
   // Paolo 2005-04-22
   // calculate the view type index

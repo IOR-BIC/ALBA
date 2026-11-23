@@ -99,7 +99,7 @@ void albaDeviceButtonsPadMouseRemoteTest::TestOnEventViewDelete()
 
   // sending some dummy events and testing for leaks
 
-  albaEventInteraction viewDeleteEvent(this,VIEW_DELETE);
+  albaEventInteraction viewDeleteEvent(this,ID_NO_EVENT);
   buttonsPadMouse->OnEvent(&viewDeleteEvent);
 
   buttonsPadMouse->Delete();

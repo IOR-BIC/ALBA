@@ -46,5 +46,11 @@ public:
 
 	/** Create the view at index id of the plugged view-list */
 	virtual albaView *ViewCreate(int id) = 0;
+
+	/** Remove the view from the view-list and delete it (called by its frame when it is closed) */
+	virtual void ViewDelete(albaView *view) = 0;
+
+	/** Move and resize the frame of the open view with the given label */
+	virtual void ViewResize(const char *label, int x, int y, int width, int height) = 0;
 };
 #endif

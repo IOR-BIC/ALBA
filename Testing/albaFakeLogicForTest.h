@@ -90,6 +90,14 @@ public:
 	virtual void OpShowGui(albaGUIPanel *panel) override {}
 
 	virtual void OpHideGui() override {}
+
+	virtual void CreateViewFrame(albaView *view) override {}
+
+	virtual void ViewDeleted(albaView *view) override {}
+
+	virtual void TileViewFrames(bool horizontally) override {}
+
+	virtual void CascadeViewFrames() override {}
 	
 	virtual const char* GetMsfFileExtension() override;
 	

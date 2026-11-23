@@ -431,11 +431,7 @@ wxString  albaIdString(int id)
      case CREATE_STORAGE:       s="CREATE_STORAGE"; break; 
 
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 
-     case VIEW_CREATED:         s="VIEW_CREATED"; break; 
-     case VIEW_DELETE:          s="VIEW_DELETE"; break; 
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
-     case VIEW_MAXIMIZE:        s="VIEW_MAXIMIZE"; break; 
-     case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
 
      case CAMERA_RESET:	        s="CAMERA_RESET"; break; 
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 
