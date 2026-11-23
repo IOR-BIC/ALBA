@@ -385,13 +385,15 @@ protected:
 	/** Called by the op manager when an operation stops: re-enable all menu and unlock the Selection; during a wizard, continue it */
 	virtual void OpRunTerminated(bool runOk) override;
 
+	/** Called by an operation to show its gui (panel) on the side bar */
+	virtual void OpShowGui(albaGUIPanel *panel) override;
+
+	/** Called by an operation to remove its gui from the side bar */
+	virtual void OpHideGui() override;
+
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
-	/** Show the gui of the running operation or the settings of the selected view. */
-	virtual void OpShowGui(bool push_gui, albaGUIPanel *panel);
-	/** Hide the setting's gui when a view is destroyed. */
-	virtual void OpHideGui(bool view_closed);
 
 	/** Show contextual menu for tree when right mouse click arrives.*/
 	virtual void TreeContextualMenu(albaEvent &e);

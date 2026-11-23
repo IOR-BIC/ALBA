@@ -74,10 +74,10 @@ public:
 	virtual void ExpandVME(albaVME *vme) = 0;
 
 	/** Show the operation's parameters gui on the tabbed panel. */
-	virtual void OpShowGui(bool push_gui, albaGUIPanel *panel) = 0;
+	virtual void OpShowGui(albaGUIPanel *panel) = 0;
 
-	/** Hide the view/operation's gui from the tabbed panel. */
-	virtual void OpHideGui(bool view_closed) = 0;
+	/** Hide the operation's gui from the tabbed panel. */
+	virtual void OpHideGui() = 0;
 
 	/** Plug the view settings on the tabbed panel. */
 	virtual void ViewSelect(albaView *view) = 0;

@@ -27,6 +27,7 @@ class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
 class albaInteractionTool;
+class albaGUIPanel;
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -65,6 +66,12 @@ public:
 
 	/** Called by the op manager when an operation ends (not for the nested ones), runOk tells if it was executed */
 	virtual void OpRunTerminated(bool runOk) = 0;
+
+	/** Called by an operation to show its gui (panel) on the side bar */
+	virtual void OpShowGui(albaGUIPanel *panel) = 0;
+
+	/** Called by an operation to remove its gui from the side bar */
+	virtual void OpHideGui() = 0;
 
 	virtual const char* GetMsfFileExtension() = 0;
 

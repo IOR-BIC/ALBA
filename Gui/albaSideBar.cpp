@@ -125,31 +125,19 @@ albaSideBar::~albaSideBar()
 {
 }
 //----------------------------------------------------------------------------
-void albaSideBar::OpShowGui(bool push_gui, albaGUIPanel *panel)
+void albaSideBar::OpShowGui(albaGUIPanel *panel)
 //----------------------------------------------------------------------------
 {
 	m_Notebook->Show(true);
-	if(push_gui)
-	{
-		m_Notebook->SetSelection(2);
-		m_OpPanel->Push(panel);
-	}
+	m_Notebook->SetSelection(2);
+	m_OpPanel->Push(panel);
 }
 //----------------------------------------------------------------------------
-void albaSideBar::OpHideGui(bool view_closed)
+void albaSideBar::OpHideGui()
 //----------------------------------------------------------------------------
 {
-	if(view_closed)
-	{
-		this->m_Notebook->SetSelection(0);
-		this->m_ViewPropertyPanel->RemoveCurrentGui();
-		this->m_ViewPropertyPanel->SetTitle("");
-	}
-	else
-	{
-		m_OpPanel->Pop();
-		m_Notebook->SetSelection(0);
-	}
+	m_OpPanel->Pop();
+	m_Notebook->SetSelection(0);
 }
 //----------------------------------------------------------------------------
 void albaSideBar::ViewSelect(albaView *view)

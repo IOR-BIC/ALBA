@@ -86,6 +86,10 @@ public:
 	virtual void OpRunStarting() override {}
 
 	virtual void OpRunTerminated(bool runOk) override {}
+
+	virtual void OpShowGui(albaGUIPanel *panel) override {}
+
+	virtual void OpHideGui() override {}
 	
 	virtual const char* GetMsfFileExtension() override;
 	

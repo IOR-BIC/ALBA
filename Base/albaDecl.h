@@ -182,8 +182,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 
 
-																												OP_SHOW_GUI,
-																												OP_HIDE_GUI,
 
 																												ITEM_SELECTED, //used by albaGUIListCtrl and Dictionary
 

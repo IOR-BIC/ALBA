@@ -690,12 +690,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 				m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 			}
 			break;
-		case OP_SHOW_GUI:
-			OpShowGui(!e->GetBool(), (albaGUIPanel*)e->GetWin());
-			break;
-		case OP_HIDE_GUI:
-			OpHideGui(e->GetBool());
-			break;
 			// ###############################################################
 			// commands related to VIEWS
 		case VIEW_CREATE:
@@ -1419,14 +1413,16 @@ void albaLogicWithManagers::OpRunTerminated(bool runOk)
 		OnFileSave();
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OpShowGui(bool push_gui, albaGUIPanel *panel)
+void albaLogicWithManagers::OpShowGui(albaGUIPanel *panel)
 {
-	if(m_SideBar) m_SideBar->OpShowGui(push_gui, panel);
+	if (m_SideBar)
+		m_SideBar->OpShowGui(panel);
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OpHideGui(bool view_closed)
+void albaLogicWithManagers::OpHideGui()
 {
-	if(m_SideBar) m_SideBar->OpHideGui(view_closed);
+	if (m_SideBar)
+		m_SideBar->OpHideGui();
 }
 
 // VIEW //////////////////////////////////////////////////////////////////////

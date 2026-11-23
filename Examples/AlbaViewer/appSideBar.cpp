@@ -95,24 +95,14 @@ appSideBar::~appSideBar()
 }
 
 //----------------------------------------------------------------------------
-void appSideBar::OpShowGui(bool push_gui, albaGUIPanel *panel)
+void appSideBar::OpShowGui(albaGUIPanel *panel)
 {
 	m_Notebook->Show(true);
 }
 //----------------------------------------------------------------------------
-void appSideBar::OpHideGui(bool view_closed)
+void appSideBar::OpHideGui()
 {
-	if(view_closed)
-	{
-		m_Notebook->SetSelection(0);
-		m_ViewPropertyPanel->RemoveCurrentGui();
-		m_ViewPropertyPanel->SetTitle("");
-	}
-	else
-	{
-		
-		m_Notebook->SetSelection(0);
-	}
+	m_Notebook->SetSelection(0);
 }
 //----------------------------------------------------------------------------
 void appSideBar::ViewSelect(albaView *view)

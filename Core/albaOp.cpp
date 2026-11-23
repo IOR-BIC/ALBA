@@ -170,14 +170,16 @@ void albaOp::ShowGui()
 	wxString title=" ";
 	title	+= menu_codes +" parameters:";
   m_Guih->SetTitle(title);
-  albaEventMacro(albaEvent(this,OP_SHOW_GUI,(wxWindow *)m_Guih));
+  if (GetLogicManager())
+    GetLogicManager()->OpShowGui(m_Guih);
 }
 //----------------------------------------------------------------------------
 void albaOp::HideGui()
 {
   if(m_Gui)
 	{
-		albaEventMacro(albaEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
+		if (GetLogicManager())
+			GetLogicManager()->OpHideGui();
 		delete m_Guih;
 		m_Guih = NULL;
 		m_Gui = NULL;
