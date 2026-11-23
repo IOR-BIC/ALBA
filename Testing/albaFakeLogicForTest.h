@@ -108,6 +108,30 @@ public:
 	virtual void TileViewFrames(bool horizontally) override {}
 
 	virtual void CascadeViewFrames() override {}
+
+	virtual void UpdateFrameTitle() override {}
+
+	virtual int FileNew() override { return ALBA_OK; }
+
+	virtual int FileOpen(const char *file = NULL) override { return ALBA_OK; }
+
+	virtual int FileSave() override { return ALBA_OK; }
+
+	virtual int FileSaveAs(bool legacy = false) override { return ALBA_OK; }
+
+	virtual int FileReload() override { return ALBA_OK; }
+
+	virtual int CreateSnapshot() override { return ALBA_OK; }
+
+	virtual void WizardRunStarting() override {}
+
+	virtual void WizardRunTerminated() override {}
+
+	virtual void WizardRunOp(const char *opName) override {}
+
+	virtual void WizardRunOp(albaOp *op) override {}
+
+	virtual void WizardRunOp(int opId) override {}
 	
 	virtual const char* GetMsfFileExtension() override;
 	

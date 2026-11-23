@@ -529,6 +529,27 @@ void albaViewManager::ViewResize(const char *label, int x, int y, int width, int
 	}
 }
 //----------------------------------------------------------------------------
+void albaViewManager::ViewOpen(const char *label)
+{
+	albaView *view = GetFromOpenedViews(label);
+	if (view)
+		Activate(view);
+	else
+		ViewCreate(label);
+}
+//----------------------------------------------------------------------------
+void albaViewManager::ViewClose(const char *label)
+{
+	albaView *view = GetFromOpenedViews(label);
+	if (view)
+	{
+		wxFrame *frame = view->GetFrame();
+		ViewDelete(view);
+		if (frame != NULL)
+			frame->Destroy();
+	}
+}
+//----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
 {
   if(m_SelectedView)

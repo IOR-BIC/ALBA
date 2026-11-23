@@ -53,10 +53,10 @@ public:
 protected:
   
 	/** FILE NEW evt. handler */
-	virtual void OnFileNew();
+	virtual int FileNew() override;
 
 	/** FILE OPEN evt. handler.*/
-	virtual void OnFileOpen(const char *file_to_open = NULL);
+	virtual int FileOpen(const char *file_to_open = NULL) override;
 
 	/** Called on Quit event. */
 	virtual void OnQuit();

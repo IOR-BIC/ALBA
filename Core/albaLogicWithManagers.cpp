@@ -574,15 +574,15 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			// ###############################################################
 			// commands related to FILE MENU  
 		case MENU_FILE_NEW:
-			OnFileNew();
+			FileNew();
 			break;
 		case MENU_FILE_OPEN:
 		{
 			albaString *filename = e->GetString();
 			if (filename)
-				OnFileOpen((*filename).GetCStr());
+				FileOpen((*filename).GetCStr());
 			else
-				OnFileOpen();
+				FileOpen();
 			UpdateFrameTitle();
 		}
 		break;
@@ -607,13 +607,13 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			OnFileHistory(e->GetId());
 			break;
 		case MENU_FILE_SAVE:
-			OnFileSave();
+			FileSave();
 			break;
 		case MENU_FILE_SAVEAS:
-			OnFileSaveAs();
+			FileSaveAs();
 			break;
 		case MENU_FILE_SAVEAS_LEGACY:
-			OnFileSaveAs(true);
+			FileSaveAs(true);
 			break;
 		case MENU_FILE_PRINT:
 			if (m_ViewManager && m_PrintSupport)
@@ -710,14 +710,8 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		break;
 		//-----from medLogic
 		case MENU_FILE_SNAPSHOT:
-		{
-			if (m_SnapshotManager && m_VMEManager && m_ViewManager)
-				m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
-
-			if (m_WizardManager && m_WizardRunning)
-				OnEvent(&albaEvent(this, WIZARD_RUN_CONTINUE, true));
-		}
-		break;
+			CreateSnapshot();
+			break;
 		case MENU_FILE_MANAGE_SNAPSHOT:
 		{
 			if (m_SnapshotManager && m_VMEManager)
@@ -729,143 +723,11 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			if (m_WizardManager)
 				m_WizardManager->WizardRun(e->GetArg());
 			break;
-		case WIZARD_RUN_STARTING:
-		{
-			//Manage start event from the wizard lock window close button
-			//and disabling toolbar
-			albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-			if (c != NULL)
-				c->SetAllowCloseWindow(false);
-			WizardRunStarting();
-		}
-		break;
-		case WIZARD_RUN_TERMINATED:
-		{
-			//Manage end event from the wizard unlock window close button
-			//and enabling toolbar
-			albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-			if (c != NULL)
-				c->SetAllowCloseWindow(true);
-			WizardRunTerminated();
-			UpdateFrameTitle();
-		}
-		break;
-		case WIZARD_RUN_CONTINUE:
-		{
-			if (m_WizardManager && m_WizardRunning)
-				m_WizardManager->WizardContinue(e->GetBool());
-		}
-		break;
-		case WIZARD_UPDATE_WINDOW_TITLE:
-		{
-			UpdateFrameTitle();
-		}
-		break;
-		case WIZARD_REQUIRED_VIEW:
-		{
-			//The wizard requires a specific view
-			//searching on open views or open a new one
-			albaView *view;
-			const char *viewStr = e->GetString()->GetCStr();
-
-			view = m_ViewManager->GetFromOpenedViews(viewStr);
-			if (view)
-				m_ViewManager->Activate(view);
-			else
-				m_ViewManager->ViewCreate(viewStr);
-		}
-		break;
-		case WIZARD_DELETE_VIEW:
-		{
-			albaView *view;
-			const char *viewStr = e->GetString()->GetCStr();
-
-			view = m_ViewManager->GetFromOpenedViews(viewStr);
-			if (view)
-			{
-				albaGUIMDIChild *c = (albaGUIMDIChild *)view->GetFrame();
-				m_ViewManager->ViewDelete(view);
-				if (c != NULL)
-					c->Destroy();
-			}
-		}
-		break;
-		case WIZARD_RUN_OP:
-		{
-			//Running an op required from the wizard
-			albaString *tmp = e->GetString();
-			albaLogMessage("wiz starting :%s", tmp->GetCStr());
-			m_CancelledBeforeOpStarting = true;
-			UpdateFrameTitle();
-			m_OpManager->OpRun(*(e->GetString()));
-			//If the op is started the value of m_CancelledBeforeOpStarting 
-			//is changed by OpRunStarting
-			if (m_CancelledBeforeOpStarting)
-			{
-				m_CancelledBeforeOpStarting = false;
-				m_WizardManager->WizardContinue(false);
-			}
-		}
-		break;
-		case WIZARD_OP_DELETE:
-		{
-			//Running an op required from the wizard
-			m_CancelledBeforeOpStarting = true;
-			UpdateFrameTitle();
-			m_OpManager->OpRun(OP_DELETE);
-		}
-		break;
-		case WIZARD_OP_NEW:
-		{
-			//Running an op required from the wizard
-			if (m_VMEManager)
-				m_VMEManager->MSFNew();
-			m_WizardManager->WizardContinue(true);
-		}
-		break;
-		case WIZARD_PAUSE:
-		{
-			UpdateFrameTitle();
-			m_OpManager->OpRun(e->GetOp());
-		}
-		break;
-		case WIZARD_RELOAD_MSF:
-		{
-			UpdateFrameTitle();
-			wxString file;
-			file = m_VMEManager->GetFileName().GetCStr();
-			if (file.IsEmpty())
-			{
-				albaLogMessage("Reload requested whitout opened MSF");
-				//continue wizard with error
-				m_WizardManager->WizardContinue(false);
-			}
-			else
-			{
-				int opened = m_VMEManager->MSFOpen(file);
-				//continue wizard after open operation
-				m_WizardManager->WizardContinue(opened != ALBA_ERROR);
-			}
-		}
-		break;
 		case MENU_VIEW_TOOLBAR:
 			m_Win->ShowDockPane("wizardgauge", !m_Win->DockPaneIsShown("wizardgauge"));
 			m_Win->ShowDockPane("wizardlabel", !m_Win->DockPaneIsShown("wizardlabel"));
 			m_Win->ShowDockPane("wizardseparator", !m_Win->DockPaneIsShown("wizardseparator"));
 			m_Win->ShowDockPane("toolbar", !m_Win->DockPaneIsShown("toolbar"));
-			break;
-		// progress of the wizard (the progress bar of the operations is driven by albaProgressBarHelper)
-		case PROGRESSBAR_SHOW:
-			m_WizardLabel->Enable();
-			m_WizardGauge->Enable();
-			break;
-		case PROGRESSBAR_HIDE:
-			m_WizardGauge->SetValue(0);
-			m_WizardGauge->Enable(false);
-			m_WizardLabel->Enable(false);
-			break;
-		case PROGRESSBAR_SET_VALUE:
-			m_WizardGauge->SetValue(e->GetArg());
 			break;
 
 		default:
@@ -879,8 +741,10 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 
 // FILE //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OnFileNew()
+int albaLogicWithManagers::FileNew()
 {
+	int result = ALBA_ERROR;
+
 	if (m_OpManager)
 		m_OpManager->VmeSelected(NULL);
 
@@ -889,14 +753,18 @@ void albaLogicWithManagers::OnFileNew()
     if(m_VMEManager->AskConfirmAndSave())
 	  {
 		  m_VMEManager->MSFNew();
+			result = ALBA_OK;
 	  }
   }
-	
+
 	m_Win->SetTitle(m_AppTitle);
+	return result;
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
+int albaLogicWithManagers::FileOpen(const char *file_to_open)
 {
+	int opened = ALBA_ERROR;
+
 	if (m_VMEManager)
 	{
 		m_OpeningMSF = true;
@@ -922,18 +790,12 @@ void albaLogicWithManagers::OnFileOpen(const char *file_to_open)
 				file = albaGetOpenFile(lastFolder, wildc).ToAscii();
 			}
 			
-			if (file.IsEmpty() && m_WizardManager && m_WizardRunning)
-				m_WizardManager->WizardContinue(false);
-			else if (file.IsEmpty())
-				return;
-
-			int opened = m_VMEManager->MSFOpen(file);
-			//If there is a wizzard running we need to continue it after open operation
-			if (m_WizardManager && m_WizardRunning)
-				m_WizardManager->WizardContinue(opened != ALBA_ERROR);
+			if (!file.IsEmpty())
+				opened = m_VMEManager->MSFOpen(file);
 		}
 		m_OpeningMSF = false;
 	}
+	return opened;
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OnFileHistory(int menuId)
@@ -950,34 +812,56 @@ void albaLogicWithManagers::OnFileHistory(int menuId)
   }
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OnFileSave()
+int albaLogicWithManagers::FileSave()
 {
+	int saved = ALBA_ERROR;
   if(m_VMEManager)
   {
 		albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
-	  int saved=m_VMEManager->MSFSave();
-	  //If there is a wizard running we need to continue it after save operation
-	  if (m_WizardManager && m_WizardRunning)
-		  m_WizardManager->WizardContinue(saved!=ALBA_ERROR);
+	  saved=m_VMEManager->MSFSave();
 	  UpdateFrameTitle();
   }
+	return saved;
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OnFileSaveAs(bool legacy)
+int albaLogicWithManagers::FileSaveAs(bool legacy)
 {
-  if(m_VMEManager) 
+	int saved = ALBA_ERROR;
+  if(m_VMEManager)
   {
 	  albaString save_default_folder = albaGetLastUserFolder();
 	  save_default_folder.ParsePathName();
 	  m_VMEManager->SetDirName(save_default_folder);
-	  int saved=m_VMEManager->MSFSaveAs(legacy);
-	  //If there is a wizard running we need to continue it after save operation
-	  if (m_WizardManager && m_WizardRunning)
-		  m_WizardManager->WizardContinue(saved!=ALBA_ERROR);
+	  saved=m_VMEManager->MSFSaveAs(legacy);
 	  UpdateFrameTitle();
   }
+	return saved;
+}
+//----------------------------------------------------------------------------
+int albaLogicWithManagers::FileReload()
+{
+	UpdateFrameTitle();
+	if (m_VMEManager == NULL)
+		return ALBA_ERROR;
+
+	wxString file = m_VMEManager->GetFileName().GetCStr();
+	if (file.IsEmpty())
+	{
+		albaLogMessage("Reload requested whitout opened MSF");
+		return ALBA_ERROR;
+	}
+	return m_VMEManager->MSFOpen(file);
+}
+//----------------------------------------------------------------------------
+int albaLogicWithManagers::CreateSnapshot()
+{
+	if (m_SnapshotManager == NULL || m_VMEManager == NULL || m_ViewManager == NULL)
+		return ALBA_ERROR;
+
+	m_SnapshotManager->CreateSnapshot(m_VMEManager->GetRoot(), m_ViewManager->GetSelectedView());
+	return ALBA_OK;
 }
 
 // VME ///////////////////////////////////////////////////////////////////////
@@ -1332,7 +1216,7 @@ void albaLogicWithManagers::OpRunTerminated(bool runOk)
     m_SideBar->EnableSelect(true);
 
 	if(m_ApplicationSettings->IsAutoSaveOn() && !m_OpeningMSF)
-		OnFileSave();
+		FileSave();
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpShowGui(albaGUIPanel *panel)
@@ -1461,6 +1345,7 @@ void albaLogicWithManagers::CreateWizardToolbar()
 	m_WizardLabel = new wxStaticText(labelWin, -1, " Wizard\n Progress", wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	//lab->Show(false);
 	m_WizardLabel->Disable();
+	m_WizardManager->SetProgressGauge(m_WizardGauge, m_WizardLabel);
 
 	m_Win->AddDockPane(m_WizardGauge, wxPaneInfo()
 		.Name("wizardgauge")
@@ -1597,6 +1482,11 @@ void albaLogicWithManagers::ConfigureWizardManager()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::WizardRunStarting()
 {
+	//lock the close button of the view
+	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	if (c != NULL)
+		c->SetAllowCloseWindow(false);
+
 	//Disabling menu, toolbars and selection by interacion manager and sidebar
 	m_WizardRunning = true;
 
@@ -1611,6 +1501,11 @@ void albaLogicWithManagers::WizardRunStarting()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::WizardRunTerminated()
 {
+	//unlock the close button of the view
+	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	if (c != NULL)
+		c->SetAllowCloseWindow(true);
+
 	//Enabling menu, toolbars and selection by interacion manager and sidebar
 	m_WizardRunning = false;
 	
@@ -1622,6 +1517,44 @@ void albaLogicWithManagers::WizardRunTerminated()
 #endif
 	if (m_SideBar)
 		m_SideBar->EnableSelect(true);
+
+	UpdateFrameTitle();
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::WizardRunOp(const char *opName)
+{
+	albaLogMessage("wiz starting :%s", opName);
+	albaString op = opName;
+	m_CancelledBeforeOpStarting = true;
+	UpdateFrameTitle();
+	m_OpManager->OpRun(op);
+	WizardContinueIfOpNotStarted();
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::WizardRunOp(albaOp *op)
+{
+	m_CancelledBeforeOpStarting = true;
+	UpdateFrameTitle();
+	m_OpManager->OpRun(op);
+	WizardContinueIfOpNotStarted();
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::WizardRunOp(int opId)
+{
+	m_CancelledBeforeOpStarting = true;
+	UpdateFrameTitle();
+	m_OpManager->OpRun(opId);
+	WizardContinueIfOpNotStarted();
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::WizardContinueIfOpNotStarted()
+{
+	//If the op is started the value of m_CancelledBeforeOpStarting is changed by OpRunStarting
+	if (m_CancelledBeforeOpStarting)
+	{
+		m_CancelledBeforeOpStarting = false;
+		m_WizardManager->WizardContinue(false);
+	}
 }
 
 // MENU-TOOLBAR //////////////////////////////////////////////////////////////
@@ -2215,7 +2148,7 @@ void albaLogicWithManagers::HandleException()
 		int answare = wxMessageBox(_("An Excpetion has occurred and this application must be closed.\nYou can make a attempt to save your work.\nDo You want to proceed?"), _("Fatal Exception!"), wxYES_NO | wxCENTER | wxICON_ERROR | wxYES_DEFAULT);
 		if (answare == wxYES)
 		{
-			OnFileSaveAs();
+			FileSaveAs();
 
 			if (m_OpManager->Running())
 				m_OpManager->StopCurrentOperation();

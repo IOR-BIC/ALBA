@@ -108,6 +108,12 @@ public:
 
 	/** Move and resize the frame of the open view with the given label */
   virtual void ViewResize(const char *label, int x, int y, int width, int height) override;
+
+	/** Activate the view with the given label, creating it if it is not open */
+	virtual void ViewOpen(const char *label) override;
+
+	/** Delete the view with the given label (if open) and destroy its frame */
+	virtual void ViewClose(const char *label) override;
   
 	/** Delete all view. */
   virtual void ViewDeleteAll();

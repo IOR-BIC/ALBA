@@ -320,18 +320,21 @@ protected:
 
 	// EVENT HANDLERS
 
-	/** FILE NEW evt. handler */
-	virtual void OnFileNew();
-	/** FILE OPEN evt. handler.
-	By default (file_to_open = NULL) it ask the user to choose a file to open,
-	otherwise it open the given one.*/
-	virtual void OnFileOpen(const char *file_to_open = NULL);
+	/** Create a new project, asking to save the opened one: return ALBA_OK if created */
+	virtual int FileNew() override;
+	/** Open a project file. By default (file_to_open = NULL) it ask the user to choose a file to open,
+	otherwise it open the given one: return ALBA_ERROR if not opened */
+	virtual int FileOpen(const char *file_to_open = NULL) override;
 	/** FILE HISTORY evt. handler */
 	virtual void OnFileHistory(int menuId);
-	/** FILE SAVE evt. handler */
-	virtual void OnFileSave();
-	/** FILE SAVEAS evt. handler, if "legacy" is true saves file as old alba file format */
-	virtual void OnFileSaveAs(bool legacy = false);
+	/** Save the project: return ALBA_ERROR if not saved */
+	virtual int FileSave() override;
+	/** Save the project asking the file name, if "legacy" is true saves file as old alba file format: return ALBA_ERROR if not saved */
+	virtual int FileSaveAs(bool legacy = false) override;
+	/** Open again the current project file: return ALBA_ERROR if there is none or it is not opened */
+	virtual int FileReload() override;
+	/** Create a snapshot of the selected view: return ALBA_ERROR if not created */
+	virtual int CreateSnapshot() override;
 
 	/** Called on Quit event. */
 	virtual void OnQuit();
@@ -422,8 +425,8 @@ protected:
 	/** Enable/Disable menu items when an operation start/end running. */
 	virtual void EnableMenuAndToolbar();
 
-	/** Called after FileOpen or Save operation */
-	virtual void UpdateFrameTitle();
+	/** Update the title of the main window (opened file or running wizard) */
+	virtual void UpdateFrameTitle() override;
 
 	//-------------------
 
@@ -431,11 +434,23 @@ protected:
 	/** to be added */
 	virtual void ConfigureWizardManager();
 
-	/** Called when an wizard starts. Disable all menu and lock the Selection */
-	virtual void WizardRunStarting();
+	/** Called by the wizard manager when a wizard starts. Disable all menu, lock the Selection and the close of the view */
+	virtual void WizardRunStarting() override;
 
-	/** Called when an wizard stops. Re-enable all menu and unlock the Selection */
-	virtual void WizardRunTerminated();
+	/** Called by the wizard manager when a wizard stops. Re-enable all menu, unlock the Selection and the close of the view */
+	virtual void WizardRunTerminated() override;
+
+	/** Run an operation for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(const char *opName) override;
+
+	/** Run an operation for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(albaOp *op) override;
+
+	/** Run an operation (by id, e.g. OP_DELETE) for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(int opId) override;
+
+	/** Called after the request of an operation by the wizard: if the operation did not start the wizard continues (with failure) */
+	void WizardContinueIfOpNotStarted();
 
 	/** Redefined to add Print buttons */
 	virtual void CreateWizardToolbar();

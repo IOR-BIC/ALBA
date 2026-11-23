@@ -29,6 +29,7 @@ class albaProsthesesDBManager;
 class albaObserver;
 class albaInteractionTool;
 class albaGUIPanel;
+class albaOp;
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -110,11 +111,49 @@ public:
 	/** Called by the view manager when it deletes a view */
 	virtual void ViewDeleted(albaView *view) = 0;
 
+	/** Update the title of the main window (opened file or running wizard) */
+	virtual void UpdateFrameTitle() = 0;
+
 	/** Tile the view frames horizontally or vertically */
 	virtual void TileViewFrames(bool horizontally) = 0;
 
 	/** Cascade the view frames */
 	virtual void CascadeViewFrames() = 0;
+
+	//Files
+	/** Create a new project, asking to save the opened one: return ALBA_OK if created */
+	virtual int FileNew() = 0;
+
+	/** Open the given project file, or ask the user to choose one if file is NULL: return ALBA_ERROR if not opened */
+	virtual int FileOpen(const char *file = NULL) = 0;
+
+	/** Save the project: return ALBA_ERROR if not saved */
+	virtual int FileSave() = 0;
+
+	/** Save the project asking the file name, if "legacy" is true in the old file format: return ALBA_ERROR if not saved */
+	virtual int FileSaveAs(bool legacy = false) = 0;
+
+	/** Open again the current project file: return ALBA_ERROR if there is none or it is not opened */
+	virtual int FileReload() = 0;
+
+	/** Create a snapshot of the selected view: return ALBA_ERROR if not created */
+	virtual int CreateSnapshot() = 0;
+
+	//Wizards
+	/** Called by the wizard manager when a wizard starts: menus, operations and selection are locked */
+	virtual void WizardRunStarting() = 0;
+
+	/** Called by the wizard manager when a wizard ends: menus, operations and selection are unlocked */
+	virtual void WizardRunTerminated() = 0;
+
+	/** Run an operation for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(const char *opName) = 0;
+
+	/** Run an operation for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(albaOp *op) = 0;
+
+	/** Run an operation (by id, e.g. OP_DELETE) for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(int opId) = 0;
 
 	//Interaction
 	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */

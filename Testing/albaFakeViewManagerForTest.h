@@ -32,5 +32,7 @@ public:
 	virtual albaView *ViewCreate(int id) override { return NULL; }
 	virtual void ViewDelete(albaView *view) override {}
 	virtual void ViewResize(const char *label, int x, int y, int width, int height) override {}
+	virtual void ViewOpen(const char *label) override {}
+	virtual void ViewClose(const char *label) override {}
 };
 #endif

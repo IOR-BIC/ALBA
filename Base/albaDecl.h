@@ -151,10 +151,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	HELP_HOME,
 
 	UPDATE_UI,           // update menu and toolbar widgets
-	// progress of the wizard (albaWizard, albaWizardBlock): the progress bar is driven by albaProgressBarHelper
-	PROGRESSBAR_SHOW,
-	PROGRESSBAR_HIDE,
-	PROGRESSBAR_SET_VALUE,
 	// events about vme
 	VME_SELECTED,  // from albaGUIVMEChooserTree
 	VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
@@ -197,21 +193,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	TILE_WINDOW_HORIZONTALLY,
 	TILE_WINDOW_VERTICALLY,
 
-	// wizard events and ids of wizards - used by albaWizardManager and albaGUIFrame
-	WIZARD_RUN_STARTING,
-	WIZARD_RUN_CONTINUE,
-	WIZARD_RUN_TERMINATED,
-	WIZARD_REQUIRED_VIEW,
-	WIZARD_DELETE_VIEW,
-	WIZARD_RUN_OP,
-	WIZARD_UPDATE_WINDOW_TITLE,
-	WIZARD_PAUSE,
-	WIZARD_OP_DELETE,
-	WIZARD_OP_NEW,
-	WIZARD_SWITCH,
-	WIZARD_RELOAD_MSF,
-	WIZARD_INFORMATION_BOX_SHOW_SET,
-	WIZARD_INFORMATION_BOX_SHOW_GET,
+	// ids of the wizards (menu) - used by albaWizardManager and albaGUIFrame
 	WIZARD_START,
 	WIZARD_END = WIZARD_START + MAXWIZARD,
 

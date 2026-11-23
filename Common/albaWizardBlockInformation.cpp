@@ -29,6 +29,8 @@
 #include <wx/image.h>
 #include <wx/statline.h>
 #include "albaGUIPicButton.h"
+#include "albaWizard.h"
+#include "albaWizardManager.h"
 
 
 
@@ -72,14 +74,9 @@ void albaWizardBlockInformation::ExcutionBegin()
 {
   albaWizardBlock::ExcutionBegin();
 
-  //Create event for communication
-  albaEvent e=albaEvent(this,WIZARD_INFORMATION_BOX_SHOW_GET);
-
-  //Ask upward to the wizard manager if information box shows is enabled
-  albaEventMacro(e);
-
-  //read value
-  m_ShowBoxes=e.GetBool();
+  //Ask the wizard manager if information box shows is enabled
+  albaWizardManager *manager = m_Wizard ? m_Wizard->GetManager() : NULL;
+  m_ShowBoxes = manager ? manager->GetShowInformationBoxes() : false;
  
   //Show information box only if is enabled in options
   if (m_ShowBoxes)
@@ -233,8 +230,9 @@ void albaWizardBlockInformation::OnEvent( albaEventBase *alba_event )
     {
     case WIZARD_INFO_SHOW_ID:
       {
-        //Forward up event to update persistent settings
-        albaEventMacro(albaEvent(this,WIZARD_INFORMATION_BOX_SHOW_SET,(bool)m_ShowBoxes));
+        //update persistent settings
+        if (m_Wizard && m_Wizard->GetManager())
+          m_Wizard->GetManager()->SetShowInformationBoxes(m_ShowBoxes);
       }
       break;
     default:

@@ -150,11 +150,11 @@ void appLogic::OnEvent(albaEventBase *alba_event)
 			albaString *filename = e->GetString();
 			if (filename)
 			{
-				OnFileOpen((*filename).GetCStr());
+				FileOpen((*filename).GetCStr());
 			}
 			else
 			{
-				OnFileOpen();
+				FileOpen();
 			}
 
 			UpdateFrameTitle();
@@ -231,7 +231,7 @@ void appLogic::OnQuit()
 
 // FILE //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void appLogic::OnFileNew()
+int appLogic::FileNew()
 {
 	if (m_OpManager)
 		m_OpManager->VmeSelected(NULL);
@@ -242,9 +242,10 @@ void appLogic::OnFileNew()
 	}
 
 	m_Win->SetTitle(m_AppTitle);
+	return m_VMEManager ? ALBA_OK : ALBA_ERROR;
 }
 //----------------------------------------------------------------------------
-void appLogic::OnFileOpen(const char *file_to_open)
+int appLogic::FileOpen(const char *file_to_open)
 {
 	if (m_VMEManager)
 	{
@@ -269,10 +270,11 @@ void appLogic::OnFileOpen(const char *file_to_open)
 		}
 
 		if (file.IsEmpty())
-			return;
+			return ALBA_ERROR;
 
-		int opened = m_VMEManager->MSFOpen(file);
+		return m_VMEManager->MSFOpen(file);
 	}
+	return ALBA_ERROR;
 }
 
 //----------------------------------------------------------------------------

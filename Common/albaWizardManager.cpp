@@ -28,6 +28,8 @@
 #include "albaWizard.h"
 #include "albaWizardWaitOp.h"
 #include "albaGUISettingsDialog.h"
+#include "albaServiceLocator.h"
+#include "albaAbsLogicManager.h"
 #include <wx/tokenzr.h>
 
 //----------------------------------------------------------------------------
@@ -41,6 +43,8 @@ albaWizardManager::albaWizardManager()
   m_Listener = NULL;
   m_Selected = NULL;
   m_RunningWizard =NULL;
+  m_ProgressGauge = NULL;
+  m_ProgressLabel = NULL;
   m_Settings=new albaWizardSettings(this);
   m_NumWizard = 0;
   m_WizardList.clear();
@@ -83,6 +87,7 @@ void albaWizardManager::WizardAdd( albaWizard *wizard, wxString menuPath /*= ""*
   wizard->SetId(m_NumWizard+WIZARD_START);
   //The listener for the wizard is the wizard manager
   wizard->SetListener(this);
+  wizard->m_Manager=this;
   m_NumWizard++;
 }
 
@@ -171,9 +176,9 @@ void albaWizardManager::WizardRun( albaWizard *wizard, void *wizard_param /*= NU
     m_RunningWizard->SetParameters(wizard_param);
   }
   
-  //notify logic about wizard start
-  //Used for other menu and toolbar disabling
-  Notify(WIZARD_RUN_STARTING); 
+  //tell the logic about wizard start: menus, toolbar and operations are locked
+  if (albaServiceLocator::GetLogicManager())
+    albaServiceLocator::GetLogicManager()->WizardRunStarting(); 
 
   //set selected VME and execute the wizard
   m_RunningWizard->SetSelectedVME(m_Selected);
@@ -217,8 +222,9 @@ void albaWizardManager::WizzardStop()
 
   EnableWizardMenus();
 
-  //notify to to logic
-  Notify(WIZARD_RUN_TERMINATED);
+  //tell the logic about wizard end
+  if (albaServiceLocator::GetLogicManager())
+    albaServiceLocator::GetLogicManager()->WizardRunTerminated();
 }
 
 //----------------------------------------------------------------------------
@@ -244,56 +250,72 @@ void albaWizardManager::EnableWizardMenus( bool CanEnable /*= true*/ )
 void albaWizardManager::OnEvent( albaEventBase *alba_event )
 //----------------------------------------------------------------------------
 {
+  //All events from the wizards are forwarded up to logic
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
-    switch(e->GetId())
-    {
-    case WIZARD_RUN_TERMINATED:
-     {
-        WizzardStop();
-     }
-    break;
-    case WIZARD_INFORMATION_BOX_SHOW_SET:
-      {
-        //update the wizard settings
-        m_Settings->SetShowInformationBoxes(e->GetBool());
-      }
-    break;
-    case WIZARD_INFORMATION_BOX_SHOW_GET:
-      {
-        //get the wizard settings and update the event to inform the caller
-        e->SetBool(m_Settings->GetShowInformationBoxes());
-      }
-    break;
-    case WIZARD_RUN_OP:
-      { 
-        //call the handler for operations
-        OnRunOp(e);
-      }
-    break;
-    case WIZARD_SWITCH:
-      {
-        int i;
-        wxString wizardName=e->GetString()->GetCStr();
-        for(i=0;i<m_NumWizard;i++)
-          if (wizardName==m_WizardList[i]->GetName())
-          {
-            WizardRun(WIZARD_START+i);
-            break;
-          }
-        //If we not found the required wizard we stop the execution of the current
-        if (i==m_NumWizard)
-           WizzardStop();      
-      }
-    break;
-    default:
-      //All event form wizard (like vme select/show, view request, ecc...)
-      //will be forwarded up to logic
-      e->SetSender(this);
-      albaEventMacro(*e);
-      break;
-    } // end switch case
+    e->SetSender(this);
+    albaEventMacro(*e);
   }
+}
+
+//----------------------------------------------------------------------------
+void albaWizardManager::WizardSwitch(wxString wizardName)
+//----------------------------------------------------------------------------
+{
+  int i;
+  for(i=0;i<m_NumWizard;i++)
+    if (wizardName==m_WizardList[i]->GetName())
+    {
+      WizardRun(WIZARD_START+i);
+      break;
+    }
+  //If we not found the required wizard we stop the execution of the current
+  if (i==m_NumWizard)
+     WizzardStop();
+}
+
+//----------------------------------------------------------------------------
+bool albaWizardManager::GetShowInformationBoxes()
+//----------------------------------------------------------------------------
+{
+  return m_Settings->GetShowInformationBoxes() != 0;
+}
+
+//----------------------------------------------------------------------------
+void albaWizardManager::SetShowInformationBoxes(bool show)
+//----------------------------------------------------------------------------
+{
+  m_Settings->SetShowInformationBoxes(show);
+}
+
+//----------------------------------------------------------------------------
+void albaWizardManager::SetProgressGauge(wxGauge *gauge, wxStaticText *label)
+//----------------------------------------------------------------------------
+{
+  m_ProgressGauge = gauge;
+  m_ProgressLabel = label;
+}
+
+//----------------------------------------------------------------------------
+void albaWizardManager::ShowProgress(bool show)
+//----------------------------------------------------------------------------
+{
+  if (m_ProgressGauge == NULL)
+    return;
+
+  if (!show)
+    m_ProgressGauge->SetValue(0);
+  m_ProgressGauge->Enable(show);
+  if (m_ProgressLabel)
+    m_ProgressLabel->Enable(show);
+}
+
+//----------------------------------------------------------------------------
+void albaWizardManager::SetProgress(int progress)
+//----------------------------------------------------------------------------
+{
+  if (m_ProgressGauge)
+    m_ProgressGauge->SetValue(progress);
 }
 
 //----------------------------------------------------------------------------
@@ -308,14 +330,6 @@ void albaWizardManager::WizardContinue(int opSuccess)
     albaLogMessage("Error no wizard running");
 }
 
-
-//----------------------------------------------------------------------------
-void albaWizardManager::Notify( int msg )
-//----------------------------------------------------------------------------
-{
-  //notify operation to logic
-  albaEventMacro(albaEvent(this,msg));  
-}
 
 //----------------------------------------------------------------------------
 void albaWizardManager::EnableToolbar( bool CanEnable /*= true*/ )
@@ -339,52 +353,33 @@ albaString albaWizardManager::GetDescription()
 }
 
 //----------------------------------------------------------------------------
-void albaWizardManager::OnRunOp(albaEvent *e)
+void albaWizardManager::RunOp(const char *op)
 //----------------------------------------------------------------------------
 {
-  //Special operation for the wizard
-  albaString opString=*e->GetString();
+  albaAbsLogicManager *logic = albaServiceLocator::GetLogicManager();
+  if (logic == NULL)
+    return;
+
+  //Special operations for the wizard: the file operations end at once and the wizard continues with their result,
+  //the others are run by the logic and the wizard continues when they end
+  albaString opString=op;
   if (opString=="PAUSE")
-  {
-    //pause op
-    albaEventMacro(albaEvent(this,WIZARD_PAUSE,m_WaitOp));
-  }
+    logic->WizardRunOp(m_WaitOp);
   else if (opString=="SAVE")
-  {
-    //Save msf
-    albaEventMacro(albaEvent(this,MENU_FILE_SAVE));
-  }
+    WizardContinue(logic->FileSave() != ALBA_ERROR);
   else if (opString=="SAVE_AS")
-  {
-    //save msf with name
-    albaEventMacro(albaEvent(this,MENU_FILE_SAVEAS));
-  }
+    WizardContinue(logic->FileSaveAs() != ALBA_ERROR);
   else if (opString=="OPEN")
-  {
-    //Open MSF
-    albaEventMacro(albaEvent(this,MENU_FILE_OPEN));
-  }
+    WizardContinue(logic->FileOpen() != ALBA_ERROR);
   else if (opString=="DELETE")
-  {
-    //Delete current VME
-    albaEventMacro(albaEvent(this,WIZARD_OP_DELETE));
-  }
+    logic->WizardRunOp(OP_DELETE);
   else if (opString=="NEW")
-  {
-    albaEventMacro(albaEvent(this,WIZARD_OP_NEW));
-  }
+    WizardContinue(logic->FileNew() != ALBA_ERROR);
   else if (opString=="RELOAD")
-  {
-    albaEventMacro(albaEvent(this,WIZARD_RELOAD_MSF));
-  }
+    WizardContinue(logic->FileReload() != ALBA_ERROR);
   else if (opString=="SNAPSHOT")
-  {
-    albaEventMacro(albaEvent(this,MENU_FILE_SNAPSHOT,true));
-  }
+    WizardContinue(logic->CreateSnapshot() != ALBA_ERROR);
   else
-  {
-    //Run the standard operations
-    albaEventMacro(*e);
-  }
+    logic->WizardRunOp(opString.GetCStr());
 }
 
