@@ -215,7 +215,7 @@ void albaPipeIsosurface::OnEvent(albaEventBase *alba_event)
 		  case ID_CONTOUR_VALUE:
 			{
 				SetContourValue((float)m_ContourValue);
-				m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+				GetViewManager()->CameraUpdate();
 				m_Gui->Update();
 			}
 			break;
@@ -288,7 +288,7 @@ void albaPipeIsosurface::SetAlphaValue(double value)
 		m_OpacityFunc->AddPoint(m_VolumeRange[1], m_AlphaValue);
 
 	m_ContourMapper->Modified();
-	m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeIsosurface::SetActorVisibility(int visibility)

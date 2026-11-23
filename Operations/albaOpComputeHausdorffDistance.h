@@ -91,8 +91,6 @@ public:
 
 protected:
 
-  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-  /*virtual*/ void OpStop(int result);
 
   /** Create the operation GUI. */
   void CreateGui();

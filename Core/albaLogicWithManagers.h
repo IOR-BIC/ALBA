@@ -32,7 +32,6 @@
 // forward reference
 class albaViewManager;
 class albaOpManager;
-class albaGUIMaterialChooser;
 class albaVME;
 class albaVMELandmark;
 class albaVMELandmarkCloud;
@@ -215,7 +214,7 @@ public:
 	virtual const char* GetMsfFileExtension() { return m_Extension.GetCStr(); }
 		
 	/* Return the Operation Manager */
-	virtual albaOpManager * GetOpManager() const { return m_OpManager; }
+	albaOpManager * GetOpManager() const { return m_OpManager; }
 
 	virtual albaViewManager *GetViewManager() { return m_ViewManager; }
 
@@ -286,13 +285,13 @@ protected:
 
 	// Description:
 	// Set the time to update the time bar.
-	virtual void TimeSet(double t);
+	virtual void TimeSet(double t) override;
 	//---------------------------------------------------------
 
 	/** Redefined to add View,Op,Import,Export menu */
 	virtual void CreateMenu();
-	/** create a new storage object */
-	virtual void CreateStorage(albaEvent *e);
+	/** Called by the VME manager to replace its storage: delete oldStorage (if any) and return a new one */
+	virtual albaVMEStorage *CreateStorage(albaVMEStorage *oldStorage) override;
 
 	/** This method creates and add the Toolbar, for specific app toolbar override the CreateToolBar method*/
 	virtual void CreateAndPlugToolbar();
@@ -321,18 +320,21 @@ protected:
 
 	// EVENT HANDLERS
 
-	/** FILE NEW evt. handler */
-	virtual void OnFileNew();
-	/** FILE OPEN evt. handler.
-	By default (file_to_open = NULL) it ask the user to choose a file to open,
-	otherwise it open the given one.*/
-	virtual void OnFileOpen(const char *file_to_open = NULL);
+	/** Create a new project, asking to save the opened one: return ALBA_OK if created */
+	virtual int FileNew() override;
+	/** Open a project file. By default (file_to_open = NULL) it ask the user to choose a file to open,
+	otherwise it open the given one: return ALBA_ERROR if not opened */
+	virtual int FileOpen(const char *file_to_open = NULL) override;
 	/** FILE HISTORY evt. handler */
 	virtual void OnFileHistory(int menuId);
-	/** FILE SAVE evt. handler */
-	virtual void OnFileSave();
-	/** FILE SAVEAS evt. handler, if "legacy" is true saves file as old alba file format */
-	virtual void OnFileSaveAs(bool legacy = false);
+	/** Save the project: return ALBA_ERROR if not saved */
+	virtual int FileSave() override;
+	/** Save the project asking the file name, if "legacy" is true saves file as old alba file format: return ALBA_ERROR if not saved */
+	virtual int FileSaveAs(bool legacy = false) override;
+	/** Open again the current project file: return ALBA_ERROR if there is none or it is not opened */
+	virtual int FileReload() override;
+	/** Create a snapshot of the selected view: return ALBA_ERROR if not created */
+	virtual int CreateSnapshot() override;
 
 	/** Called on Quit event. */
 	virtual void OnQuit();
@@ -341,9 +343,9 @@ protected:
 	Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
 	virtual void ImportExternalFile(albaString &filename);
 
-	/** Respond to a VME_SELECT evt. Update the selection on the tree and view representation. */
+	/** Select the vme running albaOpSelect: the selection can be undone. */
 	virtual void VmeSelect(albaVME *vme);
-	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
+	/** Called when a vme has been selected. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(albaVME *vme);
 
 	/** Called from VmeSelect to select a LM */
@@ -366,52 +368,56 @@ protected:
 
 	/** Add a new vme to the tree. */
 	virtual void VmeAdd(albaVME *vme);
-	/** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
-	virtual void VmeAdded(albaVME *vme);
+	/** Called by the VME manager for each VME added to the tree: tell it to SideBar, ViewManager, ecc.. */
+	virtual void VmeAdded(albaVME *vme) override;
 	/** Remove a vme from the tree. */
 	virtual void VmeRemove(albaVME *vme);
-	/** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
-	virtual void VmeRemoving(albaVME *vme);
+	/** Called by the VME manager for each VME that is going to be removed: tell it to SideBar, ViewManager, ecc.. */
+	virtual void VmeRemoving(albaVME *vme) override;
 	/** called from VME after removing*/
 	virtual void VmeRemoved();
 
 	virtual void VmeVisualModeChanged(albaVME * vme);
+
+	/** Show the tree in a dialog and return the VME chosen by the user, NULL on cancel. */
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+
+	/** Called by the op manager when an operation starts: disable all menu and lock the Selection */
+	virtual void OpRunStarting() override;
+
+	/** Called by the op manager when an operation stops: re-enable all menu and unlock the Selection; during a wizard, continue it */
+	virtual void OpRunTerminated(bool runOk) override;
+
+	/** Called by an operation to show its gui (panel) on the side bar */
+	virtual void OpShowGui(albaGUIPanel *panel) override;
+
+	/** Called by an operation to remove its gui from the side bar */
+	virtual void OpHideGui() override;
+
+	/** Called by the view manager when it creates a view: create the frame of the view and attach the view to it */
+	virtual void CreateViewFrame(albaView *v) override;
+
+	/** Called by the view manager when it deletes a view: update side bar, interaction and menus */
+	virtual void ViewDeleted(albaView *view) override;
+
+	/** Tile the view frames horizontally or vertically */
+	virtual void TileViewFrames(bool horizontally) override;
+
+	/** Cascade the view frames */
+	virtual void CascadeViewFrames() override;
+
+	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
-	/** Build a dialog to show all available materials. */
-	virtual void VmeChooseMaterial(albaVME *vme, bool updateProperty);
 
-	//Update Vme Visual Properties
-	virtual void VmeUpdateProperties(albaVME *vme, bool updatePropertyFromTag);
+	/** Show the contextual menu of the tree, with the items of vme if vmeMenu is true */
+	virtual void ShowTreeContextualMenu(albaGUIVMETree *tree, albaVME *vme, bool vmeMenu) override;
 
-	/** Called when an operation starts. Disable all menu and lock the Selection */
-	virtual void OpRunStarting();
-	/** Called when an operation stops. Re-enable all menu and unlock the Selection */
-	virtual void OpRunTerminated(int runOk);
-	/** Show the gui of the running operation or the settings of the selected view. */
-	virtual void OpShowGui(bool push_gui, albaGUIPanel *panel);
-	/** Hide the setting's gui when a view is destroyed. */
-	virtual void OpHideGui(bool view_closed);
-
-	/** Show contextual menu for tree when right mouse click arrives.*/
-	virtual void TreeContextualMenu(albaEvent &e);
-
-	/** Show contextual menu for views when right mouse click arrives.*/
-	virtual void ViewContextualMenu(bool vme_menu);
+	/** Show the contextual menu of the selected view, with the VME items if vmeMenu is true */
+	virtual void ShowViewContextualMenu(bool vmeMenu) override;
 
 	/** Create a new view. */
 	virtual void ViewCreate(int viewId);
-	/** A new View has Been Created - Logic must create the View Frame */
-	virtual void ViewCreated(albaView *v);
-
-	virtual void CameraUpdate();
-
-	virtual void CameraReset();
-
-	/** enter in Camera Update Skip Modality, useful to avoid flickering or incomplete visualizations */
-	virtual void EnableCameraUpdateSkip();
-
-	/** exit the Camera Update Skip Modality */
-	virtual void DisableCameraUpdateSkip();
 
 	/** Called when user change the measure unit from menù Options.*/
 	void UpdateMeasureUnit();
@@ -419,8 +425,8 @@ protected:
 	/** Enable/Disable menu items when an operation start/end running. */
 	virtual void EnableMenuAndToolbar();
 
-	/** Called after FileOpen or Save operation */
-	virtual void UpdateFrameTitle();
+	/** Update the title of the main window (opened file or running wizard) */
+	virtual void UpdateFrameTitle() override;
 
 	//-------------------
 
@@ -428,11 +434,23 @@ protected:
 	/** to be added */
 	virtual void ConfigureWizardManager();
 
-	/** Called when an wizard starts. Disable all menu and lock the Selection */
-	virtual void WizardRunStarting();
+	/** Called by the wizard manager when a wizard starts. Disable all menu, lock the Selection and the close of the view */
+	virtual void WizardRunStarting() override;
 
-	/** Called when an wizard stops. Re-enable all menu and unlock the Selection */
-	virtual void WizardRunTerminated();
+	/** Called by the wizard manager when a wizard stops. Re-enable all menu, unlock the Selection and the close of the view */
+	virtual void WizardRunTerminated() override;
+
+	/** Run an operation for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(const char *opName) override;
+
+	/** Run an operation for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(albaOp *op) override;
+
+	/** Run an operation (by id, e.g. OP_DELETE) for the running wizard, which continues when the operation ends (or at once if it does not start) */
+	virtual void WizardRunOp(int opId) override;
+
+	/** Called after the request of an operation by the wizard: if the operation did not start the wizard continues (with failure) */
+	void WizardContinueIfOpNotStarted();
 
 	/** Redefined to add Print buttons */
 	virtual void CreateWizardToolbar();
@@ -450,7 +468,6 @@ protected:
 	albaProsthesesDBManager *m_ProsthesisDBManager;
 
 
-	albaGUIMaterialChooser  *m_MaterialChooser;
 	albaPrintManager     *m_PrintSupport;
 
 	albaDeviceButtonsPadMouse            *m_Mouse;
@@ -505,7 +522,6 @@ protected:
 	albaWXLog          *m_Logger;
 	albaVTKLog         *m_VtkLog;
 
-	int				m_SkipCameraUpdate;
 	
 	albaGUIApplicationSettings *m_ApplicationSettings;
 	albaGUISettingsTimeBar  *m_TimeBarSettings;

@@ -540,8 +540,6 @@ void albaCameraTransform::InternalUpdate()
 
     m_OldViewMatrix->DeepCopy(camera->GetViewTransformMatrix());
   }
-
-  InvokeEvent(this, MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------

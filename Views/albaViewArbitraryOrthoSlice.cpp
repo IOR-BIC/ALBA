@@ -937,7 +937,7 @@ void albaViewArbitraryOrthoSlice::OnLUTRangeModified()
 		double low, hi;
 		m_LutSlider->GetSubRange(&low, &hi);
 		m_ColorLUT->SetTableRange(low, hi);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -1234,13 +1234,7 @@ bool albaViewArbitraryOrthoSlice::AcceptRefSys(albaVME *node)
 void albaViewArbitraryOrthoSlice::OnLoadFromRefsys()
 {
 	GLO_CurrentVolume = m_InputVolume;
-	albaString title = _("Choose RefSys");
-	albaEvent e;
-	e.SetId(VME_CHOOSE);
-	e.SetPointer(&albaViewArbitraryOrthoSlice::AcceptRefSys);
-	e.SetString(&title);
-	albaEventMacro(e);
-	albaVME *n = e.GetVme();
+	albaVME *n = GetLogicManager()->ChooseVME(_("Choose RefSys"), &albaViewArbitraryOrthoSlice::AcceptRefSys);
 	
 	if (n != NULL)
 		RestoreViewsParamsFromVMETags(n);

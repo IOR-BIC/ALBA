@@ -373,7 +373,7 @@ void albaPipeVolumeVR::OnEvent(albaEventBase *alba_event)
           m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
 
         m_ResampleFilter->Update();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     }

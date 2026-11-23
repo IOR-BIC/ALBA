@@ -109,13 +109,6 @@ public:
   /** Import the raw data into the Data Manager*/
   bool Import();
 
-  enum{
-    CROP_SELECTED,
-    ADD_CROP_ITEM,
-    GIZMO_NOT_EXIST,
-    GIZMO_RESIZING,
-    GIZMO_DONE
-  };
 
 protected:
 
@@ -165,8 +158,6 @@ protected:
   int			 m_NumberSlices;	
   int			 m_Offset;
   int			 m_FileSpacing;
-  int      m_SideToBeDragged;
-  int      m_GizmoStatus;
   int      m_CropMode;
   wxString m_Extension;
   wxString m_Prefix;

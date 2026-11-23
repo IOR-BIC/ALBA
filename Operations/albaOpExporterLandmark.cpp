@@ -189,7 +189,7 @@ void albaOpExporterLandmark::OpRun()
     result = OP_RUN_OK;
   }
 
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpExporterLandmark::ExportLandmark(albaVMELandmarkCloud* cloud)

@@ -84,6 +84,7 @@ int albaVMEGenericAbstract::DeepCopy(albaVME *a)
         m_DataVector=vme->GetDataVector()->NewInstance(); // create a new instance of the same type
       m_DataVector->DeepCopy(vme->GetDataVector()); // copy data
       m_DataVector->SetListener(this);
+      m_DataVector->SetVME(this);
     }
     return ALBA_OK;
   }
@@ -109,6 +110,7 @@ int albaVMEGenericAbstract::DeepCopyVmeLarge(albaVME *a)
 
       m_DataVector->DeepCopyVmeLarge(vme->GetDataVector()); // copy data
       m_DataVector->SetListener(this);
+      m_DataVector->SetVME(this);
     }
     return ALBA_OK;
   }

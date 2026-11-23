@@ -137,7 +137,7 @@ int albaTextFileReaderHelper::ReadInit(albaString &fileName, int textMode, int s
 
 	if (showProgressBar)
 	{
-		m_ProgressHelper = new albaProgressBarHelper(listener);
+		m_ProgressHelper = new albaProgressBarHelper();
 		m_ProgressHelper->SetTextMode(textMode);
 		m_ProgressHelper->InitProgressBar(progressBarText.GetCStr());
 	}

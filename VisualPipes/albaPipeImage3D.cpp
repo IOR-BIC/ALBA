@@ -220,7 +220,7 @@ void albaPipeImage3D::OnEvent(albaEventBase* alba_event)
       m_Gui->Update();
     }
     case ID_LUT_CHOOSER:
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     break;
     }
   }
@@ -231,7 +231,7 @@ void albaPipeImage3D::SetInterpolation(int val)
 {
 	m_Interpolation = val;
 	m_ImageTexture->SetInterpolate(m_Interpolation);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

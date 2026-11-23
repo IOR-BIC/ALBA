@@ -178,7 +178,7 @@ void albaOpSmoothSurfaceCells::OpRun()
 
 		DeleteOpDialog();
 
-		albaEventMacro(albaEvent(this,result));
+		NotifyOpEnd(result);
 	}
 }
 //----------------------------------------------------------------------------
@@ -186,14 +186,14 @@ void albaOpSmoothSurfaceCells::OpDo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSmoothSurfaceCells::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 // widget ID's

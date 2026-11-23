@@ -101,7 +101,7 @@ void albaOpImporterAnsysCommon::OpRun()
     ImportFile();
     result = OP_RUN_OK;
   }
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 
 //----------------------------------------------------------------------------

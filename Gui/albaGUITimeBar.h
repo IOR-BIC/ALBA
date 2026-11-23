@@ -89,7 +89,10 @@ protected:
   albaObserver     *m_Listener;
   albaGUISettingsTimeBar *m_TimeBarSettings; ///< Settings panel for the time bar.
 
-  /** Update the time and send the TIME_SET event to synchronize all the application. */
+  /** Set the current time to the logic manager, to synchronize all the application */
+  void SetLogicTime();
+
+  /** Update the time and set it to the logic manager to synchronize all the application. */
 	void OnTimer(wxTimerEvent &event);
   
 	/** Update the time bar interface. */

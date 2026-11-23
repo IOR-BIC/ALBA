@@ -37,7 +37,7 @@
 #include "albaView.h"
 #include "albaNode.h"
 #include "albaGUITreeContextualMenu.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 
 
 albaCxxTypeMacro(albaNodeA);
@@ -128,7 +128,7 @@ void testCheckTreeLogic::OnEvent(albaEventBase *alba_event)
         albaNode *vme = e->GetVme();
         bool vme_menu = e->GetBool();
         bool autosort = e->GetArg() != 0;
-        contextMenu->CreateContextualMenu((albaGUICheckTree *)e->GetSender(),NULL,vme,vme_menu);
+        contextMenu->CreateContextualMenu((albaGUIVMETree *)e->GetSender(),NULL,vme,vme_menu);
         contextMenu->ShowContextualMenu();
         delete contextMenu;
         contextMenu = NULL;
@@ -207,9 +207,9 @@ void testCheckTreeLogic::CreateSideBar()
   m_side_bar = NULL;
   m_side_bar = new albaGUISashPanel(m_win, MENU_VIEW_SIDEBAR, wxRIGHT,330,"Side Bar \tCtrl+S");
 
-  m_tree = new albaGUICheckTree(m_side_bar,-1,true);
+  m_tree = new albaGUIVMETree(m_side_bar,-1,true);
   m_tree->SetListener(this);
-  m_tree->SetTitle("albaGUICheckTree");
+  m_tree->SetTitle("albaGUIVMETree");
   m_side_bar->Put(m_tree);
 
   m_tree->VmeAdd(m_nodea);

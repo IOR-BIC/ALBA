@@ -876,7 +876,7 @@ vtkPolyData *albaComputeHausdorffDistance::GetOutput()
   
 	albaGUIBusyInfo wait(_("albaComputeHausdorffDistance: computing Hausdorff distance..."));
 
-	m_ProgBarHelper = new albaProgressBarHelper(m_Listener);
+	m_ProgBarHelper = new albaProgressBarHelper();
 	m_ProgBarHelper->InitProgressBar();
 
   long progress = 0;

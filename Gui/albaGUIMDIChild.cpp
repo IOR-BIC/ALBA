@@ -25,6 +25,8 @@
 
 
 #include "albaGUIMDIChild.h"
+#include "albaServiceLocator.h"
+#include "albaAbsViewManager.h"
 #include "albaGUIFrame.h"
 #include "albaDecl.h"
 #include "albaView.h"
@@ -44,7 +46,6 @@ BEGIN_EVENT_TABLE(albaGUIMDIChild,wxMDIChildFrame)
 				EVT_SIZE      (                  albaGUIMDIChild::OnSize)
         EVT_BUTTON    (VIEW_CLICKED,     albaGUIMDIChild::OnSelect)
 				EVT_ACTIVATE  (albaGUIMDIChild::OnActivate)
-        EVT_MAXIMIZE  (albaGUIMDIChild::OnMaximize)
 END_EVENT_TABLE()
 
 bool albaGUIMDIChild::m_Quitting = false;
@@ -117,11 +118,11 @@ void albaGUIMDIChild::OnCloseWindow(wxCloseEvent& event)
 {
   if (!m_AllowCloseFlag) {return;}
 
-  // VIEW_DELETE must be sent from here and not from the destructor
-	// otherwise VIEW_DELETE is sent also on the closing of the application
-	// when the listener (the ViewManager) has been already destroyed
-
-	albaEventMacro(albaEvent(this,VIEW_DELETE,m_View));
+  // the view must be deleted from here and not from the destructor,
+	// otherwise it is deleted also on the closing of the application,
+	// when the view manager has been already destroyed
+	if (albaServiceLocator::GetViewManager())
+		albaServiceLocator::GetViewManager()->ViewDelete(m_View);
 	Destroy();
   m_View = NULL;
 }
@@ -131,16 +132,6 @@ void albaGUIMDIChild::OnActivate(wxActivateEvent& event)
 { 
   if( event.GetActive() && m_View && !m_Quitting )
   {
-    albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
-  }
-}
-//----------------------------------------------------------------------------
-void albaGUIMDIChild::OnMaximize(wxMaximizeEvent &event)
-//----------------------------------------------------------------------------
-{
-  if (m_View)
-  {
-    albaString msg = "MaximizeSelectedView";
-    albaEventMacro(albaEvent(this,VIEW_MAXIMIZE,&msg));
+    albaServiceLocator::GetLogicManager()->SelectView(m_View);
   }
 }

@@ -23,6 +23,8 @@
 #include <wx/fileconf.h>
 
 class albaVMEManager;
+class albaVMEManagerTestLogic;
+class albaAbsLogicManager;
 
 /** albaVMEManagerTest:
 Test class for albaVMEManager
@@ -32,6 +34,9 @@ class albaVMEManagerTest : public albaTest, public albaObserver
 public: 
   // Executed before each test
   void BeforeTest();
+
+  // Executed after each test
+  void AfterTest();
 
 	// CPPUNIT test suite
   CPPUNIT_TEST_SUITE( albaVMEManagerTest );
@@ -78,11 +83,11 @@ private:
   void SetDirNameTest();
   void SetSingleBinaryFileTest();
 
-  void OnEvent(albaEventBase *alba_event); // This method trap the events coming from the vme manager
+  void OnEvent(albaEventBase *alba_event); // the vme manager needs a listener
 
   albaVMEManager *m_Manager;
-  int m_TestId;
-  bool m_Result;
+  albaVMEManagerTestLogic *m_Logic;
+  albaAbsLogicManager *m_OldLogic;
   wxFileConfig *m_Config;
 };
 

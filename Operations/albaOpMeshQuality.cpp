@@ -117,7 +117,7 @@ void albaOpMeshQuality::OpRun()
 	}
 	DeleteOpDialog();
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpMeshQuality::OnEvent(albaEventBase *alba_event)
@@ -140,12 +140,6 @@ void albaOpMeshQuality::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-}
-//----------------------------------------------------------------------------
-void albaOpMeshQuality::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
 void albaOpMeshQuality::DeleteOpDialog()

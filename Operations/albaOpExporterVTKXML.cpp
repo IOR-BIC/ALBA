@@ -42,6 +42,7 @@
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
 #include "albaVMEGroup.h"
+#include "albaProgressBarHelper.h"
 #include "vtkTransformFilter.h"
 #include "vtkUnstructuredGrid.h"
 //----------------------------------------------------------------------------
@@ -240,7 +241,8 @@ void albaOpExporterVTKXML::SaveVTKData()
   else
     writer->SetDataModeToAscii();
 
-  albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,writer));
+  albaProgressBarHelper progressHelper;
+  progressHelper.BindToVTKFilter(writer);
 
   writer->SetFileName(m_File.GetCStr());
   writer->Write();

@@ -185,7 +185,7 @@ int albaOpExporterVTK::ExportVTK()
 //----------------------------------------------------------------------------
 void albaOpExporterVTK::SaveVTKData()
 {
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
  
@@ -248,7 +248,6 @@ void albaOpExporterVTK::SaveVTKData()
 		writer->WriteArrayMetaDataOff();
 	}
   // workaround code:  this is not working so I'm setting a dummy 50/100 progress value 
-  // albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR, writer));
   long dummyProgressValue = 50;
   
   progressHelper.UpdateProgressBar(dummyProgressValue);

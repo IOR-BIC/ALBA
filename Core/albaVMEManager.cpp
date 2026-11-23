@@ -25,6 +25,8 @@
 
 
 #include "albaVMEManager.h"
+#include "albaServiceLocator.h"
+#include "albaAbsLogicManager.h"
 
 #include <albaGUIBusyInfo.h>
 #include <wx/zipstrm.h>
@@ -189,7 +191,8 @@ void albaVMEManager::MSFNew()
   if (m_Storage)
   {
     m_Storage->GetRoot()->CleanTree();
-    albaEventMacro(albaEvent(this,CLEAR_UNDO_STACK)); // ask logic to clear the undo stack
+    if (albaServiceLocator::GetOpManager())
+      albaServiceLocator::GetOpManager()->ClearUndoStack();
   }
 
   RemoveTempDirectory(); // remove the temporary directory
@@ -199,9 +202,11 @@ void albaVMEManager::MSFNew()
   m_LoadingFlag = true; // set the loading flag to prevent the manager
                         // listen to NODE_ATTACHED_TO_TREE and NODE_DETACHED_TO_TREE events
 
-  albaEvent e(this,CREATE_STORAGE,m_Storage); // ask logic to create a new storage
-  albaEventMacro(e);
-  m_Storage = (albaVMEStorage *)e.GetMafObject();
+  if (m_Storage)
+    NotifyRemove(m_Storage->GetRoot());
+  m_Storage = albaServiceLocator::GetLogicManager()->CreateStorage(m_Storage); // the logic deletes the old storage and creates the new one
+  m_Storage->SetListener(this);
+  m_Storage->GetRoot()->Initialize();
   m_LoadingFlag = false;
 	  
 	//Add the application stamps
@@ -210,8 +215,8 @@ void albaVMEManager::MSFNew()
 	tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
 	m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp); // set the appstamp tag for the root
   AddCreationDate(m_Storage->GetRoot());
-	albaEventMacro(albaEvent(this,VME_ADDED,m_Storage->GetRoot())); // raise notification events
-	albaEventMacro(albaEvent(this,VME_SELECTED,m_Storage->GetRoot()));
+	albaServiceLocator::GetLogicManager()->VmeAdded(m_Storage->GetRoot());
+	albaServiceLocator::GetLogicManager()->VmeSelected(m_Storage->GetRoot());
 
   m_MSFFile = ""; //next MSFSave will ask for a filename
   m_ZipFile = ""; 
@@ -402,9 +407,10 @@ int albaVMEManager::MSFOpen(albaString filename)
 	///////////////////////////////////////////////////////////////////////////////// 
   NotifyAdd(root_node); // add the storage root (the tree) with events notification
 
-	albaEventMacro(albaEvent(this,VME_SELECTED, root_node)); // raise notification events (to logic)
-  albaEventMacro(albaEvent(this,CAMERA_RESET));
-  
+	albaServiceLocator::GetLogicManager()->VmeSelected(root_node);
+  if (albaServiceLocator::GetViewManager())
+    albaServiceLocator::GetViewManager()->CameraReset();
+
 	if (m_TmpDir != "")
 	{
     m_FileHistory.AddFileToHistory(m_ZipFile.GetCStr()); // add the zmsf file to the history
@@ -810,7 +816,7 @@ void albaVMEManager::NotifyRemove(albaVME *vme)
   iter->IgnoreVisibleToTraverse(true); // ignore visible to traverse flag and visits all nodes
   iter->SetTraversalModeToPostOrder(); // traverse is: first the subtree left to right, then the root
   for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-		albaEventMacro(albaEvent(this,VME_REMOVING,node)); // raise notification event (to logic)
+		albaServiceLocator::GetLogicManager()->VmeRemoving(node);
   iter->Delete();
 }
 //----------------------------------------------------------------------------
@@ -833,7 +839,7 @@ void albaVMEManager::NotifyAdd(albaVME *vme)
       }
     }
 
-    albaEventMacro(albaEvent(this,VME_ADDED,node)); // raise notification event (to logic)
+    albaServiceLocator::GetLogicManager()->VmeAdded(node);
     if (checkSingleFile)
     {
       // if checkSingleFile == true this method is called by the MSFOpen

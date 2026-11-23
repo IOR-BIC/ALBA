@@ -29,7 +29,7 @@
 
 #include "albaTagArray.h"
 #include "albaStorage.h"
-#include "albaEventIO.h"
+#include "albaVMEStorage.h"
 #include "albaStorageElement.h"
 
 #include <vtkIndent.h>
@@ -265,9 +265,7 @@ int albaVMEExternalData::InternalRestore(albaStorageElement *parent)
 void albaVMEExternalData::InitializeCurrentPath()
 //-----------------------------------------------------------------------
 {
-  albaEventIO e(this,NODE_GET_STORAGE);
-  ForwardUpEvent(e);
-  albaStorage *storage=e.GetStorage();
+  albaStorage *storage = GetStorage();
   if (storage != NULL)
   {
     m_MSFPath = storage->GetURL();

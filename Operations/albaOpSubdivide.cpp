@@ -147,7 +147,7 @@ void albaOpSubdivide::OnEvent(albaEventBase *alba_event)
     {	
       case ID_PREVIEW:
         {
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         }
       break;
       case ID_NUMBER_OF_SUBDIVISION:
@@ -187,7 +187,7 @@ void albaOpSubdivide::OpStop(int result)
   }
 
   HideGui();
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 //----------------------------------------------------------------------------
 void albaOpSubdivide::OpUndo()

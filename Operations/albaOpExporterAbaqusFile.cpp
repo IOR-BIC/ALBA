@@ -111,12 +111,6 @@ void albaOpExporterAbaqusFile::OnOK()
     Write();
   }
 }
-//----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::OpStop(int result)
-{
-  HideGui();
-  albaEventMacro(albaEvent(this,result));        
-}
 
 //----------------------------------------------------------------------------
 int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2) 
@@ -157,7 +151,7 @@ int albaOpExporterAbaqusFile::Write()
   input->GetUnstructuredGridOutput()->Update();
 
   // Init ProgressBar
-  m_ProgressHelper = new albaProgressBarHelper(m_Listener);
+  m_ProgressHelper = new albaProgressBarHelper();
   m_ProgressHelper->SetTextMode(m_TestMode);
   m_ProgressHelper->InitProgressBar("Please wait exporting file...");
 

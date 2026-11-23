@@ -30,7 +30,6 @@
 #include "albaSmartPointer.h"
 #include "albaVME.h"
 #include "albaVMEStorage.h"
-#include "albaEventIO.h"
 #include "albaVMERoot.h"
 
 #include <iostream>

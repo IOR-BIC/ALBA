@@ -27,6 +27,8 @@
 #include "albaEventBase.h"
 #include "albaVME.h"
 #include "albaVMELandmarkCloud.h"
+#include "albaServiceLocator.h"
+#include "albaAbsLogicManager.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaToolSelect);
@@ -65,7 +67,8 @@ bool albaToolSelect::Select()
   if (vme->IsA("albaVMELandmarkCloud"))
     vme = (albaVME *)((albaVMELandmarkCloud *)vme)->GetNearestLandmark(m_PickedPosition, true);
 
-  albaEventMacro(albaEventBase(this, VME_SELECT, vme, MCH_UP));
+  if (albaServiceLocator::GetLogicManager())
+    albaServiceLocator::GetLogicManager()->VmeSelect(vme);
   return true;
 }
 
@@ -90,6 +93,7 @@ bool albaToolSelect::OnRightButtonUp(albaView *view, vtkRenderer *ren, double po
     return false;
 
   m_ShowContextMenu = false;
-  albaEventMacro(albaEventBase(this, SHOW_VIEW_CONTEXTUAL_MENU, m_PickedVME, MCH_UP));
+  if (albaServiceLocator::GetLogicManager())
+    albaServiceLocator::GetLogicManager()->ShowViewContextualMenu(IsPickedVmeSelectable());
   return true;
 }

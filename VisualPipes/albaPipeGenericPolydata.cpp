@@ -352,7 +352,7 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 						m_MaterialButton->UpdateMaterialIcon();
 						m_Gui->Update();
 					}
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 				break;
 			case ID_THICKNESS:
@@ -367,9 +367,8 @@ void albaPipeGenericPolydata::OnEvent(albaEventBase *alba_event)
 					}
 				}
 				break;
-			case VME_CHOOSE_MATERIAL:
+			case VME_MATERIAL_CHANGED:
 				{
-					albaEventMacro(*e);
 					mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 					if (material && material->m_Prop)
 					{
@@ -400,7 +399,7 @@ void albaPipeGenericPolydata::SetActorPicking(int enable)
 {
 	m_Actor->SetPickable(enable);
 	m_Actor->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -438,7 +437,7 @@ void albaPipeGenericPolydata::SetRepresentation(REPRESENTATIONS rep)
 		m_Gui->Enable(ID_EDGE_VISIBILITY, m_Representation != WIREFRAME_REP); 
 		m_Gui->Update();
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -446,7 +445,7 @@ void albaPipeGenericPolydata::SetNormalsTypeToPoints()
 {
 	m_ShowCellsNormals=0;
 	m_Actor->GetProperty()->SetInterpolationToPhong(); 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -454,7 +453,7 @@ void albaPipeGenericPolydata::SetNormalsTypeToCells()
 {
 	m_ShowCellsNormals=1 ;
 	m_Actor->GetProperty()->SetInterpolationToFlat();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -476,7 +475,7 @@ void albaPipeGenericPolydata::SetEdgesVisibilityOn()
 	m_BorderElementsWiredActor=1;
   m_ActorWired->SetVisibility(1);
   m_ActorWired->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeGenericPolydata::SetEdgesVisibilityOff()
@@ -484,7 +483,7 @@ void albaPipeGenericPolydata::SetEdgesVisibilityOff()
 	m_BorderElementsWiredActor=0;
   m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -499,7 +498,7 @@ void albaPipeGenericPolydata::SetThickness(double thickness)
 	m_Actor->GetProperty()->SetLineWidth(m_Border);
 	m_Actor->GetProperty()->SetPointSize(m_Border);
 	m_Actor->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

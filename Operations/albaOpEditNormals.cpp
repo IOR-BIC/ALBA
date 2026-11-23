@@ -142,7 +142,7 @@ void albaOpEditNormals::OpDo()
 {
 	((albaVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	if(!m_TestMode)
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpEditNormals::OpUndo()
@@ -150,7 +150,7 @@ void albaOpEditNormals::OpUndo()
 {
 	((albaVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	if(!m_TestMode)
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpEditNormals::OnEvent(albaEventBase *alba_event)
@@ -184,13 +184,6 @@ void albaOpEditNormals::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-}
-//----------------------------------------------------------------------------
-void albaOpEditNormals::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
 void albaOpEditNormals::OnGenerateNormals()
@@ -277,7 +270,7 @@ void albaOpEditNormals::OnPreview()
 	m_PreviewResultFlag   = false;
 	m_ClearInterfaceFlag	= true;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpEditNormals::OnClear()  
@@ -306,5 +299,5 @@ void albaOpEditNormals::OnClear()
 	m_PreviewResultFlag = false;
 	m_ClearInterfaceFlag= false;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

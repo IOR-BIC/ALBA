@@ -90,8 +90,6 @@ protected:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node) { return true; };
 
-  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-  void OpStop(int result);
 
 	void AddImageToList(std::vector<vtkImageData*>& images, vtkImageData* image, const char* name);
     

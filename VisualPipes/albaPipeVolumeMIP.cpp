@@ -254,7 +254,7 @@ void albaPipeVolumeMIP::OnEvent(albaEventBase *alba_event)
         m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
 
         m_Volume->Update();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     default:
@@ -275,7 +275,7 @@ void albaPipeVolumeMIP::SetResampleFactor(double value)
     m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
 
     m_Volume->Update();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -299,7 +299,7 @@ void albaPipeVolumeMIP::UpdateMIPFromLUT()
 //      m_ColorTransferFunction->AddRGBPoint(p, rgba[0], rgba[1], rgba[2]);
       m_OpacityTransferFunction->AddPoint(p, (double)v/(double)tv);
     }
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 
 }

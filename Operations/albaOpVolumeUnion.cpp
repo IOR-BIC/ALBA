@@ -117,14 +117,14 @@ void albaOpVolumeUnion::OpRun()
 	if(!m_TestMode)
 	{
 		CreateGui();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeUnion::BuildVolumeUnion()
 //----------------------------------------------------------------------------
 {
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Build Volume Union: please wait...");
 
@@ -418,15 +418,12 @@ enum VOLUME_UNION_WIDGET_ID
 };
 
 //----------------------------------------------------------------------------
-bool albaOpVolumeUnion::VmeChoose(albaString title,albaEvent *e)
+bool albaOpVolumeUnion::VmeChoose(albaString title)
 //----------------------------------------------------------------------------
 {
-	e->SetPointer(&albaOpVolumeUnion::VmeUnionAccept);
-	e->SetString(&title);
-	e->SetId(VME_CHOOSE);
-	albaEventMacro(*e);
-	if(e->GetVme()) {
-        m_SecondVMEVolume = albaVMEVolume::SafeDownCast(e->GetVme());
+	albaVME *chosenVME = GetLogicManager()->ChooseVME(title, &albaOpVolumeUnion::VmeUnionAccept);
+	if(chosenVME) {
+		m_SecondVMEVolume = albaVMEVolume::SafeDownCast(chosenVME);
 		return true;
 	}	
 	else {
@@ -505,8 +502,7 @@ void albaOpVolumeUnion::OnEvent(albaEventBase *alba_event)
 			break;
 			case ID_VOL_SELECT:
 				{
-					albaString title = "Choose Union Volume";
-					bool selOK = VmeChoose(title,e);
+					bool selOK = VmeChoose("Choose Union Volume");
 					if(selOK) {
 						if ( !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) && !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkImageData")) )
 						{

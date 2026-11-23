@@ -29,7 +29,6 @@
 #include "albaEvent.h"
 #include "albaServiceClient.h"
 #include "albaAbsLogicManager.h"
-#include "albaViewManager.h"
 #include "albaViewArbitrarySlice.h"
 #include "albaViewArbitraryOrthoSlice.h"
 #include "albaTagArray.h"
@@ -77,14 +76,14 @@ bool albaOpCreateRefSysFromViewSlice::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 void albaOpCreateRefSysFromViewSlice::OpRun()   
 {
-	m_View = GetLogicManager()->GetViewManager()->GetSelectedView();
+	m_View = GetLogicManager()->GetSelectedView();
 
 	if (m_View && (m_View->IsA("albaViewArbitraryOrthoSlice") || m_View->IsA("albaViewArbitrarySlice")))
 	{
 		albaNEW(m_RefSys);
 		m_RefSys->SetName("Reference System");
 		m_Output = m_RefSys;
-		albaEventMacro(albaEvent(this, OP_RUN_OK));
+		NotifyOpEnd(OP_RUN_OK);
 	}
 }
 

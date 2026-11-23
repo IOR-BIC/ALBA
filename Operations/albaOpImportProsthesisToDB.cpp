@@ -101,11 +101,6 @@ void albaOpImportProsthesisToDB::OpRun()
 	OpStop(result);
 }
 //----------------------------------------------------------------------------
-void albaOpImportProsthesisToDB::OpStop(int result)
-{	
-	albaEventMacro(albaEvent(this, result));
-}
-//----------------------------------------------------------------------------
 void albaOpImportProsthesisToDB::OpDo()
 {
 }

@@ -28,29 +28,8 @@
 #include "albaEventBase.h"
 #include "albaVMEGroup.h"
 #include "albaVMEGizmo.h"
-
-//----------------------------------------------------------------------------
-class albaToolSelectTestListener : public albaObserver // stores the events of the select tool
-//----------------------------------------------------------------------------
-{
-public:
-  albaToolSelectTestListener() {Clear();};
-  void Clear() {m_SelectCount = m_MenuCount = 0; m_Data = NULL; m_Channel = -1;};
-  virtual void OnEvent(albaEventBase *event)
-  {
-    if (event->GetId() == VME_SELECT)
-      m_SelectCount++;
-    else if (event->GetId() == SHOW_VIEW_CONTEXTUAL_MENU)
-      m_MenuCount++;
-    m_Data = event->GetData();
-    m_Channel = event->GetChannel();
-  };
-
-  int    m_SelectCount;
-  int    m_MenuCount;
-  void  *m_Data;
-  albaID m_Channel;
-};
+#include "albaServiceLocator.h"
+#include "albaFakeLogicForTest.h"
 
 //----------------------------------------------------------------------------
 void albaToolSelectTest::TestSelect()
@@ -59,20 +38,20 @@ void albaToolSelectTest::TestSelect()
   albaSmartPointer<albaVMEGroup> vme;
   albaToolSelect *tool;
   albaNEW(tool);
-  albaToolSelectTestListener listener;
-  tool->SetListener(&listener);
+  albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+  logic->ClearCalls();
   double picked[3] = {1, 2, 3};
   double pos[2] = {10, 20};
 
-  // every button down on a VME selects it, on MCH_UP with the VME as data; the button is not used
+  // every button down on a VME asks the logic to select it; the button is not used
   tool->SetPickedVME(vme, picked);
   CPPUNIT_ASSERT(tool->GetPickedVME() == vme.GetPointer());
   CPPUNIT_ASSERT(tool->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_SelectCount == 1 && listener.m_Data == vme.GetPointer() && listener.m_Channel == MCH_UP);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 1 && logic->GetCall(0).testFunction == albaFakeLogicForTest::FKL_VME_SELECT && logic->GetCall(0).vme == vme.GetPointer());
   CPPUNIT_ASSERT(tool->OnMiddleButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(tool->OnRightButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(tool->OnTrackerButtonDown(NULL, ALBA_LEFT_BUTTON, NULL));
-  CPPUNIT_ASSERT(listener.m_SelectCount == 4);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 4);
 
   albaDEL(tool);
 }
@@ -83,8 +62,8 @@ void albaToolSelectTest::TestNotSelectable()
   albaSmartPointer<albaVMEGizmo> gizmo;
   albaToolSelect *tool;
   albaNEW(tool);
-  albaToolSelectTestListener listener;
-  tool->SetListener(&listener);
+  albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+  logic->ClearCalls();
   double pos[2] = {10, 20};
 
   // nothing picked, or a gizmo: no selection
@@ -92,7 +71,7 @@ void albaToolSelectTest::TestNotSelectable()
   CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
   tool->SetPickedVME(gizmo, NULL);
   CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_SelectCount == 0);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 0);
 
   albaDEL(tool);
 }
@@ -103,8 +82,8 @@ void albaToolSelectTest::TestEnableSelect()
   albaSmartPointer<albaVMEGroup> vme;
   albaToolSelect *tool;
   albaNEW(tool);
-  albaToolSelectTestListener listener;
-  tool->SetListener(&listener);
+  albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+  logic->ClearCalls();
   double pos[2] = {10, 20};
   tool->SetPickedVME(vme, NULL);
 
@@ -112,7 +91,7 @@ void albaToolSelectTest::TestEnableSelect()
   tool->EnableSelect(false);
   CPPUNIT_ASSERT(!tool->IsSelectEnabled());
   CPPUNIT_ASSERT(!tool->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_SelectCount == 0);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 0);
 
   albaDEL(tool);
 }
@@ -121,28 +100,34 @@ void albaToolSelectTest::TestContextMenu()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> vme;
+  albaSmartPointer<albaVMEGizmo> gizmo;
   albaToolSelect *tool;
   albaNEW(tool);
-  albaToolSelectTestListener listener;
-  tool->SetListener(&listener);
+  albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+  logic->ClearCalls();
   double pos[2] = {10, 20};
+  albaFakeLogicForTest::testFunctions menu = albaFakeLogicForTest::FKL_SHOW_VIEW_CONTEXTUAL_MENU;
 
-  // the right click shows the context menu with the picked VME, also when nothing is picked
+  // the right click shows the context menu of the view, with the VME items only for a selectable VME
   tool->SetPickedVME(vme, NULL);
   tool->OnRightButtonDown(NULL, NULL, pos);
   CPPUNIT_ASSERT(tool->OnRightButtonUp(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_MenuCount == 1 && listener.m_Data == vme.GetPointer());
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 1 && logic->GetViewContextualMenuWithVME());
   tool->SetPickedVME(NULL, NULL);
   tool->OnRightButtonDown(NULL, NULL, pos);
   CPPUNIT_ASSERT(tool->OnRightButtonUp(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_MenuCount == 2 && listener.m_Data == NULL);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 2 && !logic->GetViewContextualMenuWithVME());
+  tool->SetPickedVME(gizmo, NULL);
+  tool->OnRightButtonDown(NULL, NULL, pos);
+  CPPUNIT_ASSERT(tool->OnRightButtonUp(NULL, NULL, pos));
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 3 && !logic->GetViewContextualMenuWithVME());
 
   // a drag cancels it, and a release without the right button down does not show it
   tool->OnRightButtonDown(NULL, NULL, pos);
   CPPUNIT_ASSERT(!tool->OnDrag(NULL, NULL, pos));
   CPPUNIT_ASSERT(!tool->OnRightButtonUp(NULL, NULL, pos));
   CPPUNIT_ASSERT(!tool->OnRightButtonUp(NULL, NULL, pos));
-  CPPUNIT_ASSERT(listener.m_MenuCount == 2);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(menu) == 3);
 
   albaDEL(tool);
 }

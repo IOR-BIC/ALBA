@@ -179,7 +179,7 @@ void  albaOpImporterVRML::OpRun()
     ImportFile();
   }
 
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void  albaOpImporterVRML::SetFileName(const char *file_name)

@@ -265,7 +265,7 @@ void albaViewVirtualRX::OnEvent(albaEventBase *alba_event)
 			UpdateProjection(m_GizmoPoints[0], m_GizmoPoints[1], RX_SIDE_VIEW, m_ProjectionMode);
 			UpdateProjection(m_GizmoPoints[2], m_GizmoPoints[3], RX_FRONT_VIEW, m_ProjectionMode);
 			//UpdateProjection(m_GizmoPoints[4], m_GizmoPoints[5], 2, m_ProjectionMode);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_PROJECTION_RESET:
@@ -326,7 +326,7 @@ void albaViewVirtualRX::OnEventMouseMove(albaEvent *e)
 	Validate(gizmoId, gizmoPoint[gizmoId / 2]);
 	
 	UpdateProjectionGui();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 bool albaViewVirtualRX::Validate(long gizmoId, double gizmoPoint)
@@ -533,7 +533,7 @@ void albaViewVirtualRX::CreateGizmo()
 	
 	ShowGizmo();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaViewVirtualRX::DestroyGizmo()
@@ -650,7 +650,7 @@ void albaViewVirtualRX::ResetProjection()
 	UpdateProjection(m_GizmoPoints[2], m_GizmoPoints[3], RX_FRONT_VIEW, m_ProjectionMode);
 	//UpdateProjection(m_GizmoPoints[4], m_GizmoPoints[5], 2, m_ProjectionMode);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	UpdateProjectionGui();
 }
@@ -714,5 +714,5 @@ void albaViewVirtualRX::UpdateProjectionGizmos()
 		m_PrjGizmo[gizmoId]->SetGizmoMovingModalityToBound();
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

@@ -280,8 +280,7 @@ void albaVMERefSys::SetScaleFactor(double scale)
   m_ScaleAxisTransform->Scale(m_ScaleFactor,m_ScaleFactor,m_ScaleFactor);
   m_ScaleAxisTransform->Update();
   m_ScaleAxis->Update();
-  albaEvent cam_event(this,CAMERA_UPDATE);
-  this->ForwardUpEvent(cam_event);
+  GetViewManager()->CameraUpdate();
   Modified();
 }
 
@@ -391,12 +390,7 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
       case ID_POINT2:
       {
         albaID button_id = e->GetId();
-        albaString title = _("Choose vme");
-        e->SetId(VME_CHOOSE);
-        e->SetPointer(&albaVMERefSys::LandmarkAccept);
-        e->SetString(&title);
-        ForwardUpEvent(e);
-        albaVME *n = e->GetVme();
+        albaVME *n = GetLogicManager()->ChooseVME(_("Choose vme"), &albaVMERefSys::LandmarkAccept);
         if (n != NULL)
         {
           if (button_id == ID_REF_SYS_ORIGIN)
@@ -465,7 +459,7 @@ void albaVMERefSys::OnEvent(albaEventBase *alba_event)
 
 				//Workaround to update accept on move operations
 				GetLogicManager()->VmeModified(this);
-        GetLogicManager()->CameraUpdate();
+        GetViewManager()->CameraUpdate();
 				m_Gui->Update();
 			}
 			break;

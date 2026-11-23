@@ -55,7 +55,6 @@ protected:
 
   albaString GetWildcard();
    
-  void OpStop(int result);
 
   void OnOK();
 

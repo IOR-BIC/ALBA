@@ -61,8 +61,6 @@ public:
 	/** Execute the operation. */
 	void OpDo();
 
-  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop	(int result);
 
   /** Read the file  */ 
   void Read();

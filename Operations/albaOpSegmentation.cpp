@@ -84,6 +84,7 @@
 #include "vtkMaskPolyDataFilter.h"
 
 #include "albaGUIBusyInfo.h"
+#include "albaProgressBarHelper.h"
 #include "wx/bitmap.h"
 #include "wx/sizer.h"
 #include "wx/window.h"
@@ -302,7 +303,7 @@ void albaOpSegmentation::OpUndo()
     albaDEL(m_OutputSurface);
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OpStop(int result)
@@ -317,7 +318,7 @@ void albaOpSegmentation::OpStop(int result)
     }
   }
 
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 
 // INITIALIZATION ////////////////////////////////////////////////////////////
@@ -1680,12 +1681,7 @@ void albaOpSegmentation::OnRemoveRange()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnLoadSegmentation()
 {
-	albaString title = albaString("Select a segmentation:");
-	albaEvent e(this, VME_CHOOSE);
-	e.SetString(&title);
-	e.SetPointer(&albaOpSegmentation::SegmentedVolumeAccept);
-	albaEventMacro(e);
-	albaVME *vme = e.GetVme();
+	albaVME *vme = GetLogicManager()->ChooseVME("Select a segmentation:", &albaOpSegmentation::SegmentedVolumeAccept);
 	albaVMEVolumeGray *newVolume = albaVMEVolumeGray::SafeDownCast(vme);
 
 	if (newVolume)
@@ -1700,12 +1696,7 @@ void albaOpSegmentation::OnLoadSegmentation()
 //----------------------------------------------------------------------------
 void albaOpSegmentation::OnLoadMask()
 {
-	albaString title = albaString("Select a mask:");
-	albaEvent e(this, VME_CHOOSE);
-	e.SetString(&title);
-	e.SetPointer(&albaOpSegmentation::MaskAccept);
-	albaEventMacro(e);
-	albaVME *vme = e.GetVme();
+	albaVME *vme = GetLogicManager()->ChooseVME("Select a mask:", &albaOpSegmentation::MaskAccept);
 
 	vtkPolyData *maskPolydata = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
 	if (!maskPolydata)
@@ -1762,7 +1753,8 @@ void albaOpSegmentation::OnLoadMask()
 	maskPolydataFilter->SetTriplePass(m_TriplePass);
 	maskPolydataFilter->SetMask(transformedMaskPolydata);
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, maskPolydataFilter));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(maskPolydataFilter);
 	maskPolydataFilter->Update();
 
 	m_SegmentationVolume->SetData(maskPolydataFilter->GetOutput(), m_SegmentationVolume->GetTimeStamp());

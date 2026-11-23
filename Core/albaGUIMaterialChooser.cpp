@@ -63,7 +63,6 @@
 #include "vtkImageShrink3D.h"
 #include "vtkLight.h"
 #include "vtkImageExport.h"
-#include "albaViewManager.h"
 
 //----------------------------------------------------------------------------
 albaGUIMaterialChooser::albaGUIMaterialChooser(wxString dialog_title)
@@ -448,14 +447,12 @@ void albaGUIMaterialChooser::OnEvent(albaEventBase *alba_event)
         assert(m_VmeMaterial);
         m_VmeMaterial->DeepCopy(m_ChoosedMaterial);
         m_VmeMaterial->m_Prop->DeepCopy(m_Property);
-				GetLogicManager()->GetViewManager()->PropertyUpdate();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->PropertyUpdate(m_Vme);
+				GetViewManager()->CameraUpdate();
       break;
       //case wxCANCEL:
       case ID_CANCEL:
         m_Dialog->EndModal(wxCANCEL); 
-      break;
-      case ID_GUI_UPDATE:
       break;
       default:
         e->Log();

@@ -25,7 +25,7 @@
 #include "albaGUIDialogFindVme.h"
 #include "albaDecl.h"
 #include "albaGUIValidator.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 
 #include "albaVMERoot.h"
 
@@ -117,7 +117,7 @@ bool albaGUIDialogFindVme::FindNextNode(const char *text)
   return m_Tree->SelectNode((long long)nodeFound);
 }
 //----------------------------------------------------------------------------
-void albaGUIDialogFindVme::SetTree(albaGUICheckTree *tree)
+void albaGUIDialogFindVme::SetTree(albaGUIVMETree *tree)
 //----------------------------------------------------------------------------
 {
   m_Tree = tree;

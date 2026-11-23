@@ -54,7 +54,7 @@ public:
   void OnEvent(albaEventBase *e);
  
   /** Destroy all nodes (also the root), for each destroyed node the manager send 
-  an event VME_REMOVING, then search the root and select it. */ 
+  VmeRemoving to the logic, then search the root and select it. */ 
   void MSFNew();
   
 	/** Open the msf filename. */
@@ -93,10 +93,10 @@ public:
 	/** Set the time for the tree. */
   void TimeSet(double time);
 
-	/** Send the event VME_REMOVING to inform logic that the vme and its subtree are removed from the tree. */
+	/** Tell the logic that the vme and its subtree are removed from the tree (VmeRemoving). */
   void NotifyRemove(albaVME *n);
 
-	/** Send the event VME_ADDED to inform logic that the vme and its subtree are added to the tree. */
+	/** Tell the logic that the vme and its subtree are added to the tree (VmeAdded). */
   void NotifyAdd(albaVME *n);
   
 	/** Show the dialog to confirm the save of the current tree. */

@@ -348,7 +348,7 @@ void albaPipeVolumeArbOrthoSlice::OnEvent(albaEventBase *alba_event)
       {
         mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
         material->UpdateFromTables();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
       case ID_SLICE_SLIDER_X:
@@ -362,16 +362,16 @@ void albaPipeVolumeArbOrthoSlice::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_OPACITY_SLIDER:
 				SetSliceOpacity(m_SliceOpacity);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
 			break;
       case ID_ENABLE_GPU:
 				SetEnableGPU(m_EnableGPU);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
       case ID_ENABLE_TRILINEAR_INTERPOLATION:
         SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
       default:
       break;

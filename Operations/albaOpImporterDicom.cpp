@@ -364,7 +364,7 @@ void albaOpImporterDicom::OpStop(int result)
 
 	vtkDEL(m_CurrentSliceID);
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 int albaOpImporterDicom::BuildVMEImagesOutput()
@@ -375,7 +375,7 @@ int albaOpImporterDicom::BuildVMEImagesOutput()
 	int step = GetSetting()->GetBuildStep() + 1;
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 	
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building images: please wait...");
 
@@ -446,7 +446,7 @@ int albaOpImporterDicom::BuildVMEVolumeGrayOutput()
 	int totalNumberOfImages = SlicesPerFrame*nFrames;
 	int parsedSlices = 0;
 
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Building volume: please wait...");
 
@@ -858,7 +858,7 @@ bool albaOpImporterDicom::LoadDicomFromDir(const char *dicomDirABSPath)
 	dir.GetAllFiles(dicomDirABSPath, &allFiles, wxEmptyString, wxDIR_FILES | wxDIR_DIRS);
 	int fileNumber = allFiles.size();
 
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Reading DICOM directory: please wait...");
 

@@ -93,7 +93,7 @@ public:
   virtual void OnEvent(albaEventBase *event)
   {
     albaEvent *e = albaEvent::SafeDownCast(event);
-    if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
+    if (e && e->GetId() == ID_TRANSFORM && e->GetArg() == albaBehaviorTransform::MOUSE_ACTION_DOWN)
     {
       m_MouseDownCount++;
       albaTransform::GetPosition(*albaMatrix::SafeDownCast(e->GetMafObject()), m_PickedPosition);

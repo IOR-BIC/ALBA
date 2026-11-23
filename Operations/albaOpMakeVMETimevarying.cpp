@@ -208,7 +208,7 @@ void albaOpMakeVMETimevarying::CreateGui()
   //--------------------------//
 
 	ShowGui();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
@@ -236,13 +236,8 @@ void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
       //------------------------------------------//
       case ID_ADD_VME_BUTTON:
       {
-        albaString title = _("Choose VME");
-        albaEvent e(this,VME_CHOOSE,&title);
-				e.SetPointer(&albaOpMakeVMETimevarying::DialogAcceptVME);
-        albaEventMacro(e);
-        
         //albaNEW(m_CurrentVME);
-        m_CurrentVME = e.GetVme();
+        m_CurrentVME = GetLogicManager()->ChooseVME(_("Choose VME"), &albaOpMakeVMETimevarying::DialogAcceptVME);
         bool VMEOk = AcceptVME(m_CurrentVME);
         if(m_CurrentVME)
         {
@@ -440,13 +435,6 @@ void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
   {
     albaEventMacro(*e);
   }
-}
-//----------------------------------------------------------------------------
-void albaOpMakeVMETimevarying::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  HideGui();
-	albaEventMacro(albaEvent(this,result));
 }
 //----------------------------------------------------------------------------
 bool albaOpMakeVMETimevarying::DialogAcceptVME(albaVME* node)

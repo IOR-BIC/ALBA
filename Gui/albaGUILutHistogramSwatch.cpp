@@ -244,7 +244,7 @@ void albaGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
         //for highlighting on the views
         m_Lut->SetTableValue(i,newcol);
         m_Material->UpdateFromTables();
-        GetLogicManager()->CameraUpdate();
+        GetViewManager()->CameraUpdate();
         m_LastHighlighted=i;
         m_Highlighted=true;
       }
@@ -257,7 +257,7 @@ void albaGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
     m_Material->ApplyGammaCorrection(4);
     m_Material->UpdateProp();
     m_Highlighted=0;
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ void albaGUILutHistogramSwatch::OnSize(wxSizeEvent &event)
   m_Material->ApplyGammaCorrection(4);
   m_Material->UpdateProp();
   m_Highlighted=0;
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
   Refresh();
 }
 //----------------------------------------------------------------------------

@@ -68,8 +68,6 @@ protected:
 	/** Send the event to select the owned view. */
   void OnActivate (wxActivateEvent& event);
 
-  /** Used to maximize view in remote application.*/
-  void OnMaximize(wxMaximizeEvent &event);
 
   wxWindow		*m_Win;
   albaView     *m_View;

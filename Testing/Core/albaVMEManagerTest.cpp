@@ -28,6 +28,8 @@
 #include "albaVMEManager.h"
 #include "albaVMEManagerTest.h"
 #include "albaSmartPointer.h"
+#include "albaServiceLocator.h"
+#include "albaFakeLogicForTest.h"
 #include "albaVME.h"
 #include "albaVMEStorage.h"
 #include "albaVMESurfaceParametric.h"
@@ -41,74 +43,22 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 
-#define TEST_RESULT CPPUNIT_ASSERT(m_Result);
-
-
-// enum test that need events check
-enum TEST_ID
+//----------------------------------------------------------------------------
+class albaVMEManagerTestLogic : public albaFakeLogicForTest // counts the notifications of the VME manager
+//----------------------------------------------------------------------------
 {
-  MSFNEW_TEST = MINID,
-  NOTIFYADDREMOVE_TEST,
+public:
+	virtual void VmeAdded(albaVME *vme) override { m_VmeAddedCalls++; }
+	virtual void VmeRemoving(albaVME *vme) override { m_VmeRemovingCalls++; }
+	int m_VmeAddedCalls = 0;
+	int m_VmeRemovingCalls = 0;
 };
-
 
 //----------------------------------------------------------------------------
 void albaVMEManagerTest::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  if(albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-    {
-      case CREATE_STORAGE: // the manager ask for storage creation (MSFNew method)
-        {
-          // create a vme storage for albaVMEManager
-          albaVMEStorage *storage = (albaVMEStorage*)e->GetMafObject();
-          if(storage!=NULL)
-          {
-            storage->Delete();
-          }
-          storage = albaVMEStorage::New();
-          storage->GetRoot()->SetName("root");
-          storage->SetListener((albaVMEManager*)e->GetSender());
-          storage->GetRoot()->Initialize();
-          e->SetMafObject(storage);
-        }
-        break;
-      case VME_ADDED:
-        {
-          if(m_TestId == MSFNEW_TEST) // MSFNew method
-          {
-            CPPUNIT_ASSERT(m_Manager->GetRoot() == e->GetVme());
-          }
-          if(m_TestId == NOTIFYADDREMOVE_TEST)
-          {
-            m_Result = true;
-          }
-        }
-        break;
-      case VME_REMOVING:
-        {
-          if(m_TestId == NOTIFYADDREMOVE_TEST)
-          {
-            m_Result = true;
-          }
-        }
-        break;
-      case VME_SELECTED:
-        {
-          if(m_TestId == MSFNEW_TEST) // MSFNEw method
-          {
-            CPPUNIT_ASSERT(m_Manager->GetRoot() == e->GetVme());
-          }
-        }
-        break;
-    default:
-      {
-      }
-      break;
-    }
-  }
+  // the manager asks here the single file mode when saving: the default is kept
 }
 //----------------------------------------------------------------------------
 void albaVMEManagerTest::TestFixture()
@@ -125,6 +75,17 @@ void albaVMEManagerTest::BeforeTest()
   wxConfigBase::Set(m_Config);
 
   int result = albaVMEFactory::Initialize();
+
+  m_OldLogic = albaServiceLocator::GetLogicManager();
+  m_Logic = new albaVMEManagerTestLogic();
+  albaServiceLocator::SetLogicManager(m_Logic);
+}
+//----------------------------------------------------------------------------
+void albaVMEManagerTest::AfterTest()
+//----------------------------------------------------------------------------
+{
+  albaServiceLocator::SetLogicManager(m_OldLogic);
+  cppDEL(m_Logic);
 }
 
 //----------------------------------------------------------------------------
@@ -144,8 +105,6 @@ void albaVMEManagerTest::TestStaticAllocation()
 void albaVMEManagerTest::MSFNewTest()
 //----------------------------------------------------------------------------
 {
-  m_TestId = MSFNEW_TEST; // MSFNewTest
-
   m_Manager = new albaVMEManager();
   m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
@@ -440,8 +399,6 @@ void albaVMEManagerTest::TimeSetTest()
 void albaVMEManagerTest::NotifyAddRemoveTest()
 //----------------------------------------------------------------------------
 {
-  m_TestId = NOTIFYADDREMOVE_TEST;
-
   m_Manager = new albaVMEManager();
   m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
@@ -453,24 +410,22 @@ void albaVMEManagerTest::NotifyAddRemoveTest()
   albaVMESurfaceParametric *sphere;
   albaNEW(sphere);
 
-  m_Result = false;
+  m_Logic->m_VmeAddedCalls = 0;
 
   m_Manager->VmeAdd(sphere);
 
-  // OnEvent test on raised event and set m_Result (if the raised event is VME_ADDED)
-  TEST_RESULT;
+  CPPUNIT_ASSERT(m_Logic->m_VmeAddedCalls == 1); // the logic was told of the added vme
 
   albaVMERoot* root = m_Manager->GetRoot();
   // the surface must be the first root's child
   CPPUNIT_ASSERT(root->GetFirstChild()==sphere);
 
-  m_Result = false;
+  m_Logic->m_VmeRemovingCalls = 0;
 
   // test vme remove
   m_Manager->VmeRemove(sphere);
   
-  // OnEvent test on raised event and set m_Result (if the raised event is VME_REMOVING)
-  TEST_RESULT;
+  CPPUNIT_ASSERT(m_Logic->m_VmeRemovingCalls == 1); // the logic was told of the removed vme
   
   CPPUNIT_ASSERT(root->GetFirstChild()==NULL);
 

@@ -67,8 +67,6 @@ protected:
 	/** Return true for the acceptable vme type. */
 	/*virtual*/ bool InternalAccept(albaVME *node);
 
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	/*virtual*/ void OpStop(int result);	
 
 	albaMatrix m_InputMatrix;
 

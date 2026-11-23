@@ -41,8 +41,8 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,albaView*);
 /** 
 albaViewCompound is the base class for Compound Views in ALBA.
 
-The member function GetNodeStatus(vme) will be called by the albaGUICheckTree 
-in order to update it's icons. (Note that albaGUICheckTree doesn't know about
+The member function GetNodeStatus(vme) will be called by the albaGUIVMETree 
+in order to update it's icons. (Note that albaGUIVMETree doesn't know about
 the SceneGraph anymore)
 
 albaViewCompound doesn't have a Scenegraph, nor knowledge about VTK /sa albaViewVTK.
@@ -105,7 +105,7 @@ public:
 
   /** 
   return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
-  having albaViewCompound::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph */
+  having albaViewCompound::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph */
   virtual int  GetNodeStatus(albaVME *vme);
 
 	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */

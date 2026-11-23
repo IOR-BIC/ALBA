@@ -43,6 +43,7 @@ class albaStorageElement;
 class albaTagArray;
 class vtkDataSet;
 class albaVMEItemAsynchObserver;
+class albaVMEStorage;
 
 /** albaVMEItem - store the single dataset stored into a albaDataVector
   albaVMEItem is an object that stores the single time stamped dataset of a
@@ -257,6 +258,15 @@ public:
   /** Update Item Id  */
   void UpdateItemId();
 
+  /** Set the VME owning this item (not referenced). Called by albaDataVector when the item is added or detached and when its VME changes. */
+  void SetVME(albaVME *vme) {m_VME = vme;}
+
+  /** Return the VME owning this item, NULL if the item is not in the data vector of a VME. */
+  albaVME *GetVME() {return m_VME;}
+
+  /** Return the storage of the tree of the owning VME, NULL if not available. */
+  albaVMEStorage *GetStorage();
+
 protected:
   albaVMEItem(); // to be allocated with New()
   ~albaVMEItem(); // to be deleted with Delete()
@@ -291,12 +301,7 @@ protected:
   void SetDataModified(bool flag);
   bool GetDataModified() {return m_DataModified;}
 
-  /**
-  Set the VME to which this item owns. At present the VME object is
-  not referenced!!! Also this function should never be called by the
-  user but only by albaVME and albaVMEItemArray functions.*/
-  //void SetVME(albaVME *vme) {m_VME=vme;}
-
+  albaVME      * m_VME;                  ///< VME owning this item (not referenced)
   albaTagArray * m_TagArray;             ///< meta data attributes attached to this dataset      
   bool          m_DataModified;         ///< true when data has been modified from last storing
   // static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data

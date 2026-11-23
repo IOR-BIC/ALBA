@@ -123,7 +123,7 @@ void albaOpCreateEditSkeleton::OpDo()
 		albaVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	}
 	
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpCreateEditSkeleton::OpUndo()
@@ -184,5 +184,5 @@ void albaOpCreateEditSkeleton::OpStop(int result)
   {
     HideGui();
   }
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }

@@ -116,13 +116,6 @@ void albaOpApplyTrajectory::OpRun()
   }
 }
 //----------------------------------------------------------------------------
-void albaOpApplyTrajectory::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  HideGui();
-  albaEventMacro(albaEvent(this,result));
-}
-//----------------------------------------------------------------------------
 void albaOpApplyTrajectory::CreateGui()
 //----------------------------------------------------------------------------
 {
@@ -193,7 +186,7 @@ void albaOpApplyTrajectory::OpUndo()
   oldVme->Modified();
  
 	GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpApplyTrajectory::OnEvent(albaEventBase *alba_event) 
@@ -233,15 +226,9 @@ void albaOpApplyTrajectory::OnEvent(albaEventBase *alba_event)
       break;
     case ID_SELECT_VME:
       {
-        albaString title = albaString("Select a VME:");
-        albaEvent e(this,VME_CHOOSE);
-        e.SetString(&title);
-        e.SetPointer(&albaOpApplyTrajectory::AcceptInputVME); // accept only time-varying VME
-        albaEventMacro(e);
-        if (e.GetVme())
-        {
-          m_VME = e.GetVme();
-        }
+        albaVME *chosenVME = GetLogicManager()->ChooseVME("Select a VME:", &albaOpApplyTrajectory::AcceptInputVME); // accept only time-varying VME
+        if (chosenVME)
+          m_VME = chosenVME;
 
         if (!m_TestMode)
         {
@@ -312,7 +299,7 @@ int albaOpApplyTrajectory::Read()
   } while (!inputFile.Eof());
 
   GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   return ALBA_OK;
 }
@@ -342,6 +329,6 @@ int albaOpApplyTrajectory::ApplyTrajectoriesFromVME()
   }
 
   GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
   return ALBA_OK;
 }

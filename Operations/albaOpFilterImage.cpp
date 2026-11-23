@@ -181,7 +181,7 @@ void albaOpFilterImage::OpStop(int result)
 	if (result == OP_RUN_CANCEL)
 		albaDEL(m_ImgOut);
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpFilterImage::OpDo()

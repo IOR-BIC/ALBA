@@ -369,7 +369,7 @@ void albaGUILutHistogramEditor::UpdateVolumeLut(bool reset)
     m_LutSwatch->Modified();
 
   //Forward event to update other views
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -377,5 +377,5 @@ void albaGUILutHistogramEditor::OnSize(wxSizeEvent &event)
 //----------------------------------------------------------------------------
 {
   albaGUIDialog::OnSize(event);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

@@ -41,7 +41,7 @@
 #include "albaViewVTK.h"
 #include "albaSceneNode.h"
 #include "albaSceneGraph.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 
 //#include "albaGUIBitmaps.h"
 #include "albaGUILab.h"
@@ -98,7 +98,7 @@ albaGUITreeContextualMenu::~albaGUITreeContextualMenu()
 {
 }
 //----------------------------------------------------------------------------
-void albaGUITreeContextualMenu::CreateContextualMenu(albaGUICheckTree *tree, albaView *view, albaVME *vme, bool vme_menu)
+void albaGUITreeContextualMenu::CreateContextualMenu(albaGUIVMETree *tree, albaView *view, albaVME *vme, bool vme_menu)
 //----------------------------------------------------------------------------
 {
   m_ViewActive  = view;
@@ -370,7 +370,7 @@ void albaGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 	}
 
   if(m_ViewActive != NULL)
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaGUITreeContextualMenu::CryptSubTree(bool crypt)

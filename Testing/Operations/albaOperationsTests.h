@@ -49,13 +49,8 @@ class DummyObserver : public albaObserver
 {
 public:
 
-	DummyObserver() {m_DummyVme = new DummyVme();};
-	~DummyObserver() {delete m_DummyVme;};
-
-	/*virtual*/ void OnEvent(albaEventBase *alba_event);
-
-protected:
-	DummyVme *m_DummyVme;
+	/** Ignore the events sent by the operations under test */
+	/*virtual*/ void OnEvent(albaEventBase *alba_event) {};
 };
 
 #endif

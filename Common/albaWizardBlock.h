@@ -33,6 +33,8 @@
   Class Name: albaWizardBlock.
   Class for the base wizard block, each block on a wizard must extend this block
 */
+class albaWizard;
+
 class ALBA_EXPORT albaWizardBlock: public albaServiceClient 
 {
 public:
@@ -112,6 +114,7 @@ protected:
   int m_Success;
   int m_Running;
   albaObserver    *m_Listener;
+  albaWizard      *m_Wizard; ///< The wizard of the block, set by albaWizard::AddBlock
   albaString m_DescriptionLabel;
   long m_BlockProgress;
 

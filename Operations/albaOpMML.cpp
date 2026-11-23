@@ -218,8 +218,6 @@ void albaOpMML::OpDo()  {}
 //----------------------------------------------------------------------------
 void albaOpMML::OpUndo() {}
 
-//----------------------------------------------------------------------------
-void albaOpMML::OpStop(int result) {	albaEventMacro(albaEvent(this,result));}
 
 //----------------------------------------------------------------------------
 void albaOpMML::OpRun()   
@@ -627,11 +625,7 @@ void albaOpMML::OnMuscleSelection()
 //----------------------------------------------------------------------------
 {
   // raise event to request a VME selection dialog
-  albaString title = "Select Muscle (Atlas)";
-  albaEvent e(this,VME_CHOOSE);
-  e.SetString(&title);
-  albaEventMacro(e);
-  albaVME *vme = e.GetVme();
+  albaVME *vme = GetLogicManager()->ChooseVME("Select Muscle (Atlas)");
   if(!vme) return;
 
   // get vme surface
@@ -1474,11 +1468,7 @@ void albaOpMML::OnLandmark1AtlasPatientSelection()
     return;
   }
 
-  albaString title = "Select Landmark 1 (Atlas)";
-  albaEvent e(this,VME_CHOOSE);
-  e.SetString(&title);
-  albaEventMacro(e);
-  albaVME *vme = e.GetVme();
+  albaVME *vme = GetLogicManager()->ChooseVME("Select Landmark 1 (Atlas)");
   if(!vme) return;
 
   albaVMELandmark *lm = albaVMELandmark::SafeDownCast(vme);
@@ -1584,11 +1574,7 @@ void albaOpMML::OnLandmark2AtlasPatientSelection()
     return;
   }
 
-  albaString title = "Select Landmark 2 (Atlas)";
-  albaEvent e(this,VME_CHOOSE);
-  e.SetString(&title);
-  albaEventMacro(e);
-  albaVME *vme = e.GetVme();
+  albaVME *vme = GetLogicManager()->ChooseVME("Select Landmark 2 (Atlas)");
   if(!vme) return;
 
   albaVMELandmark *lm = albaVMELandmark::SafeDownCast(vme);
@@ -1694,11 +1680,7 @@ void albaOpMML::OnLandmark3AtlasPatientSelection()
     return;
   }
 
-  albaString title = "Select Landmark 3 (Atlas)";
-  albaEvent e(this,VME_CHOOSE);
-  e.SetString(&title);
-  albaEventMacro(e);
-  albaVME *vme = e.GetVme();
+  albaVME *vme = GetLogicManager()->ChooseVME("Select Landmark 3 (Atlas)");
   if(!vme) return;
 
   albaVMELandmark *lm = albaVMELandmark::SafeDownCast(vme);
@@ -1804,11 +1786,7 @@ void albaOpMML::OnLandmark4AtlasPatientSelection()
     return;
   }
 
-  albaString title = "Select Landmark 3 (Atlas)";
-  albaEvent e(this,VME_CHOOSE);
-  e.SetString(&title);
-  albaEventMacro(e);
-  albaVME *vme = e.GetVme();
+  albaVME *vme = GetLogicManager()->ChooseVME("Select Landmark 3 (Atlas)");
   if(!vme) return;
 
   albaVMELandmark *lm = albaVMELandmark::SafeDownCast(vme);

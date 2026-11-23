@@ -42,7 +42,7 @@ class vtkAssemblyPath;
 //----------------------------------------------------------------------------
 // const :
 //----------------------------------------------------------------------------
-/** status of a SceneNode -- do not change, it is used by albaCheckTree also */
+/** status of a SceneNode -- do not change, it is used by albaGUIVMETree also */
 enum NODE_STATUS_ID
 {
   NODE_NON_VISIBLE =0,
@@ -65,8 +65,8 @@ enum VME_VISIBILITY_ID
 /** 
 albaView is the base class for Views in alba.
 
-The member function GetNodeStatus(vme) will be called by the albaGUICheckTree 
-in order to update it's icons. (Note that albaGUICheckTree doesn't know about
+The member function GetNodeStatus(vme) will be called by the albaGUIVMETree 
+in order to update it's icons. (Note that albaGUIVMETree doesn't know about
 the SceneGraph anymore)
 
 albaView doesn't have a Scenegraph, nor knowledge about VTK /sa albaViewVTK.
@@ -114,7 +114,7 @@ public:
   virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
-  //having albaView::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph
+  //having albaView::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph
   virtual int GetNodeStatus(albaVME *vme) {return NODE_NON_VISIBLE;};
   
   /** return the current pipe for the specified vme (if any exist at this moment) */

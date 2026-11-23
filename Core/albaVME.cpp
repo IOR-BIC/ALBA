@@ -32,7 +32,6 @@
 #include "albaAbsMatrixPipe.h"
 #include "albaMatrixPipe.h"
 #include "albaDataPipe.h"
-#include "albaEventIO.h"
 #include "albaEvent.h"
 #include "albaTagArray.h"
 #include "albaOBB.h"
@@ -630,8 +629,6 @@ int albaVME::SetMatrixPipe(albaMatrixPipe *mpipe)
       if (m_AbsMatrixPipe)
         m_AbsMatrixPipe->SetVME(this);
 
-      InvokeEvent(this, VME_MATRIX_CHANGED);
-
       return ALBA_OK;
     }
     else
@@ -704,9 +701,6 @@ int albaVME::SetDataPipe(albaDataPipe *dpipe)
       m_DataPipe->SetVME(this);
       m_DataPipe->SetTimeStamp(m_CurrentTime);
     }
-
-    // advise listeners the data pipe has changed
-    InvokeEvent(this, VME_OUTPUT_DATA_CHANGED);
 
     return ALBA_OK;
   }
@@ -950,14 +944,8 @@ albaGUI *albaVME::CreateGui()
 
 	albaString type = GetTypeName();
 	albaString typeName = GetTypeNameFromType(type);
-	albaEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetString(&type);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	ForwardUpEvent(buildHelpGui);
 
-	
-	if (buildHelpGui.GetArg() == true)
+	if (GetHelpManager() && GetHelpManager()->HasHelpEntry(type))
 		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, typeName, "Print node debug information");
 	else
 		m_Gui->Button(ID_PRINT_INFO, typeName, "", "Print node debug information");
@@ -1383,6 +1371,13 @@ albaVME *albaVME::GetRoot()
 	albaVME *node;
 	for (node = this; node->GetParent(); node = node->GetParent());
 	return node;
+}
+
+//-------------------------------------------------------------------------
+albaVMEStorage *albaVME::GetStorage()
+{
+	albaVMERoot *root = albaVMERoot::SafeDownCast(GetRoot());
+	return root ? root->GetStorage() : NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -1911,12 +1906,8 @@ void albaVME::NodeOnEvent(albaEventBase *e)
 
 				case ID_HELP:
 				{
-					albaEvent helpEvent;
-					helpEvent.SetSender(this);
-					albaString vmeTypeName = this->GetTypeName();
-					helpEvent.SetString(&vmeTypeName);
-					helpEvent.SetId(OPEN_HELP_PAGE);
-					ForwardUpEvent(helpEvent);
+					if (GetHelpManager())
+						GetHelpManager()->ShowHelpEntry(GetTypeName());
 				}
 				break;
 
@@ -1952,19 +1943,7 @@ void albaVME::NodeOnEvent(albaEventBase *e)
 				ForwardUpEvent(e);
 		}
 		else
-		{
-			switch (e->GetId())
-			{
-			case NODE_GET_ROOT:
-			{
-				albaEventIO *alba_event = albaEventIO::SafeDownCast(e);
-				alba_event->SetRoot(GetRoot());
-			}
-			break;
-			default:
-				ForwardUpEvent(e);
-			}
-		}
+			ForwardUpEvent(e);
 		//    return;
 	}
 	else if (e->GetChannel() == MCH_DOWN)

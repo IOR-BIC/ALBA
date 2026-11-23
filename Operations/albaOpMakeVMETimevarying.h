@@ -72,7 +72,6 @@ protected:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
-  virtual void OpStop(int result);
 
   /** GUI */
   void CreateGui();

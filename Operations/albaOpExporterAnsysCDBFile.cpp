@@ -94,7 +94,7 @@ int albaOpExporterAnsysCDBFile::Write()
   input->Update();
   input->GetUnstructuredGridOutput()->Update();
 
-	m_ProgressHelper=new albaProgressBarHelper(m_Listener);
+	m_ProgressHelper=new albaProgressBarHelper();
 	m_ProgressHelper->SetTextMode(m_TestMode);
 	m_ProgressHelper->InitProgressBar("Please wait exporting file...");
 

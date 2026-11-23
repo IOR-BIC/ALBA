@@ -25,10 +25,8 @@
 #include "albaGUI.h"
 #include "albaTool2DMeasure.h"
 #include "albaTool2DMeasurePoint.h"
-#include "albaLogicWithManagers.h"
 #include "albaVMEPolyline.h"
 #include "albaView.h"
-#include "albaViewManager.h"
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 
@@ -106,7 +104,7 @@ void albaOpCreatePolyline::OpRun()
 		UpdateGui();
 	}
 
-	albaView *view = ((albaLogicWithManagers*)GetLogicManager())->GetViewManager()->GetSelectedView();
+	albaView *view = GetLogicManager()->GetSelectedView();
 
 	if (view)
 	{
@@ -171,10 +169,10 @@ void albaOpCreatePolyline::OpStop(int result)
 		m_PointInteractor->RemoveAllMeasures();
 		albaDEL(m_PointInteractor);
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpCreatePolyline::OpDo()

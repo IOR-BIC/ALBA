@@ -35,6 +35,8 @@
 #include "albaVMELandmark.h"
 #include "albaVMESurfaceParametric.h"
 #include "albaMatrix.h"
+#include "albaServiceLocator.h"
+#include "albaFakeLogicForTest.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkTransform.h"
@@ -42,37 +44,6 @@
 #include "vtkPolyData.h"
 
 #define TOLERANCE 0.5
-
-//----------------------------------------------------------------------------
-// Observer answering the VME_CHOOSE requests of the operation:
-// it gives the first candidate accepted by the operation's accept function
-class NearestLandmarkChooser : public albaObserver
-{
-public:
-	typedef bool(*AcceptFunction)(albaVME *);
-
-	NearestLandmarkChooser(albaVME *landmark, albaVME *surface) { m_Landmark = landmark; m_Surface = surface; m_Choices = 0; }
-
-	void OnEvent(albaEventBase *alba_event)
-	{
-		albaEvent *e = albaEvent::SafeDownCast(alba_event);
-		if (e == NULL || e->GetId() != VME_CHOOSE)
-			return;
-
-		m_Choices++;
-		AcceptFunction accept = (AcceptFunction)e->GetPointer();
-		if (m_Landmark && accept(m_Landmark))
-			e->SetVme(m_Landmark);
-		else if (m_Surface && accept(m_Surface))
-			e->SetVme(m_Surface);
-		else
-			e->SetVme(NULL);
-	}
-
-	albaVME *m_Landmark;
-	albaVME *m_Surface;
-	int m_Choices;
-};
 
 //----------------------------------------------------------------------------
 void albaOpNearestLandmarkTest::BeforeTest()
@@ -248,17 +219,26 @@ void albaOpNearestLandmarkTest::TestOpRunCancel()
 //----------------------------------------------------------------------------
 void albaOpNearestLandmarkTest::RunOperation(albaVME *input, albaVME *landmark, albaVME *surface, int expectedChoices)
 {
-	NearestLandmarkChooser chooser(landmark, surface);
+	// The fake logic answers ChooseVME with the first candidate accepted by the operation's accept function
+	std::vector<albaVME*> candidates;
+	if (landmark)
+		candidates.push_back(landmark);
+	if (surface)
+		candidates.push_back(surface);
+
+	albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+	logic->ClearCalls();
+	logic->SetChooseCandidates(candidates);
 
 	albaOpNearestLandmark *op = new albaOpNearestLandmark();
 	op->TestModeOn();
-	op->SetListener(&chooser);
 	CPPUNIT_ASSERT(op->Accept(input));
 	op->SetInput(input);
 	op->OpRun();
 	cppDEL(op);
 
-	CPPUNIT_ASSERT(chooser.m_Choices == expectedChoices);
+	CPPUNIT_ASSERT(logic->GetNumberOfChooseCalls() == expectedChoices);
+	logic->SetChooseCandidates(std::vector<albaVME*>());
 }
 
 //----------------------------------------------------------------------------

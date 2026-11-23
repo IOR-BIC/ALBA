@@ -121,14 +121,14 @@ bool albaOpRegisterClusters::InternalAccept(albaVME* node)
 };
 
 //----------------------------------------------------------------------------
-//Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.
+//Callback for ChooseVME that accepts Closed Landmarkclouds VMEs only.
 /*static*/ bool albaOpRegisterClusters::LMCloudAccept(albaVME* node)
 {
 	return (albaVMELandmarkCloud::SafeDownCast(node));
 }
 
 //----------------------------------------------------------------------------
-//Callback for VME_CHOOSE that accepts Surface VME only.
+//Callback for ChooseVME that accepts Surface VME only.
 /*static*/ bool albaOpRegisterClusters::SurfaceAccept(albaVME* node)
 {
 	return (albaVMESurface::SafeDownCast(node) != NULL);
@@ -670,7 +670,7 @@ void albaOpRegisterClusters::OpDo()
 		target->GetLocalTimeStamps(timeStamps);
 		int numTimeStamps = target->GetNumberOfTimeStamps();
 
-		albaProgressBarHelper progressHelper(m_Listener);
+		albaProgressBarHelper progressHelper;
 		progressHelper.SetTextMode(m_TestMode);
 		progressHelper.InitProgressBar();
 		
@@ -911,12 +911,7 @@ void albaOpRegisterClusters::OnEvent(albaEventBase *alba_event)
 //Called when ID_CHOOSE event is raised.
 void albaOpRegisterClusters::OnChooseLandmarkCloud()
 {
-	albaString s(_("Choose cloud"));
-	albaEvent e(this,VME_CHOOSE, &s);
-	e.SetPointer(&albaOpRegisterClusters::LMCloudAccept);
-	albaEventMacro(e);
-
-	albaVME *vme = e.GetVme();
+	albaVME *vme = GetLogicManager()->ChooseVME(_("Choose cloud"), &albaOpRegisterClusters::LMCloudAccept);
 	OnChooseVme(vme);
 
 	m_Gui->Enable(ID_WEIGHT, m_Target != NULL && m_RegistrationMode != AFFINE);
@@ -926,12 +921,7 @@ void albaOpRegisterClusters::OnChooseLandmarkCloud()
 //Called when ID_CHOOSE_SURFACE event is raised.
 void albaOpRegisterClusters::OnChooseSurface()
 {
-	albaString s(_("Choose surface"));
-	albaEvent e(this,VME_CHOOSE, &s);
-	e.SetPointer(&albaOpRegisterClusters::SurfaceAccept);
-	albaEventMacro(e);
-
-	albaVME *vme = e.GetVme();
+	albaVME *vme = GetLogicManager()->ChooseVME(_("Choose surface"), &albaOpRegisterClusters::SurfaceAccept);
 	OnChooseVme(vme);
 }
 

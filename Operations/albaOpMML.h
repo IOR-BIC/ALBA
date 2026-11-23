@@ -126,7 +126,6 @@ protected:
   //
   albaOpMMLContourWidget *m_Widget;  // interactive contour widget
 
-  void    OpStop(int result);
 
   void	ResetOperation();
   void	OnRegistrationOK();

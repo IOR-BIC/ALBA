@@ -129,14 +129,14 @@ void albaOpCleanSurface::OpDo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpCleanSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((albaVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpCleanSurface::OnEvent(albaEventBase *alba_event)
@@ -167,13 +167,6 @@ void albaOpCleanSurface::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-}
-//----------------------------------------------------------------------------
-void albaOpCleanSurface::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
 void albaOpCleanSurface::OnClean()
@@ -222,7 +215,7 @@ void albaOpCleanSurface::OnPreview()
 	m_PreviewResultFlag   = false;
 	m_ClearInterfaceFlag	= true;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpCleanSurface::OnClear()  
@@ -245,5 +238,5 @@ void albaOpCleanSurface::OnClear()
 	m_PreviewResultFlag = false;
 	m_ClearInterfaceFlag= false;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

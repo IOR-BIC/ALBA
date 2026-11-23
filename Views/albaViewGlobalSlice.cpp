@@ -392,7 +392,7 @@ void albaViewGlobalSlice::VmeCreatePipe(albaVME *vme)
 
       if (m_NumberOfVisibleVme == 1)
       {
-				GetLogicManager()->CameraReset();
+				GetViewManager()->CameraReset();
       }
       else
       {
@@ -467,7 +467,7 @@ void albaViewGlobalSlice::OnEvent(albaEventBase *alba_event)
 				if (pipe)
 				{
 					pipe->SetSliceOpacity(m_Opacity);
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 					m_OpacitySlider->SetValue(m_Opacity);
 				}
 			}
@@ -694,7 +694,7 @@ void albaViewGlobalSlice::UpdateSlice()
 	UpdatePlane();
 	UpdateText();
   
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaViewGlobalSlice::UpdatePlane()

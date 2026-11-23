@@ -23,6 +23,8 @@
 
 #include "albaDecl.h"
 #include "albaGUI.h"
+#include "albaServiceLocator.h"
+#include "albaAbsOpManager.h"
 
 //----------------------------------------------------------------------------
 albaGUIApplicationSettings::albaGUIApplicationSettings(albaObserver *Listener, const albaString &label):
@@ -95,7 +97,8 @@ void albaGUIApplicationSettings::OnEvent(albaEventBase *alba_event)
     break;
     case ID_WARN_UNDO:
       m_Config->Write("WarnUser",m_WarnUserFlag);
-      albaEventMacro(albaEvent(this,MENU_OPTION_APPLICATION_SETTINGS));
+      if (albaServiceLocator::GetOpManager())
+        albaServiceLocator::GetOpManager()->WarningIfCantUndo(m_WarnUserFlag != 0);
     break;
 		case ID_AUTOSAVE:
 			m_Config->Write("AutoSave", m_AutoSaveProject);

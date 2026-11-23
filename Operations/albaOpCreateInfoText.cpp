@@ -68,7 +68,7 @@ void albaOpCreateInfoText::OpRun()
   albaNEW(m_InfoText);
   m_InfoText->SetName("InfoText");
   m_Output = m_InfoText;
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpCreateInfoText::OpDo()

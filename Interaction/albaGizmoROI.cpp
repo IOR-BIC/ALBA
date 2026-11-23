@@ -127,7 +127,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
         long arg = e->GetArg();
 
         // if a gizmo has been picked highlight the gizmo and register the active component
-        if (arg == albaBehaviorTransform::MOUSE_DOWN)
+        if (arg == albaBehaviorTransform::MOUSE_ACTION_DOWN)
         {
           m_Accumulator = 0.;
           if (sender == m_GHandle[0])
@@ -161,7 +161,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
             m_ActiveGizmoComponent = 5;
           }
         }
-        else if (arg == albaBehaviorTransform::MOUSE_MOVE)
+        else if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
         {     
           if (this->m_Modality == G_LOCAL)
           {
@@ -331,10 +331,10 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
             // not yet implemented...
           }
         }
-        else if (arg == albaBehaviorTransform::MOUSE_UP)
+        else if (arg == albaBehaviorTransform::MOUSE_ACTION_UP)
         {
         }
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         // forward isa transform events to the listener op
         albaEventMacro(*e);
       }

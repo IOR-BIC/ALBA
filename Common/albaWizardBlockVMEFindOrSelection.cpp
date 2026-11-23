@@ -85,19 +85,14 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
 	  // if there are many acceptable volume we tell the user to select it
 	  if (VMENumber > 1)
 	  {
-		  albaString title = m_Title;
-		  albaEvent e(this,VME_CHOOSE);
-		  e.SetString(&title);
-		  e.SetPointer(&VMEAccept); 
 		  // accept only Specified VME
-		  albaEventMacro(e);
-		  selVME=e.GetVme();
+		  selVME = GetLogicManager()->ChooseVME(m_Title, &VMEAccept);
 
 		  if(selVME)
 		  {
 			  //Select vme 
 			  m_SelectedVME=selVME;
-			  albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
+			  GetLogicManager()->VmeSelect(m_SelectedVME);
 		  }
 	  }
 	  // if there is only one acceptable volume we select it
@@ -108,7 +103,7 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
 		  {
 			  //Select vme 
 			  m_SelectedVME=selVME;
-			  albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
+			  GetLogicManager()->VmeSelect(m_SelectedVME);
 		  }
 	  }
 	  else {

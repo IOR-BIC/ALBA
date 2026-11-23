@@ -75,6 +75,7 @@ albaVMEGenericAbstractConcrete::albaVMEGenericAbstractConcrete()
 {
   m_DataVector = new albaDataVector();
   m_DataVector->SetListener(this);
+  m_DataVector->SetVME(this);
 
   albaNEW(m_Transform);
   albaVMEOutputNULL *output = albaVMEOutputNULL::New();

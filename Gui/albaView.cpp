@@ -97,12 +97,8 @@ void albaView::OnEvent(albaEventBase *alba_event)
 		
 	  case ID_HELP:
 	  {
-			albaEvent helpEvent;
-			helpEvent.SetSender(this);
-			albaString viewTypeName = this->GetTypeName();
-			helpEvent.SetString(&viewTypeName);
-			helpEvent.SetId(OPEN_HELP_PAGE);
-			albaEventMacro(helpEvent);
+			if (GetHelpManager())
+				GetHelpManager()->ShowHelpEntry(GetTypeName());
 	  }
 	  break;
 
@@ -128,16 +124,7 @@ albaGUI* albaView::CreateGui()
   m_Gui = new albaGUI(this);
 	m_Gui->SetListener(this);
 
-  albaString type_name = GetTypeName();
-
-  albaEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-	buildHelpGui.SetString(&type_name);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  albaEventMacro(buildHelpGui);
-
-	
-	if (buildHelpGui.GetArg() == true)
+	if (GetHelpManager() && GetHelpManager()->HasHelpEntry(GetTypeName()))
 		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, m_Label, "Print view debug information");
 	else
 		m_Gui->Button(ID_PRINT_INFO, m_Label, "", "Print view debug information");

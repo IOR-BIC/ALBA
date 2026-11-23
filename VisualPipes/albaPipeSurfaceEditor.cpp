@@ -160,7 +160,7 @@ void albaPipeSurfaceEditor::OnEvent(albaEventBase *alba_event)
 			//m_Mapper->SetLookupTable(m_LUT);
 			m_Mapper->SetScalarRange(range);
 			m_Mapper->Update();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 	}
 }

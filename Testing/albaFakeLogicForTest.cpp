@@ -16,6 +16,8 @@
 
 #include "albaFakeLogicForTest.h"
 #include "albaVME.h"
+#include "albaVMEStorage.h"
+#include "albaVMERoot.h"
 #include <algorithm>
 
 //-------------------------------------------------------------------------
@@ -66,11 +68,28 @@ void albaFakeLogicForTest::VmeVisualModeChanged(albaVME * vme)
 	AddCall(albaFakeLogicForTest::FKL_VME_VISUAL_MODE_CHANGED, vme);
 }
 
-// Camera /////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------
-void albaFakeLogicForTest::CameraUpdate(){}
+albaVME *albaFakeLogicForTest::ChooseVME(albaString title, void *acceptFunction, albaVME *selected)
+{
+	std::vector<albaVME*> accepted = ChooseVMEs(title, acceptFunction, selected);
+	return accepted.empty() ? NULL : accepted[0];
+}
+
 //-------------------------------------------------------------------------
-void albaFakeLogicForTest::CameraReset(){}
+std::vector<albaVME*> albaFakeLogicForTest::ChooseVMEs(albaString title, void *acceptFunction, albaVME *selected)
+{
+	typedef bool(*AcceptFunction)(albaVME *);
+	AcceptFunction accept = (AcceptFunction)acceptFunction;
+
+	m_ChooseCalls++;
+	std::vector<albaVME*> accepted;
+	for (int i = 0; i < m_ChooseCandidates.size(); i++)
+		if (accept == NULL || accept(m_ChooseCandidates[i]))
+			accepted.push_back(m_ChooseCandidates[i]);
+
+	return accepted;
+}
+
 
 
 // UTILS /////////////////////////////////////////////////////////////////
@@ -79,6 +98,7 @@ void albaFakeLogicForTest::CameraReset(){}
 void albaFakeLogicForTest::ClearCalls()
 {
 	m_Calls.clear();
+	m_ChooseCalls = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -88,6 +108,15 @@ albaFakeLogicForTest::calls albaFakeLogicForTest::GetCall(int callNum)
 }
 
 //-------------------------------------------------------------------------
+int albaFakeLogicForTest::GetNumberOfCalls(testFunctions func)
+{
+	int count = 0;
+	for (int i = 0; i < m_Calls.size(); i++)
+		if (m_Calls[i].testFunction == func)
+			count++;
+	return count;
+}
+//-------------------------------------------------------------------------
 void albaFakeLogicForTest::AddCall(testFunctions func, albaVME* vme)
 {
 	calls call;
@@ -95,6 +124,15 @@ void albaFakeLogicForTest::AddCall(testFunctions func, albaVME* vme)
 	call.vme = vme;
 
 	m_Calls.push_back(call);
+}
+
+//----------------------------------------------------------------------------
+albaVMEStorage *albaFakeLogicForTest::CreateStorage(albaVMEStorage *oldStorage)
+{
+	albaDEL(oldStorage);
+	albaVMEStorage *storage = albaVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	return storage;
 }
 
 //----------------------------------------------------------------------------
@@ -119,16 +157,6 @@ void albaFakeLogicForTest::PrintImage(albaVMEImage *img)
 }
 
 //----------------------------------------------------------------------------
-albaOpManager * albaFakeLogicForTest::GetOpManager() const
-{
-	return NULL;
-}
-
-//----------------------------------------------------------------------------
-albaViewManager * albaFakeLogicForTest::GetViewManager()
-{
-	return NULL;
-}
 
 //----------------------------------------------------------------------------
 albaProsthesesDBManager * albaFakeLogicForTest::GetProsthesesDBManager()
@@ -136,17 +164,6 @@ albaProsthesesDBManager * albaFakeLogicForTest::GetProsthesesDBManager()
 	return NULL;
 }
 
-//----------------------------------------------------------------------------
-void albaFakeLogicForTest::EnableCameraUpdateSkip()
-{
-	return;
-}
-
-//----------------------------------------------------------------------------
-void albaFakeLogicForTest::DisableCameraUpdateSkip()
-{
-	return;
-}
 
 //----------------------------------------------------------------------------
 bool albaFakeLogicForTest::IsVMEExpanded(albaVME *vme)

@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class albaGUICheckTree;
+class albaGUIVMETree;
 class albaVMERoot;
 
 /** albaGUIDialogFindVme - a dialog widget with a find VME GUI.
@@ -39,7 +39,7 @@ public:
   void OnEvent(albaEventBase *alba_event);
 
   /** Set the tree on which find the VME.*/
-  void SetTree(albaGUICheckTree *tree);
+  void SetTree(albaGUIVMETree *tree);
 
   /** Useful for initialize the search string or to use it by code.*/
   bool FindNextNode(const char *text);
@@ -61,7 +61,7 @@ protected:
   albaString m_SearchString; ///< The string to find into the VME tree.
   int m_MatchCase; ///< Enable the case sensitive search.
   int m_WholeWord; ///< Enable the find only for exact matching VME names.
-  albaGUICheckTree *m_Tree; ///< The VME tree.
+  albaGUIVMETree *m_Tree; ///< The VME tree.
   albaVMERoot *m_Root;
   std::vector<albaVME*> m_NodeFoundList;
 };

@@ -174,7 +174,7 @@ void albaGizmoInteractionDebugger::OnEvent(albaEventBase *alba_event)
           m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
         }
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
 
@@ -260,13 +260,13 @@ void albaGizmoInteractionDebugger::LogTransformEvent( albaEvent *e )
   albaString mouseActionString;
   switch(mouseAction)
   {
-  case albaBehaviorTransform::MOUSE_DOWN:
+  case albaBehaviorTransform::MOUSE_ACTION_DOWN:
     mouseActionString.Append("MOUSE DOWN");
     break;
-  case albaBehaviorTransform::MOUSE_MOVE:
+  case albaBehaviorTransform::MOUSE_ACTION_MOVE:
     mouseActionString.Append("MOUSE MOVE");
     break;
-  case albaBehaviorTransform::MOUSE_UP:
+  case albaBehaviorTransform::MOUSE_ACTION_UP:
     mouseActionString.Append("MOUSE UP");
     break;
   default:

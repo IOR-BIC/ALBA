@@ -31,6 +31,7 @@
 #include "albaVME.h"
 #include "albaVMESurface.h"
 #include "albaSmartPointer.h"
+#include "albaProgressBarHelper.h"
 #include "vtkALBASmartPointer.h"
 
 #include "vtkPLYReader.h"
@@ -96,7 +97,7 @@ void albaOpImporterPLY::OpRun()
     ImportFile();
 	}
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterPLY::OpDo()
@@ -108,7 +109,7 @@ void albaOpImporterPLY::OpDo()
       m_ImportedPLYs[i]->ReparentTo(m_Input);
     }
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -121,7 +122,7 @@ void albaOpImporterPLY::OpUndo()
       GetLogicManager()->VmeRemove(m_ImportedPLYs[i]);
     }
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -140,7 +141,8 @@ int albaOpImporterPLY::ImportFile()
     fn = m_Files[kk];
   
     vtkALBASmartPointer<vtkPLYReader> reader;
-	  albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,reader));
+	  albaProgressBarHelper progressHelper;
+	  progressHelper.BindToVTKFilter(reader);
     reader->SetFileName(fn);
 	  reader->Update();
 

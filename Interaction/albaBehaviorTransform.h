@@ -207,11 +207,11 @@ public:
   Used to notify the listener about the current mouse action performed;
   event Id field is set with this enum
   */
-  enum MouseAction {MOUSE_DOWN = 0, MOUSE_MOVE, MOUSE_UP};
+  enum MouseAction {MOUSE_ACTION_DOWN = 0, MOUSE_ACTION_MOVE, MOUSE_ACTION_UP};
 
   // modified by Rafael. 9-9-2004
   // Made this function public
-  void SendTransformMatrix(const albaMatrix &matrix, int mouseAction = MOUSE_MOVE, double rotationAngle = 0);  
+  void SendTransformMatrix(const albaMatrix &matrix, int mouseAction = MOUSE_ACTION_MOVE, double rotationAngle = 0);  
 
   /** Set the current camera */
   virtual void SetCurrentCamera(vtkCamera *camera) {m_CurrentCamera=camera;}
@@ -403,13 +403,13 @@ private:
   /**
   Send the transform matrix to the listener. Also concatenate the matrix
   to m_ResultMatrix according to current m_ResultMatrix concatenation semantic. 
-  If the action is MOUSE_DOWN the picked position is send as vtkMatrix in
+  If the action is MOUSE_ACTION_DOWN the picked position is send as vtkMatrix in
   the VtkObj field of the event.
-  If the action is MOUSE_MOVE and a rotation is performed the angle of
+  If the action is MOUSE_ACTION_MOVE and a rotation is performed the angle of
   rotation in the single move event is sent as float in the float field of
   the event*/
-  void SendTransformMatrix(double *versor, double translation, int mouseAction = MOUSE_MOVE);
-  void SendTransformMatrix(double *vector, int mouseAction = MOUSE_MOVE);
+  void SendTransformMatrix(double *versor, double translation, int mouseAction = MOUSE_ACTION_MOVE);
+  void SendTransformMatrix(double *vector, int mouseAction = MOUSE_ACTION_MOVE);
 
   /** Concatenate the transform matrix to the result matrix 
   according to selected semantic */

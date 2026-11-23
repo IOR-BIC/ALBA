@@ -55,7 +55,7 @@ public:
     ID_RIGTH_TEXT_SIDE,
   };
 
-  enum SentPoseID {ABS_POSE = albaBehaviorTransform::MOUSE_UP+1};
+  enum SentPoseID {ABS_POSE = albaBehaviorTransform::MOUSE_ACTION_UP+1};
 
   /** Set position along constraint polyline*/
   void SetCurvilinearAbscissa(double s);

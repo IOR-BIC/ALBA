@@ -71,8 +71,6 @@ protected:
 	/** Allow to choose the target surface for the registration. */
 	void OnChooseTarget();
 
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
 
 	albaVME*					m_Target;				// m_input, inherited from albaOp, is used as source
 	albaVME*					m_Registered;   // the output: a copy of m_input registered on m_target

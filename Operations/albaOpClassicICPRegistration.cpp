@@ -159,13 +159,6 @@ void albaOpClassicICPRegistration::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpClassicICPRegistration::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));       
-}
-//----------------------------------------------------------------------------
 void albaOpClassicICPRegistration::OpDo()
 //----------------------------------------------------------------------------
 {
@@ -274,7 +267,7 @@ void albaOpClassicICPRegistration::OpDo()
 
 	m_Output = m_Registered;
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   wxString regString;
   regString = _("Registration done!");
@@ -292,9 +285,7 @@ void albaOpClassicICPRegistration::OpDo()
 void albaOpClassicICPRegistration::OnChooseTarget()   
 //----------------------------------------------------------------------------
 {
-	albaEvent e(this,VME_CHOOSE);
-	albaEventMacro(e);
-	albaVME *vme = e.GetVme();
+	albaVME *vme = GetLogicManager()->ChooseVME();
 
 	if(!vme) return; // the user choosed cancel - keep previous target
   if(!InternalAccept(vme)) // the user choosed ok     - check if it is a valid vme

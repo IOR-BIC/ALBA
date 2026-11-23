@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "albaDecl.h"
 #include "albaRWIBase.h"
 #include "albaObserver.h"
 #include "albaAxes.h"
@@ -46,6 +47,29 @@ enum RWI_LAYERS
 	ONE_LAYER = 0,
 	TWO_LAYER
 };
+
+/** Positions of the camera of albaRWI (CameraSet), chosen by the views when they create it */
+enum CAMERA_POSITIONS
+{
+	CAMERA_FRONT = 0,
+	CAMERA_PERSPECTIVE,
+	CAMERA_PERSPECTIVE_FRONT,
+	CAMERA_PERSPECTIVE_BACK,
+	CAMERA_PERSPECTIVE_LEFT,
+	CAMERA_PERSPECTIVE_RIGHT,
+	CAMERA_PERSPECTIVE_TOP,
+	CAMERA_PERSPECTIVE_BOTTOM,
+	CAMERA_RX_FRONT,  // CAMERA_RX_FRONT, LEFT, RIGHT must stay consecutive: albaPipeVolumeProjectedTest loops on them
+	CAMERA_RX_LEFT,
+	CAMERA_RX_RIGHT,
+	CAMERA_CT,
+	CAMERA_OS_X,  // CAMERA_OS_X, Y, Z must stay consecutive: albaViewArbitraryOrthoSlice uses CAMERA_OS_X + axis
+	CAMERA_OS_Y,
+	CAMERA_OS_Z,
+	CAMERA_OS_P,
+	CAMERA_ARB,   // camera with arbitrary look vector
+};
+
 //----------------------------------------------------------------------------
 // albaRWI :
 //----------------------------------------------------------------------------
