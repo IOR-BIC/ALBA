@@ -201,7 +201,7 @@ void albaOpSurfaceMirror::OpStop(int result)
 	  HideGui();
 	  delete m_Gui;
 	}
-	albaEventMacro(albaEvent(this,result));        
+	NotifyOpEnd(result);        
 }
 //----------------------------------------------------------------------------
 void albaOpSurfaceMirror::Preview()  

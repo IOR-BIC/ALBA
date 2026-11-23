@@ -123,8 +123,6 @@ albaOpImporterRAWImages::albaOpImporterRAWImages(wxString label) : albaOp(label)
   m_Texture		   = NULL;
   m_Plane = NULL;
 
-  m_GizmoStatus = GIZMO_NOT_EXIST;
-  m_SideToBeDragged = 0;
   m_UseLookupTable = 1; //use lookup table (on by the default)
 
 
@@ -397,7 +395,7 @@ void albaOpImporterRAWImages::OpStop(int result)
   cppDEL(m_Dialog);
 
   if(!this->m_TestMode)
-    albaEventMacro(albaEvent(this,result));
+    NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterRAWImages::OpDo()
@@ -573,164 +571,6 @@ void albaOpImporterRAWImages::OnEvent(albaEventBase *alba_event)
         m_Reader->Update();
         m_Dialog->GetRWI()->CameraUpdate();
       }
-      break;
-    case MOUSE_DOWN:
-      {		
-        if(m_CropMode)
-        {
-          long handle_id = e->GetArg();
-          double pos[3];
-          vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-          p->GetPoint(0,pos);
-
-          //calculte the rectangle's heigh
-          double b[6];
-          m_GizmoPlane->GetOutput()->GetBounds(b);
-          double dx = (b[1] - b[0]) / 10;
-          double dy = (b[3] - b[2]) / 10;
-
-          double O[3], P1[3], P2[3];
-          m_GizmoPlane->GetOrigin(O);
-          m_GizmoPlane->GetPoint1(P1);
-          m_GizmoPlane->GetPoint2(P2);
-
-          if (m_GizmoStatus == GIZMO_NOT_EXIST)
-          {
-            m_GizmoStatus = GIZMO_RESIZING;
-            m_GizmoActor->VisibilityOn();
-
-            pos[2] = 0;
-            m_GizmoPlane->SetOrigin(pos);
-            m_GizmoPlane->SetPoint1(pos[0], pos[1], pos[2]);
-            m_GizmoPlane->SetPoint2(pos[0], pos[1], pos[2]);
-          }
-          else if (m_GizmoStatus == GIZMO_DONE)
-          {
-            //	  6------------5----------4--->x
-            //		|												|
-            //		7												3
-            //		|												|
-            //		8------------1----------2
-            //		|
-            //	  v y
-
-            if (P1[0] + dx/2 <= pos[0] &&  pos[0] <= P2[0] - dx/2 && P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-              m_SideToBeDragged = 1;
-            else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 && P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-              m_SideToBeDragged = 2;
-            else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 && P2[1] + dy/2 <= pos[1] && pos[1] <= P1[1] - dy/2)
-              m_SideToBeDragged = 3;
-            else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 && P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
-              m_SideToBeDragged = 4;
-            else if (P1[0] + dx/2 <= pos[0] && pos[0] <= P2[0] - dx/2 && P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
-              m_SideToBeDragged = 5;
-            else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 && P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] +dy/2)
-              m_SideToBeDragged = 6;
-            else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 && P2[1] + dy/2 <= pos[1] && pos[1] <= P1[1] - dy/2)
-              m_SideToBeDragged = 7;
-            else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 && P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-              m_SideToBeDragged = 8;
-            else
-              // hai pickato in un punto che non corrisponde a nessun lato
-              // => crea un nuovo gizmo
-            {
-              m_GizmoStatus = GIZMO_RESIZING;
-              m_GizmoActor->VisibilityOn();
-
-              pos[2] = 0;
-              m_GizmoPlane->SetOrigin(pos);
-              m_GizmoPlane->SetPoint1(pos[0], pos[1], pos[2]);
-              m_GizmoPlane->SetPoint2(pos[0], pos[1], pos[2]);
-            }
-          }
-          m_Dialog->GetRWI()->CameraUpdate();
-
-
-          m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-          m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
-          m_Gui->Update();
-        }
-      }
-      break;
-    case MOUSE_MOVE:  //ridimensiona il gizmo
-      {
-        long handle_id = e->GetArg();
-        double pos[3], oldO[3], oldP1[3], oldP2[3];
-        vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-        p->GetPoint(0,pos);
-
-        m_GizmoPlane->GetOrigin(oldO);
-        m_GizmoPlane->GetPoint1(oldP1);
-        m_GizmoPlane->GetPoint2(oldP2);
-
-        if (m_GizmoStatus == GIZMO_RESIZING)
-        {
-          m_GizmoPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
-          m_GizmoPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
-        }
-        else if (m_GizmoStatus == GIZMO_DONE)
-        {
-          if (m_SideToBeDragged == 0) {}
-          else if (m_SideToBeDragged == 1)
-            m_GizmoPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-          else if (m_SideToBeDragged == 2)
-          {
-            m_GizmoPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-            m_GizmoPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-          }
-          else if (m_SideToBeDragged == 3)
-            m_GizmoPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-          else if (m_SideToBeDragged == 4)
-          {
-            m_GizmoPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-            m_GizmoPlane->SetPoint2(pos[0], pos[1], oldP2[2]);
-          }
-          else if (m_SideToBeDragged == 5)
-          {
-            m_GizmoPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-            m_GizmoPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-          }
-          else if (m_SideToBeDragged == 6)
-          {
-            m_GizmoPlane->SetOrigin(pos[0], pos[1], oldO[2]);
-            m_GizmoPlane->SetPoint1(pos[0], oldP1[1], oldP2[2]);
-            m_GizmoPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-          }
-          else if (m_SideToBeDragged == 7)
-          {
-            m_GizmoPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-            m_GizmoPlane->SetPoint1(pos[0], oldP1[1], oldP1[2]);
-          }
-          else if (m_SideToBeDragged == 8)
-          {
-            m_GizmoPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-            m_GizmoPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
-          }
-        }
-        m_Dialog->GetRWI()->CameraUpdate();
-        m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-        m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
-        m_Gui->Update();
-      }
-      break;
-    case MOUSE_UP:  //blocca il gizmo
-      if (m_CropMode)
-      {
-        if (m_GizmoStatus == GIZMO_RESIZING)
-          m_GizmoStatus = 	GIZMO_DONE;
-        else if (m_GizmoStatus == GIZMO_DONE)
-          m_SideToBeDragged = 0;
-        double b[6], img_bounds[6];
-        m_Reader->GetOutput()->GetBounds(img_bounds);
-        m_GizmoPlane->GetOutput()->GetBounds(b);
-        m_ROI_2D[0] = b[0];
-        m_ROI_2D[1] = b[1];
-        m_ROI_2D[2] = b[2];
-        m_ROI_2D[3] = b[3];
-      }
-      m_DimXCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
-      m_DimYCrop = albaString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
-      m_Gui->Update();
       break;
     case wxOK:
         if(!ControlFilenameList())

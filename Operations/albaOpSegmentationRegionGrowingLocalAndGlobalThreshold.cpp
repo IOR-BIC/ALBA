@@ -674,7 +674,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
   {
   	HideGui();
   }
-  albaEventMacro(albaEvent(this,result));        
+  NotifyOpEnd(result);        
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()

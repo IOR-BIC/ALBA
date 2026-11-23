@@ -96,7 +96,7 @@ void albaOpImporterPLY::OpRun()
     ImportFile();
 	}
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterPLY::OpDo()

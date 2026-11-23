@@ -77,7 +77,7 @@ void albaOpCreateSpline::OpRun()
   albaNEW(m_PolylineSpline);
   m_PolylineSpline->SetName("Polyline Spline");
   m_Output = m_PolylineSpline;
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpCreateSpline::OpDo()

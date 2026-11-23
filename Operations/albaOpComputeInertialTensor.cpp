@@ -310,13 +310,6 @@ void albaOpComputeInertialTensor::AddAttributes()
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpComputeInertialTensor::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  HideGui();
-  albaEventMacro(albaEvent(this,result)); 
-}
-//----------------------------------------------------------------------------
 void albaOpComputeInertialTensor::CreateGui()
 //----------------------------------------------------------------------------
 {

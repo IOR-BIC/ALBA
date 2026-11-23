@@ -148,7 +148,7 @@ void albaOpFillHoles::OpRun()
 	  DeleteOpDialog();
   }
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpFillHoles::OpDo()
@@ -235,12 +235,6 @@ void albaOpFillHoles::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-}
-//----------------------------------------------------------------------------
-void albaOpFillHoles::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
 void albaOpFillHoles::DeleteOpDialog()

@@ -147,13 +147,6 @@ void albaOpCropDeformableROI::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpCropDeformableROI::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 //----------------------------------------------------------------------------
 {

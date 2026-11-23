@@ -326,7 +326,7 @@ void albaOpMeasure2D::OpStop(int result)
 
 	m_InteractorVector.clear();
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------

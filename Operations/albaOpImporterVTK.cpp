@@ -222,11 +222,6 @@ int albaOpImporterVTK::ImportFile()
 	return ALBA_OK;
 }
 
-//----------------------------------------------------------------------------
-void albaOpImporterVTK::OpStop(int result)
-{
-				albaEventMacro(albaEvent(this, result));
-}
 
 //----------------------------------------------------------------------------
 char ** albaOpImporterVTK::GetIcon()

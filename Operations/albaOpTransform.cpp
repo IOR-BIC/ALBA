@@ -260,7 +260,7 @@ void albaOpTransform::OpStop(int result)
 	albaDEL(m_LocalCenterRefSysVME);
 	albaDEL(m_LocalRefSysVME);
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------
@@ -653,12 +653,12 @@ void albaOpTransform::OnEventTransformGizmo(albaEventBase *alba_event)
 	if (m_ActiveGizmo != SCAL_GIZMO)
 		PostMultiplyMatrix(e->GetMatrix());
 
-	if (!m_UpdateAfterRelease || arg == albaBehaviorTransform::MOUSE_UP)
+	if (!m_UpdateAfterRelease || arg == albaBehaviorTransform::MOUSE_ACTION_UP)
 	{
 		m_Input->SetAbsMatrix(*m_TransformVME->GetOutput()->GetAbsMatrix());
 	}
 
-	if (arg == albaBehaviorTransform::MOUSE_UP)
+	if (arg == albaBehaviorTransform::MOUSE_ACTION_UP)
 	{
 		UpdateReferenceSystem();
 	}

@@ -174,15 +174,15 @@ public:
 
 	int ImportFile(albaString filename);
 
+	/** Execute the running operation op (called by op when it ends with OK); ignored if op is not the running one */
+	virtual void OpRunOk(albaOp *op) override;
+
+	/** Delete the running operation op without executing it (called by op when it ends with CANCEL); ignored if op is not the running one */
+	virtual void OpRunCancel(albaOp *op) override;
+
 protected:
 	/** Execute the current operation. */
   virtual void OpDo(albaOp *op);
-
-	/** This method is called if the operation must be executed. */
-  virtual void OpRunOk(albaOp *op);
-
-	/** The operation is not executed and is deleted. */
-  virtual void OpRunCancel(albaOp *op);
 
 	/** Execute the 'UnDo' method of the operation. */
   virtual void OpUndo();
@@ -192,9 +192,6 @@ protected:
 
 	/** Warn the user if the operation is undoable. */
   virtual bool WarnUser(albaOp *op);
-
-	/** Sent a string message to the listener. */
-  virtual void Notify(int msg, long arg=0L);
 
 	/** Enable/Disable the toolbar's buttons. */
 	virtual void EnableToolbar(bool CanEnable = true);

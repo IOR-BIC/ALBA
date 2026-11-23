@@ -105,12 +105,6 @@ void albaOpExporterSTL::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpExporterSTL::OpStop(int result)
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 int albaOpExporterSTL::ExportSurface()
 {
 

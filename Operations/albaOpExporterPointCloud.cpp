@@ -78,7 +78,7 @@ void albaOpExporterPointCloud::OpRun()
 	if (!m_File.IsEmpty() && ExportPointCloud())
 		result = OP_RUN_OK;
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------

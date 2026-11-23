@@ -186,13 +186,6 @@ void albaOpEditNormals::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpEditNormals::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpEditNormals::OnGenerateNormals()
 //----------------------------------------------------------------------------
 {

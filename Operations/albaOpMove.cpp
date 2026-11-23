@@ -215,7 +215,7 @@ void albaOpMove::OpStop(int result)
 
 		GetViewManager()->CameraUpdate();
   }
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 
 //----------------------------------------------------------------------------

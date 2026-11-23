@@ -71,7 +71,7 @@ void albaOpCreateSurfaceParametric::OpRun()
   albaNEW(m_SurfaceParametric);
   m_SurfaceParametric->SetName("Parametric Surface");
   m_Output = m_SurfaceParametric;
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpCreateSurfaceParametric::OpDo()

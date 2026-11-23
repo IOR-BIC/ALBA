@@ -183,7 +183,7 @@ void albaOpVolumeMirror::OpStop(int result)
 	  HideGui();
 	  delete m_Gui;
 	}
-	albaEventMacro(albaEvent(this,result));        
+	NotifyOpEnd(result);        
 }
 //----------------------------------------------------------------------------
 void albaOpVolumeMirror::Preview()  

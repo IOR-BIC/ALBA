@@ -213,7 +213,7 @@ void albaOpTransformOld::OpStop(int result)
 
   m_GuiTransform->DetachInteractorFromVme();
 
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 
 //----------------------------------------------------------------------------

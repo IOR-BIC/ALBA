@@ -227,7 +227,7 @@ void albaOpImporterRAWVolume::OpRun()
 	cppDEL(m_Dialog);
 
   //finish the Run +++++++++++++++++++++++++++++++++
-	albaEventMacro(albaEvent(this,res));
+	NotifyOpEnd(res);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterRAWVolume::EnableWidgets(bool enable)

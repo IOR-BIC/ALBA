@@ -379,13 +379,15 @@ protected:
 	/** Show the tree in a dialog and return the VME chosen by the user, NULL on cancel. */
 	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 
+	/** Called by the op manager when an operation starts: disable all menu and lock the Selection */
+	virtual void OpRunStarting() override;
+
+	/** Called by the op manager when an operation stops: re-enable all menu and unlock the Selection; during a wizard, continue it */
+	virtual void OpRunTerminated(bool runOk) override;
+
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 		
-	/** Called when an operation starts. Disable all menu and lock the Selection */
-	virtual void OpRunStarting();
-	/** Called when an operation stops. Re-enable all menu and unlock the Selection */
-	virtual void OpRunTerminated(int runOk);
 	/** Show the gui of the running operation or the settings of the selected view. */
 	virtual void OpShowGui(bool push_gui, albaGUIPanel *panel);
 	/** Hide the setting's gui when a view is destroyed. */

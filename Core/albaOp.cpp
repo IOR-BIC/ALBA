@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOp.h"
+#include "albaAbsOpManager.h"
 #include "albaDecl.h"
 #include "albaSmartPointer.h"
 #include "albaGUI.h"
@@ -193,14 +194,12 @@ bool albaOp::OkEnabled()
 //----------------------------------------------------------------------------
 void albaOp::ForceStopWithOk()
 {
-  albaEvent e(this, OP_RUN_OK);
-  OnEvent(&e);
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOp::ForceStopWithCancel()
 {
-  albaEvent e(this, OP_RUN_CANCEL);
-  OnEvent(&e);
+  NotifyOpEnd(OP_RUN_CANCEL);
 }
 //----------------------------------------------------------------------------
 void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
@@ -211,17 +210,19 @@ void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
 void albaOp::OpStop(int result)
 {
 	albaLogMessage("Stopping Op :%s\n", m_Label.ToAscii());
-	if (m_Gui)
-		m_Gui->DisableRecursive();
-	if (result == OP_RUN_CANCEL || !CanUndo()) //on cancel or operation that cannot do undo the op will be deleted so the HideGui method will crash 
-	{
-		albaEventMacro(albaEvent(this, result));
-	}
+	HideGui();
+	NotifyOpEnd(result);
+}
+//----------------------------------------------------------------------------
+void albaOp::NotifyOpEnd(int result)
+{
+	if (GetOpManager() == NULL)
+		return;
+
+	if (result == OP_RUN_OK)
+		GetOpManager()->OpRunOk(this);
 	else
-	{
-		albaEventMacro(albaEvent(this, result));
-		HideGui();
-	}
+		GetOpManager()->OpRunCancel(this);
 }
 //----------------------------------------------------------------------------
 char ** albaOp::GetIcon()

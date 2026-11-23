@@ -288,7 +288,7 @@ void albaOpAddLandmark::OpStop(int result)
 
 	GetViewManager()->CameraUpdate();
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpAddLandmark::OpDo()

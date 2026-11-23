@@ -236,5 +236,5 @@ void albaOpImporterDicFile::OpRun()
 		if(ImportFile()==ALBA_OK)
 			result = OP_RUN_OK;
 	}
-	albaEventMacro(albaEvent(this,result));  
+	NotifyOpEnd(result);  
 }

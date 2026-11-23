@@ -60,6 +60,12 @@ public:
 	/** Returns true if there is a Running Operation */
 	virtual bool IsOperationRunning() = 0;
 
+	/** Called by the op manager when an operation starts (not for the nested ones): menus and selection are locked */
+	virtual void OpRunStarting() = 0;
+
+	/** Called by the op manager when an operation ends (not for the nested ones), runOk tells if it was executed */
+	virtual void OpRunTerminated(bool runOk) = 0;
+
 	virtual const char* GetMsfFileExtension() = 0;
 
 	virtual void PrintImage(albaVMEImage *img) = 0;

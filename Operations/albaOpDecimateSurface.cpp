@@ -212,7 +212,7 @@ void albaOpDecimateSurface::OpStop(int result)
   GetViewManager()->CameraUpdate();
 
 	HideGui();
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpDecimateSurface::OnDecimate()

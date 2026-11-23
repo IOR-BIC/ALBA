@@ -445,7 +445,7 @@ void albaVMEProsthesis::OnTranfromEvent(albaEvent *e)
 {
 	long arg = e->GetArg();
 	
-	if (arg == albaBehaviorTransform::MOUSE_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
+	if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE && (!m_LockOnOpRun || !GetLogicManager()->IsOperationRunning()))
 	{
 		// Update Matrix
 		// handle incoming transform events

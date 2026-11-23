@@ -69,7 +69,6 @@ protected:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
-  void OpStop(int result);
 
   wxString		m_ProposedDirectory;///<Default directory where to save file .raw
   albaString		m_FileName;///<Name of the file/files where the exporter will save raw data

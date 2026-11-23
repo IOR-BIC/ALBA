@@ -28,6 +28,7 @@
 #include "albaOpDummy.h"
 #include "albaVMEDummy.h"
 #include "albaGUISettings.h"
+#include "albaServiceLocator.h"
 
 
 bool albaOpDummy::m_Do = false;
@@ -38,7 +39,8 @@ bool albaOpDummy::m_Executed = false;
 void albaOpManagerTest::BeforeTest()
 //------------------------------------------------------------------------------
 {
-  m_OpManager = new albaOpManager(); 
+  m_OpManager = new albaOpManager();
+  albaServiceLocator::SetOpManager(m_OpManager);
 
   albaOpDummy::m_Do = false;
   albaOpDummy::m_Undo = false;
@@ -49,6 +51,7 @@ void albaOpManagerTest::BeforeTest()
 void albaOpManagerTest::AfterTest()
 //------------------------------------------------------------------------------
 {
+  albaServiceLocator::SetOpManager(NULL);
   cppDEL(m_OpManager);
 }
 //------------------------------------------------------------------------------

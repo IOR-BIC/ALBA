@@ -276,8 +276,6 @@ void albaOpMML3::OpDo()  {}
 //----------------------------------------------------------------------------
 void albaOpMML3::OpUndo() {}
 
-//----------------------------------------------------------------------------
-void albaOpMML3::OpStop(int result) {	albaEventMacro(albaEvent(this,result));}
 
 
 

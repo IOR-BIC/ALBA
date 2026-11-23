@@ -111,12 +111,6 @@ void albaOpExporterAbaqusFile::OnOK()
     Write();
   }
 }
-//----------------------------------------------------------------------------
-void albaOpExporterAbaqusFile::OpStop(int result)
-{
-  HideGui();
-  albaEventMacro(albaEvent(this,result));        
-}
 
 //----------------------------------------------------------------------------
 int albaOpExporterAbaqusFile::compareElem(const void *p1, const void *p2) 

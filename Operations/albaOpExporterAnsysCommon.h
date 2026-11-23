@@ -62,7 +62,6 @@ public:
 protected:	
   virtual albaString GetWildcard() = 0;
 	
-	void OpStop(int result);
 
   void OnOK();
 

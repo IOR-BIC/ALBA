@@ -181,13 +181,6 @@ void albaOpSmoothSurface::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpSmoothSurface::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpSmoothSurface::OnSmooth()
 //----------------------------------------------------------------------------
 {

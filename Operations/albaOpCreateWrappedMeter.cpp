@@ -71,7 +71,7 @@ void albaOpCreateWrappedMeter::OpRun()
   albaNEW(m_Meter);
   m_Meter->SetName("Wrapped Meter");
   m_Output = m_Meter;
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpCreateWrappedMeter::OpDo()

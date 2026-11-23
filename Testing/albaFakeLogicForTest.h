@@ -82,6 +82,10 @@ public:
 	void AddCall(testFunctions func, albaVME* vme);
 
 	virtual bool IsOperationRunning();
+
+	virtual void OpRunStarting() override {}
+
+	virtual void OpRunTerminated(bool runOk) override {}
 	
 	virtual const char* GetMsfFileExtension() override;
 	

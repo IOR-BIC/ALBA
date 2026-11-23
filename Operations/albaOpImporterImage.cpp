@@ -167,13 +167,6 @@ albaOp* albaOpImporterImage::Copy()
   return (new albaOpImporterImage(m_Label));
 }
 //----------------------------------------------------------------------------
-void albaOpImporterImage::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));
-}
-//----------------------------------------------------------------------------
 void albaOpImporterImage::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {

@@ -101,14 +101,14 @@ void albaOpDummy::OpRun()
 void albaOpDummy::End()
 //----------------------------------------------------------------------------
 {
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpDummy::OpStop(int result)
 //----------------------------------------------------------------------------
 {
   m_Stop = true;
-  albaEventMacro(albaEvent(this,result));        
+  NotifyOpEnd(result);        
 }
 
 albaCxxTypeMacro(albaOpDummy);

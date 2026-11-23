@@ -153,12 +153,6 @@ albaVMELandmarkCloud *albaOpNearestLandmark::CreateClosestPoint(vtkPolyData * po
 }
 
 //----------------------------------------------------------------------------
-void albaOpNearestLandmark::OpStop(int result)
-{
-
-	albaEventMacro(albaEvent(this, result));
-}
-//----------------------------------------------------------------------------
 void albaOpNearestLandmark::OpDo()
 {
 }

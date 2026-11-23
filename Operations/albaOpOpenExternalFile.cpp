@@ -77,7 +77,7 @@ void albaOpOpenExternalFile::OpRun()
 	if (filetype == NULL)
   {
 		wxMessageBox("Don't know how to handle this type of file");
-		albaEventMacro(albaEvent(this,OP_RUN_CANCEL));
+		NotifyOpEnd(OP_RUN_CANCEL);
 		return;
 	}
 	
@@ -89,13 +89,13 @@ void albaOpOpenExternalFile::OpRun()
     albaLogMessage("Executing command: '%s'", command2execute.ToAscii());
 		m_Pid = wxExecute(command2execute); //,false
 		cppDEL(filetype);
-		albaEventMacro(albaEvent(this,OP_RUN_OK));
+		NotifyOpEnd(OP_RUN_OK);
 	}
 	else
 	{
 		wxMessageBox("Don't know how to handle this type of file");
 		cppDEL(filetype);
-		albaEventMacro(albaEvent(this,OP_RUN_CANCEL));
+		NotifyOpEnd(OP_RUN_CANCEL);
 	}	
 }
 //----------------------------------------------------------------------------

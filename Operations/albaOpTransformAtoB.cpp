@@ -129,11 +129,6 @@ void albaOpTransformAtoB::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void albaOpTransformAtoB::OpStop(int result)
-{
-	albaEventMacro(albaEvent(this, result));
-}
-//----------------------------------------------------------------------------
 void albaOpTransformAtoB::OpDo()
 {
 

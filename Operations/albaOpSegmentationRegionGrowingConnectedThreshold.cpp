@@ -195,7 +195,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     m_ResampleInput->Update();
 
     HideGui();
-    albaEventMacro(albaEvent(this,result));
+    NotifyOpEnd(result);
   } 
   else if (result==OP_RUN_CANCEL)
   { 
@@ -219,7 +219,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     }
     albaDEL(m_Resample); 
     HideGui();
-    albaEventMacro(albaEvent(this,result));
+    NotifyOpEnd(result);
   }
 }
 //----------------------------------------------------------------------------

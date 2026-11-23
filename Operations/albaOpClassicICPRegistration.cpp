@@ -159,13 +159,6 @@ void albaOpClassicICPRegistration::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpClassicICPRegistration::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));       
-}
-//----------------------------------------------------------------------------
 void albaOpClassicICPRegistration::OpDo()
 //----------------------------------------------------------------------------
 {

@@ -574,7 +574,7 @@ void albaOpLabelizeSurface::OpStop(int result)
 	if(!m_TestMode)
 		HideGui();
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::OpDo()
@@ -733,7 +733,7 @@ void albaOpLabelizeSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaBehaviorTransform::MOUSE_MOVE)
+		if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);

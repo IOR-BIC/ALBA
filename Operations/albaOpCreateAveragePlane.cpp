@@ -79,11 +79,11 @@ void albaOpCreateAveragePlane::OpRun()
 
 	if (m_SelVME)
 	{
-		albaEventMacro(albaEvent(this, OP_RUN_OK));
+		NotifyOpEnd(OP_RUN_OK);
 	}
 	else
 	{
-		albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+		NotifyOpEnd(OP_RUN_CANCEL);
 	}
 }
 

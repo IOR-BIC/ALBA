@@ -159,13 +159,6 @@ void albaOpExporterMeters::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpExporterMeters::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpExporterMeters::OpDo()   
 //----------------------------------------------------------------------------
 {

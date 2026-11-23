@@ -105,6 +105,7 @@ protected:
 
 	void FillImageList();
 	
+	/** Save the image to file; return ALBA_OK or ALBA_ERROR */
 	int SaveVMEImage(albaVMEImage *image, wxString imageFileName, bool scale = false);
 	void SaveImageAs();
 	void SaveAllImages();

@@ -437,13 +437,6 @@ void albaOpMakeVMETimevarying::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-void albaOpMakeVMETimevarying::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  HideGui();
-	albaEventMacro(albaEvent(this,result));
-}
-//----------------------------------------------------------------------------
 bool albaOpMakeVMETimevarying::DialogAcceptVME(albaVME* node)
 {
 	//only the VME types that Execute can convert to a timevarying VME

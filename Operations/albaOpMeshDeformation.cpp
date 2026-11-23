@@ -174,7 +174,7 @@ void albaOpMeshDeformation::OpRun()
   //create internal structures for the visualization
   if (!CreateInternalStructures())
   {
-    albaEventMacro(albaEvent(this, OP_RUN_CANCEL)); 
+    NotifyOpEnd(OP_RUN_CANCEL); 
     return;
   }
  
@@ -188,7 +188,7 @@ void albaOpMeshDeformation::OpRun()
   DeleteOpDialog();
 
   DeleteInternalStructures();
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------
@@ -243,12 +243,6 @@ void albaOpMeshDeformation::OpUndo()
 	GetViewManager()->CameraUpdate();
 }
 
-//----------------------------------------------------------------------------
-void albaOpMeshDeformation::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  albaEventMacro(albaEvent(this,result));        
-}
 
 //----------------------------------------------------------------------------
 //Destroys GUI

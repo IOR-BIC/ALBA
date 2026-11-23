@@ -344,8 +344,6 @@ void albaGUIHistogramWidget::ExportData()
 	wxString f = albaGetSaveFile(proposed, wildc).ToAscii();
 	FILE *outFile = NULL;
 
-	int result = OP_RUN_CANCEL;
-
 	if (!f.IsEmpty())
 		outFile = albaTryOpenFile(f.ToAscii(), "w");
 

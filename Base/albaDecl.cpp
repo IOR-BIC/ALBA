@@ -437,26 +437,10 @@ wxString  albaIdString(int id)
      case VIEW_MAXIMIZE:        s="VIEW_MAXIMIZE"; break; 
      case VIEW_RESIZE:          s="VIEW_RESIZE"; break; 
 
-     case CAMERA_FRONT:	        s="CAMERA_FRONT"; break; 
-     case CAMERA_PERSPECTIVE:	  s="CAMERA_PERSPECTIVE"; break; 
-     case CAMERA_RX_FRONT:	    s="CAMERA_RX_FRONT"; break; 
-     case CAMERA_RX_LEFT:	      s="CAMERA_RX_LEFT"; break; 
-     case CAMERA_RX_RIGHT:	    s="CAMERA_RX_RIGHT"; break; 
-    // modified by Stefano 21-9-2004 (begin)
-    // modified by Stefano 21-9-2004 (end)
-     case CAMERA_CT:						s="CAMERA_CT"; break; 
-     case CAMERA_OS_X:	        s="CAMERA_OS_X"; break; 
-     case CAMERA_OS_Y:	        s="CAMERA_OS_Y"; break; 
-     case CAMERA_OS_Z:	        s="CAMERA_OS_Z"; break; 
-     case CAMERA_OS_P:	        s="CAMERA_OS_P"; break; 
      case CAMERA_RESET:	        s="CAMERA_RESET"; break; 
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 
 		 case CAMERA_FLYTO:					s="CAMERA_FLYTO"; break; 
 
-     case OP_RUN_OK:	          s="OP_RUN_OK"; break; 
-     case OP_RUN_CANCEL:	      s="OP_RUN_CANCEL"; break; 
-     case OP_RUN_STARTING:	    s="OP_RUN_STARTING"; break; 
-     case OP_RUN_TERMINATED:	  s="OP_RUN_TERMINATED"; break; 
      case OP_SHOW_GUI:	        s="OP_SHOW_GUI"; break; 
      case OP_HIDE_GUI:	        s="OP_HIDE_GUI"; break; 
 
@@ -492,13 +476,6 @@ wxString  albaIdString(int id)
      case TIME_END:	            s="TIME_END"; break; 
      case MOVIE_RECORD:         s="MOVIE_RECORD"; break; 
         
-     case MCH_UP:               s="MCH_UP"; break;
-     case MCH_DOWN:             s="MCH_DOWN"; break;
-     case MCH_INPUT:            s="MCH_INPUT"; break;
-     case MCH_OUTPUT:           s="MCH_OUTPUT"; break;
-     case MCH_NODE:             s="MCH_NODE"; break;
-     case MCH_ANY:              s="MCH_ANY"; break;
-     case MCH_VTK:              s="MCH_VTK"; break;
 
      case NODE_DETACHED_FROM_TREE:  s="NODE_DETACHED_FROM_TREE"; break;
      case NODE_ATTACHED_TO_TREE:    s="NODE_ATTACHED_TO_TREE"; break;

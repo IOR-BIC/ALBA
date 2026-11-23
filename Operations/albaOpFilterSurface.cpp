@@ -231,13 +231,6 @@ void albaOpFilterSurface::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-void albaOpFilterSurface::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpFilterSurface::OnClean()
 //----------------------------------------------------------------------------
 {

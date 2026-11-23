@@ -1139,16 +1139,6 @@ void albaOpVolumeResample::ShiftCenterResampled()
 	m_NewVolumePosition[1] = difference[1] + m_VolumePosition[1];
 	m_NewVolumePosition[2] = difference[2] + m_VolumePosition[2];
 }
-//----------------------------------------------------------------------------
-void albaOpVolumeResample::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	if (!m_TestMode)
-	{
-		HideGui();
-	}
-	albaEventMacro(albaEvent(this,result));
-}
 
 //----------------------------------------------------------------------------
 void albaOpVolumeResample::PrintSelf(ostream& os)

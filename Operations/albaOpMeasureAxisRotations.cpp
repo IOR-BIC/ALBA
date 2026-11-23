@@ -96,16 +96,6 @@ void albaOpMeasureAxisRotations::OpRun()
 	UpdateRotations();
 }
 //----------------------------------------------------------------------------
-void albaOpMeasureAxisRotations::OpStop(int result)
-{
-	if (!m_TestMode)
-	{
-		HideGui();
-	}
-
-	albaEventMacro(albaEvent(this, result));
-}
-//----------------------------------------------------------------------------
 void albaOpMeasureAxisRotations::OpDo()
 {
 }

@@ -89,7 +89,7 @@ void albaOpAddLandmarkTest::TestOpUndo()
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
   op->AddLandmark(lnd2);
-	op->OpStop(ALBA_OK);
+	op->OpStop(OP_RUN_CANCEL);
 
   op->GetCloud()->Update();
 
@@ -121,7 +121,7 @@ void albaOpAddLandmarkTest::TestOpUndo()
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
   op->AddLandmark(lnd2);
-	op->OpStop(ALBA_OK);
+	op->OpStop(OP_RUN_CANCEL);
 
   op->GetCloud()->Update();
 
@@ -147,7 +147,7 @@ void albaOpAddLandmarkTest::TestOpUndo()
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
   op->AddLandmark(lnd2);
-  op->OpStop(ALBA_OK);
+  op->OpStop(OP_RUN_CANCEL);
 
   op->GetCloud()->Update();
 

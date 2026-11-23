@@ -48,32 +48,28 @@ enum RWI_LAYERS
 	TWO_LAYER
 };
 
-/** Camera positions used only inside albaRWI (the ones the views pass to albaRWI are in albaDecl.h).
-They start after ALBA_BASE_ID, so they never take the value of a camera position of albaDecl.h handled by the same switch. */
-enum RWI_CAMERA_POSITIONS
+/** Positions of the camera of albaRWI (CameraSet), chosen by the views when they create it */
+enum CAMERA_POSITIONS
 {
-	CAMERA_BACK = ALBA_BASE_ID + 1,
-	CAMERA_LEFT,
-	CAMERA_RIGHT,
-	CAMERA_TOP,
-	CAMERA_BOTTOM,
-	CAMERA_DRR_FRONT,
-	CAMERA_DRR_LEFT,
-	CAMERA_DRR_RIGHT,
+	CAMERA_FRONT = 0,
+	CAMERA_PERSPECTIVE,
 	CAMERA_PERSPECTIVE_FRONT,
 	CAMERA_PERSPECTIVE_BACK,
 	CAMERA_PERSPECTIVE_LEFT,
 	CAMERA_PERSPECTIVE_RIGHT,
 	CAMERA_PERSPECTIVE_TOP,
 	CAMERA_PERSPECTIVE_BOTTOM,
-	CAMERA_RXFEM_XNEG,
-	CAMERA_RXFEM_XPOS,
-	CAMERA_RXFEM_YNEG,
-	CAMERA_RXFEM_YPOS,
-	CAMERA_RXFEM_ZNEG,
-	CAMERA_RXFEM_ZPOS,
-	CAMERA_BLEND,
+	CAMERA_RX_FRONT,  // CAMERA_RX_FRONT, LEFT, RIGHT must stay consecutive: albaPipeVolumeProjectedTest loops on them
+	CAMERA_RX_LEFT,
+	CAMERA_RX_RIGHT,
+	CAMERA_CT,
+	CAMERA_OS_X,  // CAMERA_OS_X, Y, Z must stay consecutive: albaViewArbitraryOrthoSlice uses CAMERA_OS_X + axis
+	CAMERA_OS_Y,
+	CAMERA_OS_Z,
+	CAMERA_OS_P,
+	CAMERA_ARB,   // camera with arbitrary look vector
 };
+
 //----------------------------------------------------------------------------
 // albaRWI :
 //----------------------------------------------------------------------------

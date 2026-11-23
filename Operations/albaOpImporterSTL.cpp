@@ -98,7 +98,7 @@ void albaOpImporterSTL::OpRun()
     ImportSTL();
 	}
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterSTL::CheckSwap(const char *file_name, int &swapFlag)

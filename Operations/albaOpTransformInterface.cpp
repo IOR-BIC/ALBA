@@ -98,7 +98,7 @@ void albaOpTransformInterface::PostMultiplyEventMatrix(albaEventBase *alba_event
     absPose.DeepCopy(tr->GetMatrix());
     absPose.SetTimeStamp(m_CurrentTime);
 
-    if (arg == albaBehaviorTransform::MOUSE_MOVE)
+    if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
     {
       // move vme
       m_Input->SetAbsMatrix(absPose);

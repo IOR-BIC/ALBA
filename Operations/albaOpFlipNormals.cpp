@@ -171,7 +171,7 @@ void albaOpFlipNormals::OpRun()
 
 		DeleteOpDialog();
 
-		albaEventMacro(albaEvent(this,result));
+		NotifyOpEnd(result);
 	}
 }
 //----------------------------------------------------------------------------

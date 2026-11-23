@@ -282,13 +282,6 @@ void albaOpComputeHausdorffDistance::SetSurfaceInput2(albaVME * vme)
 }
 
 //----------------------------------------------------------------------------
-void albaOpComputeHausdorffDistance::OpStop(int result)
-{
-  if(m_Gui)
-    HideGui();
-  albaEventMacro(albaEvent(this,result));  
-}
-//----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::OpUndo()
 {
   if (m_SurfaceOutput != NULL)

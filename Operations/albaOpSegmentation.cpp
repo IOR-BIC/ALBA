@@ -317,7 +317,7 @@ void albaOpSegmentation::OpStop(int result)
     }
   }
 
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 
 // INITIALIZATION ////////////////////////////////////////////////////////////

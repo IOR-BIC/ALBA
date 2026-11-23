@@ -70,16 +70,6 @@ void albaOpEmpty::OpRun()
 	//OpStop(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
-void albaOpEmpty::OpStop(int result)
-{
-	if (!m_TestMode)
-	{
-		HideGui();
-	}
-
-	albaEventMacro(albaEvent(this, result));
-}
-//----------------------------------------------------------------------------
 void albaOpEmpty::OpDo()
 {
 }

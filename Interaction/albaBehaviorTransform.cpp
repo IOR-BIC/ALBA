@@ -822,7 +822,7 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
           transform.Translate(o,POST_MULTIPLY);
      
           //send the transform matrix along with rotation angle
-          SendTransformMatrix(transform.GetMatrix(), MOUSE_MOVE, angle);
+          SendTransformMatrix(transform.GetMatrix(), MOUSE_ACTION_MOVE, angle);
           
         }
         else if (refSysType == albaRefSys::VIEW)
@@ -889,7 +889,7 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
           transform.Translate(o,POST_MULTIPLY);
 
           //send the transform matrix along with rotation angle
-          SendTransformMatrix(transform.GetMatrix(), MOUSE_MOVE, angle);
+          SendTransformMatrix(transform.GetMatrix(), MOUSE_ACTION_MOVE, angle);
         }
       }
       break;
@@ -1055,7 +1055,7 @@ void albaBehaviorTransform::SendTransformMatrix(double *versor, double translati
 void albaBehaviorTransform::SendTransformMatrix(const albaMatrix &matrix, int mouseAction, double rotationAngle)
 //----------------------------------------------------------------------------
 { 
-  // matrix registering the pick position in world coordinates at MOUSE_DOWN
+  // matrix registering the pick position in world coordinates at MOUSE_ACTION_DOWN
   albaSmartPointer<albaMatrix> pickPosMatrix;
 
   if (GetResultMatrixConcatenation())
@@ -1073,9 +1073,9 @@ void albaBehaviorTransform::SendTransformMatrix(const albaMatrix &matrix, int mo
   e.SetArg(mouseAction);
   e.SetDouble(rotationAngle);
 
-  // if mouseAction == MOUSE_DOWN notify the listener about the
+  // if mouseAction == MOUSE_ACTION_DOWN notify the listener about the
   // picked position in world coordinates
-  if (mouseAction == MOUSE_DOWN)
+  if (mouseAction == MOUSE_ACTION_DOWN)
   {
     albaTransform::SetPosition(*pickPosMatrix, m_LastPickPosition);
     
@@ -1270,7 +1270,7 @@ void albaBehaviorTransform::OnButtonDownAction(int X, int Y)
 
   // notify the listener about the mouse action that has been performed 
   albaMatrix identity;
-  SendTransformMatrix(identity, MOUSE_DOWN);
+  SendTransformMatrix(identity, MOUSE_ACTION_DOWN);
 }
 
 //----------------------------------------------------------------------------
@@ -1286,7 +1286,7 @@ void albaBehaviorTransform::OnButtonUpAction()
 
   // notify the listener about the mouse action that has been performed 
   albaMatrix identity;
-  SendTransformMatrix(identity, MOUSE_UP);
+  SendTransformMatrix(identity, MOUSE_ACTION_UP);
 }
 
 //----------------------------------------------------------------------------

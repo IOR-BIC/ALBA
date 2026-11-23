@@ -86,7 +86,7 @@ void albaOpValidateTree::OpRun()
       wxMessageBox(_("Tree invalid!! In log area you can find details."), _("Warning"));
     }
   }
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 int albaOpValidateTree::ValidateTree()

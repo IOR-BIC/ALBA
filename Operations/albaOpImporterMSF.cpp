@@ -95,7 +95,7 @@ void albaOpImporterMSF::OpRun()
       result = OP_RUN_OK;
     }
   }
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 int albaOpImporterMSF::ImportMSF()

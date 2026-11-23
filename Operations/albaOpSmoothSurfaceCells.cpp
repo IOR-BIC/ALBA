@@ -178,7 +178,7 @@ void albaOpSmoothSurfaceCells::OpRun()
 
 		DeleteOpDialog();
 
-		albaEventMacro(albaEvent(this,result));
+		NotifyOpEnd(result);
 	}
 }
 //----------------------------------------------------------------------------

@@ -202,7 +202,7 @@ void albaOpIterativeRegistration::OpStop(int result)
 
   Clear();
    
-  albaEventMacro(albaEvent(this,result));   
+  NotifyOpEnd(result);   
 }
 
 //----------------------------------------------------------------------------

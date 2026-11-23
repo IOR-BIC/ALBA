@@ -229,12 +229,6 @@ void albaOpFilterVolume::OnEvent(albaEventBase *alba_event)
   }
 }
 
-//----------------------------------------------------------------------------
-void albaOpFilterVolume::OpStop(int result)
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));
-}
 
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OnSmooth()

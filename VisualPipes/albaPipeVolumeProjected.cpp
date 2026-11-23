@@ -25,6 +25,7 @@
 
 #include "albaPipeVolumeProjected.h"
 #include "albaDecl.h"
+#include "albaRWI.h"
 #include "albaSceneNode.h"
 
 #include "albaVME.h"

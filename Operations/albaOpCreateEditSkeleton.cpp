@@ -184,5 +184,5 @@ void albaOpCreateEditSkeleton::OpStop(int result)
   {
     HideGui();
   }
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }

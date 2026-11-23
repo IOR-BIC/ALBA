@@ -105,12 +105,6 @@ void albaOpCreateCentroid::OpRun()
 	OpStop(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
-void albaOpCreateCentroid::OpStop(int result)
-{
-
-	albaEventMacro(albaEvent(this, result));
-}
-//----------------------------------------------------------------------------
 void albaOpCreateCentroid::OpDo()
 {
 }

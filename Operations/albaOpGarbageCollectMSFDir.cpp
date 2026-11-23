@@ -83,7 +83,7 @@ Proceed?";
     int answer = wxMessageBox(msg,_("Confirm"),wxYES_NO|wxCANCEL|wxICON_QUESTION,albaGetFrame()); // ask user if will save msf before closing
     if(answer == wxCANCEL || answer == wxNO)
     {
-      albaEventMacro(albaEvent(this,OP_RUN_CANCEL));
+      NotifyOpEnd(OP_RUN_CANCEL);
       return;
     }
     else if(answer == wxYES)
@@ -94,7 +94,7 @@ Proceed?";
  
   this->GarbageCollect();
 
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 
 int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<wxString> &filesToRemoveSet )

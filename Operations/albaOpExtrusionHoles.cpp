@@ -396,12 +396,6 @@ void albaOpExtrusionHoles::SelectHole(int pointID)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpExtrusionHoles::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpExtrusionHoles::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {

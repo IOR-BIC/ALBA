@@ -364,7 +364,7 @@ void albaOpImporterDicom::OpStop(int result)
 
 	vtkDEL(m_CurrentSliceID);
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 int albaOpImporterDicom::BuildVMEImagesOutput()

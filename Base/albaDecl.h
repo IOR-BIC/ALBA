@@ -129,9 +129,12 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MENU_FILE_PRINT_PREVIEW,
 	MENU_FILE_PRINT_SETUP,
 	MENU_FILE_PRINT_PAGE_SETUP,
+	MENU_FILE_SNAPSHOT,
+	MENU_FILE_MANAGE_SNAPSHOT,
 	MENU_FILE_QUIT,
 	MENU_EDIT_FIND_VME,
 	MENU_OP,
+	MENU_WIZARD,
 	SASH_START,                // ids of albaGUISashPanel/ ids of Dockable Panes - must be Menu events too
 	MENU_VIEW_TOOLBAR,
 	MENU_VIEW_LOGBAR,
@@ -173,28 +176,12 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 											 VIEW_MAXIMIZE, // from albaGUI to albaGUICrossSplitter
 											 VIEW_RESIZE,   // from anyone that want to block the view's size.
 
-											 CAMERA_FRONT,  // constant used in albaRWIxxx to initialize Camera pos
-											 CAMERA_PERSPECTIVE,
-											 CAMERA_RX_FRONT,
-											 CAMERA_RX_LEFT,
-											 CAMERA_RX_RIGHT,
-											 CAMERA_CT,
-											 CAMERA_OS_X,
-											 CAMERA_OS_Y,
-											 CAMERA_OS_Z,
-											 CAMERA_OS_P,
-											 CAMERA_ARB, //Camera with arbitrary look vector
-
 											 CAMERA_RESET,
 											 CAMERA_FIT,
 											 CAMERA_FLYTO,
 
 
 
-																												OP_RUN_OK,
-																												OP_RUN_CANCEL,
-																												OP_RUN_STARTING,
-																												OP_RUN_TERMINATED,
 																												OP_SHOW_GUI,
 																												OP_HIDE_GUI,
 
@@ -205,9 +192,8 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 
 																												//used by albaISATransform to talk with albaOpTransform 
-																												MOUSE_DOWN, //(to be removed Marco)
-																												MOUSE_MOVE, //(to be removed Marco)
-																												MOUSE_UP,   //(to be removed Marco)
+																												MOUSE_MOVE, // the mouse moved: sent by albaGizmoSlice while dragging and by the segmentation tools
+																												MOUSE_UP,   // the mouse button was released: sent by albaGizmoSlice and albaToolSegmentation
 																												MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
 																												// input events of the devices (albaDeviceButtonsPad, albaDeviceButtonsPadMouse, albaDeviceButtonsPadTracker)
@@ -230,6 +216,24 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 																												TILE_WINDOW_CASCADE,
 																												TILE_WINDOW_HORIZONTALLY,
 																												TILE_WINDOW_VERTICALLY,
+
+	// wizard events and ids of wizards - used by albaWizardManager and albaGUIFrame
+	WIZARD_RUN_STARTING,
+	WIZARD_RUN_CONTINUE,
+	WIZARD_RUN_TERMINATED,
+	WIZARD_REQUIRED_VIEW,
+	WIZARD_DELETE_VIEW,
+	WIZARD_RUN_OP,
+	WIZARD_UPDATE_WINDOW_TITLE,
+	WIZARD_PAUSE,
+	WIZARD_OP_DELETE,
+	WIZARD_OP_NEW,
+	WIZARD_SWITCH,
+	WIZARD_RELOAD_MSF,
+	WIZARD_INFORMATION_BOX_SHOW_SET,
+	WIZARD_INFORMATION_BOX_SHOW_GET,
+	WIZARD_START,
+	WIZARD_END = WIZARD_START + MAXWIZARD,
 
 																												EVT_USER_START, // to be used from vertical applications
 																												EVT_USER_END = EVT_USER_START + 1000,
@@ -281,15 +285,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 	PARSE_STRING,	//Added by Paolo 16-9-2003 execute the operation passed as a string
 
-	// ids for event channels
-	MCH_UP,     ///< channel used to send events up in the tree
-	MCH_DOWN,   ///< channel used to send events down in the tree
-	MCH_INPUT,  ///< channel used for events coming from an input device
-	MCH_OUTPUT, ///< channel used for events sent to an output device
-	MCH_NODE,   ///< channel used by nodes for sending events to observers
-	MCH_ANY,    ///< Id used by albaAgent to identify any channel connected to it
-	MCH_VTK,    ///< channel used to as a bridge from VTK objects
-
 	// ids issued/observed by albaVME and albaVME
 	NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
 	NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
@@ -311,33 +306,16 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 									ALBA_BASE_ID ///< base numeric ID used by albaIdFactory. This must be the LAST ONE!!!
 };
 
-enum MED_MAIN_EVENT_ID
+/** Event channels (albaEventBase::GetChannel). They start from 1: albaEventBroadcaster takes 0 or less as no channel */
+enum EVENT_CHANNELS
 {
-	MENU_FILE_SNAPSHOT = EVT_USER_START,
-	MENU_FILE_MANAGE_SNAPSHOT,
-	WIZARD_RUN_STARTING,
-	WIZARD_RUN_CONTINUE,
-	WIZARD_RUN_TERMINATED,
-	WIZARD_REQUIRED_VIEW,
-	WIZARD_DELETE_VIEW,
-	WIZARD_RUN_OP,
-	WIZARD_UPDATE_WINDOW_TITLE,
-	WIZARD_PAUSE,
-	WIZARD_OP_DELETE,
-	WIZARD_OP_NEW,
-	WIZARD_SWITCH,
-	WIZARD_RELOAD_MSF,
-	WIZARD_INFORMATION_BOX_SHOW_SET,
-	WIZARD_INFORMATION_BOX_SHOW_GET,
-	WIZARD_START,
-	WIZARD_END = WIZARD_START + MAXWIZARD,
-	MED_EVT_USER_START,
-};
-
-enum MED_MENU_EVENT_ID
-{
-	MENU_WIZARD = MENU_USER_START,
-	MED_MENU_USER_START,
+	MCH_UP = 1, ///< channel used to send events up in the tree
+	MCH_DOWN,   ///< channel used to send events down in the tree
+	MCH_INPUT,  ///< channel used for events coming from an input device
+	MCH_OUTPUT, ///< channel used for events sent to an output device
+	MCH_NODE,   ///< channel used by nodes for sending events to observers
+	MCH_ANY,    ///< Id used by albaAgent to identify any channel connected to it
+	MCH_VTK,    ///< channel used to as a bridge from VTK objects
 };
 
 /** @} */

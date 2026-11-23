@@ -100,7 +100,7 @@ void albaOpImporterLandmark::OpRun()
 	}
   else
   {
-    albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+    NotifyOpEnd(OP_RUN_CANCEL);
   }
 
 }
@@ -141,12 +141,6 @@ void albaOpImporterLandmark::OpDo()
 	m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
   
 	GetLogicManager()->VmeAdd(m_VmeCloud);
-}
-//----------------------------------------------------------------------------
-void albaOpImporterLandmark::OpStop(int result)
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));
 }
 //----------------------------------------------------------------------------
 void albaOpImporterLandmark::Read()   

@@ -461,7 +461,7 @@ void albaOpCrop::OpStop(int result)
 
 	cppDEL(m_GizmoROI);
 	m_GizmoROI = NULL;
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 //----------------------------------------------------------------------------
 void albaOpCrop::SetCroppingBoxBounds(double bounds[])

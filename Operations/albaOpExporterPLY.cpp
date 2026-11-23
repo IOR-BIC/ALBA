@@ -114,13 +114,6 @@ void albaOpExporterPLY::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpExporterPLY::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 int albaOpExporterPLY::ExportSurface()
 //----------------------------------------------------------------------------
 {

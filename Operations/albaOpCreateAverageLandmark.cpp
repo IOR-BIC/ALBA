@@ -64,7 +64,7 @@ void albaOpCreateAverageLandmark::OpRun()
 {
 	m_LimbCloud = (albaVMELandmarkCloud *)m_Input;
 
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 
 //----------------------------------------------------------------------------

@@ -169,13 +169,6 @@ void albaOpTriangulateSurface::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpTriangulateSurface::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpTriangulateSurface::OnTriangle()
 //----------------------------------------------------------------------------
 {

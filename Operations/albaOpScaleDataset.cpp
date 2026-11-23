@@ -156,7 +156,7 @@ void albaOpScaleDataset::OpStop(int result)
   m_GizmoScale->Show(false);
   cppDEL(m_GizmoScale);
 
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 
 //----------------------------------------------------------------------------

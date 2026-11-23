@@ -138,7 +138,7 @@ void albaGizmoRotate::OnEventGizmoComponents(albaEventBase *alba_event)
         long arg = e->GetArg();
 
         // if a gizmo circle has been picked
-        if (arg == albaBehaviorTransform::MOUSE_DOWN)
+        if (arg == albaBehaviorTransform::MOUSE_ACTION_DOWN)
         {
           if (sender == m_GRFan[X])
           {
@@ -153,7 +153,7 @@ void albaGizmoRotate::OnEventGizmoComponents(albaEventBase *alba_event)
             this->Highlight(Z);
           }
         }  
-        else if (arg == albaBehaviorTransform::MOUSE_MOVE)
+        else if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
         {
           // gizmo mode == local; gizmo is rotating during mouse move events
           if (m_Modality == G_LOCAL)
@@ -174,7 +174,7 @@ void albaGizmoRotate::OnEventGizmoComponents(albaEventBase *alba_event)
             currTr->Delete();
           }
         }
-        else if (arg == albaBehaviorTransform::MOUSE_UP)
+        else if (arg == albaBehaviorTransform::MOUSE_ACTION_UP)
         {
           // gizmo mode == local
           if (m_Modality == G_LOCAL)
@@ -366,7 +366,7 @@ void albaGizmoRotate::SendTransformMatrixFromGui(albaEventBase *alba_event)
     this->SetAbsPose(newAbsPose, true);
 
     // send transfrom to postmultiply to the listener. Events is sent as a transform event
-    SendTransformMatrix(M, ID_TRANSFORM, albaBehaviorTransform::MOUSE_MOVE);
+    SendTransformMatrix(M, ID_TRANSFORM, albaBehaviorTransform::MOUSE_ACTION_MOVE);
   }
 }
 

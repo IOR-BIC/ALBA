@@ -284,7 +284,7 @@ void albaOpImageCalibration::OpStop(int result)
 
 	m_ActiveInteractor = NULL;
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------

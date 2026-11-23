@@ -94,7 +94,7 @@ void albaOpReparentTo::OpRun()
 	if((m_TargetVme != NULL) && (m_Input->CanReparentTo(m_TargetVme)))
 		result = OP_RUN_OK;
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpReparentTo::SetTargetVme(albaVME *target)
@@ -105,7 +105,7 @@ void albaOpReparentTo::SetTargetVme(albaVME *target)
   if((m_TargetVme == NULL) || !m_Input->CanReparentTo(m_TargetVme))
   {
     albaMessage(_("Cannot re-parent to specified node"),_("Error"),wxICON_ERROR);
-    albaEventMacro(albaEvent(this,OP_RUN_CANCEL));
+    NotifyOpEnd(OP_RUN_CANCEL);
   }
 }
 //----------------------------------------------------------------------------

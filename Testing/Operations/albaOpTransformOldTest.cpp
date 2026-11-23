@@ -94,7 +94,7 @@ void albaOpTransformOldTest::TestOnEventGizmoTranslate()
   translateMatrix->SetElement(3,3,1);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  e->SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   e->SetMatrix(translateMatrix);
 
   albaOpTransformOld *op = new albaOpTransformOld();
@@ -135,7 +135,7 @@ void albaOpTransformOldTest::TestOnEventGizmoRotate()
   albaTransform::SetOrientation(rotateMatrix,10,20,30);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  e->SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   e->SetMatrix(&rotateMatrix);
 
   albaOpTransformOld *op = new albaOpTransformOld();
@@ -218,7 +218,7 @@ void albaOpTransformOldTest::TestOnEventGuiTransform()
   albaTransform::SetPosition(inputMmatrix,100,-20,60);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  e->SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   e->SetMatrix(&inputMmatrix);
 
   albaOpTransformOld *op = new albaOpTransformOld();
@@ -263,7 +263,7 @@ void albaOpTransformOldTest::TestOnEventGuiSaveRestorePose()
   albaTransform::SetPosition(inputMmatrix,100,-20,60);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  e->SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   e->SetMatrix(&inputMmatrix);
 
   albaOpTransformOld *op = new albaOpTransformOld();
@@ -308,7 +308,7 @@ void albaOpTransformOldTest::TestReset()
   albaTransform::SetPosition(inputMmatrix,100,-20,60);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  e->SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   e->SetMatrix(&inputMmatrix);
 
   albaOpTransformOld *op = new albaOpTransformOld();
@@ -357,7 +357,7 @@ void albaOpTransformOldTest::TestOpUndo()
   albaTransform::SetPosition(inputMmatrix,100,-20,60);
 
   albaEvent *e = new albaEvent(this,ID_TRANSFORM);
-  e->SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  e->SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   e->SetMatrix(&inputMmatrix);
 
   albaOpTransformOld *op = new albaOpTransformOld();

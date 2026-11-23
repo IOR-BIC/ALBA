@@ -690,33 +690,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 				m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 			}
 			break;
-		case OP_RUN_STARTING:
-		{
-			m_CancelledBeforeOpStarting = false;
-			albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-			if (c != NULL)
-				c->SetAllowCloseWindow(false);
-			OpRunStarting();
-		}
-		break;
-		case OP_RUN_TERMINATED:
-		{
-			if (m_WizardManager && m_WizardRunning)
-			{
-				m_RunningOperation = false;
-				if (!albaOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
-					m_WizardManager->WizardContinue(e->GetArg());
-			}
-			//else we manage the operation end by unlock the close button and so on
-			else
-			{
-				albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-				if (c != NULL)
-					c->SetAllowCloseWindow(true);
-				OpRunTerminated(e->GetArg());
-			}
-		}
-		break;
 		case OP_SHOW_GUI:
 			OpShowGui(!e->GetBool(), (albaGUIPanel*)e->GetWin());
 			break;
@@ -892,7 +865,7 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			UpdateFrameTitle();
 			m_OpManager->OpRun(*(e->GetString()));
 			//If the op is started the value of m_CancelledBeforeOpStarting 
-			//is changed by OP_RUN_STARTING event
+			//is changed by OpRunStarting
 			if (m_CancelledBeforeOpStarting)
 			{
 				m_CancelledBeforeOpStarting = false;
@@ -1404,6 +1377,11 @@ void albaLogicWithManagers::ShowLandmark(albaVMELandmark * lm, bool visibility)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::OpRunStarting()
 {
+	m_CancelledBeforeOpStarting = false;
+	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	if (c != NULL)
+		c->SetAllowCloseWindow(false);
+
 	m_RunningOperation = true;
   EnableMenuAndToolbar();
 
@@ -1414,9 +1392,21 @@ void albaLogicWithManagers::OpRunStarting()
 		m_SideBar->EnableSelect(false);
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::OpRunTerminated(int runOk)
+void albaLogicWithManagers::OpRunTerminated(bool runOk)
 {
 	m_RunningOperation = false;
+
+	if (m_WizardManager && m_WizardRunning)
+	{
+		if (!albaOpSelect::SafeDownCast(m_OpManager->GetRunningOperation()))
+			m_WizardManager->WizardContinue(runOk);
+		return;
+	}
+
+	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	if (c != NULL)
+		c->SetAllowCloseWindow(true);
+
   EnableMenuAndToolbar();
 
   if(m_InteractionManager) 

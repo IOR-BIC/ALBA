@@ -100,8 +100,6 @@ protected:
   /** Export the Wrapped meter coordinates in file. */
   void ExportWrappedMeterCoordinates(int index, int indexTime);
 
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
 
   /** Create Gui for Operation*/
   void CreateGui();

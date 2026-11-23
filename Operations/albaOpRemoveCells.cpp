@@ -177,7 +177,7 @@ void albaOpRemoveCells::OpRun()
 
     DeleteOpDialog();
 
-    albaEventMacro(albaEvent(this,result));
+    NotifyOpEnd(result);
   }
   
 }

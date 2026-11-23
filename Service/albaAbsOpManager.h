@@ -19,6 +19,8 @@
 
 #include "albaConfigure.h"
 
+class albaOp;
+
 /** Services of the operation manager, reached through albaServiceClient::GetOpManager() */
 class ALBA_EXPORT albaAbsOpManager
 {
@@ -28,5 +30,11 @@ public:
 
 	/** Enable or disable the operations in menus and toolbar, checking which ones accept the selected VME */
 	virtual void EnableOp(bool CanEnable = true) = 0;
+
+	/** Called by the running operation when it ends with OK: the operation is executed */
+	virtual void OpRunOk(albaOp *op) = 0;
+
+	/** Called by the running operation when it ends with CANCEL: the operation is deleted */
+	virtual void OpRunCancel(albaOp *op) = 0;
 };
 #endif

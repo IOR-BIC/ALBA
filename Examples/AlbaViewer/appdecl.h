@@ -25,7 +25,7 @@ PURPOSE. See the above copyright notice for more information.
 
 enum APP_MAIN_EVENT_ID
 {
-	ID_NEW_EVENT = MED_EVT_USER_START,
+	ID_NEW_EVENT = EVT_USER_START,
 };
 
 enum APP_MENU_ID

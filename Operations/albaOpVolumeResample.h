@@ -109,7 +109,6 @@ protected:
 
   void ShiftCenterResampled();
 
-	virtual void OpStop(int result);
 
 	void OnEventThis(albaEventBase *alba_event);
 	void OnEventGizmoTranslate(albaEventBase *alba_event);
