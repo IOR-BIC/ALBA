@@ -105,9 +105,9 @@ void albaGUISettingsDialog::OnEvent(albaEventBase *alba_event)
   {
     switch(e->GetId())
     {
-      case VME_SELECT:
+      case ID_SELECT_PAGE:
       {
-        Page *page = (Page*)(e->GetVme());
+        Page *page = (Page*)(m_Tree->GetSelectedNode());
         if(page)
           m_Guih->Put(page->ui);
       }

@@ -47,8 +47,8 @@ public:
 
 	void RunOp(albaOp *op);
 	
-	/** Respond to a VME_ADDED event. propagate event. to SideBar, ViewManager, ecc.. */
-	virtual void VmeAdded(albaVME *vme);
+	/** Called by the VME manager for each VME added to the tree: tell it to SideBar, ViewManager, ecc.. */
+	virtual void VmeAdded(albaVME *vme) override;
 
 protected:
   

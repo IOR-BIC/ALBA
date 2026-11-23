@@ -92,7 +92,7 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
 		  {
 			  //Select vme 
 			  m_SelectedVME=selVME;
-			  albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
+			  GetLogicManager()->VmeSelect(m_SelectedVME);
 		  }
 	  }
 	  // if there is only one acceptable volume we select it
@@ -103,7 +103,7 @@ void albaWizardBlockVMEFindOrSelection::ExcutionBegin()
 		  {
 			  //Select vme 
 			  m_SelectedVME=selVME;
-			  albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
+			  GetLogicManager()->VmeSelect(m_SelectedVME);
 		  }
 	  }
 	  else {

@@ -211,8 +211,8 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     if(m_ResampleInput!=NULL && m_ResampleInput!=m_Input)
     {
       GetLogicManager()->VmeShow(m_ResampleInput, false);
-      albaEventMacro(albaEvent(this,VME_SELECT,m_ResampleInput,false)); 
-      albaEventMacro(albaEvent(this, VME_SELECT, m_Input, true));
+      GetLogicManager()->VmeSelect(m_ResampleInput);
+      GetLogicManager()->VmeSelect(m_Input);
       GetLogicManager()->VmeShow(m_Input, true);
       m_ResampleInput->ReparentTo(NULL);
       m_ResampleInput->Update();
@@ -496,7 +496,7 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
 
     // show volume resampled
     GetLogicManager()->VmeShow(m_ResampleInput, true);
-    albaEventMacro(albaEvent(this, VME_SELECT, m_ResampleInput, true));
+    GetLogicManager()->VmeSelect(m_ResampleInput);
 		GetViewManager()->CameraUpdate();
      
     cppDEL(wait);

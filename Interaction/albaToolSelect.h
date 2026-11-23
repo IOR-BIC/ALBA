@@ -28,10 +28,10 @@ class albaVME;
   The PER calls it on each button down not used by the tools, before the behavior of the picked
   VME and the camera, which receive the same click; before the call it sets the VME picked by the
   click (NULL if none) and the picked position. Gizmos are never selected.
-  - a button down on a VME sends VME_SELECT (for a landmark cloud, its landmark nearest to the
-    picked position), if the selection is enabled;
-  - the right button released without dragging sends SHOW_VIEW_CONTEXTUAL_MENU with the picked VME.
-  The events go to the listener on MCH_UP with the VME as data. */
+  - a button down on a VME asks the logic manager to select it (for a landmark cloud, its landmark
+    nearest to the picked position), if the selection is enabled;
+  - the right button released without dragging sends SHOW_VIEW_CONTEXTUAL_MENU with the picked VME
+    to the listener on MCH_UP. */
 class ALBA_EXPORT albaToolSelect : public albaInteractionTool
 {
 public:
@@ -48,7 +48,7 @@ public:
   bool IsSelectEnabled() {return m_CanSelect;}
 
   /** The button down selects the picked VME; the right button prepares the context menu.
-    Return true if VME_SELECT has been sent. */
+    Return true if the picked VME has been selected. */
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Select();}
   virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Select();}
   virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
@@ -64,7 +64,7 @@ protected:
   albaToolSelect();
   virtual ~albaToolSelect() {}
 
-  /** Send VME_SELECT for the picked VME, if the selection is enabled; return true if sent */
+  /** Select the picked VME through the logic manager, if the selection is enabled; return true if selected */
   bool Select();
 
   /** Return true if the picked VME can be selected: not NULL and not a gizmo */

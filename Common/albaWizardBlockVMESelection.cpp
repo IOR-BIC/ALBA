@@ -68,7 +68,7 @@ void albaWizardBlockVMESelection::ExcutionBegin()
   {
     //Select vme 
     m_SelectedVME=selVME;
-    albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
+    GetLogicManager()->VmeSelect(m_SelectedVME);
   }
   else
     //Abort on user cancel

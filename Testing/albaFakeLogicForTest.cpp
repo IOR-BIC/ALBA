@@ -16,6 +16,8 @@
 
 #include "albaFakeLogicForTest.h"
 #include "albaVME.h"
+#include "albaVMEStorage.h"
+#include "albaVMERoot.h"
 #include <algorithm>
 
 //-------------------------------------------------------------------------
@@ -113,6 +115,15 @@ void albaFakeLogicForTest::AddCall(testFunctions func, albaVME* vme)
 	call.vme = vme;
 
 	m_Calls.push_back(call);
+}
+
+//----------------------------------------------------------------------------
+albaVMEStorage *albaFakeLogicForTest::CreateStorage(albaVMEStorage *oldStorage)
+{
+	albaDEL(oldStorage);
+	albaVMEStorage *storage = albaVMEStorage::New();
+	storage->GetRoot()->SetName("root");
+	return storage;
 }
 
 //----------------------------------------------------------------------------

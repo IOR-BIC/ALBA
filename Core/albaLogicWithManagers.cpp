@@ -643,19 +643,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 		case MENU_EDIT_FIND_VME:
 			m_SideBar->FindVME();
 			break;
-		case VME_SELECT:
-			VmeSelect(e->GetVme());
-			EnableMenuAndToolbar();
-			break;
-		case VME_SELECTED:
-			VmeSelected(e->GetVme());
-			break;
-		case VME_ADDED:
-			VmeAdded(e->GetVme());
-			break;
-		case VME_REMOVING:
-			VmeRemoving(e->GetVme());
-			break;
 		case SHOW_TREE_CONTEXTUAL_MENU:
 			TreeContextualMenu(*e);
 			break;
@@ -714,9 +701,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			// commands related to interaction manager
 		case ID_APP_SETTINGS:
 			m_SettingsDialog->ShowModal();
-			break;
-		case CREATE_STORAGE:
-			CreateStorage(e);
 			break;
 		case ABOUT_APPLICATION:
 		{
@@ -2235,21 +2219,12 @@ void albaLogicWithManagers::ImportExternalFile(albaString &filename)
 }
 
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::CreateStorage(albaEvent *e)
+albaVMEStorage *albaLogicWithManagers::CreateStorage(albaVMEStorage *oldStorage)
 {
-	albaVMEStorage *oldStorage, *newStorage;
-	oldStorage = (albaVMEStorage *)e->GetMafObject();
 	if (oldStorage)
-	{
-		m_VMEManager->NotifyRemove(oldStorage->GetRoot());
-		m_OpManager->VmeSelected(NULL);		
-	}
-	newStorage = albaVMEStorage::New();
-	newStorage->SetListener(m_VMEManager);
-	newStorage->GetRoot()->Initialize();
-	e->SetMafObject(newStorage);
-
+		m_OpManager->VmeSelected(NULL);
 	albaDEL(oldStorage);
+	return albaVMEStorage::New();
 }
 
 //----------------------------------------------------------------------------

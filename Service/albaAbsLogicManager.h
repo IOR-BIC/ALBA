@@ -23,6 +23,7 @@
 
 class albaVME;
 class albaVMEImage;
+class albaVMEStorage;
 class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
@@ -49,6 +50,15 @@ public:
 	virtual void VmeModified(albaVME* vme) = 0;
 
 	virtual void VmeVisualModeChanged(albaVME * vme) = 0;
+
+	/** Called by the VME manager for each VME added to the tree */
+	virtual void VmeAdded(albaVME *vme) = 0;
+
+	/** Called by the VME manager for each VME that is going to be removed from the tree */
+	virtual void VmeRemoving(albaVME *vme) = 0;
+
+	/** Called by the VME manager to replace its storage: delete oldStorage (if any) and return a new one */
+	virtual albaVMEStorage *CreateStorage(albaVMEStorage *oldStorage) = 0;
 
 	/** Show the tree in a dialog titled title and return the VME chosen by the user, NULL on cancel.
 	acceptFunction is a bool (*)(albaVME *) that tells which VMEs can be chosen (all if NULL), selected is the VME selected when the dialog opens. */

@@ -121,7 +121,7 @@ void albaOpReparentTo::OpDo()
 
   if (reparentOK == ALBA_OK)
   {
-		albaEventMacro(albaEvent(this, VME_SELECT, m_Input));
+		GetLogicManager()->VmeSelect(m_Input);
 
 		if(showed)
 	    GetLogicManager()->VmeShow(m_Input, true);

@@ -31,6 +31,7 @@
 
 #include "albaVME.h"
 #include "albaVMEIterator.h"
+#include "albaAbsLogicManager.h"
 #include <vector>
 
 //=========================================================================================
@@ -476,7 +477,7 @@ void albaGUICheckTree::OnSelectionChanged(wxTreeEvent& event)
     return;
 
   i = event.GetItem();
-  if(i.IsOk())
-    albaEventMacro(albaEvent(this, VME_SELECT, (albaVME *)NodeFromItem(i)));
+  if(i.IsOk() && GetLogicManager())
+    GetLogicManager()->VmeSelect((albaVME *)NodeFromItem(i));
 	event.Skip();
 }

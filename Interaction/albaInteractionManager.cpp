@@ -467,11 +467,11 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
           }
           return;
          break;
-        case VME_SELECT:
+        case ID_DEVICE_TREE:
           if (e->GetSender() == m_DeviceTree)
           { 
-            // Event rised by the CheckTree used to show the devices tree
-            if (albaDevice *device = GetDeviceManager()->GetDevice(e->GetArg()))
+            // a device has been selected on the devices tree
+            if (albaDevice *device = GetDeviceManager()->GetDevice(m_DeviceTree->GetSelectedNode()))
             {
               // remove the GUI and Bindings-GUI for the previous seleced device (if any)
               if(m_CurrentDevice)
@@ -520,12 +520,7 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
     return;
   }
   
-  if (id == VME_SELECT)
-  {
-    // event raised by the select tool of the PER to advise of VME selection
-    albaEventMacro(albaEvent(event->GetSender(), id, (albaVME *)event->GetData()));
-  }
-  else if (id == albaDeviceManager::DISPATCH_START)
+  if (id == albaDeviceManager::DISPATCH_START)
   {
     OnStartDispatching();    
   }

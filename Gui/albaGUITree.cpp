@@ -462,8 +462,17 @@ void albaGUITree::OnSelectionChanged(wxTreeEvent& event)
 
   i = event.GetItem();
   if(i.IsOk())
-    albaEventMacro(albaEvent(this, VME_SELECT, (albaVME *)NodeFromItem(i)));
+    albaEventMacro(albaEvent(this, GetId()));
   event.Skip();
+}
+//----------------------------------------------------------------------------
+long long albaGUITree::GetSelectedNode()
+//----------------------------------------------------------------------------
+{
+  wxTreeItemId item = m_NodeTree->GetSelection();
+  if (!item.IsOk())
+    return 0;
+  return NodeFromItem(item);
 }
 //----------------------------------------------------------------------------
 bool albaGUITree::SelectNode(long long node_id)

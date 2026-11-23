@@ -63,6 +63,13 @@ public:
 
 	virtual void VmeVisualModeChanged(albaVME * vme);
 
+	virtual void VmeAdded(albaVME *vme) override {}
+
+	virtual void VmeRemoving(albaVME *vme) override {}
+
+	/** Delete oldStorage and return a new storage with an initialized root */
+	virtual albaVMEStorage *CreateStorage(albaVMEStorage *oldStorage) override;
+
 	/** Return the first candidate accepted by acceptFunction (see SetChooseCandidates), NULL if none: no dialog is shown */
 	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
 
@@ -78,6 +85,9 @@ public:
 	void ClearCalls();
 
 	calls GetCall(int callNum);
+
+	/** Return the number of calls stored since the last ClearCalls */
+	int GetNumberOfCalls() { return m_Calls.size(); }
 	
 	void AddCall(testFunctions func, albaVME* vme);
 

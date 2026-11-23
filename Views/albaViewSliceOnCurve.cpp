@@ -615,8 +615,6 @@ void albaViewSliceOnCurve::OnEvent(albaEventBase *alba_event)
       m_ChildViewList[i]->VmeRemove(g);
     }
 
-    //albaEventMacro(albaEvent(this, VME_REMOVING, g));
-
     albaDEL(m_Gizmo); //unfortunately this must not be done because of crash if you close the view frame    
     albaDEL(m_CurrentPolyLineGizmo);    
     m_CurrentPolyLine = NULL;
@@ -842,7 +840,7 @@ void albaViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
     m_ChildViewList[MAIN_VIEW]->VmeShow(m_CurrentVolume, true);	
    
     //force GUI construction for new pipe
-    albaEventMacro( albaEvent( this, VME_SELECTED, m_CurrentVolume));
+    GetLogicManager()->VmeSelected(m_CurrentVolume);
   }
 }
 #pragma endregion

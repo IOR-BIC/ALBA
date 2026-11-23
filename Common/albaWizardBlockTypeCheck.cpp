@@ -95,7 +95,7 @@ void albaWizardBlockTypeCheck::ExcutionBegin()
   else
     return;  
 
-  albaEventMacro(albaEvent(this,VME_SELECT,m_SelectedVME));
+  GetLogicManager()->VmeSelect(m_SelectedVME);
   
   for (int i=0;i<m_AcceptedVmes.size();i++)
     if (m_SelectedVME->IsA(m_AcceptedVmes[i].ToAscii()))

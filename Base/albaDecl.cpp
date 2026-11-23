@@ -421,14 +421,10 @@ wxString  albaIdString(int id)
 
      case UPDATE_UI:	          s="UPDATE_UI"; break; 
 
-     case VME_ADDED:	          s="VME_ADDED"; break; 
-     case VME_REMOVING:	        s="VME_REMOVING"; break; 
-     case VME_SELECT:	          s="VME_SELECT"; break; 
      case VME_SELECTED:	        s="VME_SELECTED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
      case VME_PICKING:	        s="VME_PICKING"; break; 
 
-     case CREATE_STORAGE:       s="CREATE_STORAGE"; break; 
 
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 

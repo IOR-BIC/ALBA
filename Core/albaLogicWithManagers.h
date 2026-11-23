@@ -290,8 +290,8 @@ protected:
 
 	/** Redefined to add View,Op,Import,Export menu */
 	virtual void CreateMenu();
-	/** create a new storage object */
-	virtual void CreateStorage(albaEvent *e);
+	/** Called by the VME manager to replace its storage: delete oldStorage (if any) and return a new one */
+	virtual albaVMEStorage *CreateStorage(albaVMEStorage *oldStorage) override;
 
 	/** This method creates and add the Toolbar, for specific app toolbar override the CreateToolBar method*/
 	virtual void CreateAndPlugToolbar();
@@ -340,9 +340,9 @@ protected:
 	Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
 	virtual void ImportExternalFile(albaString &filename);
 
-	/** Respond to a VME_SELECT evt. Update the selection on the tree and view representation. */
+	/** Select the vme running albaOpSelect: the selection can be undone. */
 	virtual void VmeSelect(albaVME *vme);
-	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
+	/** Called when a vme has been selected. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(albaVME *vme);
 
 	/** Called from VmeSelect to select a LM */
@@ -365,12 +365,12 @@ protected:
 
 	/** Add a new vme to the tree. */
 	virtual void VmeAdd(albaVME *vme);
-	/** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
-	virtual void VmeAdded(albaVME *vme);
+	/** Called by the VME manager for each VME added to the tree: tell it to SideBar, ViewManager, ecc.. */
+	virtual void VmeAdded(albaVME *vme) override;
 	/** Remove a vme from the tree. */
 	virtual void VmeRemove(albaVME *vme);
-	/** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
-	virtual void VmeRemoving(albaVME *vme);
+	/** Called by the VME manager for each VME that is going to be removed: tell it to SideBar, ViewManager, ecc.. */
+	virtual void VmeRemoving(albaVME *vme) override;
 	/** called from VME after removing*/
 	virtual void VmeRemoved();
 
