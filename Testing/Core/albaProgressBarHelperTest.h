@@ -18,10 +18,9 @@
 #define CPP_UNIT_albaProgressBarHelperTest_H
 
 #include "albaTest.h"
-#include "albaObserver.h"
 
 
-class albaProgressBarHelperTest : public albaObserver, public albaTest
+class albaProgressBarHelperTest : public albaTest
 {
 public:
   CPPUNIT_TEST_SUITE( albaProgressBarHelperTest );
@@ -31,10 +30,8 @@ public:
 	CPPUNIT_TEST( UpdateProgressBarTest );
 	CPPUNIT_TEST( GetSetTextModeTest );
 	CPPUNIT_TEST( TextModeTest );
+	CPPUNIT_TEST( BindToVTKFilterTest );
   CPPUNIT_TEST_SUITE_END();
-
-	/** Test specific stuff executed before each test */
-	virtual void BeforeTest();
 
 protected:
   void CreateDestroyTest();
@@ -43,12 +40,7 @@ protected:
 	void UpdateProgressBarTest();
 	void GetSetTextModeTest();
 	void TextModeTest();
-		
-	virtual void OnEvent(albaEventBase *alba_event);
-
-	int m_UpdateEventNum;
-	int m_InitEventNum;
-	int m_CloseEventNum;
+	void BindToVTKFilterTest();
 };
 
 

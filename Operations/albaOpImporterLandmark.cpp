@@ -169,7 +169,7 @@ void albaOpImporterLandmark::Read()
 
   std::ifstream  landmarkFileStream(m_File.ToAscii());
  
-  albaProgressBarHelper progressHelper(m_Listener);
+  albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Reading Landmark Cloud");
 	

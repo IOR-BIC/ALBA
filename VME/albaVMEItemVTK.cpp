@@ -454,7 +454,6 @@ int albaVMEItemVTK::UpdateReader(vtkDataReader *reader, albaString &filename)
 {
   // Progressbar removed to improve vector data loading speed
   // reader->SetProgressText("Loading data...");
-  // albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,reader));
   if (m_IOMode != MEMORY)
   {
     if (GetCrypting())

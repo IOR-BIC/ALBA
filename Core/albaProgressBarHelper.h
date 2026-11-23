@@ -3,7 +3,7 @@
  Program: ALBA (Agile Library for Biomedical Applications)
  Module: albaProgressBarHelper
  Authors: Gianluigi Crimi
- 
+
  Copyright (c) BIC
  All rights reserved. See Copyright.txt or
 
@@ -19,27 +19,37 @@
 
 #include "albaDefines.h"
 #include "albaString.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations
-class albaObserver;
 class albaGUIBusyInfo;
+class albaGUIMDIFrame;
+class albaProgressBarHelperVTKCallback;
+class vtkAlgorithm;
 
-/** albaProgressBarHelper Is an helper for manage progress bar advance
+/** albaProgressBarHelper Is an helper for manage progress bar advance: it is the only class that drives
+  the progress bar of the main window. Without a main window (e.g. in the tests) the bar is not shown.
   */
-class ALBA_EXPORT albaProgressBarHelper 
+class ALBA_EXPORT albaProgressBarHelper
 {
 public:
 
-	albaProgressBarHelper(albaObserver *listener);
+	albaProgressBarHelper();
 	virtual ~albaProgressBarHelper();
+
+	/** Set the main window that shows the progress bar: the logic sets it when it creates the window and resets it (NULL) when it is destroyed */
+	static void SetMainWindow(albaGUIMDIFrame *win);
+
+	/** Return the main window that shows the progress bar, NULL if none */
+	static albaGUIMDIFrame *GetMainWindow();
 
 	/**Init the Progress Bar, if label is not an empty string a busy info is created*/
 	void InitProgressBar(wxString label="", bool showBusyCursor=true);
-	
+
 	/**Close the Progress Bar*/
 	void CloseProgressBar();
-	
+
 	/** Updates the progress bar */
 	void UpdateProgressBar(long progress);
 
@@ -49,6 +59,16 @@ public:
 	/** Sets the progress bar text */
 	void SetBarText(albaString text);
 
+	/** Show the progress of the filter while this helper exists: the bar is opened when the filter starts (if it is not already open),
+	updated while it runs and closed when it ends (if it was opened by the filter) */
+	void BindToVTKFilter(vtkAlgorithm *filter);
+
+	/** Return true if the progress bar has been initialized and not closed */
+	bool IsInited() { return m_Inited; }
+
+	/** Return the current progress */
+	long GetProgress() { return m_Progress; }
+
 	/** Get TextMode */
 	bool GetTextMode();
 
@@ -56,15 +76,16 @@ public:
 	void SetTextMode(bool textMode);
 
 protected:
- 
 
 	bool m_TextMode;
 	bool m_Inited;
 	long m_Progress;
 	albaGUIBusyInfo *m_BusyInfo;
 	wxBusyCursor *m_BusyCursor;
-	albaObserver    *m_Listener;
-	
+	std::vector<albaProgressBarHelperVTKCallback *> m_VTKCallbacks;
+
+	static albaGUIMDIFrame *m_MainWindow;
+
 private:
   albaProgressBarHelper(const albaProgressBarHelper&); // Not implemented
   void operator=(const albaProgressBarHelper&); // Not implemented

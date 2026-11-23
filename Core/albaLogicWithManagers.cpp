@@ -101,6 +101,7 @@
 // VIEWS
 #include "albaViewCompound.h"
 #include "albaViewVTK.h"
+#include "albaProgressBarHelper.h"
 
 
 #define IDM_WINDOWNEXT 4004
@@ -117,6 +118,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 		m_Win = mdiFrame;
 
 	m_Win->SetListener(this);
+	albaProgressBarHelper::SetMainWindow(m_Win);
 
 	m_ChildFrameStyle = 0; 
 	m_ApplicationSettings = new albaGUIApplicationSettings(this);
@@ -189,7 +191,9 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 }
 //----------------------------------------------------------------------------
 albaLogicWithManagers::~albaLogicWithManagers()
-{  
+{
+	albaProgressBarHelper::SetMainWindow(NULL);
+
   //free mem
   if(m_WizardManager)
     delete m_WizardManager;
@@ -564,14 +568,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 			// ###############################################################
 			// commands related to the STATUSBAR
-		case BIND_TO_PROGRESSBAR:
-#ifdef ALBA_USE_VTK
-			m_Win->BindToProgressBar(e->GetVtkObj());
-#endif
-			break;
-		case PROGRESSBAR_SET_TEXT:
-			m_Win->ProgressBarSetText(&wxString(e->GetString()->GetCStr()));
-			break;
 			// ###############################################################
 		case UPDATE_UI:
 			break;
@@ -858,37 +854,19 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			m_Win->ShowDockPane("wizardseparator", !m_Win->DockPaneIsShown("wizardseparator"));
 			m_Win->ShowDockPane("toolbar", !m_Win->DockPaneIsShown("toolbar"));
 			break;
+		// progress of the wizard (the progress bar of the operations is driven by albaProgressBarHelper)
 		case PROGRESSBAR_SHOW:
-		{
-			if (e->GetSender() == m_WizardManager)
-			{
-				m_WizardLabel->Enable();
-				m_WizardGauge->Enable();
-			}
-			else
-				m_Win->ProgressBarShow();
-		}
-		break;
+			m_WizardLabel->Enable();
+			m_WizardGauge->Enable();
+			break;
 		case PROGRESSBAR_HIDE:
-		{
-			if (e->GetSender() == m_WizardManager)
-			{
-				m_WizardGauge->SetValue(0);
-				m_WizardGauge->Enable(false);
-				m_WizardLabel->Enable(false);
-			}
-			else
-				m_Win->ProgressBarHide();
-		}
-		break;
+			m_WizardGauge->SetValue(0);
+			m_WizardGauge->Enable(false);
+			m_WizardLabel->Enable(false);
+			break;
 		case PROGRESSBAR_SET_VALUE:
-		{
-			if (e->GetSender() == m_WizardManager)
-				m_WizardGauge->SetValue(e->GetArg());
-			else
-				m_Win->ProgressBarSetVal(e->GetArg());
-		}
-		break;
+			m_WizardGauge->SetValue(e->GetArg());
+			break;
 
 		default:
 #ifdef _DEBUG

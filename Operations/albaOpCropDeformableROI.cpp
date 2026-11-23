@@ -40,6 +40,7 @@
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 #include "albaGUIBusyInfo.h"
+#include "albaProgressBarHelper.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpCropDeformableROI);
@@ -230,7 +231,8 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 		}
 
 		m_MaskPolydataFilter->SetMask(transformedMaskPolydata);
-    albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
+    albaProgressBarHelper progressHelper;
+    progressHelper.BindToVTKFilter(m_MaskPolydataFilter);
 		m_MaskPolydataFilter->Update();
 
 		if(vtkRectilinearGrid::SafeDownCast(m_MaskPolydataFilter->GetOutput()))

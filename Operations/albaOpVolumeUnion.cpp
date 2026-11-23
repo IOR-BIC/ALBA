@@ -124,7 +124,7 @@ void albaOpVolumeUnion::OpRun()
 void albaOpVolumeUnion::BuildVolumeUnion()
 //----------------------------------------------------------------------------
 {
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Build Volume Union: please wait...");
 

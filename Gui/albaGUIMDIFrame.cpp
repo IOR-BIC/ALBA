@@ -36,63 +36,6 @@
 #endif
 #include "wx/filename.h"
 
-#ifdef ALBA_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	#include "vtkAlgorithm.h"
-  #include "vtkVersion.h"
-  #include "vtkViewport.h"
-  #include "vtkCommand.h"
-
-class albaGUIMDIFrameCallback : public vtkCommand
-{
-  public:
-    vtkTypeMacro(albaGUIMDIFrameCallback,vtkCommand);
-
-    static albaGUIMDIFrameCallback *New() {return new albaGUIMDIFrameCallback;}
-    albaGUIMDIFrameCallback() {m_mode=0; m_Frame=NULL;};
-    void SetMode(int mode){m_mode=mode;};
-    void SetFrame(albaGUIMDIFrame *frame){m_Frame=frame;};
-    virtual void Execute(vtkObject *caller, unsigned long, void*)
-    {
-      assert(m_Frame);
-      if(caller->IsA("vtkProcessObject"))
-      {
-        vtkAlgorithm *po = (vtkAlgorithm*)caller;
-
-        if(m_mode==0) // ProgressEvent-Callback
-        {
-          ::wxSafeYield(NULL,true); //fix on bug #2082 
-          m_Frame->ProgressBarSetVal(po->GetProgress()*100);
-          //albaLogMessage("progress = %g", po->GetProgress()*100);
-        }
-        else if(m_mode==1) // StartEvent-Callback
-        {
-          m_Frame->ProgressBarShow();
-          m_Frame->ProgressBarSetVal(0);
-          //m_Frame->ProgressBarSetText(&wxString(po->GetClassName()));
-          m_Frame->ProgressBarSetText(&wxString(po->GetProgressText()));
-        }
-        else if(m_mode==2) // EndEvent-Callback
-        {
-          m_Frame->ProgressBarHide();
-        }
-      } 
-      else if(caller->IsA("vtkViewport"))
-      {
-        if(m_mode==1) // StartRenderingEvent-Callback
-        {
-          m_Frame->RenderStart();
-        }
-        else if(m_mode==2) // StartRenderingEvent-Callback
-        {
-          m_Frame->RenderEnd();
-        }
-      }
-    }
-  protected:  
-    int m_mode;
-    albaGUIMDIFrame *m_Frame;
-};
-#endif 
 
 //----------------------------------------------------------------------------
 // albaGUIMDIFrame
@@ -153,29 +96,12 @@ albaGUIMDIFrame::albaGUIMDIFrame(const wxString& title, const wxPoint& pos, cons
 	ib.AddIcon(albaPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON256x256"));
   SetIcons(ib);
 
-#ifdef ALBA_USE_VTK
-  m_ProgressCallback= albaGUIMDIFrameCallback::New(); 
-  m_ProgressCallback->SetFrame(this);
-  m_ProgressCallback->SetMode(0);
-  m_StartCallback = albaGUIMDIFrameCallback::New();; 
-  m_StartCallback->SetFrame(this);
-  m_StartCallback->SetMode(1);
-  m_EndCallback = albaGUIMDIFrameCallback::New(); 
-  m_EndCallback->SetFrame(this);
-  m_EndCallback->SetMode(2);
-#endif //ALBA_USE_VTK
 }
 
 //----------------------------------------------------------------------------
 albaGUIMDIFrame::~albaGUIMDIFrame()
 //----------------------------------------------------------------------------
 {
-#ifdef ALBA_USE_VTK
-  vtkDEL(m_ProgressCallback); 
-  vtkDEL(m_StartCallback); 
-  vtkDEL(m_EndCallback); 
-#endif 
-
   m_PBCalls.clear();
 
   albaSetFrame(NULL);
@@ -505,32 +431,6 @@ void albaGUIMDIFrame::RenderEnd()
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef ALBA_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//-----------------------------------------------------------
-void albaGUIMDIFrame::BindToProgressBar(vtkObject* vtkobj)
-//-----------------------------------------------------------
-{
-	if(vtkobj->IsA("vtkViewport")) 
-		BindToProgressBar((vtkViewport*)vtkobj);
-  else if(vtkobj->IsA("vtkAlgorithm")) 
-		BindToProgressBar((vtkAlgorithm*)vtkobj);
-	else 
-    albaLogMessage("wrong vtkObject passed to BindToProgressBar");
-}
-//-----------------------------------------------------------
-void albaGUIMDIFrame::BindToProgressBar(vtkAlgorithm* filter)
-//-----------------------------------------------------------
-{
-  filter->AddObserver(vtkCommand::ProgressEvent,m_ProgressCallback);
-  filter->AddObserver(vtkCommand::StartEvent,m_StartCallback);
-  filter->AddObserver(vtkCommand::EndEvent,m_EndCallback);
-}
-//-----------------------------------------------------------
-void albaGUIMDIFrame::BindToProgressBar(vtkViewport* ren)
-//-----------------------------------------------------------
-{
-  ren->AddObserver(vtkCommand::StartEvent,m_StartCallback);
-  ren->AddObserver(vtkCommand::EndEvent,m_EndCallback);
-}
 //-----------------------------------------------------------
 void albaGUIMDIFrame::OnQuit()
 //-----------------------------------------------------------

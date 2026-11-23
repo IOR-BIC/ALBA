@@ -389,7 +389,7 @@ int albaOpComputeInertialTensor::ComputeLocalInertialTensor(albaVME* node, int c
   wxString str("Computing inertial tensor: surface ");
   str << current_node << "/" << n_of_nodes;
 
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Computing inertial tensor components...");
 	progressHelper.SetBarText(str);

@@ -261,7 +261,7 @@ void albaOpExporterDicom::ExportDicom()
 	seriesDE.SetByteValue(seriesID.GetCStr(), seriesID.Length());
 	seriesDE.SetVR(gdcm::Attribute ATTRIBUTE_SeriesInstanceUID::GetVR());
 	
-	albaProgressBarHelper helper(this);
+	albaProgressBarHelper helper;
 
 	helper.InitProgressBar("Exporting...");
 		

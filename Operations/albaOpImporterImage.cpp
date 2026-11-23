@@ -206,7 +206,7 @@ void albaOpImporterImage::Import()
 
 	albaGUIBusyInfo busy("Importing Images.\nPlease wait...", m_TestMode);
 
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
 	vtkImageReader2 *reader = NULL;

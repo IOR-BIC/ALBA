@@ -18,129 +18,84 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaProgressBarHelperTest.h"
 #include "albaProgressBarHelper.h"
+#include "vtkALBASmartPointer.h"
+#include "vtkSphereSource.h"
+#include "vtkPolyData.h"
 
-//----------------------------------------------------------------------------
-void albaProgressBarHelperTest::BeforeTest()
-{
-	//Reset All Counters
-	m_CloseEventNum=m_InitEventNum=m_UpdateEventNum=0;
-}
-
-
-//----------------------------------------------------------------------------
-void albaProgressBarHelperTest::OnEvent(albaEventBase *alba_event)
-{
-	//Event Management
-	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-	{
-		switch(e->GetId()) 
-		{
-			case PROGRESSBAR_SHOW:
-				//Init Event Counter update
-				m_InitEventNum++;
-			break;
-			case PROGRESSBAR_HIDE:
-				//Close Event Counter update
-				m_CloseEventNum++;
-			break;
-			case PROGRESSBAR_SET_VALUE:
-				//Update Event Counter update
-				m_UpdateEventNum++;
-			break;
-		}
-	}
-}
+// The tests have no main window (albaProgressBarHelper::GetMainWindow() is NULL): the state of the helper is checked
 
 //-------------------------------------------------------------------------
 void albaProgressBarHelperTest::CreateDestroyTest()
 //-------------------------------------------------------------------------
 {
 	//Create and Destroy albaProgressBarHelper object
+	CPPUNIT_ASSERT(albaProgressBarHelper::GetMainWindow() == NULL);
 	albaProgressBarHelper *helper;
-	helper = new albaProgressBarHelper(this);
+	helper = new albaProgressBarHelper();
+	CPPUNIT_ASSERT(!helper->IsInited() && helper->GetProgress() == 0);
 	delete helper;
 }
 
 //----------------------------------------------------------------------------
 void albaProgressBarHelperTest::InitProgressBarTest()
 {
-	//Init Test
-	albaProgressBarHelper helper(this);
+	albaProgressBarHelper helper;
 
 	helper.InitProgressBar("",false);
+	CPPUNIT_ASSERT(helper.IsInited());
+	CPPUNIT_ASSERT(helper.GetProgress() == 0);
 
-	//Check event counters
-	CPPUNIT_ASSERT(m_InitEventNum==1);
-	CPPUNIT_ASSERT(m_UpdateEventNum==0);
-	CPPUNIT_ASSERT(m_CloseEventNum==0);
-
-	//Double Init
+	//Double Init: the bar is closed and opened again
+	helper.UpdateProgressBar(30);
 	helper.InitProgressBar("",false);
-
-	//Check event counters
-	CPPUNIT_ASSERT(m_InitEventNum==2);
-	CPPUNIT_ASSERT(m_UpdateEventNum==1);
-	CPPUNIT_ASSERT(m_CloseEventNum==1);
+	CPPUNIT_ASSERT(helper.IsInited());
+	CPPUNIT_ASSERT(helper.GetProgress() == 0);
 }
 
 //----------------------------------------------------------------------------
 void albaProgressBarHelperTest::UpdateProgressBarTest()
 {
-	albaProgressBarHelper helper(this);
+	albaProgressBarHelper helper;
 
 	helper.InitProgressBar("",false);
 
-	CPPUNIT_ASSERT(m_UpdateEventNum==0);
-	
 	helper.UpdateProgressBar(10);
-	CPPUNIT_ASSERT(m_UpdateEventNum==1);
+	CPPUNIT_ASSERT(helper.GetProgress() == 10);
 
-	//An update with the same value should not fire the update event
-	helper.UpdateProgressBar(10);
-	CPPUNIT_ASSERT(m_UpdateEventNum==1);
-
-	//An update with the higher value should fire the update event
 	helper.UpdateProgressBar(15);
-	CPPUNIT_ASSERT(m_UpdateEventNum==2);
+	CPPUNIT_ASSERT(helper.GetProgress() == 15);
 
-	//An update with the higher value should fire the update event
-	helper.UpdateProgressBar(15);
-	CPPUNIT_ASSERT(m_UpdateEventNum==2);
+	//A progress over 100 is refused
+	helper.UpdateProgressBar(150);
+	CPPUNIT_ASSERT(helper.GetProgress() == 15);
 
-	//Check event counters
-	CPPUNIT_ASSERT(m_InitEventNum==1);
-	CPPUNIT_ASSERT(m_CloseEventNum==0);
+	helper.ResetProgress();
+	CPPUNIT_ASSERT(helper.GetProgress() == 0);
+	CPPUNIT_ASSERT(helper.IsInited());
 }
 
 //----------------------------------------------------------------------------
 void albaProgressBarHelperTest::CloseProgressBarTest()
 {
-	albaProgressBarHelper helper(this);
+	albaProgressBarHelper helper;
 
 	helper.InitProgressBar("",false);
+	helper.UpdateProgressBar(50);
 	helper.CloseProgressBar();
-
-	//Check event counters
-	CPPUNIT_ASSERT(m_InitEventNum==1);
-	CPPUNIT_ASSERT(m_UpdateEventNum==1);
-	CPPUNIT_ASSERT(m_CloseEventNum==1);
+	CPPUNIT_ASSERT(!helper.IsInited());
+	CPPUNIT_ASSERT(helper.GetProgress() == 0);
 
 	//Auto close on destroy test
 	albaProgressBarHelper *helper2;
-	helper2 = new albaProgressBarHelper(this);
+	helper2 = new albaProgressBarHelper();
 	helper2->InitProgressBar("",false);
 	delete helper2;
-
-	//Check event counters
-	CPPUNIT_ASSERT(m_InitEventNum==2);
-	CPPUNIT_ASSERT(m_UpdateEventNum=2);
-	CPPUNIT_ASSERT(m_CloseEventNum==2);
 }
 
 //----------------------------------------------------------------------------
 void albaProgressBarHelperTest::GetSetTextModeTest()
 {
-	albaProgressBarHelper helper(this);
+	albaProgressBarHelper helper;
 
 	//Default mode should be false
 	CPPUNIT_ASSERT(helper.GetTextMode()==false);
@@ -157,16 +112,42 @@ void albaProgressBarHelperTest::GetSetTextModeTest()
 //----------------------------------------------------------------------------
 void albaProgressBarHelperTest::TextModeTest()
 {
-	//In text mode no events should be fired 
-	albaProgressBarHelper helper(this);
+	//In text mode the progress advances by steps of 2
+	albaProgressBarHelper helper;
 
 	helper.SetTextMode(true);
 	helper.InitProgressBar("",false);
-	helper.UpdateProgressBar(10);
+	helper.UpdateProgressBar(11);
+	CPPUNIT_ASSERT(helper.GetProgress() == 10);
 	helper.CloseProgressBar();
+	CPPUNIT_ASSERT(!helper.IsInited());
+}
 
-	//Check event counters
-	CPPUNIT_ASSERT(m_InitEventNum==0);
-	CPPUNIT_ASSERT(m_UpdateEventNum==0);
-	CPPUNIT_ASSERT(m_CloseEventNum==0);
+//----------------------------------------------------------------------------
+void albaProgressBarHelperTest::BindToVTKFilterTest()
+{
+	vtkALBASmartPointer<vtkSphereSource> sphere;
+
+	//The filter opens and closes the bar
+	{
+		albaProgressBarHelper helper;
+		helper.BindToVTKFilter(sphere);
+		sphere->Update();
+		CPPUNIT_ASSERT(!helper.IsInited());
+	}
+
+	//A bar already open is moved by the filter but it is not closed
+	{
+		albaProgressBarHelper helper;
+		helper.InitProgressBar("",false);
+		helper.BindToVTKFilter(sphere);
+		sphere->Modified();
+		sphere->Update();
+		CPPUNIT_ASSERT(helper.IsInited());
+	}
+
+	//The helpers are destroyed: the filter can still run
+	sphere->Modified();
+	sphere->Update();
+	CPPUNIT_ASSERT(sphere->GetOutput()->GetNumberOfPoints() > 0);
 }

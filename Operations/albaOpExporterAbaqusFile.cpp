@@ -151,7 +151,7 @@ int albaOpExporterAbaqusFile::Write()
   input->GetUnstructuredGridOutput()->Update();
 
   // Init ProgressBar
-  m_ProgressHelper = new albaProgressBarHelper(m_Listener);
+  m_ProgressHelper = new albaProgressBarHelper();
   m_ProgressHelper->SetTextMode(m_TestMode);
   m_ProgressHelper->InitProgressBar("Please wait exporting file...");
 

@@ -84,6 +84,7 @@
 #include "vtkMaskPolyDataFilter.h"
 
 #include "albaGUIBusyInfo.h"
+#include "albaProgressBarHelper.h"
 #include "wx/bitmap.h"
 #include "wx/sizer.h"
 #include "wx/window.h"
@@ -1752,7 +1753,8 @@ void albaOpSegmentation::OnLoadMask()
 	maskPolydataFilter->SetTriplePass(m_TriplePass);
 	maskPolydataFilter->SetMask(transformedMaskPolydata);
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, maskPolydataFilter));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(maskPolydataFilter);
 	maskPolydataFilter->Update();
 
 	m_SegmentationVolume->SetData(maskPolydataFilter->GetOutput(), m_SegmentationVolume->GetTimeStamp());

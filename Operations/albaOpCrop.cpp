@@ -32,6 +32,7 @@
 #include "albaString.h"
 #include "albaVME.h"
 #include "albaVMEVolumeGray.h"
+#include "albaProgressBarHelper.h"
 
 #include "vtkALBADistanceFilter.h"
 #include "vtkALBASmartPointer.h"
@@ -277,7 +278,8 @@ void albaOpCrop::Crop()
 		albaGUIBusyInfo wait(_("Please wait, cropping..."),m_TestMode);
     
 		vtkALBASmartPointer<vtkProbeFilter> probeFilter;
-		albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, probeFilter));
+		albaProgressBarHelper progressHelper;
+		progressHelper.BindToVTKFilter(probeFilter);
 
 		probeFilter->SetInputData(v_esp);
 		probeFilter->SetSourceData(m_InputSP);

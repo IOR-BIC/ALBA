@@ -1130,7 +1130,7 @@ size_t albaOpImporterScancoImageIO::GetScalarSize()
 int albaOpImporterScancoImageIO::ImportFile()
 {
 
-	m_PBHelper = new albaProgressBarHelper(this);
+	m_PBHelper = new albaProgressBarHelper();
 
 
 	m_PBHelper->InitProgressBar("Reading File...");

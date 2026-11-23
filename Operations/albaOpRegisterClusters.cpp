@@ -670,7 +670,7 @@ void albaOpRegisterClusters::OpDo()
 		target->GetLocalTimeStamps(timeStamps);
 		int numTimeStamps = target->GetNumberOfTimeStamps();
 
-		albaProgressBarHelper progressHelper(m_Listener);
+		albaProgressBarHelper progressHelper;
 		progressHelper.SetTextMode(m_TestMode);
 		progressHelper.InitProgressBar();
 		

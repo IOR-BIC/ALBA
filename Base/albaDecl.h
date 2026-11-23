@@ -151,61 +151,51 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	HELP_HOME,
 
 	UPDATE_UI,           // update menu and toolbar widgets
-											 // connect a vtkObject to the ProgressBar
-											 BIND_TO_PROGRESSBAR,
-											 // manually set the ProgressBar status
-											 PROGRESSBAR_SHOW,
-											 PROGRESSBAR_HIDE,
-											 PROGRESSBAR_SET_VALUE,
-											 PROGRESSBAR_SET_TEXT,
-											 // events about vme
-											 VME_SELECTED,  // from albaGUIVMEChooserTree
-											 VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
-											 VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
-											 VME_MATERIAL_CHANGED, // from albaGUIMaterialButton to its listener, after the user chose a new material
+	// progress of the wizard (albaWizard, albaWizardBlock): the progress bar is driven by albaProgressBarHelper
+	PROGRESSBAR_SHOW,
+	PROGRESSBAR_HIDE,
+	PROGRESSBAR_SET_VALUE,
+	// events about vme
+	VME_SELECTED,  // from albaGUIVMEChooserTree
+	VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
+	VME_PICKING,   // same as above, but send point position in continuous configuration (at each mouse motion)
+	VME_MATERIAL_CHANGED, // from albaGUIMaterialButton to its listener, after the user chose a new material
 
-											 // events about views
-											 VIEW_CREATE,   // from menu to albaViewManager
-											 VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
+	// events about views
+	VIEW_CREATE,   // from menu to albaViewManager
+	VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
 
-											 CAMERA_RESET,
-											 CAMERA_FIT,
-											 CAMERA_FLYTO,
+	CAMERA_RESET,
+	CAMERA_FIT,
+	CAMERA_FLYTO,
 
+	ITEM_SELECTED, //used by albaGUIListCtrl and Dictionary
 
+	IMPORT_FILE, // used when drag a non msf or zmsf file into the application as a VTK file.
 
+	//used by albaISATransform to talk with albaOpTransform
+	MOUSE_MOVE, // the mouse moved: sent by albaGizmoSlice while dragging and by the segmentation tools
+	MOUSE_UP,   // the mouse button was released: sent by albaGizmoSlice and albaToolSegmentation
+	MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
-																												ITEM_SELECTED, //used by albaGUIListCtrl and Dictionary
+	// input events of the devices (albaDeviceButtonsPad, albaDeviceButtonsPadMouse, albaDeviceButtonsPadTracker)
+	DEVICE_BUTTON_DOWN,
+	DEVICE_BUTTON_UP,
+	DEVICE_MOUSE_WHEEL,
+	DEVICE_MOUSE_2D_MOVE,
+	DEVICE_TRACKER_3D_MOVE,
+	DEVICE_TRACKER_BOUNDS_UPDATED,
 
-																												IMPORT_FILE, // used when drag a non msf or zmsf file into the application as a VTK file.
+	ID_TRANSFORM, //added by Stefano. 30-11-2003
 
+	ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY
+	SHOW_VIEW_CONTEXTUAL_MENU,
+	SHOW_TREE_CONTEXTUAL_MENU,
 
-
-																												//used by albaISATransform to talk with albaOpTransform 
-																												MOUSE_MOVE, // the mouse moved: sent by albaGizmoSlice while dragging and by the segmentation tools
-																												MOUSE_UP,   // the mouse button was released: sent by albaGizmoSlice and albaToolSegmentation
-																												MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
-
-																												// input events of the devices (albaDeviceButtonsPad, albaDeviceButtonsPadMouse, albaDeviceButtonsPadTracker)
-																												DEVICE_BUTTON_DOWN,
-																												DEVICE_BUTTON_UP,
-																												DEVICE_MOUSE_WHEEL,
-																												DEVICE_MOUSE_2D_MOVE,
-																												DEVICE_TRACKER_3D_MOVE,
-																												DEVICE_TRACKER_BOUNDS_UPDATED,
-
-																												ID_TRANSFORM, //added by Stefano. 30-11-2003 
-
-																												ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY
-																												SHOW_VIEW_CONTEXTUAL_MENU,
-																												SHOW_TREE_CONTEXTUAL_MENU,
-
-
-
-																												// resize window
-																												TILE_WINDOW_CASCADE,
-																												TILE_WINDOW_HORIZONTALLY,
-																												TILE_WINDOW_VERTICALLY,
+	// resize window
+	TILE_WINDOW_CASCADE,
+	TILE_WINDOW_HORIZONTALLY,
+	TILE_WINDOW_VERTICALLY,
 
 	// wizard events and ids of wizards - used by albaWizardManager and albaGUIFrame
 	WIZARD_RUN_STARTING,
@@ -225,55 +215,54 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	WIZARD_START,
 	WIZARD_END = WIZARD_START + MAXWIZARD,
 
-																												EVT_USER_START, // to be used from vertical applications
-																												EVT_USER_END = EVT_USER_START + 1000,
+	EVT_USER_START, // to be used from vertical applications
+	EVT_USER_END = EVT_USER_START + 1000,
 
+	MENU_USER_START,// to be used from vertical applications
+	MENU_USER_END = MENU_USER_START + 1000,
 
-																												MENU_USER_START,// to be used from vertical applications
-																												MENU_USER_END = MENU_USER_START + 1000,
+	MENU_END,
 
-																												MENU_END,
+	// ids of operations - used by albaOpManager and albaGUIFrame
+	// must be after MENU_END
+	OP_START,
+	OP_UNDO,
+	OP_REDO,
+	OP_DELETE,
+	OP_CUT,
+	OP_COPY,
+	OP_PASTE,
+	OP_RENAME,
+	OP_REPARENT,
+	OP_USER,
+	OP_END = OP_START + MAXOP,
 
-																												// ids of operations - used by albaOpManager and albaGUIFrame
-																												// must be after MENU_END
-																												OP_START,
-																												OP_UNDO,
-																												OP_REDO,
-																												OP_DELETE,
-																												OP_CUT,
-																												OP_COPY,
-																												OP_PASTE,
-																												OP_RENAME,
-																												OP_REPARENT,
-																												OP_USER,
-																												OP_END = OP_START + MAXOP,
+	// ids of views - used by albaViewManager and albaGUIFrame
+	// must be after MENU_END
+	VIEW_START,
+	VIEW_END = VIEW_START + MAXVIEW,
 
-																												// ids of views - used by albaViewManager and albaGUIFrame
-																												// must be after MENU_END
-																												VIEW_START,
-																												VIEW_END = VIEW_START + MAXVIEW,
+	// events sent by widget
 
-																												// events sent by widget
+	WIDGETS_START,
+	ID_LAYOUT,         //sent from a albaGUISashPanel to albaGUIFrame
+	ID_CLOSE_SASH,     //sent from a albaGUIButton to albaGUISashPanel
+	ID_RANGE_MODIFIED, //sent from a albaGUILutSlider to albaGUIMDIChild  - ask to Views
+	WIDGETS_END,
 
-																												WIDGETS_START,
-																												ID_LAYOUT,         //sent from a albaGUISashPanel to albaGUIFrame
-																												ID_CLOSE_SASH,     //sent from a albaGUIButton		to albaGUISashPanel 
-																												ID_RANGE_MODIFIED, //sent from a albaGUILutSlider	to albaGUIMDIChild  - ask to Views
-																												WIDGETS_END,
-
-																												// id of pictures - used in albaGUIBitmaps
-																												PIC_START,
-																												TIME_SET,				 //also sent by albaGUITimeBar to albaLogic
-																												TIME_PLAY,       //pictures used by the timebar
-																												TIME_STOP,
-																												TIME_PREV,
-																												TIME_NEXT,
-																												TIME_BEGIN,
-																												TIME_END,
-																												MOVIE_RECORD,
+	// id of pictures - used in albaGUIBitmaps
+	PIC_START,
+	TIME_SET, //also sent by albaGUITimeBar to albaLogic
+	TIME_PLAY,       //pictures used by the timebar
+	TIME_STOP,
+	TIME_PREV,
+	TIME_NEXT,
+	TIME_BEGIN,
+	TIME_END,
+	MOVIE_RECORD,
 	PIC_END,
 
-	PARSE_STRING,	//Added by Paolo 16-9-2003 execute the operation passed as a string
+	PARSE_STRING, //Added by Paolo 16-9-2003 execute the operation passed as a string
 
 	// ids issued/observed by albaVME and albaVME
 	NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
@@ -286,14 +275,11 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	AVATAR_ADDED,     ///< used to advise the InteractionManager an avatar has been added (issued by mmdTracker's)
 	AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been removed (issued by mmdTracker's)
 
+	// const used by albaGUI and albaGUIValidator
+	MINID,
+	MAXID = MINID + MAXWIDGET,
 
-									// const used by albaGUI and albaGUIValidator
-									MINID,
-									MAXID = MINID + MAXWIDGET,
-
-
-
-									ALBA_BASE_ID ///< base numeric ID used by albaIdFactory. This must be the LAST ONE!!!
+	ALBA_BASE_ID ///< base numeric ID used by albaIdFactory. This must be the LAST ONE!!!
 };
 
 /** Event channels (albaEventBase::GetChannel). They start from 1: albaEventBroadcaster takes 0 or less as no channel */

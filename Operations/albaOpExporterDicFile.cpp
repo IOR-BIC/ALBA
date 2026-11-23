@@ -175,7 +175,7 @@ void albaOpExporterDicFile::ExportDIC()
 void albaOpExporterDicFile::SaveDICData()
 //----------------------------------------------------------------------------
 {
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
 

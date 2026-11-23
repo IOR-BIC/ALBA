@@ -197,7 +197,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathematics()
 {
   //Perform the morphological closing operation
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Please wait, morphological mathematics...");
 
@@ -224,7 +224,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathem
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 {
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Please wait, region growing...");
 	
@@ -242,7 +242,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
   localFilter->SetLowerThreshold(m_Threshold);
   localFilter->SetUpperLabel(m_UpperLabel);
   localFilter->SetUpperThreshold(m_Threshold+400);
-  albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,localFilter));
   localFilter->Update();
 
   //Save the result of the region growing

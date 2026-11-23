@@ -29,6 +29,7 @@
 #include "albaGUI.h"
 
 #include "albaVMEVolumeGray.h"
+#include "albaProgressBarHelper.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkImageData.h"
@@ -250,7 +251,8 @@ void albaOpFilterVolume::OnSmooth()
   smoothFilter->SetRadiusFactors(m_SmoothRadius);
   smoothFilter->SetStandardDeviations(m_StandardDeviation);
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, smoothFilter));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(smoothFilter);
 	
 	smoothFilter->Update();
 
@@ -290,7 +292,8 @@ void albaOpFilterVolume::OnMedian()
   medianFilter->SetInputData(m_OutputVolume->GetOutput()->GetVTKData());
   medianFilter->SetKernelSize(m_KernelSize[0],m_KernelSize[1],m_KernelSize[2]);
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, medianFilter));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(medianFilter);
 
   medianFilter->Update();
 

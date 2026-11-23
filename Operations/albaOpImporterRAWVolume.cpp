@@ -33,6 +33,7 @@
 
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
+#include "albaProgressBarHelper.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkRenderer.h"
@@ -467,10 +468,8 @@ bool albaOpImporterRAWVolume::Import()
 	reader->SetHeaderSize(m_FileHeader);
 	reader->SetFileDimensionality(3);
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
-  if(!this->m_TestMode)
-	{
-		albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,reader));
-	}
+  albaProgressBarHelper progressHelper;
+  progressHelper.BindToVTKFilter(reader);
 //  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_SliceVOI[1] - m_SliceVOI[0] - 1);
 //  reader->SetDataOrigin(0.0,0.0,m_SliceVOI[0]*m_DataSpacing[2]);
 	reader->Update();

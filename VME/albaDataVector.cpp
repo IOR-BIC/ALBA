@@ -283,7 +283,7 @@ int albaDataVector::InternalStore(albaStorageElement *parent)
 
         if (resolvedURL == ALBA_OK && wxFileExists(filename.GetCStr()))//Only if exist an archive where it is possible read the vtk data
         {
-          albaProgressBarHelper progressHelper(m_Listener);
+          albaProgressBarHelper progressHelper;
 					progressHelper.InitProgressBar("",false);
 
 

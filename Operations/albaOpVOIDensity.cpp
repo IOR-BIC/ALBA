@@ -535,7 +535,7 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_ADD_HOLES_AREA:
 			{
-				albaProgressBarHelper progressHelper(m_Listener);
+				albaProgressBarHelper progressHelper;
 				progressHelper.SetTextMode(m_TestMode);
 				progressHelper.InitProgressBar("Updating Area...");
 				CalculateSurfaceArea();
@@ -645,7 +645,7 @@ void albaOpVOIDensity::EvaluateSurface()
 	vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
 	numberVoxels = VolumeData->GetNumberOfPoints();
 
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Evaluating Density...");
 

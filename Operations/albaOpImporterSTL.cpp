@@ -31,6 +31,7 @@
 #include "albaVME.h"
 #include "albaVMESurface.h"
 #include "albaSmartPointer.h"
+#include "albaProgressBarHelper.h"
 #include "vtkALBASmartPointer.h"
 
 #include "vtkSTLReader.h"
@@ -246,7 +247,8 @@ void albaOpImporterSTL::ImportSTL()
 	  }
 
     vtkALBASmartPointer<vtkSTLReader> reader;
-	  albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,reader));
+	  albaProgressBarHelper progressHelper;
+	  progressHelper.BindToVTKFilter(reader);
     reader->SetFileName(fn);
 	  reader->Update();
 
