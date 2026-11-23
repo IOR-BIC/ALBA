@@ -26,7 +26,7 @@ enum VME_CHOOSER_STYLES
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 
 //----------------------------------------------------------------------------
 // Forward refs:
@@ -42,10 +42,10 @@ typedef bool (*ValidateCallBackType) (albaVME *);
 This widget has the possibility to manage validation callback passed through a constructor that allows to say if a VME can be choose or not.
 Another feature of the widget is to show also a checkbox near the VME's icon to allow a multiple selection.
 */
-class albaGUIVMEChooserTree: public albaGUICheckTree
+class albaGUIVMEChooserTree: public albaGUIVMETree
 {
 public:
-                 albaGUIVMEChooserTree (wxWindow *parent, albaGUICheckTree *tree, ValidateCallBackType vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree=NULL); 
+                 albaGUIVMEChooserTree (wxWindow *parent, albaGUIVMETree *tree, ValidateCallBackType vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree=NULL); 
   virtual       ~albaGUIVMEChooserTree();
 
   /** Return the choosed node*/
@@ -63,7 +63,7 @@ protected:
   void InitializeImageList();
 
   /** clone in tree a subtree of source_item */
-  void CloneSubTree(albaGUICheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item);
+  void CloneSubTree(albaGUIVMETree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item);
 
   /** Called by the Custom-Tree-Event-Handler */
   void ShowContextualMenu(wxMouseEvent& event);

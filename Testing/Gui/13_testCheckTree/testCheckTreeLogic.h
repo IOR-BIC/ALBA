@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class albaGUIMDIFrame;
 class albaGUISashPanel;
-class albaGUICheckTree;
+class albaGUIVMETree;
 class testCheckTreeGui;
 
 //-------------------------------------------------------------------------
@@ -69,7 +69,7 @@ protected:
   wxMenuBar     *m_menu_bar;
   albaGUISashPanel  *m_log_bar; 
   albaGUISashPanel  *m_side_bar;
-  albaGUICheckTree  *m_tree;
+  albaGUIVMETree  *m_tree;
   wxNotebook    *m_notebook;
 
   albaNodeA    *m_nodea;

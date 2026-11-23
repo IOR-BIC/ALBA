@@ -82,7 +82,7 @@ public:
 	virtual albaVME *GetSelectedVme() {return m_SelectedVme;};
 
   /**
-  Used by the albaGUICheckTree - return the status of a SceneNode*/
+  Used by the albaGUIVMETree - return the status of a SceneNode*/
 	virtual int  GetNodeStatus (albaVME *node);
 
   /** print a dump of this object */

@@ -56,7 +56,7 @@
 #include "albaUser.h"
 #include "albaGUIMDIFrame.h"
 #include "albaGUIMDIChild.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 #include "albaGUITimeBar.h"
 #include "albaGUIViewFrame.h"
 #include "albaGUIApplicationSettings.h"
@@ -1969,7 +1969,7 @@ void albaLogicWithManagers::TreeContextualMenu(albaEvent &e)
 	bool vme_menu = e.GetBool();
 	bool autosort = e.GetArg() != 0;
 
-	contextMenu->CreateContextualMenu((albaGUICheckTree *)e.GetSender(), v, vme, vme_menu);
+	contextMenu->CreateContextualMenu((albaGUIVMETree *)e.GetSender(), v, vme, vme_menu);
 	contextMenu->ShowContextualMenu();
 
 	cppDEL(contextMenu);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUICheckTree
+ Module: albaGUIVMETree
  Authors: Silvano Imboden
  
  Copyright (c) BIC
@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaGUICheckTree.h" 
+#include "albaGUIVMETree.h" 
 #include "albaDecl.h"
 #include "albaView.h"
 #include "albaPics.h" 
@@ -38,11 +38,11 @@
 // Helper class to subclass the wxTreeCtrl
 // in order to intercept mouse clicks. 
 //=========================================================================================
-class albaGUICheckTreeEvtHandler : public wxEvtHandler
+class albaGUIVMETreeEvtHandler : public wxEvtHandler
 {
 public:
-  albaGUICheckTreeEvtHandler() : m_NodeTree(0) { }
-  albaGUICheckTreeEvtHandler(albaGUICheckTree* tree) : m_NodeTree(tree) { }
+  albaGUIVMETreeEvtHandler() : m_NodeTree(0) { }
+  albaGUIVMETreeEvtHandler(albaGUIVMETree* tree) : m_NodeTree(tree) { }
   
   void OnMouseDown(wxMouseEvent& event)        {m_NodeTree->OnMouseDown(event);};
   void OnMouseUp(wxMouseEvent& event)          {m_NodeTree->OnMouseUp(event);};
@@ -50,17 +50,17 @@ public:
 	void ShowContextualMenu(wxMouseEvent& event) {m_NodeTree->ShowContextualMenu(event);};
 		
 private:
-  albaGUICheckTree  *m_NodeTree;
+  albaGUIVMETree  *m_NodeTree;
   
-	DECLARE_DYNAMIC_CLASS(albaGUICheckTreeEvtHandler )
+	DECLARE_DYNAMIC_CLASS(albaGUIVMETreeEvtHandler )
   DECLARE_EVENT_TABLE()
 };
-IMPLEMENT_DYNAMIC_CLASS( albaGUICheckTreeEvtHandler , wxEvtHandler )
-BEGIN_EVENT_TABLE( albaGUICheckTreeEvtHandler , wxEvtHandler )
-    EVT_LEFT_DOWN( albaGUICheckTreeEvtHandler ::OnMouseDown )
-		EVT_RIGHT_UP( albaGUICheckTreeEvtHandler ::ShowContextualMenu )
-    EVT_LEFT_UP( albaGUICheckTreeEvtHandler ::OnMouseUp )
-    EVT_MOUSE_EVENTS( albaGUICheckTreeEvtHandler ::OnMouseEvent )
+IMPLEMENT_DYNAMIC_CLASS( albaGUIVMETreeEvtHandler , wxEvtHandler )
+BEGIN_EVENT_TABLE( albaGUIVMETreeEvtHandler , wxEvtHandler )
+    EVT_LEFT_DOWN( albaGUIVMETreeEvtHandler ::OnMouseDown )
+		EVT_RIGHT_UP( albaGUIVMETreeEvtHandler ::ShowContextualMenu )
+    EVT_LEFT_UP( albaGUIVMETreeEvtHandler ::OnMouseUp )
+    EVT_MOUSE_EVENTS( albaGUIVMETreeEvtHandler ::OnMouseEvent )
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -84,12 +84,12 @@ enum TREE_RMENU_COMMANDS
 //----------------------------------------------------------------------------
 // EVENT_TABLE
 //----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(albaGUICheckTree,wxPanel)
-    EVT_TREE_SEL_CHANGED(ID_TREE, albaGUICheckTree::OnSelectionChanged)
+BEGIN_EVENT_TABLE(albaGUIVMETree,wxPanel)
+    EVT_TREE_SEL_CHANGED(ID_TREE, albaGUIVMETree::OnSelectionChanged)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-albaGUICheckTree::albaGUICheckTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTitle)
+albaGUIVMETree::albaGUIVMETree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTitle)
 :albaGUITree(parent,id,CloseButton,HideTitle)
 //----------------------------------------------------------------------------
 {
@@ -98,12 +98,12 @@ albaGUICheckTree::albaGUICheckTree( wxWindow* parent,wxWindowID id, bool CloseBu
   m_SelectedVME = NULL;
   m_RMenu	= NULL;
 
-  m_NodeTree->PushEventHandler( new albaGUICheckTreeEvtHandler(this) );
+  m_NodeTree->PushEventHandler( new albaGUIVMETreeEvtHandler(this) );
 
   InitializeImageList();
 }
 //----------------------------------------------------------------------------
-albaGUICheckTree::~albaGUICheckTree()
+albaGUIVMETree::~albaGUIVMETree()
 //----------------------------------------------------------------------------
 {
 	if(m_RMenu)
@@ -111,7 +111,7 @@ albaGUICheckTree::~albaGUICheckTree()
 	m_NodeTree->PopEventHandler(true);
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::ShowContextualMenu(wxMouseEvent& event)
+void albaGUIVMETree::ShowContextualMenu(wxMouseEvent& event)
 //----------------------------------------------------------------------------
 {
   int flag;
@@ -133,32 +133,32 @@ void albaGUICheckTree::ShowContextualMenu(wxMouseEvent& event)
   albaEventMacro(e);
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::EnableSelect(bool enable)
+void albaGUIVMETree::EnableSelect(bool enable)
 //----------------------------------------------------------------------------
 {
   m_CanSelect = enable;
 }
 
 //----------------------------------------------------------------------------
-bool albaGUICheckTree::IsVMEExpanded(albaVME * vme)
+bool albaGUIVMETree::IsVMEExpanded(albaVME * vme)
 {
 	return IsNodeExpanded((long long)vme);
 }
 
 //----------------------------------------------------------------------------
-void albaGUICheckTree::CollapseVME(albaVME * vme)
+void albaGUIVMETree::CollapseVME(albaVME * vme)
 {
 	CollapseNode((long long)vme);
 }
 
 //----------------------------------------------------------------------------
-void albaGUICheckTree::ExpandVME(albaVME * vme)
+void albaGUIVMETree::ExpandVME(albaVME * vme)
 {
 	ExpandNode((long long)vme);
 }
 
 //----------------------------------------------------------------------------
-void albaGUICheckTree::OnMouseDown( wxMouseEvent& event )
+void albaGUIVMETree::OnMouseDown( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
   //purpose: intercept and notify if the icon was clicked,
@@ -184,7 +184,7 @@ void albaGUICheckTree::OnMouseDown( wxMouseEvent& event )
 	event.Skip();//process event as usual
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::OnMouseUp( wxMouseEvent& event )
+void albaGUIVMETree::OnMouseUp( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
   //purpose: prevent selection if I clicked on the icon.
@@ -196,7 +196,7 @@ void albaGUICheckTree::OnMouseUp( wxMouseEvent& event )
 	event.Skip();//process event as usual
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::OnMouseEvent( wxMouseEvent& event )
+void albaGUIVMETree::OnMouseEvent( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
 	//pourpose: prevent selection if I clicked on the icon.
@@ -213,7 +213,7 @@ void albaGUICheckTree::OnMouseEvent( wxMouseEvent& event )
 	event.Skip();//process event as usual
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::OnIconClick(wxTreeItemId item)
+void albaGUIVMETree::OnIconClick(wxTreeItemId item)
 //----------------------------------------------------------------------------
 {
   albaVME* vme = (albaVME*) (NodeFromItem(item));
@@ -232,7 +232,7 @@ void albaGUICheckTree::OnIconClick(wxTreeItemId item)
   }
 }
 //----------------------------------------------------------------------------
-bool albaGUICheckTree::IsIconChecked(wxTreeItemId item)
+bool albaGUIVMETree::IsIconChecked(wxTreeItemId item)
 //----------------------------------------------------------------------------
 {
   albaVME* vme = (albaVME*) (NodeFromItem(item));
@@ -240,14 +240,14 @@ bool albaGUICheckTree::IsIconChecked(wxTreeItemId item)
   return checked;
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::VmeAdd(albaVME *vme)   
+void albaGUIVMETree::VmeAdd(albaVME *vme)   
 //----------------------------------------------------------------------------
 {
   AddNode((long long)vme,(long long)vme->GetParent(), vme->GetName(), vme->WasVMEExpandedWhenStored(), 0);
 	VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::VmeRemove(albaVME *vme)   
+void albaGUIVMETree::VmeRemove(albaVME *vme)   
 //----------------------------------------------------------------------------
 {
   this->DeleteNode((long long)vme);
@@ -257,7 +257,7 @@ void albaGUICheckTree::VmeRemove(albaVME *vme)
   }
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::VmeSelected(albaVME *vme)   
+void albaGUIVMETree::VmeSelected(albaVME *vme)   
 //----------------------------------------------------------------------------
 {
   this->SelectNode((long long)vme);
@@ -265,20 +265,20 @@ void albaGUICheckTree::VmeSelected(albaVME *vme)
   VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::VmeModified(albaVME *vme)
+void albaGUIVMETree::VmeModified(albaVME *vme)
 //----------------------------------------------------------------------------
 {
   this->SetNodeLabel((long long)vme, vme->GetName());
 	VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::VmeShow(albaVME *vme, bool show)   
+void albaGUIVMETree::VmeShow(albaVME *vme, bool show)   
 //----------------------------------------------------------------------------
 {
 	VmeUpdateIcon(vme);
 }
 //----------------------------------------------------------------------------
-int albaGUICheckTree::GetVmeStatus(albaVME *vme)
+int albaGUIVMETree::GetVmeStatus(albaVME *vme)
 //----------------------------------------------------------------------------
 {
   if(!m_View)
@@ -286,7 +286,7 @@ int albaGUICheckTree::GetVmeStatus(albaVME *vme)
   return m_View->GetNodeStatus(vme);
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::VmeUpdateIcon(albaVME *vme)
+void albaGUIVMETree::VmeUpdateIcon(albaVME *vme)
 //----------------------------------------------------------------------------
 {
   albaVMEIterator *iter = vme->NewIterator();
@@ -323,14 +323,14 @@ void albaGUICheckTree::VmeUpdateIcon(albaVME *vme)
 //  SetNodeIcon( (long)vme, icon_index );
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::ViewSelected(albaView *view)
+void albaGUIVMETree::ViewSelected(albaView *view)
 //----------------------------------------------------------------------------
 {
   m_View = view;
   TreeUpdateIcon();
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::TreeUpdateIcon()
+void albaGUIVMETree::TreeUpdateIcon()
 //----------------------------------------------------------------------------
 {
   if (m_SelectedVME != NULL)
@@ -339,7 +339,7 @@ void albaGUICheckTree::TreeUpdateIcon()
   }
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::ViewDeleted(albaView *view)
+void albaGUIVMETree::ViewDeleted(albaView *view)
 //----------------------------------------------------------------------------
 {
 	if(view != m_View) 
@@ -347,7 +347,7 @@ void albaGUICheckTree::ViewDeleted(albaView *view)
 	ViewSelected(NULL);
 }
 //----------------------------------------------------------------------------
-int albaGUICheckTree::ClassNameToIcon(wxString classname)
+int albaGUIVMETree::ClassNameToIcon(wxString classname)
 //----------------------------------------------------------------------------
 {
   MapClassNameToIcon::iterator it = m_MapClassNameToIcon.find(classname.ToAscii());
@@ -362,7 +362,7 @@ int albaGUICheckTree::ClassNameToIcon(wxString classname)
   }
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::InitializeImageList()
+void albaGUIVMETree::InitializeImageList()
 //----------------------------------------------------------------------------
 {
   // purpose:
@@ -381,7 +381,7 @@ void albaGUICheckTree::InitializeImageList()
 
   if(num_types <= 0)
   {
-    wxLogMessage("albaGUICheckTree:  Warning - no vme-icons defined");
+    wxLogMessage("albaGUIVMETree:  Warning - no vme-icons defined");
     return;
   }
   //retrieve state icons
@@ -440,7 +440,7 @@ void albaGUICheckTree::InitializeImageList()
   SetImageList(imgs);
 }
 //----------------------------------------------------------------------------
-wxBitmap albaGUICheckTree::MergeIcons(wxBitmap state, wxBitmap vme)
+wxBitmap albaGUIVMETree::MergeIcons(wxBitmap state, wxBitmap vme)
 //----------------------------------------------------------------------------
 {
   int sw = state.GetWidth();
@@ -469,7 +469,7 @@ wxBitmap albaGUICheckTree::MergeIcons(wxBitmap state, wxBitmap vme)
   return merge;
 }
 //----------------------------------------------------------------------------
-void albaGUICheckTree::OnSelectionChanged(wxTreeEvent& event)
+void albaGUIVMETree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
   wxTreeItemId i;

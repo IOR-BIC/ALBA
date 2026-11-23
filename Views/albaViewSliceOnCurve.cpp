@@ -271,7 +271,7 @@ void albaViewSliceOnCurve::HideSameVMEs(albaView* view, albaVME* vme)
 
 //----------------------------------------------------------------------------
 //return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
-//having albaViewCompound::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph
+//having albaViewCompound::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph
 int albaViewSliceOnCurve::GetNodeStatus(albaVME *vme)
 //----------------------------------------------------------------------------
 {

@@ -27,7 +27,7 @@ class albaView;
 class albaGUIMDIChild;
 class albaEvent;
 class albaObserver;
-class albaGUICheckTree;
+class albaGUIVMETree;
 class albaVME;
 class albaSceneGraph;
 class albaVME;
@@ -79,7 +79,7 @@ public:
   void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 
   /** Create a contextual menu*/
-  virtual void CreateContextualMenu(albaGUICheckTree *tree, albaView *view, albaVME *vme, bool vme_menu);
+  virtual void CreateContextualMenu(albaGUIVMETree *tree, albaView *view, albaVME *vme, bool vme_menu);
 
   /** Visualize contextual men for the MDI child and selected view. */
   void ShowContextualMenu();
@@ -90,7 +90,7 @@ protected:
   albaView       *m_ViewActive;
   albaVME        *m_VmeActive;
   albaVME       *m_NodeActive;
-  albaGUICheckTree  *m_NodeTree;
+  albaGUIVMETree  *m_NodeTree;
   albaObserver   *m_Listener;
 
 	albaOpManager	*m_OpManager;

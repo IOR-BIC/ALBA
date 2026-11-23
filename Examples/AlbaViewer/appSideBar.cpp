@@ -60,7 +60,7 @@ appSideBar::appSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener)
 	m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1, -1),/*wxSP_3DSASH |*/ wxSP_3D | wxSP_LIVE_UPDATE);
 
 	// Tree
-	m_Tree = new albaGUICheckTree(m_SideSplittedPanel, -1, false, true);
+	m_Tree = new albaGUIVMETree(m_SideSplittedPanel, -1, false, true);
 	m_Tree->SetListener(Listener);
 	m_Tree->SetSize(-1, 300);
 	m_Tree->SetTitle(" vme hierarchy: ");
@@ -200,7 +200,7 @@ std::vector<albaVME*> appSideBar::VmeChoose(void *vme_accept_function, long styl
 //----------------------------------------------------------------------------
 void appSideBar::FindVME()
 {
-	albaGUICheckTree *tree = m_Tree;
+	albaGUIVMETree *tree = m_Tree;
 	albaGUIDialogFindVme fd(_("Find VME"));
 	fd.SetTree(tree);
 	fd.ShowModal();

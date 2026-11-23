@@ -202,7 +202,7 @@ SET(GUI_SRCS
   ../Gui/albaGUIApplicationSettings.cpp  	../Gui/albaGUIApplicationSettings.h
   ../Gui/albaGUIButton.cpp  				../Gui/albaGUIButton.h
   ../Gui/albaGUICheckListBox.cpp  			../Gui/albaGUICheckListBox.h
-  ../Gui/albaGUICheckTree.cpp  				../Gui/albaGUICheckTree.h
+  ../Gui/albaGUIVMETree.cpp  				../Gui/albaGUIVMETree.h
   ../Gui/albaGUIColorSwatch.cpp  			../Gui/albaGUIColorSwatch.h
   ../Gui/albaGUIColorWidget.cpp  			../Gui/albaGUIColorWidget.h
   ../Gui/albaGUICrossSplitter.cpp  			../Gui/albaGUICrossSplitter.h

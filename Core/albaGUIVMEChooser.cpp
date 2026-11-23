@@ -38,7 +38,7 @@
 #include "mmaApplicationLayout.h"
 
 //----------------------------------------------------------------------------
-albaGUIVMEChooser::albaGUIVMEChooser(albaGUICheckTree *tree, wxString dialog_title, void *vme_accept_function, long style, bool multiSelect, albaVME *subTree)
+albaGUIVMEChooser::albaGUIVMEChooser(albaGUIVMETree *tree, wxString dialog_title, void *vme_accept_function, long style, bool multiSelect, albaVME *subTree)
 : albaGUIDialog(dialog_title,albaCLOSEWINDOW | albaRESIZABLE | albaCLOSE | albaOK )
 //----------------------------------------------------------------------------
 {

@@ -21,7 +21,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 #include "albaAbsSideBar.h"
 #include "albaEvent.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 #include "albaGUIVMEChooserTree.h"
 #include "albaObserver.h"
 
@@ -114,7 +114,7 @@ protected:
 
   albaGUIPanelStack	*m_OpPanel;
 	albaGUIHolder			*m_ViewPropertyPanel;
-	albaGUICheckTree  *m_Tree;
+	albaGUIVMETree  *m_Tree;
 
 	albaGUIHolder  *m_VmePanel;
   albaGUIHolder  *m_VmePipePanel;

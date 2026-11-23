@@ -46,8 +46,8 @@ BEGIN_EVENT_TABLE(albaGUIVMEChooserTree,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-albaGUIVMEChooserTree::albaGUIVMEChooserTree( wxWindow *parent, albaGUICheckTree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, albaVME *subTree)
-:albaGUICheckTree(parent, id, CloseButton, HideTitle)
+albaGUIVMEChooserTree::albaGUIVMEChooserTree( wxWindow *parent, albaGUIVMETree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, albaVME *subTree)
+:albaGUIVMETree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
   m_ChoosedNode       = NULL;
@@ -64,7 +64,7 @@ albaGUIVMEChooserTree::albaGUIVMEChooserTree( wxWindow *parent, albaGUICheckTree
   if (!multiSelect)
     InitializeImageList();
   else
-    albaGUICheckTree::InitializeImageList();
+    albaGUIVMETree::InitializeImageList();
 
 	if (subTree && tree->NodeExist((long long)subTree) )
 	{
@@ -241,7 +241,7 @@ void albaGUIVMEChooserTree::ShowContextualMenu(wxMouseEvent& event)
 {
 }
 //----------------------------------------------------------------------------
-void albaGUIVMEChooserTree::CloneSubTree(albaGUICheckTree *source_tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item)
+void albaGUIVMEChooserTree::CloneSubTree(albaGUIVMETree *source_tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item)
 //----------------------------------------------------------------------------
 {
   wxString  text  = source_tree->GetTree()->GetItemText(*source_item);

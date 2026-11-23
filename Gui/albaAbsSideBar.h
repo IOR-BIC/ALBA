@@ -24,7 +24,7 @@
 
 #include "albaEvent.h"
 #include "albaObserver.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 #include "albaGUIVMEChooserTree.h"
 //----------------------------------------------------------------------------
 // forward reference

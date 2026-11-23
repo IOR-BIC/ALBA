@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUICheckTree
+ Module: albaGUIVMETree
  Authors: Silvano Imboden
  
  Copyright (c) BIC
@@ -13,8 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __albaGUICheckTree_H__
-#define __albaGUICheckTree_H__
+#ifndef __albaGUIVMETree_H__
+#define __albaGUIVMETree_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -34,20 +34,20 @@ class albaVME;
 class albaView;
 
 //----------------------------------------------------------------------------
-// albaGUICheckTree :
+// albaGUIVMETree :
 //----------------------------------------------------------------------------
 /** 
-  class Name : albaGUICheckTree.
+  class Name : albaGUIVMETree.
   Class that represents the widget component put inside side bar and containing the vme tree with the possibility 
   to check vme visibility and/or  vme selection. It is possible only one selection at time.
 */
-class ALBA_EXPORT albaGUICheckTree: public albaGUITree
+class ALBA_EXPORT albaGUIVMETree: public albaGUITree
 {
 public:
   /** constructor .*/
-  albaGUICheckTree (wxWindow* parent, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false); 
+  albaGUIVMETree (wxWindow* parent, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false); 
   /** destructor .*/
-  virtual       ~albaGUICheckTree();
+  virtual       ~albaGUIVMETree();
 
   /** Add the vme to the checked tree and create the related icon. */
 	void VmeAdd(albaVME *vme);
@@ -147,5 +147,5 @@ protected:
 
   /** event table declaration */
   DECLARE_EVENT_TABLE()
-}; // end of albaGUICheckTree
+}; // end of albaGUIVMETree
 #endif
