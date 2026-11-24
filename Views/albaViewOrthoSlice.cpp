@@ -24,6 +24,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaRWIBase.h"
 #include "albaViewOrthoSlice.h"
 #include "albaViewSlice.h"
 #include "albaPipeVolumeOrthoSlice.h"
@@ -45,7 +46,6 @@
 #include "albaPipeSurfaceSlice.h"
 #include "albaPipePolylineSlice.h"
 #include "albaPipePolyline.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
@@ -835,7 +835,7 @@ void albaViewOrthoSlice::SetThicknessForAllSurfaceSlices(albaVME *root)
 bool albaViewOrthoSlice::IsPickedSliceView()
 //----------------------------------------------------------------------------
 {
-  albaRWIBase *rwi = m_Mouse->GetRWI();
+  albaRWIBase *rwi = albaRWIBase::GetLastMouseRWI();
   if (rwi)
   {
      if(m_Views[0]->GetRWI()!=rwi)

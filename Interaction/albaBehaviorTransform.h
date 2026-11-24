@@ -26,7 +26,6 @@
 //----------------------------------------------------------------------------
 //forward ref
 //----------------------------------------------------------------------------
-class albaDeviceButtonsPadMouse;
 class albaMatrix;
 class albaRefSys;
 class albaTransform;
@@ -90,20 +89,15 @@ public:
   //----------------------------------------------------------------------------
 
   /**
-    Set the translation/rotation/scale to on/off
-  */
+    Only one flag is on: the drags translate or rotate. Enabling one disables the other. */
   void EnableTranslation(bool enable);
   void EnableRotation(bool enable);
-  void EnableScaling(bool enable);
-  void EnableUniformScaling(bool enable);
 
-  /** 
+  /**
     Return the translation flag
   */
   bool GetTranslationFlag() {return m_TranslationFlag;}
   bool GetRotationFlag() {return m_RotationFlag;}
-  bool GetScalingFlag() {return m_ScalingFlag;} 
-  bool GetUniformScalingFlag() {return m_UniformScalingFlag;}
         
   
   //----------------------------------------------------------------------------
@@ -113,26 +107,14 @@ public:
   /**
     Get the translation constraint. To set the constraint retrieve the constrain object and set it.*/
   albaInteractorConstraint *GetTranslationConstraint() {return m_TranslationConstraint;}
- 
-  /** 
-    Set the translation constraint. Notice the constraint is copied and not referenced */
-  void SetTranslationConstraint(albaInteractorConstraint *constrain);
-      
-  /** 
+
+  /**
     Get the rotation constraint. To set the constraint retrieve the constrain object and set it.*/
   albaInteractorConstraint *GetRotationConstraint() {return m_RotationConstraint;}
-  
-  /** 
-    Set the rotation constraint. Notice the constraint is copied and not referenced */
-  void SetRotationConstraint(albaInteractorConstraint *constrain);
 
   /**
     Get the scale constraint. To set the constraint retrieve the constrain object and set it.*/
   albaInteractorConstraint *GetScaleConstraint() {return m_ScaleConstraint;}
-  /** 
-    Set the scaling constraint. Notice the constraint is copied and
-    not referenced */
-  void SetScaleConstraint(albaInteractorConstraint *constrain);
              
    //----------------------------------------------------------------------------
 
@@ -171,7 +153,7 @@ public:
 
   
   /** The left and middle buttons start the transform if PrepareTransform accepts them;
-    the PER sets the prop and the picked position first. Return false without a renderer. */
+    the PER sets the picked position first. Return false without a renderer. */
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
   virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
 
@@ -187,12 +169,7 @@ public:
   //----------------------------------------------------------------------------
  
   /**
-  Set the picking already performed by the caller at the button down position:
-  the next OnButtonDownAction will use it instead of picking again */
-  void SetButtonDownPick(bool picked, double pickedPos[3]);
-
-  /**
-  Action to be performed on button down event*/
+  Action to be performed on button down event: it starts from the position picked by the PER */
   void OnButtonDownAction(int X, int Y);
 
   /**
@@ -205,7 +182,7 @@ public:
   
   /**
   Used to notify the listener about the current mouse action performed;
-  event Id field is set with this enum
+  the Arg field of the ID_TRANSFORM event is set with this enum
   */
   enum MouseAction {MOUSE_ACTION_DOWN = 0, MOUSE_ACTION_MOVE, MOUSE_ACTION_UP};
 
@@ -262,12 +239,6 @@ protected:
   albaInteractorConstraint *m_CurrentRotationConstraint; ///< the rotation constraint of the current transform, chosen by PrepareTransform
   int m_LastDragPos[2];   ///< the last position of the drags, the drags without a change of position are discarded
 
-  /** Only one flag can be true: the mouse can only translate, rotate or scale during a single move */
-  void EnableTranslationInternal(bool enable);
-  void EnableRotationInternal(bool enable);
-  void EnableScalingInternal(bool enable);
-  void EnableUniformScalingInternal(bool enable);
-
   /** Perform translation */
   void Translate(double *p1, double *p2);  
 
@@ -322,8 +293,6 @@ protected:
 
   bool            m_TranslationFlag; 
   bool            m_RotationFlag;
-  bool            m_ScalingFlag;
-  bool            m_UniformScalingFlag;
 
   bool            m_SurfaceSnap; //< toggle surface snap
 	bool            m_SurfaceNormal; //< toggle surface snap
@@ -381,10 +350,6 @@ protected:
 	vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
 
 	double  m_LastPickPosition[3];
-
-	bool    m_ButtonDownPickSet;        ///< True if the button down picking has been set by the caller
-	bool    m_ButtonDownPicked;         ///< Result of the picking set by the caller
-	double  m_ButtonDownPickPosition[3];///< Position of the picking set by the caller
 
 private:
 

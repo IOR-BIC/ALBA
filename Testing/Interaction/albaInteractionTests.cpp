@@ -21,16 +21,7 @@
 
 #include "albaInteractionTests.h"
 
-#include "albaActionTest.h"
-#include "albaAgentEventQueueTest.h"
 #include "albaAgentTest.h"
-#include "albaAgentThreadedTest.h"
-#include "albaAvatar3DConeTest.h"
-#include "albaAvatarTest.h"
-#include "albaDeviceClientALBATest.h"
-#include "albaDeviceManagerTest.h"
-#include "albaDeviceSetTest.h"
-#include "albaDeviceTest.h"
 #include "albaEventInteractionTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaFakeViewManagerForTest.h"
@@ -63,15 +54,14 @@
 #include "albaGizmoTranslateAxisTest.h"
 #include "albaGizmoTranslatePlaneTest.h"
 #include "albaGizmoTranslateTest.h"
-#include "albaInteractionFactoryTest.h"
 #include "albaInteractorConstraintTest.h"
 #include "albaToolExtractIsosurfaceTest.h"
 #include "albaPositionalEventRouterTest.h"
-#include "albaStaticEventRouterTest.h"
 #include "albaToolSelectCellTest.h"
 #include "albaInteractionBehaviorTest.h"
 #include "albaRefSysTest.h"
 #include "albaServiceLocator.h"
+#include "albaPositionalEventRouter.h"
 
 #include "albaToolVTKPickerTest.h"
 #include "albaToolSelectPointTest.h"
@@ -123,6 +113,8 @@ int	main( int argc, char* argv[] )
 
 	albaFakeLogicForTest *logic = new albaFakeLogicForTest();
 	albaServiceLocator::SetLogicManager(logic);
+	albaPositionalEventRouter *per = albaPositionalEventRouter::New(); // the router of the mouse events used by the render windows and the operations
+	albaServiceLocator::SetPositionalEventRouter(per);
 	albaFakeViewManagerForTest *viewManager = new albaFakeViewManagerForTest();
 	albaServiceLocator::SetViewManager(viewManager);
 
@@ -149,29 +141,19 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoInterfaceTest::suite());
 	runner.addTest(albaInteractorConstraintTest::suite());
 	runner.addTest(albaRefSysTest::suite());
-	runner.addTest(albaDeviceSetTest::suite());
 	runner.addTest(albaGizmoTranslateGUITest::suite());
 	runner.addTest(albaGizmoRotateGUITest::suite());
 	runner.addTest(albaGizmoScaleGUITest::suite());
 	runner.addTest(albaEventInteractionTest::suite());
-	runner.addTest(albaDeviceManagerTest::suite());
-	runner.addTest(albaInteractionFactoryTest::suite());
 	runner.addTest(albaTransformTextEntriesGUITest::suite());
-	runner.addTest(albaActionTest::suite());
 	runner.addTest(albaSaveRestorePoseGUITest::suite());
-	runner.addTest(albaAgentEventQueueTest::suite());
-	runner.addTest(albaAgentThreadedTest::suite());
 	runner.addTest(albaPositionalEventRouterTest::suite());
-	runner.addTest(albaDeviceTest::suite());
 	runner.addTest(albaGizmoScaleAxisTest::suite());
 	runner.addTest(albaGizmoScaleTest::suite());
 	runner.addTest(albaToolExtractIsosurfaceTest::suite());
 	runner.addTest(albaInteractionBehaviorTest::suite());
-	runner.addTest(albaAvatarTest::suite());
-	runner.addTest(albaStaticEventRouterTest::suite());
 	runner.addTest(albaGizmoInterfaceGUITest::suite());
 	runner.addTest(albaTransformInterfaceGUITest::suite());
-	runner.addTest(albaAvatar3DConeTest::suite());
 	runner.addTest(albaRotateTranslateGUITest::suite());
 	runner.addTest(albaBehaviorRotateTranslateTest::suite());
 	runner.addTest(albaToolFlyToTest::suite());
@@ -189,6 +171,8 @@ int	main( int argc, char* argv[] )
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
 
+	albaServiceLocator::SetPositionalEventRouter(NULL);
+	per->Delete();
 	cppDEL(logic);
 	cppDEL(viewManager);
 

@@ -25,7 +25,6 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaDeviceButtonsPadMouse;
 class albaSceneGraph;
 class albaGUI;
 class albaRWIBase;
@@ -126,7 +125,8 @@ public:
   Set the size of the windowing double slider according to the size of the view. */
   virtual void OnLayout();
 
-  virtual void SetMouse(albaDeviceButtonsPadMouse *mouse);
+  /** Set the view of the render windows of the sub views, also nested */
+  void SetRWIView(albaView *view);
 
   virtual albaSceneGraph *GetSceneGraph();
   virtual albaRWIBase    *GetRWI();
@@ -138,19 +138,10 @@ public:
   Return a pointer to the image of all sub-views.*/
   void GetImage(wxBitmap &bmp, int magnification = 1);
 
-  /** 
-  Find the pocked VME at button down. As argument the function needs
-  the device which performed the action, and provides as result pointers
-  to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior);
 
   /** 
   Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
-
-  /** 
-  Perform a picking according to the absolute matrix given and return true on success*/
-  virtual bool Pick(albaMatrix &m);
 
   /** 
   Write into the double array the position picked during Pick method.*/
@@ -161,7 +152,7 @@ public:
   virtual albaVME *GetPickedVme();
 	  
   /** 
-  Return the sub-view in which the mouse is interacting with.*/
+  Return the sub-view of the render window that got the last mouse event.*/
   albaView *GetSubView();
 
   /** 
@@ -169,7 +160,7 @@ public:
   albaView *GetSubView(int idx);
 
   /** 
-  Return the sub-view num index which the mouse is interacting with.*/
+  Return the index of the sub-view of the render window that got the last mouse event.*/
   int GetSubViewIndex();
 
   /** 
@@ -226,7 +217,6 @@ protected:
   wxSize  m_Size; ///< size of the compound view
   albaGUI *m_GuiView;
   wxWindow *m_GuiViewWindow;
-  albaDeviceButtonsPadMouse *m_Mouse;
 
 
   std::vector<albaView *> m_ChildViewList; ///< Child views vector

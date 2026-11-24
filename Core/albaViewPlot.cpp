@@ -25,7 +25,6 @@
 
 #include "albaViewPlot.h"
 
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGUI.h"
 #include "albaPipe.h"
 #include "albaPipeFactory.h"
@@ -76,11 +75,6 @@ void albaViewPlot::Create()
   m_Sg  = new albaSceneGraph(this,NULL);
   m_Sg->SetListener(this);
 }
-//----------------------------------------------------------------------------
-void albaViewPlot::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-}
-
 //----------------------------------------------------------------------------
 void albaViewPlot::VmeAdd(albaVME *vme)
 {

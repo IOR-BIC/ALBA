@@ -46,7 +46,6 @@ const bool DEBUG_MODE = false;
 #include "albaAbsMatrixPipe.h"
 
 #include "vtkDataSet.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"
@@ -127,6 +126,7 @@ void albaViewSlice::Create()
   RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
   m_Rwi = new albaRWI(albaGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_StereoType);
+  m_Rwi->m_RwiBase->SetView(this); // the mouse events of the render window come from this view
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
@@ -135,7 +135,6 @@ void albaViewSlice::Create()
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();

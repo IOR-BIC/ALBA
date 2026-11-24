@@ -31,7 +31,6 @@
 //----------------------------------------------------------------------------
 class albaLightKit;
 class albaVME;
-class albaDeviceButtonsPadMouse;
 class vtkRenderWindow;
 class vtkRenderer;
 class albaAttachCamera;
@@ -124,17 +123,9 @@ public:
   virtual vtkRenderer     *GetBackRenderer();
   virtual vtkRenderWindow *GetRenderWindow();
 
-  /** 
-  Find the pocked VME at button down. As argument the function needs
-  the device which performed the action, and provides as result pointers
-  to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior);
 
   /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
-
-  /** Perform a picking according to the absolute matrix given and return true on success*/
-  virtual bool Pick(albaMatrix &m);
 
 	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   void SetWindowSize(int w, int h);
@@ -152,8 +143,6 @@ public:
 
   albaPipeMap m_PipeMap; ///< Map used to store visual pipeline associated with vme types
 
-  /** Set the mouse device to use inside the view */
-  void SetMouse(albaDeviceButtonsPadMouse *mouse);
   
   albaRWI *m_Rwi;
 

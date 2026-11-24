@@ -269,6 +269,8 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 //------------------------------------------------------------------------
 {
   m_VmeGizmo->SetBehavior(NULL);
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  m_LeftMouseInteractor->SetListener(NULL);
   albaDEL(m_LeftMouseInteractor);
 }
 

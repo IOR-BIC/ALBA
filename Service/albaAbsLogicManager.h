@@ -27,7 +27,6 @@ class albaVMEStorage;
 class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
-class albaInteractionTool;
 class albaGUIPanel;
 class albaOp;
 class albaGUIVMETree;
@@ -166,11 +165,6 @@ public:
 	/** Run an operation (by id, e.g. OP_DELETE) for the running wizard, which continues when the operation ends (or at once if it does not start) */
 	virtual void WizardRunOp(int opId) = 0;
 
-	//Interaction
-	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */
-	virtual void PushTool(albaInteractionTool *tool) = 0;
-	/** Remove a tool from the tool stack of the positional event router */
-	virtual void PopTool(albaInteractionTool *tool) = 0;
 	
 	//Managers
 	/** Get the Prostheses DB Manager */

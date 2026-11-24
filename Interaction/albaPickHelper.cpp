@@ -26,7 +26,6 @@
 
 #include "albaView.h"
 #include "albaVME.h"
-#include "albaMatrix.h"
 #include "albaRWIBase.h"
 #include "vtkALBAAssembly.h"
 #include "vtkALBASmartPointer.h"
@@ -101,25 +100,16 @@ bool albaPickHelper::PickCell(vtkRenderWindow *renderWindow, double x, double y,
 }
 
 //----------------------------------------------------------------------------
-bool albaPickHelper::PickPoint(albaView *view, double *mousePos, albaMatrix *trackerPose, double pickedPos[3], albaVME *&pickedVme, vtkIdType &pointId, double &scalar)
+bool albaPickHelper::PickPoint(albaView *view, double mousePos[2], double pickedPos[3], albaVME *&pickedVme, vtkIdType &pointId, double &scalar)
 //----------------------------------------------------------------------------
 {
   pickedVme = NULL;
   pointId = -1;
   scalar = 0;
-  if (view == NULL)
+  if (view == NULL || mousePos == NULL)
     return false;
 
-  bool picked = false;
-  if (mousePos)
-    picked = PickCell(view, mousePos[0], mousePos[1], pickedPos, &pickedVme);
-  else if (trackerPose)
-  {
-    picked = view->Pick(*trackerPose);
-    view->GetPickedPosition(pickedPos);
-    pickedVme = picked ? view->GetPickedVme() : NULL;
-  }
-
+  bool picked = PickCell(view, mousePos[0], mousePos[1], pickedPos, &pickedVme);
   if (!picked || pickedVme == NULL)
     return false;
 

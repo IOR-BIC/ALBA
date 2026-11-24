@@ -19,71 +19,19 @@
 #include "albaObject.h"
 #include "albaObserver.h"
 #include "albaEventSender.h"
-#include "albaStorable.h"
-#include "albaString.h"
-#include "albaSmartPointer.h"
-#include "albaServiceClient.h"
-
-#include <map>
-#include <set>
-#include <list>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
 class albaEventBase;
-class albaEvent;
-class albaAction;
-class albaInteractionBehavior;
-#ifdef ALBA_EXPORTS
-#include "albaAvatar.h"
-#else
-class albaAvatar;
-#endif
-class albaDevice;
-class albaDeviceManager;
-class albaDeviceSet;
-class albaDeviceButtonsPadMouse;
-class albaGUIInteractionSettings;
-class vtkRenderer;
-class vtkRendererWindow;
-class albaView;
-class mflXMLWriter;
-class vtkXMLDataElement;
-class vtkXMLDataParser;
-class albaStaticEventRouter;
 class albaToolFlyTo;
 class albaPositionalEventRouter;
-class albaInteractionTool;
-class albaVME;
-class albaGUIDialog;
-class albaGUI;
-class albaGUITree;
-class albaGUICheckListBox;
-class albaGUIHolder;
-class albaGUINamedPanel;
 
-#ifdef ALBA_EXPORTS
-#include "albaDllMacros.h"
-EXPORT_STL_MAP(ALBA_EXPORT,albaString,albaAutoPointer<albaAvatar>);
-EXPORT_STL_VECTOR(ALBA_EXPORT, albaAvatar *);
-#endif
-
-
-/** This class takes care of mastering the interaction inside views.
-  This class is responsible to coordinate interaction, i.e. 
-  resources necessary for interaction (currently devices, actions and avatars)
-  and to manage communication routing for interaction. Management of devices is
-  delegated to the DeviceManager object, picking and routing of events to 
-  picked VME is delegated to PER (positional event router) object, and low level 
-  routing from devices to actions is delegated to the SER (static event router) 
-  object.
-  @sa albaDeviceManager albaPositionalEventRouter albaStaticEventRouter 
-  
-  @todo
-  - check the renderer to be RenFront
-*/
-class ALBA_EXPORT albaInteractionManager : public albaObject, public albaObserver, public albaEventSender, public albaStorable, public albaServiceClient
+/** Owner of the interaction inside the views: it creates the PER (positional event router) and registers it in
+  albaServiceLocator. The render windows send it their mouse events, and it routes them to the tools and to the
+  behavior of the picked VME; the tools are pushed directly on the PER. The events sent by the PER go to the listener.
+  @sa albaPositionalEventRouter albaRWIBase */
+class ALBA_EXPORT albaInteractionManager : public albaObject, public albaObserver, public albaEventSender
 {
 public:
   albaInteractionManager();
@@ -94,156 +42,21 @@ public:
   /** Enable/Disable VME selection by picking */
   void EnableSelect(bool enable);
 
-  /**  Process incoming events. */
+  /** The events of the PER are forwarded to the listener */
   virtual void OnEvent(albaEventBase *event);
-
-  /** Get the device manager object */
-  albaDeviceManager *GetDeviceManager() {return m_DeviceManager;}
-
-  /** return the mouse device */
-  albaDeviceButtonsPadMouse *GetMouseDevice();
-
-  /** return the mouse action, an action to which mouse is bound by default */
-  //albaAction *GetMouseAction();
-
-  /** Define a new action router.*/
-  albaAction *AddAction(const char *name, float priority = 0.0);
-
-  /** Define a new avatar */
-  void AddAvatar(albaAvatar *avatar);
-
-  /** Remove an avatar */
-  int RemoveAvatar(albaAvatar *avatar);
-
-  /** Get an avatar given its name.*/
-  albaAvatar *GetAvatar(const char *name);
-
-  typedef std::map<albaString,albaAutoPointer<albaAvatar> > mmuAvatarsMap;
-  typedef std::vector<albaAvatar *> mmuAvatarsVector;
-
-  /** Return the avatars container */
-  const mmuAvatarsMap &GetAvatars();
-
-  /** return an array with the list of avatars currently connected */
-  void GetAvatars(mmuAvatarsVector &avatars);
-
-  /** Get an action router.*/
-  albaAction *GetAction(const char *name);
-
-  /** Set the selected view. This makes all dynamic avatars
-    and interactors to be informed of the current renderer. */
-  void ViewSelected(albaView *view);
-  
-  /** Return the currently selected view */
-  albaView *GetSelectedView(albaView *view) {return m_SelectedView;}
-
-  /** Set the selected VTK renderer */
-  void SetCurrentRenderer(vtkRenderer *ren);
-
-  /** Return the renderer of the currently selected view,
-  if its a VTK based view otherwise return NULL.*/
-  vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
-
-
-  /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
-  int Store(const char *filename);
-
-  /** restore interaction settings from an XML file (Multimod Interaction Settings - MIS - format) */
-  int Restore(const char *filename);
-
-
-  /** return the positional event router */
-  albaPositionalEventRouter *GetPER() {return m_PositionalEventRouter;}
-
-  /** Push a tool on the tool stack of the PER: it receives the events before the default interaction */
-  void PushTool(albaInteractionTool *tool);
-
-  /** Remove a tool from the tool stack of the PER */
-  void PopTool(albaInteractionTool *tool);
 
   /** Send a key pressed or released to the tools of the PER; return true if a tool used it */
   bool OnKey(int keyCode, bool pressed);
 
   /** Enable/disable the event tracing: each input event routed by the PER is written in the log
-  with the device, the button, the modifiers and who handled it. Disabled by default. */
+  with the modifiers and who handled it. Disabled by default. */
   void SetEventTracing(bool enable);
-
-  /** return the static event router */
-  albaStaticEventRouter *GetSER() {return m_StaticEventRouter;}
 
   /** Start the fly-to mode: push the fly-to tool, the next click flies to the clicked point */
   void CameraFlyToMode();
 
-  /** Open a dialog to choose among available devices */
-  int DeviceChooser(wxString &dev_name,wxString &dev_type);
-
-  /** This is used to allow also external objects to add devices */
-  void AddDeviceToTree(albaDevice *device,albaDeviceSet *parent=NULL);
-  void RemoveDeviceFromTree(albaDevice *device);
-
-  /** Update names in device list */
-  //void UpdateDeviceTree();
-
-  /** Update the name of a device */
-  void UpdateDevice(albaDevice *device);
-
-  /** update bindings check list */
-  void UpdateBindings();
-
-  /** Show in modal configuration the settings dialog. */
-  //bool ShowModal(); //SIL. 07-jun-2006 : 
-  albaGUI* GetGui();  //SIL. 07-jun-2006 : 
-
-  albaStaticEventRouter *GetStaticEventRouter() {return m_StaticEventRouter;}
-
 protected:
-  /** This is called by Store() to store information of this object.  */
-  virtual int InternalStore(albaStorageElement *node);
-
-  /** This is called by Restore() to restore information of this object. */
-  virtual int InternalRestore(albaStorageElement *node);
-  
-  /** The camera updates requested while the device events are dispatched are fused into one at the end of the dispatching */
-  virtual void OnStartDispatching();
-  virtual void OnEndDispatching();
-  virtual void OnDeviceAdded(albaEventBase *event);
-  virtual void OnDeviceRemoving(albaEventBase *event);
-  virtual void OnDeviceNameChanged(albaEventBase *event);
-  virtual void OnBindDeviceToAction(albaEvent *e);
-  virtual void OnAddAvatar(albaEventBase *event);
-  virtual void OnRemoveAvatar(albaEventBase *event);
-
-  /** Create the GUI dialog. */
-  void CreateGUI();
-
-  albaGUI*                 m_Gui;  //SIL. 07-jun-2006 : 
-  wxFrame*                m_Frame;
-  //albaGUIDialog*              m_Dialog;
-  albaGUI*                 m_Devices;
-  albaGUITree*                m_DeviceTree;
-  albaGUICheckListBox*        m_ActionsList;
-  albaGUIHolder*           m_SettingsPanel;
-  //albaGUINamedPanel*          m_BindingsPanel;
-  albaGUI*                 m_Bindings;
-
-  albaDevice*              m_CurrentDevice;
-  albaString			          m_SettingFileName;
-  
-  albaDeviceManager*       m_DeviceManager; 
-  albaPositionalEventRouter*                 m_PositionalEventRouter;
-  albaStaticEventRouter*                 m_StaticEventRouter;
-  albaToolFlyTo*                          m_FlyToTool; ///< tool of the fly-to mode
- 
-  mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
-
-  albaView*                            m_SelectedView;     ///< the view currently selected
-  vtkRenderer*                        m_CurrentRenderer;  ///< the renderer of selected view: to be removed!
-
-private:
-  /** hidden to not be called directly */
-  int Store(albaStorageElement *element) {return albaStorable::Store(element);}
-  
-  /** hidden to not be called directly */
-  int Restore(albaStorageElement *element) {return albaStorable::Restore(element);}
+  albaPositionalEventRouter *m_PositionalEventRouter; ///< router of the mouse events
+  albaToolFlyTo             *m_FlyToTool;             ///< tool of the fly-to mode
 };
 #endif 

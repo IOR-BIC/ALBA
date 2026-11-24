@@ -22,6 +22,7 @@
 #include "albaAbsOpManager.h"
 
 class albaAbsLogicManager;
+class albaPositionalEventRouter;
 
 class ALBA_EXPORT albaServiceLocator
 {
@@ -51,10 +52,17 @@ public:
 	/** Register the operation manager used by all the service clients */
 	static void SetOpManager(albaAbsOpManager* opManager) { m_OpManager = opManager; }
 
+	/** Return the router of the mouse events of the render windows, NULL if the application has no interaction */
+	static albaPositionalEventRouter* GetPositionalEventRouter() { return m_PositionalEventRouter; }
+
+	/** Register the router of the mouse events (done by the interaction manager) */
+	static void SetPositionalEventRouter(albaPositionalEventRouter* per) { m_PositionalEventRouter = per; }
+
 protected:
 	static albaAbsLogicManager* m_LogicManager; ///< the registered logic manager
 	static albaAbsViewManager* m_ViewManager;   ///< the registered view manager
 	static albaAbsHelpManager* m_HelpManager;   ///< the registered help manager
 	static albaAbsOpManager* m_OpManager;       ///< the registered operation manager
+	static albaPositionalEventRouter* m_PositionalEventRouter; ///< the registered router of the mouse events
 };
 #endif

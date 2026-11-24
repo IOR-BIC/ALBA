@@ -35,7 +35,6 @@ enum OP_RESULT
 class albaVME;
 class albaGUI;
 class albaGUIHolder;
-class albaDeviceButtonsPadMouse;
 class albaGUISettings;
 
 //----------------------------------------------------------------------------
@@ -137,12 +136,6 @@ public:
 	wxMenuItem     *m_MenuItem;
 	wxString        m_OpMenuPath;
 
-	//MARCO 7/05/04
-	virtual const char **GetActions() { return NULL; };
-
-	/** Initialize the mouse device. */
-	void SetMouse(albaDeviceButtonsPadMouse *mouse);
-	albaDeviceButtonsPadMouse *GetMouse() { return m_Mouse; };
 
 	/** Turn On m_TestMode flag.
 	The m_TestMode flag is used to exclude the execution of GUI components that conflicts with test machine.*/
@@ -188,7 +181,6 @@ protected:
 	int 						m_OpType; ///< Store the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER
 	bool						m_InputPreserving; ///< Flag to say if the operation change the input data (m_InputPreserving = false) or not.
 	albaObserver    *m_Listener;
-	albaDeviceButtonsPadMouse       *m_Mouse;
 	albaGUISettings *m_SettingPanel;
 	bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.
 	bool m_EnableAccept;

@@ -99,6 +99,9 @@ void albaGizmoPath::Destructor()
   m_LineSource->Delete();
 
   m_VmeGizmoPath->SetBehavior(NULL);
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  if (m_LeftMouseInteractor)
+    m_LeftMouseInteractor->SetListener(NULL);
   albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmoPath->ReparentTo(NULL);
@@ -431,6 +434,9 @@ void albaGizmoPath::DestroyVMEGizmo()
   assert(m_VmeGizmoPath != NULL);
 
   m_VmeGizmoPath->SetBehavior(NULL);
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  if (m_LeftMouseInteractor)
+    m_LeftMouseInteractor->SetListener(NULL);
   albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmoPath->ReparentTo(NULL);

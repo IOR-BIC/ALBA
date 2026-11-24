@@ -30,7 +30,6 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Forward references :
 //----------------------------------------------------------------------------
-class albaDeviceButtonsPadMouse;
 class albaRWI;
 class albaRWIBase;
 

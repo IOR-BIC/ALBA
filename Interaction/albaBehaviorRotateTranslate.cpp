@@ -85,7 +85,7 @@ bool albaBehaviorRotateTranslate::PrepareTransform(int button)
       return false;
     if (m_CtrlDown)
       m_CurrentRotationConstraint = m_RollConstraint;
-    EnableRotationInternal(true);
+    EnableRotation(true);
     return true;
   }
 
@@ -93,7 +93,7 @@ bool albaBehaviorRotateTranslate::PrepareTransform(int button)
   {
     if (m_ShiftDown || m_CtrlDown)
       return false;
-    EnableTranslationInternal(true);
+    EnableTranslation(true);
     return true;
   }
 

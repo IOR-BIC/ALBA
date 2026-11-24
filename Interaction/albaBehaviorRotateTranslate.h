@@ -58,9 +58,6 @@ public:
   /** Set the VME giving the reference system of the constraints and the pivot */
   void SetRefSysVME(albaVME *refSysVME);
 
-  using albaBehaviorTransform::SetRotationConstraint;
-  using albaBehaviorTransform::SetTranslationConstraint;
-
   /** Set the rotation constraint, one of TRANSFORM_CONSTRAINT from X_AXIS to NORMAL_VIEW_PLANE */
   void SetRotationConstraint(int constraint);
 

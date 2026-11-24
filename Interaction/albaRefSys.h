@@ -53,9 +53,11 @@ public:
   albaRefSys(albaVME *vme);
   albaRefSys(vtkMatrix4x4 *matrix);
   albaRefSys(vtkRenderer *ren);
-  virtual ~albaRefSys();
-  
   /** copy constructor */
+  albaRefSys(const albaRefSys &source);
+  virtual ~albaRefSys();
+
+  /** copy the type, the transform, the renderer and the VME */
   void operator =(const albaRefSys &source);
   
 

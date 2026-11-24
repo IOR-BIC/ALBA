@@ -21,6 +21,7 @@ PURPOSE. See the above copyright notice for more information.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpExtractIsosurface.h"
 #include "albaGUIBusyInfo.h"
 #include "wx\statline.h"
@@ -33,7 +34,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaRWIBase.h"
 #include "albaRWI.h"
 #include "albaViewVTK.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "albaGUIButton.h"
 #include "albaGUIValidator.h"
@@ -270,14 +270,12 @@ void albaOpExtractIsosurface::CreateOpDialog()
   m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
   m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
   m_Rwi->Show(true);
-  m_Rwi->m_RwiBase->SetMouse(m_Mouse);
-  m_View->SetMouse(m_Mouse);
   m_OldSelectedView = GetLogicManager()->GetSelectedView();
   GetLogicManager()->SelectView(m_View);
   albaNEW(m_DensityPicker);
   m_DensityPicker->SetListener(this);	
   m_DensityPicker->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
-  GetLogicManager()->PushTool(m_DensityPicker);
+  GetPositionalEventRouter()->PushTool(m_DensityPicker);
   m_PIPRen->SetViewport(.6, .01, .99, .4);
   m_PIPRen->GetActiveCamera()->SetFocalPoint(0,0,0);
   m_PIPRen->GetActiveCamera()->SetPosition(0,0,-70);
@@ -575,7 +573,7 @@ void albaOpExtractIsosurface::CreateSlicePipeline()
 //----------------------------------------------------------------------------
 void albaOpExtractIsosurface::DeleteOpDialog()
 {
-  GetLogicManager()->PopTool(m_DensityPicker);
+  GetPositionalEventRouter()->PopTool(m_DensityPicker);
 
   m_VolNode->DeletePipe();
   cppDEL(m_VolNode);

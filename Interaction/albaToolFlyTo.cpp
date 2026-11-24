@@ -22,6 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaToolFlyTo.h"
 #include "albaAbsLogicManager.h"
 #include "albaView.h"
@@ -52,7 +53,7 @@ bool albaToolFlyTo::FlyAndPop(albaView *view, vtkRenderer *ren, double pos[2], d
 
   // one click ends the fly-to mode, also when nothing is picked
   if (GetLogicManager())
-    GetLogicManager()->PopTool(this);
+    GetPositionalEventRouter()->PopTool(this);
   return true;
 }
 
