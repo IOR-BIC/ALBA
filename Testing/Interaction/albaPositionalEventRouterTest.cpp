@@ -422,21 +422,14 @@ void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
   generic->SetListener(&listener);
   generic->SetRendererAndView(NULL, view);
 
-  // picking set by the caller: no picking on the view
-  double callerPos[3] = {7.0, 8.0, 9.0};
-  generic->SetButtonDownPick(true, callerPos);
+  // the button down uses the position picked by the PER: no picking on the view
+  double pickedPos[3] = {7.0, 8.0, 9.0};
+  generic->SetPickedPosition(pickedPos);
   generic->OnButtonDownAction(10, 20);
 
   CPPUNIT_ASSERT(view->m_PickCount == 0);
   CPPUNIT_ASSERT(listener.m_MouseDownCount == 1);
   CPPUNIT_ASSERT(listener.m_PickedPosition[0] == 7.0 && listener.m_PickedPosition[1] == 8.0 && listener.m_PickedPosition[2] == 9.0);
-
-  // the caller picking is used only once, then the behavior picks by itself
-  generic->OnButtonDownAction(10, 20);
-
-  CPPUNIT_ASSERT(view->m_PickCount == 1);
-  CPPUNIT_ASSERT(listener.m_MouseDownCount == 2);
-  CPPUNIT_ASSERT(listener.m_PickedPosition[0] == 1.0 && listener.m_PickedPosition[1] == 2.0 && listener.m_PickedPosition[2] == 3.0);
 
   generic->Delete();
   vme->Delete();

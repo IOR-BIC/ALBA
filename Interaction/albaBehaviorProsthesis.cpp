@@ -55,7 +55,7 @@ bool albaBehaviorProsthesis::PrepareTransform(int button)
   // the left button with SHIFT translates, as the middle button
   if (button == ALBA_LEFT_BUTTON && m_ShiftDown)
   {
-    EnableTranslationInternal(true);
+    EnableTranslation(true);
     return true;
   }
 
