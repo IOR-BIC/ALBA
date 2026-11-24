@@ -45,16 +45,27 @@ albaInteractorConstraint::albaInteractorConstraint(const albaInteractorConstrain
 {
   m_RefSys = new albaRefSys;
   Reset();
-  *m_RefSys=*(source.m_RefSys);
+  *this = source;
+}
+
+//----------------------------------------------------------------------------
+albaInteractorConstraint &albaInteractorConstraint::operator=(const albaInteractorConstraint& source)
+//----------------------------------------------------------------------------
+{
+  // each constraint owns its ref sys: the contents are copied, not the pointer
+  *m_RefSys = *(source.m_RefSys);
 
   for (int j = 0; j < 3; j++)
   {
     m_ConstraintModality[j] = source.m_ConstraintModality[j];
     m_LowerBound[j] = source.m_LowerBound[j];
+    m_UpperBound[j] = source.m_UpperBound[j];
     m_Min[j] = source.m_Min[j];
-    m_Max[j] = source.m_Max[j];  
-    m_SnapArray[j]=source.m_SnapArray[j];
+    m_Max[j] = source.m_Max[j];
+    m_Step[j] = source.m_Step[j];
+    m_SnapArray[j] = source.m_SnapArray[j];
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -64,7 +75,7 @@ void albaInteractorConstraint::Reset()
   for (int j = 0; j < 3; j++)
   {
     m_ConstraintModality[j] = FREE;
-    m_LowerBound[j] = 0;
+    m_LowerBound[j] = m_UpperBound[j] = 0;
     m_Min[j] = m_Max[j] = m_Step[j] = 0;  
     m_SnapArray[j]=NULL;
   }

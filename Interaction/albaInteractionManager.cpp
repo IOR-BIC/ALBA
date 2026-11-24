@@ -133,6 +133,7 @@ albaInteractionManager::~albaInteractionManager()
   if (m_FlyToTool)
     m_PositionalEventRouter->PopTool(m_FlyToTool);
   albaDEL(m_FlyToTool);
+  SetCurrentRenderer(NULL);
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
@@ -164,11 +165,13 @@ void albaInteractionManager::SetEventTracing(bool enable)
 //----------------------------------------------------------------------------
 void albaInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
 {
-  if (ren)
-    ren->UnRegister(NULL);
+  if (ren == m_CurrentRenderer)
+    return;
 
+  // the previous renderer is released, the new one is kept
+  if (m_CurrentRenderer)
+    m_CurrentRenderer->UnRegister(NULL);
   m_CurrentRenderer = ren;
-
   if (ren)
     ren->Register(NULL);
 }

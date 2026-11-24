@@ -48,6 +48,24 @@ void albaRefSysTest::TestCopyConstructor()
   refSysTarget = refSysSource;
   int targetType = refSysTarget.GetType();
   CPPUNIT_ASSERT(targetType == albaRefSys::VIEW);
+
+  // each copy keeps its own reference to the renderer
+  vtkRenderer *renderer = vtkRenderer::New();
+  refSysSource.SetTypeToView(renderer);
+  CPPUNIT_ASSERT(renderer->GetReferenceCount() == 2);
+  {
+    albaRefSys copy(refSysSource);
+    CPPUNIT_ASSERT(copy.GetType() == albaRefSys::VIEW && copy.GetRenderer() == renderer);
+    refSysTarget = refSysSource;
+    CPPUNIT_ASSERT(renderer->GetReferenceCount() == 4);
+  }
+  CPPUNIT_ASSERT(renderer->GetReferenceCount() == 3);
+
+  // reset releases the renderer
+  refSysTarget.Reset();
+  refSysSource.Reset();
+  CPPUNIT_ASSERT(renderer->GetReferenceCount() == 1);
+  vtkDEL(renderer);
 }
 
 void albaRefSysTest::TestSetTypeToCustom()
@@ -134,7 +152,18 @@ void albaRefSysTest::TestDeepCopy()
 {
   albaRefSys refSysSource;
   albaRefSys refSysTarget;
+  vtkRenderer *renderer = vtkRenderer::New();
+  refSysSource.SetTypeToView(renderer);
+
+  // the target gets type and renderer of the source, with its own reference
   refSysTarget.DeepCopy(&refSysSource);
+  CPPUNIT_ASSERT(refSysTarget.GetType() == albaRefSys::VIEW);
+  CPPUNIT_ASSERT(refSysTarget.GetRenderer() == renderer);
+  CPPUNIT_ASSERT(renderer->GetReferenceCount() == 3);
+
+  refSysTarget.Reset();
+  refSysSource.Reset();
+  vtkDEL(renderer);
 }
 
 void albaRefSysTest::TestReset()

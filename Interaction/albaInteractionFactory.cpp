@@ -141,7 +141,7 @@ const char *albaInteractionFactory::GetAvatarDescription(const char *avatar_name
 //------------------------------------------------------------------------------
 {
   // check if that device exists
-  if (glo_AvatarNames.find(avatar_name)!=glo_DeviceNames.end())
+  if (glo_AvatarNames.find(avatar_name)!=glo_AvatarNames.end())
   {
     mmuOverRideMap::iterator pos = m_OverrideMap->find(avatar_name);
     if ( pos != m_OverrideMap->end() )
