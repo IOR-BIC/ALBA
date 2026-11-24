@@ -41,9 +41,7 @@
   #include "albaViewVTK.h"
   
   #include "albaInteractionManager.h"
-  #include "albaInteractionFactory.h"
   #include "albaInteractionBehavior.h"
-  #include "albaDeviceManager.h"
   #include "albaDeviceButtonsPadMouse.h"
   #include "albaPositionalEventRouter.h"
   #include "albaGUITreeContextualMenu.h"
@@ -176,7 +174,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_User = new albaUser();
 
 	m_ShowStorageSettings = false;
-	m_ShowInteractionSettings = false;
 	m_SelectedLandmark = NULL;
 	m_FatalExptionOccurred = false;
 
@@ -302,9 +299,6 @@ void albaLogicWithManagers::Configure()
 
 		m_Mouse = m_InteractionManager->GetMouseDevice();
 		//SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
-
-		if (m_ShowInteractionSettings)
-			m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
 	}
 	
 	if (m_UseViewManager)

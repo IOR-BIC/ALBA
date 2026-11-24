@@ -45,7 +45,7 @@ class albaEventBroadcaster;
   of agents.
   This class support also bridging of events coming from VTK: a albaAgent can be set as observer of VTK events
   which are tunneled inside ALBA events.
-  @sa albaEventBase albaAgent albaAgentEventQueue */
+  @sa albaEventBase albaInteractionAgent albaDevice */
 class ALBA_EXPORT albaAgent: public albaReferenceCounted, public albaObserver, public albaEventBroadcaster
 {
 public:

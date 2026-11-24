@@ -419,7 +419,7 @@ protected:
 	/** Create a new view. */
 	virtual void ViewCreate(int viewId);
 
-	/** Called when user change the measure unit from menù Options.*/
+	/** Called when user change the measure unit from menï¿½ Options.*/
 	void UpdateMeasureUnit();
 
 	/** Enable/Disable menu items when an operation start/end running. */
@@ -535,7 +535,6 @@ protected:
 	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
 	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
 	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
-	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
 	bool m_FatalExptionOccurred;
 	bool m_OpeningMSF;
 private:

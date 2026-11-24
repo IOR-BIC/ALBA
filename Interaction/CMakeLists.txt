@@ -9,12 +9,8 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 # Set your list of sources here.
 SET(PROJECT_SRCS
   albaAgent.cpp  							albaAgent.h
-  albaAgentEventHandler.cpp  				albaAgentEventHandler.h
-  albaAgentEventQueue.cpp  					albaAgentEventQueue.h
   albaGizmoAutoscaleHelper.cpp  				albaGizmoAutoscaleHelper.h
   albaDevice.cpp  							albaDevice.h
-  albaDeviceManager.cpp  					albaDeviceManager.h
-  albaDeviceSet.cpp  						albaDeviceSet.h
   albaEventInteraction.cpp  					albaEventInteraction.h
   albaGizmoBoundingBox.cpp  					albaGizmoBoundingBox.h
   albaGizmoHandle.cpp  						albaGizmoHandle.h
@@ -41,7 +37,6 @@ SET(PROJECT_SRCS
   albaTransformInterfaceGUI.cpp  			albaTransformInterfaceGUI.h
   albaRotateTranslateGUI.cpp  				albaRotateTranslateGUI.h
   albaTransformTextEntriesGUI.cpp  			albaTransformTextEntriesGUI.h
-  albaInteractionFactory.cpp  				albaInteractionFactory.h
   albaInteractionManager.cpp  				albaInteractionManager.h
   albaInteractionBehavior.cpp  						albaInteractionBehavior.h
   albaInteractionAgent.cpp  						albaInteractionAgent.h

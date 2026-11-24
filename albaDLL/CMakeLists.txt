@@ -283,12 +283,8 @@ ENDIF (ALBA_USE_VTK)
 ###############################################
 SET(INTERACTION_SRCS
   ../Interaction/albaAgent.cpp  							../Interaction/albaAgent.h
-  ../Interaction/albaAgentEventHandler.cpp  				../Interaction/albaAgentEventHandler.h
-  ../Interaction/albaAgentEventQueue.cpp  					../Interaction/albaAgentEventQueue.h
   ../Interaction/albaGizmoAutoscaleHelper.cpp  				../Interaction/albaGizmoAutoscaleHelper.h
   ../Interaction/albaDevice.cpp  							../Interaction/albaDevice.h
-  ../Interaction/albaDeviceManager.cpp  					../Interaction/albaDeviceManager.h
-  ../Interaction/albaDeviceSet.cpp  						../Interaction/albaDeviceSet.h
   ../Interaction/albaEventInteraction.cpp  					../Interaction/albaEventInteraction.h
   ../Interaction/albaGizmoBoundingBox.cpp  					../Interaction/albaGizmoBoundingBox.h
   ../Interaction/albaGizmoHandle.cpp  						../Interaction/albaGizmoHandle.h
@@ -315,7 +311,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaTransformInterfaceGUI.cpp  			../Interaction/albaTransformInterfaceGUI.h
   ../Interaction/albaRotateTranslateGUI.cpp  				../Interaction/albaRotateTranslateGUI.h
   ../Interaction/albaTransformTextEntriesGUI.cpp  			../Interaction/albaTransformTextEntriesGUI.h
-  ../Interaction/albaInteractionFactory.cpp  				../Interaction/albaInteractionFactory.h
   ../Interaction/albaInteractionManager.cpp  				../Interaction/albaInteractionManager.h
   ../Interaction/albaInteractionBehavior.cpp  						../Interaction/albaInteractionBehavior.h
   ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h

@@ -30,16 +30,12 @@ SET(PROJECT_SRCS
 	albaGizmoInterfaceTest.h albaGizmoInterfaceTest.cpp
 	albaInteractorConstraintTest.h albaInteractorConstraintTest.cpp
 	albaRefSysTest.h albaRefSysTest.cpp
-	albaDeviceSetTest.h albaDeviceSetTest.cpp
 	albaGizmoTranslateGUITest.h albaGizmoTranslateGUITest.cpp
 	albaGizmoRotateGUITest.h albaGizmoRotateGUITest.cpp
 	albaGizmoScaleGUITest.h albaGizmoScaleGUITest.cpp
 	albaEventInteractionTest.h albaEventInteractionTest.cpp
-	albaDeviceManagerTest.h albaDeviceManagerTest.cpp
-	albaInteractionFactoryTest.h albaInteractionFactoryTest.cpp
 	albaTransformTextEntriesGUITest.h albaTransformTextEntriesGUITest.cpp
 	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
-	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp
 	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp
 	albaDeviceTest.h albaDeviceTest.cpp
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp

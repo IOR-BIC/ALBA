@@ -34,7 +34,6 @@
 #include "albaGUIPicButton.h"
 #include "albaGUIRollOut.h"
 #include "albaGUIValidator.h"
-#include "albaInteractionFactory.h"
 #include "albaToolSegmentationEdit.h"
 #include "albaToolSegmentationThreshold.h"
 #include "albaMatrix.h"
