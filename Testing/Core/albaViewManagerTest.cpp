@@ -261,6 +261,19 @@ void albaViewManagerTest::ViewDeleteTest()
   //CPPUNIT_ASSERT(view1 == NULL); // check if the view has been deleted  
   CPPUNIT_ASSERT(m_Manager->GetList() != view1); // check if the view has been removed from the view list
   CPPUNIT_ASSERT(m_Logic->m_ViewDeletedCalls == 1); // check if the logic was told of the view deletion
+
+  // deleting another view keeps the selected one
+  albaView* view3 = new albaViewDummy();
+  m_Manager->ViewInsert(view3);
+  view3->m_Id = VIEW_START;
+  m_Manager->ViewSelected(view2);
+  m_Manager->ViewDelete(view3);
+  CPPUNIT_ASSERT(m_Manager->GetSelectedView() == view2);
+
+  // deleting the selected view clears the selection
+  view2->m_Id = VIEW_START;
+  m_Manager->ViewDelete(view2);
+  CPPUNIT_ASSERT(m_Manager->GetSelectedView() == NULL);
 }
 //----------------------------------------------------------------------------
 void albaViewManagerTest::GetViewTest()

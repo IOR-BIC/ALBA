@@ -552,10 +552,11 @@ void albaViewManager::ViewClose(const char *label)
 //----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
 {
-  if(m_SelectedView)
+  // only the deleted view loses the selection: the mouse is given to the views only when they are created
+  if(view == m_SelectedView)
   {
     if(m_SelectedRWI)
-      m_SelectedRWI->SetMouse(NULL); // update the selected view rwi
+      m_SelectedRWI->SetMouse(NULL);
     m_SelectedRWI = NULL;
     m_SelectedView = NULL;
   }
