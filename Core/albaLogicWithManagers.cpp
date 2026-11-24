@@ -42,7 +42,6 @@
   
   #include "albaInteractionManager.h"
   #include "albaInteractionBehavior.h"
-  #include "albaDeviceButtonsPadMouse.h"
   #include "albaPositionalEventRouter.h"
   #include "albaGUITreeContextualMenu.h"
   #include "albaGUIContextualMenu.h"
@@ -297,8 +296,6 @@ void albaLogicWithManagers::Configure()
 		m_InteractionManager = new albaInteractionManager();
 		m_InteractionManager->SetListener(this);
 
-		m_Mouse = m_InteractionManager->GetMouseDevice();
-		//SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
 	}
 	
 	if (m_UseViewManager)
@@ -306,7 +303,6 @@ void albaLogicWithManagers::Configure()
 		m_ViewManager = new albaViewManager();
 		albaServiceLocator::SetViewManager(m_ViewManager);
 		m_ViewManager->SetListener(this);
-		m_ViewManager->SetMouse(m_Mouse);
 
 		m_SettingsDialog->AddPage(m_ViewManager->GetSettingsGui(), "View");
 	}
@@ -316,7 +312,6 @@ void albaLogicWithManagers::Configure()
 		m_OpManager = new albaOpManager();
 		albaServiceLocator::SetOpManager(m_OpManager);
 		m_OpManager->SetListener(this);
-		m_OpManager->SetMouse(m_Mouse);
 		m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 	}
 
@@ -330,7 +325,6 @@ void albaLogicWithManagers::Configure()
 	if (m_UseSnapshotManager)
 	{
 		m_SnapshotManager = new albaSnapshotManager();
-		m_SnapshotManager->SetMouse(m_Mouse);
 
 		m_SettingsDialog->AddPage(m_SnapshotManager->GetSettingsGui(), "Snapshot");
 	}
@@ -1209,11 +1203,6 @@ void albaLogicWithManagers::ViewDeleted(albaView *view)
 		m_SideBar->ViewDeleted(view);
 	if (view == m_SelectedView)
 		m_SelectedView = NULL;
-#ifdef ALBA_USE_VTK
-	// currently albaInteraction is strictly dependent on VTK (marco)
-	if (m_InteractionManager)
-		m_InteractionManager->ViewSelected(NULL);
-#endif
 	EnableMenuAndToolbar();
 
 	if (m_OpManager)
@@ -1242,12 +1231,6 @@ void albaLogicWithManagers::SelectView(albaView *view)
 
 	if (m_SideBar)
 		m_SideBar->ViewSelect(view);
-
-	// currently albaInteraction is strictly dependent on VTK (marco)
-#ifdef ALBA_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->ViewSelected(view);
-#endif
 
 	if (m_OpManager)
 	{
@@ -1390,24 +1373,6 @@ const char* albaLogicWithManagers::GetAlbaBuildNum()
 void albaLogicWithManagers::SetAlbaBuildNum(char* buildNum)
 {
 	m_AlbaBuildNum = buildNum;
-}
-
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::PushTool(albaInteractionTool *tool)
-{
-#ifdef ALBA_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->PushTool(tool);
-#endif
-}
-
-//----------------------------------------------------------------------------
-void albaLogicWithManagers::PopTool(albaInteractionTool *tool)
-{
-#ifdef ALBA_USE_VTK
-	if (m_InteractionManager)
-		m_InteractionManager->PopTool(tool);
-#endif
 }
 
 //----------------------------------------------------------------------------

@@ -17,7 +17,6 @@
 #include "albaBehaviorTransform.h"
 
 #include "albaDecl.h"
-#include "albaDevice.h"
 #include "albaRefSys.h"
 
 

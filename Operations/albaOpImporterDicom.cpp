@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <algorithm>
 
+#include "albaPositionalEventRouter.h"
 #include "albaGUIBusyInfo.h"
 #include "wx/listctrl.h"
 #include "wx/dir.h"
@@ -31,7 +32,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "albaOpImporterDicom.h"
 #include "albaGUIWizardPageNew.h"
 #include "albaGUIValidator.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaToolDICOMImporter.h"
 #include "albaViewVTK.h"
 #include "albaTagArray.h"
@@ -326,7 +326,7 @@ void albaOpImporterDicom::OpDo()
 void albaOpImporterDicom::OpStop(int result)
 {
 	if (m_DicomTool)
-		GetLogicManager()->PopTool(m_DicomTool);
+		GetPositionalEventRouter()->PopTool(m_DicomTool);
 
 	// the previous view is selected again before the views of the pages are deleted
 	if (m_LoadPage)
@@ -586,7 +586,6 @@ void albaOpImporterDicom::CreateLoadPage()
 
 	// the views of the pages are selected while they are shown: the mouse and the interaction work on them
 	m_OldSelectedView = GetLogicManager()->GetSelectedView();
-	m_LoadPage->GetView()->SetMouse(m_Mouse);
 	if (m_Input)
 		m_LoadPage->GetView()->VmeSelect(m_Input, true); // the view GUI, built by the side bar, needs the selected VME
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
@@ -606,7 +605,6 @@ void albaOpImporterDicom::CreateCropPage()
 	m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
 	m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
 
-	m_CropPage->GetView()->SetMouse(m_Mouse);
 	if (m_Input)
 		m_CropPage->GetView()->VmeSelect(m_Input, true); // the view GUI, built by the side bar, needs the selected VME
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
@@ -801,7 +799,7 @@ void albaOpImporterDicom::CreateSliceVTKPipeline()
 	m_TextMapper->Modified();
 
 	// interactor
-	if (m_Mouse)
+	if (GetPositionalEventRouter())
 	{
 		albaNEW(m_DicomTool);
 		m_DicomTool->SetListener(this);
@@ -1362,7 +1360,7 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 			m_LoadPage->GetWindowing(m_SliceRange, m_SliceSubRange);
 
 			m_DicomTool->SetSliceBounds(m_SliceBounds);
-			GetLogicManager()->PushTool(m_DicomTool); // the crop rectangle is edited only in the crop page
+			GetPositionalEventRouter()->PushTool(m_DicomTool); // the crop rectangle is edited only in the crop page
 
 			m_CropPage->RemoveGuiLowerCenter(m_CropGuiCenter);
 			m_CropGuiCenter = new albaGUI(this);
@@ -1391,7 +1389,7 @@ void albaOpImporterDicom::OnWizardChangePage( albaEvent * e )
 	{
 		//get the current windowing in order to maintain subrange thought the wizard pages 
 		m_CropPage->GetWindowing(m_SliceRange, m_SliceSubRange);
-		GetLogicManager()->PopTool(m_DicomTool);
+		GetPositionalEventRouter()->PopTool(m_DicomTool);
 
 		//TODO RESTORE THIS
 		wxWindow* NextButton = m_Wizard->FindWindowById(wxID_FORWARD);

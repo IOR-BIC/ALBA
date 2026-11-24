@@ -27,8 +27,8 @@
 #include "albaEventBase.h"
 #include "albaView.h"
 #include "albaPositionalEventRouter.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaToolFlyTo.h"
+#include "albaServiceLocator.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractionManager);
@@ -37,17 +37,14 @@ albaCxxTypeMacro(albaInteractionManager);
 albaInteractionManager::albaInteractionManager()
 {
   m_FlyToTool = NULL;
-  m_SelectedView = NULL;
 
   albaNEW(m_PositionalEventRouter);
   m_PositionalEventRouter->SetName("PositionalEventRouter");
   m_PositionalEventRouter->SetListener(this);
   m_PositionalEventRouter->Initialize();
 
-  // the mouse events go to the PER
-  albaNEW(m_Mouse);
-  m_Mouse->SetName("Mouse");
-  m_Mouse->AddObserver(m_PositionalEventRouter, MCH_INPUT);
+  // the render windows send the mouse events to the registered router
+  albaServiceLocator::SetPositionalEventRouter(m_PositionalEventRouter);
 }
 
 //------------------------------------------------------------------------------
@@ -56,8 +53,8 @@ albaInteractionManager::~albaInteractionManager()
   if (m_FlyToTool)
     m_PositionalEventRouter->PopTool(m_FlyToTool);
   albaDEL(m_FlyToTool);
-  m_Mouse->RemoveObserver(m_PositionalEventRouter);
-  albaDEL(m_Mouse);
+  if (albaServiceLocator::GetPositionalEventRouter() == m_PositionalEventRouter)
+    albaServiceLocator::SetPositionalEventRouter(NULL);
   albaDEL(m_PositionalEventRouter);
 }
 
@@ -65,18 +62,6 @@ albaInteractionManager::~albaInteractionManager()
 void albaInteractionManager::OnEvent(albaEventBase *event)
 {
   InvokeEvent(event);
-}
-
-//----------------------------------------------------------------------------
-void albaInteractionManager::PushTool(albaInteractionTool *tool)
-{
-  m_PositionalEventRouter->PushTool(tool);
-}
-
-//----------------------------------------------------------------------------
-void albaInteractionManager::PopTool(albaInteractionTool *tool)
-{
-  m_PositionalEventRouter->PopTool(tool);
 }
 
 //----------------------------------------------------------------------------
@@ -96,18 +81,11 @@ void albaInteractionManager::CameraFlyToMode()
 {
   if (m_FlyToTool == NULL)
     albaNEW(m_FlyToTool);
-  PushTool(m_FlyToTool);
+  m_PositionalEventRouter->PushTool(m_FlyToTool);
 }
 
 //------------------------------------------------------------------------------
 void albaInteractionManager::EnableSelect(bool enable)
 {
   m_PositionalEventRouter->EnableSelect(enable);
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::ViewSelected(albaView *view)
-{
-  m_SelectedView = view;
-  m_Mouse->SetView(view);
 }

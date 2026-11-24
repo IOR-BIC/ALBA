@@ -26,7 +26,6 @@
 //----------------------------------------------------------------------------
 //forward ref
 //----------------------------------------------------------------------------
-class albaDeviceButtonsPadMouse;
 class albaMatrix;
 class albaRefSys;
 class albaTransform;

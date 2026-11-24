@@ -203,6 +203,7 @@ void albaViewGlobalSlice::Create()
   RWI_LAYERS num_layers = TWO_LAYER;
   
   m_Rwi = new albaRWI(albaGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_StereoType);
+  m_Rwi->m_RwiBase->SetView(this); // the mouse events of the render window come from this view
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;

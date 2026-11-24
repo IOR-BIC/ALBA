@@ -22,8 +22,6 @@
 #include "albaInteractionTests.h"
 
 #include "albaAgentTest.h"
-#include "albaDeviceButtonsPadTest.h"
-#include "albaDeviceTest.h"
 #include "albaEventInteractionTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaFakeViewManagerForTest.h"
@@ -63,6 +61,7 @@
 #include "albaInteractionBehaviorTest.h"
 #include "albaRefSysTest.h"
 #include "albaServiceLocator.h"
+#include "albaPositionalEventRouter.h"
 
 #include "albaToolVTKPickerTest.h"
 #include "albaToolSelectPointTest.h"
@@ -114,6 +113,8 @@ int	main( int argc, char* argv[] )
 
 	albaFakeLogicForTest *logic = new albaFakeLogicForTest();
 	albaServiceLocator::SetLogicManager(logic);
+	albaPositionalEventRouter *per = albaPositionalEventRouter::New(); // the router of the mouse events used by the render windows and the operations
+	albaServiceLocator::SetPositionalEventRouter(per);
 	albaFakeViewManagerForTest *viewManager = new albaFakeViewManagerForTest();
 	albaServiceLocator::SetViewManager(viewManager);
 
@@ -147,8 +148,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaTransformTextEntriesGUITest::suite());
 	runner.addTest(albaSaveRestorePoseGUITest::suite());
 	runner.addTest(albaPositionalEventRouterTest::suite());
-	runner.addTest(albaDeviceTest::suite());
-	runner.addTest(albaDeviceButtonsPadTest::suite());
 	runner.addTest(albaGizmoScaleAxisTest::suite());
 	runner.addTest(albaGizmoScaleTest::suite());
 	runner.addTest(albaToolExtractIsosurfaceTest::suite());
@@ -172,6 +171,8 @@ int	main( int argc, char* argv[] )
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
 
+	albaServiceLocator::SetPositionalEventRouter(NULL);
+	per->Delete();
 	cppDEL(logic);
 	cppDEL(viewManager);
 

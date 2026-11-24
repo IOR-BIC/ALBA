@@ -37,7 +37,6 @@ class albaVMELandmark;
 class albaVMELandmarkCloud;
 class albaInteractionManager;
 class albaPrintManager;
-class albaDeviceButtonsPadMouse;
 class albaGUISettingsDialog;
 class albaGUIAboutDialog;
 class albaGUISplashScreen;
@@ -267,12 +266,6 @@ public:
 	/** Return the selected view, NULL if none */
 	albaView *GetSelectedView() override { return m_SelectedView; }
 
-	/** Push a tool on the tool stack of the positional event router */
-	void PushTool(albaInteractionTool *tool) override;
-
-	/** Remove a tool from the tool stack of the positional event router */
-	void PopTool(albaInteractionTool *tool) override;
-
 
 	bool IsTimeVaringEnabled() override;
 
@@ -470,7 +463,6 @@ protected:
 
 	albaPrintManager     *m_PrintSupport;
 
-	albaDeviceButtonsPadMouse            *m_Mouse;
 
 	mmaApplicationLayout *m_AppLayout;
 

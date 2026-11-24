@@ -26,12 +26,10 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaPositionalEventRouterTest.h"
 #include "albaPositionalEventRouter.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
+#include "albaRWIBase.h"
 #include "albaVMESurface.h"
 #include "albaView.h"
 #include "albaEvent.h"
-#include "albaDeviceButtonsPad.h"
 #include "albaBehaviorTransform.h"
 #include "albaTransform.h"
 #include "albaInteractionTool.h"
@@ -135,20 +133,17 @@ class albaPERTestModalTool : public albaPERTestTool // the button down receives 
 public:
   albaTypeMacro(albaPERTestModalTool, albaPERTestTool);
 
-  albaPERTestModalTool() {m_PER = NULL; m_Mouse = NULL; m_UseLeft = true;};
+  albaPERTestModalTool() {m_PER = NULL; m_RWI = NULL; m_UseLeft = true;};
 
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
   {
     m_LeftDown++;
-    albaEventInteraction up(m_Mouse, DEVICE_BUTTON_UP);
-    up.SetButton(ALBA_LEFT_BUTTON);
-    up.SetChannel(MCH_INPUT);
-    m_PER->OnEvent(&up);
+    m_PER->OnLeftButtonUp(m_RWI, view, ren, pos);
     return m_UseLeft;
   };
 
   albaPositionalEventRouter *m_PER;
-  albaDeviceButtonsPadMouse *m_Mouse;
+  albaRWIBase *m_RWI;
 };
 
 albaCxxTypeMacro(albaPERTestModalTool);
@@ -197,23 +192,53 @@ public:
 albaCxxTypeMacro(albaPERTestBehavior);
 
 //----------------------------------------------------------------------------
-static void SendToPER(albaPositionalEventRouter *per, albaDeviceButtonsPadMouse *mouse, albaID id, int button = ALBA_LEFT_BUTTON)
+class albaPERTestMouse // the render window and the view sending the mouse events to the PER
 //----------------------------------------------------------------------------
 {
-  albaEventInteraction e(mouse, id);
-  e.SetButton(button);
-  e.Set2DPosition(10, 20);
-  e.SetChannel(MCH_INPUT);
-  per->OnEvent(&e);
+public:
+  albaPERTestMouse() {m_RWI = albaRWIBase::New(); m_View = NULL;};
+  ~albaPERTestMouse() {m_RWI->Delete();};
+
+  albaRWIBase *m_RWI;  ///< created without a window: the PER only compares it
+  albaView    *m_View;
+};
+
+//----------------------------------------------------------------------------
+static void SendToPER(albaPositionalEventRouter *per, albaPERTestMouse *mouse, albaID id, int button = ALBA_LEFT_BUTTON, double rotation = 0)
+//----------------------------------------------------------------------------
+{
+  // the render window sets the modifier keys and calls the method of the event, at the position (10, 20)
+  double pos[2] = {10, 20};
+  per->SetModifierKeys(false, false, false);
+  switch (id)
+  {
+    case DEVICE_BUTTON_DOWN:
+      switch (button)
+      {
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(mouse->m_RWI, mouse->m_View, NULL, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(mouse->m_RWI, mouse->m_View, NULL, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(mouse->m_RWI, mouse->m_View, NULL, pos);  break;
+      }
+      break;
+    case DEVICE_BUTTON_UP:
+      switch (button)
+      {
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(mouse->m_RWI, mouse->m_View, NULL, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(mouse->m_RWI, mouse->m_View, NULL, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(mouse->m_RWI, mouse->m_View, NULL, pos);  break;
+      }
+      break;
+    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(mouse->m_RWI, mouse->m_View, NULL, pos); break;
+    case DEVICE_MOUSE_WHEEL:   per->OnMouseWheel(mouse->m_RWI, mouse->m_View, NULL, pos, rotation); break;
+  }
 }
 
 //----------------------------------------------------------------------------
-static void SelectView(albaDeviceButtonsPadMouse *mouse, albaView *view)
+static void SelectView(albaPERTestMouse *mouse, albaView *view)
 //----------------------------------------------------------------------------
 {
-  mouse->SetView(view);
+  mouse->m_View = view;
 }
-
 
 void albaPositionalEventRouterTest::TestFixture()
 {
@@ -245,11 +270,8 @@ void albaPositionalEventRouterTest::TestIsInteracting()
   albaPositionalEventRouter *mip = albaPositionalEventRouter::New();
   CPPUNIT_ASSERT(mip);
 
-  albaDeviceButtonsPadMouse *dummyDevice = albaDeviceButtonsPadMouse::New();
-
-  bool isInteracting = mip->IsInteracting(dummyDevice);
+  bool isInteracting = mip->IsInteracting();
   CPPUNIT_ASSERT(isInteracting == false);
-  dummyDevice->Delete();
   mip->Delete();
 }
 
@@ -258,12 +280,12 @@ void albaPositionalEventRouterTest::TestOnEvent()
   // mostly to test for leaks: a move without view and without tools
   albaPositionalEventRouter *mip = albaPositionalEventRouter::New();
   CPPUNIT_ASSERT(mip);
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
 
   SendToPER(mip, mouse, DEVICE_MOUSE_2D_MOVE);
-  CPPUNIT_ASSERT(!mip->IsInteracting(mouse));
+  CPPUNIT_ASSERT(!mip->IsInteracting());
 
-  mouse->Delete();
+  delete mouse;
   mip->Delete();
 }
 
@@ -283,7 +305,7 @@ void albaPositionalEventRouterTest::TestGetCameraTool()
 void albaPositionalEventRouterTest::TestButtonDownPicksAtPosition()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
   albaVMESurface *vme = albaVMESurface::New();
   view->m_FakeVme = vme;
@@ -310,13 +332,13 @@ void albaPositionalEventRouterTest::TestButtonDownPicksAtPosition()
 
   per->Delete();
   vme->Delete();
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
 
   // the picked VME has a behavior, like gizmos
@@ -328,24 +350,16 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
 
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
 
-  albaEventInteraction down(mouse, DEVICE_BUTTON_DOWN);
-  down.SetButton(ALBA_LEFT_BUTTON);
-  down.Set2DPosition(10, 20);
-  down.SetChannel(MCH_INPUT);
-  per->OnEvent(&down);
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
 
   // the select tool and the behavior share the same picking
   CPPUNIT_ASSERT(per->GetSelectTool()->GetPickedVME() == vme);
   CPPUNIT_ASSERT(behavior->m_Interacting);
-  CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == behavior);
+  CPPUNIT_ASSERT(per->GetInteractingTool() == behavior);
   CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
   CPPUNIT_ASSERT(view->m_PickCount == 1);
 
-  albaEventInteraction up(mouse, DEVICE_BUTTON_UP);
-  up.SetButton(ALBA_LEFT_BUTTON);
-  up.Set2DPosition(10, 20);
-  up.SetChannel(MCH_INPUT);
-  per->OnEvent(&up);
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
 
   CPPUNIT_ASSERT(!behavior->m_Interacting);
   CPPUNIT_ASSERT(view->m_PickCount == 1);
@@ -356,29 +370,26 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
 
   // a button the behavior does not use goes to the camera, and the drags do not reach the behavior
   behavior->m_UseLeft = false;
-  per->OnEvent(&down);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == NULL);
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
+  CPPUNIT_ASSERT(per->IsInteracting() && per->GetInteractingTool() == NULL);
   CPPUNIT_ASSERT(per->GetCameraTool()->IsInteracting());
-  albaEventInteraction move(mouse, DEVICE_MOUSE_2D_MOVE);
-  move.Set2DPosition(15, 25);
-  move.SetChannel(MCH_INPUT);
-  per->OnEvent(&move);
+  SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
   CPPUNIT_ASSERT(behavior->m_Drag == 0);
-  per->OnEvent(&up);
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
 
   per->Delete();
   vme->SetBehavior(NULL);
   vme->Delete();
   albaDEL(behavior);
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 
 void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
   albaVMESurface *vme = albaVMESurface::New();
   view->m_FakeVme = vme;
@@ -399,7 +410,7 @@ void albaPositionalEventRouterTest::TestGenericMouseUsesButtonDownPick()
 
   generic->Delete();
   vme->Delete();
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 
@@ -424,8 +435,7 @@ void albaPositionalEventRouterTest::TestTransformBehaviorButtons()
 void albaPositionalEventRouterTest::TestEventTracing()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
-  mouse->SetName("TestMouse");
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
 
   albaPERTestBehavior *behavior;
@@ -437,39 +447,25 @@ void albaPositionalEventRouterTest::TestEventTracing()
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   CPPUNIT_ASSERT(!per->GetEventTracing());
 
-  albaEventInteraction down(mouse, DEVICE_BUTTON_DOWN);
-  down.SetButton(ALBA_LEFT_BUTTON);
-  down.Set2DPosition(10, 20);
-  down.SetChannel(MCH_INPUT);
-
-  albaEventInteraction up(mouse, DEVICE_BUTTON_UP);
-  up.SetButton(ALBA_LEFT_BUTTON);
-  up.Set2DPosition(10, 20);
-  up.SetChannel(MCH_INPUT);
-
   // tracing disabled: nothing is traced
-  per->OnEvent(&down);
-  per->OnEvent(&up);
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).empty());
 
   // the button down selects the picked VME and starts its behavior
   per->SetEventTracing(true);
-  per->OnEvent(&down);
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
   std::string trace = per->GetLastEventTrace();
-  CPPUNIT_ASSERT(trace.find("device=TestMouse") != std::string::npos);
-  CPPUNIT_ASSERT(trace.find("button=0") != std::string::npos); // ALBA_LEFT_BUTTON
+  CPPUNIT_ASSERT(trace.find("LeftButtonDown ctrl=0 alt=0 shift=0") != std::string::npos);
   CPPUNIT_ASSERT(trace.find("Select, Behavior albaPERTestBehavior") != std::string::npos);
 
   // the button up goes to the behavior that started the interaction
-  per->OnEvent(&up);
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
   trace = per->GetLastEventTrace();
   CPPUNIT_ASSERT(trace.find("-> Behavior albaPERTestBehavior") != std::string::npos);
 
   // a move without interaction is not traced
-  albaEventInteraction move(mouse, DEVICE_MOUSE_2D_MOVE);
-  move.Set2DPosition(15, 25);
-  move.SetChannel(MCH_INPUT);
-  per->OnEvent(&move);
+  SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
   CPPUNIT_ASSERT(trace == per->GetLastEventTrace());
 
   per->SetEventTracing(false);
@@ -478,7 +474,7 @@ void albaPositionalEventRouterTest::TestEventTracing()
   vme->SetBehavior(NULL);
   vme->Delete();
   albaDEL(behavior);
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 
@@ -519,7 +515,7 @@ void albaPositionalEventRouterTest::TestPushPopTool()
 void albaPositionalEventRouterTest::TestToolInteraction()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
 
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
@@ -532,7 +528,7 @@ void albaPositionalEventRouterTest::TestToolInteraction()
   tool->m_UseLeft = true;
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
   CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("-> Tool albaPERTestTool") != std::string::npos);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == tool);
+  CPPUNIT_ASSERT(per->IsInteracting() && per->GetInteractingTool() == tool);
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
 
   // the other buttons pressed in the meantime go to the same tool, and do not end the interaction
@@ -544,28 +540,28 @@ void albaPositionalEventRouterTest::TestToolInteraction()
 
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_LeftUp == 1);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
 
   // the tool does not use the left button: the default behavior gets down, drag and up
   tool->m_UseLeft = false;
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(per->IsInteracting() && per->GetInteractingTool() == NULL);
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
   CPPUNIT_ASSERT(tool->m_LeftDown == 2 && tool->m_Drag == 2 && tool->m_LeftUp == 1);
 
   // a button the tool does not handle goes to the default behavior
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN, ALBA_MIDDLE_BUTTON);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(per->IsInteracting());
   SendToPER(per, mouse, DEVICE_BUTTON_UP, ALBA_MIDDLE_BUTTON);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
 
   // popping a tool while it interacts with a device leaves the device to the camera until the button is released
   tool->m_UseLeft = true;
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
   per->PopTool(tool);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(per->IsInteracting() && per->GetInteractingTool() == NULL);
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(tool->m_LeftUp == 1);
   CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
@@ -573,13 +569,13 @@ void albaPositionalEventRouterTest::TestToolInteraction()
   per->SetEventTracing(false);
   per->Delete();
   albaDEL(tool);
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 
 void albaPositionalEventRouterTest::TestToolOrder()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   albaPERTestTool *bottom;
   albaNEW(bottom);
@@ -617,24 +613,20 @@ void albaPositionalEventRouterTest::TestToolOrder()
   CPPUNIT_ASSERT(bottom->m_LastPos[0] == 10 && bottom->m_LastPos[1] == 20);
 
   top->m_UseWheel = true;
-  double rotation = 120;
-  albaEventInteraction wheel(mouse, DEVICE_MOUSE_WHEEL);
-  wheel.SetData(&rotation);
-  wheel.SetChannel(MCH_INPUT);
-  per->OnEvent(&wheel);
+  SendToPER(per, mouse, DEVICE_MOUSE_WHEEL, 0, 120);
   CPPUNIT_ASSERT(top->m_Wheel == 1 && bottom->m_Wheel == 0);
   CPPUNIT_ASSERT(top->m_LastRotation == 120);
 
   per->Delete();
   albaDEL(top);
   albaDEL(bottom);
-  mouse->Delete();
+  delete mouse;
 }
 
 void albaPositionalEventRouterTest::TestBehaviorBeforeTools()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
 
   // the picked VME has a behavior, like gizmos
@@ -671,14 +663,14 @@ void albaPositionalEventRouterTest::TestBehaviorBeforeTools()
   vme->SetBehavior(NULL);
   vme->Delete();
   albaDEL(behavior);
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 
 void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
 
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
@@ -692,7 +684,7 @@ void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
   tool->m_UseDrag = false;
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
   CPPUNIT_ASSERT(camera->IsInteracting());
-  CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == tool);
+  CPPUNIT_ASSERT(per->GetInteractingTool() == tool);
   per->SetEventTracing(true);
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
   CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("Tool albaPERTestTool, Camera albaToolCamera") != std::string::npos);
@@ -713,63 +705,65 @@ void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
 
   per->Delete();
   albaDEL(tool);
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 
 void albaPositionalEventRouterTest::TestOneInteractionAtATime()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
-  albaDeviceButtonsPadMouse *other = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
+  albaPERTestMouse *other = new albaPERTestMouse();
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   albaPERTestTool *tool;
   albaNEW(tool);
   tool->m_UseLeft = tool->m_UseMove = tool->m_UseWheel = true;
   per->PushTool(tool);
 
-  // while a device interacts, the events of the other devices are ignored
+  // while a render window interacts, the events of the other render windows are ignored
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == tool);
+  CPPUNIT_ASSERT(per->IsInteracting() && per->GetInteractingTool() == tool);
   SendToPER(per, other, DEVICE_BUTTON_DOWN);
   SendToPER(per, other, DEVICE_MOUSE_2D_MOVE);
   SendToPER(per, other, DEVICE_MOUSE_WHEEL);
   SendToPER(per, other, DEVICE_BUTTON_UP);
-  CPPUNIT_ASSERT(!per->IsInteracting(other));
+  CPPUNIT_ASSERT(per->IsInteracting());
   CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_Move == 0 && tool->m_Wheel == 0 && tool->m_LeftUp == 0);
 
   // a button up without interaction is ignored
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse) && tool->m_LeftUp == 1);
+  CPPUNIT_ASSERT(!per->IsInteracting() && tool->m_LeftUp == 1);
   SendToPER(per, other, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(tool->m_LeftUp == 1);
 
-  // after the end of the interaction the other device can interact
+  // after the end of the interaction the other render window can interact, and the first one is ignored
   SendToPER(per, other, DEVICE_BUTTON_DOWN);
-  CPPUNIT_ASSERT(per->IsInteracting(other) && !per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(per->IsInteracting());
+  SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
+  CPPUNIT_ASSERT(tool->m_Move == 0 && tool->m_Drag == 0);
   SendToPER(per, other, DEVICE_BUTTON_UP);
 
   per->Delete();
   albaDEL(tool);
-  other->Delete();
-  mouse->Delete();
+  delete other;
+  delete mouse;
 }
 
 void albaPositionalEventRouterTest::TestButtonUpDuringButtonDown()
 {
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   albaPERTestModalTool *tool;
   albaNEW(tool);
   tool->m_PER = per;
-  tool->m_Mouse = mouse;
+  tool->m_RWI = mouse->m_RWI;
   per->PushTool(tool);
 
   // the button up arrives while the tool handles the button down: the interaction ends there,
   // and neither the tool nor the camera keep interacting; the tool is not the handler yet, so it does not get the up
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
   CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_LeftUp == 0);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
-  CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+  CPPUNIT_ASSERT(per->GetInteractingTool() == NULL);
   CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
 
   // the next moves are moves without buttons, not drags
@@ -779,19 +773,19 @@ void albaPositionalEventRouterTest::TestButtonUpDuringButtonDown()
   // a new button down starts a new interaction
   per->PopTool(tool);
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
-  CPPUNIT_ASSERT(per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(per->IsInteracting());
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
 
   per->Delete();
   albaDEL(tool);
-  mouse->Delete();
+  delete mouse;
 }
 
 void albaPositionalEventRouterTest::TestBehaviorDeletedDuringInteraction()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPERTestMouse *mouse = new albaPERTestMouse();
   SelectView(mouse, view);
   albaPERTestBehavior *behavior;
   albaNEW(behavior);
@@ -802,7 +796,7 @@ void albaPositionalEventRouterTest::TestBehaviorDeletedDuringInteraction()
 
   // the PER keeps the interacting behavior alive
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
-  CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == behavior);
+  CPPUNIT_ASSERT(per->GetInteractingTool() == behavior);
   CPPUNIT_ASSERT(behavior->GetReferenceCount() == 2);
 
   // its owner deletes it during the interaction, e.g. closing the operation: drags and button up still reach it
@@ -815,11 +809,11 @@ void albaPositionalEventRouterTest::TestBehaviorDeletedDuringInteraction()
 
   // the button up ends the interaction and deletes it
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
-  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
 
   per->Delete();
   vme->Delete();
-  mouse->Delete();
+  delete mouse;
   delete view;
 }
 

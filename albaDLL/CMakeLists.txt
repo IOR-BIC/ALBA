@@ -284,7 +284,6 @@ ENDIF (ALBA_USE_VTK)
 SET(INTERACTION_SRCS
   ../Interaction/albaAgent.cpp  							../Interaction/albaAgent.h
   ../Interaction/albaGizmoAutoscaleHelper.cpp  				../Interaction/albaGizmoAutoscaleHelper.h
-  ../Interaction/albaDevice.cpp  							../Interaction/albaDevice.h
   ../Interaction/albaEventInteraction.cpp  					../Interaction/albaEventInteraction.h
   ../Interaction/albaGizmoBoundingBox.cpp  					../Interaction/albaGizmoBoundingBox.h
   ../Interaction/albaGizmoHandle.cpp  						../Interaction/albaGizmoHandle.h
@@ -325,8 +324,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaToolExtractIsosurface.cpp  					../Interaction/albaToolExtractIsosurface.h
   ../Interaction/albaToolDICOMImporter.cpp  					../Interaction/albaToolDICOMImporter.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
-  ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
-  ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
   ../Interaction/albaBehaviorRotateTranslate.cpp  					../Interaction/albaBehaviorRotateTranslate.h
   ../Interaction/albaBehaviorProsthesis.cpp  					../Interaction/albaBehaviorProsthesis.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h

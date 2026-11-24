@@ -23,6 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaRWIBase.h"
 #include "albaViewCompound.h"
 #include "albaViewVTK.h"
 #include "albaRWI.h"
@@ -31,7 +32,6 @@
 #include "albaGUIViewWin.h"
 #include "albaGUI.h"
 #include "albaInteractionBehavior.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaViewCompound);
@@ -53,7 +53,6 @@ albaViewCompound::albaViewCompound(const wxString &label, int num_row, int num_c
   m_GuiView = NULL;
   m_GuiViewWindow = NULL;
   m_SubViewMaximized = -1;
-  m_Mouse = NULL;
   m_LayoutConfiguration = GRID_LAYOUT;
 }
 //----------------------------------------------------------------------------
@@ -125,6 +124,9 @@ void albaViewCompound::Create()
     }
   }
   m_NumOfChildView = m_ChildViewList.size();
+
+  // the render windows of the sub views belong to this view
+  SetRWIView(this);
 
   CreateGuiView();
 }
@@ -414,20 +416,22 @@ void albaViewCompound::LayoutSubView(int width, int height)
   }
 }
 //----------------------------------------------------------------------------
-void albaViewCompound::SetMouse(albaDeviceButtonsPadMouse *mouse)
+void albaViewCompound::SetRWIView(albaView *view)
 //----------------------------------------------------------------------------
 {
-  m_Mouse = mouse;
   for(int i=0; i<m_NumOfChildView; i++)
   {
-    ((albaViewVTK *)m_ChildViewList[i])->SetMouse(mouse);
+    if (m_ChildViewList[i]->IsALBAType(albaViewCompound))
+      ((albaViewCompound *)m_ChildViewList[i])->SetRWIView(view);
+    else if (m_ChildViewList[i]->GetRWI())
+      m_ChildViewList[i]->GetRWI()->SetView(view);
   }
 }
 //----------------------------------------------------------------------------
 albaView *albaViewCompound::GetSubView()
 //----------------------------------------------------------------------------
 {
-  albaRWIBase *rwi = m_Mouse->GetRWI();
+  albaRWIBase *rwi = albaRWIBase::GetLastMouseRWI();
   if (rwi)
   {
     for(int i=0; i<m_NumOfChildView; i++)
@@ -461,7 +465,7 @@ albaView *albaViewCompound::GetSubView(int idx)
 int albaViewCompound::GetSubViewIndex()
 //----------------------------------------------------------------------------
 {
-  albaRWIBase *rwi = m_Mouse->GetRWI();
+  albaRWIBase *rwi = albaRWIBase::GetLastMouseRWI();
   if (rwi)
   {
     for(int i=0; i<m_NumOfChildView; i++)

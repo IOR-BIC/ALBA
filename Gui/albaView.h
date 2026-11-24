@@ -30,8 +30,6 @@ class albaSceneGraph;
 class albaVME;
 class albaGUI;
 class albaGUIHolder;
-class albaDeviceButtonsPadMouse;
-class albaDevice;
 class albaInteractionBehavior;
 
 class albaRWIBase;
@@ -98,7 +96,6 @@ public:
 
   virtual void			CameraReset(albaVME *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
-  virtual void      SetMouse(albaDeviceButtonsPadMouse *mouse)                               {};
   virtual albaRWIBase *GetRWI()                                              {return NULL;};
   virtual albaSceneGraph *GetSceneGraph()                                    {return NULL;};
   virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};

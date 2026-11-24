@@ -37,10 +37,8 @@ SET(PROJECT_SRCS
 	albaTransformTextEntriesGUITest.h albaTransformTextEntriesGUITest.cpp
 	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
 	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp
-	albaDeviceTest.h albaDeviceTest.cpp
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
 	albaGizmoScaleTest.h albaGizmoScaleTest.cpp
-	albaDeviceButtonsPadTest.h albaDeviceButtonsPadTest.cpp
 	albaToolExtractIsosurfaceTest.h albaToolExtractIsosurfaceTest.cpp
 	albaInteractionBehaviorTest.h albaInteractionBehaviorTest.cpp
 	albaGizmoInterfaceGUITest.h albaGizmoInterfaceGUITest.cpp

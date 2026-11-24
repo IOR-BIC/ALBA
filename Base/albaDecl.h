@@ -173,7 +173,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MOUSE_UP,   // the mouse button was released: sent by albaGizmoSlice and albaToolSegmentation
 	MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
-	// input events of the devices (albaDeviceButtonsPad, albaDeviceButtonsPadMouse)
+	// mouse events (albaEventInteraction)
 	DEVICE_BUTTON_DOWN,
 	DEVICE_BUTTON_UP,
 	DEVICE_MOUSE_WHEEL,

@@ -32,7 +32,6 @@
 #include "albaViewVTK.h"
 #include "albaVMERoot.h"
 #include "albaVMEGeneric.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaFakeLogicForTest.h"
 #include "albaServiceLocator.h"
 
@@ -69,7 +68,6 @@ public:
   // The following methods are added for test albaViewManager automation
   albaVME *GetVME(albaID vmeID); // Not a albaView method!
 	virtual void SetBackgroundColor(wxColor color);
-	void SetMouse(albaDeviceButtonsPadMouse *mouse);
 	albaVME *GetSelectedVME() { return m_SelectedVme; }; // Not a albaView method!
   albaVME *GetShownVME(){return m_ShownVme;}; // Not a albaView method!
   bool GetCameraReset(){return m_CameraReset;}; // Not a albaView method!
@@ -147,10 +145,6 @@ albaVME *albaViewDummy::GetVME(albaID vmeID) // New method for test stuff
 void albaViewDummy::SetBackgroundColor(wxColor color)
 {
 	m_BackgroundColor = color;
-}
-void albaViewDummy::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-	
 }
 
 //----------------------------------------------------------------------------
@@ -601,24 +595,7 @@ void albaViewManagerTest::GetCurrentRootTest()
   albaDEL(root);
   albaDEL(vme);
 }
-//----------------------------------------------------------------------------
-void albaViewManagerTest::SetMouseTest()
-//----------------------------------------------------------------------------
-{
-  albaDeviceButtonsPadMouse *mouse;
-  albaNEW(mouse);
-  albaViewDummy *tempView = new albaViewDummy();
-  m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
-  // Create some views
-  albaViewDummy *view1 = albaViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
-  m_Manager->ViewSelected(view1);
-  m_Manager->SetMouse(mouse);
-
-  CPPUNIT_ASSERT(m_Manager->m_Mouse == mouse);
-
-  albaDEL(mouse);
-}
 
 //----------------------------------------------------------------------------
 void albaViewManagerTest::GetFromOpenedViewsTest()

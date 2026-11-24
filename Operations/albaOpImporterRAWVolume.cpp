@@ -201,7 +201,6 @@ void albaOpImporterRAWVolume::OpRun()
   m_Dialog->GetGui()->AddGui(m_Gui);
   m_Dialog->GetRWI()->SetSize(0,0,400,400);
   m_Dialog->m_RwiSizer->Add(slider_sizer, 0, wxEXPAND);
-  m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
   m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
   m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
 

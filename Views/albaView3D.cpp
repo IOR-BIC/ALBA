@@ -275,6 +275,7 @@ void albaView3D::Create()
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
   m_Rwi = new albaRWI(albaGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_StereoType);
+  m_Rwi->m_RwiBase->SetView(this); // the mouse events of the render window come from this view
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;

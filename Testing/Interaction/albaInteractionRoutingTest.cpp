@@ -25,10 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaInteractionRoutingTest.h"
 
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaEvent.h"
-#include "albaEventInteraction.h"
 #include "albaTool2DMeasure.h"
 #include "albaTool2DMeasureEllipse.h"
 #include "albaPositionalEventRouter.h"
@@ -147,8 +144,8 @@ void albaInteractionRoutingTest::BeforeTest()
   m_View = new albaRoutingTestView();
   m_View->m_TestRwi = m_Rwi;
 
-  m_Mouse = albaDeviceButtonsPadMouse::New();
-  m_Mouse->SetView(m_View);
+  m_Rwi->SetView(m_View);
+  m_OldPER = albaServiceLocator::GetPositionalEventRouter();
 
   m_Listener.Clear();
 }
@@ -156,7 +153,7 @@ void albaInteractionRoutingTest::BeforeTest()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::AfterTest()
 {
-  m_Mouse->Delete();
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
   delete m_View;
 
   m_Renderer->RemoveAllViewProps();
@@ -171,22 +168,44 @@ void albaInteractionRoutingTest::AfterTest()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::SendMouse(albaID id, double x, double y, int button, int modifier, int modifier2)
 {
-  albaEventInteraction e(m_Rwi, id, x, y, button);
-  if (modifier >= 0)
-    e.SetModifier(modifier);
-  if (modifier2 >= 0)
-    e.SetModifier(modifier2);
-  m_Mouse->OnEvent(&e);
+  // as the render window does: the modifier keys first, then the method of the event of the registered PER, with the view and the renderer under the mouse
+  albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+  bool ctrl = modifier == ALBA_CTRL_KEY || modifier2 == ALBA_CTRL_KEY;
+  bool alt = modifier == ALBA_ALT_KEY || modifier2 == ALBA_ALT_KEY;
+  bool shift = modifier == ALBA_SHIFT_KEY || modifier2 == ALBA_SHIFT_KEY;
+  double pos[2] = {x, y};
+  vtkRenderer *ren = m_Rwi->FindPokedRenderer((int)x, (int)y);
+  per->SetModifierKeys(ctrl, alt, shift);
+  switch (id)
+  {
+    case DEVICE_BUTTON_DOWN:
+      switch (button)
+      {
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos);  break;
+      }
+      break;
+    case DEVICE_BUTTON_UP:
+      switch (button)
+      {
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos);  break;
+      }
+      break;
+    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(m_Rwi, m_Rwi->GetView(), ren, pos); break;
+  }
 }
 
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::SendWheel(double x, double y, double rotation)
 {
-  albaEventInteraction e(m_Rwi, DEVICE_MOUSE_WHEEL, x, y);
-  e.SetData(&rotation);
-  m_Mouse->OnEvent(&e);
+  albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+  double pos[2] = {x, y};
+  per->SetModifierKeys(false, false, false);
+  per->OnMouseWheel(m_Rwi, m_Rwi->GetView(), m_Rwi->FindPokedRenderer((int)x, (int)y), pos, rotation);
 }
-
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Set2DCamera()
 {
@@ -200,7 +219,7 @@ void albaInteractionRoutingTest::Set2DCamera()
 void albaInteractionRoutingTest::TestCameraDragAndWheel()
 {
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
-  m_Mouse->AddObserver(per, MCH_INPUT);
+  albaServiceLocator::SetPositionalEventRouter(per);
   per->SetEventTracing(true);
 
   vtkCamera *camera = m_Renderer->GetActiveCamera();
@@ -222,7 +241,7 @@ void albaInteractionRoutingTest::TestCameraDragAndWheel()
   CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
   CPPUNIT_ASSERT(camera->GetDistance() < startDistance);
 
-  m_Mouse->RemoveObserver(per);
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
   per->Delete();
 }
 
@@ -238,7 +257,7 @@ void albaInteractionRoutingTest::Drag(int button, double x, double y, int modifi
 void albaInteractionRoutingTest::TestCameraButtons()
 {
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
-  m_Mouse->AddObserver(per, MCH_INPUT);
+  albaServiceLocator::SetPositionalEventRouter(per);
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   double focalPoint[3], newFocalPoint[3], viewUp[3], newViewUp[3], distance;
 
@@ -284,7 +303,7 @@ void albaInteractionRoutingTest::TestCameraButtons()
   CPPUNIT_ASSERT(!mouseTool->IsInteracting());
   CPPUNIT_ASSERT(mouseTool->GetMotion() == albaToolCamera::MOTION_NONE);
 
-  m_Mouse->RemoveObserver(per);
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
   per->Delete();
 }
 
@@ -307,7 +326,7 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   m_RenderWindow->Render();
 
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
-  m_Mouse->AddObserver(per, MCH_INPUT);
+  albaServiceLocator::SetPositionalEventRouter(per);
   albaToolPicker *picker;
   albaNEW(picker);
   picker->SetListener(&m_Listener);
@@ -332,7 +351,7 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
   camera->GetPosition(position);
   CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
-  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
 
   // a click on the background does not pick
   SendMouse(DEVICE_BUTTON_DOWN, 5, 5, ALBA_LEFT_BUTTON);
@@ -345,7 +364,7 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
 
   per->PopTool(picker);
-  m_Mouse->RemoveObserver(per);
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
   per->Delete();
   albaDEL(picker);
   m_Renderer->RemoveAllViewProps();
@@ -357,7 +376,7 @@ albaPositionalEventRouter *albaInteractionRoutingTest::NewPERWithTool(albaIntera
 {
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   per->SetListener(&m_Listener);
-  m_Mouse->AddObserver(per, MCH_INPUT);
+  albaServiceLocator::SetPositionalEventRouter(per);
   per->PushTool(tool);
   return per;
 }
@@ -365,7 +384,7 @@ albaPositionalEventRouter *albaInteractionRoutingTest::NewPERWithTool(albaIntera
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::DeletePER(albaPositionalEventRouter *per)
 {
-  m_Mouse->RemoveObserver(per);
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
   per->Delete();
 }
 
@@ -615,33 +634,31 @@ void albaInteractionRoutingTest::TestModifierKeysReachAllTools()
 void albaInteractionRoutingTest::TestCaptureLostReleasesButtons()
 {
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
-  m_Mouse->AddObserver(per, MCH_INPUT);
-  m_Rwi->SetMouse(m_Mouse);
+  albaServiceLocator::SetPositionalEventRouter(per);
   m_Rwi->vtkRenderWindowInteractor::Enable();
   albaToolCamera *mouseTool = per->GetCameraTool();
 
   // the right button starts the interaction: losing the capture releases it, not the left one
   wxMouseEvent rightDown(wxEVT_RIGHT_DOWN);
   m_Rwi->OnRightMouseButtonDown(rightDown);
-  CPPUNIT_ASSERT(per->IsInteracting(m_Mouse) && mouseTool->IsInteracting());
+  CPPUNIT_ASSERT(per->IsInteracting() && mouseTool->IsInteracting());
   wxMouseCaptureLostEvent lost;
   m_Rwi->OnMouseCaptureLost(lost);
-  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse) && !mouseTool->IsInteracting());
+  CPPUNIT_ASSERT(!per->IsInteracting() && !mouseTool->IsInteracting());
 
   // with two buttons pressed, both are released and the capture is given back
   wxMouseEvent leftDown(wxEVT_LEFT_DOWN);
   m_Rwi->OnLeftMouseButtonDown(leftDown);
   m_Rwi->OnRightMouseButtonDown(rightDown);
-  CPPUNIT_ASSERT(per->IsInteracting(m_Mouse));
+  CPPUNIT_ASSERT(per->IsInteracting());
   m_Rwi->OnMouseCaptureLost(lost);
-  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse) && !mouseTool->IsInteracting());
+  CPPUNIT_ASSERT(!per->IsInteracting() && !mouseTool->IsInteracting());
   CPPUNIT_ASSERT(wxWindow::GetCapture() != m_Rwi);
 
   // a capture lost without buttons pressed does nothing
   m_Rwi->OnMouseCaptureLost(lost);
-  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse));
+  CPPUNIT_ASSERT(!per->IsInteracting());
 
-  m_Rwi->SetMouse(NULL);
-  m_Mouse->RemoveObserver(per);
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
   per->Delete();
 }

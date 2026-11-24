@@ -37,7 +37,6 @@
 #include "albaAnimate.h"
 
 #include "albaInteractionBehavior.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "albaVME.h"
 #include "albaVMELandmarkCloud.h"
@@ -113,6 +112,7 @@ void albaViewVTK::Create()
 {
   if(m_LightCopyEnabled == true) return;
   m_Rwi = new albaRWI(albaGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_StereoType, m_ShowOrientator, m_AxesType);
+  m_Rwi->m_RwiBase->SetView(this); // the mouse events of the render window come from this view
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
@@ -126,13 +126,6 @@ void albaViewVTK::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   //m_Picker2D->InitializePickList();
-}
-
-//----------------------------------------------------------------------------
-void albaViewVTK::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-  assert(m_Rwi->m_RwiBase);
-  m_Rwi->m_RwiBase->SetMouse(mouse);
 }
 
 //----------------------------------------------------------------------------

@@ -25,7 +25,6 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaDeviceButtonsPadMouse;
 class albaSceneGraph;
 class albaGUI;
 class albaRWIBase;
@@ -126,7 +125,8 @@ public:
   Set the size of the windowing double slider according to the size of the view. */
   virtual void OnLayout();
 
-  virtual void SetMouse(albaDeviceButtonsPadMouse *mouse);
+  /** Set the view of the render windows of the sub views, also nested */
+  void SetRWIView(albaView *view);
 
   virtual albaSceneGraph *GetSceneGraph();
   virtual albaRWIBase    *GetRWI();
@@ -152,7 +152,7 @@ public:
   virtual albaVME *GetPickedVme();
 	  
   /** 
-  Return the sub-view in which the mouse is interacting with.*/
+  Return the sub-view of the render window that got the last mouse event.*/
   albaView *GetSubView();
 
   /** 
@@ -160,7 +160,7 @@ public:
   albaView *GetSubView(int idx);
 
   /** 
-  Return the sub-view num index which the mouse is interacting with.*/
+  Return the index of the sub-view of the render window that got the last mouse event.*/
   int GetSubViewIndex();
 
   /** 
@@ -217,7 +217,6 @@ protected:
   wxSize  m_Size; ///< size of the compound view
   albaGUI *m_GuiView;
   wxWindow *m_GuiViewWindow;
-  albaDeviceButtonsPadMouse *m_Mouse;
 
 
   std::vector<albaView *> m_ChildViewList; ///< Child views vector
