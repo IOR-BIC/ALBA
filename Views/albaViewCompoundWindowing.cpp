@@ -103,7 +103,7 @@ void albaViewCompoundWindowing::VmeShow(albaVME *vme, bool show)
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

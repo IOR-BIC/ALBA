@@ -358,12 +358,12 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 				data->GetScalarRange(range);
 				m_Mapper->SetScalarRange(range);
 			}
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_LUT:
 			m_SurfaceMaterial->UpdateFromLut();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			break;
 		case ID_USE_VTK_PROPERTY:
 			if (m_UseVTKProperty != 0)
@@ -378,7 +378,7 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 			{
 				m_MaterialButton->Enable(m_UseVTKProperty != 0);
 			}
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			break;
 		case ID_USE_LOOKUP_TABLE:
 			m_Gui->Enable(ID_LUT, m_UseLookupTable != 0);
@@ -398,16 +398,11 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
         m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_UseTexture != 0);
         m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
       }
-      GetLogicManager()->CameraUpdate();
+      GetViewManager()->CameraUpdate();
 			break;
 		case ID_CHOOSE_TEXTURE:
 		{
-			albaString title = "Choose texture";
-			e->SetId(VME_CHOOSE);
-			e->SetPointer(&albaPipeSurfaceTextured::ImageAccept);
-			e->SetString(&title);
-			albaEventMacro(*e);
-			albaVME *n = e->GetVme();
+			albaVME *n = GetLogicManager()->ChooseVME("Choose texture", &albaPipeSurfaceTextured::ImageAccept);
 			if (n != NULL)
 			{
 				vtkImageData *image = vtkImageData::SafeDownCast(n->GetOutput()->GetVTKData());
@@ -418,7 +413,7 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 					m_SurfaceMaterial->m_MaterialType = mmaMaterial::USE_TEXTURE;
           m_Texture->SetInputConnection(n->GetOutput()->GetVTKOutputPort());
 					m_Actor->SetTexture(m_Texture);
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 					m_Gui->Enable(ID_TEXTURE_MAPPING_MODE, true);
 				}
 			}
@@ -426,7 +421,7 @@ void albaPipeSurfaceTextured::OnEvent(albaEventBase *alba_event)
 		break;
 		case ID_TEXTURE_MAPPING_MODE:
 			GenerateTextureMapCoordinate();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			break;
 		default:
 			albaEventMacro(*e);
@@ -485,5 +480,5 @@ void albaPipeSurfaceTextured::SetActorPicking(int enable)
 {
 	m_Actor->SetPickable(enable);
   m_Actor->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

@@ -10,8 +10,11 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
 
 	albaServiceLocator.cpp 	albaServiceLocator.h
-	albaServiceClient.cpp 	albaServiceClient.h
+	albaServiceClient.h
 	albaAbsLogicManager.h
+	albaAbsViewManager.h
+	albaAbsHelpManager.h
+	albaAbsOpManager.h
 )
 
 SET(PROJECT_LIBS ${wxWidgets_LIBRARIES})

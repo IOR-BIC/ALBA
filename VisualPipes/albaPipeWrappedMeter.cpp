@@ -293,7 +293,7 @@ void albaPipeWrappedMeter::OnEvent(albaEventBase *alba_event)
         m_WrappedMeterVME->ForwardUpEvent(*e);
       break;
     }
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   else if (alba_event->GetSender() == m_WrappedMeterVME)
   {

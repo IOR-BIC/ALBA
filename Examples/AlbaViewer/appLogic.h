@@ -47,16 +47,16 @@ public:
 
 	void RunOp(albaOp *op);
 	
-	/** Respond to a VME_ADDED event. propagate event. to SideBar, ViewManager, ecc.. */
-	virtual void VmeAdded(albaVME *vme);
+	/** Called by the VME manager for each VME added to the tree: tell it to SideBar, ViewManager, ecc.. */
+	virtual void VmeAdded(albaVME *vme) override;
 
 protected:
   
 	/** FILE NEW evt. handler */
-	virtual void OnFileNew();
+	virtual int FileNew() override;
 
 	/** FILE OPEN evt. handler.*/
-	virtual void OnFileOpen(const char *file_to_open = NULL);
+	virtual int FileOpen(const char *file_to_open = NULL) override;
 
 	/** Called on Quit event. */
 	virtual void OnQuit();
@@ -77,7 +77,7 @@ protected:
 	virtual void CreateMenu();
 
 	/** Show contextual menu for views when right mouse click arrives */
-	virtual void ViewContextualMenu(bool vme_menu) {};
+	virtual void ShowViewContextualMenu(bool vmeMenu) override {};
 
 	/* Initialize About Dialog */
 	void InitAboutDialog();

@@ -59,7 +59,7 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,albaOp*);
 // albaOpManager :
 //----------------------------------------------------------------------------
 /**  */
-class ALBA_EXPORT albaOpManager: public albaObserver, public albaServiceClient
+class ALBA_EXPORT albaOpManager: public albaObserver, public albaServiceClient, public albaAbsOpManager
 {
 public:
 	         albaOpManager();
@@ -118,7 +118,7 @@ public:
   virtual void OpSelect(albaVME* v);
 
 	/** Set the flag for warning the user if the operation is undoable. */
-  virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
+  virtual void WarningIfCantUndo (bool warn) override {m_Warn = warn;};
 
 	/** Set a reference to the main toolbar. */
   virtual void SetToolbar(wxToolBar *tb) {m_ToolBar = tb;};
@@ -129,8 +129,8 @@ public:
 	/** return true if there is a running operation. */
   virtual bool Running()								 {return m_Context.Caller() != NULL;};
 
-	/** Clear the stack of executed operation. */
-  virtual void ClearUndoStack(); 
+	/** Clear the stack of executed operation and the clipboard; ignored while an operation is running. */
+  virtual void ClearUndoStack() override;
 
 	/** Try to Stop the Current operation with OK condition. */
 	virtual bool ForceStopWithOk();
@@ -163,7 +163,7 @@ public:
   albaUser* GetMafUser(){return m_User;};
 
 	/** Enable/Disable the men items operation. */
-	virtual void EnableOp(bool CanEnable = true);
+	virtual void EnableOp(bool CanEnable = true) override;
 
 
 	/**Set Build Num*/
@@ -174,15 +174,15 @@ public:
 
 	int ImportFile(albaString filename);
 
+	/** Execute the running operation op (called by op when it ends with OK); ignored if op is not the running one */
+	virtual void OpRunOk(albaOp *op) override;
+
+	/** Delete the running operation op without executing it (called by op when it ends with CANCEL); ignored if op is not the running one */
+	virtual void OpRunCancel(albaOp *op) override;
+
 protected:
 	/** Execute the current operation. */
   virtual void OpDo(albaOp *op);
-
-	/** This method is called if the operation must be executed. */
-  virtual void OpRunOk(albaOp *op);
-
-	/** The operation is not executed and is deleted. */
-  virtual void OpRunCancel(albaOp *op);
 
 	/** Execute the 'UnDo' method of the operation. */
   virtual void OpUndo();
@@ -192,9 +192,6 @@ protected:
 
 	/** Warn the user if the operation is undoable. */
   virtual bool WarnUser(albaOp *op);
-
-	/** Sent a string message to the listener. */
-  virtual void Notify(int msg, long arg=0L);
 
 	/** Enable/Disable the toolbar's buttons. */
 	virtual void EnableToolbar(bool CanEnable = true);

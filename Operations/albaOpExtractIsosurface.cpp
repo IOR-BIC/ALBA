@@ -214,7 +214,7 @@ void albaOpExtractIsosurface::OpRun()
   }
   DeleteOpDialog();
 
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------

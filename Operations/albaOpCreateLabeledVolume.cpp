@@ -76,7 +76,7 @@ void albaOpCreateLabeledVolume::OpRun()
   
   m_Output = m_LabeledVolume;
   m_LabeledVolume->SetVolumeLink(m_Input);
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpCreateLabeledVolume::OpDo()

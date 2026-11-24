@@ -88,13 +88,6 @@ public:
   int GetWidth() {return m_width;};
   int GetHeight() {return m_height;};
 
-  /** set call data, data sent by sender (event's invoker) to all observers. 
-  Be aware that the vmeVector argument will be empty after the Set */
-  void SetVmeVector(std::vector<albaVME*> vmeVector);
-
-  /** return call data, data sent by sender (event's invoker) to all observers */
-  std::vector<albaVME*> GetVmeVector();
-
   void GetWidgetData(WidgetDataType &widget_data);
 
   void SetArg(long arg)         { m_Arg = arg;};
@@ -128,7 +121,6 @@ protected:
   albaMatrix       *m_Matrix;
   albaMatrix       *m_OldMatrix;
   albaObject       *m_MafObject;
-  std::vector<albaVME*> m_VmeVector;
   WidgetDataType   m_WidgetData;
 	void						*m_Pointer;
 

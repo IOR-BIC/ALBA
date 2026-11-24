@@ -29,6 +29,7 @@
 #include "albaGUI.h"
 
 #include "albaVMEVolumeGray.h"
+#include "albaProgressBarHelper.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkImageData.h"
@@ -171,7 +172,7 @@ void albaOpFilterVolume::OpDo()
 			m_OutputVolumeRegistered = false;
 		}
 		m_OutputVolume->ReparentTo(m_Input);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 
@@ -184,7 +185,7 @@ void albaOpFilterVolume::OpUndo()
 		m_OutputVolumeRegistered = true;
 		m_OutputVolume->Register(this);
 		m_OutputVolume->ReparentTo(NULL);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 
@@ -229,12 +230,6 @@ void albaOpFilterVolume::OnEvent(albaEventBase *alba_event)
   }
 }
 
-//----------------------------------------------------------------------------
-void albaOpFilterVolume::OpStop(int result)
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));
-}
 
 //----------------------------------------------------------------------------
 void albaOpFilterVolume::OnSmooth()
@@ -256,13 +251,14 @@ void albaOpFilterVolume::OnSmooth()
   smoothFilter->SetRadiusFactors(m_SmoothRadius);
   smoothFilter->SetStandardDeviations(m_StandardDeviation);
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, smoothFilter));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(smoothFilter);
 	
 	smoothFilter->Update();
 
   m_OutputVolume->SetData(smoothFilter->GetOutput(),m_Input->GetTimeStamp());
 	m_OutputVolume->GetOutput()->Update();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   if (!m_TestMode)
   {
@@ -296,13 +292,14 @@ void albaOpFilterVolume::OnMedian()
   medianFilter->SetInputData(m_OutputVolume->GetOutput()->GetVTKData());
   medianFilter->SetKernelSize(m_KernelSize[0],m_KernelSize[1],m_KernelSize[2]);
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, medianFilter));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(medianFilter);
 
   medianFilter->Update();
 
 	m_OutputVolume->SetData(medianFilter->GetOutput(), m_Input->GetTimeStamp());
 	m_OutputVolume->GetOutput()->Update();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	if (!m_TestMode)
 	{
@@ -376,7 +373,7 @@ void albaOpFilterVolume::OnReplace()
 		m_OutputVolume->SetData(outputDataSP, m_Input->GetTimeStamp());
 	}
 	m_OutputVolume->GetOutput()->Update();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 
 	if (!m_TestMode)
@@ -411,5 +408,5 @@ void albaOpFilterVolume::OnReset()
 		m_Gui->Update();
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

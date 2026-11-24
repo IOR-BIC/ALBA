@@ -289,10 +289,10 @@ public:
 	/*virtual*/ void OnEvent(albaEventBase *alba_event);    
 
 public:
-	/** Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.*/
+	/** Callback for ChooseVME that accepts Closed Landmarkclouds VMEs only.*/
 	static bool LMCloudAccept(albaVME* node); 
 
-	/** Callback for VME_CHOOSE that accepts Surface VME only. */
+	/** Callback for ChooseVME that accepts Surface VME only. */
 	static bool SurfaceAccept(albaVME* node);
 
 protected:

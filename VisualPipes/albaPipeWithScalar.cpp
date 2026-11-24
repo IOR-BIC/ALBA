@@ -259,14 +259,14 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				UpdateComponentsMangaement();
 				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateScalarBarTitle();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_COMPONENTS:
 			{
 				UpdateVisualizationWithNewSelectedScalars();
 				UpdateScalarBarTitle();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_LUT:
@@ -295,7 +295,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				UpdateComponentsMangaement();
 				UpdateActiveScalarsInVMEDataVectorItems();
 				UpdateScalarBarTitle();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_PROBE_MAPS:
@@ -305,12 +305,7 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 			break;
 			case ID_SELECT_PROBE_VME:
 			{
-				albaString s(_("Choose Probe Map Volume"));
-				albaEvent e(this, VME_CHOOSE, &s);
-				e.SetPointer(&albaPipeWithScalar::VolumeAccept);
-				albaEventMacro(e);
-
-				albaVME *vme = e.GetVme();
+				albaVME *vme = GetLogicManager()->ChooseVME(_("Choose Probe Map Volume"), &albaPipeWithScalar::VolumeAccept);
 				if (vme == NULL)
 					return;
 
@@ -331,21 +326,21 @@ void albaPipeWithScalar::OnEvent(albaEventBase *alba_event)
 				ShowScalarBarActor(m_ShowScalarBar);
 				EnableDisableGuiComponents();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 
 			case ID_SCALAR_BAR_LAB_N:
 			{
 				SetScalarBarLabelsNum(m_ScalarBarLabNum + 3);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 
 			case ID_SCALAR_BAR_POS:
 			{
 				SetScalarBarPos(m_ScalarBarPos);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 			case ID_SHOW_HISTOGRAM:
@@ -378,7 +373,7 @@ void albaPipeWithScalar::SetScalarRange(double * sr)
 	if (m_LutSlider)
 		m_LutSlider->SetSubRange(sr);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -815,7 +810,7 @@ void albaPipeWithScalar::SetProbeVolume(albaVME *vol)
 	m_Mapper->SetScalarVisibility(m_MapsStackActive);
 	EnableDisableGuiComponents();
 	UpdateActiveScalarsInVMEDataVectorItems();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -842,7 +837,7 @@ void albaPipeWithScalar::SetProbeMapActive(int val)
 	EnableDisableGuiComponents();
 	if(m_Mapper->GetScalarVisibility())
 		UpdateActiveScalarsInVMEDataVectorItems();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
  
 }
 
@@ -864,7 +859,7 @@ void albaPipeWithScalar::SetProbeMode(int mode)
 	if (m_Gui)
 		m_Gui->Update();
 	EnableDisableGuiComponents();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

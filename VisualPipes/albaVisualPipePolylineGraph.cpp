@@ -576,7 +576,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
     case ID_SHOW_BRANCH_ID:
       {
         m_ActorBranchId->SetVisibility(m_ShowBranchId==true);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_TUBE_RADIUS:
@@ -584,7 +584,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         m_Tube->SetRadius(m_TubeRadius);
         albaTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
         item->SetValue(m_TubeRadius);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_TUBE_CAPPING:
@@ -592,7 +592,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         m_Tube->SetCapping(m_Capping);
         albaTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
         item->SetValue(m_Capping);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_TUBE_RESOLUTION:
@@ -600,7 +600,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         m_Tube->SetNumberOfSides(m_TubeResolution);
         albaTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
         item->SetValue(m_TubeResolution);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_SPHERE_RADIUS:
@@ -608,7 +608,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         m_Sphere->SetRadius(m_SphereRadius);
         albaTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
         item->SetValue(m_SphereRadius);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_SPHERE_RESOLUTION:
@@ -617,7 +617,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         m_Sphere->SetThetaResolution(m_SphereResolution);
         albaTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RESOLUTION");
         item->SetValue(m_SphereResolution);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_POLYLINE_REPRESENTATION:
@@ -625,13 +625,13 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         SetRepresentation(m_Representation);
         albaTagItem *item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
         item->SetValue(m_Representation);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_SCALAR_DIMENSION:
       {
         UpdateProperty();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_SCALARS:
@@ -645,7 +645,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
           m_ActiveScalarType = CELL_TYPE;
         }
         UpdateScalars();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_LUT:
@@ -654,7 +654,7 @@ void albaVisualPipePolylineGraph::OnEvent(albaEventBase *alba_event)
         //m_Table->GetTableRange(sr);
         m_Mapper->SetScalarRange(sr);
       }
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
       break;
     default:
       albaEventMacro(*e);
@@ -674,7 +674,7 @@ void albaVisualPipePolylineGraph::SetActorPicking(int enable)
 {
   m_Actor->SetPickable(enable);
   m_Actor->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaVisualPipePolylineGraph::UpdateScalars()

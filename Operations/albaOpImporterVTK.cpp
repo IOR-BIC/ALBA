@@ -37,6 +37,7 @@
 #include "albaVMEMesh.h"
 
 #include "albaTagArray.h"
+#include "albaProgressBarHelper.h"
 #include "vtkALBASmartPointer.h"
 
 #include "vtkDataSet.h"
@@ -146,7 +147,8 @@ int albaOpImporterVTK::ImportFile()
 	default:
 		return ALBA_ERROR;
 	}
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, preader));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(preader);
 	preader->SetFileName(m_FileName);
 	preader->Update();
 
@@ -222,11 +224,6 @@ int albaOpImporterVTK::ImportFile()
 	return ALBA_OK;
 }
 
-//----------------------------------------------------------------------------
-void albaOpImporterVTK::OpStop(int result)
-{
-				albaEventMacro(albaEvent(this, result));
-}
 
 //----------------------------------------------------------------------------
 char ** albaOpImporterVTK::GetIcon()

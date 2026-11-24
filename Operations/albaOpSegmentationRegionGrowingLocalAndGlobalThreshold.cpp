@@ -197,7 +197,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathematics()
 {
   //Perform the morphological closing operation
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Please wait, morphological mathematics...");
 
@@ -224,7 +224,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathem
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 {
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Please wait, region growing...");
 	
@@ -242,7 +242,6 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
   localFilter->SetLowerThreshold(m_Threshold);
   localFilter->SetUpperLabel(m_UpperLabel);
   localFilter->SetUpperThreshold(m_Threshold+400);
-  albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,localFilter));
   localFilter->Update();
 
   //Save the result of the region growing
@@ -667,14 +666,14 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
 	    m_SurfaceOutput->ReparentTo(NULL);
 	  }
 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 
   if (m_Gui)
   {
   	HideGui();
   }
-  albaEventMacro(albaEvent(this,result));        
+  NotifyOpEnd(result);        
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
@@ -696,7 +695,7 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
   {
     return;
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
@@ -718,5 +717,5 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
   {
     return;
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

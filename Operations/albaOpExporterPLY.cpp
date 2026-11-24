@@ -30,6 +30,7 @@
 #include "albaVME.h"
 #include "albaVMEOutputSurface.h"
 #include "albaTransformBase.h"
+#include "albaProgressBarHelper.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPLYWriter.h"
@@ -114,13 +115,6 @@ void albaOpExporterPLY::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpExporterPLY::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 int albaOpExporterPLY::ExportSurface()
 //----------------------------------------------------------------------------
 {
@@ -149,7 +143,8 @@ int albaOpExporterPLY::ExportSurface()
 	v_tpdf->Update();
 
 	vtkALBASmartPointer<vtkPLYWriter> writer;
-  albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,writer));
+  albaProgressBarHelper progressHelper;
+  progressHelper.BindToVTKFilter(writer);
 	writer->SetFileName(m_File.GetCStr());
 	if(this->m_ABSMatrixFlag)
 		writer->SetInputConnection(v_tpdf->GetOutputPort());

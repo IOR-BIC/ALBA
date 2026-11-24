@@ -440,7 +440,7 @@ void albaGUIImageViewer::UpdateSelectionDialog(int selection)
 //----------------------------------------------------------------------------
 int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName, bool scale)
 {
-	int result = OP_RUN_CANCEL;
+	int result = ALBA_ERROR;
 
 	if (image && imageFileName != "")
 	{
@@ -502,7 +502,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 
 			vtkDEL(imageBMPWriter);
 
-			result = OP_RUN_OK;
+			result = ALBA_OK;
 		}
 		else if (extension == "jpg")
 		{
@@ -518,7 +518,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 
 			vtkDEL(imageWriter);
 
-			result = OP_RUN_OK;
+			result = ALBA_OK;
 		}
 		else if (extension == "png")
 		{
@@ -534,7 +534,7 @@ int albaGUIImageViewer::SaveVMEImage(albaVMEImage *image, wxString imageFileName
 
 			vtkDEL(pngWriter);
 
-			result = OP_RUN_OK;
+			result = ALBA_OK;
 		}
 	}
 
@@ -559,7 +559,7 @@ void albaGUIImageViewer::SaveImageAs()
 			wxString imageName = m_ImagesList[m_ImageSelection];
 			albaVMEImage *image = (albaVMEImage*)m_ImagesGroup->FindInTreeByName(imageName);
 
-			if (SaveVMEImage(image, newFileName) == OP_RUN_OK)
+			if (SaveVMEImage(image, newFileName) == ALBA_OK)
 				wxMessageBox("Image Saved!");
 		}
 	}
@@ -587,7 +587,7 @@ void albaGUIImageViewer::SaveAllImages()
 
 				albaVMEImage *image = (albaVMEImage*)m_ImagesGroup->FindInTreeByName(m_ImagesList[i]);
 
-				if (image != NULL  && SaveVMEImage(image, newFileName) == OP_RUN_OK)
+				if (image != NULL  && SaveVMEImage(image, newFileName) == ALBA_OK)
 					immSavedCount++;
 				else
 					wxMessageBox("Error during Image Save");

@@ -337,7 +337,7 @@ void albaVMESurfaceParametric::OnEvent(albaEventBase *alba_event)
       {  
 				SetGeometryType(m_GeometryType);
         InternalUpdate();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
 			break;
       case CHANGE_VALUE_SPHERE:
@@ -351,7 +351,7 @@ void albaVMESurfaceParametric::OnEvent(albaEventBase *alba_event)
       {
 				Modified();
         InternalUpdate();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
       
@@ -935,9 +935,8 @@ void albaVMESurfaceParametric::SetGeometryType( int parametricSurfaceTypeID )
 	EnableParametricSurfaceGui(m_GeometryType);
 
 	
-	albaOpManager * opManager = GetLogicManager()->GetOpManager();
-	if(opManager)
-		opManager->EnableOp();
+	if (GetOpManager())
+		GetOpManager()->EnableOp();
 
   Modified();
 }

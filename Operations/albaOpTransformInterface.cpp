@@ -38,6 +38,7 @@
 #include "albaVMEGizmo.h"
 #include "albaVMEGeneric.h"
 #include "albaVMEOutput.h"
+#include "albaProgressBarHelper.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkTransform.h"
@@ -98,14 +99,14 @@ void albaOpTransformInterface::PostMultiplyEventMatrix(albaEventBase *alba_event
     absPose.DeepCopy(tr->GetMatrix());
     absPose.SetTimeStamp(m_CurrentTime);
 
-    if (arg == albaBehaviorTransform::MOUSE_MOVE)
+    if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
     {
       // move vme
       m_Input->SetAbsMatrix(absPose);
       // update matrix for OpDo()
       m_NewAbsMatrix = absPose;
     } 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 
     // clean up
     tr->Delete();
@@ -189,7 +190,8 @@ void albaOpTransformInterface::OpDo()
 
 			albaGUIBusyInfo("Applying scaling to data...", m_TestMode);
 
-      albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,tPDF.GetPointer()));
+      albaProgressBarHelper progressHelper;
+      progressHelper.BindToVTKFilter(tPDF.GetPointer());
       tPDF->Update();
 
       ((albaVMEGeneric *)m_Input)->SetData(tPDF->GetOutput(),m_Input->GetTimeStamp());
@@ -210,7 +212,8 @@ void albaOpTransformInterface::OpDo()
       wxString progress_string("Applying scaling to data...");
       albaGUIBusyInfo wait(progress_string.ToAscii(),m_TestMode);
 
-      albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,tf.GetPointer()));
+      albaProgressBarHelper progressHelper;
+      progressHelper.BindToVTKFilter(tf.GetPointer());
       tf->Update();
 
       ((albaVMEGeneric *)m_Input)->SetData(tf->GetOutput(),m_Input->GetTimeStamp());
@@ -239,8 +242,10 @@ void albaOpTransformInterface::OpDo()
     }
     else if (dataSet->IsA("vtkRectilinearGrid"))
     {
-	    albaGUIBusyInfo wait_info("Applying scaling to data...", m_TestMode);
-	    
+			albaProgressBarHelper progressHelper;
+			progressHelper.SetTextMode(m_TestMode);
+			progressHelper.InitProgressBar("Applying scaling to data...");
+
 			long progress = 0;
 
       vtkRectilinearGrid *currentRG = vtkRectilinearGrid::SafeDownCast(m_Input->GetOutput()->GetVTKData());
@@ -262,7 +267,7 @@ void albaOpTransformInterface::OpDo()
         }
 
         progress = (arrayId + 1) * 100 / 3;
-        albaEventMacro(albaEvent(this,PROGRESSBAR_SET_VALUE,progress));
+        progressHelper.UpdateProgressBar(progress);
       }
       
       rg->Modified();
@@ -275,7 +280,7 @@ void albaOpTransformInterface::OpDo()
   
   m_Input->GetOutput()->Update();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -288,6 +293,6 @@ void albaOpTransformInterface::SetRefSysVME(albaVME* refSysVME)
 
   m_RefSysVME = refSysVME;
   RefSysVmeChanged();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 }

@@ -31,6 +31,9 @@
 
 class albaObserver;
 class albaVME;
+class wxGauge;
+class albaWizardManager;
+class wxStaticText;
 
 #ifdef ALBA_EXPORT
 #include "albaDllMacros.h"
@@ -76,6 +79,15 @@ public:
 
   /** Return true if progress bar show is enabled*/
   bool GetShowProgressBar(){return m_ShowProgressBar;};
+
+  /** Return the manager of the wizard, set by albaWizardManager::WizardAdd (NULL if none) */
+  albaWizardManager *GetManager() {return m_Manager;};
+
+  /** Enable the progress gauge of the manager, or disable and reset it (nothing without a manager) */
+  void ShowProgress(bool show);
+
+  /** Set the value of the progress gauge of the manager (nothing without a manager) */
+  void SetProgress(int progress);
     
 protected:
   /** Return true for the acceptable vme type.*/
@@ -110,6 +122,7 @@ protected:
   void SetSelectedVME(albaVME *node);
 
   albaObserver    *m_Listener;
+  albaWizardManager *m_Manager;
 
 private:
 

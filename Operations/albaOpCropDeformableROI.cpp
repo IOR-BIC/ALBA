@@ -40,6 +40,7 @@
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
 #include "albaGUIBusyInfo.h"
+#include "albaProgressBarHelper.h"
 
 //----------------------------------------------------------------------------
 albaCxxTypeMacro(albaOpCropDeformableROI);
@@ -147,13 +148,6 @@ void albaOpCropDeformableROI::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpCropDeformableROI::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));        
-}
-//----------------------------------------------------------------------------
 void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 //----------------------------------------------------------------------------
 {
@@ -237,7 +231,8 @@ void albaOpCropDeformableROI::Algorithm(albaVME *vme)
 		}
 
 		m_MaskPolydataFilter->SetMask(transformedMaskPolydata);
-    albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
+    albaProgressBarHelper progressHelper;
+    progressHelper.BindToVTKFilter(m_MaskPolydataFilter);
 		m_MaskPolydataFilter->Update();
 
 		if(vtkRectilinearGrid::SafeDownCast(m_MaskPolydataFilter->GetOutput()))
@@ -293,13 +288,5 @@ void albaOpCropDeformableROI::EnableDisableGui()
 
 void albaOpCropDeformableROI::MaskSelection()
 {
-	albaEvent *e; 
-	e = new albaEvent();
-	albaString title = _("Choose mask");
-	e->SetId(VME_CHOOSE);
-	e->SetPointer(&albaOpCropDeformableROI::OutputSurfaceAccept);
-	e->SetString(&title);
-	albaEventMacro(*e);
-	m_PNode = e->GetVme();
-	delete e;
+	m_PNode = GetLogicManager()->ChooseVME(_("Choose mask"), &albaOpCropDeformableROI::OutputSurfaceAccept);
 }

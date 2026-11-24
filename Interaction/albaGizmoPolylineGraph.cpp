@@ -350,7 +350,7 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 //------------------------------------------------------------------------
 {
   m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
   // forward isa transform events to the listener op
   // instanciating the gizmo; the sender is changed to "this" so that the operation can check for
@@ -381,13 +381,13 @@ void albaGizmoPolylineGraph::LogTransformEvent( albaEvent *e )
   albaString mouseActionString;
   switch(mouseAction)
   {
-  case albaBehaviorTransform::MOUSE_DOWN:
+  case albaBehaviorTransform::MOUSE_ACTION_DOWN:
     mouseActionString.Append("MOUSE DOWN");
     break;
-  case albaBehaviorTransform::MOUSE_MOVE:
+  case albaBehaviorTransform::MOUSE_ACTION_MOVE:
     mouseActionString.Append("MOUSE MOVE");
     break;
-  case albaBehaviorTransform::MOUSE_UP:
+  case albaBehaviorTransform::MOUSE_ACTION_UP:
     mouseActionString.Append("MOUSE UP");
     break;
   default:

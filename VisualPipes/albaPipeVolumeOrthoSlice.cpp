@@ -443,18 +443,18 @@ void albaPipeVolumeOrthoSlice::OnEvent(albaEventBase *alba_event)
       {
         mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
         material->UpdateFromTables();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
       case ID_SLICE_SLIDER_X:
       case ID_SLICE_SLIDER_Y:
       case ID_SLICE_SLIDER_Z:
         SetOrigin(m_GUIOrigin);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       break;
 			case ID_OPACITY_SLIDER:
 				SetSliceOpacity(m_SliceOpacity);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
 			break;
       case ID_ENABLE_TRILINEAR_INTERPOLATION:
@@ -495,7 +495,7 @@ void albaPipeVolumeOrthoSlice::SetColorLookupTable(vtkLookupTable *lut)
     if(m_Texture[i])
       m_Texture[i]->SetLookupTable(m_CustomColorLUT);
   }
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::Select(bool sel)
@@ -521,7 +521,7 @@ void albaPipeVolumeOrthoSlice::SetInterpolation(int on)
 	for (int i = 0; i < 3; i++)
 		if (m_Texture[i])
 			m_Texture[i]->SetInterpolate(m_Interpolate);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeVolumeOrthoSlice::SetSliceDirection(int sliceDirection)
@@ -578,7 +578,7 @@ void albaPipeVolumeOrthoSlice::SetActorPicking(int enable)
 			m_SliceActor[i]->Modified();
 		}
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

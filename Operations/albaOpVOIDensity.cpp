@@ -516,12 +516,7 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 		{
 			case ID_CHOOSE_SURFACE:
 			{
-				albaString title = _("VOI surface");
-        albaEvent event(this,VME_CHOOSE,&title);
-				event.SetPointer(&albaOpVOIDensity::OutputSurfaceAccept);
-				albaEventMacro(event);
-
-				if (SetSurface(event.GetVme()) != ALBA_ERROR)
+        if (SetSurface(GetLogicManager()->ChooseVME(_("VOI surface"), &albaOpVOIDensity::OutputSurfaceAccept)) != ALBA_ERROR)
 				{
 					EvaluateSurface();
 					EnableDisableGUI(true);
@@ -540,7 +535,7 @@ void albaOpVOIDensity::OnEvent(albaEventBase *alba_event)
 				break;
 			case ID_ADD_HOLES_AREA:
 			{
-				albaProgressBarHelper progressHelper(m_Listener);
+				albaProgressBarHelper progressHelper;
 				progressHelper.SetTextMode(m_TestMode);
 				progressHelper.InitProgressBar("Updating Area...");
 				CalculateSurfaceArea();
@@ -650,7 +645,7 @@ void albaOpVOIDensity::EvaluateSurface()
 	vtkALBASmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
 	numberVoxels = VolumeData->GetNumberOfPoints();
 
-	albaProgressBarHelper progressHelper(m_Listener);
+	albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Evaluating Density...");
 

@@ -139,7 +139,7 @@ public:
 
   /** 
   return the status of the vme within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
-  having albaViewCompound::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph */
+  having albaViewCompound::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph */
   /*virtual*/ int  GetNodeStatus(albaVME *vme);
 
   /** 

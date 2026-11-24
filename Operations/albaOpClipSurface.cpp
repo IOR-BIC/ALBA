@@ -54,6 +54,7 @@
 #include "vtkAppendPolyData.h"
 #include "vtkALBAClipSurfaceBoundingBox.h"
 #include "albaTransform.h"
+#include "albaProgressBarHelper.h"
 #include "vtkPolyDataConnectivityFilter.h"
 
 
@@ -257,7 +258,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_BY:
@@ -283,7 +284,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->Update();
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 				}
 			}
 			break;
@@ -315,7 +316,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 				else
 					OpStop(OP_RUN_OK);
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case wxCANCEL:
@@ -332,13 +333,7 @@ void albaOpClipSurface::OnEventThis(albaEventBase *alba_event)
 void albaOpClipSurface::ChooseSurface()
 {
 	currentVME = m_Input;
-	albaEvent e;
-	albaString title = "Choose m_Clipper Surface";
-	e.SetPointer(&albaOpClipSurface::SurfaceAccept);
-	e.SetString(&title);
-	e.SetId(VME_CHOOSE);
-	albaEventMacro(e);
-	m_ClipperVME = e.GetVme();
+	m_ClipperVME = GetLogicManager()->ChooseVME("Choose m_Clipper Surface", &albaOpClipSurface::SurfaceAccept);
 	currentVME = NULL;
 	if (m_ClipperVME == NULL)
 		return;
@@ -426,7 +421,7 @@ void albaOpClipSurface::OnEventGizmoScale(albaEventBase *alba_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 		}
 		break;
 
@@ -460,7 +455,7 @@ void albaOpClipSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 				currTr->Delete();
 			}
 			break;
@@ -528,7 +523,7 @@ void albaOpClipSurface::ChangeGizmo()
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpClipSurface::OpStop(int result)
@@ -552,7 +547,7 @@ void albaOpClipSurface::OpStop(int result)
 	cppDEL(m_GizmoScale);
 
   HideGui();
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpClipSurface::OpDo()
@@ -618,7 +613,7 @@ void albaOpClipSurface::OpDo()
 		m_ReverseClippedVME->ReparentTo(m_Input);
 		m_ReverseClippedVME->SetAbsMatrix(m_Input->GetAbsMatrixPipe()->GetMatrix());
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpClipSurface::OpUndo()
@@ -631,7 +626,7 @@ void albaOpClipSurface::OpUndo()
 		m_ReverseClippedVME->ReparentTo(NULL);
 		albaDEL(m_ReverseClippedVME);
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 int albaOpClipSurface::Clip()
@@ -705,7 +700,8 @@ int albaOpClipSurface::Clip()
 		}
 	}
 
-	albaEventMacro(albaEvent(this, BIND_TO_PROGRESSBAR, m_Clipper));
+	albaProgressBarHelper progressHelper;
+	progressHelper.BindToVTKFilter(m_Clipper);
 
 	m_Clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
 	m_Clipper->SetInsideOut(m_ClipInside);  // use 0/1 to reverse sense of clipping
@@ -749,14 +745,14 @@ void albaOpClipSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaBehaviorTransform::MOUSE_MOVE)
+		if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -847,7 +843,7 @@ void albaOpClipSurface::ShowClipPlane(bool show)
     }
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpClipSurface::AttachInteraction()

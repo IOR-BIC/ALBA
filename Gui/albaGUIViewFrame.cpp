@@ -27,6 +27,8 @@
 
 
 #include "albaGUIViewFrame.h"
+#include "albaServiceLocator.h"
+#include "albaAbsViewManager.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaView.h"
@@ -68,7 +70,8 @@ albaGUIViewFrame::~albaGUIViewFrame( )
 void albaGUIViewFrame::OnCloseWindow(wxCloseEvent &event)
 //----------------------------------------------------------------------------
 { 
-	albaEventMacro(albaEvent(this,VIEW_DELETE,m_View));
+	if (albaServiceLocator::GetViewManager())
+		albaServiceLocator::GetViewManager()->ViewDelete(m_View);
 	Destroy();
 }
 //----------------------------------------------------------------------------
@@ -98,8 +101,7 @@ void albaGUIViewFrame::OnSize(wxSizeEvent &event)
 void albaGUIViewFrame::OnSelect(wxCommandEvent &event) 
 //----------------------------------------------------------------------------
 {
-  wxWindow *rwi = (wxWindow*)event.GetEventObject();
-  albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,rwi));
+  albaServiceLocator::GetLogicManager()->SelectView(m_View);
 }
 //----------------------------------------------------------------------------
 void albaGUIViewFrame::OnActivate(wxActivateEvent& event)
@@ -107,7 +109,7 @@ void albaGUIViewFrame::OnActivate(wxActivateEvent& event)
 { 
 	if( event.GetActive() && !m_Quitting )
   {
-		albaEventMacro(albaEvent(this,VIEW_SELECT,m_View,(wxWindow*)NULL));
+		albaServiceLocator::GetLogicManager()->SelectView(m_View);
 	  Layout();
 	}
 }
@@ -126,18 +128,7 @@ void albaGUIViewFrame::SetView(albaView *view)
 void albaGUIViewFrame::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
+  // forward to ViewManager
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch(e->GetId())
-    {
-    case VIEW_QUIT:
-      albaEventMacro(albaEvent(this,VIEW_DELETE,m_View));
-      Destroy();
-      break;
-    default:
-      // forward to ViewManager
-      albaEventMacro(*e);
-      break;
-    }
-  }
+    albaEventMacro(*e);
 }

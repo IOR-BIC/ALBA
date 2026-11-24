@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaGUICheckTree;
+class albaGUIVMETree;
 class albaVME;
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class ALBA_EXPORT albaGUIVMEChooser : public albaGUIDialog
 {
 
 public:
-	albaGUIVMEChooser(albaGUICheckTree *tree, wxString dialog_title = "Vme Chooser", void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree = NULL);
+	albaGUIVMEChooser(albaGUIVMETree *tree, wxString dialog_title = "Vme Chooser", void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree = NULL);
 
 	~albaGUIVMEChooser();
 

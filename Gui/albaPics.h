@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "albaGUICheckTree.h" // friend class
+#include "albaGUIVMETree.h" // friend class
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -60,8 +60,8 @@ struct albaPictureFactory_Pimpl;
 
 NOTE:
 - Icons for the Toolbar must be 20x20 in size, and with transparent background (replacing blank color with "None" in the XPM)
-- Icons to be used in one ImageList (albaGUITree,albaGUICheckTree,...) must be all the same size, and with white background.
-- Icons to be used in albaGUICheckTree (vme icons) must be 16x16 with white background
+- Icons to be used in one ImageList (albaGUITree,albaGUIVMETree,...) must be all the same size, and with white background.
+- Icons to be used in albaGUIVMETree (vme icons) must be 16x16 with white background
 */
 class ALBA_EXPORT albaPictureFactory 
 {

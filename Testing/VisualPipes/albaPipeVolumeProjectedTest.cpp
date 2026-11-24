@@ -25,6 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "albaPipeVolumeProjectedTest.h"
 #include "albaPipeVolumeProjected.h"
+#include "albaRWI.h"
 
 #include "albaSceneNode.h"
 #include "albaVMEVolumeGray.h"

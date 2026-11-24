@@ -320,23 +320,18 @@ void albaRWI::CameraSet(int cam_position, double zoom)
 	case CAMERA_PERSPECTIVE_FRONT:
 		x = 0; y = -1; z = 0; vx = 0; vy = 0; vz = 1;
 		break;
-	case CAMERA_BACK:
 	case CAMERA_PERSPECTIVE_BACK:
 		x = 0; y = 1; z = 0; vx = 0; vy = 0; vz = 1;
 		break;
-	case CAMERA_LEFT:
 	case CAMERA_PERSPECTIVE_LEFT:
 		x = -1; y = 0; z = 0; vx = 0; vy = 0; vz = 1;
 		break;
-	case CAMERA_RIGHT:
 	case CAMERA_PERSPECTIVE_RIGHT:
 		x = 1; y = 0; z = 0; vx = 0; vy = 0; vz = 1;
 		break;
-	case CAMERA_TOP:
 	case CAMERA_PERSPECTIVE_TOP:
 		x = 0; y = 0; z = 1; vx = 0; vy = -1; vz = 0;
 		break;
-	case CAMERA_BOTTOM:
 	case CAMERA_PERSPECTIVE_BOTTOM:
 		x = 0; y = 0; z = -1; vx = 0; vy = -1; vz = 0;
 		break;
@@ -351,18 +346,6 @@ void albaRWI::CameraSet(int cam_position, double zoom)
 		break;
 	case CAMERA_RX_RIGHT:
 		x=-1;y=0; z=0; vx=0; vy=0; vz=1;
-		break;
-	case CAMERA_DRR_FRONT:
-		m_Camera->ParallelProjectionOff();
-		x=0; y=-1; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
-		break;
-	case CAMERA_DRR_LEFT:
-		m_Camera->ParallelProjectionOff();
-		x=1 ;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
-		break;
-	case CAMERA_DRR_RIGHT:
-		m_Camera->ParallelProjectionOff();
-		x=-1;y=0; z=0; vx=0; vy=0; vz=1;	//modified by Paolo 10-6-2003
 		break;
 		//    case CAMERA_CT:
 		//x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
@@ -386,29 +369,6 @@ void albaRWI::CameraSet(int cam_position, double zoom)
 		m_Camera->ParallelProjectionOff();     // Daniele 09/05/2007
 		x=-1; y=-1; z=1; vx=0; vy=0; vz=1;
 		break;
-		// ste beg
-	case CAMERA_RXFEM_XNEG:
-		x=-1;y=0; z=0; vx=0; vy=0; vz=1;
-		break;
-	case CAMERA_RXFEM_XPOS:
-		x=1 ;y=0; z=0; vx=0; vy=0; vz=1;
-		break;
-	case CAMERA_RXFEM_YNEG:
-		x=0; y=-1;z=0; vx=0; vy=0; vz=1;
-		break;
-	case CAMERA_RXFEM_YPOS:
-		x=0; y=1; z=0; vx=0; vy=0; vz=1;
-		break;
-	case CAMERA_RXFEM_ZNEG:
-		x=0; y=0; z=-1;vx=1; vy=0; vz=0;
-		break;
-	case CAMERA_RXFEM_ZPOS:
-		x=0; y=0; z=1; vx=1; vy=0; vz=0;
-		break;
-	case CAMERA_BLEND:
-		x=0; y=0; z=1; vx=0; vy=-1; vz=0;
-		break;
-		// ste end
 	}
 	m_Camera->SetFocalPoint(0,0,0);
 	m_Camera->SetPosition(x*100,y*100,z*100);

@@ -20,11 +20,13 @@
 #include "albaTest.h"
 
 class albaViewManager;
+class albaAbsLogicManager;
+class albaViewManagerTestLogic;
 
 /** albaViewManagerTest:
 Test class for albaViewManager
 */
-class albaViewManagerTest : public albaTest, public albaObserver
+class albaViewManagerTest : public albaTest
 {
 public: 
   // Executed before each test
@@ -55,7 +57,7 @@ public:
   CPPUNIT_TEST( GetListTemplateTest );
   CPPUNIT_TEST( GetViewTest );
   CPPUNIT_TEST( SetMouseTest );
-  CPPUNIT_TEST( GetFromListTest );
+  CPPUNIT_TEST( GetFromOpenedViewsTest );
   //CPPUNIT_TEST( VmeModifiedTest ); EMPTY METHOD not tested
   //CPPUNIT_TEST( OnQuit ); EMPTY METHOD not tested
   CPPUNIT_TEST_SUITE_END();
@@ -82,11 +84,10 @@ private:
   void GetListTemplateTest();
   void GetViewTest();
   void SetMouseTest();
-  void GetFromListTest();
+  void GetFromOpenedViewsTest();
 
-  void OnEvent(albaEventBase *alba_event); // This method trap the events coming from the view manager
-
-  int m_EventResult;
+  albaViewManagerTestLogic *m_Logic; ///< records the calls of the view manager to the logic
+  albaAbsLogicManager *m_OldLogic;
   albaViewManager *m_Manager;
 
 };

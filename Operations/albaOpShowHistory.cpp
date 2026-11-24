@@ -247,7 +247,7 @@ void albaOpShowHistory::OpRun()
 
 	m_DialogIsOpened = true;
 
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 
 //----------------------------------------------------------------------------

@@ -295,7 +295,7 @@ void albaOpFreezeVME::OpRun()
 void albaOpFreezeVME::OpDo()   
 	//----------------------------------------------------------------------------
 {
-	GetLogicManager()->CameraUpdate(); GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate(); GetViewManager()->CameraUpdate();
 }
 
 

@@ -124,11 +124,7 @@ void albaOpVOIDensityEditor::OnEvent(albaEventBase *alba_event)
 		{
 			case ID_CHOOSE_SURFACE:
 			{
-				albaString title = _("VOI surface");
-        albaEvent event(this,VME_CHOOSE,&title);
-				event.SetPointer(&albaOpVOIDensityEditor::OutputSurfaceAccept);
-				albaEventMacro(event);
-				m_Surface = event.GetVme();
+        m_Surface = GetLogicManager()->ChooseVME(_("VOI surface"), &albaOpVOIDensityEditor::OutputSurfaceAccept);
 				if(m_Surface == NULL)
 					return;
 				m_Surface->Update();
@@ -232,7 +228,7 @@ void albaOpVOIDensityEditor::EditVolumeScalars()
   m_Input->GetOutput()->Update();
   
 	GetLogicManager()->VmeModified(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -264,6 +260,6 @@ void albaOpVOIDensityEditor::OpUndo()
     }
     ((albaVMEVolumeGray *)m_Input)->Update();
     vtkDEL(m_OldData);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }

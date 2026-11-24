@@ -150,22 +150,17 @@ void appLogic::OnEvent(albaEventBase *alba_event)
 			albaString *filename = e->GetString();
 			if (filename)
 			{
-				OnFileOpen((*filename).GetCStr());
+				FileOpen((*filename).GetCStr());
 			}
 			else
 			{
-				OnFileOpen();
+				FileOpen();
 			}
 
 			UpdateFrameTitle();
 			m_OpeningMSF = false;
 
 			ShowVMEOnView();
-		}
-		break;
-		case ID_GET_FILENAME:
-		{
-			e->SetString(&(m_VMEManager->GetFileName()));
 		}
 		break;
 
@@ -214,7 +209,6 @@ void appLogic::OnQuit()
 		cppDEL(m_SnapshotManager);
 
 	cppDEL(m_VMEManager);
-	cppDEL(m_MaterialChooser);
 	cppDEL(m_HelpManager);
 	cppDEL(m_ViewManager);
 	cppDEL(m_InteractionManager);
@@ -237,7 +231,7 @@ void appLogic::OnQuit()
 
 // FILE //////////////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-void appLogic::OnFileNew()
+int appLogic::FileNew()
 {
 	if (m_OpManager)
 		m_OpManager->VmeSelected(NULL);
@@ -248,9 +242,10 @@ void appLogic::OnFileNew()
 	}
 
 	m_Win->SetTitle(m_AppTitle);
+	return m_VMEManager ? ALBA_OK : ALBA_ERROR;
 }
 //----------------------------------------------------------------------------
-void appLogic::OnFileOpen(const char *file_to_open)
+int appLogic::FileOpen(const char *file_to_open)
 {
 	if (m_VMEManager)
 	{
@@ -275,10 +270,11 @@ void appLogic::OnFileOpen(const char *file_to_open)
 		}
 
 		if (file.IsEmpty())
-			return;
+			return ALBA_ERROR;
 
-		int opened = m_VMEManager->MSFOpen(file);
+		return m_VMEManager->MSFOpen(file);
 	}
+	return ALBA_ERROR;
 }
 
 //----------------------------------------------------------------------------

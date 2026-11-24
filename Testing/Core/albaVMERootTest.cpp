@@ -35,7 +35,6 @@
 #include "albaSmartPointer.h"
 #include "albaTagArray.h"
 #include "albaCoreTests.h"
-#include "albaEventIO.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -308,28 +307,30 @@ void albaVMERootTest::SafeDownCastTest()
 	albaDEL(n);
 }
 //----------------------------------------------------------------------------
-void albaVMERootTest::OnRootEventTest()
+void albaVMERootTest::VMEGetStorageTest()
 {
 	albaVMEStorage *storage = albaVMEStorage::New();
 	storage->GetRoot()->SetName("root");
 	storage->GetRoot()->Initialize();
 
-	albaVMERoot *r1;
-	albaNEW(r1);
-	r1->SetStorage(storage);
+	albaVMESurface *surface;
+	albaNEW(surface);
 
-	albaEventIO *eventA = new albaEventIO();
-	eventA->SetId(NODE_GET_STORAGE);
-
-	r1->OnEvent(eventA);
-
-	//check if eventIO has storage variable correctly set
-	albaVMEStorage *s = r1->GetStorage();
-	result = (s == eventA->GetStorage());
+	//a VME outside the tree has no storage
+	result = (surface->GetStorage() == NULL);
 	TEST_RESULT(result);
 
-	albaDEL(r1);
-	cppDEL(eventA);
+	//a VME in the tree reaches the storage through the root
+	surface->ReparentTo(storage->GetRoot());
+	result = (surface->GetStorage() == storage);
+	TEST_RESULT(result);
+
+	//the root returns its storage also through the albaVME interface
+	albaVME *root = storage->GetRoot();
+	result = (root->GetStorage() == storage);
+	TEST_RESULT(result);
+
+	albaDEL(surface);
 	albaDEL(storage);
 }
 //----------------------------------------------------------------------------

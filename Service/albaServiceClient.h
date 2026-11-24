@@ -17,16 +17,24 @@
 #ifndef _albaServiceClient_H
 #define _albaServiceClient_H
 
+#include "albaServiceLocator.h"
+
 class albaAbsLogicManager;
 
+/** Base class of the objects that use the services registered in albaServiceLocator */
 class ALBA_EXPORT albaServiceClient
 {
-	public:
-		albaServiceClient();
-	
-		albaAbsLogicManager* GetLogicManager();
+public:
+	/** Return the registered logic manager, NULL if none */
+	albaAbsLogicManager* GetLogicManager() { return albaServiceLocator::GetLogicManager(); }
 
-  protected:
-		albaAbsLogicManager* m_Logic;
+	/** Return the registered view manager, NULL if none */
+	albaAbsViewManager* GetViewManager() { return albaServiceLocator::GetViewManager(); }
+
+	/** Return the registered help manager, NULL if the application has no help */
+	albaAbsHelpManager* GetHelpManager() { return albaServiceLocator::GetHelpManager(); }
+
+	/** Return the registered operation manager, NULL if the application has none */
+	albaAbsOpManager* GetOpManager() { return albaServiceLocator::GetOpManager(); }
 };
 #endif

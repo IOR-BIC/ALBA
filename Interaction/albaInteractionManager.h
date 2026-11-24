@@ -22,6 +22,7 @@
 #include "albaStorable.h"
 #include "albaString.h"
 #include "albaSmartPointer.h"
+#include "albaServiceClient.h"
 
 #include <map>
 #include <set>
@@ -82,7 +83,7 @@ EXPORT_STL_VECTOR(ALBA_EXPORT, albaAvatar *);
   @todo
   - check the renderer to be RenFront
 */
-class ALBA_EXPORT albaInteractionManager : public albaObject, public albaObserver, public albaEventSender, public albaStorable
+class ALBA_EXPORT albaInteractionManager : public albaObject, public albaObserver, public albaEventSender, public albaStorable, public albaServiceClient
 {
 public:
   albaInteractionManager();
@@ -150,16 +151,6 @@ public:
   /** restore interaction settings from an XML file (Multimod Interaction Settings - MIS - format) */
   int Restore(const char *filename);
 
-  /** propagate a request for rendering the specified window or 
-      all the windows (rw==NULL). Requests arriving within a single
-      event dispatching cycle are are fused into a single request*/
-  //void CameraUpdate(vtkRendererWindow *rw) {/* NOT YET IMPLEMENTED */}
-
-  /** 
-    Queue a request for rendering for the specified view. Default is 
-    render all views */
-  void CameraUpdate(albaView *view=NULL);
-
 
   /** return the positional event router */
   albaPositionalEventRouter *GetPER() {return m_PositionalEventRouter;}
@@ -182,11 +173,6 @@ public:
 
   /** Start the fly-to mode: push the fly-to tool, the next click flies to the clicked point */
   void CameraFlyToMode();
-
-  /** return the minimum time to elapse between two subsequent renderings */
-  albaTimeStamp GetIntraFrameTime() {return m_IntraFrameTime;}
-  /** set the minimum time to elapse between two subsequent renderings */
-  void SetIntraFrameTime(albaTimeStamp iftime) {m_IntraFrameTime=iftime;}
 
   /** Open a dialog to choose among available devices */
   int DeviceChooser(wxString &dev_name,wxString &dev_type);
@@ -217,9 +203,9 @@ protected:
   /** This is called by Restore() to restore information of this object. */
   virtual int InternalRestore(albaStorageElement *node);
   
+  /** The camera updates requested while the device events are dispatched are fused into one at the end of the dispatching */
   virtual void OnStartDispatching();
   virtual void OnEndDispatching();
-  virtual void OnCameraUpdate(albaEventBase *e);
   virtual void OnDeviceAdded(albaEventBase *event);
   virtual void OnDeviceRemoving(albaEventBase *event);
   virtual void OnDeviceNameChanged(albaEventBase *event);
@@ -250,13 +236,8 @@ protected:
  
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
 
-  std::set<albaView *>                 m_CameraUpdateRequests; ///< requests for Camera update of single views
-  
   albaView*                            m_SelectedView;     ///< the view currently selected
   vtkRenderer*                        m_CurrentRenderer;  ///< the renderer of selected view: to be removed!
-  int                                 m_LockRenderingFlag;///< 
-  albaTimeStamp                        m_LastRenderTime;   ///< used to avoid overloading of the GUI process due to rendering
-  albaTimeStamp                        m_IntraFrameTime;   ///< the minimum time to elapse between two subsequent renderings
 
 private:
   /** hidden to not be called directly */

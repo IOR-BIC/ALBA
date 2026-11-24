@@ -73,23 +73,17 @@ bool albaOpCreateAveragePlane::InternalAccept(albaVME *node)
 //----------------------------------------------------------------------------
 void albaOpCreateAveragePlane::OpRun()
 {
-	albaString title = _("Choose Plane");
-	albaEvent e(this, VME_CHOOSE, &title);
-	e.SetPointer(&PlaneAccept);
-
 	glo_CurrentVME = m_Input;
-	albaEventMacro(e);
+	m_SelVME = GetLogicManager()->ChooseVME(_("Choose Plane"), &PlaneAccept);
 	glo_CurrentVME = NULL;
-	
-	m_SelVME = e.GetVme();
 
 	if (m_SelVME)
 	{
-		albaEventMacro(albaEvent(this, OP_RUN_OK));
+		NotifyOpEnd(OP_RUN_OK);
 	}
 	else
 	{
-		albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+		NotifyOpEnd(OP_RUN_CANCEL);
 	}
 }
 
@@ -140,7 +134,7 @@ void albaOpCreateAveragePlane::OpDo()
 	albaDEL(outPlane);
 			
 	GetLogicManager()->VmeShow(m_Output, true);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 
 	return;
 }
@@ -152,5 +146,5 @@ void albaOpCreateAveragePlane::OpUndo()
 
 	//Restore previous selection
 	GetLogicManager()->VmeSelect(m_Input);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

@@ -492,7 +492,7 @@ void albaViewArbitrarySlice::OnEventThis(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 {
-	GetLogicManager()->EnableCameraUpdateSkip();
+	GetViewManager()->EnableCameraUpdateSkip();
 	if (m_InputVolume)
 	{
 		if (typeGizmo == GIZMO_TRANSLATE)
@@ -511,7 +511,7 @@ void albaViewArbitrarySlice::SetGizmo(int typeGizmo)
 		m_TypeGizmo = typeGizmo;
 		m_Gui->Update();
 	}
-	GetLogicManager()->DisableCameraUpdateSkip();
+	GetViewManager()->DisableCameraUpdateSkip();
 
 }
 
@@ -900,7 +900,7 @@ void albaViewArbitrarySlice::OnLUTRangeModified()
 		double low, hi;
 		m_LutSlider->GetSubRange(&low, &hi);
 		m_ColorLUT->SetTableRange(low, hi);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------

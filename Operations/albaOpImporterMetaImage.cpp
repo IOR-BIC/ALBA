@@ -170,11 +170,6 @@ int albaOpImporterMetaImage::ImportFile()
 	return ALBA_OK;
 }
 
-//----------------------------------------------------------------------------
-void albaOpImporterMetaImage::OpStop(int result)
-{
-	albaEventMacro(albaEvent(this, result));
-}
 
 //----------------------------------------------------------------------------
 char **albaOpImporterMetaImage::GetIcon()

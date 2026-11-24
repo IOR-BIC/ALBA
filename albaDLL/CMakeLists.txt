@@ -86,7 +86,6 @@ SET(CORE_SRCS
   ../Core/albaAttributeTraceability.cpp  ../Core/albaAttributeTraceability.h
   ../Core/albaCoreFactory.cpp  			../Core/albaCoreFactory.h
   ../Core/albaDataPipe.cpp  				../Core/albaDataPipe.h
-  ../Core/albaEventIO.cpp  				../Core/albaEventIO.h
   ../Core/albaMatrixPipe.cpp  			../Core/albaMatrixPipe.h
   ../Core/albaVMEIterator.cpp  			../Core/albaVMEIterator.h
   ../Core/albaOp.cpp  ../Core/albaOp.h
@@ -179,7 +178,7 @@ SET(COMMON_SRCS
 ###############################################
 SET(SERVICE_SRCS
 	../Service/albaServiceLocator.cpp 	../Service/albaServiceLocator.h
-	../Service/albaServiceClient.cpp 	../Service/albaServiceClient.h
+	../Service/albaServiceClient.h
 	../Service/albaAbsLogicManager.h
 )
 
@@ -203,7 +202,7 @@ SET(GUI_SRCS
   ../Gui/albaGUIApplicationSettings.cpp  	../Gui/albaGUIApplicationSettings.h
   ../Gui/albaGUIButton.cpp  				../Gui/albaGUIButton.h
   ../Gui/albaGUICheckListBox.cpp  			../Gui/albaGUICheckListBox.h
-  ../Gui/albaGUICheckTree.cpp  				../Gui/albaGUICheckTree.h
+  ../Gui/albaGUIVMETree.cpp  				../Gui/albaGUIVMETree.h
   ../Gui/albaGUIColorSwatch.cpp  			../Gui/albaGUIColorSwatch.h
   ../Gui/albaGUIColorWidget.cpp  			../Gui/albaGUIColorWidget.h
   ../Gui/albaGUICrossSplitter.cpp  			../Gui/albaGUICrossSplitter.h

@@ -21,6 +21,7 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
+#include "albaAbsHelpManager.h"
 #include <set>
 
 //----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class albaGUISettingsDialog;
 /**
   Class Name: albaHelpManager.
 */
-class ALBA_EXPORT albaHelpManager
+class ALBA_EXPORT albaHelpManager : public albaAbsHelpManager
 {
 public:
 
@@ -42,8 +43,12 @@ public:
   /** Default destructor */
   ~albaHelpManager();
 		
-	bool HasHelpEntry(albaString typeName);
-	void ShowHelpEntry(albaString typeName);
+	/** Return true if the help has a page for the given type name */
+	virtual bool HasHelpEntry(albaString typeName) override;
+
+	/** Open the help page of the given type name */
+	virtual void ShowHelpEntry(albaString typeName) override;
+
 	void ShowHelp();
 	void SetHelpFile(albaString fileName);;
 	

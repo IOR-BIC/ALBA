@@ -491,7 +491,7 @@ void albaGizmoSlice::OnEvent(albaEventBase *alba_event)
 				
 				// MOUSE_MOVE while dragging, MOUSE_UP on release, nothing on the button down
 				m_Point->SetPoint(0,slicePlaneOrigin);
-				int mouseEvent = e->GetArg() == albaBehaviorTransform::MOUSE_MOVE ? MOUSE_MOVE : (e->GetArg() == albaBehaviorTransform::MOUSE_UP ? MOUSE_UP : 0);
+				int mouseEvent = e->GetArg() == albaBehaviorTransform::MOUSE_ACTION_MOVE ? MOUSE_MOVE : (e->GetArg() == albaBehaviorTransform::MOUSE_ACTION_UP ? MOUSE_UP : 0);
 				if (mouseEvent)
 					albaEventMacro(albaEvent(this, mouseEvent, m_Point, m_Id));
 

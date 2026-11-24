@@ -148,7 +148,7 @@ void albaPipePointCloudSlice::OnEvent(albaEventBase *alba_event)
 	{
 		m_Cutter->SetPlaneTolerance(m_Tolerance);
 		m_Cutter->Update();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 	else
 		Superclass::OnEvent(alba_event);

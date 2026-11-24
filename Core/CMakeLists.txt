@@ -13,7 +13,6 @@ SET(PROJECT_SRCS
   albaAttributeTraceability.cpp  albaAttributeTraceability.h
   albaCoreFactory.cpp  			albaCoreFactory.h
   albaDataPipe.cpp  				albaDataPipe.h
-  albaEventIO.cpp  				albaEventIO.h
   albaMatrixPipe.cpp  			albaMatrixPipe.h
   albaVMEIterator.cpp  			albaVMEIterator.h
   albaOp.cpp  albaOp.h

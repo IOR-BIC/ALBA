@@ -310,8 +310,6 @@ void albaGizmoAutoscaleHelper::InternalUpdate()
 		return;
 	
 	RecomputeAll();    
-
-	InvokeEvent(this, MATRIX_UPDATED);
 }
 
 //------------------------------------------------------------------------------

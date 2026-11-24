@@ -40,6 +40,8 @@
 #include "albaRWIBase.h"
 #include "albaView.h"
 #include "albaVMESurface.h"
+#include "albaServiceLocator.h"
+#include "albaFakeLogicForTest.h"
 #include "vtkALBAAssembly.h"
 #include "vtkALBASmartPointer.h"
 
@@ -491,19 +493,22 @@ void albaInteractionRoutingTest::Test2DMeasureRightButton()
   albaPositionalEventRouter *per = NewPERWithTool(measure);
 
   // the measures do not use the right button: the right click shows the context menu of the view
+  albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
+  logic->ClearCalls();
   SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_RIGHT_BUTTON);
   SendMouse(DEVICE_BUTTON_UP, 400, 300, ALBA_RIGHT_BUTTON);
-  CPPUNIT_ASSERT(m_Listener.Count(SHOW_VIEW_CONTEXTUAL_MENU) == 1);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(albaFakeLogicForTest::FKL_SHOW_VIEW_CONTEXTUAL_MENU) == 1);
 
   // and the drags of the right button zoom the camera, without the context menu
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   double startScale = camera->GetParallelScale();
   m_Listener.Clear();
+  logic->ClearCalls();
   SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_RIGHT_BUTTON);
   SendMouse(DEVICE_MOUSE_2D_MOVE, 400, 340, ALBA_RIGHT_BUTTON);
   SendMouse(DEVICE_BUTTON_UP, 400, 340, ALBA_RIGHT_BUTTON);
   CPPUNIT_ASSERT(camera->GetParallelScale() != startScale);
-  CPPUNIT_ASSERT(m_Listener.Count(SHOW_VIEW_CONTEXTUAL_MENU) == 0);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls(albaFakeLogicForTest::FKL_SHOW_VIEW_CONTEXTUAL_MENU) == 0);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
 
   DeletePER(per);

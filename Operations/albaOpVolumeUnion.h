@@ -78,7 +78,7 @@ public:
 
   void UpdateGUI();
 
-  bool VmeChoose(albaString title,albaEvent *e);
+  bool VmeChoose(albaString title);
   
   double m_bounds[6];
   double m_resolutionXYZ[3];

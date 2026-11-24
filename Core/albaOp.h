@@ -22,6 +22,13 @@
 #include "albaServiceClient.h"
 #include "albaAbsLogicManager.h"
 
+/** Result of an operation, passed to OpStop */
+enum OP_RESULT
+{
+	OP_RUN_OK = 0,
+	OP_RUN_CANCEL,
+};
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -167,8 +174,11 @@ protected:
 	/** Return true for the acceptable vme type. */
 	virtual bool InternalAccept(albaVME* vme);
 
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
+	/** Called at the end of the operation with result OP_RUN_OK or OP_RUN_CANCEL: hide the gui and tell the op manager */
 	virtual void OpStop(int result);
+
+	/** Tell the op manager that the operation ended with result OP_RUN_OK or OP_RUN_CANCEL */
+	void NotifyOpEnd(int result);
 
 	albaVME				 *m_Input; ///< Pointer to the Input VME.
 	albaVME         *m_Output; ///< Pointer to the Output VME

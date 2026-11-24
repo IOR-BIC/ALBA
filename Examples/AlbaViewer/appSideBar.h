@@ -21,7 +21,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 #include "albaAbsSideBar.h"
 #include "albaEvent.h"
-#include "albaGUICheckTree.h"
+#include "albaGUIVMETree.h"
 #include "albaGUIVMEChooserTree.h"
 #include "albaObserver.h"
 
@@ -78,10 +78,10 @@ public:
 	virtual void ExpandVME(albaVME *vme);
 		
 	// Show the operation's parameters gui on the tabbed panel.
-	void OpShowGui(bool push_gui, albaGUIPanel *panel);
+	void OpShowGui(albaGUIPanel *panel);
 
-	// Hide the view/operation's gui from the tabbed panel.
-	void OpHideGui(bool view_closed);
+	// Hide the operation's gui from the tabbed panel.
+	void OpHideGui();
 
 	// Plug the view settings on the tabbed panel.
 	void ViewSelect(albaView *view);
@@ -98,7 +98,7 @@ public:
 	bool IsShown() {return m_Notebook->IsShown();};
   void Show(bool show) {m_Notebook->Show(show);};
 
-	// Respond to a VME_CHOOSE event. Build a dialog containing the vme tree and return the vme choosed from the user.
+	// Build a dialog containing the vme tree and return the vmes chosen by the user (used by the logic ChooseVME/ChooseVMEs).
 	std::vector<albaVME*> VmeChoose(void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, albaString title = "Choose Node", bool multiSelect = false, albaVME *vme = NULL);
 
 	// Open a Find VME dialog.
@@ -114,7 +114,7 @@ protected:
 
   albaGUIPanelStack	*m_OpPanel;
 	albaGUIHolder			*m_ViewPropertyPanel;
-	albaGUICheckTree  *m_Tree;
+	albaGUIVMETree  *m_Tree;
 
 	albaGUIHolder  *m_VmePanel;
   albaGUIHolder  *m_VmePipePanel;

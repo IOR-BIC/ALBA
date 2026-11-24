@@ -65,6 +65,8 @@ albaViewManager::albaViewManager() :	albaGUISettings(this, _("View Manager"))
   m_Listener          = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
+  m_SkipCameraUpdate  = 0;
+  m_CameraUpdateRequested = false;
 	m_RootVme           = NULL;
   m_ViewBeingCreated  = NULL; 
   m_TemplateNum       = 0;
@@ -177,27 +179,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 	{
     switch(e->GetId())
     {
-      case VIEW_CREATE:
-        ViewCreate(e->GetId());
-      break;
-      case VIEW_DELETE:
-        ViewDelete(e->GetView());
-      break;
-      case VIEW_SELECT:
-      {
-        albaView *view = e->GetView();
-        //		albaRWIBase* rwi = (albaRWIBase*) e->GetWin();   
-        //		if(!rwi) rwi = view->GetDefaultRWI();
-
-        bool notifylogic = (view != m_SelectedView);
-
-        ViewSelected(view/*, rwi*/);
-
-        if (notifylogic && GetLogicManager())
-          GetLogicManager()->SelectView(view);
-      }
-      break;
-
 			case ID_VIEW_SETTING_MAXIMIZE:
 			{
 				m_Config->Write("View_Maximize", m_ViewMaximize);
@@ -253,13 +234,9 @@ void albaViewManager::ViewAdd(albaView *view, bool visibleInMenu)
   m_TemplateNum++;
 }
 //----------------------------------------------------------------------------
-void albaViewManager::ViewSelected(albaView *view/*, albaRWIBase *rwi*/)
+void albaViewManager::ViewSelected(albaView *view)
 {
   m_SelectedView = view;
-
-//  if(m_SelectedRWI)
-//    m_SelectedRWI->SetInteractorStyle(NULL);
-
   m_SelectedRWI = view->GetRWI();
 }
 //----------------------------------------------------------------------------
@@ -328,10 +305,13 @@ void albaViewManager::VmeShow(albaVME *vme, bool show)
     m_SelectedView->VmeShow(vme, show); // show the vme in the selected view
 }
 //----------------------------------------------------------------------------
-void albaViewManager::PropertyUpdate(bool fromTag)
+void albaViewManager::PropertyUpdate(albaVME *vme, bool fromTag)
 {
-  for(albaView* v = m_ViewList; v; v=v->m_Next) 
-		v->VmeUpdateProperty(this->m_SelectedVme, fromTag); // update the vme properties in all views
+	if (vme == NULL)
+		vme = m_SelectedVme;
+
+  for(albaView* v = m_ViewList; v; v=v->m_Next)
+		v->VmeUpdateProperty(vme, fromTag); // update the vme properties in all views
 }
 //----------------------------------------------------------------------------
 void albaViewManager::CameraReset(bool sel)   
@@ -346,6 +326,12 @@ void albaViewManager::CameraReset(albaVME *vme)
 //----------------------------------------------------------------------------
 void albaViewManager::CameraUpdate(bool only_selected)   
 {
+  if (m_SkipCameraUpdate)
+  {
+    m_CameraUpdateRequested = true;
+    return;
+  }
+
   if (only_selected && m_SelectedView != NULL)
   {
     m_SelectedView->CameraUpdate(); // Update only the selected view
@@ -353,6 +339,22 @@ void albaViewManager::CameraUpdate(bool only_selected)
   }
   for(albaView* v = m_ViewList; v; v=v->m_Next) // Update all views
     v->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void albaViewManager::EnableCameraUpdateSkip()
+{
+	m_SkipCameraUpdate++;
+}
+//----------------------------------------------------------------------------
+void albaViewManager::DisableCameraUpdateSkip()
+{
+	assert(m_SkipCameraUpdate);
+	m_SkipCameraUpdate--;
+	if (m_SkipCameraUpdate == 0 && m_CameraUpdateRequested)
+	{
+		m_CameraUpdateRequested = false;
+		CameraUpdate();
+	}
 }
 //----------------------------------------------------------------------------
 void albaViewManager::OnQuit()
@@ -426,7 +428,7 @@ albaView *albaViewManager::ViewCreate(int id)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  albaEventMacro(albaEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
+  GetLogicManager()->CreateViewFrame(new_view);
 
 	if (m_ViewMaximize)
 		new_view->GetFrame()->Maximize();
@@ -484,7 +486,7 @@ albaView *albaViewManager::ViewCreate(wxString label)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  albaEventMacro(albaEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
+  GetLogicManager()->CreateViewFrame(new_view);
   
   new_view->GetFrame()->Show(true); // show the view's frame
 	new_view->SetBackgroundColor(m_ViewColorBackground);
@@ -517,6 +519,37 @@ void albaViewManager::ViewInsert(albaView *view)
   }
 }
 //----------------------------------------------------------------------------
+void albaViewManager::ViewResize(const char *label, int x, int y, int width, int height)
+{
+	albaView *view = GetFromOpenedViews(label);
+	if (view)
+	{
+		view->GetFrame()->SetSize(width, height);
+		view->GetFrame()->SetPosition(wxPoint(x, y));
+	}
+}
+//----------------------------------------------------------------------------
+void albaViewManager::ViewOpen(const char *label)
+{
+	albaView *view = GetFromOpenedViews(label);
+	if (view)
+		Activate(view);
+	else
+		ViewCreate(label);
+}
+//----------------------------------------------------------------------------
+void albaViewManager::ViewClose(const char *label)
+{
+	albaView *view = GetFromOpenedViews(label);
+	if (view)
+	{
+		wxFrame *frame = view->GetFrame();
+		ViewDelete(view);
+		if (frame != NULL)
+			frame->Destroy();
+	}
+}
+//----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
 {
   if(m_SelectedView)
@@ -527,7 +560,7 @@ void albaViewManager::ViewDelete(albaView *view)
     m_SelectedView = NULL;
   }
 
-  albaEventMacro(albaEvent(this,VIEW_DELETE,view)); // inform the sidebar
+  GetLogicManager()->ViewDeleted(view);
 	
   // Paolo 2005-04-22
   // calculate the view type index
@@ -585,7 +618,7 @@ void albaViewManager::Activate(albaView *view)
 }
 
 //----------------------------------------------------------------------------
-albaView * albaViewManager::GetFromList( const char *label )
+albaView * albaViewManager::GetFromOpenedViews( const char *label )
 {
   albaView *view;
   for(view = GetList(); view; view=view->m_Next)

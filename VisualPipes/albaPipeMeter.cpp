@@ -338,7 +338,7 @@ void albaPipeMeter::OnEvent(albaEventBase *alba_event)
         m_MeterVME->ForwardUpEvent(*e);
       break;
     }
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   else if (alba_event->GetSender() == m_MeterVME)
   {

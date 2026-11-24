@@ -314,7 +314,7 @@ void albaViewImageCompound::VmeShow(albaVME *vme, bool show)
 		}
 	}
 	
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaViewImageCompound::EnableWidgets(bool enable)

@@ -366,7 +366,7 @@ void albaOpLabelizeSurface::ShowClipPlane(bool show)
 		}
 	}
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::OnEvent(albaEventBase *alba_event)
@@ -404,7 +404,7 @@ void albaOpLabelizeSurface::OnEventThis(albaEventBase *alba_event)
 		case ID_UNDO:
 			{
 				Undo();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_PLANE_WIDTH:
@@ -461,7 +461,7 @@ void albaOpLabelizeSurface::SetPlaneDimension()
 		m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
 		m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 		m_PlaneSource->Update();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -484,7 +484,7 @@ void albaOpLabelizeSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 			}
 			else
 				Labelize();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 			return;
 		}
 
@@ -506,7 +506,7 @@ void albaOpLabelizeSurface::OnEventGizmoPlane(albaEventBase *alba_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 				currTr->Delete();
 			}
 			break;
@@ -574,7 +574,7 @@ void albaOpLabelizeSurface::OpStop(int result)
 	if(!m_TestMode)
 		HideGui();
 
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::OpDo()
@@ -589,7 +589,7 @@ void albaOpLabelizeSurface::OpDo()
 		albaVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->Update();
 		albaVMESurface::SafeDownCast(m_Input)->GetOutput()->Update();
 		GetLogicManager()->VmeVisualModeChanged(m_Input);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 	}
 }
 //----------------------------------------------------------------------------
@@ -597,7 +597,7 @@ void albaOpLabelizeSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
 	albaVMESurface::SafeDownCast(m_Input)->SetData(m_OriginalPolydata,((albaVMESurface*)m_Input)->GetTimeStamp());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::Labelize()
@@ -712,7 +712,7 @@ void albaOpLabelizeSurface::ChangeGizmo()
 			break;
 		}
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpLabelizeSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
@@ -733,14 +733,14 @@ void albaOpLabelizeSurface::PostMultiplyEventMatrix(albaEventBase *alba_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == albaBehaviorTransform::MOUSE_MOVE)
+		if (arg == albaBehaviorTransform::MOUSE_ACTION_MOVE)
 		{
 			// move vme
 			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 
 		// clean up
 		tr->Delete();
@@ -794,7 +794,7 @@ void albaOpLabelizeSurface::OnEventGizmoScale(albaEventBase *alba_event)
 	{
 	case ID_TRANSFORM:
 		{ 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
 		}
 		break;
 

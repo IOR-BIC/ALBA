@@ -52,7 +52,7 @@ void albaOpVolumeMeasureTest::Test()
   albaString result;
   volumeMeasureOp->VolumeCompute(vmeSurface);
   result = volumeMeasureOp->GetVolume();
-  volumeMeasureOp->OpStop(ALBA_OK);
+  volumeMeasureOp->OpStop(OP_RUN_OK);
 	
   //printf("%s", result);
   CPPUNIT_ASSERT(result == albaString("6000"));

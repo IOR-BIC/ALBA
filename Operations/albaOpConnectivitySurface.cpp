@@ -248,7 +248,7 @@ void albaOpConnectivitySurface::OpStop(int result)
 		m_ExtractedVmes.clear();
 	}
 	HideGui();
-	albaEventMacro(albaEvent(this,result));        
+	NotifyOpEnd(result);        
 }
 //----------------------------------------------------------------------------
 void albaOpConnectivitySurface::OnVtkConnect()

@@ -33,6 +33,8 @@ EXPORT_STL_MAP(ALBA_EXPORT,albaTimeStamp, albaAutoPointer<albaVMEItem>);
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
+class albaVME;
+class albaVMERoot;
 
 
 /** a dynamic associative sorted array of datasets indexed by their "timestamp".
@@ -111,10 +113,21 @@ public:
 
   static albaID GetSingleFileDataId();
 
+  /** Set the VME owning this vector and its items (not referenced). Used to reach the tree root and the storage. */
+  void SetVME(albaVME *vme);
+
+  /** Return the VME owning this vector, NULL if not set. */
+  albaVME *GetVME() {return m_VME;}
+
 protected:
- 
+
   virtual int InternalStore(albaStorageElement *parent);
   virtual int InternalRestore(albaStorageElement *node);
+
+  /** Return the root of the tree of the owning VME, NULL if the vector has no VME or the tree root is not an albaVMERoot. */
+  albaVMERoot *GetRoot();
+
+  albaVME *m_VME;          ///< VME owning this vector (not referenced)
 
   albaString m_ArchiveName;///< Name of the archive if the items are stored in single file mode
   bool  m_SingleFileMode; ///< flag for storing Items as a single file

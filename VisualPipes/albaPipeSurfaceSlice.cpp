@@ -318,7 +318,7 @@ void albaPipeSurfaceSlice::SetActorPicking(int enable)
 		m_Actor->SetPickable(enable);
 		m_Actor->Modified();
 	}
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ void albaPipeSurfaceSlice::OnEvent(albaEventBase *alba_event)
 		  {
 			  m_Actor->GetProperty()->SetLineWidth(m_Border);
 			  m_Actor->Modified();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 		  }
 	  break;
 		case ID_LUT:
@@ -359,7 +359,7 @@ void albaPipeSurfaceSlice::OnEvent(albaEventBase *alba_event)
 			double sr[2];
 			m_Table->GetTableRange(sr);
 			m_Mapper->SetScalarRange(sr);
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 		case ID_SCALAR_MAP_ACTIVE:
@@ -369,7 +369,7 @@ void albaPipeSurfaceSlice::OnEvent(albaEventBase *alba_event)
 						
 			UpdateScalars();
 
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 		}
 		break;
 
@@ -413,7 +413,7 @@ void albaPipeSurfaceSlice::UpdateLUTAndMapperFromNewActiveScalars()
 	m_Actor->Modified();
 
 	UpdateProperty();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaPipeSurfaceSlice::GenerateTextureMapCoordinate()
@@ -485,5 +485,5 @@ void albaPipeSurfaceSlice::SetThickness(double thickness)
 	m_Border=thickness;
 	m_Actor->GetProperty()->SetLineWidth(m_Border);
   m_Actor->Modified();
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }

@@ -40,7 +40,6 @@
 #include "albaDeviceButtonsPadMouse.h"
 
 #include "albaStorage.h"
-#include "albaEventIO.h"
 #include "albaDataVector.h"
 #include "albaTagArray.h"
 #include "albaTagItem.h"
@@ -76,11 +75,8 @@ used by redo
 During the Run an operation can run nested operations,
 the nested operations can be cancelled individually.
 
-the nested operations send OP_RUN_STARTING and OP_RUN_TERMINATED to the caller operation.
-instead to Logic - in Logic don't need any more running_op_counter, in theory.
-In practice it needs for View-Settings.
-No is dangerous - if the operations don't manage OP_RUN_STARTING and OP_RUN_TERMINATED 
-these return and reach logic - is better to avoid.
+only the outermost operation tells the logic that it starts and ends (OpRunStarting, OpRunTerminated),
+the nested ones don't.
 
 During the Exec, can be run nested operations
 but could not be done the undo.
@@ -156,37 +152,8 @@ albaOpManager::~albaOpManager()
 //----------------------------------------------------------------------------
 void albaOpManager::OnEvent(albaEventBase *alba_event)
 {
-  albaOp* o = NULL; 
-
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    switch (e->GetId())
-    {
-      case OP_EXEC:
-        o = e->GetOp();
-        if(o) 
-          OpExec(o);
-      break; 
-      case OP_RUN:
-        o = e->GetOp();
-        if(o) 
-          OpRun(o);
-      break; 
-      case OP_RUN_OK:
-        o = (albaOp*) e->GetSender();
-        assert(o == m_Context.Caller());
-        OpRunOk(o);
-      break; 
-      case OP_RUN_CANCEL:
-        o = (albaOp*) e->GetSender();
-        assert(o == m_Context.Caller());
-        OpRunCancel(o);
-      break;
-      default:
-        albaEventMacro(*e);
-      break;
-    }
-  }
+    albaEventMacro(*e);
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpAdd(albaOp *op, wxString menuPath, bool can_undo, albaGUISettings *setting)
@@ -391,6 +358,9 @@ void albaOpManager::OpSelect(albaVME* vme)
 //----------------------------------------------------------------------------
 void albaOpManager::ClearUndoStack()
 {
+   if (Running())
+     return;
+
    m_Context.Clear();
    m_OpCut->ClipboardClear();
 	 EnableOp();
@@ -581,9 +551,6 @@ void albaOpManager::OpRun(int op_id)
 		OpRedo();
 		break;
 
-	case OP_ADD_GROUP:
-		RunOpAddGroup();
-		break;
 	case OP_DELETE:
 		RunOpDelete();
 		break;
@@ -674,7 +641,8 @@ void albaOpManager::OpRun(albaOp *op, void *op_param)
     settings->SetListener(m_RunningOp);
   }
 
-  Notify(OP_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
+  if (m_Context.Caller() == NULL)
+    GetLogicManager()->OpRunStarting();
 
   m_Context.Push(m_RunningOp);
   m_RunningOp->OpRun();
@@ -751,13 +719,15 @@ void albaOpManager::RunOpDelete()
 
 		node_to_del->ReparentTo(NULL);
 		
-		Notify(OP_RUN_TERMINATED, true);
+		if (m_Context.Caller() == NULL)
+			GetLogicManager()->OpRunTerminated(true);
 
 		ClearUndoStack();
-    GetLogicManager()->CameraUpdate();
+    GetViewManager()->CameraUpdate();
   }
 	else
-		Notify(OP_RUN_TERMINATED, false);
+		if (m_Context.Caller() == NULL)
+			GetLogicManager()->OpRunTerminated(false);
 }
 //----------------------------------------------------------------------------
 void albaOpManager::RunOpRename()
@@ -778,6 +748,9 @@ void albaOpManager::RunOpShowHistory()
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunOk(albaOp *op)
 {
+	if (op == NULL || op != m_Context.Caller())
+		return;
+
 	op->HideGui();
   m_Context.Pop();
 	
@@ -786,7 +759,8 @@ void albaOpManager::OpRunOk(albaOp *op)
 
 	OpDo(op);
   //Notify success with "arg" paramerter
-  Notify(OP_RUN_TERMINATED,true);
+  if (m_Context.Caller() == NULL)
+    GetLogicManager()->OpRunTerminated(true);
 
 	if (!opCanUndo)
 	{
@@ -801,6 +775,9 @@ void albaOpManager::OpRunOk(albaOp *op)
 //----------------------------------------------------------------------------
 void albaOpManager::OpRunCancel(albaOp *op)
 {
+	if (op == NULL || op != m_Context.Caller())
+		return;
+
   op->HideGui();
 
   m_Context.Pop();
@@ -814,7 +791,8 @@ void albaOpManager::OpRunCancel(albaOp *op)
   }
 
   //Notify cancel with "arg" paramerter
-  Notify(OP_RUN_TERMINATED,false);
+  if (m_Context.Caller() == NULL)
+    GetLogicManager()->OpRunTerminated(false);
 
 	m_RunningOp = NULL;
 	delete op; 
@@ -1089,13 +1067,6 @@ void albaOpManager::OpRedo()
   FillTraceabilityAttribute(op, in_node, out_node);
 
 	EnableOp();
-}
-//----------------------------------------------------------------------------
-void albaOpManager::Notify(int msg, long arg)   
-{
-	if(m_Context.Caller() == NULL)
-		albaEventMacro(albaEvent(this,msg,m_RunningOp,arg));  
-	
 }
 //----------------------------------------------------------------------------
 bool albaOpManager::StopCurrentOperation()

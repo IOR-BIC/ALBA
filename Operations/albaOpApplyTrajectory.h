@@ -71,8 +71,6 @@ public:
   /** Undo operation. */
   void OpUndo(); 
 
-  /** Stop the operation. */
-  void OpStop(int result);
 
   /** Wait for events */
   void OnEvent(albaEventBase *alba_event);

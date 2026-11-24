@@ -24,6 +24,7 @@
 
 #include "albaDecl.h"
 #include "albaWizardBlock.h"
+#include "albaWizard.h"
 
 
 
@@ -46,6 +47,7 @@ albaWizardBlock::albaWizardBlock(const char *name)
   m_AbortBlock=name;
 
   m_BlockProgress=-1;
+  m_Wizard=NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -116,8 +118,8 @@ void albaWizardBlock::ExcutionBegin()
   //Setting the input VME to reselect it on op cancel 
   m_InputVME=m_SelectedVME;
 
-  if (m_BlockProgress>=0)
-    albaEventMacro(albaEvent(this,PROGRESSBAR_SET_VALUE,m_BlockProgress));
+  if (m_BlockProgress>=0 && m_Wizard)
+    m_Wizard->SetProgress(m_BlockProgress);
 }
 
 //----------------------------------------------------------------------------

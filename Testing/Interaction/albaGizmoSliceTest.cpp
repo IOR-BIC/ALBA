@@ -203,16 +203,16 @@ void albaGizmoSliceTest::TestTransformEvents()
   transform.SetMatrix(identity);
 
   // the button down sends nothing, each drag sends MOUSE_MOVE, the release only MOUSE_UP
-  transform.SetArg(albaBehaviorTransform::MOUSE_DOWN);
+  transform.SetArg(albaBehaviorTransform::MOUSE_ACTION_DOWN);
   gizmoSlice->OnEvent(&transform);
   CPPUNIT_ASSERT(listener.m_MoveCount == 0 && listener.m_UpCount == 0);
 
-  transform.SetArg(albaBehaviorTransform::MOUSE_MOVE);
+  transform.SetArg(albaBehaviorTransform::MOUSE_ACTION_MOVE);
   gizmoSlice->OnEvent(&transform);
   gizmoSlice->OnEvent(&transform);
   CPPUNIT_ASSERT(listener.m_MoveCount == 2 && listener.m_UpCount == 0);
 
-  transform.SetArg(albaBehaviorTransform::MOUSE_UP);
+  transform.SetArg(albaBehaviorTransform::MOUSE_ACTION_UP);
   gizmoSlice->OnEvent(&transform);
   CPPUNIT_ASSERT(listener.m_MoveCount == 2 && listener.m_UpCount == 1);
 

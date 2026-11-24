@@ -55,8 +55,6 @@ public:
 	/** Builds operation's interface. */
 	void OpRun();
 
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	virtual void OpStop(int result);
 
 	/** Import VTK data, return ALBA_OK on success. */
 	virtual int ImportFile();

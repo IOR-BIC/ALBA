@@ -29,11 +29,6 @@
 // forward reference
 //----------------------------------------------------------------------------
 class albaObserver;
-class vtkAlgorithm;
-class vtkViewport;
-class vtkObject;
-class albaGUIMDIFrameCallback; 
-class vtkAlgorithm;
 class albaGUI;
 /**
   Class Name: albaGUIMDIFrame.
@@ -105,22 +100,8 @@ class ALBA_EXPORT albaGUIMDIFrame: public wxMDIParentFrame, public albaServiceCl
 #ifdef ALBA_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  /** Link a vtk object to the progress bar. -  */
-  void BindToProgressBar(vtkObject* vtkobj);
-
-  /** Link a vtk process object (filter) to the progress bar. */
-  void BindToProgressBar(vtkAlgorithm* filter);
-
-  /** Link a vtkViewport to the progress bar. */
-  void BindToProgressBar(vtkViewport* ren);
-
   /** Redraw the frame. */
   void OnSize(wxSizeEvent& event);
-
-protected:
-  albaGUIMDIFrameCallback *m_StartCallback; 
-  albaGUIMDIFrameCallback *m_EndCallback; ; 
-  albaGUIMDIFrameCallback *m_ProgressCallback; 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #endif  //ALBA_USE_VTK

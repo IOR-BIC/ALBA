@@ -27,8 +27,8 @@
 #include "albaAxesTest.h"
 #include "albaCoreFactoryTest.h"
 #include "albaDataPipeTest.h"
-#include "albaEventIOTest.h"
 #include "albaFakeLogicForTest.h"
+#include "albaFakeViewManagerForTest.h"
 #include "albaGUITreeContextualMenuTest.h"
 #include "albaMatrixPipeTest.h"
 #include "albaOpContextStackTest.h"
@@ -170,6 +170,8 @@ int main(int argc, char* argv[])
 
 	albaFakeLogicForTest *logic = new albaFakeLogicForTest();
 	albaServiceLocator::SetLogicManager(logic);
+	albaFakeViewManagerForTest *viewManager = new albaFakeViewManagerForTest();
+	albaServiceLocator::SetViewManager(viewManager);
 
 	//this test must be run first because manages factories
 	//runner.addTest(albaCoreFactoryTest::suite());
@@ -212,7 +214,6 @@ int main(int argc, char* argv[])
 	runner.addTest(albaVMEFactoryTest::suite());
 	runner.addTest(albaMatrixPipeTest::suite());
 	runner.addTest(albaGUITreeContextualMenuTest::suite());
-	runner.addTest(albaEventIOTest::suite());
 	runner.addTest(albaDataPipeTest::suite());
 	runner.addTest(albaAxesTest::suite());
 	runner.addTest(albaAttributeTraceabilityTest::suite());
@@ -227,6 +228,7 @@ int main(int argc, char* argv[])
 	outputter.write();
 
 	cppDEL(logic);
+	cppDEL(viewManager);
 
 	albaTest::PauseBeforeExit();
 

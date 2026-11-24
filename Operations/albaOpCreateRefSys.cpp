@@ -74,7 +74,7 @@ void albaOpCreateRefSys::OpRun()
   albaNEW(m_RefSys);
   m_RefSys->SetName("Reference System");
   m_Output = m_RefSys;
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 
 //----------------------------------------------------------------------------

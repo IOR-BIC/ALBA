@@ -175,7 +175,7 @@ void albaOpExtrusionHoles::OpDo()
 	if(m_ResultPolydata)
 		((albaVMESurface*)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpExtrusionHoles::OpUndo()
@@ -184,7 +184,7 @@ void albaOpExtrusionHoles::OpUndo()
 	if(m_OriginalPolydata)
 		((albaVMESurface*)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpExtrusionHoles::OnEvent(albaEventBase *alba_event)
@@ -394,12 +394,6 @@ void albaOpExtrusionHoles::SelectHole(int pointID)
 		m_Rwi->m_RenderWindow->Render();
 		vtkDEL(glyph);
 	}
-}
-//----------------------------------------------------------------------------
-void albaOpExtrusionHoles::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	albaEventMacro(albaEvent(this,result));        
 }
 //----------------------------------------------------------------------------
 void albaOpExtrusionHoles::DeleteOpDialog()

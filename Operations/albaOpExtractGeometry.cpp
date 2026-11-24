@@ -337,13 +337,6 @@ void albaOpExtractGeometry::OnEvent(albaEventBase *alba_event)
   }
 }
 //----------------------------------------------------------------------------
-void albaOpExtractGeometry::OpStop(int result)
-{
-  if(m_Gui)
-    HideGui();
-  albaEventMacro(albaEvent(this,result));  
-}
-//----------------------------------------------------------------------------
 void albaOpExtractGeometry::OpUndo()
 {
   if (m_SurfaceOutput != NULL)

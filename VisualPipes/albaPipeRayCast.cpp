@@ -262,7 +262,7 @@ void albaPipeRayCast::OnEvent(albaEventBase *alba_event)
 			{
         //Update functions
 				SetRayCastFunctions();
-        m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+        GetViewManager()->CameraUpdate();
 				m_Gui->Update();
 			}
 		break;
@@ -274,13 +274,13 @@ void albaPipeRayCast::OnEvent(albaEventBase *alba_event)
 
         //Update functions
         SetRayCastFunctions();
-        m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+        GetViewManager()->CameraUpdate();
       }
     break;
     case ID_CHANGE_MODALITY:
       {
         OnChangeModality();
-        m_Vme->ForwardUpEvent(&albaEvent(this,CAMERA_UPDATE));
+        GetViewManager()->CameraUpdate();
       }
     break;
   	default:

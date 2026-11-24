@@ -68,7 +68,7 @@ void albaOpCreateGroup::OpRun()
   albaNEW(m_Group);
   m_Group->SetName("Group");
   m_Output = m_Group;
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOpCreateGroup::OpDo()

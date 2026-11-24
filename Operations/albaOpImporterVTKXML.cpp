@@ -122,7 +122,7 @@ void albaOpImporterVTKXML::OpRun()
     else if(!this->m_TestMode)
         albaMessage(_("Unsupported file format"), _("I/O Error"), wxICON_ERROR );
   }
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterVTKXML::ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata)

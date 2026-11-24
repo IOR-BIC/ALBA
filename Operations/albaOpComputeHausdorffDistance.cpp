@@ -246,13 +246,7 @@ void albaOpComputeHausdorffDistance::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 albaVME *albaOpComputeHausdorffDistance::ChooseSurface()
 {
-	albaString title = albaString("Select a surface:");
-	albaEvent e(this, VME_CHOOSE);
-	e.SetString(&title);
-	e.SetPointer(&SurfaceAccept);
-	albaEventMacro(e);
-	albaVME *vme = (albaVME *)e.GetVme();
-	return vme;
+	return GetLogicManager()->ChooseVME("Select a surface:", &SurfaceAccept);
 }
 
 //----------------------------------------------------------------------------
@@ -287,13 +281,6 @@ void albaOpComputeHausdorffDistance::SetSurfaceInput2(albaVME * vme)
 	}
 }
 
-//----------------------------------------------------------------------------
-void albaOpComputeHausdorffDistance::OpStop(int result)
-{
-  if(m_Gui)
-    HideGui();
-  albaEventMacro(albaEvent(this,result));  
-}
 //----------------------------------------------------------------------------
 void albaOpComputeHausdorffDistance::OpUndo()
 {

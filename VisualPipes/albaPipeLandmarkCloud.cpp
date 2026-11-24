@@ -168,7 +168,7 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
           data->GetScalarRange(range);
           m_CloudMapper->SetScalarRange(range);
         }
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
       default:
@@ -183,7 +183,7 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
 			double radius = m_Cloud->GetRadius();
       m_SphereSource->SetRadius(radius);
 			m_CloundCornerFilter->SetCloudRadius(radius);
-      GetLogicManager()->CameraUpdate();
+      GetViewManager()->CameraUpdate();
     }
   }
   else if (alba_event->GetId() == albaVMELandmarkCloud::CLOUD_SPHERE_RES)
@@ -192,7 +192,7 @@ void albaPipeLandmarkCloud::OnEvent(albaEventBase *alba_event)
     {
       m_SphereSource->SetThetaResolution(m_Cloud->GetSphereResolution());
       m_SphereSource->SetPhiResolution(m_Cloud->GetSphereResolution());
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     }
   }
   

@@ -41,7 +41,7 @@ template class ALBA_EXPORT albaAutoPointer<albaMatrix>;
   @sa albaTransform
   @todo
   - change SetTimeStamp to apply a Modified(), than change matrix pipes to not call it!!!
-  - implement issuing of a MATRIX_UPDATED event: add an event source member
+  - implement issuing of an event when the matrix is updated: add an event source member
   */
 class ALBA_EXPORT albaTransformBase : public albaReferenceCounted, public albaEventBroadcaster
 {

@@ -31,7 +31,7 @@
 
 enum CrossSplitterModes
 {
-    VA_ONE = LAYOUT_ONE,
+    VA_ONE = 0,
     VA_TWO_VERT,  
     VA_TWO_HORZ,  
     VA_THREE_UP,  

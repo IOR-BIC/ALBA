@@ -23,7 +23,7 @@ SET(PROJECT_SRCS
   albaGUIApplicationSettings.cpp  	albaGUIApplicationSettings.h
   albaGUIButton.cpp  				albaGUIButton.h
   albaGUICheckListBox.cpp  			albaGUICheckListBox.h
-  albaGUICheckTree.cpp  				albaGUICheckTree.h
+  albaGUIVMETree.cpp  				albaGUIVMETree.h
   albaGUIColorSwatch.cpp  			albaGUIColorSwatch.h
   albaGUIColorWidget.cpp  			albaGUIColorWidget.h
   albaGUICrossSplitter.cpp  			albaGUICrossSplitter.h

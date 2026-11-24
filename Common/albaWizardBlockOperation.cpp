@@ -26,6 +26,8 @@
 #include "albaWizardBlockOperation.h"
 #include "albaVME.h"
 #include "albaEvent.h"
+#include "albaWizard.h"
+#include "albaWizardManager.h"
 
 //----------------------------------------------------------------------------
 albaWizardBlockOperation::albaWizardBlockOperation(const char *name):albaWizardBlock(name)
@@ -136,9 +138,8 @@ void albaWizardBlockOperation::ExcutionBegin()
   //Ask Wizard for View
   if (m_RequiredView!="")
   {
-    //send up the event in order to open/select the required view
-    tmpStr=m_RequiredView;
-    albaEventMacro(albaEvent(this,WIZARD_REQUIRED_VIEW,&tmpStr));
+    //open or select the required view
+    GetViewManager()->ViewOpen(m_RequiredView.ToAscii());
 	if(m_windowhastoberesized) 
 	{
 		wxSize albaframesize = albaGetFrame()->GetSize();
@@ -147,21 +148,21 @@ void albaWizardBlockOperation::ExcutionBegin()
 		int width = m_width*albaframesize.GetWidth();
 		int height = m_height*albaframesize.GetHeight();
 
-	    albaEventMacro(albaEvent(this,VIEW_RESIZE,&tmpStr,x,y,width,height));	
+	    GetViewManager()->ViewResize(tmpStr, x, y, width, height);
 	}
 	if(m_windowhastobetiled)
 	{
 		if(!m_tile_windows.Compare("Tile_window_horizontally")) 
 		{
-	        albaEventMacro(albaEvent(this,TILE_WINDOW_HORIZONTALLY));
+	        GetLogicManager()->TileViewFrames(true);
 		}
 		else if (!m_tile_windows.Compare("Tile_window_vertically")) 
 		{
-			albaEventMacro(albaEvent(this,TILE_WINDOW_VERTICALLY));
+			GetLogicManager()->TileViewFrames(false);
 		}
 		else if (!m_tile_windows.Compare("Tile_window_cascade"))
 		{
-			albaEventMacro(albaEvent(this,TILE_WINDOW_CASCADE));
+			GetLogicManager()->CascadeViewFrames();
 		}
 		else 
 		{
@@ -215,7 +216,8 @@ void albaWizardBlockOperation::ExcutionBegin()
   {
     tmpStr=m_Operation;
     //ask logic for operation run the flow will continue after operation stop
-    albaEventMacro(albaEvent(this,WIZARD_RUN_OP,&tmpStr));
+    if (m_Wizard && m_Wizard->GetManager())
+      m_Wizard->GetManager()->RunOp(tmpStr.GetCStr());
   }
 }
 
@@ -234,7 +236,7 @@ void albaWizardBlockOperation::ExcutionEnd()
 
   if(m_viewhastobedeleted) 
   {
-      albaEventMacro(albaEvent(this,WIZARD_DELETE_VIEW,&m_viewtodelete));
+      GetViewManager()->ViewClose(m_viewtodelete.GetCStr());
   }
  
 }

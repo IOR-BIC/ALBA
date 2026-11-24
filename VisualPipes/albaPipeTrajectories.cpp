@@ -185,7 +185,7 @@ void albaPipeTrajectories::OnEvent(albaEventBase *alba_event)
     {
       case ID_INTERVAL:
         UpdateProperty();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
         break;
       default:
         albaEventMacro(*e);

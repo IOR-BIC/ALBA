@@ -157,7 +157,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpDo()
   {
     m_Output->ReparentTo(m_ResampleInput);
     GetLogicManager()->VmeShow(m_Output, true);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -195,7 +195,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     m_ResampleInput->Update();
 
     HideGui();
-    albaEventMacro(albaEvent(this,result));
+    NotifyOpEnd(result);
   } 
   else if (result==OP_RUN_CANCEL)
   { 
@@ -211,15 +211,15 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     if(m_ResampleInput!=NULL && m_ResampleInput!=m_Input)
     {
       GetLogicManager()->VmeShow(m_ResampleInput, false);
-      albaEventMacro(albaEvent(this,VME_SELECT,m_ResampleInput,false)); 
-      albaEventMacro(albaEvent(this, VME_SELECT, m_Input, true));
+      GetLogicManager()->VmeSelect(m_ResampleInput);
+      GetLogicManager()->VmeSelect(m_Input);
       GetLogicManager()->VmeShow(m_Input, true);
       m_ResampleInput->ReparentTo(NULL);
       m_ResampleInput->Update();
     }
     albaDEL(m_Resample); 
     HideGui();
-    albaEventMacro(albaEvent(this,result));
+    NotifyOpEnd(result);
   }
 }
 //----------------------------------------------------------------------------
@@ -374,7 +374,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
         m_Sphere->SetData(m_SphereVTK->GetOutput(),0.0);
         m_Sphere->Update();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case VME_PICKED:
@@ -392,7 +392,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OnEvent(albaEventBase *a
           m_Sphere->Update();
 
           GetLogicManager()->VmeShow(m_Sphere, true);
-					GetLogicManager()->CameraUpdate();
+					GetViewManager()->CameraUpdate();
 
           vtkImageData *sp = vtkImageData::SafeDownCast(albaVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
 
@@ -496,8 +496,8 @@ int albaOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
 
     // show volume resampled
     GetLogicManager()->VmeShow(m_ResampleInput, true);
-    albaEventMacro(albaEvent(this, VME_SELECT, m_ResampleInput, true));
-		GetLogicManager()->CameraUpdate();
+    GetLogicManager()->VmeSelect(m_ResampleInput);
+		GetViewManager()->CameraUpdate();
      
     cppDEL(wait);
   }

@@ -219,7 +219,7 @@ void albaViewSliceOnCurveCompound::VmeShow(albaVME *vme, bool show)
 	if (ActivateWindowing(vme))
 		UpdateWindowing(show, vme);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //------------------------------------------------------------------------
@@ -255,7 +255,7 @@ void albaViewSliceOnCurveCompound::HideSameVMEs(albaView *view, albaVME *vme)
 
 //----------------------------------------------------------------------------
 //return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
-//having albaViewCompound::GetNodeStatus allow albaGUICheckTree to not know about albaSceneGraph
+//having albaViewCompound::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph
 int albaViewSliceOnCurveCompound::GetNodeStatus(albaVME *vme)
 //----------------------------------------------------------------------------
 {
@@ -597,8 +597,6 @@ void albaViewSliceOnCurveCompound::OnEvent(albaEventBase *alba_event)
       m_ChildViewList[i]->VmeRemove(g);
     }
 
-    //albaEventMacro(albaEvent(this, VME_REMOVING, g));
-
     albaDEL(m_Gizmo); //unfortunately this must not be done because of crash if you close the view frame    
     albaDEL(m_CurrentPolyLineGizmo);    
     m_CurrentPolyLine = NULL;
@@ -825,7 +823,7 @@ void albaViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType br
     m_ChildViewList[MAIN_VIEW]->VmeShow(m_CurrentVolume, true);	
 
     //force GUI construction for new pipe
-    albaEventMacro( albaEvent( this, VME_SELECTED, m_CurrentVolume));
+    GetLogicManager()->VmeSelected(m_CurrentVolume);
   }
 }
 #pragma endregion

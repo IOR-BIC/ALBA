@@ -349,7 +349,7 @@ void albaGizmoCrossRotateAxis::OnEvent(albaEventBase *alba_event)
 	{
 		if (e->GetId() == ID_TRANSFORM)
 		{
-			if (e->GetArg() == albaBehaviorTransform::MOUSE_DOWN)
+			if (e->GetArg() == albaBehaviorTransform::MOUSE_ACTION_DOWN)
 			{
 				this->SetIsActive(true);
 			}

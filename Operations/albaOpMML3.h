@@ -103,7 +103,6 @@ public:
   albaOp* Copy();
 
   void OpRun();
-  void OpStop(int result);
   void OpDo();
   void OpUndo();
 	

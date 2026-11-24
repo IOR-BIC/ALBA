@@ -166,12 +166,12 @@ void albaOpTransformOld::OnEvent(albaEventBase *alba_event)
   else if (alba_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(alba_event); 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   else if (alba_event->GetSender() == this->m_GuiTransformTextEntries)
   {
     OnEventGuiTransformTextEntries(alba_event);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   else
   {
@@ -193,7 +193,7 @@ void albaOpTransformOld::OpUndo()
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
   m_Input->GetOutput()->Update();
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpTransformOld::OpStop(int result)
@@ -213,7 +213,7 @@ void albaOpTransformOld::OpStop(int result)
 
   m_GuiTransform->DetachInteractorFromVme();
 
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 
 //----------------------------------------------------------------------------
@@ -264,7 +264,7 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
           m_GizmoScale->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
         }
       }
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     }
     break;
     
@@ -291,7 +291,7 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
         m_GizmoScale->SetRefSys(m_RefSysVME);
         m_GizmoScale->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
       }
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
     }
     break;
 
@@ -339,11 +339,7 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
     // move this to opgui; both gizmos and gui should know ref sys
     case ID_AUX_REF_SYS:
     {
-      albaString s;
-      s << "Choose VME ref sys";
-			albaEvent e(this,VME_CHOOSE, &s);
-			albaEventMacro(e);
-      SetRefSysVME(e.GetVme());
+			SetRefSysVME(GetLogicManager()->ChooseVME("Choose VME ref sys"));
     }
     break;
 
@@ -438,7 +434,7 @@ void albaOpTransformOld::OnEventGizmoScale(albaEventBase *alba_event)
       {
 	      // update gui 
 	      m_GuiTransformTextEntries->SetAbsPose(&m_NewAbsMatrix);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
 	  }
     break;
@@ -670,7 +666,7 @@ void albaOpTransformOld::Reset()
     SetRefSysVME(m_Input); 
   }
   m_NewAbsMatrix = m_OldAbsMatrix;
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

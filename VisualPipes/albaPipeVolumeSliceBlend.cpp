@@ -426,14 +426,14 @@ void albaPipeVolumeSliceBlend::OnEvent(albaEventBase *alba_event)
       {
         mmaVolumeMaterial *material = ((albaVMEVolume *)m_Vme)->GetMaterial();
         material->UpdateFromTables();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     case ID_OPACITY_SLIDER:
       {
         //Event to modify the opacity of the slice at top
         SetSliceOpacity(m_SliceOpacity);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
       }
       break;
     default:

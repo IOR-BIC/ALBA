@@ -80,7 +80,7 @@ void albaOpImporterMSF1x::OpRun()
     ImportMSF();
 	  result = OP_RUN_OK;
 	}
-	albaEventMacro(albaEvent(this,result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpImporterMSF1x::ImportMSF()
@@ -92,7 +92,6 @@ void albaOpImporterMSF1x::ImportMSF()
   m_Importer->SetURL(m_File);
   m_Importer->SetRoot((albaVMERoot *)m_Input->GetRoot());
   
-  //albaEventMacro(albaEvent(this,BIND_TO_PROGRESSBAR,preader));
   albaTagItem item;
   albaVMERoot *root = (albaVMERoot *)m_Input->GetRoot();
   root->GetTagArray()->GetTag("APP_STAMP" , item);

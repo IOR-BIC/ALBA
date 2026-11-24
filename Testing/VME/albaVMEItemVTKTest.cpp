@@ -35,8 +35,9 @@
 #include "albaVMEItemVTK.h"
 #include "albaString.h"
 #include "albaVMEStorage.h"
-#include "albaEventIO.h"
-#include "albaObserver.h"
+#include "albaVMERoot.h"
+#include "albaVMEGeneric.h"
+#include "albaDataVector.h"
 
 #include "vtkSphereSource.h"
 #include "vtkPolyData.h"
@@ -46,38 +47,6 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//----------------------------------------------------------------------------
-class DummyObserver : public albaObserver
-//----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() 
-  {
-    m_Storage = new albaVMEStorage();
-  };
-  ~DummyObserver()
-  {
-    delete m_Storage;
-  };
-
-  albaStorage* GetStorage()
-  {
-    return m_Storage;
-  };
-
-  virtual void OnEvent(albaEventBase *alba_event)
-  {
-    if(alba_event->GetId() == NODE_GET_STORAGE)
-    {
-      albaEventIO *io_event=albaEventIO::SafeDownCast(alba_event);
-      io_event->SetStorage(m_Storage);
-    }
-  }
-
-protected:
-  albaVMEStorage *m_Storage;
-};
 //----------------------------------------------------------------------------
 void albaVMEItemVTKTest::TestFixture()
 //----------------------------------------------------------------------------
@@ -308,12 +277,15 @@ void albaVMEItemVTKTest::TestReadData()
 void albaVMEItemVTKTest::TestInternalStoreData()
 //----------------------------------------------------------------------------
 {
+  // the item reaches the storage through its VME: storage -> root -> vme -> data vector -> item
+  albaVMEStorage *storage = albaVMEStorage::New();
+  albaVMEGeneric *vme;
+  albaNEW(vme);
+  vme->ReparentTo(storage->GetRoot());
+
   albaVMEItemVTK *item;
   albaNEW(item);
-
-  DummyObserver *observer = new DummyObserver();
-
-  item->SetListener(observer);
+  vme->GetDataVector()->AppendItem(item);
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
@@ -356,18 +328,22 @@ void albaVMEItemVTKTest::TestInternalStoreData()
   albaDEL(itemRead);
   vtkDEL(sphere);
   albaDEL(item);
-  delete observer;
+  albaDEL(vme);
+  albaDEL(storage);
 }
 //----------------------------------------------------------------------------
 void albaVMEItemVTKTest::TestStoreToArchive()
 //----------------------------------------------------------------------------
 {
+  // the item reaches the storage through its VME: storage -> root -> vme -> data vector -> item
+  albaVMEStorage *storage = albaVMEStorage::New();
+  albaVMEGeneric *vme;
+  albaNEW(vme);
+  vme->ReparentTo(storage->GetRoot());
+
   albaVMEItemVTK *item;
   albaNEW(item);
-
-  DummyObserver *observer = new DummyObserver();
-
-  item->SetListener(observer);
+  vme->GetDataVector()->AppendItem(item);
 
   vtkSphereSource *sphere;
   vtkNEW(sphere);
@@ -386,7 +362,7 @@ void albaVMEItemVTKTest::TestStoreToArchive()
   wxSetWorkingDirectory(workDir.GetCStr());
 
   albaString tmp_archive;
-  observer->GetStorage()->GetTmpFile(tmp_archive);
+  storage->GetTmpFile(tmp_archive);
 
   wxFileOutputStream out(tmp_archive.GetCStr());
   wxZipOutputStream zip(out);
@@ -406,7 +382,7 @@ void albaVMEItemVTKTest::TestStoreToArchive()
 
   TEST_RESULT;
 
-  result = observer->GetStorage()->StoreToURL(tmp_archive, filenameZip) == ALBA_OK;
+  result = storage->StoreToURL(tmp_archive, filenameZip) == ALBA_OK;
 
   TEST_RESULT;
 
@@ -442,6 +418,6 @@ void albaVMEItemVTKTest::TestStoreToArchive()
 
   vtkDEL(sphere);
   albaDEL(item);
-  delete observer;
-
+  albaDEL(vme);
+  albaDEL(storage);
 }

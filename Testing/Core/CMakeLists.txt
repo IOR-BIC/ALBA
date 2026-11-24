@@ -19,7 +19,6 @@ SET(PROJECT_SRCS
 	mmaApplicationLayoutTest.h mmaApplicationLayoutTest.cpp
 	albaVMETest.h albaVMETest.cpp
 	albaOpTest.h albaOpTest.cpp
-	albaEventIOTest.h albaEventIOTest.cpp
 	albaUserTest.h albaUserTest.cpp
 	albaOpSelectTest.h albaOpSelectTest.cpp
 	albaVMERootTest.h albaVMERootTest.cpp

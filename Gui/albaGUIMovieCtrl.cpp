@@ -43,7 +43,7 @@ END_EVENT_TABLE()
 
 enum MOVIECTRL_WIDGETS_ID
 {
-  ID_LOOP = MINID,
+  ID_LOOP = albaGUIMovieCtrl::ID_FRAME_SET + 1,
 };
 //----------------------------------------------------------------------------
 albaGUIMovieCtrl::albaGUIMovieCtrl( wxWindow* parent,wxWindowID id)
@@ -107,20 +107,20 @@ void albaGUIMovieCtrl::OnEvent(albaEventBase *alba_event)
       case TIME_PREV:
         m_Frame -= m_FrameStep;
         m_Frame = (m_Frame <= m_FrameMin) ? m_FrameMin : m_Frame;
-        albaEventMacro(albaEvent(this,TIME_SET, m_Frame));
+        albaEventMacro(albaEvent(this,ID_FRAME_SET, m_Frame));
       break;
       case TIME_NEXT:
         m_Frame += m_FrameStep;
         m_Frame = (m_Frame >= m_FrameMax) ? m_FrameMax : m_Frame;
-        albaEventMacro(albaEvent(this,TIME_SET, m_Frame));
+        albaEventMacro(albaEvent(this,ID_FRAME_SET, m_Frame));
       break;
       case TIME_BEGIN:
         m_Frame = m_FrameMin;
-        albaEventMacro(albaEvent(this,TIME_SET, m_Frame));
+        albaEventMacro(albaEvent(this,ID_FRAME_SET, m_Frame));
       break;
       case TIME_END:
         m_Frame = m_FrameMax;
-        albaEventMacro(albaEvent(this,TIME_SET, m_Frame));
+        albaEventMacro(albaEvent(this,ID_FRAME_SET, m_Frame));
       break;
       case MOVIE_RECORD:
         albaEventMacro(albaEvent(this,MOVIE_RECORD));
@@ -177,7 +177,7 @@ void albaGUIMovieCtrl::OnTimer(wxTimerEvent &event)
       OnEvent(&ev_stop);
     }
   }
-  albaEventMacro(albaEvent(this,TIME_SET,m_Frame,0));
+  albaEventMacro(albaEvent(this,ID_FRAME_SET,m_Frame,0));
   Update();
 }
 //----------------------------------------------------------------------------
@@ -194,12 +194,12 @@ void albaGUIMovieCtrl::SetFrameBounds(double min, double max, double step)
   if(m_Frame < min) 
   {
     m_Frame = min;
-    albaEventMacro(albaEvent(this,TIME_SET,m_Frame,0));
+    albaEventMacro(albaEvent(this,ID_FRAME_SET,m_Frame,0));
   }
   if(m_Frame > max) 
   {
     m_Frame = max;
-    albaEventMacro(albaEvent(this,TIME_SET,m_Frame,0));
+    albaEventMacro(albaEvent(this,ID_FRAME_SET,m_Frame,0));
   }
 }
 //----------------------------------------------------------------------------

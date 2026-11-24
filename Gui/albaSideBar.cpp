@@ -62,11 +62,11 @@ albaSideBar::albaSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener
 	if(style == DOUBLE_NOTEBOOK)
 	{
 		m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1,-1), wxSP_3D | wxSP_LIVE_UPDATE);
-			m_Tree = new albaGUICheckTree(m_SideSplittedPanel,-1,false,true);
+			m_Tree = new albaGUIVMETree(m_SideSplittedPanel,-1,false,true);
 	}
 	else
 	{
-  	m_Tree = new albaGUICheckTree(m_Notebook,-1,false,true);
+  	m_Tree = new albaGUIVMETree(m_Notebook,-1,false,true);
 	}
 
 		m_Tree->SetListener(Listener);
@@ -125,31 +125,19 @@ albaSideBar::~albaSideBar()
 {
 }
 //----------------------------------------------------------------------------
-void albaSideBar::OpShowGui(bool push_gui, albaGUIPanel *panel)
+void albaSideBar::OpShowGui(albaGUIPanel *panel)
 //----------------------------------------------------------------------------
 {
 	m_Notebook->Show(true);
-	if(push_gui)
-	{
-		m_Notebook->SetSelection(2);
-		m_OpPanel->Push(panel);
-	}
+	m_Notebook->SetSelection(2);
+	m_OpPanel->Push(panel);
 }
 //----------------------------------------------------------------------------
-void albaSideBar::OpHideGui(bool view_closed)
+void albaSideBar::OpHideGui()
 //----------------------------------------------------------------------------
 {
-	if(view_closed)
-	{
-		this->m_Notebook->SetSelection(0);
-		this->m_ViewPropertyPanel->RemoveCurrentGui();
-		this->m_ViewPropertyPanel->SetTitle("");
-	}
-	else
-	{
-		m_OpPanel->Pop();
-		m_Notebook->SetSelection(0);
-	}
+	m_OpPanel->Pop();
+	m_Notebook->SetSelection(0);
 }
 //----------------------------------------------------------------------------
 void albaSideBar::ViewSelect(albaView *view)
@@ -360,7 +348,7 @@ std::vector<albaVME*> albaSideBar::VmeChoose(void *vme_accept_function, long sty
 //----------------------------------------------------------------------------
 void albaSideBar::FindVME()
 {
-	albaGUICheckTree *tree = m_Tree;
+	albaGUIVMETree *tree = m_Tree;
 	albaGUIDialogFindVme fd(_("Find VME"));
 	fd.SetTree(tree);
 	fd.ShowModal();

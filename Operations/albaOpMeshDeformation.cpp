@@ -174,7 +174,7 @@ void albaOpMeshDeformation::OpRun()
   //create internal structures for the visualization
   if (!CreateInternalStructures())
   {
-    albaEventMacro(albaEvent(this, OP_RUN_CANCEL)); 
+    NotifyOpEnd(OP_RUN_CANCEL); 
     return;
   }
  
@@ -188,7 +188,7 @@ void albaOpMeshDeformation::OpRun()
   DeleteOpDialog();
 
   DeleteInternalStructures();
-  albaEventMacro(albaEvent(this,result));
+  NotifyOpEnd(result);
 }
 
 //----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ void albaOpMeshDeformation::OpDo()
     }
   }
   
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -240,15 +240,9 @@ void albaOpMeshDeformation::OpUndo()
     }
   }
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
-//----------------------------------------------------------------------------
-void albaOpMeshDeformation::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  albaEventMacro(albaEvent(this,result));        
-}
 
 //----------------------------------------------------------------------------
 //Destroys GUI
@@ -863,18 +857,12 @@ void albaOpMeshDeformation::OnEvent(albaEventBase *alba_event)
 /*virtual*/ albaVME* albaOpMeshDeformation::SelectCurveVME()
 //------------------------------------------------------------------------
 {
-  albaString title = "Choose VME with control curve";
   
-  albaEvent ev(this, VME_CHOOSE);   
-  ev.SetString(&title);
-  ev.SetPointer(&albaOpMeshDeformation::SelectCurveVMECallback);
-
-  albaEventMacro(ev);
-  return ev.GetVme();
+  return GetLogicManager()->ChooseVME("Choose VME with control curve", &albaOpMeshDeformation::SelectCurveVMECallback);
 }
 
 //------------------------------------------------------------------------
-//Callback for VME_CHOOSE that accepts polylines only
+//Callback for ChooseVME that accepts polylines only
 /*static*/ bool albaOpMeshDeformation::SelectCurveVMECallback(albaVME *vme) 
 //------------------------------------------------------------------------
 {

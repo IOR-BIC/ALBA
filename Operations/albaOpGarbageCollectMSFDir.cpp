@@ -29,7 +29,6 @@
 #include "albaGUI.h"
 
 #include "albaVMEStorage.h"
-#include "albaEventIO.h"
 #include "albaDataVector.h"
 #include "albaVMEItem.h"
 #include "albaVMEGenericAbstract.h"
@@ -84,7 +83,7 @@ Proceed?";
     int answer = wxMessageBox(msg,_("Confirm"),wxYES_NO|wxCANCEL|wxICON_QUESTION,albaGetFrame()); // ask user if will save msf before closing
     if(answer == wxCANCEL || answer == wxNO)
     {
-      albaEventMacro(albaEvent(this,OP_RUN_CANCEL));
+      NotifyOpEnd(OP_RUN_CANCEL);
       return;
     }
     else if(answer == wxYES)
@@ -95,7 +94,7 @@ Proceed?";
  
   this->GarbageCollect();
 
-  albaEventMacro(albaEvent(this,OP_RUN_OK));
+  NotifyOpEnd(OP_RUN_OK);
 }
 
 int albaOpGarbageCollectMSFDir::GetFilesToRemove( set<wxString> &filesToRemoveSet )
@@ -295,7 +294,8 @@ int albaOpGarbageCollectMSFDir::GarbageCollect()
   }
  
   // Clear UnDo stack if successful
-  albaEventMacro(albaEvent(this, CLEAR_UNDO_STACK));
+  if (GetOpManager())
+    GetOpManager()->ClearUndoStack();
 
   return ALBA_OK;
 }

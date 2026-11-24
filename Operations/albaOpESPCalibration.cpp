@@ -159,7 +159,7 @@ void albaOpESPCalibration::OpStop(int result)
 		GetLogicManager()->VmeShow(toHidelist[i], false);
 
 
-	albaEventMacro(albaEvent(this, result));
+	NotifyOpEnd(result);
 }
 //----------------------------------------------------------------------------
 void albaOpESPCalibration::OpDo()

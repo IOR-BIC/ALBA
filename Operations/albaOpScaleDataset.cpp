@@ -126,7 +126,7 @@ void albaOpScaleDataset::OnEvent(albaEventBase *alba_event)
   else if (alba_event->GetSender() == this->m_GuiSaveRestorePose) // from save/restore gui
   {
     OnEventGuiSaveRestorePose(alba_event); 
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
   else
   {
@@ -145,7 +145,7 @@ void albaOpScaleDataset::OpUndo()
 //----------------------------------------------------------------------------
 {  
 	m_Input->SetAbsMatrix(m_OldAbsMatrix);
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpScaleDataset::OpStop(int result)
@@ -156,7 +156,7 @@ void albaOpScaleDataset::OpStop(int result)
   m_GizmoScale->Show(false);
   cppDEL(m_GizmoScale);
 
-  albaEventMacro(albaEvent(this,result));  
+  NotifyOpEnd(result);  
 }
 
 //----------------------------------------------------------------------------
@@ -188,11 +188,7 @@ void albaOpScaleDataset::OnEventThis(albaEventBase *alba_event)
 
 	case ID_AUX_REF_SYS:
 	{
-		albaString s;
-		s << "Choose VME ref sys";
-		albaEvent e(this,VME_CHOOSE, &s);
-		albaEventMacro(e);
-		SetRefSysVME(e.GetVme());
+		SetRefSysVME(GetLogicManager()->ChooseVME("Choose VME ref sys"));
 	}
 	break;
 
@@ -212,7 +208,7 @@ void albaOpScaleDataset::OnEventGizmoScale(albaEventBase *alba_event)
     case ID_TRANSFORM:
   	{ 
       m_NewAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
-			GetLogicManager()->CameraUpdate();
+			GetViewManager()->CameraUpdate();
 	  }
     break;
 
@@ -294,7 +290,7 @@ void albaOpScaleDataset::CreateGui()
 	m_GizmoScale->SetRefSys(m_RefSysVME);
 	m_GizmoScale->Show(true);
 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -303,7 +299,7 @@ void albaOpScaleDataset::Reset()
 {
   m_Input->SetAbsMatrix(m_OldAbsMatrix);  
   SetRefSysVME(m_Input); 
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

@@ -39,7 +39,6 @@ public:
   /** destructor  */
   virtual ~albaGUIContextualMenu();
   /** function for setting the listener of events coming from another object*/
-  void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 
 	/**  Visualize contextual menù for the MDI child and selected view. */
   void ShowContextualMenu(wxFrame *child, albaView *view, bool vme_menu);		
@@ -47,7 +46,6 @@ public:
 protected:
   wxFrame     *m_ChildViewActive;
   albaView     *m_ViewActive;
-  albaObserver *m_Listener;
 
 	/**  Answer contextual menù's selection. */
 	void OnContextualViewMenu(wxCommandEvent& event);

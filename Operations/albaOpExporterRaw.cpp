@@ -514,13 +514,6 @@ void albaOpExporterRAW::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpExporterRAW::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	HideGui();
-  albaEventMacro(albaEvent(this,result));	
-}
-//----------------------------------------------------------------------------
 void albaOpExporterRAW::SetSingleFile(int enable)
 //----------------------------------------------------------------------------
 {

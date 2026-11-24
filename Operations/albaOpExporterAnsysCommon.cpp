@@ -84,12 +84,6 @@ void albaOpExporterAnsysCommon::OnOK()
     Write();
   }
 }
-//----------------------------------------------------------------------------
-void albaOpExporterAnsysCommon::OpStop(int result)
-{
-  HideGui();
-  albaEventMacro(albaEvent(this,result));        
-}
 
 
 //----------------------------------------------------------------------------

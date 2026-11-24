@@ -35,7 +35,6 @@
 #include "mmuTimeSet.h"
 #include "albaStorageElement.h"
 #include "albaVMEStorage.h"
-#include "albaEventIO.h"
 #include "albaIndent.h"
 #include "albaVMERoot.h"
 #include "albaAttribute.h"
@@ -63,6 +62,7 @@ albaDataVector::albaDataVector()
   m_JustRestored    = false;
   m_VectorID        = -1;
   m_ArchiveName     = "";
+  m_VME             = NULL;
 }
 
 //-----------------------------------------------------------------------
@@ -73,6 +73,7 @@ albaDataVector::~albaDataVector()
   for (it=Begin();it!=End();it++)
   {
     it->second->SetListener(NULL); // detach items before destroying
+    it->second->SetVME(NULL);
   }
 }
 //-------------------------------------------------------------------------
@@ -107,25 +108,31 @@ albaID albaDataVector::GetVectorID()
 {
   if (m_VectorID < 0)
   {
-    // retrieve the tree root
-    albaEventIO e(this,NODE_GET_ROOT);
-    InvokeEvent(e);
-
-    albaVMERoot *root = albaVMERoot::SafeDownCast(e.GetRoot());
+    albaVMERoot *root = GetRoot();
     m_VectorID = root ? root->GetNextItemId():-1;
   }
   return m_VectorID;
 }
 
 //-------------------------------------------------------------------------
+void albaDataVector::SetVME(albaVME *vme)
+{
+  m_VME = vme;
+  for (Iterator it = Begin(); it != End(); it++)
+    it->second->SetVME(vme);
+}
+
+//-------------------------------------------------------------------------
+albaVMERoot *albaDataVector::GetRoot()
+{
+  return m_VME ? albaVMERoot::SafeDownCast(m_VME->GetRoot()) : NULL;
+}
+
+//-------------------------------------------------------------------------
 void albaDataVector::UpdateVectorId()
 //-------------------------------------------------------------------------
 {
-  // retrieve the tree root
-  albaEventIO e(this,NODE_GET_ROOT);
-  InvokeEvent(e);
-
-  albaVMERoot *root = albaVMERoot::SafeDownCast(e.GetRoot());
+  albaVMERoot *root = GetRoot();
   m_VectorID = root ? root->GetNextItemId():-1;
 }
 
@@ -176,6 +183,7 @@ void albaDataVector::AppendItem(albaVMEItem *m)
 //-----------------------------------------------------------------------
 {
   m->SetListener(this);
+  m->SetVME(m_VME);
   Superclass::AppendItem(m);
 }
 //-----------------------------------------------------------------------
@@ -183,6 +191,7 @@ void albaDataVector::PrependItem(albaVMEItem *m)
 //-----------------------------------------------------------------------
 {
   m->SetListener(this);
+  m->SetVME(m_VME);
   Superclass::PrependItem(m);
 }
 //-----------------------------------------------------------------------
@@ -190,6 +199,7 @@ void albaDataVector::InsertItem(albaVMEItem *m)
 //-----------------------------------------------------------------------
 {
   m->SetListener(this);
+  m->SetVME(m_VME);
   Superclass::InsertItem(m);
 }
 //-----------------------------------------------------------------------
@@ -199,11 +209,7 @@ int albaDataVector::InternalStore(albaStorageElement *parent)
   parent->SetAttribute("NumberOfItems",albaString(GetNumberOfItems()));
   parent->SetAttribute("ItemTypeName",GetItemTypeName());
 
-  // retrieve the tree root
-  albaEventIO e(this,NODE_GET_ROOT);
-  InvokeEvent(e);
-
-  albaVMERoot *root = albaVMERoot::SafeDownCast(e.GetRoot());
+  albaVMERoot *root = GetRoot();
   assert(root);
 
   m_VectorID = GetVectorID();
@@ -277,7 +283,7 @@ int albaDataVector::InternalStore(albaStorageElement *parent)
 
         if (resolvedURL == ALBA_OK && wxFileExists(filename.GetCStr()))//Only if exist an archive where it is possible read the vtk data
         {
-          albaProgressBarHelper progressHelper(m_Listener);
+          albaProgressBarHelper progressHelper;
 					progressHelper.InitProgressBar("",false);
 
 

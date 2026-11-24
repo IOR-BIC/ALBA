@@ -96,13 +96,13 @@ void albaOpSelect::SetNewSel(albaVME* vme)
 void albaOpSelect::OpDo()
 //----------------------------------------------------------------------------
 {
-  albaEventMacro(albaEvent(this,VME_SELECTED,m_NewNodeSelected));
+  GetLogicManager()->VmeSelected(m_NewNodeSelected);
 };
 //----------------------------------------------------------------------------
 void albaOpSelect::OpUndo()
 //----------------------------------------------------------------------------
 {
-  albaEventMacro(albaEvent(this,VME_SELECTED,m_OldNodeSelected));
+  GetLogicManager()->VmeSelected(m_OldNodeSelected);
 };
 
 
@@ -296,7 +296,6 @@ Select the vme parent
 		//////////////////////////////////////////////////////////////////////////
 
 		GetLogicManager()->VmeRemove(m_Selection);
-		//albaEventMacro(albaEvent(this, VME_SELECTED, glo_SelectionParent));
 
 		glo_SelectionParent->Update();
 
@@ -372,7 +371,7 @@ Restore the Selection
 
 		SetSelectionParent(m_SelectionParentBackup);
 
-		albaEventMacro(albaEvent(this, VME_SELECTED, m_Selection));
+		GetLogicManager()->VmeSelected(m_Selection);
 		ClipboardRestore();
 	}
 }

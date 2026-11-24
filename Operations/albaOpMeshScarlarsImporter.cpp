@@ -367,7 +367,7 @@ void albaOpMeshScarlarsImporter::OpRun()
 		
 		if (ImportFile() == ALBA_ERROR)
 		{
-			albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+			NotifyOpEnd(OP_RUN_CANCEL);
 			return;
 		}
 	
@@ -375,7 +375,7 @@ void albaOpMeshScarlarsImporter::OpRun()
 		{
 		case PERFECT_MATCH_IDS:
 			CreateNewScalars();
-			albaEventMacro(albaEvent(this, OP_RUN_OK));
+			NotifyOpEnd(OP_RUN_OK);
 			return;
 			break;
 		case SUBGROUP_IDS:
@@ -386,7 +386,7 @@ void albaOpMeshScarlarsImporter::OpRun()
 			break;
 		case WRONG_IDS:
 			albaErrorMessage("Selected file contains IDs that are not present in the mesh.");
-			albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+			NotifyOpEnd(OP_RUN_CANCEL);
 			break;
 		}
 	}

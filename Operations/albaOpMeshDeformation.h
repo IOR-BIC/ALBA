@@ -208,8 +208,6 @@ protected:
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME*node);
 
-	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	/*virtual*/ void OpStop(int result);
 
   /** Creates internal data structures used in the editor.
   Returns false, if an error occurs (e.g. unsupported input) */
@@ -385,7 +383,7 @@ protected:
   Returns NULL, if the user cancels the selection. */
   virtual albaVME* SelectCurveVME();
 
-  /** Callback for VME_CHOOSE that accepts polylines only */
+  /** Callback for ChooseVME that accepts polylines only */
   static bool SelectCurveVMECallback(albaVME *vme);
 
   /** Creates albaPolyLineGraph for the given vme */

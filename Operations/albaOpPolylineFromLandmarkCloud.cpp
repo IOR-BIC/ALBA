@@ -86,7 +86,7 @@ void albaOpPolylineFromLandmarkCloud::OpRun()
 	m_Polyline->Update();
 	m_Output = m_Polyline;
 
-	albaEventMacro(albaEvent(this, OP_RUN_OK));
+	NotifyOpEnd(OP_RUN_OK);
 }
 
 //----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ void albaOpPolylineFromLandmarkCloud::OpDo()
 {
 	// A landmark cloud cannot be the root, so it always has a parent
 	m_Polyline->ReparentTo(m_Input->GetParent());
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 //----------------------------------------------------------------------------

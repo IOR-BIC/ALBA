@@ -100,7 +100,7 @@ void albaOpImporterLandmark::OpRun()
 	}
   else
   {
-    albaEventMacro(albaEvent(this, OP_RUN_CANCEL));
+    NotifyOpEnd(OP_RUN_CANCEL);
   }
 
 }
@@ -143,12 +143,6 @@ void albaOpImporterLandmark::OpDo()
 	GetLogicManager()->VmeAdd(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
-void albaOpImporterLandmark::OpStop(int result)
-{
-	HideGui();
-	albaEventMacro(albaEvent(this,result));
-}
-//----------------------------------------------------------------------------
 void albaOpImporterLandmark::Read()   
 {
   // need the number of landmarks for the progress bar
@@ -175,7 +169,7 @@ void albaOpImporterLandmark::Read()
 
   std::ifstream  landmarkFileStream(m_File.ToAscii());
  
-  albaProgressBarHelper progressHelper(m_Listener);
+  albaProgressBarHelper progressHelper;
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar("Reading Landmark Cloud");
 	

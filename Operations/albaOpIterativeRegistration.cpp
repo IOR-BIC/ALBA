@@ -202,7 +202,7 @@ void albaOpIterativeRegistration::OpStop(int result)
 
   Clear();
    
-  albaEventMacro(albaEvent(this,result));   
+  NotifyOpEnd(result);   
 }
 
 //----------------------------------------------------------------------------
@@ -245,7 +245,7 @@ void albaOpIterativeRegistration::OnRegister(albaEventBase *alba_event)
   // the next picks create a new pair of landmarks
   m_Landmark[SOURCE] = NULL;
   m_Landmark[TARGET] = NULL;
-	GetLogicManager()->CameraUpdate();
+	GetViewManager()->CameraUpdate();
 }
 
 void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
@@ -256,11 +256,7 @@ void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
   {
     case ID_CHOOSE_TARGET:
     {
-      albaString title = _("Choose target vme");
-      albaEvent e(this,VME_CHOOSE,&title);
-			e.SetPointer(&albaOpIterativeRegistration::VmeAccept);
-      albaEventMacro(e); 
-      m_TargetVME = e.GetVme();
+      m_TargetVME = GetLogicManager()->ChooseVME(_("Choose target vme"), &albaOpIterativeRegistration::VmeAccept);
       if (m_TargetVME)
       {
         AttachPicker(TARGET, m_TargetVME);
@@ -363,7 +359,7 @@ void albaOpIterativeRegistration::OnVmePicked(int side, albaEvent *e)
     m_Gui->Enable(ID_REGISTER, true);
     m_Gui->Update();
   }
-  GetLogicManager()->CameraUpdate();
+  GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaOpIterativeRegistration::Clear()

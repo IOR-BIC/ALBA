@@ -219,12 +219,7 @@ void albaVisualPipeCollisionDetection::OnEvent(albaEventBase *alba_event)
     case ID_ADD_SURFACE:
       {
         //if user add a surface to compute collision
-        albaString title = _("Choose Surface");
-        e->SetPointer(&albaVisualPipeCollisionDetection::SurfaceAccept);
-        e->SetString(&title);
-        e->SetId(VME_CHOOSE);
-        albaEventMacro(*e);
-        albaVME *surfaceTMP = e->GetVme();
+        albaVME *surfaceTMP = GetLogicManager()->ChooseVME(_("Choose Surface"), &albaVisualPipeCollisionDetection::SurfaceAccept);
         //if not surface has been selected
         if (surfaceTMP == NULL)
         {
@@ -237,12 +232,7 @@ void albaVisualPipeCollisionDetection::OnEvent(albaEventBase *alba_event)
     case ID_SELECT_SURFACE:
       {
         //if the user select a single surface for collision detection
-        albaString title = _("Choose Surface");
-        e->SetPointer(&albaVisualPipeCollisionDetection::SurfaceAccept);
-        e->SetString(&title);
-        e->SetId(VME_CHOOSE);
-        albaEventMacro(*e);
-        albaVME *surfaceTMP = e->GetVme();
+        albaVME *surfaceTMP = GetLogicManager()->ChooseVME(_("Choose Surface"), &albaVisualPipeCollisionDetection::SurfaceAccept);
         //if not surface has been selected
         if (surfaceTMP == NULL)
         {
@@ -255,14 +245,6 @@ void albaVisualPipeCollisionDetection::OnEvent(albaEventBase *alba_event)
       default:
         albaEventMacro(*e);
       break;
-    }
-  }
-  else if (alba_event->GetId() == VME_ABSMATRIX_UPDATE)
-  {
-    //Update the pipeline of visualization
-    if (m_EnablePipeUpdate)
-    {
-    	UpdatePipeline();
     }
   }
 }
@@ -436,7 +418,7 @@ void albaVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
     output0->GetCellData()->SetActiveScalars("CONTACT");
     m_Mapper->SetInputData(output0);
     m_Mapper->Update();
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------

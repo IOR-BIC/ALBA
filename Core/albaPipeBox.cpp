@@ -257,7 +257,7 @@ void albaPipeBox::OnEvent(albaEventBase *alba_event)
       default:
         e->Log();
     }
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 	if(alba_event->GetId() == VME_OUTPUT_DATA_UPDATE)
 	{

@@ -207,26 +207,24 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
 		case ID_CLIP:
 			{
 				Clip();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_UNION:
 			{
-				albaString title = "Choose Union Surface";
-				VmeChoose(title,e);
+				VmeChoose("Choose Union Surface");
         if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
         {
           albaMessage(_("Can't operate over the same VME"));
           return;
         }
 				Union();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_INTERSECTION:
 			{
-				albaString title = _("Choose Intersect Surface");
-				VmeChoose(title,e);
+				VmeChoose(_("Choose Intersect Surface"));
         if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
         {
           albaMessage(_("Can't operate over the same VME"));
@@ -234,34 +232,33 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
         }
 				Intersection();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CHOOSE_DIFFERENCE:
 			{
-				albaString title = _("Choose Difference Surface");
-				VmeChoose(title,e);
+				VmeChoose(_("Choose Difference Surface"));
         if(m_FirstOperatorVME == m_SecondOperatorVME || m_Input == m_SecondOperatorVME)
         {
           albaMessage(_("Can't operate over the same VME"));
           return;
         }
 				Difference();
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_CLIP_INSIDE:
 			if(m_Arrow) 
 			{
 				m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_UNDO:
 			{
 				Undo();
 				ShowClipPlane(m_Modality != MODE_SURFACE);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_MODALITY:
@@ -276,7 +273,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
 
 				m_Gui->Update();
 				ShowClipPlane(m_Modality == MODE_IMPLICIT_FUNCTION);
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case ID_TRANSFORM:
@@ -295,7 +292,7 @@ void albaOpBooleanSurface::OnEvent(albaEventBase *alba_event)
 				m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
 				UpdateISARefSys();
 
-				GetLogicManager()->CameraUpdate();
+				GetViewManager()->CameraUpdate();
 			}
 			break;
 		case wxOK:
@@ -723,19 +720,16 @@ void albaOpBooleanSurface::Difference()
 	}
 }
 //----------------------------------------------------------------------------
-void albaOpBooleanSurface::VmeChoose(albaString title,albaEvent *e)
+void albaOpBooleanSurface::VmeChoose(albaString title)
 //----------------------------------------------------------------------------
 {
-	e->SetPointer(&albaOpBooleanSurface::SurfaceAccept);
-	e->SetString(&title);
-	e->SetId(VME_CHOOSE);
-	albaEventMacro(*e);
-	m_SecondOperatorVME = albaVMESurface::SafeDownCast(e->GetVme());
-	if(m_SecondOperatorVME == NULL && albaVMESurfaceParametric::SafeDownCast(e->GetVme()) != NULL)
+	albaVME *chosenVME = GetLogicManager()->ChooseVME(title, &albaOpBooleanSurface::SurfaceAccept);
+	m_SecondOperatorVME = albaVMESurface::SafeDownCast(chosenVME);
+	if(m_SecondOperatorVME == NULL && albaVMESurfaceParametric::SafeDownCast(chosenVME) != NULL)
   {
     vtkALBASmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
-    transformSecondDataInput->SetTransform((vtkAbstractTransform *)e->GetVme()->GetAbsMatrixPipe()->GetVTKTransform());
-    transformSecondDataInput->SetInputData((vtkPolyData *)e->GetVme()->GetOutput()->GetVTKData());
+    transformSecondDataInput->SetTransform((vtkAbstractTransform *)chosenVME->GetAbsMatrixPipe()->GetVTKTransform());
+    transformSecondDataInput->SetInputData((vtkPolyData *)chosenVME->GetOutput()->GetVTKData());
     transformSecondDataInput->Update();
 
     albaNEW(m_SecondOperatorFromParametric);
@@ -762,5 +756,5 @@ void albaOpBooleanSurface::OpStop(int result)
 	}
 
 	HideGui();
-	albaEventMacro(albaEvent(this,result));        
+	NotifyOpEnd(result);        
 }

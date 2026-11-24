@@ -26,6 +26,10 @@
 #include "albaWizard.h"
 #include "albaObserver.h"
 #include "albaWizardBlock.h"
+#include "albaWizardManager.h"
+#include "albaServiceLocator.h"
+#include "albaAbsLogicManager.h"
+
 
 
 
@@ -38,6 +42,7 @@ albaWizard::albaWizard(const wxString &label,  const wxString &name)
   m_Label     = label;
   m_CurrentBlock=NULL;
   m_Listener=NULL;
+  m_Manager=NULL;
   m_ShowProgressBar=false;
 }
 
@@ -49,6 +54,7 @@ albaWizard::albaWizard()
   m_Label  = "Default Wizard Name";
   m_CurrentBlock=NULL;
   m_Listener=NULL;
+  m_Manager=NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -73,12 +79,7 @@ void albaWizard::Execute()
     albaLogMessage("Wizard Error: Wizard has no starting point");
   else 
   {
-    if (m_ShowProgressBar)
-    {
-      albaEventMacro(albaEvent(this,PROGRESSBAR_SHOW));
-    }
-    else 
-      albaEventMacro(albaEvent(this,PROGRESSBAR_HIDE));
+    ShowProgress(m_ShowProgressBar);
 
     //setting current block and start execution
     m_CurrentBlock=start;
@@ -92,6 +93,7 @@ void albaWizard::AddBlock( albaWizardBlock *block)
 {
   //Add a new block to the wizard and setting is listener 
   block->SetListener(this);
+  block->m_Wizard=this;
   m_Blocks.push_back(block);
 }
 
@@ -181,7 +183,8 @@ void albaWizard::BlockExecutionBegin()
 {
   wxString requiredOperation;
 
-  albaEventMacro(albaEvent(this,WIZARD_UPDATE_WINDOW_TITLE));
+  if (albaServiceLocator::GetLogicManager())
+    albaServiceLocator::GetLogicManager()->UpdateFrameTitle();
 
   //Setting selected vme to the block and execute it
   m_CurrentBlock->SetSelectedVME(m_SelectedVME);
@@ -206,9 +209,10 @@ void albaWizard::AbortWizard()
 //----------------------------------------------------------------------------
 {
   if (m_ShowProgressBar)
-    albaEventMacro(albaEvent(this,PROGRESSBAR_HIDE));
+    ShowProgress(false);
 
-  albaEventMacro(albaEvent(this,WIZARD_RUN_TERMINATED,false));
+  if (m_Manager)
+    m_Manager->WizzardStop();
 }
 
 //----------------------------------------------------------------------------
@@ -228,9 +232,10 @@ void albaWizard::BlockExecutionEnd()
     m_CurrentBlock=NULL;
 
     if (m_ShowProgressBar)
-      albaEventMacro(albaEvent(this,PROGRESSBAR_HIDE));
+      ShowProgress(false);
 
-    albaEventMacro(albaEvent(this,WIZARD_RUN_TERMINATED,true));
+    if (m_Manager)
+      m_Manager->WizzardStop();
   }
   //If the next block is in the form WIZARD{<name>} We switch to the wizard <name> and execute it
   else if (nextBlock.StartsWith("WIZARD{"))
@@ -242,15 +247,17 @@ void albaWizard::BlockExecutionEnd()
       albaLogMessage("WIZARD special keyword error: WIZARD{<name>} wrong format");
 
       if (m_ShowProgressBar)
-        albaEventMacro(albaEvent(this,PROGRESSBAR_HIDE));
+        ShowProgress(false);
 
-      albaEventMacro(albaEvent(this,WIZARD_RUN_TERMINATED,true));
+      if (m_Manager)
+        m_Manager->WizzardStop();
     }
     else 
     {
       //getting the wizard substring
       albaString wizardName = nextBlock.SubString(7,nextBlock.size()-2);
-      albaEventMacro(albaEvent(this,WIZARD_SWITCH,&wizardName));
+      if (m_Manager)
+        m_Manager->WizardSwitch(wizardName.GetCStr());
     }
   }
   else
@@ -301,11 +308,12 @@ void albaWizard::ContinueExecution(int opSuccess)
     if(answare == wxYES)
     {
       if (m_ShowProgressBar)
-        albaEventMacro(albaEvent(this,PROGRESSBAR_HIDE));
+        ShowProgress(false);
 
       //if the operation has aborted by the user we abort the entire wizard
       //this behavior can be updated for error management
-      albaEventMacro(albaEvent(this,WIZARD_RUN_TERMINATED,false));
+      if (m_Manager)
+        m_Manager->WizzardStop();
       m_CurrentBlock=NULL;
     }
     else
@@ -328,3 +336,18 @@ albaString albaWizard::GetDescriptionTitle()
 
 }
 
+//----------------------------------------------------------------------------
+void albaWizard::ShowProgress(bool show)
+//----------------------------------------------------------------------------
+{
+  if (m_Manager)
+    m_Manager->ShowProgress(show);
+}
+
+//----------------------------------------------------------------------------
+void albaWizard::SetProgress(int progress)
+//----------------------------------------------------------------------------
+{
+  if (m_Manager)
+    m_Manager->SetProgress(progress);
+}

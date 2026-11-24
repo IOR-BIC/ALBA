@@ -413,7 +413,7 @@ void albaVMELabeledVolume::GenerateLabeledVolume()
     labelMaterial->m_ColorLut->SetTableRange(scalarRange);
     labelMaterial->UpdateFromTables();
 
-    ForwardUpEvent(&albaEvent(this, CAMERA_UPDATE));
+    GetViewManager()->CameraUpdate();
   }
 }
 

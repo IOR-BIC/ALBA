@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaOp.h"
+#include "albaAbsOpManager.h"
 #include "albaDecl.h"
 #include "albaSmartPointer.h"
 #include "albaGUI.h"
@@ -82,12 +83,8 @@ void albaOp::OnEvent(albaEventBase *alba_event)
 	albaEvent *event = albaEvent::SafeDownCast(alba_event);
 	if (event	&& event->GetId() == ID_HELP)
 	{
-		albaEvent helpEvent;
-		helpEvent.SetSender(this);
-		albaString opTypeName = this->GetTypeName();
-		helpEvent.SetString(&opTypeName);
-		helpEvent.SetId(OPEN_HELP_PAGE);
-		albaEventMacro(helpEvent);
+		if (GetHelpManager())
+			GetHelpManager()->ShowHelpEntry(GetTypeName());
 	}
 	else
 		albaEventMacro(*alba_event);
@@ -116,7 +113,7 @@ void albaOp::OpDo()
   if (m_Output)
   {
     m_Output->ReparentTo(m_Input);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -125,7 +122,7 @@ void albaOp::OpUndo()
   if (m_Output)
   {
     GetLogicManager()->VmeRemove(m_Output);
-		GetLogicManager()->CameraUpdate();
+		GetViewManager()->CameraUpdate();
   }
 }
 //----------------------------------------------------------------------------
@@ -158,14 +155,7 @@ void albaOp::ShowGui()
 	wxBoxSizer * topSizer = m_Guih->GetTopSizer();
 	wxPanel * topPanel = m_Guih->GetTopPanel();
 
-	albaString type_name = GetTypeName();
-	albaEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetString(&type_name);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	albaEventMacro(buildHelpGui);
-
-	if (buildHelpGui.GetArg() == true)
+	if (GetHelpManager() && GetHelpManager()->HasHelpEntry(GetTypeName()))
 	{
 		albaGUIPicButton *b = new albaGUIPicButton(topPanel, "OP_HELP", ID_HELP);
 		b->SetEventId(ID_HELP);  //SIL. 7-4-2005: 
@@ -180,14 +170,16 @@ void albaOp::ShowGui()
 	wxString title=" ";
 	title	+= menu_codes +" parameters:";
   m_Guih->SetTitle(title);
-  albaEventMacro(albaEvent(this,OP_SHOW_GUI,(wxWindow *)m_Guih));
+  if (GetLogicManager())
+    GetLogicManager()->OpShowGui(m_Guih);
 }
 //----------------------------------------------------------------------------
 void albaOp::HideGui()
 {
   if(m_Gui)
 	{
-		albaEventMacro(albaEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
+		if (GetLogicManager())
+			GetLogicManager()->OpHideGui();
 		delete m_Guih;
 		m_Guih = NULL;
 		m_Gui = NULL;
@@ -204,14 +196,12 @@ bool albaOp::OkEnabled()
 //----------------------------------------------------------------------------
 void albaOp::ForceStopWithOk()
 {
-  albaEvent e(this, OP_RUN_OK);
-  OnEvent(&e);
+  NotifyOpEnd(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
 void albaOp::ForceStopWithCancel()
 {
-  albaEvent e(this, OP_RUN_CANCEL);
-  OnEvent(&e);
+  NotifyOpEnd(OP_RUN_CANCEL);
 }
 //----------------------------------------------------------------------------
 void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
@@ -222,17 +212,19 @@ void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
 void albaOp::OpStop(int result)
 {
 	albaLogMessage("Stopping Op :%s\n", m_Label.ToAscii());
-	if (m_Gui)
-		m_Gui->DisableRecursive();
-	if (result == OP_RUN_CANCEL || !CanUndo()) //on cancel or operation that cannot do undo the op will be deleted so the HideGui method will crash 
-	{
-		albaEventMacro(albaEvent(this, result));
-	}
+	HideGui();
+	NotifyOpEnd(result);
+}
+//----------------------------------------------------------------------------
+void albaOp::NotifyOpEnd(int result)
+{
+	if (GetOpManager() == NULL)
+		return;
+
+	if (result == OP_RUN_OK)
+		GetOpManager()->OpRunOk(this);
 	else
-	{
-		albaEventMacro(albaEvent(this, result));
-		HideGui();
-	}
+		GetOpManager()->OpRunCancel(this);
 }
 //----------------------------------------------------------------------------
 char ** albaOp::GetIcon()

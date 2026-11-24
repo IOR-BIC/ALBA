@@ -47,6 +47,7 @@
 #include "vtkFileOutputWindow.h"
 #include "vtkALBASmartPointer.h"
 #include "albaFakeLogicForTest.h"
+#include "albaFakeViewManagerForTest.h"
 #include "albaServiceLocator.h"
 
 
@@ -73,6 +74,8 @@ int main(int argc, char* argv[])
 
 	albaFakeLogicForTest *logic = new albaFakeLogicForTest();
 	albaServiceLocator::SetLogicManager(logic);
+	albaFakeViewManagerForTest *viewManager = new albaFakeViewManagerForTest();
+	albaServiceLocator::SetViewManager(viewManager);
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
@@ -102,6 +105,7 @@ int main(int argc, char* argv[])
 	outputter.write();
 
 	cppDEL(logic);
+	cppDEL(viewManager);
 
 	albaTest::PauseBeforeExit();
 
