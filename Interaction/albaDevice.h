@@ -16,7 +16,7 @@
 #ifndef __albaDevice_h
 #define __albaDevice_h
 
-#include "albaAgentThreaded.h"
+#include "albaAgentEventQueue.h"
 #include "albaStorable.h"
 
 //----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class vtkRenderer;
   @todo
    - check about ID restoring
  */
-class ALBA_EXPORT albaDevice : public albaAgentThreaded, public albaStorable
+class ALBA_EXPORT albaDevice : public albaAgentEventQueue, public albaStorable
 {
 public:
   /** non persistent device IDs start from ALBA_MIN_DEVICE_ID. This means I cannot have more then 
@@ -68,7 +68,7 @@ public:
     ID_LAST
   };
 
-  albaTypeMacro(albaDevice,albaAgentThreaded);
+  albaTypeMacro(albaDevice,albaAgentEventQueue);
 
   /**
    Get the ID for this device. This is usually set by albaDeviceSet */

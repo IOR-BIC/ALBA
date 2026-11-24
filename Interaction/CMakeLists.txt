@@ -12,11 +12,6 @@ SET(PROJECT_SRCS
   albaAgent.cpp  							albaAgent.h
   albaAgentEventHandler.cpp  				albaAgentEventHandler.h
   albaAgentEventQueue.cpp  					albaAgentEventQueue.h
-  albaAgentThreaded.cpp  					albaAgentThreaded.h
-  albaAvatar.cpp  							albaAvatar.h
-  albaAvatar3D.cpp  							albaAvatar3D.h
-  albaAvatar3DCone.cpp  						albaAvatar3DCone.h
-  albaCameraTransform.cpp  					albaCameraTransform.h
   albaGizmoAutoscaleHelper.cpp  				albaGizmoAutoscaleHelper.h
   albaDevice.cpp  							albaDevice.h
   albaDeviceManager.cpp  					albaDeviceManager.h
@@ -53,7 +48,6 @@ SET(PROJECT_SRCS
   albaInteractionAgent.cpp  						albaInteractionAgent.h
   albaInteractionTool.cpp  						albaInteractionTool.h
   albaToolCamera.cpp  						albaToolCamera.h
-  albaToolCameraMouse.cpp  						albaToolCameraMouse.h
   albaToolSegmentation.cpp  					albaToolSegmentation.h
   albaToolSegmentationThreshold.cpp  					albaToolSegmentationThreshold.h
   albaToolSegmentationEdit.cpp  					albaToolSegmentationEdit.h
@@ -62,11 +56,9 @@ SET(PROJECT_SRCS
   albaToolVTKPicker.cpp  					albaToolVTKPicker.h
   albaToolExtractIsosurface.cpp  					albaToolExtractIsosurface.h
   albaToolDICOMImporter.cpp  					albaToolDICOMImporter.h
-  albaToolCameraTracker.cpp  						albaToolCameraTracker.h
   albaRefSys.cpp  							albaRefSys.h  
   albaDeviceButtonsPad.cpp  					albaDeviceButtonsPad.h
   albaDeviceButtonsPadMouse.cpp  			albaDeviceButtonsPadMouse.h
-  albaDeviceButtonsPadTracker.cpp  			albaDeviceButtonsPadTracker.h  
   albaBehaviorRotateTranslate.cpp  					albaBehaviorRotateTranslate.h
   albaBehaviorProsthesis.cpp  					albaBehaviorProsthesis.h
   albaBehaviorCutPlane.cpp  					albaBehaviorCutPlane.h
@@ -104,39 +96,8 @@ SET(PROJECT_SRCS
 	albaTool2DMeasureEllipse.cpp albaTool2DMeasureEllipse.h
 )
 
-IF (ALBA_USE_P5_GLOVE)
-  SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
-  albaDeviceButtonsPadTrackerP5Glove.cpp		albaDeviceButtonsPadTrackerP5Glove.h
-  )
-ENDIF (ALBA_USE_P5_GLOVE)
-
-IF (ALBA_USE_WIIMOTE)
-  SET(PROJECT_SRCS
-  ${PROJECT_SRCS}
-  albaDeviceTrackerWIIMote.cpp				albaDeviceTrackerWIIMote.h
-  )
-ENDIF (ALBA_USE_WIIMOTE)
-
-
-
-IF (WIN32)
-  OPTION(ALBA_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
-  OPTION(ALBA_USE_WIIMOTE "Link driver for WIIMote device" OFF)
-ENDIF (WIN32)
-
-# currently special drivers only supported under WIN32
-#IF (WIN32)
- SUBDIRS(Drivers)
-#ENDIF (WIN32)
-
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS albaBase albaIO albaGui vtkALBA ${wxWidgets_LIBRARIES})
-
-# currently special drivers only supported under WIN32
-#IF (WIN32)
-  SET(PROJECT_LIBS ${PROJECT_LIBS} albaDrivers)
-#ENDIF (WIN32)
 
 #IF (ALBA_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} ${VTK_LIBRARIES})

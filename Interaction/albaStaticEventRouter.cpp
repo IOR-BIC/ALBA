@@ -15,7 +15,7 @@
 =========================================================================*/
 
 #include "albaStaticEventRouter.h"
-#include "albaDeviceButtonsPadTracker.h"
+#include "albaDevice.h"
 #include "albaStorageElement.h"
 
 #include <assert.h>

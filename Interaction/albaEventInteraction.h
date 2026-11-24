@@ -35,7 +35,7 @@ class albaInteractionBehavior;
   can also store an optional button argument, used to store the button 
   indexs when events for button down and button up are issued. Also an
   optional word of modifiers can be used.
-  @sa albaEventBase albaDeviceButtonsPadTracker MoveEvent ButtonDownEvent ButtonUpEvent
+  @sa albaEventBase MoveEvent ButtonDownEvent ButtonUpEvent
 */
 class ALBA_EXPORT albaEventInteraction : public albaEventBase
 {

@@ -45,7 +45,6 @@ const bool DEBUG_MODE = false;
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredPoints.h"
 #include "vtkDataSet.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkCamera.h"
 
@@ -90,7 +89,6 @@ void albaViewRX::Create()
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();

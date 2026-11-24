@@ -286,11 +286,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaAgent.cpp  							../Interaction/albaAgent.h
   ../Interaction/albaAgentEventHandler.cpp  				../Interaction/albaAgentEventHandler.h
   ../Interaction/albaAgentEventQueue.cpp  					../Interaction/albaAgentEventQueue.h
-  ../Interaction/albaAgentThreaded.cpp  					../Interaction/albaAgentThreaded.h
-  ../Interaction/albaAvatar.cpp  							../Interaction/albaAvatar.h
-  ../Interaction/albaAvatar3D.cpp  							../Interaction/albaAvatar3D.h
-  ../Interaction/albaAvatar3DCone.cpp  						../Interaction/albaAvatar3DCone.h
-  ../Interaction/albaCameraTransform.cpp  					../Interaction/albaCameraTransform.h
   ../Interaction/albaGizmoAutoscaleHelper.cpp  				../Interaction/albaGizmoAutoscaleHelper.h
   ../Interaction/albaDevice.cpp  							../Interaction/albaDevice.h
   ../Interaction/albaDeviceManager.cpp  					../Interaction/albaDeviceManager.h
@@ -327,7 +322,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaInteractionAgent.cpp  						../Interaction/albaInteractionAgent.h
   ../Interaction/albaInteractionTool.cpp  						../Interaction/albaInteractionTool.h
   ../Interaction/albaToolCamera.cpp  						../Interaction/albaToolCamera.h
-  ../Interaction/albaToolCameraMouse.cpp  						../Interaction/albaToolCameraMouse.h
   ../Interaction/albaToolSegmentation.cpp  					../Interaction/albaToolSegmentation.h
   ../Interaction/albaToolSegmentationThreshold.cpp  					../Interaction/albaToolSegmentationThreshold.h
   ../Interaction/albaToolSegmentationEdit.cpp  					../Interaction/albaToolSegmentationEdit.h
@@ -336,11 +330,9 @@ SET(INTERACTION_SRCS
   ../Interaction/albaToolVTKPicker.cpp  					../Interaction/albaToolVTKPicker.h
   ../Interaction/albaToolExtractIsosurface.cpp  					../Interaction/albaToolExtractIsosurface.h
   ../Interaction/albaToolDICOMImporter.cpp  					../Interaction/albaToolDICOMImporter.h
-  ../Interaction/albaToolCameraTracker.cpp  						../Interaction/albaToolCameraTracker.h
   ../Interaction/albaRefSys.cpp  							../Interaction/albaRefSys.h  
   ../Interaction/albaDeviceButtonsPad.cpp  					../Interaction/albaDeviceButtonsPad.h
   ../Interaction/albaDeviceButtonsPadMouse.cpp  			../Interaction/albaDeviceButtonsPadMouse.h
-  ../Interaction/albaDeviceButtonsPadTracker.cpp  			../Interaction/albaDeviceButtonsPadTracker.h  
   ../Interaction/albaBehaviorRotateTranslate.cpp  					../Interaction/albaBehaviorRotateTranslate.h
   ../Interaction/albaBehaviorProsthesis.cpp  					../Interaction/albaBehaviorProsthesis.h
   ../Interaction/albaInteractorConstraint.cpp  				../Interaction/albaInteractorConstraint.h
@@ -359,20 +351,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaGizmoCrossTranslateAxis.cpp  			../Interaction/albaGizmoCrossTranslateAxis.h
   ../Interaction/albaGizmoCrossTranslatePlane.cpp  			../Interaction/albaGizmoCrossTranslatePlane.h
 )
-
-IF (ALBA_USE_P5_GLOVE)
-  SET(INTERACTION_SRCS
-  ${INTERACTION_SRCS}
-  ../Interaction/albaDeviceButtonsPadTrackerP5Glove.cpp		../Interaction/albaDeviceButtonsPadTrackerP5Glove.h
-  )
-ENDIF (ALBA_USE_P5_GLOVE)
-
-IF (ALBA_USE_WIIMOTE)
-  SET(INTERACTION_SRCS
-  ${INTERACTION_SRCS}
-  ../Interaction/albaDeviceTrackerWIIMote.cpp				../Interaction/albaDeviceTrackerWIIMote.h
-  )
-ENDIF (ALBA_USE_WIIMOTE)
 
 
 ###############################################
@@ -950,63 +928,6 @@ SET(VIEWS_SRCS
 
 
 
-###############################################
-#DRIVERS
-###############################################
-IF (WIN32)
-SET (DRIVERS_SRCS
-# Intersense driver
-  ../Interaction/Drivers/isdriver.c
-  ../Interaction/Drivers/isense.c
-  ../Interaction/Drivers/itcom.c
-  ../Interaction/Drivers/serial.c
-  ../Interaction/Drivers/timer.c
-  ../Interaction/Drivers/isdriver.h
-  ../Interaction/Drivers/isense.h
-  ../Interaction/Drivers/itcom.h
-  ../Interaction/Drivers/serial.h
-  ../Interaction/Drivers/timer.h
-)
-ENDIF (WIN32)
-
-IF (WIN32)
-SET (DRIVERS_SRCS
-  ${DRIVERS_SRCS}
-  # Vicon driver
-  ../Interaction/Drivers/vicon.cpp
-  ../Interaction/Drivers/vicon.h
-  )
-ENDIF (WIN32)
-
-# P5 driver
-IF (ALBA_USE_P5_GLOVE)
-  SET (DRIVERS_SRCS 
-  ${DRIVERS_SRCS}
-  ../Interaction/Drivers/P5Bend.cpp
-  ../Interaction/Drivers/P5Bend.h
-  ../Interaction/Drivers/P5Motion.cpp
-  ../Interaction/Drivers/P5Motion.h
-  ../Interaction/Drivers/P5dll.h
-  )
-ENDIF (ALBA_USE_P5_GLOVE)
-
-IF (ALBA_USE_WIIMOTE)
-  SET (DRIVERS_SRCS 
-  ${DRIVERS_SRCS}
-  ../Interaction/Drivers/defines.h
-  ../Interaction/Drivers/Console.h
-  ../Interaction/Drivers/Console.cpp
-  ../Interaction/Drivers/HIDDevice.h
-  ../Interaction/Drivers/HIDDevice.cpp
-  ../Interaction/Drivers/hidpi.h
-  ../Interaction/Drivers/hidsdi.h
-  ../Interaction/Drivers/hidusage.h
-  ../Interaction/Drivers/setupapi.h
-  ../Interaction/Drivers/Utils.h
-  ../Interaction/Drivers/Wiimote.h
-  ../Interaction/Drivers/Wiimote.cpp
-  )
-ENDIF (ALBA_USE_WIIMOTE)
 
 ##############################################################################################
 ##############################################################################################
@@ -1024,7 +945,6 @@ SET(PROJECT_SRCS
   ${VISUAL_PIPES_SRCS}
   ${DATAPIPES_SRCS}
   ${OPERATIONS_SRCS}
-  #${DRIVERS_SRCS}
 )
 
 #################################

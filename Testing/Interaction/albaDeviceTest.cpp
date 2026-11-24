@@ -28,7 +28,6 @@
 #include "albaEventInteraction.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaDevice.h"
-#include "albaDeviceButtonsPadTracker.h"
 #include "albaGUI.h"
 #include "albaView.h"
 #include "albaEvent.h"
@@ -247,14 +246,4 @@ void albaDeviceTest::TestGetViewAndRenderer()
   CPPUNIT_ASSERT(mouseDevice->GetRenderer() == NULL); // no render window selected
   albaDEL(mouse);
   delete view;
-
-  // a tracker without avatar has neither a view nor a renderer, and cannot map a pose to the world
-  albaDeviceButtonsPadTracker *tracker;
-  albaNEW(tracker);
-  albaDevice *trackerDevice = tracker;
-  CPPUNIT_ASSERT(trackerDevice->GetView() == NULL);
-  CPPUNIT_ASSERT(trackerDevice->GetRenderer() == NULL);
-  albaMatrix trackerPose, worldPose;
-  CPPUNIT_ASSERT(!tracker->TrackerToWorld(trackerPose, worldPose));
-  albaDEL(tracker);
 }

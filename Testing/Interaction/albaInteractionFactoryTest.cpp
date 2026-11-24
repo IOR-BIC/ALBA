@@ -26,7 +26,6 @@
 #include "albaInteractionFactoryTest.h"
 
 #include "albaInteractionFactory.h"
-#include "albaAvatar.h"
 #include "albaDevice.h"
 #include <iostream>
 #include <iterator>
@@ -86,65 +85,13 @@ albaPlugTestDevice<T>::albaPlugTestDevice(const char *description)
 
 
 //-------------------------------------------------------------------------
-/** a simple VME created just for testing purposes. */
-class albaAvatarCustom : public albaAvatar
-{
-public:
-  albaTypeMacro(albaAvatarCustom,albaAvatar);
-
-protected:
-  albaAvatarCustom();
-  virtual ~albaAvatarCustom();
-
-private:
-  albaAvatarCustom(const albaAvatarCustom&); // Not implemented
-  void operator=(const albaAvatarCustom&); // Not implemented
-};
-
-//-------------------------------------------------------------------------
-albaCxxTypeMacro(albaAvatarCustom);
-
-//-------------------------------------------------------------------------
-albaAvatarCustom::albaAvatarCustom()
-{
-
-}
-//-------------------------------------------------------------------------
-albaAvatarCustom::~albaAvatarCustom()
-{
-
-}
-
-//------------------------------------------------------------------------------
-// a custom plugger for the new factory
-template <class T>
-class albaPlugTestAvatar
-{
-public:
-  albaPlugTestAvatar(const char *description);
-
-};
-
-//------------------------------------------------------------------------------
-template <class T>
-albaPlugTestAvatar<T>::albaPlugTestAvatar(const char *description)
-{ 
-  albaInteractionFactory *factory=albaInteractionFactory::GetInstance();
-  if (factory)
-  {
-    factory->RegisterNewAvatar(T::GetStaticTypeName(), description, T::NewObject);
-
-  }
-}
-
-//-------------------------------------------------------------------------
 void albaInteractionFactoryTest::TestGetDescription()
 {
   albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
   CPPUNIT_ASSERT(interaction_factory!=NULL);
   
   std::string value1 = interaction_factory->GetDescription();
-  std::string value2 = std::string("Factory for ALBA Devices and Avatars");
+  std::string value2 = std::string("Factory for ALBA Devices");
   
   CPPUNIT_ASSERT( value1 == value2 );
 }
@@ -165,29 +112,6 @@ void albaInteractionFactoryTest::TestInitialize()
 
   std::list<albaObjectFactory *> list=albaObjectFactory::GetRegisteredFactories();
   CPPUNIT_ASSERT(list.size()==1);
-}
-
-//-------------------------------------------------------------------------
-void albaInteractionFactoryTest::TestRegisterNewAvatar_CreateAvatarInstance()
-{
-  albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
-  
-  albaInteractionFactory::Initialize();
-
-  albaPlugTestDevice<albaDeviceCustom>("a custom device");
-
-
-  albaDevice *device0 = albaInteractionFactory::CreateDeviceInstance("albaDeviceNotExisting");
-  albaDevice *device1 = albaInteractionFactory::CreateDeviceInstance("albaDeviceCustom");
-
-  CPPUNIT_ASSERT(device0 == NULL);
-  CPPUNIT_ASSERT(device1!=NULL);
-
-  CPPUNIT_ASSERT(device1->IsALBAType(albaDeviceCustom));
-
-  // cleanup factory products
-  device1->Delete();
-
 }
 
 //-------------------------------------------------------------------------
@@ -213,79 +137,6 @@ void albaInteractionFactoryTest::TestRegisterNewDevice_CreateDeviceInstance()
 }
 
 //-------------------------------------------------------------------------
-void albaInteractionFactoryTest::TestGetNumberOfAvatars()
-//-------------------------------------------------------------------------
-{
-
-  albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
-
-  albaInteractionFactory::Initialize();
-
-  albaPlugTestAvatar<albaAvatarCustom>("a custom avatar");
-
-  albaAvatar *avatar0 = albaInteractionFactory::CreateAvatarInstance("albaAvatarNotExisting");
-  albaAvatar *avatar1 = albaInteractionFactory::CreateAvatarInstance("albaAvatarCustom");
-
-  // test factory contents
-  //poor proof to register again an already registered avatar
-  albaPlugTestAvatar<albaAvatarCustom>("a custom avatar"); 
-
-  int numberOfAvatars = interaction_factory->GetNumberOfAvatars();
-  CPPUNIT_ASSERT(numberOfAvatars == 1);
-
-  // cleanup factory products
-  avatar1->Delete();
-
-}
-
-//-------------------------------------------------------------------------
-void albaInteractionFactoryTest::TestGetAvatarName()
-//-------------------------------------------------------------------------
-{
-  albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
-
-  albaInteractionFactory::Initialize();
-
-  albaPlugTestAvatar<albaAvatarCustom>("a custom avatar"); // plug an avatar in the main node factory
-
-  albaAvatar *avatar = albaInteractionFactory::CreateAvatarInstance("albaAvatarCustom");
-
-  const char *name = interaction_factory->GetAvatarName(0);
-  CPPUNIT_ASSERT(stricmp(name, "albaAvatarCustom") == 0);
-
-  // cleanup factory products
-  avatar->Delete();
-
-}
-
-//-------------------------------------------------------------------------
-void albaInteractionFactoryTest::TestGetAvatarNames()
-//-------------------------------------------------------------------------
-{
-  albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
-
-  albaInteractionFactory::Initialize();
-
-  albaPlugTestAvatar<albaAvatarCustom>("a custom avatar"); // plug an avatar in the main node factory
-
-  albaAvatar *avatar0 = albaInteractionFactory::CreateAvatarInstance("albaAvatarNotExisting");
-  albaAvatar *avatar1 = albaInteractionFactory::CreateAvatarInstance("albaAvatarCustom");
-
-  const std::set<std::string> *avatars = interaction_factory->GetAvatarNames();
-  int s = avatars->size();
-  CPPUNIT_ASSERT(s == 1);
-
-  bool found=false;
-  if(avatars->count("albaAvatarCustom") == 1)
-    found = true;
-  CPPUNIT_ASSERT(found);
-
-  // cleanup factory products
-  avatar1->Delete();
-
-}
-
-//-------------------------------------------------------------------------
 void albaInteractionFactoryTest::TestGetNumberOfDevices()
 //-------------------------------------------------------------------------
 {
@@ -299,7 +150,7 @@ void albaInteractionFactoryTest::TestGetNumberOfDevices()
   albaDevice *device1 = albaInteractionFactory::CreateDeviceInstance("albaDeviceCustom");
 
   // test factory contents
-  //poor proof to register again an already registered avatar
+  //poor proof to register again an already registered device
   albaPlugTestDevice<albaDeviceCustom>("a custom device"); 
 
   int numberOfDevices = interaction_factory->GetNumberOfDevices();
@@ -307,32 +158,6 @@ void albaInteractionFactoryTest::TestGetNumberOfDevices()
 
   // cleanup factory products
   device1->Delete();
-}
-
-//-------------------------------------------------------------------------
-void albaInteractionFactoryTest::TestGetAvatarDescription()
-//-------------------------------------------------------------------------
-{
-  albaInteractionFactory *interaction_factory = albaInteractionFactory::GetInstance();
-
-  albaInteractionFactory::Initialize();
-
-  albaPlugTestAvatar<albaAvatarCustom>("a custom avatar"); // plug an avatar in the main node factory
-
-  albaAvatar *avatar = albaInteractionFactory::CreateAvatarInstance("albaAvatarCustom");
-
-  //---------- start comment -------------
-  // working on visual studio 2003
-  // failing on visual studio 2010
-  // commented for the moment (more investigation is needed...)
-  //
-  // const char *description = interaction_factory->GetAvatarDescription("albaAvatarCustom");
-  // CPPUNIT_ASSERT(stricmp(description, "a custom avatar") == 0);
-  //
-  //---------- end comment -------------
-  // cleanup factory products
-  avatar->Delete();
-
 }
 
 //-------------------------------------------------------------------------
@@ -344,7 +169,7 @@ void albaInteractionFactoryTest::TestGetDeviceName()
 
   albaInteractionFactory::Initialize();
 
-  albaPlugTestDevice<albaDeviceCustom>("a custom device"); // plug an avatar in the main node factory
+  albaPlugTestDevice<albaDeviceCustom>("a custom device"); // plug a device in the main node factory
 
   albaDevice *device = albaInteractionFactory::CreateDeviceInstance("albaDeviceCustom");
 
@@ -364,7 +189,7 @@ void albaInteractionFactoryTest::TestGetDeviceNames()
 
   albaInteractionFactory::Initialize();
 
-  albaPlugTestAvatar<albaDeviceCustom>("a custom device"); // plug a device in the main node factory
+  albaPlugTestDevice<albaDeviceCustom>("a custom device"); // plug a device in the main node factory
 
   albaDevice *device0 = albaInteractionFactory::CreateDeviceInstance("albaDeviceNotExisting");
   albaDevice *device1 = albaInteractionFactory::CreateDeviceInstance("albaDeviceCustom");

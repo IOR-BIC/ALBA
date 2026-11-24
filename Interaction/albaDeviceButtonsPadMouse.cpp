@@ -44,7 +44,6 @@ albaCxxTypeMacro(albaDeviceButtonsPadMouse)
 albaDeviceButtonsPadMouse::albaDeviceButtonsPadMouse()
 //------------------------------------------------------------------------------
 {
-  SetThreaded(0);
   m_LastPosition[0] = m_LastPosition[1] = 0;
   m_ButtonState[0]  = m_ButtonState[1] = m_ButtonState[2] = 0;
   m_SelectedView    = NULL;

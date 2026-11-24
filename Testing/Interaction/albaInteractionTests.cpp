@@ -24,9 +24,6 @@
 #include "albaActionTest.h"
 #include "albaAgentEventQueueTest.h"
 #include "albaAgentTest.h"
-#include "albaAgentThreadedTest.h"
-#include "albaAvatar3DConeTest.h"
-#include "albaAvatarTest.h"
 #include "albaDeviceButtonsPadTest.h"
 #include "albaDeviceManagerTest.h"
 #include "albaDeviceSetTest.h"
@@ -160,7 +157,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaActionTest::suite());
 	runner.addTest(albaSaveRestorePoseGUITest::suite());
 	runner.addTest(albaAgentEventQueueTest::suite());
-	runner.addTest(albaAgentThreadedTest::suite());
 	runner.addTest(albaPositionalEventRouterTest::suite());
 	runner.addTest(albaDeviceTest::suite());
 	runner.addTest(albaDeviceButtonsPadTest::suite());
@@ -168,11 +164,9 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoScaleTest::suite());
 	runner.addTest(albaToolExtractIsosurfaceTest::suite());
 	runner.addTest(albaInteractionBehaviorTest::suite());
-	runner.addTest(albaAvatarTest::suite());
 	runner.addTest(albaStaticEventRouterTest::suite());
 	runner.addTest(albaGizmoInterfaceGUITest::suite());
 	runner.addTest(albaTransformInterfaceGUITest::suite());
-	runner.addTest(albaAvatar3DConeTest::suite());
 	runner.addTest(albaRotateTranslateGUITest::suite());
 	runner.addTest(albaBehaviorRotateTranslateTest::suite());
 	runner.addTest(albaToolFlyToTest::suite());

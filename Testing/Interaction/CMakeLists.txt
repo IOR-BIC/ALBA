@@ -41,7 +41,6 @@ SET(PROJECT_SRCS
 	albaActionTest.h albaActionTest.cpp
 	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
 	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp
-	albaAgentThreadedTest.h albaAgentThreadedTest.cpp
 	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp
 	albaDeviceTest.h albaDeviceTest.cpp
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
@@ -49,11 +48,9 @@ SET(PROJECT_SRCS
 	albaDeviceButtonsPadTest.h albaDeviceButtonsPadTest.cpp
 	albaToolExtractIsosurfaceTest.h albaToolExtractIsosurfaceTest.cpp
 	albaInteractionBehaviorTest.h albaInteractionBehaviorTest.cpp
-	albaAvatarTest.h albaAvatarTest.cpp 
 	albaStaticEventRouterTest.h albaStaticEventRouterTest.cpp
 	albaGizmoInterfaceGUITest.h albaGizmoInterfaceGUITest.cpp
 	albaTransformInterfaceGUITest.h albaTransformInterfaceGUITest.cpp
-	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
 	albaRotateTranslateGUITest.h albaRotateTranslateGUITest.cpp
 	albaBehaviorRotateTranslateTest.h albaBehaviorRotateTranslateTest.cpp
 	albaToolFlyToTest.h albaToolFlyToTest.cpp

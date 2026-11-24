@@ -36,7 +36,6 @@ class albaInteractionBehavior;
 
 class albaRWIBase;
 class vtkCellPicker;
-class vtkALBARayCast3DPicker;
 class vtkAssemblyPath;
 
 //----------------------------------------------------------------------------
@@ -142,9 +141,6 @@ public:
   /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
 
-  /** Perform a picking according to the absolute matrix given and return true on success*/
-  virtual bool Pick(albaMatrix &m);
-
   /** Write into the double array the position picked during Pick method.*/
   virtual void GetPickedPosition(double pos[3]);
 
@@ -195,7 +191,6 @@ protected:
   albaGUIHolder	*m_Guih;
 
   vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
-  vtkALBARayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
 
   albaVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
   double         m_PickedPosition[3];

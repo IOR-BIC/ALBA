@@ -37,9 +37,6 @@
 #include "albaAnimate.h"
 
 #include "albaInteractionBehavior.h"
-#include "albaAvatar.h"
-#include "albaAvatar3D.h"
-#include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
 
 #include "albaVME.h"
@@ -53,7 +50,6 @@
 #include "vtkMatrix4x4.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 
 //----------------------------------------------------------------------------
@@ -84,7 +80,6 @@ albaViewVTK::~albaViewVTK()
   m_PipeMap.clear();
 
   vtkDEL(m_Picker2D);
-  vtkDEL(m_Picker3D);
   cppDEL(m_AttachCamera);
   cppDEL(m_LightKit);
   cppDEL(m_TextKit);
@@ -128,7 +123,6 @@ void albaViewVTK::Create()
 
 	m_BackgroundColor = m_Rwi->GetBackgroundColor();
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   //m_Picker2D->InitializePickList();
@@ -375,19 +369,11 @@ void albaViewVTK::SetWindowSize(int w, int h)
 //----------------------------------------------------------------------------
 bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
 {
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::SafeDownCast(device);
   albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
   int mouse_pos[2];
   bool picked_something = false;
 
-  if (tracker)
-  {
-    // no avatar == no picking
-    albaMatrix world_pose;
-    if (tracker->TrackerToWorld(point_pose, world_pose))
-      picked_something = Pick(world_pose);
-  }
-  else if (mouse)
+  if (mouse)
   { 
     mouse_pos[1] = (int)point_pose.GetElement(1,3);
     mouse_pos[0] = (int)point_pose.GetElement(0,3);
@@ -417,32 +403,6 @@ bool albaViewVTK::Pick(int x, int y)
   }
   return false;
 }
-//----------------------------------------------------------------------------
-bool albaViewVTK::Pick(albaMatrix &m)
-{
-  // Compute intersection ray:
-  double p1[4]={0,0,0.05,1}; // from albaAvatar3DCone (to revise!!)
-  double p2[4]={0,0,-0.05,1};
-
-  // points in world coordinates
-  double world_p1[4],world_p2[4];
-  m.MultiplyPoint(p1,world_p1);
-  m.MultiplyPoint(p2,world_p2);
-
-  vtkRendererCollection *rc = m_Rwi->m_RwiBase->GetRenderWindow()->GetRenderers();
-  vtkRenderer *r = NULL;
-  rc->InitTraversal();
-  while(r = rc->GetNextItem())
-  {
-    if( m_Picker3D->Pick(world_p1,world_p2,r) )
-    {
-      m_Picker3D->GetPickPosition(m_PickedPosition);
-      return FindPickedVme(m_Picker3D->GetPath());
-    }
-  }
-  return false;
-}
-
 //----------------------------------------------------------------------------
 void albaViewVTK::GetImage(wxBitmap &bmp, int magnification)
 {

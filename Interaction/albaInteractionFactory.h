@@ -26,19 +26,15 @@
 #define albaPlugDeviceMacro(node_type,descr) \
   RegisterNewDevice(node_type::GetStaticTypeName(), descr, node_type::NewObject);
   
-/** to be used internally for plugging default avatars --- calls a member function directly */    
-#define albaPlugAvatarMacro(node_type,descr) \
-  RegisterNewAvatar(node_type::GetStaticTypeName(), descr, node_type::NewObject);
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------  
-class albaAvatar;
 class albaDevice;
 
-/** Object factory for Devices and Avatars.
-  To make a new Device or Avatar available in the ALBA it must be plugged inside a factory, in particular
-  this factory must be of type albaInteractionFactory to be able to retrieve the list of devices and avatars
+/** Object factory for Devices.
+  To make a new Device available in the ALBA it must be plugged inside a factory, in particular
+  this factory must be of type albaInteractionFactory to be able to retrieve the list of devices
   plugged inside the factory. */
 class ALBA_EXPORT albaInteractionFactory : public albaObjectFactory
 {
@@ -71,24 +67,6 @@ public:
   /** return the comment field of the device object plugged in the factory */
   const char *GetDeviceTypeName(const char *device_name);
   
-  /** create an instance of the node give its type name */
-  static albaAvatar *CreateAvatarInstance(const char *type_name);
-   
-  /**
-    This function can be used by Application code to register new Objects's to the mflCoreFactory */
-  void RegisterNewAvatar(const char* node_name, const char* description, albaCreateObjectFunction createFunction);
-
-  /** return list of names for nodes plugged into this factory */
-  const static std::set<std::string> *GetAvatarNames();
-
-  /** return number of devices registered to this factory */
-  int GetNumberOfAvatars();
-
-  /** return device name */
-  const char *GetAvatarName(int idx);
-  
-  /** return the comment field of the avatar object plugged in the factory */
-  const char *GetAvatarDescription(const char *device_name);
 
 protected:
   albaInteractionFactory();
@@ -97,34 +75,11 @@ protected:
   static bool m_Initialized;
   //static albaInteractionFactory *m_Instance;
   static std::set<std::string> glo_DeviceNames; 
-  static std::set<std::string> glo_AvatarNames; 
   
 private:
   albaInteractionFactory(const albaInteractionFactory&);  // Not implemented.
   void operator=(const albaInteractionFactory&);  // Not implemented.
 };
-
-/** Plug  a node in the main ALBA Avatar factory.*/
-template <class T>
-class albaPlugAvatar
-{
-  public:
-  albaPlugAvatar(const char *description);
-  
-};
-
-//------------------------------------------------------------------------------
-/** Plug a new Avatar class into the Avatar factory.*/
-template <class T>
-albaPlugAvatar<T>::albaPlugAvatar(const char *description)
-//------------------------------------------------------------------------------
-{ 
-  albaInteractionFactory *factory=albaInteractionFactory::GetInstance();
-  if (factory)
-  {
-    factory->RegisterNewAvatar(T::GetStaticTypeName(), description, T::NewObject);
-  }
-}
 
 /** Plug  a node in the main ALBA Device factory.*/
 template <class T>

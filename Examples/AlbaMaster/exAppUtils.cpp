@@ -15,7 +15,6 @@ PURPOSE. See the above copyright notice for more information.
 
 #include "albaDecl.h"
 #include "exAppUtils.h"
-#include "defines.h"
 
 //----------------------------------------------------------------------------
 wxString exAppUtils::GetApplicationDirectory()

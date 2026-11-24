@@ -25,7 +25,6 @@
 #include "albaEventInteraction.h"
 #include "albaMatrix.h"
 #include "albaView.h"
-#include "albaDeviceButtonsPadTracker.h"
 
 albaCxxTypeMacro(albaEventInteraction)
 
@@ -163,15 +162,10 @@ bool albaEventInteraction::FindPokedVme(albaView *view, albaDevice *device, alba
 
     if (view)
     {
-      // trackers pick with their pose, other devices with the 2D position
+      // the 2D position is passed in the translation of the pose
       albaMatrix pointPose;
-      if (albaDeviceButtonsPadTracker::SafeDownCast(device) && m_Matrix)
-        pointPose = *m_Matrix;
-      else
-      {
-        pointPose.SetElement(0, 3, m_X);
-        pointPose.SetElement(1, 3, m_Y);
-      }
+      pointPose.SetElement(0, 3, m_X);
+      pointPose.SetElement(1, 3, m_Y);
 
       m_Picked = view->FindPokedVme(device, pointPose, m_PickedVme, m_PickedBehavior);
       if (m_Picked)

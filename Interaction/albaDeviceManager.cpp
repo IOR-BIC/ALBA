@@ -56,7 +56,6 @@ albaDeviceManager::albaDeviceManager()
   m_PersistentDeviceIdCounter = 0;
   vtkNEW(m_DeviceSet);
   m_DeviceSet->SetPersistentFlag(false);
-  m_DeviceSet->SetThreaded(false);
   m_DeviceSet->SetName("DeviceSet");
   m_DeviceSet->AutoStartOn();
   m_DeviceSet->SetListener(this);

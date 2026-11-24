@@ -52,7 +52,6 @@
 #include "albaInteractionFactory.h"
 
 #include "albaDeviceManager.h"
-#include "albaAvatar3D.h"
 #include "albaAction.h"
 #include "albaDeviceSet.h"
 #include "albaDeviceButtonsPadMouse.h"
@@ -89,7 +88,6 @@ albaInteractionManager::albaInteractionManager()
   m_SettingsPanel     = NULL;
   //m_BindingsPanel     = NULL;
   m_CurrentDevice     = NULL;
-  m_CurrentRenderer   = NULL;
   m_ActionsList       = NULL;
   m_Bindings          = NULL;
   m_SettingFileName = albaGetLastUserFolder();
@@ -133,7 +131,6 @@ albaInteractionManager::~albaInteractionManager()
   if (m_FlyToTool)
     m_PositionalEventRouter->PopTool(m_FlyToTool);
   albaDEL(m_FlyToTool);
-  SetCurrentRenderer(NULL);
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
@@ -160,20 +157,6 @@ bool albaInteractionManager::OnKey(int keyCode, bool pressed)
 void albaInteractionManager::SetEventTracing(bool enable)
 {
   m_PositionalEventRouter->SetEventTracing(enable);
-}
-
-//----------------------------------------------------------------------------
-void albaInteractionManager::SetCurrentRenderer(vtkRenderer *ren)
-{
-  if (ren == m_CurrentRenderer)
-    return;
-
-  // the previous renderer is released, the new one is kept
-  if (m_CurrentRenderer)
-    m_CurrentRenderer->UnRegister(NULL);
-  m_CurrentRenderer = ren;
-  if (ren)
-    ren->Register(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -209,74 +192,9 @@ albaAction *albaInteractionManager::GetAction(const char *name)
 }
 
 //------------------------------------------------------------------------------
-const albaInteractionManager::mmuAvatarsMap &albaInteractionManager::GetAvatars()
-{
-  return m_Avatars;
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::GetAvatars(mmuAvatarsVector &avatars)
-{
-  avatars.clear();
-  avatars.resize(m_Avatars.size());
-  int i=0;
-  for (mmuAvatarsMap::iterator it=m_Avatars.begin();it!=m_Avatars.end();it++,i++)
-  {
-    avatars[i]=it->second.GetPointer();
-  }
-}
-
-//------------------------------------------------------------------------------
-void albaInteractionManager::AddAvatar(albaAvatar *avatar)
-{
-  m_Avatars[avatar->GetName()] = avatar;
-  
-  // attach to the avatar both as a listener and an event source
-  avatar->SetListener(this);
-
-  // Link the avatar to the current renderer (if present)
-  avatar->SetRendererAndView(m_CurrentRenderer,m_SelectedView);
-}
-
-//------------------------------------------------------------------------------
-int albaInteractionManager::RemoveAvatar(albaAvatar *avatar)
-{
-  assert(avatar);
-
-  mmuAvatarsMap::iterator it=m_Avatars.find(avatar->GetName());
-  if (it==m_Avatars.end())
-    return false;
-  
-  // detach the avatar
-  avatar->SetListener(NULL);
-  
-  // unlink the avatar from the renderer
-  avatar->SetRendererAndView(NULL,NULL);
-    
-  m_Avatars.erase(it);
-
-  return true;
-}
-//------------------------------------------------------------------------------
-albaAvatar *albaInteractionManager::GetAvatar(const char *name)
-{
-  mmuAvatarsMap::iterator it=m_Avatars.find(name);  
-  return (it!=m_Avatars.end())?it->second:NULL;
-}
-
-//------------------------------------------------------------------------------
 void albaInteractionManager::ViewSelected(albaView *view)
 {
-  albaViewVTK *viewVTK = albaViewVTK::SafeDownCast(view);
-  m_SelectedView = viewVTK;
-
-  vtkRenderer *ren = viewVTK ? viewVTK->GetFrontRenderer() : NULL;
-  SetCurrentRenderer(ren);
-
-  // the avatars and the mouse work on the selected view
-  for (mmuAvatarsMap::iterator it = m_Avatars.begin(); it != m_Avatars.end(); it++)
-    it->second->SetRendererAndView(ren, view);
-
+  m_SelectedView = albaViewVTK::SafeDownCast(view);
   GetMouseDevice()->SetView(view);
 }
 
@@ -324,16 +242,6 @@ void albaInteractionManager::OnBindDeviceToAction(albaEvent *e)
   }
 }
 
-//------------------------------------------------------------------------------
-void albaInteractionManager::OnAddAvatar(albaEventBase *event)
-{
-  AddAvatar((albaAvatar *)event->GetData());
-}
-//------------------------------------------------------------------------------
-void albaInteractionManager::OnRemoveAvatar(albaEventBase *event)
-{
-  RemoveAvatar((albaAvatar *)event->GetData());
-}
 //------------------------------------------------------------------------------
 void albaInteractionManager::OnStartDispatching()
 {
@@ -542,14 +450,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
   else if (id == albaDeviceSet::DEVICE_REMOVING) 
   {
     OnDeviceRemoving(event);
-  }
-  else if (id == AVATAR_ADDED) 
-  {
-    OnAddAvatar(event);
-  }
-  else if (id == AVATAR_REMOVED) 
-  {
-    OnRemoveAvatar(event); 
   }
   else
   {

@@ -39,7 +39,6 @@
 #include "albaAttachCamera.h"
 
 #include "vtkDataSet.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"
@@ -96,7 +95,6 @@ void albaViewImage::Create()
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->InitializePickList();
 

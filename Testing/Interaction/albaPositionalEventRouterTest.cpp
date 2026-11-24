@@ -282,8 +282,6 @@ void albaPositionalEventRouterTest::TestGetCameraTool()
 
   albaToolCamera *camera = mip->GetCameraTool();
   CPPUNIT_ASSERT(camera != NULL);
-  CPPUNIT_ASSERT(camera->GetMouseTool() != NULL);
-  CPPUNIT_ASSERT(camera->GetTrackerTool() != NULL);
 
   // the camera tool is not part of the tool stack
   CPPUNIT_ASSERT(mip->GetNumberOfTools() == 0);
@@ -371,7 +369,7 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
   CPPUNIT_ASSERT(per->GetSelectTool()->GetPickedVME() == vme);
   CPPUNIT_ASSERT(behavior->m_Interacting);
   CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == behavior);
-  CPPUNIT_ASSERT(per->GetCameraTool()->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
   CPPUNIT_ASSERT(view->m_PickCount == 1);
 
   albaEventInteraction up(mouse, DEVICE_BUTTON_UP);
@@ -392,14 +390,14 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
   down.ResetPick();
   per->OnEvent(&down);
   CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == NULL);
-  CPPUNIT_ASSERT(per->GetCameraTool()->GetInteractingTool(mouse) != NULL);
+  CPPUNIT_ASSERT(per->GetCameraTool()->IsInteracting());
   albaEventInteraction move(mouse, DEVICE_MOUSE_2D_MOVE);
   move.Set2DPosition(15, 25);
   move.SetChannel(MCH_INPUT);
   per->OnEvent(&move);
   CPPUNIT_ASSERT(behavior->m_Drag == 0);
   per->OnEvent(&up);
-  CPPUNIT_ASSERT(per->GetCameraTool()->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
 
   per->Delete();
   vme->SetBehavior(NULL);
@@ -603,7 +601,7 @@ void albaPositionalEventRouterTest::TestToolInteraction()
   CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == NULL);
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(tool->m_LeftUp == 1);
-  CPPUNIT_ASSERT(!per->GetCameraTool()->GetInteractingTool(mouse));
+  CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
 
   per->SetEventTracing(false);
   per->Delete();
@@ -726,17 +724,17 @@ void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
   // the camera gets the button down of the tool too, ready to move with the drags the tool does not use
   tool->m_UseDrag = false;
   SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
-  CPPUNIT_ASSERT(camera->GetInteractingTool(mouse) != NULL);
+  CPPUNIT_ASSERT(camera->IsInteracting());
   CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == tool);
   per->SetEventTracing(true);
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
-  CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("Tool albaPERTestTool, Camera albaToolCameraMouse") != std::string::npos);
+  CPPUNIT_ASSERT(std::string(per->GetLastEventTrace()).find("Tool albaPERTestTool, Camera albaToolCamera") != std::string::npos);
   per->SetEventTracing(false);
 
   // the button up goes to the tool and ends the camera motion
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_Drag == 1 && tool->m_LeftUp == 1);
-  CPPUNIT_ASSERT(camera->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(!camera->IsInteracting());
 
   // the drags used by the tool do not reach the camera, which ends anyway with the button up
   tool->m_UseDrag = true;
@@ -744,7 +742,7 @@ void albaPositionalEventRouterTest::TestToolGivesDragToCamera()
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
   SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(tool->m_Drag == 2 && tool->m_LeftUp == 2);
-  CPPUNIT_ASSERT(camera->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(!camera->IsInteracting());
 
   per->Delete();
   albaDEL(tool);
@@ -805,7 +803,7 @@ void albaPositionalEventRouterTest::TestButtonUpDuringButtonDown()
   CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_LeftUp == 0);
   CPPUNIT_ASSERT(!per->IsInteracting(mouse));
   CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == NULL);
-  CPPUNIT_ASSERT(per->GetCameraTool()->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(!per->GetCameraTool()->IsInteracting());
 
   // the next moves are moves without buttons, not drags
   SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);

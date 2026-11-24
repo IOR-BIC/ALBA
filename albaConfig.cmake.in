@@ -4,7 +4,6 @@ SET(ALBA_INCLUDE_DIRS
   "@ALBA_SOURCE_DIR@/Core"
   "@ALBA_SOURCE_DIR@/Gui"
   "@ALBA_SOURCE_DIR@/Interaction"
-  "@ALBA_SOURCE_DIR@/Interaction/Drivers"
   "@ALBA_BINARY_DIR@/Interaction"
   "@ALBA_SOURCE_DIR@/IO"
   "@ALBA_SOURCE_DIR@/Operations"

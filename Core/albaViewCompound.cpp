@@ -31,7 +31,6 @@
 #include "albaGUIViewWin.h"
 #include "albaGUI.h"
 #include "albaInteractionBehavior.h"
-#include "albaDeviceButtonsPadTracker.h"
 #include "albaDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
@@ -509,17 +508,6 @@ bool albaViewCompound::Pick(int x, int y)
   if (sub_view)
   {
     return sub_view->Pick(x,y);
-  }
-  return false;
-}
-//----------------------------------------------------------------------------
-bool albaViewCompound::Pick(albaMatrix &m)
-//----------------------------------------------------------------------------
-{
-  albaView *sub_view = GetSubView();
-  if (sub_view)
-  {
-    return sub_view->Pick(m);
   }
   return false;
 }

@@ -149,10 +149,6 @@ public:
   virtual bool Pick(int x, int y);
 
   /** 
-  Perform a picking according to the absolute matrix given and return true on success*/
-  virtual bool Pick(albaMatrix &m);
-
-  /** 
   Write into the double array the position picked during Pick method.*/
   virtual void GetPickedPosition(double pos[3]);
 

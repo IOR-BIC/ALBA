@@ -56,7 +56,7 @@ class albaMutexLock;
   synchronizations (i.e. a basic form of data fusion). More complex data fusions can be
   performed redefining the DispacthEvents function.
 
-  @sa albaAgent albaAgentThreaded albaAgentEventHandler*/
+  @sa albaAgent albaAgentEventHandler*/
 class ALBA_EXPORT albaAgentEventQueue : public albaAgent
 {
 public:

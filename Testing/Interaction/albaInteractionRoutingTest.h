@@ -49,7 +49,6 @@ public:
   CPPUNIT_TEST_SUITE( albaInteractionRoutingTest );
   CPPUNIT_TEST( TestCameraDragAndWheel );
   CPPUNIT_TEST( TestCameraButtons );
-  CPPUNIT_TEST( TestCameraTrackerTool );
   CPPUNIT_TEST( TestPERPickerClick );
   CPPUNIT_TEST( Test2DMeasureAddWithoutModifiers );
   CPPUNIT_TEST( Test2DMeasureModifiersMoveCamera );
@@ -68,7 +67,6 @@ protected:
 
   void TestCameraDragAndWheel();
   void TestCameraButtons();
-  void TestCameraTrackerTool();
   void TestPERPickerClick();
   void Test2DMeasureAddWithoutModifiers();
   void Test2DMeasureModifiersMoveCamera();

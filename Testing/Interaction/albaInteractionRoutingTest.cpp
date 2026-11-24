@@ -34,9 +34,6 @@
 #include "albaPositionalEventRouter.h"
 #include "albaToolPicker.h"
 #include "albaToolCamera.h"
-#include "albaToolCameraMouse.h"
-#include "albaToolCameraTracker.h"
-#include "albaDeviceButtonsPadTracker.h"
 #include "albaRWIBase.h"
 #include "albaView.h"
 #include "albaVMESurface.h"
@@ -212,7 +209,7 @@ void albaInteractionRoutingTest::TestCameraDragAndWheel()
 
   // a left drag without picked VME rotates the camera
   SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCameraMouse"));
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
   SendMouse(DEVICE_MOUSE_2D_MOVE, 450, 320);
   SendMouse(DEVICE_BUTTON_UP, 450, 320, ALBA_LEFT_BUTTON);
 
@@ -222,7 +219,7 @@ void albaInteractionRoutingTest::TestCameraDragAndWheel()
   // the wheel zooms the camera
   double startDistance = camera->GetDistance();
   SendWheel(400, 300, 120);
-  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCameraMouse"));
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
   CPPUNIT_ASSERT(camera->GetDistance() < startDistance);
 
   m_Mouse->RemoveObserver(per);
@@ -283,40 +280,12 @@ void albaInteractionRoutingTest::TestCameraButtons()
   CPPUNIT_ASSERT(fabs(camera->GetDistance() - distance) < 1e-6);
 
   // the release of a button ends the camera motion
-  albaToolCameraMouse *mouseTool = per->GetCameraTool()->GetMouseTool();
+  albaToolCamera *mouseTool = per->GetCameraTool();
   CPPUNIT_ASSERT(!mouseTool->IsInteracting());
-  CPPUNIT_ASSERT(mouseTool->GetMotion() == albaToolCameraMouse::MOTION_NONE);
+  CPPUNIT_ASSERT(mouseTool->GetMotion() == albaToolCamera::MOTION_NONE);
 
   m_Mouse->RemoveObserver(per);
   per->Delete();
-}
-
-//----------------------------------------------------------------------------
-void albaInteractionRoutingTest::TestCameraTrackerTool()
-{
-  albaToolCameraTracker *trackerTool;
-  albaNEW(trackerTool);
-  albaDeviceButtonsPadTracker *tracker = albaDeviceButtonsPadTracker::New();
-
-  // the mouse is not handled by the tracker tool
-  double pos[2] = {10, 10};
-  CPPUNIT_ASSERT(!trackerTool->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(!trackerTool->IsInteracting(m_Mouse));
-
-  // a tracker without an albaAvatar3D cannot move the camera
-  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonDown(tracker, ALBA_LEFT_BUTTON, NULL));
-  CPPUNIT_ASSERT(!trackerTool->IsInteracting(tracker));
-
-  // events of devices not interacting are not used
-  CPPUNIT_ASSERT(!trackerTool->OnTrackerDrag(tracker, NULL));
-  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonUp(tracker, ALBA_LEFT_BUTTON));
-
-  // only the left button is handled
-  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonDown(tracker, ALBA_RIGHT_BUTTON, NULL));
-  CPPUNIT_ASSERT(!trackerTool->OnTrackerButtonDown(tracker, ALBA_MIDDLE_BUTTON, NULL));
-
-  tracker->Delete();
-  albaDEL(trackerTool);
 }
 
 //----------------------------------------------------------------------------
@@ -445,7 +414,7 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
   // SHIFT leaves button down, drag and button up to the camera
   measure->SetAction(albaTool2DMeasure::ACTION_ADD_MEASURE);
   SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
-  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCameraMouse"));
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
   SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 310, 0, ALBA_SHIFT_KEY);
   SendMouse(DEVICE_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
@@ -454,7 +423,7 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
 
   // CTRL does the same while adding a measure
   SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
-  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCameraMouse"));
+  CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
   SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 310, 0, ALBA_CTRL_KEY);
   SendMouse(DEVICE_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
@@ -617,7 +586,7 @@ void albaInteractionRoutingTest::TestModifierKeysReachAllTools()
   // the tool on top uses CTRL, but all the tools and the camera see it
   CPPUNIT_ASSERT(per->OnKey(WXK_CONTROL, true));
   CPPUNIT_ASSERT(per->GetCtrlDown() && top->GetCtrlDown() && bottom->GetCtrlDown());
-  CPPUNIT_ASSERT(per->GetCameraTool()->GetMouseTool()->GetCtrlDown());
+  CPPUNIT_ASSERT(per->GetCameraTool()->GetCtrlDown());
   CPPUNIT_ASSERT(!bottom->GetAltDown() && !bottom->GetShiftDown());
 
   // a tool pushed later starts with the current state
@@ -631,7 +600,7 @@ void albaInteractionRoutingTest::TestModifierKeysReachAllTools()
   // the mouse events carry the state of the modifier keys
   SendMouse(DEVICE_MOUSE_2D_MOVE, 300, 300, 0, ALBA_SHIFT_KEY, ALBA_ALT_KEY);
   CPPUNIT_ASSERT(!bottom->GetCtrlDown() && bottom->GetAltDown() && bottom->GetShiftDown());
-  CPPUNIT_ASSERT(per->GetCameraTool()->GetMouseTool()->GetShiftDown());
+  CPPUNIT_ASSERT(per->GetCameraTool()->GetShiftDown());
 
   per->OnKey(WXK_SHIFT, false);
   CPPUNIT_ASSERT(!top->GetShiftDown() && top->GetAltDown());
@@ -649,7 +618,7 @@ void albaInteractionRoutingTest::TestCaptureLostReleasesButtons()
   m_Mouse->AddObserver(per, MCH_INPUT);
   m_Rwi->SetMouse(m_Mouse);
   m_Rwi->vtkRenderWindowInteractor::Enable();
-  albaToolCameraMouse *mouseTool = per->GetCameraTool()->GetMouseTool();
+  albaToolCamera *mouseTool = per->GetCameraTool();
 
   // the right button starts the interaction: losing the capture releases it, not the left one
   wxMouseEvent rightDown(wxEVT_RIGHT_DOWN);

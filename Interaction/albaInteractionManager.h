@@ -35,11 +35,6 @@ class albaEventBase;
 class albaEvent;
 class albaAction;
 class albaInteractionBehavior;
-#ifdef ALBA_EXPORTS
-#include "albaAvatar.h"
-#else
-class albaAvatar;
-#endif
 class albaDevice;
 class albaDeviceManager;
 class albaDeviceSet;
@@ -63,16 +58,11 @@ class albaGUICheckListBox;
 class albaGUIHolder;
 class albaGUINamedPanel;
 
-#ifdef ALBA_EXPORTS
-#include "albaDllMacros.h"
-EXPORT_STL_MAP(ALBA_EXPORT,albaString,albaAutoPointer<albaAvatar>);
-EXPORT_STL_VECTOR(ALBA_EXPORT, albaAvatar *);
-#endif
 
 
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
-  resources necessary for interaction (currently devices, actions and avatars)
+  resources necessary for interaction (currently devices and actions)
   and to manage communication routing for interaction. Management of devices is
   delegated to the DeviceManager object, picking and routing of events to 
   picked VME is delegated to PER (positional event router) object, and low level 
@@ -109,40 +99,15 @@ public:
   /** Define a new action router.*/
   albaAction *AddAction(const char *name, float priority = 0.0);
 
-  /** Define a new avatar */
-  void AddAvatar(albaAvatar *avatar);
-
-  /** Remove an avatar */
-  int RemoveAvatar(albaAvatar *avatar);
-
-  /** Get an avatar given its name.*/
-  albaAvatar *GetAvatar(const char *name);
-
-  typedef std::map<albaString,albaAutoPointer<albaAvatar> > mmuAvatarsMap;
-  typedef std::vector<albaAvatar *> mmuAvatarsVector;
-
-  /** Return the avatars container */
-  const mmuAvatarsMap &GetAvatars();
-
-  /** return an array with the list of avatars currently connected */
-  void GetAvatars(mmuAvatarsVector &avatars);
-
   /** Get an action router.*/
   albaAction *GetAction(const char *name);
 
-  /** Set the selected view. This makes all dynamic avatars
-    and interactors to be informed of the current renderer. */
+  /** Set the selected view: the mouse works on it. */
   void ViewSelected(albaView *view);
   
   /** Return the currently selected view */
   albaView *GetSelectedView(albaView *view) {return m_SelectedView;}
 
-  /** Set the selected VTK renderer */
-  void SetCurrentRenderer(vtkRenderer *ren);
-
-  /** Return the renderer of the currently selected view,
-  if its a VTK based view otherwise return NULL.*/
-  vtkRenderer *GetCurrentRenderer() {return m_CurrentRenderer;}
 
 
   /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
@@ -210,8 +175,6 @@ protected:
   virtual void OnDeviceRemoving(albaEventBase *event);
   virtual void OnDeviceNameChanged(albaEventBase *event);
   virtual void OnBindDeviceToAction(albaEvent *e);
-  virtual void OnAddAvatar(albaEventBase *event);
-  virtual void OnRemoveAvatar(albaEventBase *event);
 
   /** Create the GUI dialog. */
   void CreateGUI();
@@ -234,10 +197,7 @@ protected:
   albaStaticEventRouter*                 m_StaticEventRouter;
   albaToolFlyTo*                          m_FlyToTool; ///< tool of the fly-to mode
  
-  mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
-
   albaView*                            m_SelectedView;     ///< the view currently selected
-  vtkRenderer*                        m_CurrentRenderer;  ///< the renderer of selected view: to be removed!
 
 private:
   /** hidden to not be called directly */

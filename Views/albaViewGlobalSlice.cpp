@@ -44,7 +44,6 @@
 #include "albaVMEOutput.h"
 
 #include "vtkCellPicker.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
@@ -223,7 +222,6 @@ void albaViewGlobalSlice::Create()
 
 	m_Rwi->m_RenFront->AddActor(m_TextActor);
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   //m_Picker2D->InitializePickList();

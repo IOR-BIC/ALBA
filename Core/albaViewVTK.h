@@ -133,9 +133,6 @@ public:
   /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
 
-  /** Perform a picking according to the absolute matrix given and return true on success*/
-  virtual bool Pick(albaMatrix &m);
-
 	/** Set the vtk RenderWindow size. Used only for Linux (not necessary for Windows) */
   void SetWindowSize(int w, int h);
 

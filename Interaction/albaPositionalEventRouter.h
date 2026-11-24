@@ -30,7 +30,7 @@ class albaInteractionTool;
 class albaToolCamera;
 class albaToolSelect;
 
-/** Router of the input events of the devices (mouse and trackers).
+/** Router of the input events of the mouse devices.
   One device at a time interacts: while a device has a button pressed, the events of the other devices are ignored.
   A button down picks the scene and chooses the handler of the interaction, which receives
   the buttons and the drags of the device until the button that started the interaction is released:
@@ -101,15 +101,8 @@ protected:
   void OnMiddleButtonUp(albaEventInteraction *e);
   void OnRightButtonUp(albaEventInteraction *e);
 
-  /** The buttons of the trackers, as for the mouse */
-  void OnTrackerButtonDown(albaEventInteraction *e);
-  void OnTrackerButtonUp(albaEventInteraction *e);
-
   /** The drags go to the handler and, if it does not use them, to the camera; the moves without buttons go to the tools */
   void OnMouseMove(albaEventInteraction *e);
-
-  /** The drags of the trackers, as for the mouse; the moves without buttons are not used */
-  void OnTrackerMove(albaEventInteraction *e);
 
   /** The wheel goes to the tools and, if no tool uses it and no button is pressed, to the camera */
   void OnMouseWheel(albaEventInteraction *e);

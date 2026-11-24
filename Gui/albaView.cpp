@@ -30,7 +30,6 @@
 #include "albaGUI.h"
 
 #include "vtkALBAAssembly.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkRendererCollection.h"
 #include "vtkAssemblyPath.h"
@@ -63,7 +62,6 @@ albaView::albaView(const wxString &label)
   m_PrintData = (wxPrintData*) NULL ;
 
   m_Picker2D          = NULL;
-  m_Picker3D          = NULL;
   m_PickedVME         = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
 
@@ -136,11 +134,6 @@ albaGUI* albaView::CreateGui()
 
 //-------------------------------------------------------------------------
 bool albaView::Pick(int x, int y)
-{
-  return false;
-}
-//-------------------------------------------------------------------------
-bool albaView::Pick(albaMatrix &m)
 {
   return false;
 }
