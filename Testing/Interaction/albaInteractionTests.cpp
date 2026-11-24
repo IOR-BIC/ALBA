@@ -27,7 +27,7 @@
 #include "albaAgentThreadedTest.h"
 #include "albaAvatar3DConeTest.h"
 #include "albaAvatarTest.h"
-#include "albaDeviceClientALBATest.h"
+#include "albaDeviceButtonsPadTest.h"
 #include "albaDeviceManagerTest.h"
 #include "albaDeviceSetTest.h"
 #include "albaDeviceTest.h"
@@ -163,6 +163,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaAgentThreadedTest::suite());
 	runner.addTest(albaPositionalEventRouterTest::suite());
 	runner.addTest(albaDeviceTest::suite());
+	runner.addTest(albaDeviceButtonsPadTest::suite());
 	runner.addTest(albaGizmoScaleAxisTest::suite());
 	runner.addTest(albaGizmoScaleTest::suite());
 	runner.addTest(albaToolExtractIsosurfaceTest::suite());

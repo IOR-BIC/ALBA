@@ -46,7 +46,7 @@ SET(PROJECT_SRCS
 	albaDeviceTest.h albaDeviceTest.cpp
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
 	albaGizmoScaleTest.h albaGizmoScaleTest.cpp
-	#albaDeviceClientALBATest.h albaDeviceClientALBATest.cpp
+	albaDeviceButtonsPadTest.h albaDeviceButtonsPadTest.cpp
 	albaToolExtractIsosurfaceTest.h albaToolExtractIsosurfaceTest.cpp
 	albaInteractionBehaviorTest.h albaInteractionBehaviorTest.cpp
 	albaAvatarTest.h albaAvatarTest.cpp 

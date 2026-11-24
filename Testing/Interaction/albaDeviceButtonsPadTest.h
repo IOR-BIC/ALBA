@@ -35,7 +35,6 @@ class albaDeviceButtonsPadTest : public albaTest
    void TestFixture();
    void TestConstructorDestructor();
    void TestSetGetNumberOfButtons();
-	  void CreateTestData();
    void TestSetGetButtonState();
 
 };
