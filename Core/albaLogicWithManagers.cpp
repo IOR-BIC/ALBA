@@ -44,7 +44,6 @@
   #include "albaInteractionFactory.h"
   #include "albaInteractionBehavior.h"
   #include "albaDeviceManager.h"
-  #include "albaAction.h"
   #include "albaDeviceButtonsPadMouse.h"
   #include "albaPositionalEventRouter.h"
   #include "albaGUITreeContextualMenu.h"
@@ -417,21 +416,6 @@ void albaLogicWithManagers::Plug(albaOp *op, wxString menuPath, bool canUndo, al
   if(m_OpManager) 
   {
     m_OpManager->OpAdd(op, menuPath, canUndo, setting);
-    
-// currently albaInteraction is strictly dependent on VTK
-#ifdef ALBA_USE_VTK    
-    if (m_InteractionManager)
-    {
-      if (const char **actions = op->GetActions())
-      {
-        const char *action;
-        for (int i=0;action=actions[i];i++)
-        {
-          m_InteractionManager->AddAction(action);
-        }
-      }
-    }
-#endif
   }
 }
 //----------------------------------------------------------------------------

@@ -19,7 +19,6 @@
 #include "albaObject.h"
 #include "albaObserver.h"
 #include "albaEventSender.h"
-#include "albaStorable.h"
 #include "albaString.h"
 #include "albaSmartPointer.h"
 #include "albaServiceClient.h"
@@ -33,7 +32,6 @@
 //----------------------------------------------------------------------------
 class albaEventBase;
 class albaEvent;
-class albaAction;
 class albaInteractionBehavior;
 class albaDevice;
 class albaDeviceManager;
@@ -46,7 +44,6 @@ class albaView;
 class mflXMLWriter;
 class vtkXMLDataElement;
 class vtkXMLDataParser;
-class albaStaticEventRouter;
 class albaToolFlyTo;
 class albaPositionalEventRouter;
 class albaInteractionTool;
@@ -54,7 +51,6 @@ class albaVME;
 class albaGUIDialog;
 class albaGUI;
 class albaGUITree;
-class albaGUICheckListBox;
 class albaGUIHolder;
 class albaGUINamedPanel;
 
@@ -62,18 +58,16 @@ class albaGUINamedPanel;
 
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
-  resources necessary for interaction (currently devices and actions)
+  resources necessary for interaction (currently devices)
   and to manage communication routing for interaction. Management of devices is
-  delegated to the DeviceManager object, picking and routing of events to 
-  picked VME is delegated to PER (positional event router) object, and low level 
-  routing from devices to actions is delegated to the SER (static event router) 
-  object.
-  @sa albaDeviceManager albaPositionalEventRouter albaStaticEventRouter 
+  delegated to the DeviceManager object, picking and routing of the mouse events to 
+  picked VME is delegated to PER (positional event router) object, which observes the mouse.
+  @sa albaDeviceManager albaPositionalEventRouter 
   
   @todo
   - check the renderer to be RenFront
 */
-class ALBA_EXPORT albaInteractionManager : public albaObject, public albaObserver, public albaEventSender, public albaStorable, public albaServiceClient
+class ALBA_EXPORT albaInteractionManager : public albaObject, public albaObserver, public albaEventSender, public albaServiceClient
 {
 public:
   albaInteractionManager();
@@ -93,28 +87,11 @@ public:
   /** return the mouse device */
   albaDeviceButtonsPadMouse *GetMouseDevice();
 
-  /** return the mouse action, an action to which mouse is bound by default */
-  //albaAction *GetMouseAction();
-
-  /** Define a new action router.*/
-  albaAction *AddAction(const char *name, float priority = 0.0);
-
-  /** Get an action router.*/
-  albaAction *GetAction(const char *name);
-
   /** Set the selected view: the mouse works on it. */
   void ViewSelected(albaView *view);
   
   /** Return the currently selected view */
   albaView *GetSelectedView(albaView *view) {return m_SelectedView;}
-
-
-
-  /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
-  int Store(const char *filename);
-
-  /** restore interaction settings from an XML file (Multimod Interaction Settings - MIS - format) */
-  int Restore(const char *filename);
 
 
   /** return the positional event router */
@@ -133,9 +110,6 @@ public:
   with the device, the button, the modifiers and who handled it. Disabled by default. */
   void SetEventTracing(bool enable);
 
-  /** return the static event router */
-  albaStaticEventRouter *GetSER() {return m_StaticEventRouter;}
-
   /** Start the fly-to mode: push the fly-to tool, the next click flies to the clicked point */
   void CameraFlyToMode();
 
@@ -152,29 +126,17 @@ public:
   /** Update the name of a device */
   void UpdateDevice(albaDevice *device);
 
-  /** update bindings check list */
-  void UpdateBindings();
-
   /** Show in modal configuration the settings dialog. */
   //bool ShowModal(); //SIL. 07-jun-2006 : 
   albaGUI* GetGui();  //SIL. 07-jun-2006 : 
 
-  albaStaticEventRouter *GetStaticEventRouter() {return m_StaticEventRouter;}
-
 protected:
-  /** This is called by Store() to store information of this object.  */
-  virtual int InternalStore(albaStorageElement *node);
-
-  /** This is called by Restore() to restore information of this object. */
-  virtual int InternalRestore(albaStorageElement *node);
-  
   /** The camera updates requested while the device events are dispatched are fused into one at the end of the dispatching */
   virtual void OnStartDispatching();
   virtual void OnEndDispatching();
   virtual void OnDeviceAdded(albaEventBase *event);
   virtual void OnDeviceRemoving(albaEventBase *event);
   virtual void OnDeviceNameChanged(albaEventBase *event);
-  virtual void OnBindDeviceToAction(albaEvent *e);
 
   /** Create the GUI dialog. */
   void CreateGUI();
@@ -184,26 +146,15 @@ protected:
   //albaGUIDialog*              m_Dialog;
   albaGUI*                 m_Devices;
   albaGUITree*                m_DeviceTree;
-  albaGUICheckListBox*        m_ActionsList;
   albaGUIHolder*           m_SettingsPanel;
-  //albaGUINamedPanel*          m_BindingsPanel;
-  albaGUI*                 m_Bindings;
 
   albaDevice*              m_CurrentDevice;
-  albaString			          m_SettingFileName;
   
   albaDeviceManager*       m_DeviceManager; 
   albaPositionalEventRouter*                 m_PositionalEventRouter;
-  albaStaticEventRouter*                 m_StaticEventRouter;
   albaToolFlyTo*                          m_FlyToTool; ///< tool of the fly-to mode
  
   albaView*                            m_SelectedView;     ///< the view currently selected
 
-private:
-  /** hidden to not be called directly */
-  int Store(albaStorageElement *element) {return albaStorable::Store(element);}
-  
-  /** hidden to not be called directly */
-  int Restore(albaStorageElement *element) {return albaStorable::Restore(element);}
 };
 #endif 

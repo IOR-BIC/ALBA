@@ -282,7 +282,6 @@ ENDIF (ALBA_USE_VTK)
 #INTERACTION
 ###############################################
 SET(INTERACTION_SRCS
-  ../Interaction/albaAction.cpp  							../Interaction/albaAction.h
   ../Interaction/albaAgent.cpp  							../Interaction/albaAgent.h
   ../Interaction/albaAgentEventHandler.cpp  				../Interaction/albaAgentEventHandler.h
   ../Interaction/albaAgentEventQueue.cpp  					../Interaction/albaAgentEventQueue.h
@@ -339,7 +338,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaBehaviorTransform.cpp  			../Interaction/albaBehaviorTransform.h
   ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h
   ../Interaction/albaBehaviorPicker.cpp  					../Interaction/albaBehaviorPicker.h
-  ../Interaction/albaStaticEventRouter.cpp  					../Interaction/albaStaticEventRouter.h  ######################
   ../Interaction/albaToolPicker.cpp  				../Interaction/albaToolPicker.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h

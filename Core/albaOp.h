@@ -137,9 +137,6 @@ public:
 	wxMenuItem     *m_MenuItem;
 	wxString        m_OpMenuPath;
 
-	//MARCO 7/05/04
-	virtual const char **GetActions() { return NULL; };
-
 	/** Initialize the mouse device. */
 	void SetMouse(albaDeviceButtonsPadMouse *mouse);
 	albaDeviceButtonsPadMouse *GetMouse() { return m_Mouse; };

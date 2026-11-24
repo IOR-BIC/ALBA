@@ -45,22 +45,18 @@
 #include "albaRWIBase.h"
 
 #include "albaPositionalEventRouter.h"
-#include "albaStaticEventRouter.h"
 
 #include "albaEventBase.h"
 
 #include "albaInteractionFactory.h"
 
 #include "albaDeviceManager.h"
-#include "albaAction.h"
 #include "albaDeviceSet.h"
 #include "albaDeviceButtonsPadMouse.h"
 #include "albaToolFlyTo.h"
   
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
-#include "albaXMLStorage.h"
-#include "albaStorageElement.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -68,7 +64,6 @@
 #include <set>
 #include <assert.h>
 
-#define MIS_VERSION "2.0"
 
 
 //------------------------------------------------------------------------------
@@ -86,11 +81,7 @@ albaInteractionManager::albaInteractionManager()
   m_DeviceTree        = NULL;
   //m_Dialog            = NULL;
   m_SettingsPanel     = NULL;
-  //m_BindingsPanel     = NULL;
   m_CurrentDevice     = NULL;
-  m_ActionsList       = NULL;
-  m_Bindings          = NULL;
-  m_SettingFileName = albaGetLastUserFolder();
   
   albaNEW(m_DeviceManager);
   m_DeviceManager->SetListener(this);
@@ -101,20 +92,11 @@ albaInteractionManager::albaInteractionManager()
   m_DeviceManager->Initialize();
   AddDeviceToTree(m_DeviceManager->GetDeviceSet()); // add dev_mgr node as root
   
-  // create the static event router and connect it
-  albaNEW(m_StaticEventRouter);
-  m_StaticEventRouter->SetName("StaticEventRouter");
-  m_StaticEventRouter->SetListener(this);
-  
-  // define the action for pointing and manipulating with negative priority to allow
-  // static priority defined by operations to override it.
-  albaAction *pointing_action = m_StaticEventRouter->AddAction("PointAndManipulate",-10);
-
   // create positional event router
   albaNEW(m_PositionalEventRouter);
   m_PositionalEventRouter->SetName("PositionalEventRouter");
-  pointing_action->BindInteractor(m_PositionalEventRouter);
   m_PositionalEventRouter->SetListener(this);
+  m_PositionalEventRouter->Initialize();
 
   // create a Mouse device
   // the device is plugged here instead of App::Init() since mouse is plugged 
@@ -122,7 +104,7 @@ albaInteractionManager::albaInteractionManager()
   albaPlugDevice<albaDeviceButtonsPadMouse>("Mouse");
   albaDeviceButtonsPadMouse *mouse_device = (albaDeviceButtonsPadMouse *)m_DeviceManager->AddDevice("albaDeviceButtonsPadMouse",true); // add as persistent device
   assert(mouse_device);
-  pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
+  mouse_device->AddObserver(m_PositionalEventRouter, MCH_INPUT); // the mouse events go to the PER
 }
 
 //------------------------------------------------------------------------------
@@ -134,7 +116,6 @@ albaInteractionManager::~albaInteractionManager()
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   albaDEL(m_DeviceManager);
-  albaDEL(m_StaticEventRouter);
   albaDEL(m_PositionalEventRouter);
 }
 
@@ -180,18 +161,6 @@ albaDeviceButtonsPadMouse *albaInteractionManager::GetMouseDevice()
 }
 
 //------------------------------------------------------------------------------
-albaAction *albaInteractionManager::AddAction(const char *name, float priority)
-{
-  return m_StaticEventRouter->AddAction(name,priority);
-}
-
-//------------------------------------------------------------------------------
-albaAction *albaInteractionManager::GetAction(const char *name)
-{
-  return m_StaticEventRouter->GetAction(name);
-}
-
-//------------------------------------------------------------------------------
 void albaInteractionManager::ViewSelected(albaView *view)
 {
   m_SelectedView = albaViewVTK::SafeDownCast(view);
@@ -213,7 +182,6 @@ void albaInteractionManager::OnDeviceRemoving(albaEventBase *event)
 {
   albaDevice *device=(albaDevice *)event->GetData(); 
   assert(device);
-  m_StaticEventRouter->UnBindDeviceFromAllActions(device);
   // forward event to the GUI
   RemoveDeviceFromTree(device);
 }
@@ -225,23 +193,6 @@ void albaInteractionManager::OnDeviceNameChanged(albaEventBase *event)
   // forward device to the GUI
   UpdateDevice(device);
 }
-//------------------------------------------------------------------------------
-void albaInteractionManager::OnBindDeviceToAction(albaEvent *e)
-{
-  // this event is rosed by albaAction to ask for 
-  // binding of a device to an action. Device is specified by its ID.
-  albaDevice *device=m_DeviceManager->GetDevice(e->GetArg());
-  if (device)
-  {
-    albaAction *action=albaAction::SafeDownCast((albaObject *)e->GetSender());
-    m_StaticEventRouter->BindDeviceToAction(device,action);
-  }
-  else
-  {
-    albaErrorMacro("Bind Restoring Error: unknown device ID!");
-  }
-}
-
 //------------------------------------------------------------------------------
 void albaInteractionManager::OnStartDispatching()
 {
@@ -263,10 +214,6 @@ enum IMANAGER_WIDGET_ID
   ID_ADD_DEVICE,
   ID_REMOVE_DEVICE,
   ID_DEVICE_SETTINGS,
-  ID_DEVICE_BINDINGS,
-  ID_BINDING_LIST,
-  ID_STORE,
-  ID_LOAD,
   ID_OK
 };
 //------------------------------------------------------------------------------
@@ -276,76 +223,12 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
  
   albaID id=event->GetId();
 
-  albaString action_name;
-
   albaEvent *e=albaEvent::SafeDownCast(event);
  
   if (e)
   {
-    if (id==albaAction::DEVICE_BIND)
+    switch(e->GetId())
     {
-      albaEvent *e=albaEvent::SafeDownCast(event);
-      OnBindDeviceToAction(e);
-    }
-    else
-    {
-      switch(e->GetId())
-      {
-        /*
-        case ID_OK:
-		    case wxOK:
-          //m_Dialog->EndModal(wxOK);
-          if(m_Frame) m_Frame->Show(false);
-          return; 
-		    break;
-		    */
-        case ID_STORE:
-        { 
-          //SIL. 4-7-2005: begin
-          std::string result = 
-          albaGetSaveFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Save Interaction Settings");
-          if( result == "") return;
-          m_SettingFileName = result.c_str();
-          //SIL. 4-7-2005: end
-
-          Store(m_SettingFileName);
-        
-          return;
-        }
-        break;
-        case ID_LOAD:
-        {
-          //SIL. 4-7-2005: begin
-          std::string result = 
-          albaGetOpenFile(m_SettingFileName, "Interaction Settings (*.xml)| *.xml", "Load Interaction Settings");
-          if( result == "") return;
-          m_SettingFileName = result.c_str();
-          //SIL. 4-7-2005: end
-
-          Restore(m_SettingFileName);
-          //camera reset here?
-        
-          return;
-        }
-        break;
-        case ID_BINDING_LIST:
-        {
-          assert(m_CurrentDevice);
-          action_name=m_ActionsList->GetItemLabel(m_ActionsList->GetSelection());
-          //action_name=m_ActionsList->GetItemLabel(e->GetArg());
-          //int id=m_ActionsList->FindItemIndex(e->GetArg());
-      
-          if (m_ActionsList->IsItemChecked(m_ActionsList->GetSelection()))
-          {
-            GetSER()->BindDeviceToAction(m_CurrentDevice,action_name);
-          }
-          else
-          {
-            GetSER()->UnBindDeviceFromAction(m_CurrentDevice,action_name);
-          }
-          return;
-        }
-        break;
         case ID_ADD_DEVICE:
         {
           wxString device_name,device_type;
@@ -371,10 +254,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
             {
               wxMessageBox("Cannot remove device: I/O manager error");
             }
-            else
-            {
-              m_StaticEventRouter->UnBindDeviceFromAllActions(m_CurrentDevice);
-            }
           }
           return;
          break;
@@ -384,28 +263,23 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
             // a device has been selected on the devices tree
             if (albaDevice *device = GetDeviceManager()->GetDevice(m_DeviceTree->GetSelectedNode()))
             {
-              // remove the GUI and Bindings-GUI for the previous seleced device (if any)
+              // remove the GUI of the previous selected device (if any)
               if(m_CurrentDevice)
               {
                 albaGUI *previous_gui = m_CurrentDevice->GetGui();
                 m_Gui->Remove(previous_gui);
-                m_Gui->Remove(m_Bindings);
               }
               // Set the current device
               m_CurrentDevice = device;
               m_CurrentDevice->UpdateGui();
 
-              // Insert the current device GUI and append the m_Bindings Gui
+              // Insert the current device GUI
               albaGUI *gui = m_CurrentDevice->GetGui();
               assert(gui);
               
               m_Gui->AddGui(gui,0,0);
-              m_Gui->AddGui(m_Bindings,0,0);
               m_Gui->FitGui(); // update the size of m_Gui
               m_Gui->GetParent()->FitInside(); // update the (albaGUIHolder) ScrollBar settings
-              
-              //Update Bindings panel
-              UpdateBindings();
             }
             else
             {
@@ -426,7 +300,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
             albaEventMacro(*e);
           }
       break; 
-      }
     }
     return;
   }
@@ -455,64 +328,6 @@ void albaInteractionManager::OnEvent(albaEventBase *event)
   {
     InvokeEvent(event);
   }
-}
-
-//------------------------------------------------------------------------------
-int albaInteractionManager::Store(const char *filename)
-{
-  assert(filename);
-  albaXMLStorage writer;
-  
-  // Multimod Interaction Settings file format
-  writer.SetFileType("MIS");
-  writer.SetVersion(MIS_VERSION);
-
-  writer.SetURL(filename);
-  writer.SetDocument(this);
-
-  return writer.Store();
-}
-
-//------------------------------------------------------------------------------
-int albaInteractionManager::Restore(const char *filename)
-{
-  assert(filename);
-  albaXMLStorage reader;
-
-  // Multimod Interaction Settings file format
-  reader.SetFileType("MIS");
-  reader.SetVersion(MIS_VERSION);
-
-  reader.SetURL(filename);
-  reader.SetDocument(this);
-
-  return reader.Restore();
-}
-
-//------------------------------------------------------------------------------
-int albaInteractionManager::InternalStore(albaStorageElement *node)
-{
-  // store device settings
-  if (node->StoreObject("DeviceManager",m_DeviceManager)==NULL)
-    return ALBA_ERROR;
-  
-  // store bindings
-  if (node->StoreObject("DeviceBindings",m_StaticEventRouter)==NULL)
-    return ALBA_ERROR;
-  
-  return ALBA_OK;
-}
-
-//------------------------------------------------------------------------------
-int albaInteractionManager::InternalRestore(albaStorageElement *node)
-{
-  if (node->RestoreObject("DeviceManager",m_DeviceManager)!=ALBA_OK)
-    return ALBA_ERROR;
-  
-  if (node->RestoreObject("DeviceBindings",m_StaticEventRouter)!=ALBA_OK)
-    return ALBA_ERROR;
-  
-  return ALBA_OK;
 }
 
 //----------------------------------------------------------------------------
@@ -556,33 +371,6 @@ int albaInteractionManager::DeviceChooser(wxString &dev_name,wxString &dev_type)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractionManager::UpdateBindings()
-{
-  if (m_CurrentDevice)
-  {
-    /* Fill in actions' list */
-    m_ActionsList->Clear();
-    
-    const albaStaticEventRouter::mmuActionsMap *actions=GetSER()->GetActions();
-
-    int i=0;
-    for (albaStaticEventRouter::mmuActionsMap::const_iterator it=actions->begin();it!=actions->end();it++)
-    {
-      albaAction *action = it->second;
-      bool found=false;
-
-      // search through the list
-      for (albaAction::mmuDeviceList::const_iterator it_list=action->GetDevices()->begin();it_list!=action->GetDevices()->end();it_list++)
-      {
-        if (it_list->GetPointer() == m_CurrentDevice)
-          found = true;
-      }
-      m_ActionsList->AddItem(i++,action->GetName(),found);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
 void albaInteractionManager::AddDeviceToTree(albaDevice *device,albaDeviceSet *parent)
 {
   assert(device);
@@ -614,19 +402,10 @@ void albaInteractionManager::CreateGUI()
 
   m_Gui->Button(ID_ADD_DEVICE,"Add Device");
   m_Gui->Button(ID_REMOVE_DEVICE,"Remove Device");
-  m_Gui->Button(ID_LOAD,"Load");
-  m_Gui->Button(ID_STORE,"Save as");
   m_Gui->Label("installed devices");
   m_Gui->Add(m_DeviceTree,0,0);
   m_Gui->Label("selected device options");
   m_Gui->Divider();
-
-  m_Bindings = new albaGUI(this); // bindings will be added to m_Gui later (at the device selection)
-  m_Bindings->Divider(1);
-  m_Bindings->Label("actions associated to this device",false);
-  m_ActionsList = m_Bindings->CheckList(ID_BINDING_LIST,"",60);
-  m_ActionsList->SetSize(250,100);
-  m_ActionsList->SetMinSize(wxSize(250,100));
 } 
 
 //----------------------------------------------------------------------------

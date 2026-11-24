@@ -8,7 +8,6 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  albaAction.cpp  							albaAction.h
   albaAgent.cpp  							albaAgent.h
   albaAgentEventHandler.cpp  				albaAgentEventHandler.h
   albaAgentEventQueue.cpp  					albaAgentEventQueue.h
@@ -66,7 +65,6 @@ SET(PROJECT_SRCS
   albaBehaviorTransform.cpp  			albaBehaviorTransform.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
   albaBehaviorPicker.cpp  					albaBehaviorPicker.h
-  albaStaticEventRouter.cpp  									albaStaticEventRouter.h  ######################
   albaToolPicker.cpp  						albaToolPicker.h
   albaToolFlyTo.cpp  						albaToolFlyTo.h
   albaToolSelect.cpp  						albaToolSelect.h
