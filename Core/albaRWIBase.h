@@ -171,7 +171,7 @@ public:
   virtual void OnSize(wxSizeEvent &event);
 	/** Do nothing. */
 	virtual void OnIdle(wxIdleEvent& event);
-	/** Manage Mouse Capture Lost*/
+	/** Send the button up of each button still pressed, so that the interaction started by them ends. */
 	virtual void OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt));
 
   /** Redefined to set the m_CustomInteractorStyle flag. */
@@ -202,7 +202,11 @@ protected:
 
   int m_LastX;
   int m_LastY;
-  
+
+  bool m_LeftDown;   ///< buttons pressed: released when the mouse capture is lost
+  bool m_MiddleDown;
+  bool m_RightDown;
+
 	DECLARE_EVENT_TABLE()
 };
 #endif

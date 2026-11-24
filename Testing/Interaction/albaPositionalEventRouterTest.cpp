@@ -137,6 +137,31 @@ public:
 albaCxxTypeMacro(albaPERTestTool);
 
 //----------------------------------------------------------------------------
+class albaPERTestModalTool : public albaPERTestTool // the button down receives the button up, as when it opens a modal dialog
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaPERTestModalTool, albaPERTestTool);
+
+  albaPERTestModalTool() {m_PER = NULL; m_Mouse = NULL; m_UseLeft = true;};
+
+  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+  {
+    m_LeftDown++;
+    albaEventInteraction up(m_Mouse, DEVICE_BUTTON_UP);
+    up.SetButton(ALBA_LEFT_BUTTON);
+    up.SetChannel(MCH_INPUT);
+    m_PER->OnEvent(&up);
+    return m_UseLeft;
+  };
+
+  albaPositionalEventRouter *m_PER;
+  albaDeviceButtonsPadMouse *m_Mouse;
+};
+
+albaCxxTypeMacro(albaPERTestModalTool);
+
+//----------------------------------------------------------------------------
 class albaPERTestBehavior : public albaInteractionBehavior // records the calls of the PER
 //----------------------------------------------------------------------------
 {
@@ -742,5 +767,39 @@ void albaPositionalEventRouterTest::TestOneInteractionAtATime()
   per->Delete();
   albaDEL(tool);
   other->Delete();
+  mouse->Delete();
+}
+
+void albaPositionalEventRouterTest::TestButtonUpDuringButtonDown()
+{
+  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
+  albaPERTestModalTool *tool;
+  albaNEW(tool);
+  tool->m_PER = per;
+  tool->m_Mouse = mouse;
+  per->PushTool(tool);
+
+  // the button up arrives while the tool handles the button down: the interaction ends there,
+  // and neither the tool nor the camera keep interacting; the tool is not the handler yet, so it does not get the up
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
+  CPPUNIT_ASSERT(tool->m_LeftDown == 1 && tool->m_LeftUp == 0);
+  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+  CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == NULL);
+  CPPUNIT_ASSERT(per->GetCameraTool()->GetInteractingTool(mouse) == NULL);
+
+  // the next moves are moves without buttons, not drags
+  SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
+  CPPUNIT_ASSERT(tool->m_Move == 1 && tool->m_Drag == 0);
+
+  // a new button down starts a new interaction
+  per->PopTool(tool);
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
+  CPPUNIT_ASSERT(per->IsInteracting(mouse));
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
+  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+
+  per->Delete();
+  albaDEL(tool);
   mouse->Delete();
 }

@@ -58,6 +58,7 @@ public:
   CPPUNIT_TEST( Test2DMeasurePerspectiveView );
   CPPUNIT_TEST( TestEllipseCtrlRotates );
   CPPUNIT_TEST( TestModifierKeysReachAllTools );
+  CPPUNIT_TEST( TestCaptureLostReleasesButtons );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -76,6 +77,7 @@ protected:
   void Test2DMeasurePerspectiveView();
   void TestEllipseCtrlRotates();
   void TestModifierKeysReachAllTools();
+  void TestCaptureLostReleasesButtons();
 
   /** Send a mouse event to the mouse device as the render window interactor does */
   void SendMouse(albaID id, double x, double y, int button = 0, int modifier = -1, int modifier2 = -1);

@@ -245,7 +245,10 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
     m_Handler->OnLeftButtonDown(view, ren, pos);
   }
 
-  // the camera gets the button too and moves with the drags the handler does not use
+  // the camera gets the button too and moves with the drags the handler does not use,
+  // unless the interaction already ended while the handler had the button down
+  if (m_Device == NULL)
+    return;
   if (!m_HandlerIsBehavior && m_CameraTool->OnLeftButtonDown(view, ren, pos))
     TraceHandler("Camera", m_CameraTool->GetMouseTool());
 }
@@ -290,7 +293,10 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaEventInteraction *e)
     m_Handler->OnMiddleButtonDown(view, ren, pos);
   }
 
-  // the camera gets the button too and moves with the drags the handler does not use
+  // the camera gets the button too and moves with the drags the handler does not use,
+  // unless the interaction already ended while the handler had the button down
+  if (m_Device == NULL)
+    return;
   if (!m_HandlerIsBehavior && m_CameraTool->OnMiddleButtonDown(view, ren, pos))
     TraceHandler("Camera", m_CameraTool->GetMouseTool());
 }
@@ -335,7 +341,10 @@ void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
     m_Handler->OnRightButtonDown(view, ren, pos);
   }
 
-  // the camera gets the button too and moves with the drags the handler does not use
+  // the camera gets the button too and moves with the drags the handler does not use,
+  // unless the interaction already ended while the handler had the button down
+  if (m_Device == NULL)
+    return;
   if (!m_HandlerIsBehavior && m_CameraTool->OnRightButtonDown(view, ren, pos))
     TraceHandler("Camera", m_CameraTool->GetMouseTool());
 }
@@ -442,7 +451,10 @@ void albaPositionalEventRouter::OnTrackerButtonDown(albaEventInteraction *e)
     m_Handler->OnTrackerButtonDown(tracker, button, pose);
   }
 
-  // the camera gets the button too and moves with the drags the handler does not use
+  // the camera gets the button too and moves with the drags the handler does not use,
+  // unless the interaction already ended while the handler had the button down
+  if (m_Device == NULL)
+    return;
   if (!m_HandlerIsBehavior && m_CameraTool->OnTrackerButtonDown(tracker, button, pose))
     TraceHandler("Camera", m_CameraTool->GetTrackerTool());
 }
@@ -595,6 +607,10 @@ void albaPositionalEventRouter::EndInteraction(int button)
 //------------------------------------------------------------------------------
 void albaPositionalEventRouter::SetHandler(albaInteractionTool *handler, bool isBehavior)
 {
+  // the interaction already ended while the handler had the button down, e.g. a modal dialog took the mouse capture
+  if (m_Device == NULL)
+    return;
+
   TraceHandler(isBehavior ? "Behavior" : "Tool", handler);
 
   // a tool that popped itself while handling the button does not interact

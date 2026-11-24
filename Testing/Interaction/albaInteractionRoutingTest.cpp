@@ -641,3 +641,38 @@ void albaInteractionRoutingTest::TestModifierKeysReachAllTools()
   albaDEL(top);
   albaDEL(bottom);
 }
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::TestCaptureLostReleasesButtons()
+{
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
+  m_Mouse->AddObserver(per, MCH_INPUT);
+  m_Rwi->SetMouse(m_Mouse);
+  m_Rwi->vtkRenderWindowInteractor::Enable();
+  albaToolCameraMouse *mouseTool = per->GetCameraTool()->GetMouseTool();
+
+  // the right button starts the interaction: losing the capture releases it, not the left one
+  wxMouseEvent rightDown(wxEVT_RIGHT_DOWN);
+  m_Rwi->OnRightMouseButtonDown(rightDown);
+  CPPUNIT_ASSERT(per->IsInteracting(m_Mouse) && mouseTool->IsInteracting());
+  wxMouseCaptureLostEvent lost;
+  m_Rwi->OnMouseCaptureLost(lost);
+  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse) && !mouseTool->IsInteracting());
+
+  // with two buttons pressed, both are released and the capture is given back
+  wxMouseEvent leftDown(wxEVT_LEFT_DOWN);
+  m_Rwi->OnLeftMouseButtonDown(leftDown);
+  m_Rwi->OnRightMouseButtonDown(rightDown);
+  CPPUNIT_ASSERT(per->IsInteracting(m_Mouse));
+  m_Rwi->OnMouseCaptureLost(lost);
+  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse) && !mouseTool->IsInteracting());
+  CPPUNIT_ASSERT(wxWindow::GetCapture() != m_Rwi);
+
+  // a capture lost without buttons pressed does nothing
+  m_Rwi->OnMouseCaptureLost(lost);
+  CPPUNIT_ASSERT(!per->IsInteracting(m_Mouse));
+
+  m_Rwi->SetMouse(NULL);
+  m_Mouse->RemoveObserver(per);
+  per->Delete();
+}

@@ -107,6 +107,7 @@ END_EVENT_TABLE()
 albaRWIBase::albaRWIBase() : wxWindow(), vtkRenderWindowInteractor(), m_Timer(this, ID_albaRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
+  m_LeftDown = m_MiddleDown = m_RightDown = false;
 }
 //----------------------------------------------------------------------------
 albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
@@ -135,6 +136,7 @@ albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 
   m_LastX = 0;
   m_LastY = 0;
+  m_LeftDown = m_MiddleDown = m_RightDown = false;
 
   m_CustomInteractorStyle = false;
 }
@@ -309,7 +311,10 @@ void albaRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  CaptureMouse();
+  // the mouse is captured by the first button pressed and released with the last one
+  if (GetCapture() != this)
+    CaptureMouse();
+  m_LeftDown = true;
   NotifyClick(); 
 
   if (m_CustomInteractorStyle)
@@ -340,7 +345,9 @@ void albaRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  CaptureMouse();
+  if (GetCapture() != this)
+    CaptureMouse();
+  m_MiddleDown = true;
   NotifyClick(); 
 
   if (m_CustomInteractorStyle)
@@ -371,7 +378,9 @@ void albaRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  CaptureMouse();
+  if (GetCapture() != this)
+    CaptureMouse();
+  m_RightDown = true;
   NotifyClick(); 
 
   if (m_CustomInteractorStyle)
@@ -400,12 +409,13 @@ void albaRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
 void albaRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  m_LeftDown = false;
+  if (!m_MiddleDown && !m_RightDown && GetCapture() == this)
+    ReleaseMouse();
+
   if (!Enabled) return;
 
   m_StereoFrameGenerate = false;
-
-  if( GetCapture() == this )
-    ReleaseMouse();
   
 	if (m_CustomInteractorStyle)
   {
@@ -433,12 +443,13 @@ void albaRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
 void albaRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  m_MiddleDown = false;
+  if (!m_LeftDown && !m_RightDown && GetCapture() == this)
+    ReleaseMouse();
+
   if (!Enabled) return;
 
   m_StereoFrameGenerate = false;
-
-  if( GetCapture() == this )
-    ReleaseMouse();
 
   if (m_CustomInteractorStyle)
   {
@@ -466,12 +477,13 @@ void albaRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
 void albaRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  m_RightDown = false;
+  if (!m_LeftDown && !m_MiddleDown && GetCapture() == this)
+    ReleaseMouse();
+
   if (!Enabled) return;
 
   m_StereoFrameGenerate = false;
-
-  if( GetCapture() == this )
-    ReleaseMouse();
 
   if (m_CustomInteractorStyle)
   {
@@ -627,10 +639,16 @@ void albaRWIBase::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 void albaRWIBase::OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
 {
-	wxMouseEvent evt = wxMouseEvent();
-	evt.SetX(m_LastX);
-	evt.SetY(m_LastY);
-	OnLeftMouseButtonUp(evt);
+  // alt-tab or a modal dialog during an interaction: the buttons pressed are released at the last position
+  wxMouseEvent up;
+  up.SetX(m_LastX);
+  up.SetY(m_LastY);
+  if (m_LeftDown)
+    OnLeftMouseButtonUp(up);
+  if (m_MiddleDown)
+    OnMiddleMouseButtonUp(up);
+  if (m_RightDown)
+    OnRightMouseButtonUp(up);
 }
 
 //----------------------------------------------------------------------------
