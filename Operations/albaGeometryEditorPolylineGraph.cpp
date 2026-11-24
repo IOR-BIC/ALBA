@@ -408,7 +408,7 @@ void albaGeometryEditorPolylineGraph::CreateISA()
 {
 	m_OldBehavior = m_InputVME->GetBehavior();
 
-	m_Picker = albaBehaviorPicker::New();
+	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
 
 	m_InputVME->SetBehavior(m_Picker);

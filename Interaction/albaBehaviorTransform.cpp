@@ -231,8 +231,9 @@ bool albaBehaviorTransform::StartTransform(int button, albaView *view, vtkRender
 
   // the VME has been picked by the PER, which set the prop and the picked position
   SetButtonDownPick(true, m_PickedPosition);
-  OnButtonDownAction(m_LastDragPos[0], m_LastDragPos[1]);
+  // set before the button down is sent: a listener reacting to it can already stop the transform
   m_TransformButton = button;
+  OnButtonDownAction(m_LastDragPos[0], m_LastDragPos[1]);
   return true;
 }
 

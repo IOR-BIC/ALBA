@@ -125,7 +125,7 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
   // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = albaBehaviorTransform::New();
+  albaNEW(m_IsaGen);
 
   //isa will send events to this
 	if(m_ConstraintModality==BOUNDS)
@@ -178,6 +178,8 @@ albaGizmoHandle::~albaGizmoHandle()
 
   vtkDEL(m_PlaneSource);
 	
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  m_IsaGen->SetListener(NULL);
   albaDEL(m_IsaGen);
 
   GetLogicManager()->VmeRemove(m_BoxGizmo); //m_BoxGizmo is released

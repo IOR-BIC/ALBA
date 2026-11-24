@@ -42,6 +42,8 @@ class albaPositionalEventRouterTest : public albaTest
   CPPUNIT_TEST(TestToolGivesDragToCamera);
   CPPUNIT_TEST(TestOneInteractionAtATime);
   CPPUNIT_TEST(TestButtonUpDuringButtonDown);
+  CPPUNIT_TEST(TestBehaviorDeletedDuringInteraction);
+  CPPUNIT_TEST(TestTransformStoppedAtButtonDown);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -65,6 +67,8 @@ class albaPositionalEventRouterTest : public albaTest
   void TestToolGivesDragToCamera();
   void TestOneInteractionAtATime();
   void TestButtonUpDuringButtonDown();
+  void TestBehaviorDeletedDuringInteraction();
+  void TestTransformStoppedAtButtonDown();
 
 };
 

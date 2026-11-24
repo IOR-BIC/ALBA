@@ -62,6 +62,8 @@ albaPositionalEventRouter::~albaPositionalEventRouter()
 {
   while (!m_Tools.empty())
     PopTool(m_Tools.back());
+  if (m_Handler)
+    m_Handler->UnRegister(this);
 
   m_CameraTool->Delete();
   m_SelectTool->Delete();
@@ -96,7 +98,10 @@ void albaPositionalEventRouter::PopTool(albaInteractionTool *tool)
 
   // the interaction of the tool goes on with the camera only, until the button is released
   if (m_Handler == tool)
+  {
+    m_Handler->UnRegister(this);
     m_Handler = NULL;
+  }
 
   tool->OnPop();
   tool->UnRegister(this);
@@ -598,6 +603,8 @@ void albaPositionalEventRouter::EndInteraction(int button)
   if (button != m_Button)
     return;
 
+  if (m_Handler)
+    m_Handler->UnRegister(this);
   m_Device = NULL;
   m_Button = -1;
   m_Handler = NULL;
@@ -616,6 +623,8 @@ void albaPositionalEventRouter::SetHandler(albaInteractionTool *handler, bool is
   // a tool that popped itself while handling the button does not interact
   if (isBehavior || std::find(m_Tools.begin(), m_Tools.end(), handler) != m_Tools.end())
   {
+    // the handler is kept alive until the end of the interaction: an operation or a gizmo can delete it meanwhile
+    handler->Register(this);
     m_Handler = handler;
     m_HandlerIsBehavior = isBehavior;
   }

@@ -38,6 +38,7 @@
 #include "albaToolCamera.h"
 #include "albaToolSelect.h"
 #include "vtkCamera.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 class albaFakePickView : public albaView // view counting the picking performed on it
@@ -160,6 +161,28 @@ public:
 };
 
 albaCxxTypeMacro(albaPERTestModalTool);
+
+//----------------------------------------------------------------------------
+class albaPERTestStoppingListener : public albaObserver // releases the button as soon as the transform starts
+//----------------------------------------------------------------------------
+{
+public:
+  albaPERTestStoppingListener() {m_Transform = NULL; m_MouseUpCount = 0;};
+  virtual void OnEvent(albaEventBase *event)
+  {
+    albaEvent *e = albaEvent::SafeDownCast(event);
+    if (e == NULL || e->GetId() != ID_TRANSFORM)
+      return;
+    double pos[2] = {10, 20};
+    if (e->GetArg() == albaBehaviorTransform::MOUSE_ACTION_DOWN)
+      m_Transform->OnLeftButtonUp(NULL, NULL, pos);
+    else if (e->GetArg() == albaBehaviorTransform::MOUSE_ACTION_UP)
+      m_MouseUpCount++;
+  };
+
+  albaBehaviorTransform *m_Transform;
+  int m_MouseUpCount;
+};
 
 //----------------------------------------------------------------------------
 class albaPERTestBehavior : public albaInteractionBehavior // records the calls of the PER
@@ -330,7 +353,8 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
   SelectView(mouse, view);
 
   // the picked VME has a behavior, like gizmos
-  albaPERTestBehavior *behavior = albaPERTestBehavior::New();
+  albaPERTestBehavior *behavior;
+  albaNEW(behavior);
   albaVMESurface *vme = albaVMESurface::New();
   vme->SetBehavior(behavior);
   view->m_FakeVme = vme;
@@ -380,7 +404,7 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
   per->Delete();
   vme->SetBehavior(NULL);
   vme->Delete();
-  behavior->Delete();
+  albaDEL(behavior);
   mouse->Delete();
   delete view;
 }
@@ -445,7 +469,8 @@ void albaPositionalEventRouterTest::TestEventTracing()
   mouse->SetName("TestMouse");
   SelectView(mouse, view);
 
-  albaPERTestBehavior *behavior = albaPERTestBehavior::New();
+  albaPERTestBehavior *behavior;
+  albaNEW(behavior);
   albaVMESurface *vme = albaVMESurface::New();
   vme->SetBehavior(behavior);
   view->m_FakeVme = vme;
@@ -494,7 +519,7 @@ void albaPositionalEventRouterTest::TestEventTracing()
   per->Delete();
   vme->SetBehavior(NULL);
   vme->Delete();
-  behavior->Delete();
+  albaDEL(behavior);
   mouse->Delete();
   delete view;
 }
@@ -655,7 +680,8 @@ void albaPositionalEventRouterTest::TestBehaviorBeforeTools()
   SelectView(mouse, view);
 
   // the picked VME has a behavior, like gizmos
-  albaPERTestBehavior *behavior = albaPERTestBehavior::New();
+  albaPERTestBehavior *behavior;
+  albaNEW(behavior);
   albaVMESurface *vme = albaVMESurface::New();
   vme->SetBehavior(behavior);
   view->m_FakeVme = vme;
@@ -686,7 +712,7 @@ void albaPositionalEventRouterTest::TestBehaviorBeforeTools()
   albaDEL(tool);
   vme->SetBehavior(NULL);
   vme->Delete();
-  behavior->Delete();
+  albaDEL(behavior);
   mouse->Delete();
   delete view;
 }
@@ -802,4 +828,60 @@ void albaPositionalEventRouterTest::TestButtonUpDuringButtonDown()
   per->Delete();
   albaDEL(tool);
   mouse->Delete();
+}
+
+void albaPositionalEventRouterTest::TestBehaviorDeletedDuringInteraction()
+{
+  albaFakePickView *view = new albaFakePickView();
+  albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  SelectView(mouse, view);
+  albaPERTestBehavior *behavior;
+  albaNEW(behavior);
+  albaVMESurface *vme = albaVMESurface::New();
+  vme->SetBehavior(behavior);
+  view->m_FakeVme = vme;
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
+
+  // the PER keeps the interacting behavior alive
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
+  CPPUNIT_ASSERT(per->GetInteractingTool(mouse) == behavior);
+  CPPUNIT_ASSERT(behavior->GetReferenceCount() == 2);
+
+  // its owner deletes it during the interaction, e.g. closing the operation: drags and button up still reach it
+  view->m_FakeVme = NULL;
+  vme->SetBehavior(NULL);
+  behavior->Delete(); // the pointer is still used below: the PER keeps the object alive
+  SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
+  CPPUNIT_ASSERT(behavior->m_Drag == 1);
+  CPPUNIT_ASSERT(behavior->m_Interacting);
+
+  // the button up ends the interaction and deletes it
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
+  CPPUNIT_ASSERT(!per->IsInteracting(mouse));
+
+  per->Delete();
+  vme->Delete();
+  mouse->Delete();
+  delete view;
+}
+
+void albaPositionalEventRouterTest::TestTransformStoppedAtButtonDown()
+{
+  vtkRenderer *ren = vtkRenderer::New();
+  albaBehaviorTransform *transform = albaBehaviorTransform::New();
+  albaPERTestStoppingListener listener;
+  listener.m_Transform = transform;
+  transform->SetListener(&listener);
+  double pos[2] = {10, 20};
+
+  // the listener releases the button when it gets the button down: the transform stops there
+  CPPUNIT_ASSERT(transform->OnLeftButtonDown(NULL, ren, pos));
+  CPPUNIT_ASSERT(listener.m_MouseUpCount == 1);
+  CPPUNIT_ASSERT(!transform->OnDrag(NULL, ren, pos));
+  CPPUNIT_ASSERT(!transform->OnLeftButtonUp(NULL, ren, pos));
+  CPPUNIT_ASSERT(listener.m_MouseUpCount == 1);
+
+  transform->SetListener(NULL);
+  transform->Delete();
+  ren->Delete();
 }

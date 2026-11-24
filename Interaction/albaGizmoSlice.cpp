@@ -135,6 +135,8 @@ void albaGizmoSlice::DestroyGizmoSlice()
 {
   albaDEL(m_GizmoHandleCenterMatrix);
   m_VmeGizmo->SetBehavior(NULL);
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  m_MouseBH->SetListener(NULL);
   albaDEL(m_MouseBH);
 
   m_VmeGizmo->ReparentTo(NULL);
