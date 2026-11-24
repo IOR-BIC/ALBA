@@ -106,11 +106,6 @@ public:
   /** Called to update all components that depends on Application Options.*/
   virtual void      OptionsUpdate()                                         {};
 
-  /** 
-  Find the pocked VME at button down. As argument the function needs
-  the device which performed the action, and provides as result pointers
-  to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having albaView::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph

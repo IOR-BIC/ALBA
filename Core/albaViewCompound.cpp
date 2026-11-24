@@ -222,16 +222,6 @@ albaPipe *albaViewCompound::GetNodePipe(albaVME *vme)
 }
 
 //----------------------------------------------------------------------------
-bool albaViewCompound::FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
-//----------------------------------------------------------------------------
-{
-  albaViewVTK *v = albaViewVTK::SafeDownCast(GetSubView());
-  if (v)
-    return v->FindPokedVme(device,point_pose,picked_vme,picked_behavior);
-  else
-    return false;
-}
-//----------------------------------------------------------------------------
 void albaViewCompound::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {

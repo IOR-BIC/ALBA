@@ -107,8 +107,8 @@ protected:
   /** The wheel goes to the tools and, if no tool uses it and no button is pressed, to the camera */
   void OnMouseWheel(albaEventInteraction *e);
 
-  /** Pick the scene at the button down: the select tool and the behavior of the picked VME get the picking; return the behavior, NULL if none */
-  albaInteractionBehavior *PickBehavior(albaEventInteraction *e);
+  /** Pick the view at the position of the button down: the select tool and the behavior of the picked VME get the picking; return the behavior, NULL if none */
+  albaInteractionBehavior *PickBehavior(albaView *view, double pos[2]);
 
   /** Start the interaction of the device with the button, still without handler */
   void BeginInteraction(albaDevice *device, int button);

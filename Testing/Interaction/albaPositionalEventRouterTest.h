@@ -30,7 +30,7 @@ class albaPositionalEventRouterTest : public albaTest
   CPPUNIT_TEST(TestIsInteracting);
   CPPUNIT_TEST(TestOnEvent);
   CPPUNIT_TEST(TestGetCameraTool);
-  CPPUNIT_TEST(TestEventPickCache);
+  CPPUNIT_TEST(TestButtonDownPicksAtPosition);
   CPPUNIT_TEST(TestButtonDownPicksOnce);
   CPPUNIT_TEST(TestGenericMouseUsesButtonDownPick);
   CPPUNIT_TEST(TestTransformBehaviorButtons);
@@ -55,7 +55,7 @@ class albaPositionalEventRouterTest : public albaTest
   void TestIsInteracting();
   void TestOnEvent();
   void TestGetCameraTool();
-  void TestEventPickCache();
+  void TestButtonDownPicksAtPosition();
   void TestButtonDownPicksOnce();
   void TestGenericMouseUsesButtonDownPick();
   void TestTransformBehaviorButtons();

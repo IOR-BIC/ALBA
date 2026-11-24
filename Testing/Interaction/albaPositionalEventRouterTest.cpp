@@ -57,15 +57,6 @@ public:
 
   virtual void SetBackgroundColor(wxColor color) {};
 
-  virtual bool FindPokedVme(albaDevice *device, albaMatrix &point_pose, albaVME *&picked_vme, albaInteractionBehavior *&picked_behavior)
-  {
-    if (!Pick((int)point_pose.GetElement(0,3), (int)point_pose.GetElement(1,3)))
-      return false;
-    picked_vme = m_PickedVME;
-    picked_behavior = m_PickedVME->GetBehavior();
-    return true;
-  };
-
   virtual bool Pick(int x, int y)
   {
     m_PickCount++;
@@ -289,61 +280,39 @@ void albaPositionalEventRouterTest::TestGetCameraTool()
   mip->Delete();
 }
 
-void albaPositionalEventRouterTest::TestEventPickCache()
+void albaPositionalEventRouterTest::TestButtonDownPicksAtPosition()
 {
   albaFakePickView *view = new albaFakePickView();
-  albaFakePickView *otherView = new albaFakePickView();
   albaDeviceButtonsPadMouse *mouse = albaDeviceButtonsPadMouse::New();
+  SelectView(mouse, view);
   albaVMESurface *vme = albaVMESurface::New();
   view->m_FakeVme = vme;
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
 
-  albaEventInteraction e(mouse, DEVICE_BUTTON_DOWN);
-  e.Set2DPosition(10, 20);
-
-  albaVME *pickedVme = NULL;
-  albaInteractionBehavior *pickedBehavior = NULL;
-  double pickedPos[3];
-
-  // first request: the view picks at the event position
-  CPPUNIT_ASSERT(e.FindPokedVme(view, mouse, pickedVme, pickedBehavior));
-  CPPUNIT_ASSERT(pickedVme == vme);
+  // the button down picks the view at its position, and the select tool gets the picking
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN, ALBA_RIGHT_BUTTON);
   CPPUNIT_ASSERT(view->m_PickCount == 1);
   CPPUNIT_ASSERT(view->m_LastPickX == 10 && view->m_LastPickY == 20);
-  e.GetPickedPosition(pickedPos);
-  CPPUNIT_ASSERT(pickedPos[0] == 1.0 && pickedPos[1] == 2.0 && pickedPos[2] == 3.0);
+  CPPUNIT_ASSERT(per->GetSelectTool()->GetPickedVME() == vme);
 
-  // next requests reuse the cached picking
-  pickedVme = NULL;
-  CPPUNIT_ASSERT(e.FindPokedVme(view, mouse, pickedVme, pickedBehavior));
-  CPPUNIT_ASSERT(pickedVme == vme);
+  // the drags, the button up and the wheel do not pick
+  SendToPER(per, mouse, DEVICE_MOUSE_2D_MOVE);
+  SendToPER(per, mouse, DEVICE_BUTTON_UP, ALBA_RIGHT_BUTTON);
+  SendToPER(per, mouse, DEVICE_MOUSE_WHEEL);
   CPPUNIT_ASSERT(view->m_PickCount == 1);
 
-  // changing the position, resetting or using another view picks again
-  e.Set2DPosition(30, 40);
-  e.FindPokedVme(view, mouse, pickedVme, pickedBehavior);
+  // nothing picked: the select tool gets no VME
+  view->m_FakeVme = NULL;
+  SendToPER(per, mouse, DEVICE_BUTTON_DOWN);
+  SendToPER(per, mouse, DEVICE_BUTTON_UP);
   CPPUNIT_ASSERT(view->m_PickCount == 2);
-  CPPUNIT_ASSERT(view->m_LastPickX == 30 && view->m_LastPickY == 40);
+  CPPUNIT_ASSERT(per->GetSelectTool()->GetPickedVME() == NULL);
 
-  e.ResetPick();
-  e.FindPokedVme(view, mouse, pickedVme, pickedBehavior);
-  CPPUNIT_ASSERT(view->m_PickCount == 3);
-
-  CPPUNIT_ASSERT(!e.FindPokedVme(otherView, mouse, pickedVme, pickedBehavior));
-  CPPUNIT_ASSERT(pickedVme == NULL);
-  CPPUNIT_ASSERT(otherView->m_PickCount == 1);
-
-  // the cached picking is not copied
-  albaEventInteraction copy;
-  copy.DeepCopy(&e);
-  copy.FindPokedVme(view, mouse, pickedVme, pickedBehavior);
-  CPPUNIT_ASSERT(view->m_PickCount == 4);
-
+  per->Delete();
   vme->Delete();
   mouse->Delete();
-  delete otherView;
   delete view;
 }
-
 void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
 {
   albaFakePickView *view = new albaFakePickView();
@@ -387,7 +356,6 @@ void albaPositionalEventRouterTest::TestButtonDownPicksOnce()
 
   // a button the behavior does not use goes to the camera, and the drags do not reach the behavior
   behavior->m_UseLeft = false;
-  down.ResetPick();
   per->OnEvent(&down);
   CPPUNIT_ASSERT(per->IsInteracting(mouse) && per->GetInteractingTool(mouse) == NULL);
   CPPUNIT_ASSERT(per->GetCameraTool()->IsInteracting());
@@ -486,7 +454,6 @@ void albaPositionalEventRouterTest::TestEventTracing()
 
   // the button down selects the picked VME and starts its behavior
   per->SetEventTracing(true);
-  down.ResetPick();
   per->OnEvent(&down);
   std::string trace = per->GetLastEventTrace();
   CPPUNIT_ASSERT(trace.find("device=TestMouse") != std::string::npos);

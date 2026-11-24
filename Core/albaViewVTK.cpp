@@ -367,27 +367,6 @@ void albaViewVTK::SetWindowSize(int w, int h)
 	GetRenderWindow()->SetSize(w,h);
 }
 //----------------------------------------------------------------------------
-bool albaViewVTK::FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior)
-{
-  albaDeviceButtonsPadMouse   *mouse   = albaDeviceButtonsPadMouse::SafeDownCast(device);
-  int mouse_pos[2];
-  bool picked_something = false;
-
-  if (mouse)
-  { 
-    mouse_pos[1] = (int)point_pose.GetElement(1,3);
-    mouse_pos[0] = (int)point_pose.GetElement(0,3);
-    picked_something = Pick(mouse_pos[0], mouse_pos[1]);
-  }
-  if(picked_something)
-  {
-    picked_vme = GetPickedVme();
-    picked_behavior = picked_vme->GetBehavior();
-    return true;
-  }
-  return false;
-}
-//----------------------------------------------------------------------------
 bool albaViewVTK::Pick(int x, int y)
 {
   vtkRendererCollection *rc = m_Rwi->m_RwiBase->GetRenderWindow()->GetRenderers();

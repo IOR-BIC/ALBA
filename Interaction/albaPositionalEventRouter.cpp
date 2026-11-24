@@ -212,7 +212,7 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaEventInteraction *e)
   {
     // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
     BeginInteraction(device, ALBA_LEFT_BUTTON);
-    albaInteractionBehavior *behavior = PickBehavior(e);
+    albaInteractionBehavior *behavior = PickBehavior(view, pos);
 
     // a tool can push or pop tools while handling an event: iterate on a copy
     albaInteractionTool *tool = NULL;
@@ -260,7 +260,7 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaEventInteraction *e)
   {
     // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
     BeginInteraction(device, ALBA_MIDDLE_BUTTON);
-    albaInteractionBehavior *behavior = PickBehavior(e);
+    albaInteractionBehavior *behavior = PickBehavior(view, pos);
 
     // a tool can push or pop tools while handling an event: iterate on a copy
     albaInteractionTool *tool = NULL;
@@ -308,7 +308,7 @@ void albaPositionalEventRouter::OnRightButtonDown(albaEventInteraction *e)
   {
     // a new interaction: the behavior of the picked VME, or the tools of the stack from the top
     BeginInteraction(device, ALBA_RIGHT_BUTTON);
-    albaInteractionBehavior *behavior = PickBehavior(e);
+    albaInteractionBehavior *behavior = PickBehavior(view, pos);
 
     // a tool can push or pop tools while handling an event: iterate on a copy
     albaInteractionTool *tool = NULL;
@@ -470,17 +470,19 @@ void albaPositionalEventRouter::OnMouseWheel(albaEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-albaInteractionBehavior *albaPositionalEventRouter::PickBehavior(albaEventInteraction *e)
+albaInteractionBehavior *albaPositionalEventRouter::PickBehavior(albaView *view, double pos[2])
 {
-  albaDevice *device = (albaDevice *)e->GetSender();
-  albaView *view = device->GetView();
   albaVME *pickedVme = NULL;
   albaInteractionBehavior *behavior = NULL;
   double pickedPos[3] = {0, 0, 0};
 
-  // the picking is cached into the event
-  if (view && e->FindPokedVme(view, device, pickedVme, behavior))
-    e->GetPickedPosition(pickedPos);
+  // the view picks at the position of the button down
+  if (view && view->Pick((int)pos[0], (int)pos[1]))
+  {
+    pickedVme = view->GetPickedVme();
+    view->GetPickedPosition(pickedPos);
+    behavior = pickedVme ? pickedVme->GetBehavior() : NULL;
+  }
 
   // the VME of the behavior is set by its owner: a gizmo behavior can transform another VME
   m_SelectTool->SetPickedVME(pickedVme, pickedPos);
