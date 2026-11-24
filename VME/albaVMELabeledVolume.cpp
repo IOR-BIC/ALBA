@@ -582,7 +582,6 @@ void albaVMELabeledVolume::CreateOpDialog()
   m_Dlg->SetSize(x_pos+5,y_pos+5,w,h); 
 
   m_Rwi = m_Dlg->GetRWI();
-  //m_Rwi->m_RwiBase->SetMouse(m_Mouse);
 
   wxPoint p = wxDefaultPosition;
 

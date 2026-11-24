@@ -31,7 +31,6 @@
 
 class albaVMEGroup;
 class albaGUIImageViewer;
-class albaDeviceButtonsPadMouse;
 
 /**
   Class Name: albaSnapshotManager.
@@ -69,8 +68,6 @@ public:
 	/* Set the snapshots group*/
 	void SetSnapshotGroup(albaVMEGroup* group) { m_SnapshotsGroup = group; };
 
-	/* Set Mouse for imageViewer interaction*/
-	void SetMouse(albaDeviceButtonsPadMouse *mouse);
 
 	/* Return the gui for Settings Dialog*/
 	albaGUI* GetSettingsGui();

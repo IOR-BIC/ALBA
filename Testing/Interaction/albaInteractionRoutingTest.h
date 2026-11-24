@@ -23,7 +23,6 @@
 
 class wxFrame;
 class albaRWIBase;
-class albaDeviceButtonsPadMouse;
 class albaRoutingTestView;
 class albaPositionalEventRouter;
 class albaInteractionTool;
@@ -49,7 +48,6 @@ public:
   CPPUNIT_TEST_SUITE( albaInteractionRoutingTest );
   CPPUNIT_TEST( TestCameraDragAndWheel );
   CPPUNIT_TEST( TestCameraButtons );
-  CPPUNIT_TEST( TestCameraTrackerTool );
   CPPUNIT_TEST( TestPERPickerClick );
   CPPUNIT_TEST( Test2DMeasureAddWithoutModifiers );
   CPPUNIT_TEST( Test2DMeasureModifiersMoveCamera );
@@ -58,6 +56,7 @@ public:
   CPPUNIT_TEST( Test2DMeasurePerspectiveView );
   CPPUNIT_TEST( TestEllipseCtrlRotates );
   CPPUNIT_TEST( TestModifierKeysReachAllTools );
+  CPPUNIT_TEST( TestCaptureLostReleasesButtons );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -67,7 +66,6 @@ protected:
 
   void TestCameraDragAndWheel();
   void TestCameraButtons();
-  void TestCameraTrackerTool();
   void TestPERPickerClick();
   void Test2DMeasureAddWithoutModifiers();
   void Test2DMeasureModifiersMoveCamera();
@@ -76,20 +74,21 @@ protected:
   void Test2DMeasurePerspectiveView();
   void TestEllipseCtrlRotates();
   void TestModifierKeysReachAllTools();
+  void TestCaptureLostReleasesButtons();
 
-  /** Send a mouse event to the mouse device as the render window interactor does */
+  /** Call the method of the mouse event on the registered PER, as the render window interactor does */
   void SendMouse(albaID id, double x, double y, int button = 0, int modifier = -1, int modifier2 = -1);
 
   /** Press a button at (400, 300), drag to (x, y) and release it */
   void Drag(int button, double x, double y, int modifier = -1, int modifier2 = -1);
 
-  /** Send a wheel rotation to the mouse device */
+  /** Send a wheel rotation to the registered PER */
   void SendWheel(double x, double y, double rotation);
 
-  /** Return a PER observing the mouse, with the tool pushed and m_Listener as listener */
+  /** Return a new PER registered in albaServiceLocator, with the tool pushed and m_Listener as listener */
   albaPositionalEventRouter *NewPERWithTool(albaInteractionTool *tool);
 
-  /** Detach the PER from the mouse and delete it */
+  /** Register again the previous PER and delete this one */
   void DeletePER(albaPositionalEventRouter *per);
 
   /** Use a parallel camera and disable the spin, as the 2D views do */
@@ -98,8 +97,8 @@ protected:
   wxFrame                   *m_Frame;
   albaRWIBase               *m_Rwi;
   albaRoutingTestView       *m_View;
-  albaDeviceButtonsPadMouse *m_Mouse;
   albaRoutingTestListener    m_Listener;
+  albaPositionalEventRouter *m_OldPER; ///< the PER registered before the test, restored at its end
 };
 
 #endif

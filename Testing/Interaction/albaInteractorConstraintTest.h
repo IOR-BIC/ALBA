@@ -41,6 +41,7 @@ class albaInteractorConstraintTest : public albaTest
   CPPUNIT_TEST( TestSetGetStep );
   CPPUNIT_TEST( TestSetSnapStep );
   CPPUNIT_TEST( TestSetGetSnapArray );
+  CPPUNIT_TEST( TestCopy );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -61,7 +62,8 @@ class albaInteractorConstraintTest : public albaTest
     void TestSetGetStep();
     void TestSetSnapStep();
     void TestSetGetSnapArray();
-    
+    void TestCopy();
+
 };
 
 #endif

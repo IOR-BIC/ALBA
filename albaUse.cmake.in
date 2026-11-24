@@ -7,6 +7,6 @@ LINK_DIRECTORIES(${ALBA_LIBRARY_DIRS})
 #add external Libs
 SET(PROJECT_LIBS ${PROJECT_LIBS} ${VTK_LIBRARIES} ${GDCM_LIBRARIES} Crypto XercesC GPUAPI curl ${wxWidgets_LIBRARIES})
 #add alba modules
-SET(PROJECT_LIBS ${PROJECT_LIBS} albaCore albaDataPipes albaOperations albaDrivers albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA albaBase albaIO)
+SET(PROJECT_LIBS ${PROJECT_LIBS} albaCore albaDataPipes albaOperations albaGui albaViews albaVME albaVisualPipes albaInteraction albaCommon albaService vtkALBA albaBase albaIO)
  
 SET(ALBA_BUILD_ALBADLL @ALBA_BUILD_ALBADLL@)

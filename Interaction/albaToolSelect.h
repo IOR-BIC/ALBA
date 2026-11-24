@@ -52,7 +52,6 @@ public:
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Select();}
   virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Select();}
   virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
-  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose) {return Select();}
 
   /** A drag cancels the context menu */
   virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);

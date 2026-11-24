@@ -38,10 +38,6 @@ public:
   /** With continuous picking the drags pick and send VME_PICKING */
   virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
 
-  /** The left button of a tracker picks along the tracker pose and sends VME_PICKED */
-  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose);
-  virtual bool OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button) {return button == ALBA_LEFT_BUTTON;}
-
   /** Enable/disable continuous picking in OnEvent. */
   void EnableContinuousPicking(bool enable) {m_ContinuousPickingFlag = enable;};
 
@@ -56,7 +52,7 @@ protected:
 
   /** 
   Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position. */
-  void SendPickingInformation(albaView *v, double *mouse_pos = NULL, int msg_id = VME_PICKED, albaMatrix *tracker_pos = NULL, bool mouse_flag = true);
+  void SendPickingInformation(albaView *v, double mouse_pos[2], int msg_id = VME_PICKED);
   
 private:
   albaBehaviorPicker(const albaBehaviorPicker&);  // Not implemented.

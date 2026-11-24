@@ -21,6 +21,7 @@ PURPOSE. See the above copyright notice for more information.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpAddLandmark.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -196,7 +197,7 @@ void albaOpAddLandmark::OpRun()
 		// Customize m_PickedVme behavior
 		albaNEW(m_LandmarkPicker);
 		m_LandmarkPicker->SetListener(this);
-		GetLogicManager()->PushTool(m_LandmarkPicker);
+		GetPositionalEventRouter()->PushTool(m_LandmarkPicker);
 	}
 
 	// Save old color
@@ -270,7 +271,7 @@ void albaOpAddLandmark::OpStop(int result)
 		OpUndo();
 	}
 
-	GetLogicManager()->PopTool(m_LandmarkPicker);
+	GetPositionalEventRouter()->PopTool(m_LandmarkPicker);
 	albaDEL(m_LandmarkPicker);
 
 	cppDEL(m_LandmarkGuiDict);

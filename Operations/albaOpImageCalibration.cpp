@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 #include "albaDefines.h"
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpImageCalibration.h"
 
 #include "albaDecl.h"
@@ -110,7 +111,7 @@ void albaOpImageCalibration::OpRun()
 
 
 	m_ActiveInteractor = m_DistanceInteractor;
-	GetLogicManager()->PushTool(m_ActiveInteractor);
+	GetPositionalEventRouter()->PushTool(m_ActiveInteractor);
 	m_ActiveInteractor->SetListener(this);
 
 	CreateGui();
@@ -193,9 +194,9 @@ void albaOpImageCalibration::SetActiveInteractor()
 
 	m_ActiveInteractor->Show(false);
 
-	GetLogicManager()->PopTool(m_ActiveInteractor);
+	GetPositionalEventRouter()->PopTool(m_ActiveInteractor);
 	m_ActiveInteractor = nextInteractor;
-	GetLogicManager()->PushTool(m_ActiveInteractor);
+	GetPositionalEventRouter()->PushTool(m_ActiveInteractor);
 	m_ActiveInteractor->SetListener(this);
 	m_ActiveInteractor->Show(true);
 
@@ -277,7 +278,7 @@ void albaOpImageCalibration::OpStop(int result)
 		HideGui();
 
 	if (m_ActiveInteractor != NULL)
-		GetLogicManager()->PopTool(m_ActiveInteractor);
+		GetPositionalEventRouter()->PopTool(m_ActiveInteractor);
 
 	albaDEL(m_DistanceInteractor);
 	albaDEL(m_CenterPointInteractor);

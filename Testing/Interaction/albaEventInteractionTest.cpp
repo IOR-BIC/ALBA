@@ -32,10 +32,6 @@
 void albaEventInteractionTest::TestStaticAllocation()
 //----------------------------------------------------------------------------
 {
-  albaMatrix *mat;
-  albaNEW(mat);
-  mat->SetElement(0,1,2.0);
-
   int check1 = 1 << ID_MODIFIER_1;
   int check2 = 1 << ID_MODIFIER_2;
   int Modifiers;
@@ -51,13 +47,6 @@ void albaEventInteractionTest::TestStaticAllocation()
   CPPUNIT_ASSERT(eventB.GetButton() == ID_BUTTON_RIGHT);
   CPPUNIT_ASSERT(eventB.GetModifiers() == Modifiers);
 
-  albaEventInteraction eventC(NULL, 20, mat ,ID_BUTTON_RIGHT, Modifiers);
-  CPPUNIT_ASSERT(eventC.GetSender() == NULL);
-  CPPUNIT_ASSERT(eventC.GetId() == 20);
-  CPPUNIT_ASSERT(eventC.GetButton() == ID_BUTTON_RIGHT);
-  CPPUNIT_ASSERT(eventC.GetMatrix()->Equals(mat));
-  CPPUNIT_ASSERT(eventC.GetModifiers() == Modifiers);
-
   albaEventInteraction eventD(NULL, 30, 10.,20.,ID_BUTTON_RIGHT,Modifiers);
 
   double Position2d[2];
@@ -69,17 +58,11 @@ void albaEventInteractionTest::TestStaticAllocation()
   CPPUNIT_ASSERT(eventD.GetButton() == ID_BUTTON_RIGHT);
   CPPUNIT_ASSERT(eventD.GetModifiers() == Modifiers);
 
-  
-  albaDEL(mat);
 }
 //----------------------------------------------------------------------------
 void albaEventInteractionTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
-  albaMatrix *mat;
-  albaNEW(mat);
-  mat->SetElement(0,1,2.0);
-
   int check1 = 1 << ID_MODIFIER_1;
   int check2 = 1 << ID_MODIFIER_2;
   int Modifiers;
@@ -95,13 +78,6 @@ void albaEventInteractionTest::TestDynamicAllocation()
   CPPUNIT_ASSERT(eventB->GetButton() == ID_BUTTON_RIGHT);
   CPPUNIT_ASSERT(eventB->GetModifiers() == Modifiers);
 
-  albaEventInteraction *eventC = new albaEventInteraction(NULL, 20, mat ,ID_BUTTON_RIGHT, Modifiers);
-  CPPUNIT_ASSERT(eventC->GetSender() == NULL);
-  CPPUNIT_ASSERT(eventC->GetId() == 20);
-  CPPUNIT_ASSERT(eventC->GetButton() == ID_BUTTON_RIGHT);
-  CPPUNIT_ASSERT(eventC->GetMatrix()->Equals(mat));
-  CPPUNIT_ASSERT(eventC->GetModifiers() == Modifiers);
-
   albaEventInteraction *eventD = new albaEventInteraction(NULL, 30, 10.,20.,ID_BUTTON_RIGHT,Modifiers);
 
   double Position2d[2];
@@ -113,10 +89,8 @@ void albaEventInteractionTest::TestDynamicAllocation()
   CPPUNIT_ASSERT(eventD->GetButton() == ID_BUTTON_RIGHT);
   CPPUNIT_ASSERT(eventD->GetModifiers() == Modifiers);
 
-  albaDEL(mat);
   cppDEL(eventA);
   cppDEL(eventB);
-  cppDEL(eventC);
   cppDEL(eventD);
 }
 //----------------------------------------------------------------------------
@@ -170,21 +144,6 @@ void albaEventInteractionTest::TestSetButton_GetButton()
   cppDEL(eventA);
 }
 //----------------------------------------------------------------------------
-void albaEventInteractionTest::TestSetMatrix_GetMatrix()
-//----------------------------------------------------------------------------
-{
-  albaMatrix *mat;
-  albaNEW(mat);
-  mat->SetElement(0,1,2.0);
-
-  albaEventInteraction *eventA = new albaEventInteraction();
-  eventA->SetMatrix(mat);
-  CPPUNIT_ASSERT(eventA->GetMatrix()->Equals(mat));
-  albaDEL(mat);
-  cppDEL(eventA);
-  
-}
-//----------------------------------------------------------------------------
 void albaEventInteractionTest::TestSetModifier_GetModifier()
 //----------------------------------------------------------------------------
 {
@@ -231,13 +190,9 @@ void albaEventInteractionTest::TestDeepCopy()
 {
   albaEventInteraction *eventA = new albaEventInteraction();
   
-  albaMatrix *mat;
-  albaNEW(mat);
-  mat->SetElement(0,1,2.0);
   eventA->Set2DPosition(10.,20.);
   eventA->SetXYFlag(true);
   eventA->SetButton(ID_BUTTON_RIGHT);
-  eventA->SetMatrix(mat);
   eventA->SetModifier(ID_MODIFIER_1, true);
   eventA->SetModifier(ID_MODIFIER_2, true);
 
@@ -250,10 +205,8 @@ void albaEventInteractionTest::TestDeepCopy()
   CPPUNIT_ASSERT(Position2dA[0] == Position2dB[0] && Position2dA[1] == Position2dB[1]);
   CPPUNIT_ASSERT(eventA->GetXYFlag() == eventB->GetXYFlag());
   CPPUNIT_ASSERT(eventA->GetButton() == eventB->GetButton());
-  CPPUNIT_ASSERT(eventA->GetMatrix()->Equals(eventB->GetMatrix()));
   CPPUNIT_ASSERT(eventA->GetModifiers() == eventB->GetModifiers());
 
-  albaDEL(mat);
   cppDEL(eventB);
   cppDEL(eventA);
 }

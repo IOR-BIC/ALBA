@@ -107,6 +107,9 @@ void albaGizmoInteractionDebugger::Destructor()
   m_AppendPolyData->Delete();
 
   m_VmeGizmo->SetBehavior(NULL);
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  if (m_LeftMouseInteractor)
+    m_LeftMouseInteractor->SetListener(NULL);
   albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmo->ReparentTo(NULL);
@@ -242,6 +245,9 @@ void albaGizmoInteractionDebugger::DestroyVMEGizmo()
   assert(m_VmeGizmo != NULL);
 
   m_VmeGizmo->SetBehavior(NULL);
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  if (m_LeftMouseInteractor)
+    m_LeftMouseInteractor->SetListener(NULL);
   albaDEL(m_LeftMouseInteractor);
 
   m_VmeGizmo->ReparentTo(NULL);

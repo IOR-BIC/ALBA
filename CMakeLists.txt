@@ -177,7 +177,7 @@ IF (ALBA_CAN_BUILD)
   INCLUDE_DIRECTORIES(BEFORE ".")
 
   ###############add all subdirs but "modules"
-  SET(INCLUDE_DIRS "${ALBA_BINARY_DIR}" "${ALBA_SOURCE_DIR}/Base" "${ALBA_SOURCE_DIR}/Common" "${ALBA_BINARY_DIR}/Interaction" "${ALBA_SOURCE_DIR}/Interaction" "${ALBA_SOURCE_DIR}/Interaction/Drivers" 
+  SET(INCLUDE_DIRS "${ALBA_BINARY_DIR}" "${ALBA_SOURCE_DIR}/Base" "${ALBA_SOURCE_DIR}/Common" "${ALBA_BINARY_DIR}/Interaction" "${ALBA_SOURCE_DIR}/Interaction" 
               "${ALBA_SOURCE_DIR}/Core" "${ALBA_SOURCE_DIR}/Service" "${ALBA_SOURCE_DIR}/Gui" "${ALBA_SOURCE_DIR}/IO" "${ALBA_SOURCE_DIR}/Operations" "${ALBA_SOURCE_DIR}/VME" "${ALBA_SOURCE_DIR}/VisualPipes" "${ALBA_SOURCE_DIR}/Views"
               "${ALBA_SOURCE_DIR}/VME/DataPipes" "${ALBA_SOURCE_DIR}/vtkALBA" "${ALBA_BINARY_DIR}/vtkALBA"  "${ALBA_SOURCE_DIR}/GPUAPI" 
               "${ALBA_SOURCE_DIR}/GPUAPI/GLEW" "${ALBA_SOURCE_DIR}/GPUAPI/FBO")

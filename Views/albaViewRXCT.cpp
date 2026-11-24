@@ -21,6 +21,7 @@ PURPOSE. See the above copyright notice for more information.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaRWIBase.h"
 #include "albaViewRXCT.h"
 #include "albaViewVTK.h"
 #include "albaViewRX.h"
@@ -37,7 +38,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaVMEVolume.h"
 #include "albaVMESurface.h"
 #include "albaVMESurfaceParametric.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
@@ -1065,7 +1065,7 @@ void albaViewRXCT::ResetSlicesPosition(albaVME *vme)
 //----------------------------------------------------------------------------
 bool albaViewRXCT::IsPickedSliceView()
 {
-  albaRWIBase *rwi = m_Mouse->GetRWI();
+  albaRWIBase *rwi = albaRWIBase::GetLastMouseRWI();
   if (rwi)
   {
     for(int i=0; i<m_NumOfChildView; i++)

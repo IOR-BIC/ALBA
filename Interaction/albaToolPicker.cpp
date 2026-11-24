@@ -48,7 +48,7 @@ bool albaToolPicker::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos
   double pickedPos[3], scalar;
   albaVME *pickedVme;
   vtkIdType pointId;
-  if (albaPickHelper::PickPoint(view, pos, NULL, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
+  if (albaPickHelper::PickPoint(view, pos, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
     SendPickedPointEvent(VME_PICKED, pickedPos, pointId, scalar, pickedVme);
   return true;
 }

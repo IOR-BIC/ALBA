@@ -21,12 +21,12 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpExtrusionHoles.h"
 #include "albaVME.h"
 
 #include "albaGUIDialog.h"
 #include "albaGUIButton.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIValidator.h"
 #include "albaRWI.h"
 #include "albaViewVTK.h"
@@ -399,7 +399,7 @@ void albaOpExtrusionHoles::SelectHole(int pointID)
 void albaOpExtrusionHoles::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	GetLogicManager()->PopTool(m_Picker);
+	GetPositionalEventRouter()->PopTool(m_Picker);
 
 	if(m_SurfaceActor)
 		m_Rwi->m_RenFront->RemoveActor(m_SurfaceActor);
@@ -451,15 +451,13 @@ void albaOpExtrusionHoles::CreateOpDialog()
 	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
 	m_Rwi->SetSize(0,0,500,500);
 	m_Rwi->Show(true);
-	m_Rwi->m_RwiBase->SetMouse(m_Mouse);
-	m_View->SetMouse(m_Mouse);
 	m_OldSelectedView = GetLogicManager()->GetSelectedView();
 	GetLogicManager()->SelectView(m_View);
 
 	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
 	m_Picker->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
-	GetLogicManager()->PushTool(m_Picker);
+	GetPositionalEventRouter()->PushTool(m_Picker);
 
 	wxPoint p = wxDefaultPosition;
 

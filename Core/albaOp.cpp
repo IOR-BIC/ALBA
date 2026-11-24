@@ -46,7 +46,6 @@ albaOp::albaOp(const wxString &label)
 	m_Input     = NULL;
   m_Output    = NULL;
   m_MenuItem  = NULL;
-  m_Mouse     = NULL;
   m_SettingPanel = NULL;
   m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
@@ -66,7 +65,6 @@ albaOp::albaOp()
   m_Guih      = NULL;
 	m_Input     = NULL;
   m_Output    = NULL;
-  m_Mouse     = NULL;
 	m_Compatibility     = 0xFFFF;
   m_InputPreserving = true;
   m_SettingPanel = NULL;
@@ -202,11 +200,6 @@ void albaOp::ForceStopWithOk()
 void albaOp::ForceStopWithCancel()
 {
   NotifyOpEnd(OP_RUN_CANCEL);
-}
-//----------------------------------------------------------------------------
-void albaOp::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-  m_Mouse = mouse;
 }
 //----------------------------------------------------------------------------
 void albaOp::OpStop(int result)

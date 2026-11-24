@@ -47,7 +47,6 @@ const bool DEBUG_MODE = false;
 #include "albaAbsMatrixPipe.h"
 
 #include "vtkDataSet.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"

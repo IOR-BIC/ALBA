@@ -77,26 +77,30 @@ albaRefSys::~albaRefSys()
 }
 
 //----------------------------------------------------------------------------
+albaRefSys::albaRefSys(const albaRefSys &source)
+//----------------------------------------------------------------------------
+{
+  Initialize();
+  *this = source;
+}
+
+//----------------------------------------------------------------------------
 void albaRefSys::operator =(const albaRefSys &source)
 //----------------------------------------------------------------------------
 {
+  // the renderer is registered, as in SetRenderer: each copy releases its own reference
   m_Type = source.m_Type;
-  m_Transform=source.m_Transform;
-  m_Renderer=source.m_Renderer; 
-  m_VME=source.m_VME;
+  m_Transform = source.m_Transform;
+  SetRenderer(source.m_Renderer);
+  m_VME = source.m_VME;
 }
 
 //----------------------------------------------------------------------------
 void albaRefSys::DeepCopy(const albaRefSys *source)
 //----------------------------------------------------------------------------
 {
-  /*Initialize();
-  m_Type = source->m_Type;
-  m_Transform=source->m_Transform;
-  m_Renderer=source->m_Renderer;
-  m_VME=source->m_VME;
-  */
-} 
+  *this = *source;
+}
 
 //----------------------------------------------------------------------------
 void albaRefSys::Initialize()
@@ -114,6 +118,7 @@ void albaRefSys::Reset()
 //----------------------------------------------------------------------------
 {
   albaDEL(m_Identity);
+  SetRenderer(NULL);
   Initialize();
 }
 

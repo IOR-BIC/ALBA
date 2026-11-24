@@ -35,7 +35,7 @@ class wxKeyEvent;
 class wxSizeEvent;
 class vtkInteractorObserver;
 class vtkCamera;
-class albaDeviceButtonsPadMouse;
+class albaView;
 class vtkImageAppend;
 class vtkPNGWriter;
 class vtkWindowToImageFilter;
@@ -75,13 +75,21 @@ public:
   ~albaRWIBase();
   static albaRWIBase * New();
 
-  void SetListener(albaObserver *listener) {m_Listener = listener;};
-
 	/** Notify mouse click on a view. */
   void NotifyClick();
 
-  /** set the mouse device to which forward events from the view */
-  void SetMouse(albaDeviceButtonsPadMouse *mouse);
+  /** Enable/disable the camera motion with the mouse in this render window (enabled by default).
+    Each mouse event calls the method of the router of the mouse events registered in albaServiceLocator,
+    with the view of this render window and the renderer under the mouse; the modifier keys are set first. */
+  void EnableCameraInteraction(bool enable) {m_CameraInteractionEnabled = enable;}
+  bool IsCameraInteractionEnabled() {return m_CameraInteractionEnabled;}
+
+  /** Set the view this render window belongs to (the compound view for the render windows of its sub views) */
+  void SetView(albaView *view) {m_View = view;}
+  albaView *GetView() {return m_View;}
+
+  /** Return the render window that got the last mouse move, button down or wheel, NULL if deleted */
+  static albaRWIBase *GetLastMouseRWI() {return m_LastMouseRWI;}
 
   /** Set the directory for the Stereo Movie*/
   void SetStereoMovieDirectory(const char *dir);
@@ -171,7 +179,7 @@ public:
   virtual void OnSize(wxSizeEvent &event);
 	/** Do nothing. */
 	virtual void OnIdle(wxIdleEvent& event);
-	/** Manage Mouse Capture Lost*/
+	/** Send the button up of each button still pressed, so that the interaction started by them ends. */
 	virtual void OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt));
 
   /** Redefined to set the m_CustomInteractorStyle flag. */
@@ -196,13 +204,18 @@ protected:
   
   albaString  m_SaveDir;
   vtkCamera *m_Camera;
-  albaDeviceButtonsPadMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
-  albaObserver *m_Listener;
+  bool m_CameraInteractionEnabled;  ///< true if the mouse moves the camera of this render window
+  albaView *m_View;                 ///< the view this render window belongs to
+  static albaRWIBase *m_LastMouseRWI; ///< the render window that got the last mouse event
 
   int m_LastX;
   int m_LastY;
-  
+
+  bool m_LeftDown;   ///< buttons pressed: released when the mouse capture is lost
+  bool m_MiddleDown;
+  bool m_RightDown;
+
 	DECLARE_EVENT_TABLE()
 };
 #endif

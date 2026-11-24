@@ -19,12 +19,6 @@
 
 #include "albaInteractionAgent.h"
 
-//----------------------------------------------------------------------------
-// forward declarations :
-//----------------------------------------------------------------------------
-class albaDeviceButtonsPadTracker;
-class albaMatrix;
-
 /** Base class of the tools pushed on the stack of the PER.
   The mouse methods receive the view and the renderer under the mouse (NULL when the mouse is
   not on a view) and the 2D position in display coordinates; the RWI is view->GetRWI() and the
@@ -55,15 +49,6 @@ public:
 
   /** The mouse wheel has been rotated */
   virtual bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation) {return false;}
-
-  /** A button of a tracker has been pressed; pose can be NULL */
-  virtual bool OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose) {return false;}
-
-  /** A button of a tracker has been released */
-  virtual bool OnTrackerButtonUp(albaDeviceButtonsPadTracker *tracker, int button) {return false;}
-
-  /** The tracker moved with a button pressed: called only on the tool interacting with the tracker; pose can be NULL */
-  virtual bool OnTrackerDrag(albaDeviceButtonsPadTracker *tracker, albaMatrix *pose) {return false;}
 
   /** A key has been pressed or released */
   virtual bool OnKey(int keyCode, bool pressed) {return false;}

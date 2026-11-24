@@ -43,7 +43,6 @@
 #include "albaGUIFloatSlider.h"
 
 #include "vtkDataSet.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -276,6 +275,7 @@ void albaView3D::Create()
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
   m_Rwi = new albaRWI(albaGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_StereoType);
+  m_Rwi->m_RwiBase->SetView(this); // the mouse events of the render window come from this view
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
@@ -284,7 +284,6 @@ void albaView3D::Create()
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();

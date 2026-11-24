@@ -28,7 +28,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaVME;
-class albaDeviceButtonsPadMouse;
 
 /** Struct containing information regarding visual pipe plugged into the view. */
 struct albaVisualPipeInfo
@@ -113,9 +112,6 @@ public:
   void PlugVisualPipe(albaString vme_type, albaString pipe_type, long visibility = VISIBLE);
 
   albaPipeMap m_PipeMap; ///< Map used to store visual pipeline associated with vme types
-
-  /** Set the mouse device to use inside the view */
-  void SetMouse(albaDeviceButtonsPadMouse *mouse);
 
 protected:
   albaSceneGraph *m_Sg;

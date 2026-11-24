@@ -127,7 +127,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpRun()
     
 	  m_OldBehavior = m_ResampleInput->GetBehavior();
 
-	  m_Picker = albaBehaviorPicker::New();
+	  albaNEW(m_Picker);
 	  m_Picker->SetListener(this);
 	  m_ResampleInput->SetBehavior(m_Picker);
 

@@ -1,4 +1,4 @@
-﻿/*=========================================================================
+/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
 Module:    albaTool2DMeasure.cpp
 Language:  C++
@@ -16,7 +16,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaTool2DMeasure.h"
 
 #include "albaDecl.h"
-#include "albaDeviceButtonsPadTracker.h"
 #include "albaRWI.h"
 #include "albaTagArray.h"
 #include "albaVME.h"

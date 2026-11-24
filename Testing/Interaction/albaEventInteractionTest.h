@@ -38,8 +38,6 @@ public:
   CPPUNIT_TEST(TestSetXYFlag_GetXYFlag);
   /** CPPUNIT test : set/get button */
   CPPUNIT_TEST(TestSetButton_GetButton);
-  /** CPPUNIT test : set/get matrix */
-  CPPUNIT_TEST(TestSetMatrix_GetMatrix);
   /** CPPUNIT test : set/get modifier */
   CPPUNIT_TEST(TestSetModifier_GetModifier);
   /** CPPUNIT test : set/get modifiers */
@@ -61,8 +59,6 @@ private:
   void TestSetXYFlag_GetXYFlag();
   /** set/get button */
   void TestSetButton_GetButton();
-  /** set/get matrix */
-  void TestSetMatrix_GetMatrix();
   /** set/get modifier */
   void TestSetModifier_GetModifier();
   /** set/get modifiers */

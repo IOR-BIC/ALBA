@@ -118,6 +118,8 @@ albaGizmoScaleAxis::~albaGizmoScaleAxis()
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData[i]);
 	//----------------------
+    // the PER can keep the behavior alive: it must not notify the deleted gizmo
+    m_IsaGen[i]->SetListener(NULL);
     vtkDEL(m_IsaGen[i]); 
   }
 	m_CylGizmo->ReparentTo(NULL);
@@ -249,7 +251,7 @@ void albaGizmoScaleAxis::CreateISA()
   {
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    m_IsaGen[i] = albaBehaviorTransform::New();
+    albaNEW(m_IsaGen[i]);
 
     m_IsaGen[i]->SetVME(m_InputVme);
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

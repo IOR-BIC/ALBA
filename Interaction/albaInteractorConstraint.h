@@ -52,6 +52,9 @@ public:
   /** Copy constructor to allow object copy */
   albaInteractorConstraint(const albaInteractorConstraint& source);
 
+  /** Copy the settings and the ref sys of another constraint */
+  albaInteractorConstraint &operator=(const albaInteractorConstraint& source);
+
   //----------------------------------------------------------------------------
   // Enums
   //----------------------------------------------------------------------------

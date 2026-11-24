@@ -37,7 +37,6 @@
 #include "albaOpSelect.h"
 #include "albaGUISettingsDialog.h"
 #include "albaAttributeTraceability.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "albaStorage.h"
 #include "albaDataVector.h"
@@ -629,7 +628,6 @@ void albaOpManager::OpRun(albaOp *op, void *op_param)
 	m_RunningOp->SetSetting(op->GetSetting());
   m_RunningOp->SetListener(this);
 	m_RunningOp->SetInput(m_Selected);
-  m_RunningOp->SetMouse(m_Mouse);
 
   if (op_param != NULL)
   {
@@ -1122,12 +1120,6 @@ bool albaOpManager::ForceStopWithCancel()
 
   return m_RunningOp != to_be_killed;
 }
-//----------------------------------------------------------------------------
-void albaOpManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-  m_Mouse = mouse;
-}
-
 //----------------------------------------------------------------------------
 void albaOpManager::RefreshMenu()
 {

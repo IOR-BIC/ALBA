@@ -1,4 +1,4 @@
-﻿/*=========================================================================
+/*=========================================================================
 Program:   ALBA (Agile Library for Biomedical Applications)
 Module:    albaTool2DMeasureTemplate.cpp
 Language:  C++
@@ -48,7 +48,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkViewport.h"
 #include "vtkLookupTable.h"
-#include "defines.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaTool2DMeasureTemplate)

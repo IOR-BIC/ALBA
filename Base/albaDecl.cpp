@@ -470,8 +470,6 @@ wxString  albaIdString(int id)
      case VME_OUTPUT_DATA_PREUPDATE:s="VME_OUTPUT_DATA_PREUPDATE"; break;
      case VME_OUTPUT_DATA_UPDATE:   s="VME_OUTPUT_DATA_UPDATE"; break;
 
-     case AVATAR_ADDED:         s="AVATAR_ADDED"; break;
-     case AVATAR_REMOVED:       s="AVATAR_REMOVED"; break;
 
 
 // const used by albaGUI and albaGUIValidator
@@ -481,8 +479,6 @@ wxString  albaIdString(int id)
      case DEVICE_BUTTON_UP: s="DEVICE_BUTTON_UP"; break;
      case DEVICE_MOUSE_WHEEL: s="DEVICE_MOUSE_WHEEL"; break;
      case DEVICE_MOUSE_2D_MOVE: s="DEVICE_MOUSE_2D_MOVE"; break;
-     case DEVICE_TRACKER_3D_MOVE: s="DEVICE_TRACKER_3D_MOVE"; break;
-     case DEVICE_TRACKER_BOUNDS_UPDATED: s="DEVICE_TRACKER_BOUNDS_UPDATED"; break;
      default:
       s << id;
      break;

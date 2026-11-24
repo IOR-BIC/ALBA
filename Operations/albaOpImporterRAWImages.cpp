@@ -34,7 +34,6 @@
 #include "albaRWIBase.h"
 #include "albaRWI.h"
 #include "albaGUIDialogPreview.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaTagArray.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMEVolumeRGB.h"
@@ -329,7 +328,6 @@ void albaOpImporterRAWImages::CreateGui()
     m_Dialog->GetRWI()->CameraSet(CAMERA_CT);
     m_Dialog->GetRWI()->m_RenFront->AddActor(m_Actor);
     m_Dialog->GetRWI()->m_RenFront->AddActor(m_GizmoActor);
-    m_Dialog->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 
     int w,h;
     m_Dialog->GetSize(&w,&h);

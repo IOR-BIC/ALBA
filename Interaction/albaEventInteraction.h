@@ -18,24 +18,10 @@
 #define __albaEventInteraction_h
 
 #include "albaEventBase.h"
-#include "albaMatrix.h"
-#include "albaSmartPointer.h"
 
-template class ALBA_EXPORT albaAutoPointer<albaMatrix>;
-
-class albaView;
-class albaDevice;
-class albaVME;
-class albaInteractionBehavior;
-
-/** Event class to transport a triggering button and a position from pointing devices.
-  Evant issue by 2D and 3D tracking devices in correspondace to
-  MoveEvent, ButtonDownEvent and ButtonUpevent. 2D devices set the 
-  X and Y coordinates, while 3D devices set the pose matrix. The event
-  can also store an optional button argument, used to store the button 
-  indexs when events for button down and button up are issued. Also an
-  optional word of modifiers can be used.
-  @sa albaEventBase albaDeviceButtonsPadTracker MoveEvent ButtonDownEvent ButtonUpEvent
+/** Event of the mouse: the 2D display position, the button of the button down and up events
+  and the state of the modifier keys; the wheel events carry the rotation in the data.
+  @sa albaEventBase MoveEvent ButtonDownEvent ButtonUpEvent
 */
 class ALBA_EXPORT albaEventInteraction : public albaEventBase
 {
@@ -62,11 +48,6 @@ public:
   /** Get the triggering button */
   int GetButton() {return m_Button;}
 
-  /** Get the pose matrix, for 3D tracking devices */
-  albaMatrix *GetMatrix();
-  /** Set the pose matrix, for 3D tracking devices */
-  void SetMatrix(albaMatrix *matrix);
-
   /** Set the given modifier value*/
   void SetModifier(unsigned long idx,bool value=true);
   /** Get the given modifier value*/
@@ -76,51 +57,25 @@ public:
   /** Get the given modifiers value*/
   unsigned long GetModifiers() {return m_Modifiers;}
 
-  /** Deep Copy of the object (the cached picking is not copied)*/
+  /** Deep Copy of the object */
   virtual void DeepCopy(const albaEventBase *event);
-
-  /**
-    Find the VME picked by the device at the event position on the given view.
-    The picking is performed only the first time, then the result is cached into the event
-    and shared by all the interactors receiving it. Return true if a VME has been picked. */
-  bool FindPokedVme(albaView *view, albaDevice *device, albaVME *&pickedVme, albaInteractionBehavior *&pickedBehavior);
-
-  /** Return the position picked by FindPokedVme, meaningful only if a VME has been picked */
-  void GetPickedPosition(double pos[3]);
-
-  /** Discard the cached picking, to be called when the scene or the camera has been changed */
-  void ResetPick();
 
   /** overloaded constructor */
   albaEventInteraction(void *sender=NULL,albaID id=-1,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
-
-  /** overloaded constructor */
-  albaEventInteraction(void *sender,albaID id,albaMatrix *matrix,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {ResetPick();}
+  albaEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_X(0),m_Y(0),m_XYFlag(false) {}
 
   /** overloaded constructor */
   albaEventInteraction(void *sender,albaID id,double x,double y,int button=0,unsigned long modifiers=0):
-  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers) {ResetPick();}
+  albaEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers) {}
   virtual ~albaEventInteraction() {}
 
 protected:
-
-  bool            m_PickDone;           ///< True if the picking has been performed for this event
-  bool            m_Picked;             ///< True if the cached picking found a VME
-  albaView       *m_PickView;           ///< View used by the cached picking
-  albaDevice     *m_PickDevice;         ///< Device used by the cached picking
-  albaVME        *m_PickedVme;          ///< Cached picked VME
-  albaInteractionBehavior *m_PickedBehavior;     ///< Cached behavior of the picked VME
-  double          m_PickedPosition[3];  ///< Cached picked position
 
   int           m_Button;     ///< Optional button which triggered the event
   unsigned long m_Modifiers;  ///< Optional modifiers for the button 
   double        m_X;          ///< X coordinate, used by mouse device
   double        m_Y;          ///< Y coordinate, used by mouse device
   bool          m_XYFlag;     ///< Used to signal a 2D coordinate is present
-
-  albaAutoPointer<albaMatrix>  m_Matrix;    ///< Pose matrix, used by 3D trackers
 };
 
 #endif /* __albaEventInteraction_h */

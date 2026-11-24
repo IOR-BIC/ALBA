@@ -44,7 +44,6 @@ class albaOpCreateGroup;
 class albaOpShowHistory;
 class albaOpImporterFile;
 class vtkMatrix4x4;
-class albaDeviceButtonsPadMouse;
 class albaGUISettings;
 class albaGUISettingsDialog;
 class albaUser;
@@ -149,11 +148,8 @@ public:
   /** Return an instance of operation from id.*/
   albaOp *GetOperationById(int id);
 
-  /** 
-  Initialize the action for the mouse device. */
-  void SetMouse(albaDeviceButtonsPadMouse *mouse);
 	
-  /** Called by logic to refresh the operation's menù items.*/
+  /** Called by logic to refresh the operation's menï¿½ items.*/
   void RefreshMenu();
 
   /** Set MafUser */
@@ -201,7 +197,6 @@ protected:
 
   void SetAccelerator(albaOp *op);
 
-  albaDeviceButtonsPadMouse          *m_Mouse; ///< Pointer to the mouse devices.
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
 	albaOpContextStack  m_Context;
   albaOp             *m_RunningOp; ///< Pointer to the current running operation.
@@ -227,7 +222,7 @@ protected:
 	albaOpReparentTo		*m_OpReparent; ///< Pointer to the (always available) operation for reparenting VMEs
 	albaOpCreateGroup	*m_OpAddGroup; ///< Pointer to the (always available) operation for Adding Group VMEs
 	albaOpShowHistory *m_OpShowHistory;
-	wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
+	wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menï¿½
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
 	albaString				 m_BuildNum;
 
