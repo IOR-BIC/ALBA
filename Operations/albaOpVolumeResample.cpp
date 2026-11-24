@@ -345,8 +345,6 @@ void albaOpVolumeResample::GizmoDelete()
     m_GizmoROI->Show(false);
     cppDEL(m_GizmoROI);
   }	
-
-	GetViewManager()->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 albaOp *albaOpVolumeResample::Copy()
