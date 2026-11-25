@@ -60,7 +60,6 @@ class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings, public albaSe
 public:
   albaViewManager();
  ~albaViewManager(); 
-  void SetListener(albaObserver *Listener) {m_Listener = Listener;};
   virtual void OnEvent(albaEventBase *alba_event);
 
   /** Fill the main men� with plugged views. */
@@ -174,7 +173,6 @@ protected:
   albaView       *m_ViewTemplate[MAXVIEW];   // view template vector
   int            m_TemplateNum;       // number of template
 
-  albaObserver   *m_Listener;
   albaVMERoot    *m_RootVme;
   albaVME       *m_SelectedVme;
   albaView       *m_SelectedView;

@@ -29,7 +29,7 @@ class albaAbsLogicManager;
 /** albaVMEManagerTest:
 Test class for albaVMEManager
 */
-class albaVMEManagerTest : public albaTest, public albaObserver
+class albaVMEManagerTest : public albaTest
 {
 public: 
   // Executed before each test
@@ -80,8 +80,6 @@ private:
   void GetStorageTest();
   void MakeBakFileOnSaveTest();
   void SetDirNameTest();
-
-  void OnEvent(albaEventBase *alba_event); // the vme manager needs a listener
 
   albaVMEManager *m_Manager;
   albaVMEManagerTestLogic *m_Logic;

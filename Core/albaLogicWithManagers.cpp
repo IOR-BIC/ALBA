@@ -284,7 +284,6 @@ void albaLogicWithManagers::Configure()
 	if (m_UseVMEManager)
 	{
 		m_VMEManager = new albaVMEManager();
-		m_VMEManager->SetListener(this);
 		m_VMEManager->SetMsfFileExtension(m_Extension);
 	}
 
@@ -299,7 +298,6 @@ void albaLogicWithManagers::Configure()
 	{
 		m_ViewManager = new albaViewManager();
 		albaServiceLocator::SetViewManager(m_ViewManager);
-		m_ViewManager->SetListener(this);
 
 		m_SettingsDialog->AddPage(m_ViewManager->GetSettingsGui(), "View");
 	}
@@ -308,7 +306,6 @@ void albaLogicWithManagers::Configure()
 	{
 		m_OpManager = new albaOpManager();
 		albaServiceLocator::SetOpManager(m_OpManager);
-		m_OpManager->SetListener(this);
 		m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 	}
 
@@ -1371,7 +1368,6 @@ void albaLogicWithManagers::ConfigureWizardManager()
 	if(m_UseWizardManager)
 	{
 		m_WizardManager = new albaWizardManager();
-		m_WizardManager->SetListener(this);
 	}
 }
 //----------------------------------------------------------------------------

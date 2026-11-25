@@ -119,9 +119,6 @@ private:
   /** Enable/Disable the toolbar's buttons. */
   virtual void EnableToolbar(bool CanEnable = true);
 
-  /** Set the event listener */
-  virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
-
 
   /** returns a description about current step in wizard */
   albaString GetDescription();
@@ -138,7 +135,6 @@ private:
   wxStaticText *m_ProgressLabel; ///< Label of the gauge (owned by the main window)
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
   wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
-  albaObserver       *m_Listener; 
   albaVME						*m_Selected; ///< Pointer to the current selected node.
   albaWizardWaitOp   *m_WaitOp;
 

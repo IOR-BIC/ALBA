@@ -63,7 +63,6 @@ class ALBA_EXPORT albaOpManager: public albaObserver, public albaServiceClient, 
 public:
 	         albaOpManager();
 	virtual ~albaOpManager(); 
-	virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 	virtual void OnEvent(albaEventBase *alba_event);
 
 	/** Add the operation 'op' to the list of available operations. */
@@ -222,7 +221,6 @@ protected:
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
 	albaString				 m_BuildNum;
 
-  albaObserver       *m_Listener;
 
   /** test friend */
   friend class albaOpManagerTest;

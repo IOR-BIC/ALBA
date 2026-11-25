@@ -47,9 +47,6 @@ public:
   /** destructor */
   ~albaVMEManager(); 
 
-  /** Set the event receiver object*/
-  void SetListener(albaObserver *listener) {m_Listener = listener;};
-
   /** Process events coming from other components */
   void OnEvent(albaEventBase *e);
  
@@ -152,7 +149,6 @@ protected:
 
   bool                m_Modified;         ///< Used to known when the tree has been modified...
 
-  albaObserver*        m_Listener;         ///< Register the event receiver object
   wxConfigBase*       m_Config;           ///< Application configuration for file history management
 	wxArchiveFSHandler  *m_ZipHandler;      ///< Handler for zip archive (used to open zmsf files)
   wxFileSystem        *m_FileSystem;      ///< File system manager

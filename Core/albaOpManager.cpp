@@ -78,7 +78,6 @@ but could not be done the undo.
 //----------------------------------------------------------------------------
 albaOpManager::albaOpManager()
 {
-	m_Listener = NULL;
 	m_RunningOp = NULL;
 	m_Selected = NULL;
 	m_NaturalNode = NULL;
@@ -145,8 +144,7 @@ albaOpManager::~albaOpManager()
 //----------------------------------------------------------------------------
 void albaOpManager::OnEvent(albaEventBase *alba_event)
 {
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-    albaEventMacro(*e);
+	// the events of the operations are not forwarded: the logic handles only the menu commands
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpAdd(albaOp *op, wxString menuPath, bool can_undo, albaGUISettings *setting)

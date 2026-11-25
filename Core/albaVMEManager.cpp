@@ -54,7 +54,6 @@ albaVMEManager::albaVMEManager()
 {
   m_Modified    = false;
 	m_MakeBakFile = true;
-	m_Listener    = NULL;
 	m_Storage     = NULL;
   m_Crypting    = false;
   m_LoadingFlag = false;
@@ -81,7 +80,6 @@ albaVMEManager::~albaVMEManager()
     NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
 
   m_AppStamp.clear();
-  m_Listener = NULL;
   m_FileSystem->CleanUpHandlers(); // Handlers are shared trough file systems.
   cppDEL(m_FileSystem);
   
@@ -115,8 +113,6 @@ void albaVMEManager::OnEvent(albaEventBase *alba_event)
         }
       }
       break;
-      default:
-        albaEventMacro(*alba_event);
     }
   }
 }

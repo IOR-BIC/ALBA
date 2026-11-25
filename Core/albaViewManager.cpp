@@ -60,7 +60,6 @@ albaViewManager::albaViewManager() :	albaGUISettings(this, _("View Manager"))
 	InitializeSettings();
 
   m_ViewList          = NULL;
-  m_Listener          = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
   m_SkipCameraUpdate  = 0;
@@ -199,9 +198,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 				m_Config->Flush();
 			}
 			break;
-      default:
-        albaEventMacro(*e); // forward up the event
-      break; 
     }
 	}
 }
