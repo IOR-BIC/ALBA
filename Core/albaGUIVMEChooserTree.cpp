@@ -46,7 +46,7 @@ BEGIN_EVENT_TABLE(albaGUIVMEChooserTree,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-albaGUIVMEChooserTree::albaGUIVMEChooserTree( wxWindow *parent, albaGUIVMETree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, albaVME *subTree)
+albaGUIVMEChooserTree::albaGUIVMEChooserTree( wxWindow *parent, albaGUIVMETree *tree, albaVMEAcceptFunction vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, albaVME *subTree)
 :albaGUIVMETree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
@@ -56,10 +56,7 @@ albaGUIVMEChooserTree::albaGUIVMEChooserTree( wxWindow *parent, albaGUIVMETree *
 
   m_MultipleSelection = multiSelect;
  
-  if(vme_accept_function == 0)
-    m_ValidateFunction = NULL;
-  else
-    m_ValidateFunction = vme_accept_function;
+  m_ValidateFunction = vme_accept_function;
   
   if (!multiSelect)
     InitializeImageList();

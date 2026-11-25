@@ -124,7 +124,7 @@ void albaWizardBlockVMEFindOrSelection::VmeParentSelect( const char *path )
 }
 
 //----------------------------------------------------------------------------
-int albaWizardBlockVMEFindOrSelection::VMEAccept(albaVME *node)
+bool albaWizardBlockVMEFindOrSelection::VMEAccept(albaVME *node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA(globalVMEAccept));

@@ -65,7 +65,7 @@ protected:
   virtual void ExcutionBegin();
 
   //** VME Accept function */
-  static int VMEAccept(albaVME*node);
+  static bool VMEAccept(albaVME*node);
 
   wxString m_AcceptedVME;
   wxString m_Title;

@@ -76,7 +76,7 @@ void albaWizardBlockVMESelection::ExcutionBegin()
 }
 
 //----------------------------------------------------------------------------
-int albaWizardBlockVMESelection::VMEAccept(albaVME*node)
+bool albaWizardBlockVMESelection::VMEAccept(albaVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA(globalAccept));

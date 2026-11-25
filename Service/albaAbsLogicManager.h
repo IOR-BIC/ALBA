@@ -31,6 +31,9 @@ class albaGUIPanel;
 class albaOp;
 class albaGUIVMETree;
 
+/** Function that tells if a VME can be chosen in the VME chooser dialog */
+typedef bool (*albaVMEAcceptFunction)(albaVME *vme);
+
 class ALBA_EXPORT albaAbsLogicManager
 {
 public:
@@ -62,11 +65,11 @@ public:
 	virtual albaVMEStorage *CreateStorage(albaVMEStorage *oldStorage) = 0;
 
 	/** Show the tree in a dialog titled title and return the VME chosen by the user, NULL on cancel.
-	acceptFunction is a bool (*)(albaVME *) that tells which VMEs can be chosen (all if NULL), selected is the VME selected when the dialog opens. */
-	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
+	acceptFunction tells which VMEs can be chosen (all if NULL), selected is the VME selected when the dialog opens. */
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) = 0;
 
 	/** Same as ChooseVME, but the user can choose more VMEs; returns an empty vector on cancel. */
-	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) = 0;
 
 	//Logic
 	/** Returns true if there is a Running Operation */

@@ -69,22 +69,19 @@ void albaFakeLogicForTest::VmeVisualModeChanged(albaVME * vme)
 }
 
 //-------------------------------------------------------------------------
-albaVME *albaFakeLogicForTest::ChooseVME(albaString title, void *acceptFunction, albaVME *selected)
+albaVME *albaFakeLogicForTest::ChooseVME(albaString title, albaVMEAcceptFunction acceptFunction, albaVME *selected)
 {
 	std::vector<albaVME*> accepted = ChooseVMEs(title, acceptFunction, selected);
 	return accepted.empty() ? NULL : accepted[0];
 }
 
 //-------------------------------------------------------------------------
-std::vector<albaVME*> albaFakeLogicForTest::ChooseVMEs(albaString title, void *acceptFunction, albaVME *selected)
+std::vector<albaVME*> albaFakeLogicForTest::ChooseVMEs(albaString title, albaVMEAcceptFunction acceptFunction, albaVME *selected)
 {
-	typedef bool(*AcceptFunction)(albaVME *);
-	AcceptFunction accept = (AcceptFunction)acceptFunction;
-
 	m_ChooseCalls++;
 	std::vector<albaVME*> accepted;
 	for (int i = 0; i < m_ChooseCandidates.size(); i++)
-		if (accept == NULL || accept(m_ChooseCandidates[i]))
+		if (acceptFunction == NULL || acceptFunction(m_ChooseCandidates[i]))
 			accepted.push_back(m_ChooseCandidates[i]);
 
 	return accepted;

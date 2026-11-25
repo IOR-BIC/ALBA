@@ -55,7 +55,7 @@ albaOp* albaOpCreateAveragePlane::Copy()
 }
 
 //----------------------------------------------------------------------------
-int albaOpCreateAveragePlane::PlaneAccept(albaVME *vme)
+bool albaOpCreateAveragePlane::PlaneAccept(albaVME *vme)
 {
 	albaVMESurfaceParametric *plane = albaVMESurfaceParametric::SafeDownCast(vme);
 	if (plane && plane != glo_CurrentVME && plane->GetGeometryType() == albaVMESurfaceParametric::PARAMETRIC_PLANE)

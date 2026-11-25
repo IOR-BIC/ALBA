@@ -105,7 +105,7 @@ public:
 	virtual void Show(bool show);
 
 	/** Build a dialog containing the vme tree and return the vmes chosen by the user (used by the logic ChooseVME/ChooseVMEs). */
-	virtual 	std::vector<albaVME*> VmeChoose(void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, albaString title = "Choose Node", bool multiSelect = false, albaVME *vme = NULL);
+	virtual 	std::vector<albaVME*> VmeChoose(albaVMEAcceptFunction vme_accept_function = NULL, long style = REPRESENTATION_AS_TREE, albaString title = "Choose Node", bool multiSelect = false, albaVME *vme = NULL);
 
 	/** Open a Find VME dialog. */
 	virtual void FindVME();

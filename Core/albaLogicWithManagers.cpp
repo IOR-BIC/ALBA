@@ -941,7 +941,7 @@ void albaLogicWithManagers::VmeVisualModeChanged(albaVME * vme)
 	}
 }
 //----------------------------------------------------------------------------
-albaVME *albaLogicWithManagers::ChooseVME(albaString title, void *acceptFunction, albaVME *selected)
+albaVME *albaLogicWithManagers::ChooseVME(albaString title, albaVMEAcceptFunction acceptFunction, albaVME *selected)
 {
 	if (m_SideBar == NULL)
 		return NULL;
@@ -950,7 +950,7 @@ albaVME *albaLogicWithManagers::ChooseVME(albaString title, void *acceptFunction
 	return chosen.empty() ? NULL : chosen[0];
 }
 //----------------------------------------------------------------------------
-std::vector<albaVME*> albaLogicWithManagers::ChooseVMEs(albaString title, void *acceptFunction, albaVME *selected)
+std::vector<albaVME*> albaLogicWithManagers::ChooseVMEs(albaString title, albaVMEAcceptFunction acceptFunction, albaVME *selected)
 {
 	if (m_SideBar == NULL)
 		return std::vector<albaVME*>();
