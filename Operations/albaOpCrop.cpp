@@ -99,7 +99,7 @@ void albaOpCrop::OpRun()
 	if(!m_TestMode)
 	{
 		m_GizmoROI = new albaGizmoROI(volume, this,albaGizmoHandle::BOUNDS,NULL,m_ShowShadingPlane);
-		m_GizmoROI->Show((GetLogicManager()->GetSelectedView() != NULL));
+		m_GizmoROI->Show(true);
 	}
 
 	if (volume->GetOutput()->GetVTKData()->IsA("vtkImageData"))

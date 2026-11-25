@@ -45,7 +45,7 @@ protected:
 
 	albaVME *m_SelVME;
 
-	static int PlaneAccept(albaVME *vme);
+	static bool PlaneAccept(albaVME *vme);
 
 	/** Return true for the acceptable vme type. */
 	bool InternalAccept(albaVME *node);

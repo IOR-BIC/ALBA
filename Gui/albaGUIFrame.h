@@ -56,9 +56,6 @@ protected:
   /** Send an event with the men operation's id. */
 	void OnMenuOp(wxCommandEvent& e);
   
-  /** Send an event with the UI item's id. */
-	void OnUpdateUI(wxUpdateUIEvent& e);
-  
   /** Send an event with the men 'Quit' item's id. */
 	void OnCloseWindow(wxCloseEvent& event);
   

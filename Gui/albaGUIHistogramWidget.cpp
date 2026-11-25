@@ -69,8 +69,6 @@ albaCxxTypeMacro(albaGUIHistogramWidgetTool);
 #include "vtkProperty.h"
 #include "vtkPolyDataMapper.h"
 
-ALBA_ID_IMP(albaGUIHistogramWidget::RANGE_MODIFIED);
-
 //----------------------------------------------------------------------------
 albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /* = -1 */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxSize */,long style /* = wxTAB_TRAVERSAL */, bool showThresholds /* = false */)
 :albaGUIPanel(parent,id,pos,size,style)
@@ -263,7 +261,6 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
 				m_SelectedRange[0] = m_Slider->GetValue(0);
 				m_SelectedRange[1] = m_Slider->GetValue(2);
 				m_Lut->SetTableRange(m_SelectedRange);
-				albaEventMacro(albaEvent(this, albaGUIHistogramWidget::RANGE_MODIFIED));
 				break;
 			case ID_NUMBER_OF_BIN:
 				m_Histogram->SetNumberOfBins(m_NumberOfBins);

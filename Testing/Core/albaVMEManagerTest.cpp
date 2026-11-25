@@ -55,12 +55,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-void albaVMEManagerTest::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
-{
-  // the manager asks here the single file mode when saving: the default is kept
-}
-//----------------------------------------------------------------------------
 void albaVMEManagerTest::TestFixture()
 //----------------------------------------------------------------------------
 {
@@ -106,7 +100,6 @@ void albaVMEManagerTest::MSFNewTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -127,7 +120,6 @@ void albaVMEManagerTest::MSFOpenTest()
   stamps_v.push_back("albaVMEManagerTest");
    
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(stamps_v);
   m_Manager->SetTestMode(true);
 
@@ -169,7 +161,6 @@ void albaVMEManagerTest::ZIPOpenTest()
 {
   // test compatibility with this app stamp
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -228,7 +219,6 @@ void albaVMEManagerTest::MSFSaveTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -276,7 +266,6 @@ void albaVMEManagerTest::ZIPSaveTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -308,7 +297,6 @@ void albaVMEManagerTest::MSFIsModifiedTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -325,7 +313,6 @@ void albaVMEManagerTest::VmeAddRemoveTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -354,7 +341,6 @@ void albaVMEManagerTest::TimeGetBoundsTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -384,7 +370,6 @@ void albaVMEManagerTest::TimeSetTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -400,7 +385,6 @@ void albaVMEManagerTest::NotifyAddRemoveTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -439,7 +423,6 @@ void albaVMEManagerTest::SetGetFileNameTest()
 {
 
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -454,7 +437,6 @@ void albaVMEManagerTest::GetRootTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -471,7 +453,6 @@ void albaVMEManagerTest::GetStorageTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -489,7 +470,6 @@ void albaVMEManagerTest::MakeBakFileOnSaveTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
@@ -549,36 +529,12 @@ void albaVMEManagerTest::SetDirNameTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
   m_Manager->SetTestMode(true);
 
   m_Manager->SetDirName(ALBA_DATA_ROOT);
 
   CPPUNIT_ASSERT(m_Manager->m_MSFDir == ALBA_DATA_ROOT);
-
-  cppDEL(m_Manager);
-}
-
-//----------------------------------------------------------------------------
-void albaVMEManagerTest::SetSingleBinaryFileTest()
-//----------------------------------------------------------------------------
-{
-  m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
-  m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
-  m_Manager->SetTestMode(true);
-  m_Manager->MSFNew();
-
-  m_Manager->SetSingleBinaryFile(true);
-  
-  albaEvent *e = new albaEvent(this,albaDataVector::GetSingleFileDataId(),false);
-  e->SetChannel(MCH_UP);
-  m_Manager->OnEvent(e);
-
-  CPPUNIT_ASSERT(e->GetBool() == true);
-
-  cppDEL(e);
 
   cppDEL(m_Manager);
 }

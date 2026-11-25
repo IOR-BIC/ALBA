@@ -149,7 +149,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	GENERATE_LICENCE,
 	HELP_HOME,
 
-	UPDATE_UI,           // update menu and toolbar widgets
 	// events about vme
 	VME_SELECTED,  // from albaGUIVMEChooserTree
 	VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position

@@ -50,8 +50,6 @@ BEGIN_EVENT_TABLE(albaGUIFrame, wxFrame)
     EVT_MENU_RANGE(MENU_START,MENU_END,albaGUIFrame::OnMenu)
     EVT_MENU_RANGE(wxID_FILE1,wxID_FILE9,albaGUIFrame::OnMenu)
     EVT_MENU_RANGE(OP_START,OP_END,albaGUIFrame::OnMenuOp)
-    EVT_UPDATE_UI_RANGE(MENU_START,MENU_END,albaGUIFrame::OnUpdateUI)
-    EVT_UPDATE_UI_RANGE(OP_START,OP_END,albaGUIFrame::OnUpdateUI)
     EVT_SASH_DRAGGED_RANGE(SASH_START, SASH_END, albaGUIFrame::OnSashDrag)
     EVT_BUTTON (ID_LAYOUT, albaGUIFrame::OnLayout)
     EVT_SIZE(albaGUIFrame::OnSize)
@@ -85,12 +83,6 @@ void albaGUIFrame::OnMenuOp(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
   albaEventMacro(albaEvent(this,MENU_OP,(long)e.GetId()));
-}
-//----------------------------------------------------------------------------
-void albaGUIFrame::OnUpdateUI(wxUpdateUIEvent& e)
-//----------------------------------------------------------------------------
-{ 
-  albaEventMacro(albaEvent(this,UPDATE_UI,&e));
 }
 //----------------------------------------------------------------------------
 void albaGUIFrame::OnCloseWindow(wxCloseEvent& event)

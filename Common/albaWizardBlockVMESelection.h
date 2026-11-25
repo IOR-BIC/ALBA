@@ -61,7 +61,7 @@ protected:
   virtual void ExcutionBegin();
 
   //** VME Accept function */
-  static int VMEAccept(albaVME*node);
+  static bool VMEAccept(albaVME*node);
 
 private:
 
