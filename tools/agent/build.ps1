@@ -6,6 +6,9 @@
 #          limit of the Visual Studio IDE, it is shared by all the projects
 #          built in parallel: without it each project used its own /MP and a
 #          full build ran out of memory (C1060, LNK1102), leaving stale objects.
+# If the build fails for lack of resources (out of memory, PDB errors), the
+# objects older than their sources or than the headers they include are
+# deleted (stale-objects.ps1): MSBuild may never recompile them by itself.
 param(
     [ValidateSet('Release', 'Debug', 'RelWithDebInfo', 'MinSizeRel')][string]$Configuration = 'Release',
     [string]$Target = '',
@@ -28,6 +31,15 @@ Push-Location $BldDir
 try {
     & "$PSScriptRoot\run-logged.ps1" -Name $logName -Command $buildCmd
     $exitCode = $LASTEXITCODE
+
+    # Out of heap (C1002, C1060, C1076, C3859), PDB errors (C1041, C1090,
+    # LNK1201), linker out of memory (LNK1102)
+    $resourceErrors = 'error (C1002|C1041|C1060|C1076|C1090|C3859|LNK1102|LNK1201)\b'
+    $buildLog = Join-Path $SrcDir "build-logs\$logName.log"
+    if ($exitCode -ne 0 -and (Select-String -Path $buildLog -Pattern $resourceErrors -Quiet)) {
+        Write-Output "Build failed for lack of resources: deleting the stale objects, build again"
+        & "$PSScriptRoot\stale-objects.ps1" -Configuration $Configuration -Delete
+    }
 
     # Once the external libraries are built, stop rebuilding them on every
     # build (configure.ps1 -CompileLibraries turns it back on). Only a full
