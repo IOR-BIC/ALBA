@@ -559,26 +559,3 @@ void albaVMEManagerTest::SetDirNameTest()
 
   cppDEL(m_Manager);
 }
-
-//----------------------------------------------------------------------------
-void albaVMEManagerTest::SetSingleBinaryFileTest()
-//----------------------------------------------------------------------------
-{
-  m_Manager = new albaVMEManager();
-  m_Manager->SetListener(this);
-  m_Manager->SetApplicationStamp(albaString("albaVMEManagerTest"));
-  m_Manager->SetTestMode(true);
-  m_Manager->MSFNew();
-
-  m_Manager->SetSingleBinaryFile(true);
-  
-  albaEvent *e = new albaEvent(this,albaDataVector::GetSingleFileDataId(),false);
-  e->SetChannel(MCH_UP);
-  m_Manager->OnEvent(e);
-
-  CPPUNIT_ASSERT(e->GetBool() == true);
-
-  cppDEL(e);
-
-  cppDEL(m_Manager);
-}

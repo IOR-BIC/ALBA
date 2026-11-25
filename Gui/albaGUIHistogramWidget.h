@@ -57,8 +57,6 @@ public:
   /** Main Event handler */
   void OnEvent(albaEventBase *event);
 
-  ALBA_ID_DEC(RANGE_MODIFIED);
-
   enum HISTOGRAM_WIDGET_ID
   {
 		ID_LOGSCALE = MINID,

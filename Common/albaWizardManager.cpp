@@ -37,7 +37,6 @@ albaWizardManager::albaWizardManager()
 //----------------------------------------------------------------------------
 {
   //Setting default values
-  m_Warn           = true;
   m_ToolBar = NULL;
   m_MenuBar = NULL;
   m_Listener = NULL;

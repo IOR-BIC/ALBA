@@ -135,9 +135,6 @@ public:
   /** Remove temporary directory used for compressed msf files.*/
   void RemoveTempDirectory();
 
-  /** Set the flag for saving binary files associated to time varying VMEs.*/
-  void SetSingleBinaryFile(bool singleFile);
-
   /** Set the flag for test mode without GUI */
   void SetTestMode(bool testmode){m_TestMode = testmode;}; // Losi 02/16/2010 for test class
 
@@ -172,7 +169,6 @@ protected:
 	 
   bool                m_LoadingFlag;      ///< used when an MSF is being loaded
   bool                m_Crypting;         ///< used to enable the Encryption for the MSF
-  bool                m_SingleBinaryFile; ///< used to store binary files associated to time varying VMEs as multiple files or not.
   albaVMEStorage*      m_Storage;          ///< Associated storage
   bool                m_TestMode;         ///< set true for test mode without GUI
 

@@ -288,7 +288,6 @@ void albaLogicWithManagers::Configure()
 		m_VMEManager = new albaVMEManager();
 		m_VMEManager->SetListener(this);
 		m_VMEManager->SetMsfFileExtension(m_Extension);
-		//m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
 	}
 
 	if (m_UseInteractionManager)
@@ -510,11 +509,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		/*if (e->GetId() == albaDataVector::SINGLE_FILE_DATA)
-		{
-			e->SetBool(m_StorageSettings->GetSingleFileStatus()!= 0);
-			return;
-		}*/
 		switch (e->GetId())
 		{
 			//resize view
@@ -537,11 +531,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		case MENU_VIEW_TIMEBAR:
 			m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
-			break;
-			// ###############################################################
-			// commands related to the STATUSBAR
-			// ###############################################################
-		case UPDATE_UI:
 			break;
 			// ###############################################################
 			// commands related to FILE MENU  
@@ -1192,7 +1181,6 @@ void albaLogicWithManagers::CreateViewFrame(albaView *v)
 		// child views
 		albaGUIMDIChild *c = new albaGUIMDIChild(m_Win, v);
 		c->SetWindowStyleFlag(m_ChildFrameStyle);
-		c->SetListener((albaObserver*)m_ViewManager);
 		v->SetFrame(c);
 	}
 }
@@ -1389,7 +1377,6 @@ void albaLogicWithManagers::ConfigureWizardManager()
 	{
 		m_WizardManager = new albaWizardManager();
 		m_WizardManager->SetListener(this);
-		m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 	}
 }
 //----------------------------------------------------------------------------

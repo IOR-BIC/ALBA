@@ -122,12 +122,6 @@ private:
   /** Set the event listener */
   virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 
-  /** Set the flag for warning the user if the operation is undoable. */
-  virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
-
-  /** Get the flag for warning the user if the operation is undoable. */
-  virtual bool GetWarningIfCantUndo(){return m_Warn;};
-
 
   /** returns a description about current step in wizard */
   albaString GetDescription();
@@ -146,7 +140,6 @@ private:
   wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
   albaObserver       *m_Listener; 
   albaVME						*m_Selected; ///< Pointer to the current selected node.
-  bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
   albaWizardWaitOp   *m_WaitOp;
 
   friend class albaLogicWithManagers; // class albaWizardManager can now access data directly

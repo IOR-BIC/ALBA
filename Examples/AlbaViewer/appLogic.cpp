@@ -111,12 +111,6 @@ void appLogic::OnEvent(albaEventBase *alba_event)
 	{
 		switch (e->GetId())
 		{
-		case VME_PICKED:
-		{
-			albaVME* selectedVme = m_OpManager->GetSelectedVme();
-		}
-		break;
-
 		// View Events
 		case ID_SHOW_VIEW_VTK_SURFACE:
 		{

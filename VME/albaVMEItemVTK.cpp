@@ -341,11 +341,11 @@ int albaVMEItemVTK::InternalRestoreData()
     albaString filename;
     if (m_IOMode != MEMORY)
     {
-      resolvedURL = storage->ResolveInputURL(m_URL, filename, m_DataObserver);
+      resolvedURL = storage->ResolveInputURL(m_URL, filename);
     }
     else
     {
-      resolvedURL = storage->ResolveInputURL(m_ArchiveFileName, filename, m_DataObserver);
+      resolvedURL = storage->ResolveInputURL(m_ArchiveFileName, filename);
     }
     if (resolvedURL == ALBA_WAIT)
     {

@@ -66,10 +66,6 @@ public:
 	virtual void SetListener(albaObserver *Listener) {m_Listener = Listener;};
 	virtual void OnEvent(albaEventBase *alba_event);
 
-  /** Event IDs used in collaborative modality.*/
-  ALBA_ID_DEC(OPERATION_INTERFACE_EVENT)
-  ALBA_ID_DEC(RUN_OPERATION_EVENT)
-
 	/** Add the operation 'op' to the list of available operations. */
 	virtual void OpAdd(albaOp *op, wxString menuPath = "", bool can_undo = true, albaGUISettings *setting = NULL);
 

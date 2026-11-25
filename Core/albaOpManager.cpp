@@ -50,12 +50,6 @@
 #include "albaOpImporterFile.h"
 #include "albaGUIDialogAskAndRemember.h"
 
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-ALBA_ID_IMP(albaOpManager::OPERATION_INTERFACE_EVENT)
-ALBA_ID_IMP(albaOpManager::RUN_OPERATION_EVENT)
-
 /**
 There are 4 paths in OpProcessor
 
