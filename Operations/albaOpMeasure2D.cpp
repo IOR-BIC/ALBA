@@ -91,7 +91,7 @@ char ** albaOpMeasure2D::GetIcon()
 //----------------------------------------------------------------------------
 void albaOpMeasure2D::OpRun()
 {
-	albaView *view = GetLogicManager()->GetSelectedView();
+	albaView *view = GetViewManager()->GetSelectedView();
 
 	if(view==NULL)
 		view = OpenImageView(VIEW_START + 8); // Open View if necessary

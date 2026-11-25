@@ -136,7 +136,7 @@ public:
 	virtual void PropertyUpdate(albaVME *vme = NULL, bool fromTag = false) override;
 
   /** Return the selected view. */
-	albaView *GetSelectedView();
+	albaView *GetSelectedView() override;
 
   /** Return the root of the vme tree. */
   albaVME *GetCurrentRoot() {return (albaVME*)m_RootVme;};

@@ -15,6 +15,8 @@
 =========================================================================*/
 
 #include "albaFakeLogicForTest.h"
+#include "albaFakeViewManagerForTest.h"
+#include "albaServiceLocator.h"
 #include "albaVME.h"
 #include "albaVMEStorage.h"
 #include "albaVMERoot.h"
@@ -87,6 +89,15 @@ std::vector<albaVME*> albaFakeLogicForTest::ChooseVMEs(albaString title, albaVME
 	return accepted;
 }
 
+
+
+//-------------------------------------------------------------------------
+void albaFakeLogicForTest::SelectView(albaView *view)
+{
+	albaFakeViewManagerForTest *viewManager = dynamic_cast<albaFakeViewManagerForTest *>(albaServiceLocator::GetViewManager());
+	if (viewManager)
+		viewManager->SetSelectedView(view);
+}
 
 
 // UTILS /////////////////////////////////////////////////////////////////

@@ -58,5 +58,8 @@ public:
 
 	/** Delete the view with the given label (if open) and destroy its frame */
 	virtual void ViewClose(const char *label) = 0;
+
+	/** Return the selected view, NULL if none */
+	virtual albaView *GetSelectedView() = 0;
 };
 #endif

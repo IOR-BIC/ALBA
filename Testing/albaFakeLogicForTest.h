@@ -173,18 +173,14 @@ public:
 
 	void SetCitationPaper(char *link) override;
 
-	/** Store the selected view */
-	void SelectView(albaView *view) override { m_SelectedView = view; };
-
-	/** Return the selected view */
-	albaView *GetSelectedView() override { return m_SelectedView; };
+	/** Store the selected view in the registered albaFakeViewManagerForTest */
+	void SelectView(albaView *view) override;
 
 	bool IsTimeVaringEnabled() override;
 
 protected:
 	
 	std::vector<calls> m_Calls;
-	albaView *m_SelectedView = NULL;
 	std::vector<albaVME*> m_ChooseCandidates;
 	int m_ChooseCalls = 0;
 	bool m_ViewContextualMenuWithVME = false;

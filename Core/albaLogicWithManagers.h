@@ -263,9 +263,6 @@ public:
 	/** Select a view: the side bar, the interaction and the operations work on it */
 	void SelectView(albaView *view) override;
 
-	/** Return the selected view, NULL if none */
-	albaView *GetSelectedView() override { return m_SelectedView; }
-
 
 	bool IsTimeVaringEnabled() override;
 
@@ -479,7 +476,6 @@ protected:
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
 
-	albaView *m_SelectedView; ///< the view selected with SelectView
 
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;

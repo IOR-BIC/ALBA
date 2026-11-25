@@ -108,8 +108,6 @@ public:
 	/** Select a view (also called by the view frames when they are activated or clicked): the view manager,
 	the side bar, the interaction and the operations work on it. Nothing else happens if it is already selected */
 	virtual void SelectView(albaView *view) = 0;
-	/** Return the selected view, NULL if none */
-	virtual albaView *GetSelectedView() = 0;
 
 	/** Called by the view manager when it creates a view: create the frame of the view and attach the view to it */
 	virtual void CreateViewFrame(albaView *view) = 0;

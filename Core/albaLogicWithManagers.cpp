@@ -176,8 +176,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SelectedLandmark = NULL;
 	m_FatalExptionOccurred = false;
 
-	m_SelectedView = NULL;
-
 	m_OpeningMSF = false;
 
 	m_AppLayout = NULL;
@@ -1189,8 +1187,6 @@ void albaLogicWithManagers::ViewDeleted(albaView *view)
 {
 	if (m_PlugControlPanel)
 		m_SideBar->ViewDeleted(view);
-	if (view == m_SelectedView)
-		m_SelectedView = NULL;
 	EnableMenuAndToolbar();
 
 	if (m_OpManager)
@@ -1209,13 +1205,12 @@ void albaLogicWithManagers::CascadeViewFrames()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::SelectView(albaView *view)
 {
+	albaView *oldView = m_ViewManager ? m_ViewManager->GetSelectedView() : NULL;
 	if (m_ViewManager && view)
 		m_ViewManager->ViewSelected(view);
 
-	if (view == m_SelectedView)
+	if (view == oldView)
 		return;
-
-	m_SelectedView = view;
 
 	if (m_SideBar)
 		m_SideBar->ViewSelect(view);

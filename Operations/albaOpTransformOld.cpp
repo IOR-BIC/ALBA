@@ -230,7 +230,7 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
       m_Gui->Enable(ID_TRANSLATION_STEP, m_UseGizmo?true:false);
       m_Gui->Enable(ID_ENABLE_STEP, m_UseGizmo?true:false);
       
-      if (m_UseGizmo == 0 && (GetLogicManager()->GetSelectedView() != NULL))
+      if (m_UseGizmo == 0 && (GetViewManager()->GetSelectedView() != NULL))
       {
         m_GizmoRotate->Show(false);
         m_GizmoTranslate->Show(false);
@@ -247,21 +247,21 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
           m_GizmoRotate->Show(false);
           m_GizmoScale->Show(false);
           m_GizmoTranslate->SetRefSys(m_RefSysVME);
-          m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+          m_GizmoTranslate->Show(true);
         }
         else if (m_ActiveGizmo == ROT_GIZMO)
         {
           m_GizmoTranslate->Show(false);
           m_GizmoScale->Show(false);
           m_GizmoRotate->SetRefSys(m_RefSysVME);
-          m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+          m_GizmoRotate->Show(true);
         }
         else if (m_ActiveGizmo == SCAL_GIZMO)
         {
           m_GizmoTranslate->Show(false);
           m_GizmoRotate->Show(false);
           m_GizmoScale->SetRefSys(m_RefSysVME);
-          m_GizmoScale->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+          m_GizmoScale->Show(true);
         }
       }
 			GetViewManager()->CameraUpdate();
@@ -275,21 +275,21 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
         m_GizmoRotate->Show(false);
         m_GizmoScale->Show(false);
         m_GizmoTranslate->SetRefSys(m_RefSysVME);
-        m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+        m_GizmoTranslate->Show(true);
       }
       else if (m_ActiveGizmo == ROT_GIZMO)
       {
         m_GizmoTranslate->Show(false);
         m_GizmoScale->Show(false);
         m_GizmoRotate->SetRefSys(m_RefSysVME);
-        m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+        m_GizmoRotate->Show(true);
       }
       else if (m_ActiveGizmo == SCAL_GIZMO)
       {
         m_GizmoTranslate->Show(false);
         m_GizmoRotate->Show(false);
         m_GizmoScale->SetRefSys(m_RefSysVME);
-        m_GizmoScale->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+        m_GizmoScale->Show(true);
       }
 			GetViewManager()->CameraUpdate();
     }

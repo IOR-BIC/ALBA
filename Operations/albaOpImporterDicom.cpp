@@ -585,7 +585,7 @@ void albaOpImporterDicom::CreateLoadPage()
 	m_LoadPage->AddGuiLowerCenter(m_LoadGuiCenter);
 
 	// the views of the pages are selected while they are shown: the mouse and the interaction work on them
-	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	m_OldSelectedView = GetViewManager()->GetSelectedView();
 	if (m_Input)
 		m_LoadPage->GetView()->VmeSelect(m_Input, true); // the view GUI, built by the side bar, needs the selected VME
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
