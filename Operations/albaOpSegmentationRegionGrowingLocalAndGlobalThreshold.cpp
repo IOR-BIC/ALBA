@@ -34,7 +34,6 @@
 #include "albaGUIHistogramWidget.h"
 #include "albaGUIDialog.h"
 #include "albaOpVolumeResample.h"
-#include "albaDeviceButtonsPad.h"
 #include "albaEventInteraction.h"
 #include "albaProgressBarHelper.h"
 

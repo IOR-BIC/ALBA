@@ -38,6 +38,7 @@ class vtkImageData;
 class albaGUIRangeSlider;
 class albaGUILutSlider;
 class vtkLookupTable;
+class albaInteractionTool;
 
 //----------------------------------------------------------------------------
 /** albaGUIHistogramWidget : widget that encapsulate render window into a gui*/
@@ -55,8 +56,6 @@ public:
   
   /** Main Event handler */
   void OnEvent(albaEventBase *event);
-
-  ALBA_ID_DEC(RANGE_MODIFIED);
 
   enum HISTOGRAM_WIDGET_ID
   {
@@ -112,6 +111,9 @@ public:
   
   /** Update position of the gizmo lines */
   void UpdateLines(int min,int max);
+
+  /** The mouse moved on the histogram: show the number of samples of the bin under the cursor */
+  void OnMouseMove(double pos[2]);
 protected:
 
 	/** Returns the component name */
@@ -156,5 +158,6 @@ protected:
   albaRWI        *m_HistogramRWI;
   vtkALBAHistogram  *m_Histogram;
 	vtkImageData  *m_HistogramData;
+  albaInteractionTool *m_MoveTool; ///< tool getting the mouse moves of the render window
 };
 #endif

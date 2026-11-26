@@ -41,7 +41,7 @@ class ALBA_EXPORT albaGUIVMEChooser : public albaGUIDialog
 {
 
 public:
-	albaGUIVMEChooser(albaGUIVMETree *tree, wxString dialog_title = "Vme Chooser", void *vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree = NULL);
+	albaGUIVMEChooser(albaGUIVMETree *tree, wxString dialog_title = "Vme Chooser", albaVMEAcceptFunction vme_accept_function = NULL, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree = NULL);
 
 	~albaGUIVMEChooser();
 
@@ -50,7 +50,6 @@ public:
 
 protected:
 	albaGUIVMEChooserTree *m_ChooserTree;
-	ValidateCallBackType m_ValidateCallback; // pointer to the callback
 	
 	void LoadLayout();
 	void SaveLayout();

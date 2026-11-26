@@ -49,10 +49,8 @@
 #endif
 
 #include "albaGUIApplicationSettings.h"
-#include "albaDevice.h"
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
+#include "albaPositionalEventRouter.h"
+#include "albaServiceLocator.h"
 #include "albaEvent.h"
 
 #include "vtkALBASmartPointer.h"
@@ -82,6 +80,8 @@
 #include <fstream>
 //----------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS(albaRWIBase, wxWindow)
+
+albaRWIBase *albaRWIBase::m_LastMouseRWI = NULL;
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(albaRWIBase, wxWindow)
   EVT_PAINT(albaRWIBase::OnPaint)
@@ -107,6 +107,17 @@ END_EVENT_TABLE()
 albaRWIBase::albaRWIBase() : wxWindow(), vtkRenderWindowInteractor(), m_Timer(this, ID_albaRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
+  m_Camera = NULL;
+  m_View = NULL;
+  m_CameraInteractionEnabled = true;
+  m_StereoMovieLeftEye = m_StereoMovieRightEye = NULL;
+  m_StereoImage = NULL;
+  m_StereoMoviewFrameWriter = NULL;
+  m_StereoMovieEnable = m_StereoFrameGenerate = false;
+  m_CustomInteractorStyle = false;
+  m_Width = m_Height = 10;
+  m_LastX = m_LastY = 0;
+  m_LeftDown = m_MiddleDown = m_RightDown = false;
 }
 //----------------------------------------------------------------------------
 albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
@@ -121,8 +132,8 @@ albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
   m_Width = m_Height = 10;
   
   m_Camera    = NULL;
-  m_Mouse     = NULL;
-  m_Listener  = NULL;
+  m_View      = NULL;
+  m_CameraInteractionEnabled = true;
   
   m_StereoMovieDir     = "";
   m_StereoMovieFrameCounter = 0;
@@ -135,6 +146,7 @@ albaRWIBase::albaRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 
   m_LastX = 0;
   m_LastY = 0;
+  m_LeftDown = m_MiddleDown = m_RightDown = false;
 
   m_CustomInteractorStyle = false;
 }
@@ -147,6 +159,8 @@ albaRWIBase::~albaRWIBase()
   vtkDEL(m_StereoImage);
   vtkDEL(m_StereoMoviewFrameWriter);
 
+  if (m_LastMouseRWI == this)
+    m_LastMouseRWI = NULL;
   this->SetRenderWindow(NULL);
 }
 //----------------------------------------------------------------------------
@@ -154,12 +168,6 @@ albaRWIBase * albaRWIBase::New()
 //----------------------------------------------------------------------------
 {
   return new albaRWIBase();
-}
-//----------------------------------------------------------------------------
-void albaRWIBase::SetMouse(albaDeviceButtonsPadMouse *mouse)
-//----------------------------------------------------------------------------
-{
-  m_Mouse = mouse;
 }
 //----------------------------------------------------------------------------
 void albaRWIBase::Initialize()
@@ -309,7 +317,9 @@ void albaRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  CaptureMouse();
+  // the mouse is captured by the first button pressed and released with the last one  if (GetCapture() != this)
+    CaptureMouse();
+  m_LeftDown = true;
   NotifyClick(); 
 
   if (m_CustomInteractorStyle)
@@ -319,19 +329,11 @@ void albaRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_BUTTON_DOWN);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-		e.SetButton(ALBA_LEFT_BUTTON);
-		e.SetModifier(ALBA_SHIFT_KEY, event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnLeftButtonDown(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -340,7 +342,9 @@ void albaRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  CaptureMouse();
+  if (GetCapture() != this)
+    CaptureMouse();
+  m_MiddleDown = true;
   NotifyClick(); 
 
   if (m_CustomInteractorStyle)
@@ -350,19 +354,11 @@ void albaRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_BUTTON_DOWN);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(ALBA_MIDDLE_BUTTON);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnMiddleButtonDown(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -371,7 +367,9 @@ void albaRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
 {
   if (!Enabled) return;
 
-  CaptureMouse();
+  if (GetCapture() != this)
+    CaptureMouse();
+  m_RightDown = true;
   NotifyClick(); 
 
   if (m_CustomInteractorStyle)
@@ -381,97 +379,76 @@ void albaRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_BUTTON_DOWN);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(ALBA_RIGHT_BUTTON);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnRightButtonDown(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
 void albaRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  m_LeftDown = false;
+  if (!m_MiddleDown && !m_RightDown && GetCapture() == this)
+    ReleaseMouse();
+
   if (!Enabled) return;
 
   m_StereoFrameGenerate = false;
 
-  if( GetCapture() == this )
-    ReleaseMouse();
-  
-	if (m_CustomInteractorStyle)
+  if (m_CustomInteractorStyle)
   {
-	  SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
-	  InvokeEvent(vtkCommand::LeftButtonReleaseEvent,NULL);
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    InvokeEvent(vtkCommand::LeftButtonReleaseEvent,NULL);
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_BUTTON_UP);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(ALBA_LEFT_BUTTON);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnLeftButtonUp(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
 void albaRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  m_MiddleDown = false;
+  if (!m_LeftDown && !m_RightDown && GetCapture() == this)
+    ReleaseMouse();
+
   if (!Enabled) return;
 
   m_StereoFrameGenerate = false;
 
-  if( GetCapture() == this )
-    ReleaseMouse();
-
   if (m_CustomInteractorStyle)
   {
-	  SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
-	  InvokeEvent(vtkCommand::MiddleButtonReleaseEvent,NULL);
+    SetEventInformation(event.GetX(),m_Height - event.GetY() - 1,event.ControlDown(),event.ShiftDown());
+    InvokeEvent(vtkCommand::MiddleButtonReleaseEvent,NULL);
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_BUTTON_UP);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(ALBA_MIDDLE_BUTTON);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnMiddleButtonUp(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
 void albaRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  m_RightDown = false;
+  if (!m_LeftDown && !m_MiddleDown && GetCapture() == this)
+    ReleaseMouse();
+
   if (!Enabled) return;
 
   m_StereoFrameGenerate = false;
-
-  if( GetCapture() == this )
-    ReleaseMouse();
 
   if (m_CustomInteractorStyle)
   {
@@ -480,19 +457,11 @@ void albaRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_BUTTON_UP);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(ALBA_RIGHT_BUTTON);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnRightButtonUp(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -520,46 +489,29 @@ void albaRWIBase::OnMouseMotion(wxMouseEvent &event)
   }
   else
   {
-    albaEventInteraction e(this,DEVICE_MOUSE_2D_MOVE);
-    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetModifier(ALBA_SHIFT_KEY,event.ShiftDown());
-    e.SetModifier(ALBA_CTRL_KEY,event.ControlDown());
-    e.SetModifier(ALBA_ALT_KEY,event.AltDown());
-    e.SetChannel(MCH_OUTPUT);
-    if(m_Mouse) 
-      m_Mouse->OnEvent(&e);
-    else if (m_Listener)
-    {
-      m_Listener->OnEvent(&e);
-    }
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnMouseMove(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 
 //----------------------------------------------------------------------------
 void albaRWIBase::OnMouseWheel(wxMouseEvent &event)
+//----------------------------------------------------------------------------
 {
-	if (!Enabled) return;
+  if (!Enabled) return;
 
-	bool rotateUp = event.GetWheelRotation() > 0;
-
-	double delta;
-	delta = event.GetWheelRotation();
-	albaEventInteraction e(this, DEVICE_MOUSE_WHEEL);
-	e.Set2DPosition(event.GetX(), m_Height - event.GetY() - 1);
-	e.SetData(&delta);
-
-	e.SetModifier(ALBA_SHIFT_KEY, event.ShiftDown());
-	e.SetModifier(ALBA_CTRL_KEY, event.ControlDown());
-	e.SetModifier(ALBA_ALT_KEY, event.AltDown());
-	e.SetChannel(MCH_OUTPUT);
-	if (m_Mouse)
-		m_Mouse->OnEvent(&e);
-	else if (m_Listener)
-	{
-		m_Listener->OnEvent(&e);
-	}
+  double rotation = event.GetWheelRotation();
+  {
+    m_LastMouseRWI = this;
+    double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
+    albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
+    per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
+    per->OnMouseWheel(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos, rotation);
+  }
 }
-
 //----------------------------------------------------------------------------
 void albaRWIBase::OnTimer(wxTimerEvent &event)
 //----------------------------------------------------------------------------
@@ -627,10 +579,16 @@ void albaRWIBase::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 void albaRWIBase::OnMouseCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
 {
-	wxMouseEvent evt = wxMouseEvent();
-	evt.SetX(m_LastX);
-	evt.SetY(m_LastY);
-	OnLeftMouseButtonUp(evt);
+  // alt-tab or a modal dialog during an interaction: the buttons pressed are released at the last position
+  wxMouseEvent up;
+  up.SetX(m_LastX);
+  up.SetY(m_LastY);
+  if (m_LeftDown)
+    OnLeftMouseButtonUp(up);
+  if (m_MiddleDown)
+    OnMiddleMouseButtonUp(up);
+  if (m_RightDown)
+    OnRightMouseButtonUp(up);
 }
 
 //----------------------------------------------------------------------------

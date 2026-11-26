@@ -149,7 +149,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	GENERATE_LICENCE,
 	HELP_HOME,
 
-	UPDATE_UI,           // update menu and toolbar widgets
 	// events about vme
 	VME_SELECTED,  // from albaGUIVMEChooserTree
 	VME_PICKED,    // used sent to the listener a vtkPoint positioned at the picked position
@@ -173,13 +172,11 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MOUSE_UP,   // the mouse button was released: sent by albaGizmoSlice and albaToolSegmentation
 	MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
-	// input events of the devices (albaDeviceButtonsPad, albaDeviceButtonsPadMouse, albaDeviceButtonsPadTracker)
+	// mouse events (albaEventInteraction)
 	DEVICE_BUTTON_DOWN,
 	DEVICE_BUTTON_UP,
 	DEVICE_MOUSE_WHEEL,
 	DEVICE_MOUSE_2D_MOVE,
-	DEVICE_TRACKER_3D_MOVE,
-	DEVICE_TRACKER_BOUNDS_UPDATED,
 
 	ID_TRANSFORM, //added by Stefano. 30-11-2003
 
@@ -248,8 +245,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	VME_OUTPUT_DATA_PREUPDATE, ///< issued by albaDataPipe before the output data is actually updated
 	VME_OUTPUT_DATA_UPDATE, ///< issued when the output data is updated
 
-	AVATAR_ADDED,     ///< used to advise the InteractionManager an avatar has been added (issued by mmdTracker's)
-	AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been removed (issued by mmdTracker's)
 
 	// const used by albaGUI and albaGUIValidator
 	MINID,

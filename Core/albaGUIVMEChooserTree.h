@@ -27,13 +27,12 @@ enum VME_CHOOSER_STYLES
 // Include:
 //----------------------------------------------------------------------------
 #include "albaGUIVMETree.h"
+#include "albaAbsLogicManager.h"
 
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
 class albaVME;
-
-typedef bool (*ValidateCallBackType) (albaVME *);
 
 //----------------------------------------------------------------------------
 // albaGUIVMEChooserTree :
@@ -45,7 +44,7 @@ Another feature of the widget is to show also a checkbox near the VME's icon to 
 class albaGUIVMEChooserTree: public albaGUIVMETree
 {
 public:
-                 albaGUIVMEChooserTree (wxWindow *parent, albaGUIVMETree *tree, ValidateCallBackType vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree=NULL); 
+                 albaGUIVMEChooserTree (wxWindow *parent, albaGUIVMETree *tree, albaVMEAcceptFunction vme_accept_function = NULL, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, albaVME *subTree=NULL); 
   virtual       ~albaGUIVMEChooserTree();
 
   /** Return the choosed node*/
@@ -71,7 +70,7 @@ protected:
   /** respond to Selection Changed */
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
-  ValidateCallBackType m_ValidateFunction;
+  albaVMEAcceptFunction m_ValidateFunction;
 
   albaVME   *m_ChoosedNode; ///< Pointer to the selected node in single selection.
   long       m_ChooserTreeStyle;

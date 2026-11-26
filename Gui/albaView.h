@@ -30,13 +30,10 @@ class albaSceneGraph;
 class albaVME;
 class albaGUI;
 class albaGUIHolder;
-class albaDeviceButtonsPadMouse;
-class albaDevice;
 class albaInteractionBehavior;
 
 class albaRWIBase;
 class vtkCellPicker;
-class vtkALBARayCast3DPicker;
 class vtkAssemblyPath;
 
 //----------------------------------------------------------------------------
@@ -99,7 +96,6 @@ public:
 
   virtual void			CameraReset(albaVME *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
-  virtual void      SetMouse(albaDeviceButtonsPadMouse *mouse)                               {};
   virtual albaRWIBase *GetRWI()                                              {return NULL;};
   virtual albaSceneGraph *GetSceneGraph()                                    {return NULL;};
   virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};
@@ -107,11 +103,6 @@ public:
   /** Called to update all components that depends on Application Options.*/
   virtual void      OptionsUpdate()                                         {};
 
-  /** 
-  Find the pocked VME at button down. As argument the function needs
-  the device which performed the action, and provides as result pointers
-  to piked prop, vme and its behavior if it exists. */
-  virtual bool FindPokedVme(albaDevice *device,albaMatrix &point_pose,albaVME *&picked_vme,albaInteractionBehavior *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having albaView::GetNodeStatus allow albaGUIVMETree to not know about albaSceneGraph
@@ -141,9 +132,6 @@ public:
 
   /** Perform a picking according to the screen position (x,y) and return true on success*/
   virtual bool Pick(int x, int y);
-
-  /** Perform a picking according to the absolute matrix given and return true on success*/
-  virtual bool Pick(albaMatrix &m);
 
   /** Write into the double array the position picked during Pick method.*/
   virtual void GetPickedPosition(double pos[3]);
@@ -195,7 +183,6 @@ protected:
   albaGUIHolder	*m_Guih;
 
   vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
-  vtkALBARayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
 
   albaVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
   double         m_PickedPosition[3];

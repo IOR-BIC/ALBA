@@ -22,7 +22,6 @@
 
 class albaView;
 class albaVME;
-class albaMatrix;
 class vtkRenderWindow;
 
 /** Picking functions shared by the interactors.
@@ -43,10 +42,10 @@ public:
   /** Same as above, on the renderers of the given render window. */
   static bool PickCell(vtkRenderWindow *renderWindow, double x, double y, double pickedPos[3], albaVME **pickedVme = NULL, vtkIdType *cellId = NULL);
 
-  /** Pick the VME at the display position mousePos, or along the tracker pose trackerPose when mousePos is NULL.
+  /** Pick the VME at the display position mousePos.
     Return true if a VME has been picked, setting the picked position, the id of the nearest point of the
     VME data and its scalar value (see GetPointScalar). */
-  static bool PickPoint(albaView *view, double *mousePos, albaMatrix *trackerPose, double pickedPos[3], albaVME *&pickedVme, vtkIdType &pointId, double &scalar);
+  static bool PickPoint(albaView *view, double mousePos[2], double pickedPos[3], albaVME *&pickedVme, vtkIdType &pointId, double &scalar);
 
   /** Return the id of the point of the VME data nearest to pos (-1 if not found) and set scalar to its
     scalar value (0 if the data has no scalars). If clampToBounds is true pos is first clamped into the

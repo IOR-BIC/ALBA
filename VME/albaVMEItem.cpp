@@ -65,8 +65,6 @@ albaVMEItem::albaVMEItem()
   m_InputMemory     = NULL;
   m_InputMemorySize = 0;
 
-  m_DataObserver= new albaVMEItemAsynchObserver();
-
   m_ReleaseOldFile  = true;
   m_IsLoadingData   = false;
 
@@ -79,7 +77,6 @@ albaVMEItem::albaVMEItem()
 albaVMEItem::~albaVMEItem()
 //-------------------------------------------------------------------------
 {
-  cppDEL(m_DataObserver);
   SetURL(""); // this simply force to garbage collect the linked URL when the item is destroyed
   albaDEL(m_TagArray);
 }
@@ -380,31 +377,4 @@ void albaVMEItem::SetGlobalCompareDataFlag(bool f)
 //----------------------------------------------------------------------------
 {
   (*GetGlobalCompareDataFlag()) = f;
-}
-
-//----------------------------------------------------------------------------
-//     ****************  albaVMEItemAsynchObserver  ****************
-//----------------------------------------------------------------------------
-ALBA_ID_IMP(albaVMEItemAsynchObserver::VME_ITEM_DATA_DOWNLOADED);
-
-//----------------------------------------------------------------------------
-albaVMEItemAsynchObserver::albaVMEItemAsynchObserver()
-//----------------------------------------------------------------------------
-{
-  m_Item = NULL;
-}
-//----------------------------------------------------------------------------
-albaVMEItemAsynchObserver::~albaVMEItemAsynchObserver() 
-//----------------------------------------------------------------------------
-{
-  m_Item = NULL;
-}
-//----------------------------------------------------------------------------
-void albaVMEItemAsynchObserver::OnEvent(albaEventBase *alba_event)
-//----------------------------------------------------------------------------
-{
-  if (alba_event->GetId() == VME_ITEM_DATA_DOWNLOADED)
-  {
-    m_Item->ReadData(m_Filename);
-  }
 }

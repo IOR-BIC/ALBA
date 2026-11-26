@@ -22,6 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpFlipNormals.h"
 #include "albaGUIBusyInfo.h"
 
@@ -29,7 +30,6 @@
 
 #include "albaRWI.h"
 #include "albaViewVTK.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "albaGUIDialog.h"
 #include "albaGUIButton.h"
@@ -229,9 +229,7 @@ void albaOpFlipNormals::CreateOpDialog()
 	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
 	m_Rwi->SetSize(0,0,800,800);
 	m_Rwi->Show(true);
-	m_Rwi->m_RwiBase->SetMouse(m_Mouse);
-	m_View->SetMouse(m_Mouse);
-	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	m_OldSelectedView = GetViewManager()->GetSelectedView();
 	GetLogicManager()->SelectView(m_View);
 
 	m_Rwi->m_RenFront->AddActor(m_PolydataActor);
@@ -249,7 +247,7 @@ void albaOpFlipNormals::CreateOpDialog()
 
 	m_SelectCellTool->SetListener(this);
 	m_SelectCellTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
-	GetLogicManager()->PushTool(m_SelectCellTool);
+	GetPositionalEventRouter()->PushTool(m_SelectCellTool);
 
 	wxPoint p = wxDefaultPosition;
 
@@ -378,7 +376,7 @@ void albaOpFlipNormals::CreateNormalsPipe()
 void albaOpFlipNormals::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-	GetLogicManager()->PopTool(m_SelectCellTool);
+	GetPositionalEventRouter()->PopTool(m_SelectCellTool);
 
 	albaDEL(m_SelectCellTool);
 

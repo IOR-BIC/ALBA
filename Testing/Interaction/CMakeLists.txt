@@ -30,30 +30,19 @@ SET(PROJECT_SRCS
 	albaGizmoInterfaceTest.h albaGizmoInterfaceTest.cpp
 	albaInteractorConstraintTest.h albaInteractorConstraintTest.cpp
 	albaRefSysTest.h albaRefSysTest.cpp
-	albaDeviceSetTest.h albaDeviceSetTest.cpp
 	albaGizmoTranslateGUITest.h albaGizmoTranslateGUITest.cpp
 	albaGizmoRotateGUITest.h albaGizmoRotateGUITest.cpp
 	albaGizmoScaleGUITest.h albaGizmoScaleGUITest.cpp
 	albaEventInteractionTest.h albaEventInteractionTest.cpp
-	albaDeviceManagerTest.h albaDeviceManagerTest.cpp
-	albaInteractionFactoryTest.h albaInteractionFactoryTest.cpp
 	albaTransformTextEntriesGUITest.h albaTransformTextEntriesGUITest.cpp
-	albaActionTest.h albaActionTest.cpp
 	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
-	albaAgentEventQueueTest.h albaAgentEventQueueTest.cpp
-	albaAgentThreadedTest.h albaAgentThreadedTest.cpp
 	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp
-	albaDeviceTest.h albaDeviceTest.cpp
 	albaGizmoScaleAxisTest.h albaGizmoScaleAxisTest.cpp
 	albaGizmoScaleTest.h albaGizmoScaleTest.cpp
-	#albaDeviceClientALBATest.h albaDeviceClientALBATest.cpp
 	albaToolExtractIsosurfaceTest.h albaToolExtractIsosurfaceTest.cpp
 	albaInteractionBehaviorTest.h albaInteractionBehaviorTest.cpp
-	albaAvatarTest.h albaAvatarTest.cpp 
-	albaStaticEventRouterTest.h albaStaticEventRouterTest.cpp
 	albaGizmoInterfaceGUITest.h albaGizmoInterfaceGUITest.cpp
 	albaTransformInterfaceGUITest.h albaTransformInterfaceGUITest.cpp
-	albaAvatar3DConeTest.h albaAvatar3DConeTest.cpp
 	albaRotateTranslateGUITest.h albaRotateTranslateGUITest.cpp
 	albaBehaviorRotateTranslateTest.h albaBehaviorRotateTranslateTest.cpp
 	albaToolFlyToTest.h albaToolFlyToTest.cpp

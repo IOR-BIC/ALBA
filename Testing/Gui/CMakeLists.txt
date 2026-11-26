@@ -6,29 +6,6 @@ ELSE(ALBA_BUILD_ALBADLL)
   SET(PROJECT_LIBS albaTests GPUAPI albaCore albaVME albaGui albaVisualPipes albaCommon albaViews albaInteraction albaService)
 ENDIF(ALBA_BUILD_ALBADLL)
 
-
-#SUBDIRS(Minimal)
-#SUBDIRS(01_testGui)
-#SUBDIRS(02_testFrame)
-#SUBDIRS(03_testMenu)
-#SUBDIRS(04_testSash)
-#SUBDIRS(05_testLog)
-#SUBDIRS(06_testTab)
-#SUBDIRS(07_testSideBar)
-#SUBDIRS(08_testStatusBar)
-#SUBDIRS(09_testTimeBar)
-#SUBDIRS(10_testPicFactory)
-#SUBDIRS(11_testTree)
-#SUBDIRS(12_Bmp2Xpm)
-#SUBDIRS(13_testCheckTree)
-#SUBDIRS(14_testOpMan)
-#SUBDIRS(15_testDialog)
-#SUBDIRS(16_testRWI)
-#SUBDIRS(17_TestWXVTK)
-#SUBDIRS(18_testView)
-#SUBDIRS(19_testVMEChooser)
-
-
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------

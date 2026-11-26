@@ -40,7 +40,6 @@
 
 #include "albaEvent.h"
 #include "albaRWIBase.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGUI.h"
 #include "albaAbsLogicManager.h"
 
@@ -55,14 +54,12 @@
 albaViewManager::albaViewManager() :	albaGUISettings(this, _("View Manager"))
 //----------------------------------------------------------------------------
 {
-  m_Mouse       = NULL;
   m_SelectedRWI = NULL;
 
 	m_SettingsGui = NULL;
 	InitializeSettings();
 
   m_ViewList          = NULL;
-  m_Listener          = NULL;
   m_SelectedVme       = NULL;
   m_SelectedView      = NULL;
   m_SkipCameraUpdate  = 0;
@@ -82,8 +79,6 @@ albaViewManager::albaViewManager() :	albaGUISettings(this, _("View Manager"))
 //----------------------------------------------------------------------------
 albaViewManager::~albaViewManager()
 {	
-	if(m_SelectedRWI)
-    m_SelectedRWI->SetMouse(NULL);
 	
 	albaView *v = NULL;
 
@@ -98,14 +93,6 @@ albaViewManager::~albaViewManager()
 
   for(int i=0; i<m_TemplateNum; i++) // destroy all template views
     cppDEL(m_ViewTemplate[i]);
-}
-
-//----------------------------------------------------------------------------
-void albaViewManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-  m_Mouse = mouse;
-  if(m_SelectedView && m_Mouse)
-    m_Mouse->SetView(m_SelectedView); // Update the mouse for the selected view
 }
 
 //----------------------------------------------------------------------------
@@ -211,9 +198,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 				m_Config->Flush();
 			}
 			break;
-      default:
-        albaEventMacro(*e); // forward up the event
-      break; 
     }
 	}
 }
@@ -497,7 +481,6 @@ albaView *albaViewManager::ViewCreate(wxString label)
 void albaViewManager::ViewInsert(albaView *view)
 {
 	view->SetListener(this);
-  view->SetMouse(m_Mouse); // set the mouse for the specified view
   if(m_RootVme != NULL)
   {
     albaVMEIterator *iter = m_RootVme->NewIterator(); // iterate over inserted vme
@@ -552,10 +535,9 @@ void albaViewManager::ViewClose(const char *label)
 //----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
 {
-  if(m_SelectedView)
+  // only the deleted view loses the selection
+  if(view == m_SelectedView)
   {
-    if(m_SelectedRWI)
-      m_SelectedRWI->SetMouse(NULL); // update the selected view rwi
     m_SelectedRWI = NULL;
     m_SelectedView = NULL;
   }
@@ -594,8 +576,6 @@ void albaViewManager::ViewDeleteAll()
 {
   if(m_SelectedView)
   {
-    if(m_SelectedRWI) 
-      m_SelectedRWI->SetMouse(NULL);
     m_SelectedRWI = NULL;
     m_SelectedView = NULL;
   }

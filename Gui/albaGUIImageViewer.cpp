@@ -26,7 +26,6 @@
 #include "albaGUIImageViewer.h"
 
 #include "albaDecl.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGUI.h"
 #include "albaGUIButton.h"
 #include "albaGUIDialog.h"
@@ -228,7 +227,6 @@ void albaGUIImageViewer::ShowImageDialog(albaVMEGroup *group, int selection)
 		m_Rwi->CameraSet(CAMERA_CT);
 		m_Rwi->CameraUpdate();
 
-		m_Rwi->m_RwiBase->SetMouse(m_Mouse);
 		m_Rwi->m_RenFront->AddActor(m_Actor);
 
 		m_RwiSizer->Add(m_Rwi->m_RwiBase, 1, wxEXPAND);

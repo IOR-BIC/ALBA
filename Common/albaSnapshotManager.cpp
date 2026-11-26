@@ -25,7 +25,6 @@
 #include "albaDecl.h"
 #include "albaSnapshotManager.h"
 
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGUIImageViewer.h"
 #include "albaLogicWithManagers.h"
 #include "albaRWIBase.h"
@@ -262,12 +261,6 @@ bool albaSnapshotManager::HasSnapshots(albaVME *root)
 		m_SnapshotsGroup = (albaVMEGroup *)root->FindInTreeByName(m_GroupName);
 
 	return m_SnapshotsGroup && m_SnapshotsGroup->GetNumberOfChildren() > 0;
-}
-
-//----------------------------------------------------------------------------
-void albaSnapshotManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-	m_ImageViewer->SetMouse(mouse);
 }
 
 //----------------------------------------------------------------------------

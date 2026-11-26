@@ -30,7 +30,6 @@
 #include "albaSmartPointer.h"
 #include "albaOp.h"
 #include "albaVMEGroup.h"
-#include "albaDeviceButtonsPadMouse.h"
 #include "albaGUI.h"
 
 #include <iostream>
@@ -241,24 +240,6 @@ void albaOpTest::TestIsCompatible()
 {
   result = m_Op->IsCompatible((long)0xFFFF);
   TEST_RESULT
-}
-//----------------------------------------------------------------------------
-void albaOpTest::TestGetActions()
-//----------------------------------------------------------------------------
-{
-  result = m_Op->GetActions() == NULL;
-  TEST_RESULT
-}
-//----------------------------------------------------------------------------
-void albaOpTest::TestSetGetMouse()
-//----------------------------------------------------------------------------
-{
-  albaDeviceButtonsPadMouse *mouse;
-  mouse = albaDeviceButtonsPadMouse::New();
-  m_Op->SetMouse(mouse);
-  result = m_Op->GetMouse() == mouse;
-  TEST_RESULT
-  mouse->Delete();
 }
 //----------------------------------------------------------------------------
 void albaOpTest::TestTestModeOn()

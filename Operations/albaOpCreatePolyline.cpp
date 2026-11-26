@@ -19,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpCreatePolyline.h"
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -104,7 +105,7 @@ void albaOpCreatePolyline::OpRun()
 		UpdateGui();
 	}
 
-	albaView *view = GetLogicManager()->GetSelectedView();
+	albaView *view = GetViewManager()->GetSelectedView();
 
 	if (view)
 	{
@@ -116,7 +117,7 @@ void albaOpCreatePolyline::OpRun()
 		m_PointInteractor->SetColorText(1, 0, 0);
 		m_PointInteractor->ShowText(false);
 
-		GetLogicManager()->PushTool(m_PointInteractor);
+		GetPositionalEventRouter()->PushTool(m_PointInteractor);
 		m_PointInteractor->Enable(true);
 		m_PointInteractor->SetListener(this);
 
@@ -164,7 +165,7 @@ void albaOpCreatePolyline::OpStop(int result)
 	if (m_PointInteractor)
 	{
 		// Remove ExtraInteractor
-		GetLogicManager()->PopTool(m_PointInteractor);
+		GetPositionalEventRouter()->PopTool(m_PointInteractor);
 
 		m_PointInteractor->RemoveAllMeasures();
 		albaDEL(m_PointInteractor);

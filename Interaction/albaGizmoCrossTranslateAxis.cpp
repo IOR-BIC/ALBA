@@ -145,6 +145,8 @@ albaGizmoCrossTranslateAxis::~albaGizmoCrossTranslateAxis()
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData);
 	//----------------------
+	// the PER can keep the behavior alive: it must not notify the deleted gizmo
+	m_IsaGen->SetListener(NULL);
 	vtkDEL(m_IsaGen); 
 
 	// clean up translation feedback stuff
@@ -279,7 +281,7 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 void albaGizmoCrossTranslateAxis::CreateISA()
 //----------------------------------------------------------------------------
 {
-	m_IsaGen = albaBehaviorTransform::New();
+	albaNEW(m_IsaGen);
 
 	m_IsaGen->SetVME(m_InputVme);
 	m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);

@@ -47,9 +47,6 @@ public:
   /** destructor */
   ~albaVMEManager(); 
 
-  /** Set the event receiver object*/
-  void SetListener(albaObserver *listener) {m_Listener = listener;};
-
   /** Process events coming from other components */
   void OnEvent(albaEventBase *e);
  
@@ -135,9 +132,6 @@ public:
   /** Remove temporary directory used for compressed msf files.*/
   void RemoveTempDirectory();
 
-  /** Set the flag for saving binary files associated to time varying VMEs.*/
-  void SetSingleBinaryFile(bool singleFile);
-
   /** Set the flag for test mode without GUI */
   void SetTestMode(bool testmode){m_TestMode = testmode;}; // Losi 02/16/2010 for test class
 
@@ -155,7 +149,6 @@ protected:
 
   bool                m_Modified;         ///< Used to known when the tree has been modified...
 
-  albaObserver*        m_Listener;         ///< Register the event receiver object
   wxConfigBase*       m_Config;           ///< Application configuration for file history management
 	wxArchiveFSHandler  *m_ZipHandler;      ///< Handler for zip archive (used to open zmsf files)
   wxFileSystem        *m_FileSystem;      ///< File system manager
@@ -172,7 +165,6 @@ protected:
 	 
   bool                m_LoadingFlag;      ///< used when an MSF is being loaded
   bool                m_Crypting;         ///< used to enable the Encryption for the MSF
-  bool                m_SingleBinaryFile; ///< used to store binary files associated to time varying VMEs as multiple files or not.
   albaVMEStorage*      m_Storage;          ///< Associated storage
   bool                m_TestMode;         ///< set true for test mode without GUI
 

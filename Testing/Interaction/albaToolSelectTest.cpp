@@ -50,8 +50,7 @@ void albaToolSelectTest::TestSelect()
   CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 1 && logic->GetCall(0).testFunction == albaFakeLogicForTest::FKL_VME_SELECT && logic->GetCall(0).vme == vme.GetPointer());
   CPPUNIT_ASSERT(tool->OnMiddleButtonDown(NULL, NULL, pos));
   CPPUNIT_ASSERT(tool->OnRightButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(tool->OnTrackerButtonDown(NULL, ALBA_LEFT_BUTTON, NULL));
-  CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 4);
+  CPPUNIT_ASSERT(logic->GetNumberOfCalls() == 3);
 
   albaDEL(tool);
 }

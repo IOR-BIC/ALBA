@@ -29,6 +29,7 @@
 #include "albaFakeLogicForTest.h"
 #include "albaFakeViewManagerForTest.h"
 #include "albaServiceLocator.h"
+#include "albaPositionalEventRouter.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -61,6 +62,8 @@ int main( int argc, char* argv[] )
 	
 	albaFakeLogicForTest *logic = new albaFakeLogicForTest();
 	albaServiceLocator::SetLogicManager(logic);
+	albaPositionalEventRouter *per = albaPositionalEventRouter::New(); // the router of the mouse events used by the render windows and the operations
+	albaServiceLocator::SetPositionalEventRouter(per);
 	albaFakeViewManagerForTest *viewManager = new albaFakeViewManagerForTest();
 	albaServiceLocator::SetViewManager(viewManager);
 	
@@ -80,6 +83,8 @@ int main( int argc, char* argv[] )
 	CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
 	outputter.write(); 
 
+	albaServiceLocator::SetPositionalEventRouter(NULL);
+	per->Delete();
 	cppDEL(logic);
 	cppDEL(viewManager);
 

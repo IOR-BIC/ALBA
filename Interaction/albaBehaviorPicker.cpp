@@ -30,8 +30,6 @@
 
 #include "albaView.h"
 //#include "albaViewCompound.h"
-#include "albaDeviceButtonsPadTracker.h"
-#include "albaAvatar3D.h"
 
 #include "albaRWIBase.h"
 #include "albaVME.h"
@@ -39,7 +37,6 @@
 
 #include "vtkALBASmartPointer.h"
 #include "vtkCellPicker.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkObjectFactory.h"
 #include "vtkPoints.h"
 #include "vtkRendererCollection.h"
@@ -90,25 +87,12 @@ bool albaBehaviorPicker::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 }
 
 //----------------------------------------------------------------------------
-bool albaBehaviorPicker::OnTrackerButtonDown(albaDeviceButtonsPadTracker *tracker, int button, albaMatrix *pose)
-{
-  if (button != ALBA_LEFT_BUTTON)
-    return false;
-
-  // the tracker picks along its pose in the world frame, no avatar == no picking
-  albaMatrix worldPose;
-  if (pose && tracker->TrackerToWorld(*pose, worldPose))
-    SendPickingInformation(tracker->GetView(), NULL, VME_PICKED, &worldPose, false);
-  return true;
-}
-
-//----------------------------------------------------------------------------
-void albaBehaviorPicker::SendPickingInformation(albaView *v, double *mouse_pos, int msg_id, albaMatrix *tracker_pos, bool mouse_flag)
+void albaBehaviorPicker::SendPickingInformation(albaView *v, double mouse_pos[2], int msg_id)
 //----------------------------------------------------------------------------
 {
   double pos_picked[3], scalar_value;
   albaVME *pickedVME;
   vtkIdType pid;
-  if (albaPickHelper::PickPoint(v, mouse_flag ? mouse_pos : NULL, mouse_flag ? NULL : tracker_pos, pos_picked, pickedVME, pid, scalar_value))
+  if (albaPickHelper::PickPoint(v, mouse_pos, pos_picked, pickedVME, pid, scalar_value))
     SendPickedPointEvent(msg_id, pos_picked, pid, scalar_value);
 }

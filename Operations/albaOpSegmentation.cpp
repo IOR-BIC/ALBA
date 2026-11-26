@@ -18,6 +18,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+#include "albaPositionalEventRouter.h"
 #include "albaOpSegmentation.h"
 
 #include "albaAbsLogicManager.h"
@@ -34,7 +35,6 @@
 #include "albaGUIPicButton.h"
 #include "albaGUIRollOut.h"
 #include "albaGUIValidator.h"
-#include "albaInteractionFactory.h"
 #include "albaToolSegmentationEdit.h"
 #include "albaToolSegmentationThreshold.h"
 #include "albaMatrix.h"
@@ -414,9 +414,7 @@ void albaOpSegmentation::InitializeInteractors()
 	m_View->SetCanSpin(false);
 
 	// the main mouse works on the view of the dialog: its events reach the PER of the interaction manager
-	m_View->GetRWI()->SetMouse(m_Mouse);
-	m_View->SetMouse(m_Mouse);
-	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	m_OldSelectedView = GetViewManager()->GetSelectedView();
 	GetLogicManager()->SelectView(m_View);
 
 	albaNEW(m_ThresholdTool);
@@ -427,7 +425,7 @@ void albaOpSegmentation::InitializeInteractors()
 	m_EditTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
 	m_EditTool->SetListener(this);
 
-	GetLogicManager()->PushTool(m_ThresholdTool);
+	GetPositionalEventRouter()->PushTool(m_ThresholdTool);
 }
 //----------------------------------------------------------------------------
 void albaOpSegmentation::InitVolumeDimensions()
@@ -982,8 +980,8 @@ void albaOpSegmentation::DeleteOpDialog()
 	// the tools are removed and the previous view selected again before the view is deleted
 	if (m_ThresholdTool)
 	{
-		GetLogicManager()->PopTool(m_ThresholdTool);
-		GetLogicManager()->PopTool(m_EditTool);
+		GetPositionalEventRouter()->PopTool(m_ThresholdTool);
+		GetPositionalEventRouter()->PopTool(m_EditTool);
 		GetLogicManager()->SelectView(m_OldSelectedView);
 	}
 	albaDEL(m_ThresholdTool);
@@ -1342,8 +1340,8 @@ void albaOpSegmentation::OnEditStep()
 	
 	m_View->CameraUpdate();
 
-	GetLogicManager()->PopTool(m_ThresholdTool);
-	GetLogicManager()->PushTool(m_EditTool);
+	GetPositionalEventRouter()->PopTool(m_ThresholdTool);
+	GetPositionalEventRouter()->PushTool(m_EditTool);
 
 	m_AutomaticScalarTextMapper->SetInput("");
 
@@ -1982,8 +1980,8 @@ void albaOpSegmentation::OnEditStepExit()
 	SetCursor(CUR_DEFAULT);
 
   // Logic stuff
-  GetLogicManager()->PopTool(m_EditTool);
-  GetLogicManager()->PushTool(m_ThresholdTool);
+  GetPositionalEventRouter()->PopTool(m_EditTool);
+  GetPositionalEventRouter()->PushTool(m_ThresholdTool);
    
   m_SnippetsLabel->SetLabel( _(""));
 }

@@ -19,6 +19,7 @@ PURPOSE. See the above copyright notice for more information.
 // This force to include Window, wxWidgets and VTK exactly in this order.
 //----------------------------------------------------------------------------
 
+#include "albaPositionalEventRouter.h"
 #include "albaOpMeasure2D.h"
 #include "albaDecl.h"
 
@@ -90,7 +91,7 @@ char ** albaOpMeasure2D::GetIcon()
 //----------------------------------------------------------------------------
 void albaOpMeasure2D::OpRun()
 {
-	albaView *view = GetLogicManager()->GetSelectedView();
+	albaView *view = GetViewManager()->GetSelectedView();
 
 	if(view==NULL)
 		view = OpenImageView(VIEW_START + 8); // Open View if necessary
@@ -205,7 +206,7 @@ void albaOpMeasure2D::InitInteractors()
 	InteractorEllipse->ShowText(m_ShowText);
 	m_InteractorVector.push_back(InteractorEllipse);
 
-	GetLogicManager()->PushTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PushTool(m_InteractorVector[m_CurrentInteractor]);
 
 
 	m_MaxMeasures = m_InteractorVector[m_CurrentInteractor]->GetMaxMeasures();
@@ -319,7 +320,7 @@ void albaOpMeasure2D::OpStop(int result)
 	}
 	
 	// Remove Interactor
-	GetLogicManager()->PopTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PopTool(m_InteractorVector[m_CurrentInteractor]);
 
 	for (int i = 0; i < m_InteractorVector.size(); i++)
 		albaDEL(m_InteractorVector[i]);
@@ -485,9 +486,9 @@ void albaOpMeasure2D::SetMeasureInteractor(int index)
 {
 	m_InteractorVector[m_CurrentInteractor]->Enable(false);
 
-	GetLogicManager()->PopTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PopTool(m_InteractorVector[m_CurrentInteractor]);
 	m_CurrentInteractor = index;
-	GetLogicManager()->PushTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PushTool(m_InteractorVector[m_CurrentInteractor]);
 
 	m_InteractorVector[m_CurrentInteractor]->SetListener(this);
 	m_InteractorVector[m_CurrentInteractor]->Enable();

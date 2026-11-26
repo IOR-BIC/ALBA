@@ -33,7 +33,6 @@ class albaVMERoot;
 class albaView;
 class albaGUIViewPanel;
 class albaRWIBase;
-class albaDeviceButtonsPadMouse;
 
 #ifdef ALBA_EXPORTS
 #include "albaDllMacros.h"
@@ -61,10 +60,9 @@ class ALBA_EXPORT albaViewManager : albaObserver, albaGUISettings, public albaSe
 public:
   albaViewManager();
  ~albaViewManager(); 
-  void SetListener(albaObserver *Listener) {m_Listener = Listener;};
   virtual void OnEvent(albaEventBase *alba_event);
 
-  /** Fill the main menù with plugged views. */
+  /** Fill the main menï¿½ with plugged views. */
 	void FillMenu (wxMenu* menu);
 
   /** Check if the view 'v' should be hidden from the 'View' menu.*/
@@ -88,7 +86,7 @@ public:
   /** Add the View to the view-list. */
 	virtual void ViewAdd(albaView *view, bool visibleInMenu = true);
   
-	/** Pass the selected render window to the mouse device. */
+	/** Store the selected view and its render window. */
   void ViewSelected(albaView *view);
   
   /** Activate the view from software to simulate the click on the view (used by remote). */
@@ -137,7 +135,7 @@ public:
 	virtual void PropertyUpdate(albaVME *vme = NULL, bool fromTag = false) override;
 
   /** Return the selected view. */
-	albaView *GetSelectedView();
+	albaView *GetSelectedView() override;
 
   /** Return the root of the vme tree. */
   albaVME *GetCurrentRoot() {return (albaVME*)m_RootVme;};
@@ -157,8 +155,6 @@ public:
   /** Return the view pointer from view's id and multiplicity. */
   albaView *GetView(int id, int mult) {return m_ViewMatrixID[id][mult];};
 
-  /** Initialize the action for the mouse device.*/
-  void SetMouse(albaDeviceButtonsPadMouse *mouse);
 
 	/* Return the gui for Settings Dialog*/
 	albaGUI* GetSettingsGui();
@@ -172,13 +168,11 @@ protected:
 	/** Initialize the application settings.*/
 	void InitializeSettings();
 
-  albaDeviceButtonsPadMouse      *m_Mouse;
   albaView       *m_ViewList;  // created view list
 
   albaView       *m_ViewTemplate[MAXVIEW];   // view template vector
   int            m_TemplateNum;       // number of template
 
-  albaObserver   *m_Listener;
   albaVMERoot    *m_RootVme;
   albaVME       *m_SelectedVme;
   albaView       *m_SelectedView;

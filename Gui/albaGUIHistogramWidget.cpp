@@ -31,11 +31,34 @@
 #include "albaGUIRangeSlider.h"
 #include "albaGUILutSlider.h"
 
-#include "albaDeviceButtonsPad.h"
-#include "albaDeviceButtonsPadMouse.h"
-#include "albaEventInteraction.h"
+#include "albaInteractionTool.h"
+#include "albaPositionalEventRouter.h"
+#include "albaServiceLocator.h"
+#include "albaRWIBase.h"
 #include "mmuIdFactory.h"
 
+//----------------------------------------------------------------------------
+class albaGUIHistogramWidgetTool : public albaInteractionTool // gives the mouse moves on the histogram renderer to the widget
+//----------------------------------------------------------------------------
+{
+public:
+  albaTypeMacro(albaGUIHistogramWidgetTool, albaInteractionTool);
+
+  albaGUIHistogramWidgetTool() {m_Widget = NULL; m_Renderer = NULL;}
+
+  virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+  {
+    if (ren != m_Renderer)
+      return false;
+    m_Widget->OnMouseMove(pos);
+    return true;
+  }
+
+  albaGUIHistogramWidget *m_Widget;
+  vtkRenderer *m_Renderer; ///< the renderer of the histogram: the moves on the other renderers are not used
+};
+
+albaCxxTypeMacro(albaGUIHistogramWidgetTool);
 #include "vtkDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkRenderer.h"
@@ -45,8 +68,6 @@
 #include "vtkLineSource.h"
 #include "vtkProperty.h"
 #include "vtkPolyDataMapper.h"
-
-ALBA_ID_IMP(albaGUIHistogramWidget::RANGE_MODIFIED);
 
 //----------------------------------------------------------------------------
 albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /* = -1 */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxSize */,long style /* = wxTAB_TRAVERSAL */, bool showThresholds /* = false */)
@@ -92,7 +113,15 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   ((wxWindow *)m_HistogramRWI->m_RwiBase)->SetMinSize(wxSize(size.GetWidth(),size.GetHeight()));
   //m_HistogramRWI->m_RwiBase->SetMinSize(wxSize(size.GetWidth(),size.GetHeight()));
   m_HistogramRWI->m_RwiBase->Reparent(this);
-  m_HistogramRWI->m_RwiBase->SetListener(this);
+  albaGUIHistogramWidgetTool *moveTool;
+  albaNEW(moveTool);
+  moveTool->m_Widget = this;
+  moveTool->m_Renderer = m_HistogramRWI->m_RenFront;
+  m_MoveTool = moveTool;
+  albaServiceLocator::GetPositionalEventRouter()->PushTool(m_MoveTool);
+
+  // the histogram does not move its camera
+  m_HistogramRWI->m_RwiBase->EnableCameraInteraction(false);
   m_HistogramRWI->m_RwiBase->Show(true);
 
   if (showThresholds)
@@ -138,7 +167,9 @@ albaGUIHistogramWidget::~albaGUIHistogramWidget()
   m_HistogramRWI->m_RenFront->RemoveActor(m_Histogram);
   cppDEL(m_Slider);
   vtkDEL(m_Histogram);
+  albaServiceLocator::GetPositionalEventRouter()->PopTool(m_MoveTool);
   cppDEL(m_HistogramRWI);
+  albaDEL(m_MoveTool);
 }
 
 //----------------------------------------------------------------------------
@@ -230,7 +261,6 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
 				m_SelectedRange[0] = m_Slider->GetValue(0);
 				m_SelectedRange[1] = m_Slider->GetValue(2);
 				m_Lut->SetTableRange(m_SelectedRange);
-				albaEventMacro(albaEvent(this, albaGUIHistogramWidget::RANGE_MODIFIED));
 				break;
 			case ID_NUMBER_OF_BIN:
 				m_Histogram->SetNumberOfBins(m_NumberOfBins);
@@ -247,22 +277,17 @@ void albaGUIHistogramWidget::OnEvent( albaEventBase *event )
 		}
     m_HistogramRWI->CameraUpdate();
   }
-  else if (albaEventInteraction *ei = albaEventInteraction::SafeDownCast(event))
+}
+//----------------------------------------------------------------------------
+void albaGUIHistogramWidget::OnMouseMove(double pos[2])
+{
+  if(m_Histogram->GetInputData() == NULL) return;
+  if (m_ShowText)
   {
-    if (ei->GetId() == DEVICE_MOUSE_2D_MOVE)
-    {
-      if(m_Histogram->GetInputData() == NULL) return;
-			if (m_ShowText)
-			{
-				double pos[2];
-				ei->Get2DPosition(pos);
-
-				m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0], pos[1]);
-				m_Histogram->SetLabel(albaString(m_HisctogramValue).GetCStr());
-			}
-      m_HistogramRWI->CameraUpdate();
-    }
+    m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0], pos[1]);
+    m_Histogram->SetLabel(albaString(m_HisctogramValue).GetCStr());
   }
+  m_HistogramRWI->CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::UpdateGui()

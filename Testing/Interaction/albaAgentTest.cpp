@@ -29,7 +29,6 @@
 #include <iostream>
 
 #include "albaAgent.h"
-#include "albaAgentEventQueue.h"
 #include "albaSmartPointer.h"
 
 enum my_events 

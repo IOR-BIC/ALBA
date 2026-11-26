@@ -38,16 +38,11 @@
 #include "mmaApplicationLayout.h"
 
 //----------------------------------------------------------------------------
-albaGUIVMEChooser::albaGUIVMEChooser(albaGUIVMETree *tree, wxString dialog_title, void *vme_accept_function, long style, bool multiSelect, albaVME *subTree)
+albaGUIVMEChooser::albaGUIVMEChooser(albaGUIVMETree *tree, wxString dialog_title, albaVMEAcceptFunction vme_accept_function, long style, bool multiSelect, albaVME *subTree)
 : albaGUIDialog(dialog_title,albaCLOSEWINDOW | albaRESIZABLE | albaCLOSE | albaOK )
 //----------------------------------------------------------------------------
 {
-  if(vme_accept_function == 0)
-    m_ValidateCallback = NULL;
-  else
-    m_ValidateCallback = (ValidateCallBackType)vme_accept_function;
-
-  m_ChooserTree = new albaGUIVMEChooserTree(this,tree,m_ValidateCallback,-1,false,true,style, multiSelect,subTree);
+  m_ChooserTree = new albaGUIVMEChooserTree(this,tree,vme_accept_function,-1,false,true,style, multiSelect,subTree);
   m_ChooserTree->SetListener(this);
   m_ChooserTree->SetTitle("");
 	m_ChooserTree->SetMinSize(wxSize(100, 200));

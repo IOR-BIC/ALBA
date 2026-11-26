@@ -25,6 +25,8 @@
 
 #include "albaInteractorConstraintTest.h"
 #include "vtkDoubleArray.h"
+#include "vtkRenderer.h"
+#include "albaRefSys.h"
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
 
@@ -180,4 +182,36 @@ void albaInteractorConstraintTest::TestSetGetSnapArray()
   cppDEL(constraint);
 
   vtkDEL(array);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractorConstraintTest::TestCopy()
+{
+  vtkRenderer *renderer = vtkRenderer::New();
+  albaInteractorConstraint *source = new albaInteractorConstraint();
+  source->SetConstraintModality(albaInteractorConstraint::X, albaInteractorConstraint::BOUNDS);
+  source->SetUpperBound(albaInteractorConstraint::X, 5);
+  source->SetStep(albaInteractorConstraint::Y, 2);
+  source->GetRefSys()->SetTypeToView(renderer);
+
+  // the assignment copies the settings and the contents of the ref sys, not its pointer
+  albaInteractorConstraint *target = new albaInteractorConstraint();
+  *target = *source;
+  CPPUNIT_ASSERT(target->GetRefSys() != source->GetRefSys());
+  CPPUNIT_ASSERT(target->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::BOUNDS);
+  CPPUNIT_ASSERT(target->GetUpperBound(albaInteractorConstraint::X) == 5);
+  CPPUNIT_ASSERT(target->GetStep(albaInteractorConstraint::Y) == 2);
+  CPPUNIT_ASSERT(target->GetRefSys()->GetRenderer() == renderer);
+
+  // the copy constructor does the same
+  albaInteractorConstraint *copy = new albaInteractorConstraint(*source);
+  CPPUNIT_ASSERT(copy->GetRefSys() != source->GetRefSys());
+  CPPUNIT_ASSERT(copy->GetUpperBound(albaInteractorConstraint::X) == 5);
+
+  // each constraint deletes its own ref sys and releases the renderer
+  delete source;
+  delete target;
+  delete copy;
+  CPPUNIT_ASSERT(renderer->GetReferenceCount() == 1);
+  renderer->Delete();
 }

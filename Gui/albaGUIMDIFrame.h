@@ -117,9 +117,6 @@ protected:
 	/** Send the 'Views' men event. */
   void OnMenuView(wxCommandEvent& e);
 
-	/** Send the UI event. */
-  void OnUpdateUI(wxUpdateUIEvent& e);
-
 	/** Send the MENU_FILE_QUIT event. */
   void OnCloseWindow(wxCloseEvent& event);
 

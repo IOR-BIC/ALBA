@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class albaDeviceButtonsPadMouse;
 class albaGUIButton;
 class albaGUIDialog;
 class albaRWI;
@@ -100,7 +99,6 @@ public:
 
 	int GetImagesNum() { return m_ImagesList.size(); };
 
-	void SetMouse(albaDeviceButtonsPadMouse *mouse) { m_Mouse = mouse; };
 protected:
 
 	void FillImageList();
@@ -134,7 +132,6 @@ protected:
 	bool m_EnableSaveImageButton;
 	bool m_EnableImageCheckButton;
 
-	albaDeviceButtonsPadMouse *m_Mouse;
 
 	wxBoxSizer				*m_RwiSizer;
 	albaRWI						*m_Rwi; //Render window

@@ -37,7 +37,6 @@
 #include "albaOpSelect.h"
 #include "albaGUISettingsDialog.h"
 #include "albaAttributeTraceability.h"
-#include "albaDeviceButtonsPadMouse.h"
 
 #include "albaStorage.h"
 #include "albaDataVector.h"
@@ -50,12 +49,6 @@
 #include "albaOpShowHistory.h"
 #include "albaOpImporterFile.h"
 #include "albaGUIDialogAskAndRemember.h"
-
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-ALBA_ID_IMP(albaOpManager::OPERATION_INTERFACE_EVENT)
-ALBA_ID_IMP(albaOpManager::RUN_OPERATION_EVENT)
 
 /**
 There are 4 paths in OpProcessor
@@ -85,7 +78,6 @@ but could not be done the undo.
 //----------------------------------------------------------------------------
 albaOpManager::albaOpManager()
 {
-	m_Listener = NULL;
 	m_RunningOp = NULL;
 	m_Selected = NULL;
 	m_NaturalNode = NULL;
@@ -152,8 +144,7 @@ albaOpManager::~albaOpManager()
 //----------------------------------------------------------------------------
 void albaOpManager::OnEvent(albaEventBase *alba_event)
 {
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-    albaEventMacro(*e);
+	// the events of the operations are not forwarded: the logic handles only the menu commands
 }
 //----------------------------------------------------------------------------
 void albaOpManager::OpAdd(albaOp *op, wxString menuPath, bool can_undo, albaGUISettings *setting)
@@ -629,7 +620,6 @@ void albaOpManager::OpRun(albaOp *op, void *op_param)
 	m_RunningOp->SetSetting(op->GetSetting());
   m_RunningOp->SetListener(this);
 	m_RunningOp->SetInput(m_Selected);
-  m_RunningOp->SetMouse(m_Mouse);
 
   if (op_param != NULL)
   {
@@ -1122,12 +1112,6 @@ bool albaOpManager::ForceStopWithCancel()
 
   return m_RunningOp != to_be_killed;
 }
-//----------------------------------------------------------------------------
-void albaOpManager::SetMouse(albaDeviceButtonsPadMouse *mouse)
-{
-  m_Mouse = mouse;
-}
-
 //----------------------------------------------------------------------------
 void albaOpManager::RefreshMenu()
 {

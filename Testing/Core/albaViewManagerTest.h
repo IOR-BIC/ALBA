@@ -56,7 +56,6 @@ public:
   CPPUNIT_TEST( GetListTest );
   CPPUNIT_TEST( GetListTemplateTest );
   CPPUNIT_TEST( GetViewTest );
-  CPPUNIT_TEST( SetMouseTest );
   CPPUNIT_TEST( GetFromOpenedViewsTest );
   //CPPUNIT_TEST( VmeModifiedTest ); EMPTY METHOD not tested
   //CPPUNIT_TEST( OnQuit ); EMPTY METHOD not tested
@@ -83,7 +82,6 @@ private:
   void GetListTest();
   void GetListTemplateTest();
   void GetViewTest();
-  void SetMouseTest();
   void GetFromOpenedViewsTest();
 
   albaViewManagerTestLogic *m_Logic; ///< records the calls of the view manager to the logic

@@ -17,7 +17,6 @@
 #include "albaBehaviorTransform.h"
 
 #include "albaDecl.h"
-#include "albaDevice.h"
 #include "albaRefSys.h"
 
 
@@ -57,8 +56,6 @@ albaBehaviorTransform::albaBehaviorTransform()
   m_LastDragPos[0] = m_LastDragPos[1] = 0;
   m_TranslationFlag       = true;
   m_RotationFlag          = true;
-  m_ScalingFlag           = true;
-  m_UniformScalingFlag    = true;
   m_SurfaceSnap           = false;
 	m_SurfaceNormal         = false;
   m_ResultTransform       = NULL;
@@ -92,10 +89,6 @@ albaBehaviorTransform::albaBehaviorTransform()
    m_MousePointer2DPosition[0] = m_MousePointer2DPosition[1] = 0;
    m_LastMousePointer2DPosition[0] = m_LastMousePointer2DPosition[1] = 0;
    m_ConstrainRefSys = NULL;
-
-   m_ButtonDownPickSet = false;
-   m_ButtonDownPicked = false;
-   m_ButtonDownPickPosition[0] = m_ButtonDownPickPosition[1] = m_ButtonDownPickPosition[2] = 0.0;
 }
 //----------------------------------------------------------------------------
 albaBehaviorTransform::~albaBehaviorTransform()
@@ -175,27 +168,6 @@ void albaBehaviorTransform::SetRendererAndView(vtkRenderer *ren, albaView *view)
 }
 
 //------------------------------------------------------------------------------
-void albaBehaviorTransform::SetTranslationConstraint(albaInteractorConstraint *constrain)
-//------------------------------------------------------------------------------
-{
-  *m_TranslationConstraint=*constrain;
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::SetRotationConstraint(albaInteractorConstraint *constrain)
-//------------------------------------------------------------------------------
-{
-  *m_RotationConstraint=*constrain;
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::SetScaleConstraint(albaInteractorConstraint *constrain)
-//------------------------------------------------------------------------------
-{
-  *m_ScaleConstraint=*constrain;
-}
- 
-//------------------------------------------------------------------------------
 bool albaBehaviorTransform::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
 {
   return StartTransform(ALBA_LEFT_BUTTON, view, ren, pos);
@@ -229,10 +201,9 @@ bool albaBehaviorTransform::StartTransform(int button, albaView *view, vtkRender
   m_LastDragPos[0] = (int)pos[0];
   m_LastDragPos[1] = (int)pos[1];
 
-  // the VME has been picked by the PER, which set the prop and the picked position
-  SetButtonDownPick(true, m_PickedPosition);
-  OnButtonDownAction(m_LastDragPos[0], m_LastDragPos[1]);
+  // set before the button down is sent: a listener reacting to it can already stop the transform
   m_TransformButton = button;
+  OnButtonDownAction(m_LastDragPos[0], m_LastDragPos[1]);
   return true;
 }
 
@@ -289,28 +260,16 @@ void albaBehaviorTransform::SetVME(albaVME *vme)
 void albaBehaviorTransform::EnableTranslation(bool enable)
 //------------------------------------------------------------------------------
 {
-  EnableTranslationInternal(enable);
+  m_TranslationFlag = enable;
+  m_RotationFlag = !enable;
 }
 
 //------------------------------------------------------------------------------
 void albaBehaviorTransform::EnableRotation(bool enable)
 //------------------------------------------------------------------------------
 {
-  EnableRotationInternal(enable);
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::EnableScaling(bool enable)
-// ------------------------------------------------------------------------------
-{
-  EnableScalingInternal(enable);
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::EnableUniformScaling(bool enable)
-//------------------------------------------------------------------------------
-{
-  EnableUniformScalingInternal(enable);
+  m_RotationFlag = enable;
+  m_TranslationFlag = !enable;
 }
 
 //----------------------------------------------------------------------------
@@ -1132,33 +1091,10 @@ void albaBehaviorTransform::OnMouseMoveAction(int X, int Y)
      Translate(prevPickPoint, pickPoint);
    }
 
-   if (m_ScalingFlag == true)
-   {
-     // scale
-     // not yet implemented
-   }
-
-   if (m_UniformScalingFlag == true)
-   {
-     // uniform scale
-     // not yet implemented
-   }
-
   // Update m_LastMousePointer2DPosition
   m_LastMousePointer2DPosition[0] = m_MousePointer2DPosition[0];
   m_LastMousePointer2DPosition[1] = m_MousePointer2DPosition[1];
 
-}
-
-//----------------------------------------------------------------------------
-void albaBehaviorTransform::SetButtonDownPick(bool picked, double pickedPos[3])
-//----------------------------------------------------------------------------
-{
-  m_ButtonDownPickSet = true;
-  m_ButtonDownPicked = picked;
-  m_ButtonDownPickPosition[0] = pickedPos[0];
-  m_ButtonDownPickPosition[1] = pickedPos[1];
-  m_ButtonDownPickPosition[2] = pickedPos[2];
 }
 
 //----------------------------------------------------------------------------
@@ -1174,28 +1110,10 @@ void albaBehaviorTransform::OnButtonDownAction(int X, int Y)
   m_MousePointer2DPosition[0] = m_LastMousePointer2DPosition[0] = X;
   m_MousePointer2DPosition[1] = m_LastMousePointer2DPosition[1] = Y;
 
-  // use the picking set by the caller, otherwise perform picking on current renderer
-  if (m_ButtonDownPickSet)
-  {
-    if (m_ButtonDownPicked)
-    {
-      m_LastPickPosition[0] = m_ButtonDownPickPosition[0];
-      m_LastPickPosition[1] = m_ButtonDownPickPosition[1];
-      m_LastPickPosition[2] = m_ButtonDownPickPosition[2];
-    }
-    m_ButtonDownPickSet = false;
-  }
-  else
-  {
-        if (m_View)
-    {
-      albaView *v = m_View;
-      if (v && v->Pick(X,Y))
-      {
-        v->GetPickedPosition(m_LastPickPosition);
-      }
-    }
-  }
+  // the VME has been picked by the PER at the button down
+  m_LastPickPosition[0] = m_PickedPosition[0];
+  m_LastPickPosition[1] = m_PickedPosition[1];
+  m_LastPickPosition[2] = m_PickedPosition[2];
   //reset projection accumulator   
     m_ProjectionAccumulator = 0;
 
@@ -1560,36 +1478,4 @@ bool albaBehaviorTransform::PickUnderVME(double pickedPos[3], albaVME *&pickedVm
     p->PickableOn();
 
   return picked;
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::EnableTranslationInternal(bool enable)
-//------------------------------------------------------------------------------
-{
-  m_TranslationFlag = enable;
-  m_RotationFlag = m_ScalingFlag = m_UniformScalingFlag = !enable;
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::EnableRotationInternal(bool enable)
-//------------------------------------------------------------------------------
-{
-  m_RotationFlag = enable;
-  m_TranslationFlag = m_ScalingFlag = m_UniformScalingFlag = !enable;
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::EnableScalingInternal(bool enable)
-//------------------------------------------------------------------------------
-{
-  m_ScalingFlag = enable;
-  m_TranslationFlag = m_RotationFlag = m_UniformScalingFlag = !enable;
-}
-
-//------------------------------------------------------------------------------
-void albaBehaviorTransform::EnableUniformScalingInternal(bool enable)
-//------------------------------------------------------------------------------
-{
-  m_UniformScalingFlag = enable;
-  m_TranslationFlag = m_RotationFlag = m_ScalingFlag = !enable;
 }

@@ -117,6 +117,8 @@ albaGizmoRotateCircle::~albaGizmoRotateCircle()
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  m_IsaGen->SetListener(NULL);
   vtkDEL(m_IsaGen); 
   
 	m_GizmoCircle->ReparentTo(NULL);
@@ -174,7 +176,7 @@ void albaGizmoRotateCircle::CreateISA()
   // Default isa constrain rotation around X axis.
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  m_IsaGen = albaBehaviorTransform::New();
+  albaNEW(m_IsaGen);
   m_IsaGen->SetVME(m_InputVme);
   m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK); 
   m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);

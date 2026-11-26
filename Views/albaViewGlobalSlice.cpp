@@ -44,7 +44,6 @@
 #include "albaVMEOutput.h"
 
 #include "vtkCellPicker.h"
-#include "vtkALBARayCast3DPicker.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
@@ -204,6 +203,7 @@ void albaViewGlobalSlice::Create()
   RWI_LAYERS num_layers = TWO_LAYER;
   
   m_Rwi = new albaRWI(albaGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_StereoType);
+  m_Rwi->m_RwiBase->SetView(this); // the mouse events of the render window come from this view
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
@@ -223,7 +223,6 @@ void albaViewGlobalSlice::Create()
 
 	m_Rwi->m_RenFront->AddActor(m_TextActor);
 
-  vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
   //m_Picker2D->InitializePickList();

@@ -27,10 +27,12 @@ class albaVMEStorage;
 class albaView;
 class albaProsthesesDBManager;
 class albaObserver;
-class albaInteractionTool;
 class albaGUIPanel;
 class albaOp;
 class albaGUIVMETree;
+
+/** Function that tells if a VME can be chosen in the VME chooser dialog */
+typedef bool (*albaVMEAcceptFunction)(albaVME *vme);
 
 class ALBA_EXPORT albaAbsLogicManager
 {
@@ -63,11 +65,11 @@ public:
 	virtual albaVMEStorage *CreateStorage(albaVMEStorage *oldStorage) = 0;
 
 	/** Show the tree in a dialog titled title and return the VME chosen by the user, NULL on cancel.
-	acceptFunction is a bool (*)(albaVME *) that tells which VMEs can be chosen (all if NULL), selected is the VME selected when the dialog opens. */
-	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
+	acceptFunction tells which VMEs can be chosen (all if NULL), selected is the VME selected when the dialog opens. */
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) = 0;
 
 	/** Same as ChooseVME, but the user can choose more VMEs; returns an empty vector on cancel. */
-	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) = 0;
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) = 0;
 
 	//Logic
 	/** Returns true if there is a Running Operation */
@@ -106,8 +108,6 @@ public:
 	/** Select a view (also called by the view frames when they are activated or clicked): the view manager,
 	the side bar, the interaction and the operations work on it. Nothing else happens if it is already selected */
 	virtual void SelectView(albaView *view) = 0;
-	/** Return the selected view, NULL if none */
-	virtual albaView *GetSelectedView() = 0;
 
 	/** Called by the view manager when it creates a view: create the frame of the view and attach the view to it */
 	virtual void CreateViewFrame(albaView *view) = 0;
@@ -166,11 +166,6 @@ public:
 	/** Run an operation (by id, e.g. OP_DELETE) for the running wizard, which continues when the operation ends (or at once if it does not start) */
 	virtual void WizardRunOp(int opId) = 0;
 
-	//Interaction
-	/** Push a tool on the tool stack of the positional event router: it receives the events before the default interaction */
-	virtual void PushTool(albaInteractionTool *tool) = 0;
-	/** Remove a tool from the tool stack of the positional event router */
-	virtual void PopTool(albaInteractionTool *tool) = 0;
 	
 	//Managers
 	/** Get the Prostheses DB Manager */

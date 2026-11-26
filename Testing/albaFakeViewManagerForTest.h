@@ -19,7 +19,8 @@
 
 #include "albaAbsViewManager.h"
 
-/** View manager registered by the test executables: there are no views, so every service does nothing */
+/** View manager registered by the test executables: there are no views, so every service does nothing,
+but it keeps the view selected through albaFakeLogicForTest::SelectView */
 class albaFakeViewManagerForTest : public albaAbsViewManager
 {
 public:
@@ -34,5 +35,12 @@ public:
 	virtual void ViewResize(const char *label, int x, int y, int width, int height) override {}
 	virtual void ViewOpen(const char *label) override {}
 	virtual void ViewClose(const char *label) override {}
+	virtual albaView *GetSelectedView() override { return m_SelectedView; }
+
+	/** Store the selected view (called by albaFakeLogicForTest::SelectView) */
+	void SetSelectedView(albaView *view) { m_SelectedView = view; }
+
+protected:
+	albaView *m_SelectedView = NULL;
 };
 #endif

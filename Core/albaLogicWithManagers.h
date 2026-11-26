@@ -37,7 +37,6 @@ class albaVMELandmark;
 class albaVMELandmarkCloud;
 class albaInteractionManager;
 class albaPrintManager;
-class albaDeviceButtonsPadMouse;
 class albaGUISettingsDialog;
 class albaGUIAboutDialog;
 class albaGUISplashScreen;
@@ -264,15 +263,6 @@ public:
 	/** Select a view: the side bar, the interaction and the operations work on it */
 	void SelectView(albaView *view) override;
 
-	/** Return the selected view, NULL if none */
-	albaView *GetSelectedView() override { return m_SelectedView; }
-
-	/** Push a tool on the tool stack of the positional event router */
-	void PushTool(albaInteractionTool *tool) override;
-
-	/** Remove a tool from the tool stack of the positional event router */
-	void PopTool(albaInteractionTool *tool) override;
-
 
 	bool IsTimeVaringEnabled() override;
 
@@ -380,7 +370,7 @@ protected:
 	virtual void VmeVisualModeChanged(albaVME * vme);
 
 	/** Show the tree in a dialog and return the VME chosen by the user, NULL on cancel. */
-	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) override;
 
 	/** Called by the op manager when an operation starts: disable all menu and lock the Selection */
 	virtual void OpRunStarting() override;
@@ -407,7 +397,7 @@ protected:
 	virtual void CascadeViewFrames() override;
 
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
-	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) override;
 		
 
 	/** Show the contextual menu of the tree, with the items of vme if vmeMenu is true */
@@ -419,7 +409,7 @@ protected:
 	/** Create a new view. */
 	virtual void ViewCreate(int viewId);
 
-	/** Called when user change the measure unit from menù Options.*/
+	/** Called when user change the measure unit from menï¿½ Options.*/
 	void UpdateMeasureUnit();
 
 	/** Enable/Disable menu items when an operation start/end running. */
@@ -470,7 +460,6 @@ protected:
 
 	albaPrintManager     *m_PrintSupport;
 
-	albaDeviceButtonsPadMouse            *m_Mouse;
 
 	mmaApplicationLayout *m_AppLayout;
 
@@ -487,7 +476,6 @@ protected:
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
 
-	albaView *m_SelectedView; ///< the view selected with SelectView
 
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;
@@ -535,7 +523,6 @@ protected:
 	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
 	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
 	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
-	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
 	bool m_FatalExptionOccurred;
 	bool m_OpeningMSF;
 private:

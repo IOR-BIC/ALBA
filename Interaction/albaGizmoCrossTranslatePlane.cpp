@@ -161,6 +161,8 @@ albaGizmoCrossTranslatePlane::~albaGizmoCrossTranslatePlane()
 	for (i = 0; i < NUM_GIZMO_PARTS; i++)
 	{
 		vtkDEL(m_LineTF[i]);
+		// the PER can keep the behavior alive: it must not notify the deleted gizmo
+		m_IsaGen[i]->SetListener(NULL);
 		vtkDEL(m_IsaGen[i]); 
 	}
 
@@ -283,7 +285,7 @@ void albaGizmoCrossTranslatePlane::CreateISA()
 	{
 		// default behavior is activated by mouse left and is constrained to X axis,
 		// default ref sys is input vme abs matrix
-		m_IsaGen[i] = albaBehaviorTransform::New();
+		albaNEW(m_IsaGen[i]);
 		m_IsaGen[i]->SetVME(m_InputVme);
 
 		// default movement is constrained to plane XZ 

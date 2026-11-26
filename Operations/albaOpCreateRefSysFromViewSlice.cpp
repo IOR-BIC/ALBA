@@ -66,7 +66,7 @@ bool albaOpCreateRefSysFromViewSlice::InternalAccept(albaVME*node)
 {
 	bool hasView = false;
 
-	albaView *view = GetLogicManager()->GetSelectedView();
+	albaView *view = GetViewManager()->GetSelectedView();
 	if (view)
 		hasView = view->IsA("albaViewArbitraryOrthoSlice") || view->IsA("albaViewArbitrarySlice");
 
@@ -76,7 +76,7 @@ bool albaOpCreateRefSysFromViewSlice::InternalAccept(albaVME*node)
 //----------------------------------------------------------------------------
 void albaOpCreateRefSysFromViewSlice::OpRun()   
 {
-	m_View = GetLogicManager()->GetSelectedView();
+	m_View = GetViewManager()->GetSelectedView();
 
 	if (m_View && (m_View->IsA("albaViewArbitraryOrthoSlice") || m_View->IsA("albaViewArbitrarySlice")))
 	{

@@ -36,5 +36,8 @@ public:
 
 	/** Return the registered operation manager, NULL if the application has none */
 	albaAbsOpManager* GetOpManager() { return albaServiceLocator::GetOpManager(); }
+
+	/** Return the router of the mouse events of the render windows, NULL if the application has no interaction */
+	albaPositionalEventRouter* GetPositionalEventRouter() { return albaServiceLocator::GetPositionalEventRouter(); }
 };
 #endif

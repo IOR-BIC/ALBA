@@ -178,11 +178,11 @@ void albaOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
 void albaOpVolumeResample::CreateGizmos()
 //----------------------------------------------------------------------------
 {
-  m_ViewSelectedMessage = GetLogicManager()->GetSelectedView() != NULL;
+  m_ViewSelectedMessage = GetViewManager()->GetSelectedView() != NULL;
 
 	m_GizmoROI = new albaGizmoROI(m_Input, this, albaGizmoHandle::FREE,m_VMEDummy,m_ShowShadingPlane);
   m_GizmoROI->ShowShadingPlane(true);
-	m_GizmoROI->Show(true && m_ViewSelectedMessage);
+	m_GizmoROI->Show(true);
 	
   if(m_ViewSelectedMessage)
     m_GizmoROI->GetBounds(m_VolumeBounds);
@@ -230,7 +230,7 @@ void albaOpVolumeResample::CreateGizmos()
 		m_GizmoTranslate = new albaGizmoTranslate(m_Input, this);
 		m_GizmoTranslate->SetRefSys(m_Input);
 		m_GizmoTranslate->SetAbsPose(m_CenterVolumeRefSysMatrix);
-		m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+		m_GizmoTranslate->Show(true);
 		m_GizmoRotate = new albaGizmoRotate(m_Input, this);
 		m_GizmoRotate->SetRefSys(m_Input);
 		m_GizmoRotate->SetAbsPose(m_CenterVolumeRefSysMatrix);

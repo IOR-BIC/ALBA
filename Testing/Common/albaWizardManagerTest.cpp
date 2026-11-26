@@ -38,23 +38,6 @@ void albaWizardManagerTest::AfterTest()
   cppDEL(config);
 }
 
-//----------------------------------------------------------------------------
-void albaWizardManagerTest::TestSetterGetter()
-//----------------------------------------------------------------------------
-{
-  wxConfig *config = new wxConfig(wxEmptyString);
-
-  albaWizardManager manager=albaWizardManager();
-  
-  manager.WarningIfCantUndo(true);
-  CPPUNIT_ASSERT(manager.GetWarningIfCantUndo()==true);
-  
-  manager.WarningIfCantUndo(false);
-  CPPUNIT_ASSERT(manager.GetWarningIfCantUndo()==false);
-
-  cppDEL(config);
-
-}
 
 
 
