@@ -34,7 +34,6 @@
 #include "albaGUIHistogramWidget.h"
 #include "albaGUIDialog.h"
 #include "albaOpVolumeResample.h"
-#include "albaEventInteraction.h"
 #include "albaProgressBarHelper.h"
 
 
@@ -473,56 +472,50 @@ void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles
   wxSetWorkingDirectory(oldDir);
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBase *alba_event)
+void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnHistogramBinPicked(int histogramValue, double scalar)
 {
-  if (albaEventInteraction *ei = albaEventInteraction::SafeDownCast(alba_event))
+  // the CTRL+clicks on the histogram set in turn the bone peak, the soft peak, the bone base and the soft base
+  if (m_CurrentPoint % 4 == 0)
   {
-    if (ei->GetId() == DEVICE_BUTTON_DOWN && ei->GetButton() == ALBA_LEFT_BUTTON && ei->GetModifier(ALBA_CTRL_KEY))
-    {
-      //         if(m_Histogram->GetInputData() == NULL) return;
-      double pos[2];
-      ei->Get2DPosition(pos);
-      int hisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
-      double scalar = m_Histogram->GetHistogramScalarValue(pos[0],pos[1]);
+    m_Point1 = albaString::Format("Bone Peak : %d",histogramValue);
+    m_Point1Value = scalar;
+    m_Point1HistogramValue = histogramValue;
+  }
+  if (m_CurrentPoint % 4 == 1)
+  {
+    m_Point2 = albaString::Format("Soft Peak : %d",histogramValue);
+    m_Point2Value = scalar;
+    m_Point2HistogramValue = histogramValue;
+  }
+  if (m_CurrentPoint % 4 == 2)
+  {
+    m_Point3 = albaString::Format("Bone Base : %.2f",scalar);
+    m_Point3Value = scalar;
+  }
+  if (m_CurrentPoint % 4 == 3)
+  {
+    m_Point4 = albaString::Format("Soft Base : %.2f",scalar);
+    m_Point4Value = scalar;
 
-      if (m_CurrentPoint % 4 == 0)
-      {
-        m_Point1 = albaString::Format("Bone Peak : %d",hisctogramValue);
-        m_Point1Value = scalar;
-        m_Point1HistogramValue = hisctogramValue;
-      }
-      if (m_CurrentPoint % 4 == 1)
-      {
-        m_Point2 = albaString::Format("Soft Peak : %d",hisctogramValue);
-        m_Point2Value = scalar;
-        m_Point2HistogramValue = hisctogramValue;
-        //ComputeParam();
-        //WriteHistogramFiles();
-      }
-      if (m_CurrentPoint % 4 == 2)
-      {
-        m_Point3 = albaString::Format("Bone Base : %.2f",scalar);
-        m_Point3Value = scalar;
-      }
-      if (m_CurrentPoint % 4 == 3)
-      {
-        m_Point4 = albaString::Format("Soft Base : %.2f",scalar);
-        m_Point4Value = scalar;
-
-        ComputeParam();
-        WriteHistogramFiles();
-      }
-
-      m_CurrentPoint++;
-
-      m_Gui->Update();
-
-      return;
-    }
+    ComputeParam();
+    WriteHistogramFiles();
   }
 
+  m_CurrentPoint++;
+
+  m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void albaOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(albaEventBase *alba_event)
+{
   if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
   {
+    if (e->GetId() == albaGUIHistogramWidget::BIN_PICKED)
+    {
+      OnHistogramBinPicked(e->GetArg(), e->GetDouble());
+      return;
+    }
+
     switch(e->GetId())
     {
     case ID_ELIMINATE_HISTOGRAM_VALUES:
