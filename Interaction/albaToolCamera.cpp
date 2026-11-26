@@ -50,7 +50,7 @@ albaToolCamera::albaToolCamera()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolCamera::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_ShiftDown)
     return Start(rwi, ren, pos, m_CtrlDown ? MOTION_DOLLY : MOTION_PAN);
@@ -92,7 +92,7 @@ bool albaToolCamera::Stop()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolCamera::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (!m_Interacting)
     return false;
@@ -119,7 +119,7 @@ bool albaToolCamera::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation)
+bool albaToolCamera::OnWheelImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation)
 {
   SetRendererAndView(ren, rwi->GetView());
   if (m_Renderer == NULL)

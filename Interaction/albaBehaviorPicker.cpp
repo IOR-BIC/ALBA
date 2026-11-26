@@ -64,14 +64,14 @@ albaBehaviorPicker::~albaBehaviorPicker()
 }
 
 //----------------------------------------------------------------------------
-bool albaBehaviorPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorPicker::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   SendPickingInformation(rwi->GetView(), pos);
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool albaBehaviorPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorPicker::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_ContinuousPickingFlag)
     SendPickingInformation(rwi->GetView(), pos);
@@ -79,7 +79,7 @@ bool albaBehaviorPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, doub
 }
 
 //----------------------------------------------------------------------------
-bool albaBehaviorPicker::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorPicker::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_ContinuousPickingFlag)
     SendPickingInformation(rwi->GetView(), pos, VME_PICKING);

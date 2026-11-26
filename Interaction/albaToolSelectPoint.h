@@ -29,13 +29,13 @@ public:
   albaTypeMacro(albaToolSelectPoint, albaInteractionTool);
 
   /** Pick a point */
-  bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** End picking */
-  bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** While picking the camera does not move */
-  bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** Set the CTRL modifier to On => picking performed on LeftButtonDown + CTRL */
   void SetCtrlModifierOn() {m_UseCtrlModifier = true;}

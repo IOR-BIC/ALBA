@@ -30,11 +30,8 @@
 albaCxxTypeMacro(albaToolSegmentationThreshold);
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentationThreshold::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentationThreshold::OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(rwi->GetView()))
-    return false;
-
   double pickedPos[3];
   albaVME *pickedVME = NULL;
   if (albaPickHelper::PickCell(m_View, pos[0], pos[1], pickedPos, &pickedVME) && pickedVME)

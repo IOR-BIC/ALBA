@@ -37,14 +37,14 @@ public:
 
   enum CAMERA_MOTIONS {MOTION_NONE = 0, MOTION_ROTATE, MOTION_PAN, MOTION_DOLLY, MOTION_SPIN};
 
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
-  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Stop();}
-  virtual bool OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Start(rwi, ren, pos, MOTION_PAN);}
-  virtual bool OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Stop();}
-  virtual bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Start(rwi, ren, pos, MOTION_DOLLY);}
-  virtual bool OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Stop();}
-  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
-  virtual bool OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation);
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Stop();}
+  virtual bool OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Start(rwi, ren, pos, MOTION_PAN);}
+  virtual bool OnMiddleButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Stop();}
+  virtual bool OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Start(rwi, ren, pos, MOTION_DOLLY);}
+  virtual bool OnRightButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Stop();}
+  virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnWheelImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation);
 
   /** Return true if the camera is moving because of a mouse button */
   bool IsInteracting() {return m_Interacting;}

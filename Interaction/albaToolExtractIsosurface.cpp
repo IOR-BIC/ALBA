@@ -40,9 +40,9 @@ albaToolExtractIsosurface::albaToolExtractIsosurface()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolExtractIsosurface::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolExtractIsosurface::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolRenderWindow(ren))
+  if (ren == NULL)
     return false;
 
   m_PickValue = true;
@@ -50,16 +50,16 @@ bool albaToolExtractIsosurface::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *
 }
 
 //------------------------------------------------------------------------------
-bool albaToolExtractIsosurface::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolExtractIsosurface::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_PickValue = false;
   return false;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolExtractIsosurface::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolExtractIsosurface::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolRenderWindow(ren))
+  if (ren == NULL)
     return true;
 
   if (m_PickValue)

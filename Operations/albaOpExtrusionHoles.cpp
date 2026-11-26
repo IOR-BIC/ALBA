@@ -457,6 +457,7 @@ void albaOpExtrusionHoles::CreateOpDialog()
 	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
 	m_Picker->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_Picker->OperateOnlyOn(m_View->GetRWI());
 	GetPositionalEventRouter()->PushTool(m_Picker);
 
 	wxPoint p = wxDefaultPosition;

@@ -419,10 +419,12 @@ void albaOpSegmentation::InitializeInteractors()
 
 	albaNEW(m_ThresholdTool);
 	m_ThresholdTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_ThresholdTool->OperateOnlyOn(m_View->GetRWI());
 	m_ThresholdTool->SetListener(this);
 
 	albaNEW(m_EditTool);
 	m_EditTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_EditTool->OperateOnlyOn(m_View->GetRWI());
 	m_EditTool->SetListener(this);
 
 	GetPositionalEventRouter()->PushTool(m_ThresholdTool);

@@ -169,13 +169,13 @@ void albaBehaviorTransform::SetRendererAndView(vtkRenderer *ren, albaView *view)
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return StartTransform(ALBA_LEFT_BUTTON, rwi, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return StartTransform(ALBA_MIDDLE_BUTTON, rwi, ren, pos);
 }
@@ -209,7 +209,7 @@ bool albaBehaviorTransform::StartTransform(int button, albaRWIBase *rwi, vtkRend
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_TransformButton < 0)
     return false;
@@ -224,13 +224,13 @@ bool albaBehaviorTransform::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double po
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return StopTransform(ALBA_LEFT_BUTTON);
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnMiddleButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return StopTransform(ALBA_MIDDLE_BUTTON);
 }

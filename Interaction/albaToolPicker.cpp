@@ -32,7 +32,7 @@
 albaCxxTypeMacro(albaToolPicker)
 
 //----------------------------------------------------------------------------
-bool albaToolPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolPicker::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // SHIFT leaves the button to the PER
   m_Dragged = false;
@@ -40,7 +40,7 @@ bool albaToolPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double
 }
 
 //----------------------------------------------------------------------------
-bool albaToolPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolPicker::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_Dragged)
     return true;

@@ -89,10 +89,10 @@ public:
 	};
 
 	/// TOOL EVENTS
-	virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
-	virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
-	virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
-	virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
 	/// MEASURE
 	/** Add Measure*/

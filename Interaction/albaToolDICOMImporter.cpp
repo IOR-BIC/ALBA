@@ -100,9 +100,9 @@ albaToolDICOMImporter::~albaToolDICOMImporter()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-	if (!IsOnToolRenderWindow(ren))
+	if (m_Renderer == NULL)
 		return false;
 
 	double worldPos[4];
@@ -116,9 +116,9 @@ bool albaToolDICOMImporter::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double po
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-	if (!IsOnToolRenderWindow(ren))
+	if (m_Renderer == NULL)
 		return false;
 
 	double worldPos[4];
@@ -144,7 +144,7 @@ bool albaToolDICOMImporter::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren,
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (m_GizmoStatus == NORMAL_MODALITY)
 		return false;
@@ -154,7 +154,7 @@ bool albaToolDICOMImporter::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double po
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	m_GizmoStatus = NORMAL_MODALITY;
 

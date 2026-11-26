@@ -38,32 +38,30 @@
 #include "mmuIdFactory.h"
 
 //----------------------------------------------------------------------------
-class albaGUIHistogramWidgetTool : public albaInteractionTool // gives the mouse moves and the CTRL+clicks on the histogram renderer to the widget
+class albaGUIHistogramWidgetTool : public albaInteractionTool // gives the mouse moves and the CTRL+clicks on the histogram render window to the widget
 //----------------------------------------------------------------------------
 {
 public:
   albaTypeMacro(albaGUIHistogramWidgetTool, albaInteractionTool);
 
-  albaGUIHistogramWidgetTool() {m_Widget = NULL; m_Renderer = NULL;}
+  albaGUIHistogramWidgetTool() {m_Widget = NULL;}
 
-  virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+  albaGUIHistogramWidget *m_Widget;
+
+protected:
+  virtual bool OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
   {
-    if (ren != m_Renderer)
-      return false;
     m_Widget->OnMouseMove(pos);
     return true;
   }
 
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
   {
-    if (ren != m_Renderer || !GetCtrlDown())
+    if (!GetCtrlDown())
       return false;
     m_Widget->OnCtrlClick(pos);
     return true;
   }
-
-  albaGUIHistogramWidget *m_Widget;
-  vtkRenderer *m_Renderer; ///< the renderer of the histogram: the events on the other renderers are not used
 };
 
 albaCxxTypeMacro(albaGUIHistogramWidgetTool);
@@ -127,7 +125,7 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   albaGUIHistogramWidgetTool *tool;
   albaNEW(tool);
   tool->m_Widget = this;
-  tool->m_Renderer = m_HistogramRWI->m_RenFront;
+  tool->OperateOnlyOn(m_HistogramRWI->m_RwiBase);
   m_Tool = tool;
   albaServiceLocator::GetPositionalEventRouter()->PushTool(m_Tool);
 

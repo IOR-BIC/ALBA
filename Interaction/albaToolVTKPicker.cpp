@@ -50,9 +50,9 @@ albaToolVTKPicker::~albaToolVTKPicker()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolVTKPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolVTKPicker::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolRenderWindow(ren) || !m_CtrlDown)
+  if (ren == NULL || !m_CtrlDown)
     return false;
 
   // a picking not ended by a button up is ended here
@@ -79,7 +79,7 @@ bool albaToolVTKPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, dou
 }
 
 //------------------------------------------------------------------------------
-bool albaToolVTKPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolVTKPicker::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_Picker != NULL)
   {
@@ -90,7 +90,7 @@ bool albaToolVTKPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, doubl
 }
 
 //------------------------------------------------------------------------------
-bool albaToolVTKPicker::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolVTKPicker::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_Picker == NULL || !m_ContinuousPicking)
     return true;

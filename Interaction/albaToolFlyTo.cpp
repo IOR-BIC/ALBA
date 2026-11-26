@@ -36,13 +36,13 @@
 albaCxxTypeMacro(albaToolFlyTo);
 
 //------------------------------------------------------------------------------
-bool albaToolFlyTo::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolFlyTo::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return FlyAndPop(rwi, ren, pos, 1);
 }
 
 //------------------------------------------------------------------------------
-bool albaToolFlyTo::OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolFlyTo::OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return FlyAndPop(rwi, ren, pos, -0.6);
 }

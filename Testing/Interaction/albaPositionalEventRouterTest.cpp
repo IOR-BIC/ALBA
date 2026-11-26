@@ -118,13 +118,13 @@ public:
     m_LastPos[0] = m_LastPos[1] = m_LastRotation = 0;
   };
 
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_LeftDown++; return m_UseLeft;};
-  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_LeftUp++; return true;};
-  virtual bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_RightDown++; return m_UseRight;};
-  virtual bool OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_RightUp++; return true;};
-  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Drag++; return m_UseDrag;};
-  virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Move++; m_LastPos[0] = pos[0]; m_LastPos[1] = pos[1]; return m_UseMove;};
-  virtual bool OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation) {m_Wheel++; m_LastRotation = rotation; return m_UseWheel;};
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_LeftDown++; return m_UseLeft;};
+  virtual bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_LeftUp++; return true;};
+  virtual bool OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_RightDown++; return m_UseRight;};
+  virtual bool OnRightButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_RightUp++; return true;};
+  virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Drag++; return m_UseDrag;};
+  virtual bool OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Move++; m_LastPos[0] = pos[0]; m_LastPos[1] = pos[1]; return m_UseMove;};
+  virtual bool OnWheelImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation) {m_Wheel++; m_LastRotation = rotation; return m_UseWheel;};
   virtual void OnPush() {m_Push++;};
   virtual void OnPop() {m_Pop++;};
 
@@ -144,7 +144,7 @@ public:
 
   albaPERTestModalTool() {m_PER = NULL; m_RWI = NULL; m_UseLeft = true;};
 
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
   {
     m_LeftDown++;
     m_PER->OnLeftButtonUp(m_RWI, ren, pos);
@@ -188,9 +188,9 @@ public:
 
   albaPERTestBehavior() {m_UseLeft = true; m_Interacting = false; m_Drag = 0;};
 
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Interacting = m_UseLeft; return m_UseLeft;};
-  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Interacting = false; return true;};
-  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Drag++; return true;};
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Interacting = m_UseLeft; return m_UseLeft;};
+  virtual bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Interacting = false; return true;};
+  virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Drag++; return true;};
 
   double *GetPickedPosition() {return m_PickedPosition;};
 
@@ -846,4 +846,43 @@ void albaPositionalEventRouterTest::TestTransformStoppedAtButtonDown()
   transform->Delete();
   ren->Delete();
   rwi->Delete();
+}
+
+void albaPositionalEventRouterTest::TestOperateOnlyOn()
+{
+  albaPERTestMouse *mouse = new albaPERTestMouse();
+  albaPERTestMouse *other = new albaPERTestMouse();
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
+  albaPERTestTool *tool;
+  albaNEW(tool);
+  tool->m_UseLeft = tool->m_UseMove = tool->m_UseWheel = true;
+  tool->OperateOnlyOn(mouse->m_RWI);
+  CPPUNIT_ASSERT(tool->GetOperatingRWI() == mouse->m_RWI);
+  per->PushTool(tool);
+
+  // the events of the other render windows do not reach the tool
+  SendToPER(per, other, TEST_MOUSE_MOVE);
+  SendToPER(per, other, TEST_MOUSE_WHEEL);
+  SendToPER(per, other, TEST_BUTTON_DOWN);
+  SendToPER(per, other, TEST_BUTTON_UP);
+  CPPUNIT_ASSERT(tool->m_Move == 0 && tool->m_Wheel == 0 && tool->m_LeftDown == 0 && tool->m_LeftUp == 0);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+
+  // the events of its render window do
+  SendToPER(per, mouse, TEST_MOUSE_MOVE);
+  SendToPER(per, mouse, TEST_MOUSE_WHEEL);
+  SendToPER(per, mouse, TEST_BUTTON_DOWN);
+  CPPUNIT_ASSERT(per->GetInteractingTool() == tool);
+  SendToPER(per, mouse, TEST_BUTTON_UP);
+  CPPUNIT_ASSERT(tool->m_Move == 1 && tool->m_Wheel == 1 && tool->m_LeftDown == 1 && tool->m_LeftUp == 1);
+
+  // without a render window the tool gets the events of all of them
+  tool->OperateOnlyOn(NULL);
+  SendToPER(per, other, TEST_MOUSE_MOVE);
+  CPPUNIT_ASSERT(tool->m_Move == 2);
+
+  per->Delete();
+  albaDEL(tool);
+  delete other;
+  delete mouse;
 }

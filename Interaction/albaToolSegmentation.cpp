@@ -44,11 +44,8 @@ albaToolSegmentation::albaToolSegmentation()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(rwi->GetView()))
-    return false;
-
   long modifier = 0;
   if (m_CtrlDown)
     modifier = ALBA_CTRL_KEY;
@@ -62,7 +59,7 @@ bool albaToolSegmentation::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, 
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   albaEventMacro(albaEvent(this, MOUSE_UP));
@@ -70,21 +67,21 @@ bool albaToolSegmentation::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, do
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // the camera moves with the drags
-  return IsOnToolView(rwi->GetView());
+  return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // the camera moves with the drags
-  return IsOnToolView(rwi->GetView());
+  return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_IsPicking)
     SendPickingInformation(pos, 0, VME_PICKING);

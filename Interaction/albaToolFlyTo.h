@@ -29,10 +29,10 @@ public:
   albaTypeMacro(albaToolFlyTo, albaInteractionTool);
 
   /** Fly toward the clicked point */
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** Fly to the clicked point moving the camera away */
-  virtual bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** Move the camera of ren in numSteps steps to the point picked at pos: the focal point goes to
     the point and the camera approaches it by zoom (from -1 to 1, negative moves the camera away).

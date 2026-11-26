@@ -247,6 +247,7 @@ void albaOpFlipNormals::CreateOpDialog()
 
 	m_SelectCellTool->SetListener(this);
 	m_SelectCellTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_SelectCellTool->OperateOnlyOn(m_View->GetRWI());
 	GetPositionalEventRouter()->PushTool(m_SelectCellTool);
 
 	wxPoint p = wxDefaultPosition;

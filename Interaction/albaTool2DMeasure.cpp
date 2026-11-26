@@ -197,7 +197,7 @@ void albaTool2DMeasure::SetUpdateDistance(double dist)
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!m_IsEnabled)
 		return false;
@@ -241,7 +241,7 @@ bool albaTool2DMeasure::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, dou
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (m_CurrentRenderer != m_Renderer)
 		return true;
@@ -275,7 +275,7 @@ bool albaTool2DMeasure::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, doubl
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	InitRenderer(rwi, ren);
 
@@ -306,7 +306,7 @@ bool albaTool2DMeasure::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!m_IsEnabled)
 		return false;

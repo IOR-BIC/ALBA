@@ -36,21 +36,22 @@ class ALBA_EXPORT albaInteractionTool : public albaInteractionAgent
 public:
   albaTypeMacro(albaInteractionTool, albaInteractionAgent);
 
-  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  /** Make the tool work only on the mouse events of rwi; NULL, the default, for the events of all the render windows.
+    The pointer is only compared, never used. */
+  void OperateOnlyOn(albaRWIBase *rwi) {m_OperatingRWI = rwi;}
+  albaRWIBase *GetOperatingRWI() {return m_OperatingRWI;}
 
-  /** The mouse moved with a button pressed: called only on the tool interacting with the mouse */
-  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-
-  /** The mouse moved without buttons pressed */
-  virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
-
-  /** The mouse wheel has been rotated */
-  virtual bool OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation) {return false;}
+  /** The mouse events: the events of the render windows the tool does not operate on are not used (see OperateOnlyOn),
+    the others go to the methods ...Impl of the subclasses. */
+  bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  bool OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation);
 
   /** A key has been pressed or released */
   virtual bool OnKey(int keyCode, bool pressed) {return false;}
@@ -62,12 +63,30 @@ public:
   virtual void OnPop() {}
 
 protected:
-  albaInteractionTool() {}
+  albaInteractionTool() {m_OperatingRWI = NULL;}
   virtual ~albaInteractionTool() {}
 
-  /** Return true if ren belongs to the render window of the tool renderer (set with SetRendererAndView):
-    the tool works only on its render window */
-  bool IsOnToolRenderWindow(vtkRenderer *ren);
+  /** The mouse events of the render windows the tool operates on: a method returns true if the tool used the event */
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMiddleButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnRightButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+
+  /** The mouse moved with a button pressed: called only on the tool interacting with the mouse */
+  virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+
+  /** The mouse moved without buttons pressed */
+  virtual bool OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+
+  /** The mouse wheel has been rotated */
+  virtual bool OnWheelImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation) {return false;}
+
+  /** Return true if the tool operates on the events of rwi (see OperateOnlyOn) */
+  bool IsOnOperatingRWI(albaRWIBase *rwi) {return m_OperatingRWI == NULL || rwi == m_OperatingRWI;}
+
+  albaRWIBase *m_OperatingRWI; ///< the only render window the tool operates on, NULL for all
 
 private:
   albaInteractionTool(const albaInteractionTool&);  // Not implemented.
