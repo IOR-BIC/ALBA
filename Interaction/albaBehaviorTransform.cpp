@@ -15,6 +15,7 @@
 =========================================================================*/
 
 #include "albaBehaviorTransform.h"
+#include "albaRWIBase.h"
 
 #include "albaDecl.h"
 #include "albaRefSys.h"
@@ -168,15 +169,15 @@ void albaBehaviorTransform::SetRendererAndView(vtkRenderer *ren, albaView *view)
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  return StartTransform(ALBA_LEFT_BUTTON, view, ren, pos);
+  return StartTransform(ALBA_LEFT_BUTTON, rwi, ren, pos);
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  return StartTransform(ALBA_MIDDLE_BUTTON, view, ren, pos);
+  return StartTransform(ALBA_MIDDLE_BUTTON, rwi, ren, pos);
 }
 
 //------------------------------------------------------------------------------
@@ -186,13 +187,13 @@ bool albaBehaviorTransform::PrepareTransform(int button)
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::StartTransform(int button, albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::StartTransform(int button, albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   StopTransform(m_TransformButton);
   if (ren == NULL)
     return false;
 
-  SetRendererAndView(ren, view);
+  SetRendererAndView(ren, rwi->GetView());
   m_CurrentRotationConstraint = m_RotationConstraint;
   if (!PrepareTransform(button))
     return false;
@@ -208,7 +209,7 @@ bool albaBehaviorTransform::StartTransform(int button, albaView *view, vtkRender
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_TransformButton < 0)
     return false;
@@ -223,13 +224,13 @@ bool albaBehaviorTransform::OnDrag(albaView *view, vtkRenderer *ren, double pos[
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return StopTransform(ALBA_LEFT_BUTTON);
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorTransform::OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorTransform::OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return StopTransform(ALBA_MIDDLE_BUTTON);
 }

@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaToolPicker.h"
+#include "albaRWIBase.h"
 #include "albaPickHelper.h"
 #include "albaVME.h"
 
@@ -31,7 +32,7 @@
 albaCxxTypeMacro(albaToolPicker)
 
 //----------------------------------------------------------------------------
-bool albaToolPicker::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // SHIFT leaves the button to the PER
   m_Dragged = false;
@@ -39,7 +40,7 @@ bool albaToolPicker::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double p
 }
 
 //----------------------------------------------------------------------------
-bool albaToolPicker::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_Dragged)
     return true;
@@ -48,7 +49,7 @@ bool albaToolPicker::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos
   double pickedPos[3], scalar;
   albaVME *pickedVme;
   vtkIdType pointId;
-  if (albaPickHelper::PickPoint(view, pos, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
+  if (albaPickHelper::PickPoint(rwi->GetView(), pos, pickedPos, pickedVme, pointId, scalar) && !pickedVme->IsA("albaVMEGizmo"))
     SendPickedPointEvent(VME_PICKED, pickedPos, pointId, scalar, pickedVme);
   return true;
 }

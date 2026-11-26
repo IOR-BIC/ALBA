@@ -154,15 +154,15 @@ public:
   
   /** The left and middle buttons start the transform if PrepareTransform accepts them;
     the PER sets the picked position first. Return false without a renderer. */
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
-  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The drags change the transform */
-  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The release of the button that started the transform ends it */
-  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
-  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   //----------------------------------------------------------------------------
   // Actions performed on mouse driven events
@@ -230,7 +230,7 @@ protected:
   virtual bool PrepareTransform(int button);
 
   /** Start the transform of the button, if PrepareTransform accepts it */
-  bool StartTransform(int button, albaView *view, vtkRenderer *ren, double pos[2]);
+  bool StartTransform(int button, albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** End the transform, if started by the button */
   bool StopTransform(int button);

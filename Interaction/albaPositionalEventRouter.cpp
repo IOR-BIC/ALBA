@@ -139,11 +139,10 @@ bool albaPositionalEventRouter::OnKey(int keyCode, bool pressed)
 }
 
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
+  // the view of the render window picks the behaviors and selects: the dialogs have no view
   albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
 
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
@@ -160,7 +159,7 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, double pos[2]
     albaInteractionTool *tool = NULL;
     std::vector<albaInteractionTool *> tools = m_Tools;
     for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
-      if (tools[i]->OnLeftButtonDown(view, ren, pos))
+      if (tools[i]->OnLeftButtonDown(rwi, ren, pos))
         tool = tools[i];
 
     if (tool)
@@ -168,9 +167,9 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, double pos[2]
     else
     {
       // the default actions of the click on a view: selection and context menu
-      if (view && m_SelectTool->OnLeftButtonDown(view, ren, pos))
+      if (view && m_SelectTool->OnLeftButtonDown(rwi, ren, pos))
         TraceHandler("Select");
-      if (behavior && behavior->OnLeftButtonDown(view, ren, pos))
+      if (behavior && behavior->OnLeftButtonDown(rwi, ren, pos))
         SetHandler(behavior, true);
     }
   }
@@ -178,22 +177,21 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, double pos[2]
   {
     // the other buttons pressed during the interaction go to the same handler
     TraceCurrentHandler();
-    m_Handler->OnLeftButtonDown(view, ren, pos);
+    m_Handler->OnLeftButtonDown(rwi, ren, pos);
   }
 
   // the camera gets the button too and moves with the drags the handler does not use, if the render window
   // moves its camera and the interaction did not already end while the handler had the button down
-  if (m_Interacting && !m_HandlerIsBehavior && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnLeftButtonDown(view, ren, pos))
+  if (m_Interacting && !m_HandlerIsBehavior && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnLeftButtonDown(rwi, ren, pos))
     TraceHandler("Camera", m_CameraTool);
 
   WriteEventTrace("LeftButtonDown");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
+  // the view of the render window picks the behaviors and selects: the dialogs have no view
   albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
 
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
@@ -210,7 +208,7 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, double pos[
     albaInteractionTool *tool = NULL;
     std::vector<albaInteractionTool *> tools = m_Tools;
     for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
-      if (tools[i]->OnMiddleButtonDown(view, ren, pos))
+      if (tools[i]->OnMiddleButtonDown(rwi, ren, pos))
         tool = tools[i];
 
     if (tool)
@@ -218,9 +216,9 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, double pos[
     else
     {
       // the default actions of the click on a view: selection and context menu
-      if (view && m_SelectTool->OnMiddleButtonDown(view, ren, pos))
+      if (view && m_SelectTool->OnMiddleButtonDown(rwi, ren, pos))
         TraceHandler("Select");
-      if (behavior && behavior->OnMiddleButtonDown(view, ren, pos))
+      if (behavior && behavior->OnMiddleButtonDown(rwi, ren, pos))
         SetHandler(behavior, true);
     }
   }
@@ -228,22 +226,21 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, double pos[
   {
     // the other buttons pressed during the interaction go to the same handler
     TraceCurrentHandler();
-    m_Handler->OnMiddleButtonDown(view, ren, pos);
+    m_Handler->OnMiddleButtonDown(rwi, ren, pos);
   }
 
   // the camera gets the button too and moves with the drags the handler does not use, if the render window
   // moves its camera and the interaction did not already end while the handler had the button down
-  if (m_Interacting && !m_HandlerIsBehavior && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnMiddleButtonDown(view, ren, pos))
+  if (m_Interacting && !m_HandlerIsBehavior && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnMiddleButtonDown(rwi, ren, pos))
     TraceHandler("Camera", m_CameraTool);
 
   WriteEventTrace("MiddleButtonDown");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
+  // the view of the render window picks the behaviors and selects: the dialogs have no view
   albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
 
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
@@ -260,7 +257,7 @@ void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, double pos[2
     albaInteractionTool *tool = NULL;
     std::vector<albaInteractionTool *> tools = m_Tools;
     for (int i = tools.size() - 1; i >= 0 && behavior == NULL && tool == NULL; i--)
-      if (tools[i]->OnRightButtonDown(view, ren, pos))
+      if (tools[i]->OnRightButtonDown(rwi, ren, pos))
         tool = tools[i];
 
     if (tool)
@@ -268,9 +265,9 @@ void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, double pos[2
     else
     {
       // the default actions of the click on a view: selection and context menu
-      if (view && m_SelectTool->OnRightButtonDown(view, ren, pos))
+      if (view && m_SelectTool->OnRightButtonDown(rwi, ren, pos))
         TraceHandler("Select");
-      if (behavior && behavior->OnRightButtonDown(view, ren, pos))
+      if (behavior && behavior->OnRightButtonDown(rwi, ren, pos))
         SetHandler(behavior, true);
     }
   }
@@ -278,23 +275,19 @@ void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, double pos[2
   {
     // the other buttons pressed during the interaction go to the same handler
     TraceCurrentHandler();
-    m_Handler->OnRightButtonDown(view, ren, pos);
+    m_Handler->OnRightButtonDown(rwi, ren, pos);
   }
 
   // the camera gets the button too and moves with the drags the handler does not use, if the render window
   // moves its camera and the interaction did not already end while the handler had the button down
-  if (m_Interacting && !m_HandlerIsBehavior && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnRightButtonDown(view, ren, pos))
+  if (m_Interacting && !m_HandlerIsBehavior && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnRightButtonDown(rwi, ren, pos))
     TraceHandler("Camera", m_CameraTool);
 
   WriteEventTrace("RightButtonDown");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
-  albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
-
   // a button up without interaction, e.g. pressed outside the views, and the events of the other render windows are ignored
   if (!m_Interacting || rwi != m_RWI)
     return;
@@ -303,9 +296,9 @@ void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, double pos[2])
   if (m_Handler)
   {
     TraceCurrentHandler();
-    m_Handler->OnLeftButtonUp(view, ren, pos);
+    m_Handler->OnLeftButtonUp(rwi, ren, pos);
   }
-  if (m_CameraTool->OnLeftButtonUp(view, ren, pos))
+  if (m_CameraTool->OnLeftButtonUp(rwi, ren, pos))
     TraceHandler("Camera", m_CameraTool);
 
   EndInteraction(ALBA_LEFT_BUTTON);
@@ -313,12 +306,8 @@ void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, double pos[2])
   WriteEventTrace("LeftButtonUp");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
-  albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
-
   // a button up without interaction, e.g. pressed outside the views, and the events of the other render windows are ignored
   if (!m_Interacting || rwi != m_RWI)
     return;
@@ -327,9 +316,9 @@ void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, double pos[2]
   if (m_Handler)
   {
     TraceCurrentHandler();
-    m_Handler->OnMiddleButtonUp(view, ren, pos);
+    m_Handler->OnMiddleButtonUp(rwi, ren, pos);
   }
-  if (m_CameraTool->OnMiddleButtonUp(view, ren, pos))
+  if (m_CameraTool->OnMiddleButtonUp(rwi, ren, pos))
     TraceHandler("Camera", m_CameraTool);
 
   EndInteraction(ALBA_MIDDLE_BUTTON);
@@ -337,11 +326,10 @@ void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, double pos[2]
   WriteEventTrace("MiddleButtonUp");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnRightButtonUp(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
+  // the view of the render window shows the context menu: the dialogs have no view
   albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
 
   // a button up without interaction, e.g. pressed outside the views, and the events of the other render windows are ignored
   if (!m_Interacting || rwi != m_RWI)
@@ -351,25 +339,21 @@ void albaPositionalEventRouter::OnRightButtonUp(albaRWIBase *rwi, double pos[2])
   if (m_Handler)
   {
     TraceCurrentHandler();
-    m_Handler->OnRightButtonUp(view, ren, pos);
+    m_Handler->OnRightButtonUp(rwi, ren, pos);
   }
-  if (m_CameraTool->OnRightButtonUp(view, ren, pos))
+  if (m_CameraTool->OnRightButtonUp(rwi, ren, pos))
     TraceHandler("Camera", m_CameraTool);
 
   EndInteraction(ALBA_RIGHT_BUTTON);
 
   // the right button released on a view without dragging shows the context menu
-  if (view && m_SelectTool->OnRightButtonUp(view, ren, pos))
+  if (view && m_SelectTool->OnRightButtonUp(rwi, ren, pos))
     TraceHandler("Context menu");
   WriteEventTrace("RightButtonUp");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, double pos[2])
+void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  // the tools get the view of the render window and the renderer under the mouse
-  albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
-
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;
@@ -382,7 +366,7 @@ void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, double pos[2])
     bool used = false;
     std::vector<albaInteractionTool *> tools = m_Tools;
     for (int i = tools.size() - 1; i >= 0 && !used; i--)
-      if (tools[i]->OnMove(view, ren, pos))
+      if (tools[i]->OnMove(rwi, ren, pos))
       {
         TraceHandler("Tool", tools[i]);
         used = true;
@@ -391,17 +375,17 @@ void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, double pos[2])
   else
   {
     // a drag cancels the context menu
-    m_SelectTool->OnDrag(view, ren, pos);
+    m_SelectTool->OnDrag(rwi, ren, pos);
 
     bool used = false;
     if (m_Handler)
     {
       TraceCurrentHandler();
-      used = m_Handler->OnDrag(view, ren, pos);
+      used = m_Handler->OnDrag(rwi, ren, pos);
     }
 
     // the drags the handler does not use move the camera
-    if (!used && m_CameraTool->OnDrag(view, ren, pos))
+    if (!used && m_CameraTool->OnDrag(rwi, ren, pos))
       TraceHandler("Camera", m_CameraTool);
   }
 
@@ -409,12 +393,8 @@ void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, double pos[2])
 }
 
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMouseWheel(albaRWIBase *rwi, double pos[2], double rotation)
+void albaPositionalEventRouter::OnMouseWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation)
 {
-  // the tools get the view of the render window and the renderer under the mouse
-  albaView *view = rwi->GetView();
-  vtkRenderer *ren = rwi->GetRendererAt(pos);
-
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;
@@ -425,14 +405,14 @@ void albaPositionalEventRouter::OnMouseWheel(albaRWIBase *rwi, double pos[2], do
   bool used = false;
   std::vector<albaInteractionTool *> tools = m_Tools;
   for (int i = tools.size() - 1; i >= 0 && !used; i--)
-    if (tools[i]->OnWheel(view, ren, pos, rotation))
+    if (tools[i]->OnWheel(rwi, ren, pos, rotation))
     {
       TraceHandler("Tool", tools[i]);
       used = true;
     }
 
   // the wheel moves the camera when no tool uses it, no button is pressed and the render window moves its camera
-  if (!used && !m_Interacting && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnWheel(view, ren, pos, rotation))
+  if (!used && !m_Interacting && rwi->IsCameraInteractionEnabled() && m_CameraTool->OnWheel(rwi, ren, pos, rotation))
     TraceHandler("Camera", m_CameraTool);
 
   WriteEventTrace("MouseWheel");

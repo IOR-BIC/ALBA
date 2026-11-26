@@ -36,7 +36,7 @@ public:
   void EnableTransform(bool enable) {m_TransformEnabled = enable;}
 
   /** The left button with SHIFT or CTRL sends ID_CLICK_ON_VME, if the clicks with modifier are enabled */
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
 protected:
   albaBehaviorCutPlane();

@@ -24,6 +24,7 @@
 
 #include "albaPositionalEventRouter.h"
 #include "albaToolFlyTo.h"
+#include "albaRWIBase.h"
 #include "albaAbsLogicManager.h"
 #include "albaView.h"
 
@@ -35,21 +36,21 @@
 albaCxxTypeMacro(albaToolFlyTo);
 
 //------------------------------------------------------------------------------
-bool albaToolFlyTo::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolFlyTo::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  return FlyAndPop(view, ren, pos, 1);
+  return FlyAndPop(rwi, ren, pos, 1);
 }
 
 //------------------------------------------------------------------------------
-bool albaToolFlyTo::OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolFlyTo::OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  return FlyAndPop(view, ren, pos, -0.6);
+  return FlyAndPop(rwi, ren, pos, -0.6);
 }
 
 //------------------------------------------------------------------------------
-bool albaToolFlyTo::FlyAndPop(albaView *view, vtkRenderer *ren, double pos[2], double zoom)
+bool albaToolFlyTo::FlyAndPop(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double zoom)
 {
-  FlyTo(view, ren, pos, zoom);
+  FlyTo(rwi->GetView(), ren, pos, zoom);
 
   // one click ends the fly-to mode, also when nothing is picked
   if (GetLogicManager())

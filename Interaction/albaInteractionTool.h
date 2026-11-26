@@ -19,9 +19,11 @@
 
 #include "albaInteractionAgent.h"
 
+class albaRWIBase;
+
 /** Base class of the tools pushed on the stack of the PER.
-  The mouse methods receive the view and the renderer under the mouse (NULL when the mouse is
-  not on a view) and the 2D position in display coordinates; the RWI is view->GetRWI() and the
+  The mouse methods receive the render window, the renderer under the mouse and the 2D position
+  in display coordinates; the view is rwi->GetView(), NULL for the render windows of the dialogs, and the
   modifier keys are GetCtrlDown(), GetAltDown() and GetShiftDown().
   The PER offers each event to the tools from the top of the stack to the bottom:
   a method returns true if the tool used the event, and then the event stops there.
@@ -34,21 +36,21 @@ class ALBA_EXPORT albaInteractionTool : public albaInteractionAgent
 public:
   albaTypeMacro(albaInteractionTool, albaInteractionAgent);
 
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
-  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
 
   /** The mouse moved with a button pressed: called only on the tool interacting with the mouse */
-  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
 
   /** The mouse moved without buttons pressed */
-  virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]) {return false;}
+  virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return false;}
 
   /** The mouse wheel has been rotated */
-  virtual bool OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation) {return false;}
+  virtual bool OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation) {return false;}
 
   /** A key has been pressed or released */
   virtual bool OnKey(int keyCode, bool pressed) {return false;}

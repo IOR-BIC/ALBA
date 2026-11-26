@@ -38,7 +38,7 @@ albaToolSelectPoint::albaToolSelectPoint()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelectPoint::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelectPoint::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // when no point is picked the button goes to the camera
   if ((m_UseCtrlModifier && !m_CtrlDown) || !PickPoint(ren, pos))
@@ -49,14 +49,14 @@ bool albaToolSelectPoint::OnLeftButtonDown(albaView *view, vtkRenderer *ren, dou
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelectPoint::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelectPoint::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelectPoint::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelectPoint::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   return m_IsPicking;
 }

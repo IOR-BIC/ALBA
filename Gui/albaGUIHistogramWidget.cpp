@@ -46,7 +46,7 @@ public:
 
   albaGUIHistogramWidgetTool() {m_Widget = NULL; m_Renderer = NULL;}
 
-  virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+  virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
   {
     if (ren != m_Renderer)
       return false;
@@ -54,7 +54,7 @@ public:
     return true;
   }
 
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
   {
     if (ren != m_Renderer || !GetCtrlDown())
       return false;

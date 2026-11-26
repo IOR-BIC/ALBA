@@ -30,8 +30,8 @@ class albaToolCamera;
 class albaToolSelect;
 
 /** Router of the mouse events of the render windows.
-  The render window interactor calls the method of each event with itself and the 2D position; the state of the modifier keys
-  is set first with SetModifierKeys. The tools get the view of the render window and the renderer under the mouse.
+  The render window interactor calls the method of each event with itself, the renderer under the mouse and the 2D position; the state of the modifier keys
+  is set first with SetModifierKeys. The tools get the same parameters and the view from the render window.
   One render window at a time interacts: while a button is pressed, the events of the other render windows are ignored.
   A button down picks the scene and chooses the handler of the interaction, which receives
   the buttons and the drags until the button that started the interaction is released:
@@ -48,20 +48,20 @@ public:
   albaTypeMacro(albaPositionalEventRouter,albaInteractionAgent);
 
   /** The buttons pressed in a render window: a new interaction starts, or the button goes to the handler of the current one, and to the camera */
-  void OnLeftButtonDown(albaRWIBase *rwi, double pos[2]);
-  void OnMiddleButtonDown(albaRWIBase *rwi, double pos[2]);
-  void OnRightButtonDown(albaRWIBase *rwi, double pos[2]);
+  void OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  void OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  void OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The buttons released go to the handler and to the camera; the release of the starting button ends the interaction */
-  void OnLeftButtonUp(albaRWIBase *rwi, double pos[2]);
-  void OnMiddleButtonUp(albaRWIBase *rwi, double pos[2]);
-  void OnRightButtonUp(albaRWIBase *rwi, double pos[2]);
+  void OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  void OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  void OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The mouse moved: the drags go to the handler and, if it does not use them, to the camera; the moves without buttons go to the tools */
-  void OnMouseMove(albaRWIBase *rwi, double pos[2]);
+  void OnMouseMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The wheel goes to the tools and, if no tool uses it and no button is pressed, to the camera */
-  void OnMouseWheel(albaRWIBase *rwi, double pos[2], double rotation);
+  void OnMouseWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation);
 
   /** Enable/disable the selection of the picked VME with a click (see albaToolSelect) */
   virtual void EnableSelect(bool enable);

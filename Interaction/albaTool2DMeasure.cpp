@@ -14,6 +14,7 @@ PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #include "albaTool2DMeasure.h"
+#include "albaRWIBase.h"
 
 #include "albaDecl.h"
 #include "albaRWI.h"
@@ -109,13 +110,12 @@ albaTool2DMeasure::~albaTool2DMeasure()
 }
 
 //----------------------------------------------------------------------------
-void albaTool2DMeasure::InitRenderer(albaView *view, vtkRenderer *ren)
+void albaTool2DMeasure::InitRenderer(albaRWIBase *rwi, vtkRenderer *ren)
 {
 	GetViewManager()->CameraUpdate();
 
-		albaRWIBase *rwi = view ? view->GetRWI() : NULL;
-
-		if (rwi == NULL || ren == NULL || m_CurrentRwi == rwi)
+		// the measures work only on the render windows of the views
+		if (rwi == NULL || rwi->GetView() == NULL || ren == NULL || m_CurrentRwi == rwi)
 			return;
 
 		m_CurrentRwi = rwi;
@@ -197,14 +197,14 @@ void albaTool2DMeasure::SetUpdateDistance(double dist)
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!m_IsEnabled)
 		return false;
 
 	GetViewManager()->CameraUpdate();
 
-	InitRenderer(view, ren);
+	InitRenderer(rwi, ren);
 	m_CurrentRenderer = m_Renderer;
 
 	// with SHIFT, or with CTRL while adding a measure, the button is left to the PER for the whole interaction;
@@ -241,7 +241,7 @@ bool albaTool2DMeasure::OnLeftButtonDown(albaView *view, vtkRenderer *ren, doubl
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (m_CurrentRenderer != m_Renderer)
 		return true;
@@ -275,9 +275,9 @@ bool albaTool2DMeasure::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double 
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-	InitRenderer(view, ren);
+	InitRenderer(rwi, ren);
 
 	double pointCoord[3];
 	ScreenToWorld(pos, pointCoord);
@@ -306,12 +306,12 @@ bool albaTool2DMeasure::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!m_IsEnabled)
 		return false;
 
-	InitRenderer(view, ren);
+	InitRenderer(rwi, ren);
 
 	double pointCoord[3];
 	ScreenToWorld(pos, pointCoord);

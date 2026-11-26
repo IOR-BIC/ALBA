@@ -29,13 +29,13 @@ class ALBA_EXPORT albaToolPicker : public albaInteractionTool
 public: 
   albaTypeMacro(albaToolPicker, albaInteractionTool);
 
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The drags move the camera, and the button up after a drag does not pick */
-  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) {m_Dragged = true; return false;}
+  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {m_Dragged = true; return false;}
 
   /** A click without dragging picks the point */
-  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
 protected:
   albaToolPicker() {m_Dragged = false;}

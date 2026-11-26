@@ -100,7 +100,7 @@ albaToolDICOMImporter::~albaToolDICOMImporter()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!IsOnToolRenderWindow(ren))
 		return false;
@@ -109,14 +109,14 @@ bool albaToolDICOMImporter::OnMove(albaView *view, vtkRenderer *ren, double pos[
 	ComputeDisplayToWorld((int)pos[0], (int)pos[1], -1, worldPos);
 	CalculateSideDragged(worldPos);
 
-	UpdateCursor(view ? view->GetRWI() : NULL);
+	UpdateCursor(rwi);
 
 	m_Renderer->GetRenderWindow()->Render();
 	return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!IsOnToolRenderWindow(ren))
 		return false;
@@ -144,7 +144,7 @@ bool albaToolDICOMImporter::OnLeftButtonDown(albaView *view, vtkRenderer *ren, d
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (m_GizmoStatus == NORMAL_MODALITY)
 		return false;
@@ -154,7 +154,7 @@ bool albaToolDICOMImporter::OnDrag(albaView *view, vtkRenderer *ren, double pos[
 }
 
 //------------------------------------------------------------------------------
-bool albaToolDICOMImporter::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolDICOMImporter::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	m_GizmoStatus = NORMAL_MODALITY;
 

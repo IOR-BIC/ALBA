@@ -50,7 +50,7 @@ albaToolVTKPicker::~albaToolVTKPicker()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolVTKPicker::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolVTKPicker::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (!IsOnToolRenderWindow(ren) || !m_CtrlDown)
     return false;
@@ -79,7 +79,7 @@ bool albaToolVTKPicker::OnLeftButtonDown(albaView *view, vtkRenderer *ren, doubl
 }
 
 //------------------------------------------------------------------------------
-bool albaToolVTKPicker::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolVTKPicker::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_Picker != NULL)
   {
@@ -90,7 +90,7 @@ bool albaToolVTKPicker::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double 
 }
 
 //------------------------------------------------------------------------------
-bool albaToolVTKPicker::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolVTKPicker::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_Picker == NULL || !m_ContinuousPicking)
     return true;

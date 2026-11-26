@@ -80,7 +80,7 @@ public:
 
   /** Enable/disable the camera motion with the mouse in this render window (enabled by default).
     Each mouse event calls the method of the router of the mouse events registered in albaServiceLocator with this
-    render window and the position: the router gets from them the view and the renderer. The modifier keys are set first. */
+    render window, the renderer under the mouse and the position: the router gets the view from the render window. The modifier keys are set first. */
   void EnableCameraInteraction(bool enable) {m_CameraInteractionEnabled = enable;}
   bool IsCameraInteractionEnabled() {return m_CameraInteractionEnabled;}
 
@@ -90,9 +90,6 @@ public:
 
   /** Return the render window that got the last mouse move, button down or wheel, NULL if deleted */
   static albaRWIBase *GetLastMouseRWI() {return m_LastMouseRWI;}
-
-  /** Return the renderer at the display position pos, NULL if none or without render window */
-  vtkRenderer *GetRendererAt(double pos[2]);
 
   /** Set the directory for the Stereo Movie*/
   void SetStereoMovieDirectory(const char *dir);

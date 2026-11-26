@@ -73,21 +73,21 @@ bool albaToolSelect::Select()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelect::OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelect::OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_ShowContextMenu = true;
   return Select();
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelect::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelect::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_ShowContextMenu = false;
   return false;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelect::OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelect::OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (!m_ShowContextMenu)
     return false;

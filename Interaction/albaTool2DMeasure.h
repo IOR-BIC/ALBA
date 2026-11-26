@@ -89,10 +89,10 @@ public:
 	};
 
 	/// TOOL EVENTS
-	virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
-	virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
-	virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
-	virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2]);
+	virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+	virtual bool OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
 	/// MEASURE
 	/** Add Measure*/
@@ -219,7 +219,7 @@ protected:
 	virtual ~albaTool2DMeasure();
 
 	/** Update the renderer and the plane of the measures when the mouse goes on another RWI */
-	void InitRenderer(albaView *view, vtkRenderer *ren);
+	void InitRenderer(albaRWIBase *rwi, vtkRenderer *ren);
 		
 	/** Draw New Measure*/
 	virtual void DrawNewMeasure(double * wp) {};

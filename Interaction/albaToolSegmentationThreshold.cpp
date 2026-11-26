@@ -23,15 +23,16 @@
 //----------------------------------------------------------------------------
 
 #include "albaToolSegmentationThreshold.h"
+#include "albaRWIBase.h"
 #include "albaPickHelper.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaToolSegmentationThreshold);
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentationThreshold::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentationThreshold::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(view))
+  if (!IsOnToolView(rwi->GetView()))
     return false;
 
   double pickedPos[3];

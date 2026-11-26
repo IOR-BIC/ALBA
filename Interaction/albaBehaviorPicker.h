@@ -30,13 +30,13 @@ public:
   albaTypeMacro(albaBehaviorPicker,albaInteractionBehavior);
 
   /** The left button picks and sends VME_PICKED */
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** With continuous picking the release of the left button picks and sends VME_PICKED */
-  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** With continuous picking the drags pick and send VME_PICKING */
-  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** Enable/disable continuous picking in OnEvent. */
   void EnableContinuousPicking(bool enable) {m_ContinuousPickingFlag = enable;};

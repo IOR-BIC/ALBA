@@ -40,7 +40,7 @@ albaToolExtractIsosurface::albaToolExtractIsosurface()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolExtractIsosurface::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolExtractIsosurface::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (!IsOnToolRenderWindow(ren))
     return false;
@@ -50,24 +50,24 @@ bool albaToolExtractIsosurface::OnLeftButtonDown(albaView *view, vtkRenderer *re
 }
 
 //------------------------------------------------------------------------------
-bool albaToolExtractIsosurface::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolExtractIsosurface::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_PickValue = false;
   return false;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolExtractIsosurface::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolExtractIsosurface::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolRenderWindow(ren) || view == NULL || view->GetRWI() == NULL)
+  if (!IsOnToolRenderWindow(ren))
     return true;
 
   if (m_PickValue)
   {
-    if (view->GetRWI()->GetPicker()->Pick((int)pos[0], (int)pos[1], 0, ren))
+    if (rwi->GetPicker()->Pick((int)pos[0], (int)pos[1], 0, ren))
     {
       double pickedPos[3];
-      view->GetRWI()->GetPicker()->GetPickPosition(pickedPos);
+      rwi->GetPicker()->GetPickPosition(pickedPos);
       SendPickedPointEvent(VME_PICKED, pickedPos);
     }
   }

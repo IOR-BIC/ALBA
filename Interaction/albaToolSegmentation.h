@@ -44,15 +44,15 @@ public:
 
   albaAbstractTypeMacro(albaToolSegmentation, albaInteractionTool);
 
-  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override {return true;}
-  bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override {return true;}
+  bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override {return true;}
+  bool OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override {return true;}
 
   /** Send VME_PICKING while picking; the drag is left to the camera */
-  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** Forward the key to the listener, which reads the modifier keys with GetCtrlDown, GetAltDown and GetShiftDown */
   bool OnKey(int keyCode, bool pressed) override;

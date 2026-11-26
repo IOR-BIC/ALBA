@@ -30,13 +30,13 @@ public:
   albaTypeMacro(albaToolSelectCell, albaInteractionTool);
 
   /** With CTRL on a cell start picking */
-  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** End picking */
-  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** Keep picking while dragging: the camera does not move */
-  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
 protected:
   albaToolSelectCell();

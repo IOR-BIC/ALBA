@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaToolSegmentationEdit.h"
+#include "albaRWIBase.h"
 #include "albaEvent.h"
 #include "albaPickHelper.h"
 
@@ -30,9 +31,9 @@
 albaCxxTypeMacro(albaToolSegmentationEdit);
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentationEdit::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentationEdit::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(view))
+  if (!IsOnToolView(rwi->GetView()))
     return false;
 
   // the position is sent even if nothing has been picked, (0, 0, 0) in that case
@@ -46,9 +47,9 @@ bool albaToolSegmentationEdit::OnMove(albaView *view, vtkRenderer *ren, double p
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentationEdit::OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation)
+bool albaToolSegmentationEdit::OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation)
 {
-  if (!IsOnToolView(view) || !m_ShiftDown)
+  if (!IsOnToolView(rwi->GetView()) || !m_ShiftDown)
     return false;
 
   albaEvent scrollEvent(this, MOUSE_WHEEL, (long)rotation);
