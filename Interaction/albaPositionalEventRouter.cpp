@@ -139,8 +139,12 @@ bool albaPositionalEventRouter::OnKey(int keyCode, bool pressed)
 }
 
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;
@@ -185,8 +189,12 @@ void albaPositionalEventRouter::OnLeftButtonDown(albaRWIBase *rwi, albaView *vie
   WriteEventTrace("LeftButtonDown");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;
@@ -231,8 +239,12 @@ void albaPositionalEventRouter::OnMiddleButtonDown(albaRWIBase *rwi, albaView *v
   WriteEventTrace("MiddleButtonDown");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;
@@ -277,8 +289,12 @@ void albaPositionalEventRouter::OnRightButtonDown(albaRWIBase *rwi, albaView *vi
   WriteEventTrace("RightButtonDown");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // a button up without interaction, e.g. pressed outside the views, and the events of the other render windows are ignored
   if (!m_Interacting || rwi != m_RWI)
     return;
@@ -297,8 +313,12 @@ void albaPositionalEventRouter::OnLeftButtonUp(albaRWIBase *rwi, albaView *view,
   WriteEventTrace("LeftButtonUp");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // a button up without interaction, e.g. pressed outside the views, and the events of the other render windows are ignored
   if (!m_Interacting || rwi != m_RWI)
     return;
@@ -317,8 +337,12 @@ void albaPositionalEventRouter::OnMiddleButtonUp(albaRWIBase *rwi, albaView *vie
   WriteEventTrace("MiddleButtonUp");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnRightButtonUp(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnRightButtonUp(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // a button up without interaction, e.g. pressed outside the views, and the events of the other render windows are ignored
   if (!m_Interacting || rwi != m_RWI)
     return;
@@ -340,8 +364,12 @@ void albaPositionalEventRouter::OnRightButtonUp(albaRWIBase *rwi, albaView *view
   WriteEventTrace("RightButtonUp");
 }
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2])
+void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, double pos[2])
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;
@@ -381,8 +409,12 @@ void albaPositionalEventRouter::OnMouseMove(albaRWIBase *rwi, albaView *view, vt
 }
 
 //------------------------------------------------------------------------------
-void albaPositionalEventRouter::OnMouseWheel(albaRWIBase *rwi, albaView *view, vtkRenderer *ren, double pos[2], double rotation)
+void albaPositionalEventRouter::OnMouseWheel(albaRWIBase *rwi, double pos[2], double rotation)
 {
+  // the tools get the view of the render window and the renderer under the mouse
+  albaView *view = rwi->GetView();
+  vtkRenderer *ren = rwi->GetRendererAt(pos);
+
   // one interaction at a time: the events of the other render windows are ignored
   if (m_Interacting && rwi != m_RWI)
     return;

@@ -168,33 +168,32 @@ void albaInteractionRoutingTest::AfterTest()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::SendMouse(albaID id, double x, double y, int button, int modifier, int modifier2)
 {
-  // as the render window does: the modifier keys first, then the method of the event of the registered PER, with the view and the renderer under the mouse
+  // as the render window does: the modifier keys first, then the method of the event of the registered PER, with the render window and the position
   albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
   bool ctrl = modifier == ALBA_CTRL_KEY || modifier2 == ALBA_CTRL_KEY;
   bool alt = modifier == ALBA_ALT_KEY || modifier2 == ALBA_ALT_KEY;
   bool shift = modifier == ALBA_SHIFT_KEY || modifier2 == ALBA_SHIFT_KEY;
   double pos[2] = {x, y};
-  vtkRenderer *ren = m_Rwi->FindPokedRenderer((int)x, (int)y);
   per->SetModifierKeys(ctrl, alt, shift);
   switch (id)
   {
     case DEVICE_BUTTON_DOWN:
       switch (button)
       {
-        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos);   break;
-        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos); break;
-        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos);  break;
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(m_Rwi, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(m_Rwi, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(m_Rwi, pos);  break;
       }
       break;
     case DEVICE_BUTTON_UP:
       switch (button)
       {
-        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos);   break;
-        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos); break;
-        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos);  break;
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(m_Rwi, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(m_Rwi, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(m_Rwi, pos);  break;
       }
       break;
-    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(m_Rwi, m_Rwi->GetView(), ren, pos); break;
+    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(m_Rwi, pos); break;
   }
 }
 
@@ -204,7 +203,7 @@ void albaInteractionRoutingTest::SendWheel(double x, double y, double rotation)
   albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
   double pos[2] = {x, y};
   per->SetModifierKeys(false, false, false);
-  per->OnMouseWheel(m_Rwi, m_Rwi->GetView(), m_Rwi->FindPokedRenderer((int)x, (int)y), pos, rotation);
+  per->OnMouseWheel(m_Rwi, pos, rotation);
 }
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Set2DCamera()

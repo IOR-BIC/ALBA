@@ -138,7 +138,7 @@ public:
   virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
   {
     m_LeftDown++;
-    m_PER->OnLeftButtonUp(m_RWI, view, ren, pos);
+    m_PER->OnLeftButtonUp(m_RWI, pos);
     return m_UseLeft;
   };
 
@@ -192,15 +192,14 @@ public:
 albaCxxTypeMacro(albaPERTestBehavior);
 
 //----------------------------------------------------------------------------
-class albaPERTestMouse // the render window and the view sending the mouse events to the PER
+class albaPERTestMouse // the render window sending the mouse events to the PER
 //----------------------------------------------------------------------------
 {
 public:
-  albaPERTestMouse() {m_RWI = albaRWIBase::New(); m_View = NULL;};
+  albaPERTestMouse() {m_RWI = albaRWIBase::New();};
   ~albaPERTestMouse() {m_RWI->Delete();};
 
-  albaRWIBase *m_RWI;  ///< created without a window: the PER only compares it
-  albaView    *m_View;
+  albaRWIBase *m_RWI;  ///< created without a window: the renderer under the mouse is NULL
 };
 
 //----------------------------------------------------------------------------
@@ -215,21 +214,21 @@ static void SendToPER(albaPositionalEventRouter *per, albaPERTestMouse *mouse, a
     case DEVICE_BUTTON_DOWN:
       switch (button)
       {
-        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(mouse->m_RWI, mouse->m_View, NULL, pos);   break;
-        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(mouse->m_RWI, mouse->m_View, NULL, pos); break;
-        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(mouse->m_RWI, mouse->m_View, NULL, pos);  break;
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(mouse->m_RWI, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(mouse->m_RWI, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(mouse->m_RWI, pos);  break;
       }
       break;
     case DEVICE_BUTTON_UP:
       switch (button)
       {
-        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(mouse->m_RWI, mouse->m_View, NULL, pos);   break;
-        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(mouse->m_RWI, mouse->m_View, NULL, pos); break;
-        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(mouse->m_RWI, mouse->m_View, NULL, pos);  break;
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(mouse->m_RWI, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(mouse->m_RWI, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(mouse->m_RWI, pos);  break;
       }
       break;
-    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(mouse->m_RWI, mouse->m_View, NULL, pos); break;
-    case DEVICE_MOUSE_WHEEL:   per->OnMouseWheel(mouse->m_RWI, mouse->m_View, NULL, pos, rotation); break;
+    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(mouse->m_RWI, pos); break;
+    case DEVICE_MOUSE_WHEEL:   per->OnMouseWheel(mouse->m_RWI, pos, rotation); break;
   }
 }
 
@@ -237,7 +236,7 @@ static void SendToPER(albaPositionalEventRouter *per, albaPERTestMouse *mouse, a
 static void SelectView(albaPERTestMouse *mouse, albaView *view)
 //----------------------------------------------------------------------------
 {
-  mouse->m_View = view;
+  mouse->m_RWI->SetView(view);
 }
 
 void albaPositionalEventRouterTest::TestFixture()
