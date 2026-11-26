@@ -451,7 +451,7 @@ void albaOpExtrusionHoles::CreateOpDialog()
 	m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
 	m_Rwi->SetSize(0,0,500,500);
 	m_Rwi->Show(true);
-	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	m_OldSelectedView = GetViewManager()->GetSelectedView();
 	GetLogicManager()->SelectView(m_View);
 
 	albaNEW(m_Picker);

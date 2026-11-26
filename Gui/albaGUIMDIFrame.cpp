@@ -48,8 +48,6 @@ BEGIN_EVENT_TABLE(albaGUIMDIFrame, wxMDIParentFrame)
 		EVT_MENU_RANGE(OP_START,OP_END,albaGUIMDIFrame::OnMenuOp)
     EVT_MENU_RANGE(VIEW_START,VIEW_END,albaGUIMDIFrame::OnMenuView)
 		EVT_MENU_RANGE(wxID_FILE1, wxID_FILE9, albaGUIMDIFrame::OnMenu)
-    EVT_UPDATE_UI_RANGE(MENU_START,MENU_END,albaGUIMDIFrame::OnUpdateUI)
-    EVT_UPDATE_UI_RANGE(OP_START,OP_END,albaGUIMDIFrame::OnUpdateUI)
     EVT_SIZE(albaGUIMDIFrame::OnSize) //SIL. 23-may-2006 : 
 
     EVT_IDLE(albaGUIMDIFrame::OnIdle) 
@@ -133,12 +131,6 @@ void albaGUIMDIFrame::OnMenuView(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
   albaEventMacro(albaEvent(this,VIEW_CREATE,(long)e.GetId()));
-}
-//----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnUpdateUI(wxUpdateUIEvent& e)
-//----------------------------------------------------------------------------
-{ 
-	albaEventMacro(albaEvent(this,UPDATE_UI,&e));
 }
 //----------------------------------------------------------------------------
 void albaGUIMDIFrame::OnCloseWindow(wxCloseEvent& event)

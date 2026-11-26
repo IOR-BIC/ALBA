@@ -42,7 +42,6 @@ class albaOBB;
 class albaStorageElement;
 class albaTagArray;
 class vtkDataSet;
-class albaVMEItemAsynchObserver;
 class albaVMEStorage;
 
 /** albaVMEItem - store the single dataset stored into a albaDataVector
@@ -326,33 +325,7 @@ protected:
   unsigned long m_InputMemorySize;  ///< size of memory storing data to be read
   const char *  m_OutputMemory;     ///< pointer to memory storing the data to be written
   unsigned long m_OutputMemorySize; ///< size of the block of memory where data has been stored
-  albaVMEItemAsynchObserver *m_DataObserver; ///< observer used to update the item's data when downloaded
   albaString     m_ChecksumMD5; ///< Store the MD5 checksum for the data associated to the item.
 };
 
-/** albaVMEItemAsynchObserver - used by the albaVMEItem to synchronize the asynchronous
-loading data from remote storages.
-
-@sa albaVMEItemVTK
-*/
-class ALBA_EXPORT albaVMEItemAsynchObserver : public albaObserver
-{
-public:
-  ALBA_ID_DEC(VME_ITEM_DATA_DOWNLOADED); ///< event used to update the albaVMEItem data when download is finished.
-
-  albaVMEItemAsynchObserver();
-  virtual	~albaVMEItemAsynchObserver();
-
-  virtual void OnEvent(albaEventBase *alba_event);
-
-  /** Set the item to which send the update event when the asynchronous
-  message from the storage comes up.*/
-  void SetItem(albaVMEItem *item) {m_Item = item;};
-
-  void SetFileName(albaString &filename) {m_Filename = filename;};
-
-protected:
-  albaVMEItem *m_Item; ///< Item to update when the loading of the binary data finish
-  albaString   m_Filename; ///< Filename downloaded and to be read.
-};
 #endif

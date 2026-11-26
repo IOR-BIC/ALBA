@@ -263,9 +263,6 @@ public:
 	/** Select a view: the side bar, the interaction and the operations work on it */
 	void SelectView(albaView *view) override;
 
-	/** Return the selected view, NULL if none */
-	albaView *GetSelectedView() override { return m_SelectedView; }
-
 
 	bool IsTimeVaringEnabled() override;
 
@@ -373,7 +370,7 @@ protected:
 	virtual void VmeVisualModeChanged(albaVME * vme);
 
 	/** Show the tree in a dialog and return the VME chosen by the user, NULL on cancel. */
-	virtual albaVME *ChooseVME(albaString title = "Choose Node", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+	virtual albaVME *ChooseVME(albaString title = "Choose Node", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) override;
 
 	/** Called by the op manager when an operation starts: disable all menu and lock the Selection */
 	virtual void OpRunStarting() override;
@@ -400,7 +397,7 @@ protected:
 	virtual void CascadeViewFrames() override;
 
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
-	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", void *acceptFunction = NULL, albaVME *selected = NULL) override;
+	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) override;
 		
 
 	/** Show the contextual menu of the tree, with the items of vme if vmeMenu is true */
@@ -479,7 +476,6 @@ protected:
 	bool m_UseHelpManager;
 	bool m_UseSnapshotManager;
 
-	albaView *m_SelectedView; ///< the view selected with SelectView
 
 	albaGUISettingsDialog	*m_SettingsDialog;
 	albaGUIAboutDialog			*m_AboutDialog;

@@ -248,13 +248,13 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
         {
           m_GizmoRotate->Show(false);
           m_GizmoTranslate->SetRefSys(m_RefSysVME);
-          m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+          m_GizmoTranslate->Show(true);
         }
         else if (m_ActiveGizmo == ROT_GIZMO)
         {
           m_GizmoTranslate->Show(false);
           m_GizmoRotate->SetRefSys(m_RefSysVME);
-          m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+          m_GizmoRotate->Show(true);
         }
       }
 			GetViewManager()->CameraUpdate();
@@ -267,13 +267,13 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
       {
         m_GizmoRotate->Show(false);
         m_GizmoTranslate->SetRefSys(m_RefSysVME);
-        m_GizmoTranslate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+        m_GizmoTranslate->Show(true);
       }
       else if (m_ActiveGizmo == ROT_GIZMO)
       {
         m_GizmoTranslate->Show(false);
         m_GizmoRotate->SetRefSys(m_RefSysVME);
-        m_GizmoRotate->Show(true && (GetLogicManager()->GetSelectedView() != NULL));
+        m_GizmoRotate->Show(true);
       }
       else if (m_ActiveGizmo == SCAL_GIZMO)
       {

@@ -23,6 +23,10 @@ Always use exactly these commands. Never invent, replace, or bypass them.
   `-MaxCompilers <n>` (default: the number of logical processors), the compiler
   processes running at once in the whole build, as the Visual Studio IDE does,
   so the build does not run out of memory.
+  If the build fails for lack of resources (out of memory, PDB errors), it
+  deletes the objects older than their sources or than the headers they
+  include (`tools/agent/stale-objects.ps1`), which MSBuild may never recompile:
+  run the build again, they are compiled then.
 - Rebuild the external libraries (only if asked, or if something under `Libs/`
   changed): `powershell -NoProfile -ExecutionPolicy Bypass -File tools/agent/configure.ps1 -CompileLibraries`,
   then the build.

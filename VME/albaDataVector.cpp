@@ -42,12 +42,6 @@
 #include <fstream>
 #include "albaProgressBarHelper.h"
 
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-/** Event ID used to know if the VME should serialize itself as a single or multiple binary files.*/
-// static const albaID m_SingleFileDataId = mmuIdFactory::GetNextId("SINGLE_FILE_DATA");
-
 //-----------------------------------------------------------------------
 albaCxxTypeMacro(albaDataVector)
 //-----------------------------------------------------------------------
@@ -75,13 +69,6 @@ albaDataVector::~albaDataVector()
     it->second->SetListener(NULL); // detach items before destroying
     it->second->SetVME(NULL);
   }
-}
-//-------------------------------------------------------------------------
-albaID albaDataVector::GetSingleFileDataId()
-//-------------------------------------------------------------------------
-{
-  static const albaID singleFileDataId = mmuIdFactory::GetNextId("SINGLE_FILE_DATA");
-  return singleFileDataId;
 }
 //-------------------------------------------------------------------------
 bool albaDataVector::GetCrypting()
@@ -250,11 +237,6 @@ int albaDataVector::InternalStore(albaStorageElement *parent)
   {
     if (m_LastBaseURL != base_url)
     {
-      /*// ask how to save the binary file (as setting of the application):
-      // single file or multi file.
-      albaEvent single_file_event(this, SINGLE_FILE_DATA);
-      InvokeEvent(&single_file_event);
-      SetSingleFileMode(single_file_event.GetBool());*/
       bool single_file_mode;
       single_file_mode = GetNumberOfItems() > 1;
       SetSingleFileMode(single_file_mode);

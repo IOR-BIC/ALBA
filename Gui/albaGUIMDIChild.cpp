@@ -56,7 +56,6 @@ albaGUIMDIChild::albaGUIMDIChild(wxMDIParentFrame* parent,albaView *view)
 {
   assert(view);
   m_View     = view;
-  m_Listener = NULL;
   m_AllowCloseFlag  = true;
   m_EnableResize    = true;
 

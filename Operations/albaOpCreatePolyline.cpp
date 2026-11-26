@@ -105,7 +105,7 @@ void albaOpCreatePolyline::OpRun()
 		UpdateGui();
 	}
 
-	albaView *view = GetLogicManager()->GetSelectedView();
+	albaView *view = GetViewManager()->GetSelectedView();
 
 	if (view)
 	{

@@ -41,8 +41,6 @@ public:
   albaGUIMDIChild(wxMDIParentFrame* parent, albaView *view); 
   /** destructor. */
   virtual ~albaGUIMDIChild();
-  /** Set the listener object, i.e. the object receiving events sent by this object */
-  void SetListener(albaObserver *Listener) {m_Listener = Listener;};
   
 	/** Set the quitting flag. */
 	static void OnQuit () {m_Quitting=true;}; 
@@ -71,7 +69,6 @@ protected:
 
   wxWindow		*m_Win;
   albaView     *m_View;
-  albaObserver *m_Listener;
   static bool  m_Quitting;
   bool         m_AllowCloseFlag;
   bool         m_EnableResize;

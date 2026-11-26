@@ -37,9 +37,6 @@ public:
   /** Start test suite macro */
 	CPPUNIT_TEST_SUITE( albaWizardManagerTest );
 
-  /** macro for test TestSetGetVector */
-  CPPUNIT_TEST( TestSetterGetter );
-
   /** macro for test Dynamic allocation */
   CPPUNIT_TEST( TestDynamicAllocation );
 
@@ -51,8 +48,6 @@ public:
 
 protected:
 
-  /** Test Setter and Getter methods */
-  void TestSetterGetter();
 
   /** Test wizard Add */
 	void TestAddWizard();

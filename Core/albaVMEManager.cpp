@@ -41,8 +41,6 @@
 #include "albaDecl.h"
 #include "albaVME.h"
 #include "albaVMEStorage.h"
-#include "albaVMEGenericAbstract.h"
-#include "albaDataVector.h"
 
 #include "albaVMEIterator.h"
 #include "albaTagArray.h"
@@ -56,7 +54,6 @@ albaVMEManager::albaVMEManager()
 {
   m_Modified    = false;
 	m_MakeBakFile = true;
-	m_Listener    = NULL;
 	m_Storage     = NULL;
   m_Crypting    = false;
   m_LoadingFlag = false;
@@ -67,8 +64,6 @@ albaVMEManager::albaVMEManager()
 	m_ZipFile  = "";
   m_TmpDir   = "";
   m_MsfFileExtension = "msf";
-
-  m_SingleBinaryFile = false;
 
 	m_Config = new wxConfig(wxEmptyString);
   m_ZipHandler = NULL;
@@ -85,7 +80,6 @@ albaVMEManager::~albaVMEManager()
     NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
 
   m_AppStamp.clear();
-  m_Listener = NULL;
   m_FileSystem->CleanUpHandlers(); // Handlers are shared trough file systems.
   cppDEL(m_FileSystem);
   
@@ -93,22 +87,11 @@ albaVMEManager::~albaVMEManager()
   cppDEL(m_Config);
 }
 //----------------------------------------------------------------------------
-void albaVMEManager::SetSingleBinaryFile(bool singleFile)
-//----------------------------------------------------------------------------
-{
-  m_SingleBinaryFile = singleFile;
-}
-//----------------------------------------------------------------------------
 void albaVMEManager::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   if (alba_event->GetChannel()==MCH_UP)
   {
-    if (alba_event->GetId() == albaDataVector::GetSingleFileDataId())
-    {
-      ((albaEvent *)alba_event)->SetBool(m_SingleBinaryFile);
-      return;
-    }
     // events coming from the tree...
     switch (alba_event->GetId())
     {
@@ -130,8 +113,6 @@ void albaVMEManager::OnEvent(albaEventBase *alba_event)
         }
       }
       break;
-      default:
-        albaEventMacro(*alba_event);
     }
   }
 }
@@ -639,12 +620,6 @@ int albaVMEManager::MSFSave(int legacy_mode)
 
   if(m_MSFFile.IsEmpty() || fromDifferentApp) 
   {
-    // new file to save: ask to the application which is the default
-    // modality to save binary files.
-    albaEvent e(this,albaDataVector::GetSingleFileDataId());
-    albaEventMacro(e);
-    SetSingleBinaryFile(e.GetBool()); // set the save modality for time-varying vme
-    
     // ask for the new file name.
     wxString wildc = _("Project file (*."+ m_MsfFileExtension +")|*."
 		              + m_MsfFileExtension +"|Compressed file (*.z"+ m_MsfFileExtension +")|*.z" + m_MsfFileExtension + "");
@@ -822,8 +797,6 @@ void albaVMEManager::NotifyRemove(albaVME *vme)
 //----------------------------------------------------------------------------
 void albaVMEManager::NotifyAdd(albaVME *vme)
 {
-  bool checkSingleFile = vme->IsALBAType(albaVMERoot);
-  
   albaVMEIterator *iter = vme->NewIterator();
   iter->IgnoreVisibleToTraverse(true); // ignore visible to traverse flag and visits all nodes
   for (albaVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -840,21 +813,6 @@ void albaVMEManager::NotifyAdd(albaVME *vme)
     }
 
     albaServiceLocator::GetLogicManager()->VmeAdded(node);
-    if (checkSingleFile)
-    {
-      // if checkSingleFile == true this method is called by the MSFOpen
-      // so we have to check if the msf has been saved in single binary file or not.
-      albaVMEGenericAbstract *vmeWithDataVector = albaVMEGenericAbstract::SafeDownCast(node);
-      if (vmeWithDataVector)
-      {
-        albaDataVector *dv = vmeWithDataVector->GetDataVector();
-        if (dv != NULL)
-        {
-          SetSingleBinaryFile(dv->GetSingleFileMode());
-          checkSingleFile = false;
-        }
-      }
-    }
   }
   iter->Delete();
   m_Modified = true;

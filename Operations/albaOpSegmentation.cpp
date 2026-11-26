@@ -414,7 +414,7 @@ void albaOpSegmentation::InitializeInteractors()
 	m_View->SetCanSpin(false);
 
 	// the main mouse works on the view of the dialog: its events reach the PER of the interaction manager
-	m_OldSelectedView = GetLogicManager()->GetSelectedView();
+	m_OldSelectedView = GetViewManager()->GetSelectedView();
 	GetLogicManager()->SelectView(m_View);
 
 	albaNEW(m_ThresholdTool);

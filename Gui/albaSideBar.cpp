@@ -339,7 +339,7 @@ void albaSideBar::UpdateVmePanel()
 }
 
 //----------------------------------------------------------------------------
-std::vector<albaVME*> albaSideBar::VmeChoose(void *vme_accept_function, long style, albaString title, bool multiSelect, albaVME *vme)
+std::vector<albaVME*> albaSideBar::VmeChoose(albaVMEAcceptFunction vme_accept_function, long style, albaString title, bool multiSelect, albaVME *vme)
 {
 	albaGUIVMEChooser vc(m_Tree, title.GetCStr(), vme_accept_function, style, multiSelect, vme);
 	return vc.ShowChooserDialog();

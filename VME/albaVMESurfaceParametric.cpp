@@ -56,7 +56,6 @@
 #include "vtkMath.h"
 #include "vtkPolyLine.h"
 #include "vtkLinearExtrusionFilter.h"
-#include "albaOpManager.h"
 
 const bool DEBUG_MODE = true;
 
@@ -935,8 +934,8 @@ void albaVMESurfaceParametric::SetGeometryType( int parametricSurfaceTypeID )
 	EnableParametricSurfaceGui(m_GeometryType);
 
 	
-	if (GetOpManager())
-		GetOpManager()->EnableOp();
+	if (GetLogicManager())
+		GetLogicManager()->VmeModified(this);
 
   Modified();
 }

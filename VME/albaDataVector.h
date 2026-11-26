@@ -111,8 +111,6 @@ public:
   Release memory of the input albaVME. */
   void DeepCopyVmeLarge(albaDataVector *o);
 
-  static albaID GetSingleFileDataId();
-
   /** Set the VME owning this vector and its items (not referenced). Used to reach the tree root and the storage. */
   void SetVME(albaVME *vme);
 

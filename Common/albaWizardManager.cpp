@@ -37,10 +37,8 @@ albaWizardManager::albaWizardManager()
 //----------------------------------------------------------------------------
 {
   //Setting default values
-  m_Warn           = true;
   m_ToolBar = NULL;
   m_MenuBar = NULL;
-  m_Listener = NULL;
   m_Selected = NULL;
   m_RunningWizard =NULL;
   m_ProgressGauge = NULL;
@@ -250,12 +248,7 @@ void albaWizardManager::EnableWizardMenus( bool CanEnable /*= true*/ )
 void albaWizardManager::OnEvent( albaEventBase *alba_event )
 //----------------------------------------------------------------------------
 {
-  //All events from the wizards are forwarded up to logic
-  if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
-  {
-    e->SetSender(this);
-    albaEventMacro(*e);
-  }
+  // the events of the wizards are not forwarded: the logic handles only the menu commands
 }
 
 //----------------------------------------------------------------------------

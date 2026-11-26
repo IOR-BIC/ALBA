@@ -176,8 +176,6 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_SelectedLandmark = NULL;
 	m_FatalExptionOccurred = false;
 
-	m_SelectedView = NULL;
-
 	m_OpeningMSF = false;
 
 	m_AppLayout = NULL;
@@ -286,9 +284,7 @@ void albaLogicWithManagers::Configure()
 	if (m_UseVMEManager)
 	{
 		m_VMEManager = new albaVMEManager();
-		m_VMEManager->SetListener(this);
 		m_VMEManager->SetMsfFileExtension(m_Extension);
-		//m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
 	}
 
 	if (m_UseInteractionManager)
@@ -302,7 +298,6 @@ void albaLogicWithManagers::Configure()
 	{
 		m_ViewManager = new albaViewManager();
 		albaServiceLocator::SetViewManager(m_ViewManager);
-		m_ViewManager->SetListener(this);
 
 		m_SettingsDialog->AddPage(m_ViewManager->GetSettingsGui(), "View");
 	}
@@ -311,7 +306,6 @@ void albaLogicWithManagers::Configure()
 	{
 		m_OpManager = new albaOpManager();
 		albaServiceLocator::SetOpManager(m_OpManager);
-		m_OpManager->SetListener(this);
 		m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 	}
 
@@ -510,11 +504,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		/*if (e->GetId() == albaDataVector::SINGLE_FILE_DATA)
-		{
-			e->SetBool(m_StorageSettings->GetSingleFileStatus()!= 0);
-			return;
-		}*/
 		switch (e->GetId())
 		{
 			//resize view
@@ -537,11 +526,6 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 		case MENU_VIEW_TIMEBAR:
 			m_Win->ShowDockPane("timebar", !m_Win->DockPaneIsShown("timebar"));
-			break;
-			// ###############################################################
-			// commands related to the STATUSBAR
-			// ###############################################################
-		case UPDATE_UI:
 			break;
 			// ###############################################################
 			// commands related to FILE MENU  
@@ -952,7 +936,7 @@ void albaLogicWithManagers::VmeVisualModeChanged(albaVME * vme)
 	}
 }
 //----------------------------------------------------------------------------
-albaVME *albaLogicWithManagers::ChooseVME(albaString title, void *acceptFunction, albaVME *selected)
+albaVME *albaLogicWithManagers::ChooseVME(albaString title, albaVMEAcceptFunction acceptFunction, albaVME *selected)
 {
 	if (m_SideBar == NULL)
 		return NULL;
@@ -961,7 +945,7 @@ albaVME *albaLogicWithManagers::ChooseVME(albaString title, void *acceptFunction
 	return chosen.empty() ? NULL : chosen[0];
 }
 //----------------------------------------------------------------------------
-std::vector<albaVME*> albaLogicWithManagers::ChooseVMEs(albaString title, void *acceptFunction, albaVME *selected)
+std::vector<albaVME*> albaLogicWithManagers::ChooseVMEs(albaString title, albaVMEAcceptFunction acceptFunction, albaVME *selected)
 {
 	if (m_SideBar == NULL)
 		return std::vector<albaVME*>();
@@ -1192,7 +1176,6 @@ void albaLogicWithManagers::CreateViewFrame(albaView *v)
 		// child views
 		albaGUIMDIChild *c = new albaGUIMDIChild(m_Win, v);
 		c->SetWindowStyleFlag(m_ChildFrameStyle);
-		c->SetListener((albaObserver*)m_ViewManager);
 		v->SetFrame(c);
 	}
 }
@@ -1201,8 +1184,6 @@ void albaLogicWithManagers::ViewDeleted(albaView *view)
 {
 	if (m_PlugControlPanel)
 		m_SideBar->ViewDeleted(view);
-	if (view == m_SelectedView)
-		m_SelectedView = NULL;
 	EnableMenuAndToolbar();
 
 	if (m_OpManager)
@@ -1221,13 +1202,12 @@ void albaLogicWithManagers::CascadeViewFrames()
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::SelectView(albaView *view)
 {
+	albaView *oldView = m_ViewManager ? m_ViewManager->GetSelectedView() : NULL;
 	if (m_ViewManager && view)
 		m_ViewManager->ViewSelected(view);
 
-	if (view == m_SelectedView)
+	if (view == oldView)
 		return;
-
-	m_SelectedView = view;
 
 	if (m_SideBar)
 		m_SideBar->ViewSelect(view);
@@ -1388,8 +1368,6 @@ void albaLogicWithManagers::ConfigureWizardManager()
 	if(m_UseWizardManager)
 	{
 		m_WizardManager = new albaWizardManager();
-		m_WizardManager->SetListener(this);
-		m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
 	}
 }
 //----------------------------------------------------------------------------

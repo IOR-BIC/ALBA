@@ -418,8 +418,6 @@ wxString  albaIdString(int id)
 
      case ID_APP_SETTINGS:	    s="ID_APP_SETTINGS"; break; 
 
-     case UPDATE_UI:	          s="UPDATE_UI"; break; 
-
      case VME_SELECTED:	        s="VME_SELECTED"; break;
      case VME_PICKED:	          s="VME_PICKED"; break; 
      case VME_PICKING:	        s="VME_PICKING"; break; 

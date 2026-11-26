@@ -270,7 +270,7 @@ void albaOpExtractIsosurface::CreateOpDialog()
   m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
   m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
   m_Rwi->Show(true);
-  m_OldSelectedView = GetLogicManager()->GetSelectedView();
+  m_OldSelectedView = GetViewManager()->GetSelectedView();
   GetLogicManager()->SelectView(m_View);
   albaNEW(m_DensityPicker);
   m_DensityPicker->SetListener(this);	
