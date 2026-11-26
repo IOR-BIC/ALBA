@@ -284,7 +284,6 @@ ENDIF (ALBA_USE_VTK)
 SET(INTERACTION_SRCS
   ../Interaction/albaAgent.cpp  							../Interaction/albaAgent.h
   ../Interaction/albaGizmoAutoscaleHelper.cpp  				../Interaction/albaGizmoAutoscaleHelper.h
-  ../Interaction/albaEventInteraction.cpp  					../Interaction/albaEventInteraction.h
   ../Interaction/albaGizmoBoundingBox.cpp  					../Interaction/albaGizmoBoundingBox.h
   ../Interaction/albaGizmoHandle.cpp  						../Interaction/albaGizmoHandle.h
   ../Interaction/albaGizmoInterface.cpp  					../Interaction/albaGizmoInterface.h

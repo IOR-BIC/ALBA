@@ -14,7 +14,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "albaCrypt.h"
 #include "albaDefines.h"
 #include "albaDefines.h"
-#include "albaEventInteraction.h"
 #include "albaGUIButton.h"
 #include "albaGUIDialog.h"
 #include "albaGUIPicButton.h"

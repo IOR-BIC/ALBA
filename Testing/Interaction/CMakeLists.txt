@@ -33,7 +33,6 @@ SET(PROJECT_SRCS
 	albaGizmoTranslateGUITest.h albaGizmoTranslateGUITest.cpp
 	albaGizmoRotateGUITest.h albaGizmoRotateGUITest.cpp
 	albaGizmoScaleGUITest.h albaGizmoScaleGUITest.cpp
-	albaEventInteractionTest.h albaEventInteractionTest.cpp
 	albaTransformTextEntriesGUITest.h albaTransformTextEntriesGUITest.cpp
 	albaSaveRestorePoseGUITest.h albaSaveRestorePoseGUITest.cpp
 	albaPositionalEventRouterTest.h albaPositionalEventRouterTest.cpp

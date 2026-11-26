@@ -37,7 +37,6 @@
 #include "albaTagArray.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
-#include "albaEventInteraction.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkProperty.h"

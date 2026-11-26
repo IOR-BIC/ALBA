@@ -22,7 +22,6 @@
 #include "albaInteractionTests.h"
 
 #include "albaAgentTest.h"
-#include "albaEventInteractionTest.h"
 #include "albaFakeLogicForTest.h"
 #include "albaFakeViewManagerForTest.h"
 #include "albaGizmoInterfaceGUITest.h"
@@ -144,7 +143,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(albaGizmoTranslateGUITest::suite());
 	runner.addTest(albaGizmoRotateGUITest::suite());
 	runner.addTest(albaGizmoScaleGUITest::suite());
-	runner.addTest(albaEventInteractionTest::suite());
 	runner.addTest(albaTransformTextEntriesGUITest::suite());
 	runner.addTest(albaSaveRestorePoseGUITest::suite());
 	runner.addTest(albaPositionalEventRouterTest::suite());

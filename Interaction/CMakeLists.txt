@@ -10,7 +10,6 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 SET(PROJECT_SRCS
   albaAgent.cpp  							albaAgent.h
   albaGizmoAutoscaleHelper.cpp  				albaGizmoAutoscaleHelper.h
-  albaEventInteraction.cpp  					albaEventInteraction.h
   albaGizmoBoundingBox.cpp  					albaGizmoBoundingBox.h
   albaGizmoHandle.cpp  						albaGizmoHandle.h
   albaGizmoInterface.cpp  					albaGizmoInterface.h

@@ -33,7 +33,6 @@
 #include "albaGUI.h"
 #include "albaGUIFloatSlider.h"
 #include "albaGUILutSlider.h"
-#include "albaEventInteraction.h"
 #include "albaVMEIterator.h"
 
 #include "mmaVolumeMaterial.h"
