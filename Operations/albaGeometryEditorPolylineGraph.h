@@ -36,8 +36,7 @@ class albaVMEPolylineEditor;
 class albaVMEPolylineGraph;
 class albaPolylineGraph;
 class albaGUI;
-class albaBehaviorPicker;
-class albaInteractionBehavior;
+class albaToolPicker;
 class vtkSphereSource;
 class vtkGlyph3D;
 class vtkTubeFilter;
@@ -49,7 +48,7 @@ class vtkPolyData;
 /**
   class name: albaGeometryEditorPolylineGraph
   This class allows the editing of a polylinegraph (class created by BES).
-  It creates ISA, can add, insert, remove, move point in the polyline graph,
+  It creates the behavior, can add, insert, remove, move point in the polyline graph,
   it can also add, remove branch in which points are.
 */
 class ALBA_EXPORT albaGeometryEditorPolylineGraph: public albaObserver, public albaServiceClient 
@@ -149,8 +148,8 @@ protected:
   /** create gui */
 	void CreateGui();
 
-	/** Create isa stuff */
-	void CreateISA();
+	/** Create the picker of the edited polyline and push it on the PER */
+	void CreatePicker();
 
   /** create pipe*/
 	void CreatePipe();
@@ -161,8 +160,8 @@ protected:
 	/** Manage if a VME is picked in the view */
 	void VmePicked(albaEvent *e);
 
-	/** Update VME Editor behavior and VME Input behavior */
-	void BehaviorUpdate();
+	/** Set the VMEs picked by the picker and its continuous picking for the current action */
+	void PickerUpdate();
 
   /** compute distance to polyline */
   double ComputeDistancePointLine(double lineP0[3],double lineP1[3],double point[3]);
@@ -171,8 +170,7 @@ protected:
 	Register the event receiver object*/
 	albaObserver *m_Listener;
 
-	albaBehaviorPicker *m_Picker;
-	albaInteractionBehavior *m_OldBehavior;
+	albaToolPicker *m_Picker;
 
 	albaVMEPolylineEditor			*m_VMEPolylineEditor;
 	albaVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection

@@ -126,11 +126,11 @@ protected:
   /** Destroys VTK pipeline for the gizmo. Called from DestroyVMEGizmo. */
   virtual void DestroyGizmoVTKData();
   
-  /** Creates the interactor for the gizmo. Called from Init. */
-  virtual void CreateInteractor();
+  /** Creates the behavior of the gizmo. Called from Init. */
+  virtual void CreateBehavior();
 
-  /** Destroys the interactor of the gizmo. Called from Done. */
-  virtual void DestroyInteractor();
+  /** Destroys the behavior of the gizmo. Called from Done. */
+  virtual void DestroyBehavior();
 
   /** Handles ID_TRANSFORM event */
   virtual void OnTransform(albaEvent *e);
@@ -140,7 +140,7 @@ protected:
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;     //<VME gizmo (this is used by medCurvilinearAbscisaHelper)
 
-  albaBehaviorTransform *m_LeftMouseInteractor;
+  albaBehaviorTransform *m_Behavior;
     
   vtkSphereSource  *m_SphereSource;   //<sphere denoting the position  
   vtkArrowSource* m_AxisSource[3];          //<source for axis

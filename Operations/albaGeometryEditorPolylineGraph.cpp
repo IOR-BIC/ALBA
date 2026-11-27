@@ -29,7 +29,8 @@
 #include "albaGUI.h"
 #include "albaVMEPolylineEditor.h"
 #include "albaVMEPolylineGraph.h"
-#include "albaBehaviorPicker.h"
+#include "albaToolPicker.h"
+#include "albaPositionalEventRouter.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkPolyData.h"
@@ -84,13 +85,12 @@ albaGeometryEditorPolylineGraph::albaGeometryEditorPolylineGraph(albaVME *input,
 	m_SelectedPointVTK = UNDEFINED_POINT_ID;
 	m_SelectedBranch = UNDEFINED_BRANCH_ID;
 
-	m_OldBehavior = NULL;
 	m_Picker			= NULL;
 
 	if(!m_TestMode)
 	{
 		CreateGui();
-		CreateISA();
+		CreatePicker();
 	}
 
 	CreatePipe();
@@ -141,13 +141,11 @@ void albaGeometryEditorPolylineGraph::CreatePipe()
 albaGeometryEditorPolylineGraph::~albaGeometryEditorPolylineGraph() 
 //----------------------------------------------------------------------------
 {
-	if(m_InputVME)
-		m_InputVME->SetBehavior(m_OldBehavior);
+	if(m_Picker)
+		GetPositionalEventRouter()->PopTool(m_Picker);
 
-	m_VMEPolylineEditor->SetBehavior(NULL);
 	m_VMEPolylineEditor->ReparentTo(NULL);
 
-	m_VMEPolylineSelection->SetBehavior(NULL);
 	m_VMEPolylineSelection->ReparentTo(NULL);
 
 
@@ -201,7 +199,7 @@ void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
 					m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
 					m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
 
-					BehaviorUpdate();
+					PickerUpdate();
 				}
 			break;
 			case VME_PICKING:
@@ -213,7 +211,7 @@ void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
 			case ID_POINT_TOOL:
 			case ID_BRANCH_TOOL:
 				{
-					BehaviorUpdate();
+					PickerUpdate();
 				}
 				break;
 			case ID_BUTTON_POINT_DELETE:
@@ -255,38 +253,33 @@ void albaGeometryEditorPolylineGraph::OnEvent(albaEventBase *alba_event)
 	}
 }
 //----------------------------------------------------------------------------
-void albaGeometryEditorPolylineGraph::BehaviorUpdate()
+void albaGeometryEditorPolylineGraph::PickerUpdate()
 //----------------------------------------------------------------------------
 {
+	m_Picker->RemoveAllTargetVMEs();
+	m_Picker->EnableContinuousPicking(false);
 	if(m_Action==ID_POINT_ACTION)
 	{
 		if(m_PointTool==ID_ADD_POINT)//If the user want to add a point
-		{
-			m_VMEPolylineEditor->SetBehavior(NULL);
-			m_InputVME->SetBehavior(m_Picker);
-		}
+			m_Picker->AddTargetVME(m_InputVME);
 		else if(m_PointTool==ID_INSERT_POINT||m_PointTool==ID_SELECT_POINT)
-		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
-			m_InputVME->SetBehavior(NULL);
-		}
+			m_Picker->AddTargetVME(m_VMEPolylineEditor);
 		else if(m_PointTool==ID_MOVE_POINT)
 		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
-			m_InputVME->SetBehavior(m_Picker);
+			// the button down picks the point, the drags move it and the button up releases it
+			m_Picker->AddTargetVME(m_VMEPolylineEditor);
+			m_Picker->AddTargetVME(m_InputVME);
+			m_Picker->EnableContinuousPicking(true);
 		}
 	}
 	else if(m_Action==ID_BRANCH_ACTION)
 	{
 		if(m_BranchTool==ID_ADD_BRANCH)//If the user want add a branch
-		{
-			m_VMEPolylineEditor->SetBehavior(NULL);
-			m_InputVME->SetBehavior(m_Picker);
-		}
+			m_Picker->AddTargetVME(m_InputVME);
 		else if(m_BranchTool==ID_SELECT_BRANCH)
 		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
-			m_InputVME->SetBehavior(m_Picker);
+			m_Picker->AddTargetVME(m_VMEPolylineEditor);
+			m_Picker->AddTargetVME(m_InputVME);
 		}
 	}
 }
@@ -403,16 +396,14 @@ int albaGeometryEditorPolylineGraph::UpdateVMEEditorData(vtkPolyData *polydata)
 	return result;
 }
 //-------------------------------------------------------------------------
-void albaGeometryEditorPolylineGraph::CreateISA()
+void albaGeometryEditorPolylineGraph::CreatePicker()
 //-------------------------------------------------------------------------
 {
-	m_OldBehavior = m_InputVME->GetBehavior();
-
 	albaNEW(m_Picker);
 	m_Picker->SetListener(this);
-
-	m_InputVME->SetBehavior(m_Picker);
-	m_VMEPolylineEditor->SetBehavior(m_Picker);
+	m_Picker->AddTargetVME(m_InputVME);
+	m_Picker->AddTargetVME(m_VMEPolylineEditor);
+	GetPositionalEventRouter()->PushTool(m_Picker);
 }
 //----------------------------------------------------------------------------
 vtkPolyData* albaGeometryEditorPolylineGraph::GetOutput()
@@ -433,7 +424,6 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 		{
 			if(m_PointTool==ID_ADD_POINT)
 			{
-				m_Picker->EnableContinuousPicking(false);
 				double pos[3];
 				vtkPoints *pts = NULL; 
 				pts = (vtkPoints *)e->GetVtkObj();
@@ -452,9 +442,6 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 				pts->GetPoint(0,vertexCoord);
 
         if(e->GetId()==VME_PICKED)
-          m_Picker->EnableContinuousPicking(!m_Picker->IsContinuousPicking());
-
-        if(e->GetId()==VME_PICKED)
         {
           SelectPoint(vertexCoord);
           if(!m_TestMode)
@@ -470,7 +457,6 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 			}
 			else if(m_PointTool==ID_SELECT_POINT)
 			{
-				m_Picker->EnableContinuousPicking(false);
 				double vertexCoord[3];
 				vtkPoints *pts = NULL; 
 				pts = (vtkPoints *)e->GetVtkObj();
@@ -499,8 +485,6 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 					GetLogicManager()->VmeVisualModeChanged(m_VMEPolylineSelection);
         }
 
-				//m_Picker->EnableContinuousPicking(true);
-
 				if(InsertPoint(vertexCoord)==ALBA_OK)
 				{
 					//m_PointTool = ID_MOVE_POINT;
@@ -512,7 +496,6 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 		{
 			if(m_BranchTool==ID_SELECT_BRANCH)
 			{
-				m_Picker->EnableContinuousPicking(false);
 				double pos[3];
 				vtkPoints *pts = NULL; 
 				pts = (vtkPoints *)e->GetVtkObj();
@@ -528,7 +511,6 @@ void albaGeometryEditorPolylineGraph::VmePicked(albaEvent *e)
 			{
 				if(m_SelectedPoint!=UNDEFINED_POINT_ID)
 				{
-					m_Picker->EnableContinuousPicking(false);
 					double pos[3];
 					vtkPoints *pts = NULL; 
 					pts = (vtkPoints *)e->GetVtkObj();

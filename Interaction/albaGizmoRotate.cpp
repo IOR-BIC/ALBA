@@ -331,7 +331,7 @@ void albaGizmoRotate::SetInput(albaVME *input)
 }
 
 //----------------------------------------------------------------------------  
-albaBehaviorTransform *albaGizmoRotate::GetInteractor(int axis)
+albaBehaviorTransform *albaGizmoRotate::GetBehavior(int axis)
 //----------------------------------------------------------------------------  
 {
   return m_GRCircle[axis]->GetInteractor();

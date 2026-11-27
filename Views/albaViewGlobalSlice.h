@@ -58,6 +58,9 @@ public:
   /** RTTI macro. */
   albaTypeMacro(albaViewGlobalSlice, albaViewVTK);
 
+  /** The view shows a slice */
+  virtual bool IsSliceView() { return true; }
+
 	/** IDs for the view GUI */
   enum VIEW_SLICE_WIDGET_ID
   {

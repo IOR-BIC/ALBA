@@ -108,10 +108,10 @@ protected:
 	albaView* OpenImageView(int viewId);
 
 	/**/
-	virtual void InitInteractors();
+	virtual void InitTools();
 
 	/** Select a Measure Interactor */
-	void SetMeasureInteractor(int index);
+	void SetMeasureTool(int index);
 
 	/* Update Measure ListBox */
 	void UpdateMeasureList();
@@ -138,9 +138,9 @@ protected:
 
 	wxListBox *m_MeasureListBox;
 
-	std::vector<albaTool2DMeasure *> m_InteractorVector;
+	std::vector<albaTool2DMeasure *> m_ToolVector;
 
-	int m_CurrentInteractor;
-	int m_SelectedInteractor;
+	int m_CurrentTool;
+	int m_SelectedTool;
 };
 #endif

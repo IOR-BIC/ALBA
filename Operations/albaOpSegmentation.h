@@ -217,7 +217,7 @@ protected:
   virtual void InitializeView();
   
 	/** Initialize the Interactors  */
-  void InitializeInteractors();
+  void InitializeTools();
   
   /** Init GUI slice slider with volume parameters. */
   void UpdateSliderValidator();

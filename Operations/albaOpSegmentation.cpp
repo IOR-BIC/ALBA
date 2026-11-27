@@ -339,7 +339,7 @@ void albaOpSegmentation::Init()
 {
 	InitMouseCursors();
 	InitSegmentationVolume();
-	InitializeInteractors();
+	InitializeTools();
 	UpdateWindowing();
 	UpdateSliderValidator();
 	InitRanges();
@@ -408,7 +408,7 @@ void albaOpSegmentation::InitSegmentationVolume()
 	m_View->VmeAdd(m_SegmentationVolume);
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentation::InitializeInteractors()
+void albaOpSegmentation::InitializeTools()
 {
 	assert(m_View);
 	m_View->SetCanSpin(false);
@@ -419,10 +419,12 @@ void albaOpSegmentation::InitializeInteractors()
 
 	albaNEW(m_ThresholdTool);
 	m_ThresholdTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_ThresholdTool->OperateOnlyOn(m_View->GetRWI());
 	m_ThresholdTool->SetListener(this);
 
 	albaNEW(m_EditTool);
 	m_EditTool->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+	m_EditTool->OperateOnlyOn(m_View->GetRWI());
 	m_EditTool->SetListener(this);
 
 	GetPositionalEventRouter()->PushTool(m_ThresholdTool);
@@ -569,7 +571,7 @@ void albaOpSegmentation::CreateOpDialog()
 	m_View->GetFrontRenderer()->AddActor(m_AutomaticSliceTextActor);
 	//////////////////////////////////////////////////////////////////////////
 
-	//InitializeInteractors();
+	//InitializeTools();
 
 	// Display window      
 	m_View->m_Rwi->SetSize(0, 0, viewSize[0], viewSize[1]);

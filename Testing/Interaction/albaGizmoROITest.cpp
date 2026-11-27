@@ -224,7 +224,7 @@ void albaGizmoROITest::TestSetConstrainRefSys()
 
   for (int i =0; i < 6; i++)
   {
-    albaMatrix *mat = gizmoROI->m_GHandle[i]->m_IsaGen->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+    albaMatrix *mat = gizmoROI->m_GHandle[i]->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
     CPPUNIT_ASSERT(mat == &refSys);
   }
 

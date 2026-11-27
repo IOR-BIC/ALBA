@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaRefSys.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -41,6 +41,7 @@
 // vtk stuff
 #include "vtkCubeSource.h"
 #include "vtkCylinderSource.h"
+#include "vtkAppendPolyData.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkPolyData.h"
@@ -51,87 +52,70 @@
 albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
 //----------------------------------------------------------------------------
 {
-  m_IsaGen[0] = m_IsaGen[1] = NULL;
+  m_Behavior = NULL;
 
   m_Listener = listener;
   m_InputVme = input;
-  
+
   // default axis is X
   m_Axis = X;
-  
+
   // create pipeline stuff
   CreatePipeline();
 
-  // create isa stuff
-  CreateISA();
+  // create the behavior
+  CreateBehavior();
 
-  //-----------------
-  // create vme gizmos stuff
-  //-----------------
-
-  // cylinder gizmo
-  m_CylGizmo = albaVMEGizmo::New();
-  m_CylGizmo->SetName("CylGizmo");
-  m_CylGizmo->SetDataConnection(m_RotatePDF[CYLINDER]->GetOutputPort());
-  m_CylGizmo->SetMediator(m_Listener);
-
-  // cube gizmo
-  m_CubeGizmo = albaVMEGizmo::New();  
-  m_CubeGizmo->SetName("CubeGizmo");
-  m_CubeGizmo->SetDataConnection(m_RotatePDF[CUBE]->GetOutputPort());
-  m_CubeGizmo->SetMediator(m_Listener);
-
-  // assign isa to cylinder and cube
-  m_CylGizmo->SetBehavior(m_IsaGen[0]);
-  m_CubeGizmo->SetBehavior(m_IsaGen[1]);
+  // the gizmo vme shows the cylinder and the cube as a single figure
+  m_Gizmo = albaVMEGizmo::New();
+  m_Gizmo->SetName("ScaleAxisGizmo");
+  m_Gizmo->SetDataConnection(m_RotatePDF->GetOutputPort());
+  m_Gizmo->SetMediator(m_Listener);
+  m_Gizmo->SetBehavior(m_Behavior);
 
   m_InputVme->Update();
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
-  
-  // set come gizmo material property and initial color to red
-  this->SetColor(1, 0, 0, 1, 0, 0);
 
-  m_CylGizmo->ReparentTo(m_InputVme->GetRoot());
-  m_CubeGizmo->ReparentTo(m_InputVme->GetRoot());
+  // set the gizmo material property and initial color to red
+  this->SetColor(1, 0, 0);
+
+  m_Gizmo->ReparentTo(m_InputVme->GetRoot());
 
   m_Highlight = false;
   m_Show = false;
 }
 //----------------------------------------------------------------------------
-albaGizmoScaleAxis::~albaGizmoScaleAxis() 
+albaGizmoScaleAxis::~albaGizmoScaleAxis()
 //----------------------------------------------------------------------------
 {
-  m_CylGizmo->SetBehavior(NULL);
-  m_CubeGizmo->SetBehavior(NULL);
-   
+  m_Gizmo->SetBehavior(NULL);
+
   vtkDEL(m_Cube);
   vtkDEL(m_Cylinder);
-  
+
   // clean up
   for (int i = 0; i < 2; i++)
   {
     vtkDEL(m_TranslateTr[i]);
     vtkDEL(m_TranslatePDF[i]);
-    vtkDEL(m_RotationTr);
-    vtkDEL(m_RotatePDF[i]);
-	//----------------------
-	// No leaks so somebody is performing this...
-	// wxDEL(GizmoData[i]);
-	//----------------------
-    // the PER can keep the behavior alive: it must not notify the deleted gizmo
-    m_IsaGen[i]->SetListener(NULL);
-    vtkDEL(m_IsaGen[i]); 
   }
-	m_CylGizmo->ReparentTo(NULL);
-	m_CubeGizmo->ReparentTo(NULL);
+  vtkDEL(m_Append);
+  vtkDEL(m_RotationTr);
+  vtkDEL(m_RotatePDF);
+
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  m_Behavior->SetListener(NULL);
+  vtkDEL(m_Behavior);
+
+  m_Gizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoScaleAxis::CreatePipeline() 
+void albaGizmoScaleAxis::CreatePipeline()
 //----------------------------------------------------------------------------
 {
   // create pipeline for cube-cylinder gizmo along global X axis
-  // calculate diagonal of m_InputVme space bounds 
+  // calculate diagonal of m_InputVme space bounds
   double b[6],p1[3],p2[3],d;
 	if(m_InputVme->IsA("albaVMEGizmo"))
 		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
@@ -146,18 +130,18 @@ void albaGizmoScaleAxis::CreatePipeline()
 	p2[2] = (b[5] != -1) ? b[5] : 100;
 
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
-  
+
   // create the cylinder
   m_Cylinder = vtkCylinderSource::New();
   m_Cylinder->SetRadius(d / 200);
-  
+
   //-----------------
   // rotate the cylinder on the X axis (default axis is Z)
   //-----------------
-	
+
   vtkTransform *cylInitTr = vtkTransform::New();
-  cylInitTr->RotateZ(-90);	
-  
+  cylInitTr->RotateZ(-90);
+
   vtkTransformPolyDataFilter *cylInitTrPDF = vtkTransformPolyDataFilter::New();
   cylInitTrPDF->SetInputConnection(m_Cylinder->GetOutputPort());
   cylInitTrPDF->SetTransform(cylInitTr);
@@ -174,12 +158,11 @@ void albaGizmoScaleAxis::CreatePipeline()
      |  |
       --
    */
-  
+
   //-----------------
 
   // create the cube
   m_Cube = vtkCubeSource::New();
-  //Cube->SetRadius(m_InputVme->GetCurrentData()->GetLength() / 30);
 
   // create the translation transform
   m_TranslateTr[CUBE] = vtkTransform::New();
@@ -188,7 +171,7 @@ void albaGizmoScaleAxis::CreatePipeline()
   // create cube translation transform pdf
   m_TranslatePDF[CUBE] = vtkTransformPolyDataFilter::New();
   m_TranslatePDF[CUBE]->SetInputConnection(m_Cube->GetOutputPort());
-  
+
   // create cylinder translation transform
   m_TranslatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
   m_TranslatePDF[CYLINDER]->SetInputConnection(cylInitTrPDF->GetOutputPort());
@@ -210,32 +193,31 @@ void albaGizmoScaleAxis::CreatePipeline()
   m_TranslatePDF[CYLINDER]->SetTransform(m_TranslateTr[CYLINDER]);
 
 /*
-  ^           ________          
+  ^           ________
   |          |        |
   |----------|        |
   |          |        |------>X
   |----------|        |
   |          |________|
-  O          
-  
+  O
+
   <---------><-------->
      cylLen    cubeLen
-  */  
+  */
 
-  // create rotation transform and rotation TPDF 
-  m_RotatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
-  m_RotatePDF[CUBE] = vtkTransformPolyDataFilter::New();
+  // join the cylinder and the cube in a single figure
+  m_Append = vtkAppendPolyData::New();
+  m_Append->AddInputConnection(m_TranslatePDF[CYLINDER]->GetOutputPort());
+  m_Append->AddInputConnection(m_TranslatePDF[CUBE]->GetOutputPort());
+
+  // create rotation transform and rotation TPDF
   m_RotationTr = vtkTransform::New();
-  m_RotationTr->Identity(); 
+  m_RotationTr->Identity();
 
-  m_RotatePDF[CYLINDER]->SetTransform(m_RotationTr);
-  m_RotatePDF[CUBE]->SetTransform(m_RotationTr);
-
-  m_RotatePDF[CYLINDER]->SetInputConnection(m_TranslatePDF[CYLINDER]->GetOutputPort());
-  m_RotatePDF[CUBE]->SetInputConnection(m_TranslatePDF[CUBE]->GetOutputPort());
-
-  m_RotatePDF[CYLINDER]->Update();
-  m_RotatePDF[CYLINDER]->Update();
+  m_RotatePDF = vtkTransformPolyDataFilter::New();
+  m_RotatePDF->SetTransform(m_RotationTr);
+  m_RotatePDF->SetInputConnection(m_Append->GetOutputPort());
+  m_RotatePDF->Update();
 
   //clean up
   cylInitTr->Delete();
@@ -243,80 +225,48 @@ void albaGizmoScaleAxis::CreatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoScaleAxis::CreateISA()
+void albaGizmoScaleAxis::CreateBehavior()
 //----------------------------------------------------------------------------
 {
-  // create the transform behavior of the gizmo
-  for (int i = 0; i < 2; i++)
-  {
-    // default behavior is activated by mouse left and is constrained to X axis,
-    // default ref sys is input vme abs matrix
-    albaNEW(m_IsaGen[i]);
+  // default behavior is activated by mouse left and is constrained to X axis,
+  // default ref sys is input vme abs matrix
+  albaNEW(m_Behavior);
 
-    m_IsaGen[i]->SetVME(m_InputVme);
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
-  	m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
-      
-    //isa will send events to this
-    m_IsaGen[i]->SetListener(this);
-  }
+  m_Behavior->SetVME(m_InputVme);
+  m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
+
+  // the behavior will send events to this
+  m_Behavior->SetListener(this);
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoScaleAxis::SetAxis(int axis) 
+void albaGizmoScaleAxis::SetAxis(int axis)
 //----------------------------------------------------------------------------
 {
   // this should be called when the translation gizmo
   // is created; gizmos are not highlighted
-  
+
   // register the axis
   m_Axis = axis;
-  
-  // rotate the cylinder and the cube to match given axis
+
+  // rotate the figure to match the given axis and change the axis constraint
+  m_RotationTr->Identity();
   if (m_Axis == X)
+    m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
+  else if (m_Axis == Y)
   {
-    // reset cyl and cube rotation
-    m_RotationTr->Identity();
-  
-    // set cyl and cube color to red
-    this->SetColor(1, 0, 0, 1, 0, 0);
-
-    // change the axis constrain
-    for (int i = 0; i < 2; i++)
-    {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
-    }
-  }
-  else if (axis == Y)
-  {
-    // set rotation to move con and cyl on Y 
-    m_RotationTr->Identity();
     m_RotationTr->RotateZ(90);
-   
-    // set cyl and cube color to green
-    this->SetColor(0, 1, 0, 0, 1, 0);
-
-    // change the axis constrain
-    for (int i = 0; i < 2; i++)
-    {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-    }
-  }  
-  else if (axis == Z)
+    m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
+  }
+  else if (m_Axis == Z)
   {
-    // set rotation to move con and cyl on Z
-    m_RotationTr->Identity();
     m_RotationTr->RotateY(-90);
-    
-    // set cyl and cube color to blue
-     this->SetColor(0, 0, 1, 0, 0, 1);
+    m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
+  }
 
-     // change the axis constrain
-    for (int i = 0; i < 2; i++)
-    {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
-    }
-  }  
+  // set the axis color
+  Highlight(false);
 }
 
 //----------------------------------------------------------------------------
@@ -325,30 +275,15 @@ void albaGizmoScaleAxis::Highlight(bool highlight)
 {
   m_Highlight = highlight;
 
-  if (highlight == true)
-  {
-   // Highlight the cylinder by setting its color to yellow 
-   this->SetColor(CYLINDER, 1, 1, 0);
-  } 
-  else
-  {
-   // deactivate the cylinder 
-   if (m_Axis == X)
-   {
-     // set cyl col to red
-     this->SetColor(CYLINDER, 1, 0, 0);
-   } 
-   else if (m_Axis == Y)
-   {
-     // set cyl col to green
-     this->SetColor(CYLINDER, 0, 1, 0);
-   }
-   else if (m_Axis == Z)
-   {
-     // set cyl col to blue
-     this->SetColor(CYLINDER, 0, 0, 1);
-   } 
-  }
+  // the highlighted figure is yellow, otherwise it has the axis color: X red, Y green, Z blue
+  if (highlight)
+    this->SetColor(1, 1, 0);
+  else if (m_Axis == X)
+    this->SetColor(1, 0, 0);
+  else if (m_Axis == Y)
+    this->SetColor(0, 1, 0);
+  else if (m_Axis == Z)
+    this->SetColor(0, 0, 1);
 }
 
 //----------------------------------------------------------------------------
@@ -356,17 +291,17 @@ void  albaGizmoScaleAxis::SetCubeLength(double cubeLength)
 //----------------------------------------------------------------------------
 {
   /*
-  ^           ________          
+  ^           ________
   |          |        |
   |----------|        |
   |          |        |------>X
   |----------|        |
   |          |________|
-  O          
-  
+  O
+
   <---------><-------->
      cylLen    cubeLen
-  */  
+  */
 
   // set the cube length
   m_Cube->SetXLength(cubeLength);
@@ -390,17 +325,17 @@ void albaGizmoScaleAxis::SetCylinderLength(double cylLength)
 //----------------------------------------------------------------------------
 {
   /*
-  ^           ________          
+  ^           ________
   |          |        |
   |----------|        |
   |          |        |------>X
   |----------|        |
   |          |________|
-  O          
-  
+  O
+
   <---------><-------->
      cylLen    cubeLen
-  */  
+  */
 
   // set cylLen to cylLength
   m_Cylinder->SetHeight(cylLength);
@@ -409,7 +344,7 @@ void albaGizmoScaleAxis::SetCylinderLength(double cylLength)
   m_TranslateTr[CYLINDER]->Identity();
   m_TranslateTr[CYLINDER]->Translate(cylLength / 2, 0, 0);
 
-  // translate the cube in (cylLen + (cubeLen / 2)) 
+  // translate the cube in (cylLen + (cubeLen / 2))
   m_TranslateTr[CUBE]->Identity();
   m_TranslateTr[CUBE]->Translate(cylLength + m_Cube->GetXLength() / 2, 0, 0);
 }
@@ -430,49 +365,22 @@ void albaGizmoScaleAxis::OnEvent(albaEventBase *alba_event)
   albaEventMacro(*alba_event);
 }
 
-/** Gizmo color */
 //----------------------------------------------------------------------------
-void albaGizmoScaleAxis::SetColor(int part, double col[3])
+void albaGizmoScaleAxis::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  if (part == CYLINDER)
-  {
-    m_CylGizmo->GetMaterial()->m_Prop->SetColor(col);
-    m_CylGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-    m_CylGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-    m_CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
-  }
-  else
-  {
-    m_CubeGizmo->GetMaterial()->m_Prop->SetColor(col);
-    m_CubeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-    m_CubeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-    m_CubeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
-  }
+  m_Gizmo->GetMaterial()->m_Prop->SetColor(col);
+  m_Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
+  m_Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+  m_Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoScaleAxis::SetColor(int part, double colR, double colG, double colB)
+void albaGizmoScaleAxis::SetColor(double colR, double colG, double colB)
 //----------------------------------------------------------------------------
 {
   double col[3] = {colR, colG, colB};
-  this->SetColor(part, col);
-}
-
-//----------------------------------------------------------------------------
-void albaGizmoScaleAxis::SetColor(double cylCol[3], double coneCol[3])
-//----------------------------------------------------------------------------
-{
-  this->SetColor(CYLINDER, cylCol);
-  this->SetColor(CUBE, coneCol);
-}
-
-//----------------------------------------------------------------------------
-void albaGizmoScaleAxis::SetColor(double cylR, double cylG, double cylB, double coneR, double coneG, double coneB)
-//----------------------------------------------------------------------------
-{
-  this->SetColor(CYLINDER, cylR, cylG, cylB);
-  this->SetColor(CUBE, coneR, coneG, coneB);
+  this->SetColor(col);
 }
 
 //----------------------------------------------------------------------------
@@ -480,43 +388,38 @@ void albaGizmoScaleAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
   m_Show = show;
-  GetLogicManager()->VmeShow(m_CylGizmo, show);
-  GetLogicManager()->VmeShow(m_CubeGizmo, show);
+  GetLogicManager()->VmeShow(m_Gizmo, show);
 }
 
 //----------------------------------------------------------------------------
 void albaGizmoScaleAxis::SetAbsPose(albaMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  m_CubeGizmo->SetAbsMatrix(*absPose); 
-  m_CylGizmo->SetAbsMatrix(*absPose); 
+  m_Gizmo->SetAbsMatrix(*absPose);
   SetRefSysMatrix(absPose);
 }
 
 //----------------------------------------------------------------------------
 void albaGizmoScaleAxis::SetRefSysMatrix(albaMatrix *matrix)
 //----------------------------------------------------------------------------
-{  
-  for (int i = 0; i < 2; i++)
-  {
-    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-    m_IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
-  } 
+{
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+  m_Behavior->GetPivotRefSys()->SetTypeToCustom(matrix);
 }
 
 //----------------------------------------------------------------------------
 albaMatrix *albaGizmoScaleAxis::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return m_CylGizmo->GetOutput()->GetAbsMatrix();
+  return m_Gizmo->GetOutput()->GetAbsMatrix();
 }
 
 //----------------------------------------------------------------------------
 void albaGizmoScaleAxis::SetInput(albaVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->m_InputVme = vme; 
-  SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
+  this->m_InputVme = vme;
+  SetAbsPose(vme->GetOutput()->GetAbsMatrix());
   SetRefSysMatrix(vme->GetOutput()->GetAbsMatrix());
 }
 

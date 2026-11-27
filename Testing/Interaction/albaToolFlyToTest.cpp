@@ -26,6 +26,7 @@
 #include "albaToolFlyToTest.h"
 #include "albaToolFlyTo.h"
 #include "albaView.h"
+#include "albaRWIBase.h"
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -143,21 +144,24 @@ void albaToolFlyToTest::TestButtons()
 {
   vtkRenderer *ren = NewTestRenderer();
   albaFlyToTestView *view = new albaFlyToTestView();
+  albaRWIBase *rwi = albaRWIBase::New();
+  rwi->SetView(view);
   albaToolFlyTo *tool;
   albaNEW(tool);
   double pos[2] = {10, 20};
 
   // the left and right clicks are always used, also when nothing is picked; the middle button is not used
-  CPPUNIT_ASSERT(tool->OnLeftButtonDown(view, ren, pos));
+  CPPUNIT_ASSERT(tool->OnLeftButtonDown(rwi, ren, pos));
   double focal[3];
   ren->GetActiveCamera()->GetFocalPoint(focal);
   CPPUNIT_ASSERT(Equal(focal, 1, 2, 3));
   view->m_CanPick = false;
-  CPPUNIT_ASSERT(tool->OnRightButtonDown(view, ren, pos));
-  CPPUNIT_ASSERT(tool->OnLeftButtonDown(NULL, NULL, pos));
-  CPPUNIT_ASSERT(!tool->OnMiddleButtonDown(view, ren, pos));
+  CPPUNIT_ASSERT(tool->OnRightButtonDown(rwi, ren, pos));
+  CPPUNIT_ASSERT(tool->OnLeftButtonDown(rwi, NULL, pos));
+  CPPUNIT_ASSERT(!tool->OnMiddleButtonDown(rwi, ren, pos));
 
   albaDEL(tool);
+  rwi->Delete();
   delete view;
   ren->Delete();
 }

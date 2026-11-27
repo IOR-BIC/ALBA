@@ -104,17 +104,17 @@ void albaGizmoScaleAxisTest::CreateTestData()
 void albaGizmoScaleAxisTest::TestConstructor()
 {
   albaGizmoScaleAxis *gizmoScaleAxis = new albaGizmoScaleAxis(m_GizmoInputSurface);
-  gizmoScaleAxis->SetAxis(albaInteractorConstraint::X);
+  gizmoScaleAxis->SetAxis(albaTransformConstraint::X);
 
   gizmoScaleAxis->SetCylinderLength(5);
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoScaleAxis);
 
-  gizmoScaleAxis->SetAxis(albaInteractorConstraint::Y);
+  gizmoScaleAxis->SetAxis(albaTransformConstraint::Y);
   RenderGizmo(gizmoScaleAxis);
 
-  gizmoScaleAxis->SetAxis(albaInteractorConstraint::Z);
+  gizmoScaleAxis->SetAxis(albaTransformConstraint::Z);
   RenderGizmo(gizmoScaleAxis);
 
   cppDEL(gizmoScaleAxis);
@@ -170,11 +170,8 @@ void albaGizmoScaleAxisTest::TestSetRefSysMatrix()
   gizmoScaleAxis->SetRefSysMatrix(refSysMatrix);
   
   // using friend albaGizmoScaleAxis
-  for (int i = 0; i < 2; i++)
-  {
-    albaMatrix *mat = gizmoScaleAxis->m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
-    CPPUNIT_ASSERT(mat == refSysMatrix);
-  }
+  albaMatrix *mat = gizmoScaleAxis->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  CPPUNIT_ASSERT(mat == refSysMatrix);
 
   cppDEL(gizmoScaleAxis);
 }
@@ -244,8 +241,7 @@ void albaGizmoScaleAxisTest::TestFixture()
 
 void albaGizmoScaleAxisTest::RenderGizmo( albaGizmoScaleAxis * gizmoScaleAxis )
 {
-  RenderData(gizmoScaleAxis->m_CylGizmo->GetOutput()->GetVTKData());
-  RenderData(gizmoScaleAxis->m_CubeGizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoScaleAxis->m_Gizmo->GetOutput()->GetVTKData());
 }
 
 void albaGizmoScaleAxisTest::TestHighlight()

@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaToolSegmentation.h"
+#include "albaRWIBase.h"
 #include "albaEvent.h"
 #include "albaPickHelper.h"
 #include "albaView.h"
@@ -43,11 +44,8 @@ albaToolSegmentation::albaToolSegmentation()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolView(view))
-    return false;
-
   long modifier = 0;
   if (m_CtrlDown)
     modifier = ALBA_CTRL_KEY;
@@ -61,7 +59,7 @@ bool albaToolSegmentation::OnLeftButtonDown(albaView *view, vtkRenderer *ren, do
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   albaEventMacro(albaEvent(this, MOUSE_UP));
@@ -69,21 +67,21 @@ bool albaToolSegmentation::OnLeftButtonUp(albaView *view, vtkRenderer *ren, doub
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // the camera moves with the drags
-  return IsOnToolView(view);
+  return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // the camera moves with the drags
-  return IsOnToolView(view);
+  return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSegmentation::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSegmentation::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_IsPicking)
     SendPickingInformation(pos, 0, VME_PICKING);

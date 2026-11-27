@@ -120,7 +120,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
     // receiving events from gizmo handles
     switch(e->GetId())
     {
-      //receiving pose matrixes from isa
+      // receiving pose matrixes from the behavior
       case ID_TRANSFORM:
       {
         void *sender = e->GetSender();
@@ -335,7 +335,7 @@ void albaGizmoROI::OnEventGizmoComponents(albaEventBase *alba_event)
         {
         }
 				GetViewManager()->CameraUpdate();
-        // forward isa transform events to the listener op
+        // forward behavior transform events to the listener op
         albaEventMacro(*e);
       }
       break;

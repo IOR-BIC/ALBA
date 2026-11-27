@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorConstraintTest
+ Module: albaTransformConstraintTest
  Authors: Stefano Perticoni
  
  Copyright (c) BIC
@@ -14,17 +14,17 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_albaInteractorConstraintTest_H__
-#define __CPP_UNIT_albaInteractorConstraintTest_H__
+#ifndef __CPP_UNIT_albaTransformConstraintTest_H__
+#define __CPP_UNIT_albaTransformConstraintTest_H__
 
 #include "albaTest.h"
 
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 
-class albaInteractorConstraintTest : public albaTest
+class albaTransformConstraintTest : public albaTest
 {
   public:
-  CPPUNIT_TEST_SUITE( albaInteractorConstraintTest );
+  CPPUNIT_TEST_SUITE( albaTransformConstraintTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructor );
   CPPUNIT_TEST( TestSetGetConstraintModality );

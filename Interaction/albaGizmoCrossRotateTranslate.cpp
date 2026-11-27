@@ -37,10 +37,9 @@
 
 albaGizmoCrossRotateTranslate::albaGizmoCrossRotateTranslate()
 {
-	m_NameRTG = "UNDEFINED_RTG_NAME";
+	m_Name = "UNDEFINED_RTG_NAME";
 	m_GizmoCrossTranslate = NULL;
 	m_GizmoCrossRotate = NULL;
-	m_Listener = NULL;
 }
 
 albaGizmoCrossRotateTranslate::~albaGizmoCrossRotateTranslate()
@@ -102,7 +101,7 @@ void albaGizmoCrossRotateTranslate::Show(bool show)
 
 void albaGizmoCrossRotateTranslate::SetName( albaString name )
 {
-	m_NameRTG = name;
+	m_Name = name;
 	m_GizmoCrossRotate->SetName(name);
 	m_GizmoCrossTranslate->SetName(name);
 }

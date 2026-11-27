@@ -37,7 +37,6 @@
 #include "albaTagArray.h"
 #include "albaVME.h"
 #include "albaVMEGizmo.h"
-#include "albaEventInteraction.h"
 
 #include "vtkALBASmartPointer.h"
 #include "vtkProperty.h"
@@ -205,7 +204,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 
 	InitSnapArray(m_InputVME, axis);
 	m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
-	m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, albaInteractorConstraint::BOUNDS);
+	m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, albaTransformConstraint::BOUNDS);
 
 	switch (axis)
 	{
@@ -217,7 +216,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 			if (wy < 0.00001) wy = -10;
 			ps->SetPoint1(0, inversion * (wy + borderCube / 2), 0);
 			ps->SetPoint2(0, 0, inversion *(wz + borderCube / 2));
-			m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::X, interval[0]);
+			m_MouseBH->GetTranslationConstraint()->SetBounds(albaTransformConstraint::X, interval[0]);
 		}
 		break;
 		case GIZMO_SLICE_Y:
@@ -227,7 +226,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 			cubeHandleLocalPosition[2] -= inversion *borderCube / 2;
 			ps->SetPoint1(inversion *(wx + borderCube / 2), 0, 0);
 			ps->SetPoint2(0, 0, inversion *(wz + borderCube / 2));
-			m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::Y, interval[1]);
+			m_MouseBH->GetTranslationConstraint()->SetBounds(albaTransformConstraint::Y, interval[1]);
 		}
 		break;
 		case GIZMO_SLICE_Z:
@@ -239,7 +238,7 @@ void albaGizmoSlice::UpdateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int
 			ps->SetPoint1(inversion *(wx + borderCube / 2), 0, 0);
 			if (wy < 0.00001) wy = -10;
 			ps->SetPoint2(0, inversion *(wy + borderCube / 2), 0);
-			m_MouseBH->GetTranslationConstraint()->SetBounds(albaInteractorConstraint::Z, interval[2]);
+			m_MouseBH->GetTranslationConstraint()->SetBounds(albaTransformConstraint::Z, interval[2]);
 		}
 		break;
 	}
@@ -519,17 +518,17 @@ void albaGizmoSlice::SetGizmoMovingModalityToBound()
   {
     case GIZMO_SLICE_X:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::BOUNDS, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);   
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::BOUNDS, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);   
     }    
 	  break;
     case GIZMO_SLICE_Y:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::BOUNDS, albaInteractorConstraint::LOCK);    
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::BOUNDS, albaTransformConstraint::LOCK);    
     }
     break;   
     case GIZMO_SLICE_Z:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::BOUNDS);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::BOUNDS);  
     }
 	  break;
   }
@@ -545,17 +544,17 @@ void albaGizmoSlice::SetGizmoMovingModalityToSnap()
   {
     case GIZMO_SLICE_X:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::SNAP_ARRAY, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);   
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::SNAP_ARRAY, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);   
     }    
 	  break;
     case GIZMO_SLICE_Y:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::SNAP_ARRAY, albaInteractorConstraint::LOCK);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::SNAP_ARRAY, albaTransformConstraint::LOCK);  
     }
     break;   
     case GIZMO_SLICE_Z:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::SNAP_ARRAY);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::SNAP_ARRAY);  
     }
 	  break;
   }

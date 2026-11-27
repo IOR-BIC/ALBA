@@ -774,9 +774,9 @@ void albaViewArbitrarySlice::CreateGizmos()
 	m_GizmoTranslate->SetStep(X_AXIS, 1.0);
 	m_GizmoTranslate->SetStep(Y_AXIS, 1.0);
 	m_GizmoTranslate->SetStep(Z_AXIS, 1.0);
-/*	m_GizmoTranslate->SetConstraintModality(X_AXIS, albaInteractorConstraint::BOUNDS);
-	m_GizmoTranslate->SetConstraintModality(Y_AXIS, albaInteractorConstraint::BOUNDS);
-	m_GizmoTranslate->SetConstraintModality(Z_AXIS, albaInteractorConstraint::BOUNDS);*/
+/*	m_GizmoTranslate->SetConstraintModality(X_AXIS, albaTransformConstraint::BOUNDS);
+	m_GizmoTranslate->SetConstraintModality(Y_AXIS, albaTransformConstraint::BOUNDS);
+	m_GizmoTranslate->SetConstraintModality(Z_AXIS, albaTransformConstraint::BOUNDS);*/
 	m_GizmoTranslate->Show(true);
 
 	m_GizmoRotate = new albaGizmoRotate(m_InputVolume, this);

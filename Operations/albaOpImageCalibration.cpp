@@ -62,9 +62,9 @@ albaOpImageCalibration::albaOpImageCalibration(const wxString &label)
 	m_Diameter = 0.0;
 	m_Radius = 0.0;
 
-	m_DistanceInteractor = NULL;
-	m_CenterPointInteractor = NULL;
-	m_ActiveInteractor = NULL;
+	m_DistanceTool = NULL;
+	m_CenterPointTool = NULL;
+	m_ActiveTool = NULL;
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -103,16 +103,16 @@ void albaOpImageCalibration::OpRun()
 	if (inputImage != NULL)
 		inputImage->GetSpacing(m_InputSpacing);
 
-	albaNEW(m_DistanceInteractor);
-	albaNEW(m_CenterPointInteractor);
+	albaNEW(m_DistanceTool);
+	albaNEW(m_CenterPointTool);
 
-	m_DistanceInteractor->SetMaxMeasures(1);
-	m_CenterPointInteractor->SetMaxMeasures(1);
+	m_DistanceTool->SetMaxMeasures(1);
+	m_CenterPointTool->SetMaxMeasures(1);
 
 
-	m_ActiveInteractor = m_DistanceInteractor;
-	GetPositionalEventRouter()->PushTool(m_ActiveInteractor);
-	m_ActiveInteractor->SetListener(this);
+	m_ActiveTool = m_DistanceTool;
+	GetPositionalEventRouter()->PushTool(m_ActiveTool);
+	m_ActiveTool->SetListener(this);
 
 	CreateGui();
 	ShowGui();
@@ -152,18 +152,18 @@ void albaOpImageCalibration::UpdateGui()
 	m_Gui->Enable(ID_DIAMETER, isCircle);
 	m_Gui->Enable(ID_RADIUS, isCircle);
 
-	if (m_ActiveInteractor->GetMeasureCount() > 0)
+	if (m_ActiveTool->GetMeasureCount() > 0)
 	{
 		double iterDist = 0;
 		double guiDist = 0;
 		if (isCircle)
 		{
-			iterDist = m_CenterPointInteractor->GetCircleRadius(0);
+			iterDist = m_CenterPointTool->GetCircleRadius(0);
 			guiDist = m_Radius;
 		}
 		else
 		{
-			iterDist = m_DistanceInteractor->GetDistance(0);
+			iterDist = m_DistanceTool->GetDistance(0);
 			guiDist = m_Distance;
 		}
 		m_Gui->Enable(wxOK, iterDist != 0 && guiDist !=0);
@@ -177,28 +177,28 @@ void albaOpImageCalibration::UpdateGui()
 }
 
 //----------------------------------------------------------------------------
-void albaOpImageCalibration::SetActiveInteractor()
+void albaOpImageCalibration::SetActiveTool()
 {
 	//on change interactor remove current measure
-	m_ActiveInteractor->RemoveAllMeasures();
+	m_ActiveTool->RemoveAllMeasures();
 
 
 	//set constraint for distance interactor
 	//constraint mode and gui order is the same so we can use m_SelectedIterator to set constraint 
 	if (m_SelectedIterator != CIRCLE)
-		m_DistanceInteractor->SetConstraint(m_SelectedIterator);
+		m_DistanceTool->SetConstraint(m_SelectedIterator);
 	
-	albaTool2DMeasure *nextInteractor = (m_SelectedIterator == CIRCLE) ? (albaTool2DMeasure *)m_CenterPointInteractor : m_DistanceInteractor;
-	if (nextInteractor == m_ActiveInteractor)
+	albaTool2DMeasure *nextInteractor = (m_SelectedIterator == CIRCLE) ? (albaTool2DMeasure *)m_CenterPointTool : m_DistanceTool;
+	if (nextInteractor == m_ActiveTool)
 		return;
 
-	m_ActiveInteractor->Show(false);
+	m_ActiveTool->Show(false);
 
-	GetPositionalEventRouter()->PopTool(m_ActiveInteractor);
-	m_ActiveInteractor = nextInteractor;
-	GetPositionalEventRouter()->PushTool(m_ActiveInteractor);
-	m_ActiveInteractor->SetListener(this);
-	m_ActiveInteractor->Show(true);
+	GetPositionalEventRouter()->PopTool(m_ActiveTool);
+	m_ActiveTool = nextInteractor;
+	GetPositionalEventRouter()->PushTool(m_ActiveTool);
+	m_ActiveTool->SetListener(this);
+	m_ActiveTool->Show(true);
 
 	UpdateGui();
 }
@@ -215,7 +215,7 @@ void albaOpImageCalibration::OnEvent(albaEventBase *alba_event)
 		switch (event->GetId())
 		{
 		case ID_ITERATOR:
-			SetActiveInteractor();
+			SetActiveTool();
 			UpdateGui();
 			break;
 		case ID_DISTANCE:
@@ -238,7 +238,7 @@ void albaOpImageCalibration::OnEvent(albaEventBase *alba_event)
 			break;
 		}
 	}
-	else if (event->GetSender() == m_ActiveInteractor && event->GetId() == albaTool2DMeasure::ID_MEASURE_CHANGED)
+	else if (event->GetSender() == m_ActiveTool && event->GetId() == albaTool2DMeasure::ID_MEASURE_CHANGED)
 	{
 		UpdateGui();
 	}
@@ -255,12 +255,12 @@ void albaOpImageCalibration::OpStop(int result)
 		if (m_SelectedIterator == CIRCLE)
 		{
 			
-				measuredDistance = m_CenterPointInteractor->GetCircleRadius(0);
+				measuredDistance = m_CenterPointTool->GetCircleRadius(0);
 				guiDistance = m_Radius;
 		}
 		else
 		{
-			measuredDistance = m_DistanceInteractor->GetDistance(0);
+			measuredDistance = m_DistanceTool->GetDistance(0);
 			guiDistance = m_Distance;
 		}
 
@@ -277,13 +277,13 @@ void albaOpImageCalibration::OpStop(int result)
 	if (m_Gui != NULL)
 		HideGui();
 
-	if (m_ActiveInteractor != NULL)
-		GetPositionalEventRouter()->PopTool(m_ActiveInteractor);
+	if (m_ActiveTool != NULL)
+		GetPositionalEventRouter()->PopTool(m_ActiveTool);
 
-	albaDEL(m_DistanceInteractor);
-	albaDEL(m_CenterPointInteractor);
+	albaDEL(m_DistanceTool);
+	albaDEL(m_CenterPointTool);
 
-	m_ActiveInteractor = NULL;
+	m_ActiveTool = NULL;
 
 	NotifyOpEnd(result);
 }

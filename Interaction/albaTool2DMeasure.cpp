@@ -14,6 +14,7 @@ PURPOSE. See the above copyright notice for more information.
 =========================================================================*/
 
 #include "albaTool2DMeasure.h"
+#include "albaRWIBase.h"
 
 #include "albaDecl.h"
 #include "albaRWI.h"
@@ -47,10 +48,8 @@ albaTool2DMeasure::albaTool2DMeasure()
 	m_Coordinate = vtkCoordinate::New();
 	m_Coordinate->SetCoordinateSystemToWorld();
 
-	m_Renderer = NULL;
 	m_CurrentRenderer = NULL;
 	m_AllRenderersVector.clear();
-	m_View = NULL;
 	m_CurrentRwi = NULL;
 	m_CurrPlane = 0; // XY;
 
@@ -109,13 +108,12 @@ albaTool2DMeasure::~albaTool2DMeasure()
 }
 
 //----------------------------------------------------------------------------
-void albaTool2DMeasure::InitRenderer(albaView *view, vtkRenderer *ren)
+void albaTool2DMeasure::InitRenderer(albaRWIBase *rwi, vtkRenderer *ren)
 {
 	GetViewManager()->CameraUpdate();
 
-		albaRWIBase *rwi = view ? view->GetRWI() : NULL;
-
-		if (rwi == NULL || ren == NULL || m_CurrentRwi == rwi)
+		// the measures work only on the render windows of the views
+		if (rwi == NULL || rwi->GetView() == NULL || ren == NULL || m_CurrentRwi == rwi)
 			return;
 
 		m_CurrentRwi = rwi;
@@ -197,14 +195,14 @@ void albaTool2DMeasure::SetUpdateDistance(double dist)
 
 /// MOUSE EVENTS /////////////////////////////////////////////////////////////
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!m_IsEnabled)
 		return false;
 
 	GetViewManager()->CameraUpdate();
 
-	InitRenderer(view, ren);
+	InitRenderer(rwi, ren);
 	m_CurrentRenderer = m_Renderer;
 
 	// with SHIFT, or with CTRL while adding a measure, the button is left to the PER for the whole interaction;
@@ -241,7 +239,7 @@ bool albaTool2DMeasure::OnLeftButtonDown(albaView *view, vtkRenderer *ren, doubl
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (m_CurrentRenderer != m_Renderer)
 		return true;
@@ -275,9 +273,9 @@ bool albaTool2DMeasure::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double 
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-	InitRenderer(view, ren);
+	InitRenderer(rwi, ren);
 
 	double pointCoord[3];
 	ScreenToWorld(pos, pointCoord);
@@ -306,12 +304,12 @@ bool albaTool2DMeasure::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 	return true;
 }
 //----------------------------------------------------------------------------
-bool albaTool2DMeasure::OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaTool2DMeasure::OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
 	if (!m_IsEnabled)
 		return false;
 
-	InitRenderer(view, ren);
+	InitRenderer(rwi, ren);
 
 	double pointCoord[3];
 	ScreenToWorld(pos, pointCoord);
@@ -529,53 +527,16 @@ void albaTool2DMeasure::SetColor(vtkActor2D *actor, Color *color)
 }
 
 //----------------------------------------------------------------------------
-void albaTool2DMeasure::SetRendererByView(albaView * view)
+void albaTool2DMeasure::SetRendererAndView(vtkRenderer *ren, albaView *view)
 {
-	m_View = view;
+	if (m_Renderer && m_Renderer != ren)
+		RemoveAllMeasures();
 
-	vtkRenderer *newRenderer = NULL;
+	Superclass::SetRendererAndView(ren, view);
+	m_CurrentRenderer = ren;
 
-	vtkRendererCollection *rc;
-	rc = view->GetRWI()->GetRenderWindow()->GetRenderers();
-		
-	if (rc) // Searching for a frontal renderer on render collection
-	{
-		rc->InitTraversal();
-		vtkRenderer *ren;
-		while (ren = rc->GetNextItem())
-			if (ren->GetLayer() == 1)//Frontal Render
-			{
-				newRenderer = ren;
-				break;
-			}
-	}
-
-	//if the renderer is changed we move all actor to new renderer 
-	if (m_Renderer != newRenderer)
-	{
-		// Removing from old renderer
-		if (m_Renderer)
-		{
-			RemoveAllMeasures();
-		}
-		// Adding to new renderer
-		if (newRenderer)
-		{
-			// 			double p1[3];
-			// 			double p2[3];
-			// 
-			// 			for (int i = 0; i < m_LineSourceVector.size(); i++)
-			// 			{
-			// 				m_LineSourceVector[i]->GetPoint1(p1);
-			// 				m_LineSourceVector[i]->GetPoint2(p2);
-			// 				AddMeasure(p1, p2);
-			// 			}
-		}
-	}
-
-	m_Renderer = newRenderer;
-	m_CurrentRenderer = newRenderer;
-	m_Renderer->GetRenderWindow()->Render();
+	if (m_Renderer)
+		m_Renderer->GetRenderWindow()->Render();
 }
 
 //----------------------------------------------------------------------------

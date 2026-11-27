@@ -65,7 +65,7 @@ albaGizmoPolylineGraph::albaGizmoPolylineGraph(albaVME* imputVme, albaObserver *
   
   m_VmeGizmo = NULL;
   m_CurvilinearAbscissaHelper = NULL;
-  m_LeftMouseInteractor = NULL;
+  m_Behavior = NULL;
   m_SphereSource = NULL;
   m_AppendPolyData = NULL;
   for (int i = 0; i < 3; i++)
@@ -82,7 +82,7 @@ albaGizmoPolylineGraph::albaGizmoPolylineGraph(albaVME* imputVme, albaObserver *
 //------------------------------------------------------------------------
 {
   CreateVMEGizmo();
-  CreateInteractor();
+  CreateBehavior();
 
   m_CurvilinearAbscissaHelper = new albaCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, NULL, m_TestMode);
 }
@@ -92,7 +92,7 @@ albaGizmoPolylineGraph::albaGizmoPolylineGraph(albaVME* imputVme, albaObserver *
 /*virtual*/ void albaGizmoPolylineGraph::InternalRelease()
 //------------------------------------------------------------------------
 {
-  DestroyInteractor();
+  DestroyBehavior();
   DestroyVMEGizmo();
 
   cppDEL(m_CurvilinearAbscissaHelper);
@@ -248,30 +248,30 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
 }
 //------------------------------------------------------------------------
 //Creates the interactor for the gizmo. Called from ctor. 
-/*virtual*/ void albaGizmoPolylineGraph::CreateInteractor()
+/*virtual*/ void albaGizmoPolylineGraph::CreateBehavior()
 //------------------------------------------------------------------------
 {  
   m_RefSysVME = m_InputVME;
 
-  albaNEW(m_LeftMouseInteractor);
-  m_LeftMouseInteractor->SetListener(this);
-  m_LeftMouseInteractor->SetVME(m_InputVME);
-  m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-  m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_LeftMouseInteractor->EnableTranslation(true);    
+  albaNEW(m_Behavior);
+  m_Behavior->SetListener(this);
+  m_Behavior->SetVME(m_InputVME);
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
+  m_Behavior->EnableTranslation(true);    
 
-  m_VmeGizmo->SetBehavior(m_LeftMouseInteractor);
+  m_VmeGizmo->SetBehavior(m_Behavior);
 }
 
 //------------------------------------------------------------------------
 //Destroys the interactor of the gizmo. Called from dtor.
-/*virtual*/ void albaGizmoPolylineGraph::DestroyInteractor()
+/*virtual*/ void albaGizmoPolylineGraph::DestroyBehavior()
 //------------------------------------------------------------------------
 {
   m_VmeGizmo->SetBehavior(NULL);
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  m_LeftMouseInteractor->SetListener(NULL);
-  albaDEL(m_LeftMouseInteractor);
+  m_Behavior->SetListener(NULL);
+  albaDEL(m_Behavior);
 }
 
 //------------------------------------------------------------------------
@@ -354,7 +354,7 @@ void albaGizmoPolylineGraph::DestroyVMEGizmo()
   m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
 	GetViewManager()->CameraUpdate();
 
-  // forward isa transform events to the listener op
+  // forward behavior transform events to the listener op
   // instanciating the gizmo; the sender is changed to "this" so that the operation can check for
   // gizmo sending events
   e->SetSender(this);

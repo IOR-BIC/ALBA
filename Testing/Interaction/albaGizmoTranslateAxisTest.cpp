@@ -106,7 +106,7 @@ void albaGizmoTranslateAxisTest::CreateTestData()
 void albaGizmoTranslateAxisTest::TestConstructor()
 {
   albaGizmoTranslateAxis *gizmoTranslateAxis = new albaGizmoTranslateAxis(m_GizmoInputSurface);
-  gizmoTranslateAxis->SetAxis(albaInteractorConstraint::X);
+  gizmoTranslateAxis->SetAxis(albaTransformConstraint::X);
 
   gizmoTranslateAxis->SetCylinderLength(5);
   gizmoTranslateAxis->SetConeLength(5);
@@ -114,10 +114,10 @@ void albaGizmoTranslateAxisTest::TestConstructor()
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoTranslateAxis);
 
-  gizmoTranslateAxis->SetAxis(albaInteractorConstraint::Y);
+  gizmoTranslateAxis->SetAxis(albaTransformConstraint::Y);
   RenderGizmo(gizmoTranslateAxis);
 
-  gizmoTranslateAxis->SetAxis(albaInteractorConstraint::Z);
+  gizmoTranslateAxis->SetAxis(albaTransformConstraint::Z);
   RenderGizmo(gizmoTranslateAxis);
 
   cppDEL(gizmoTranslateAxis);
@@ -173,11 +173,8 @@ void albaGizmoTranslateAxisTest::TestSetRefSysMatrix()
   gizmoTranslateAxis->SetRefSysMatrix(&refSys);
   
   // using friend albaGizmoTranslateAxis
-  for (int i = 0; i < 2; i++)
-  {
-    albaMatrix *mat = gizmoTranslateAxis->m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
-    CPPUNIT_ASSERT(mat == &refSys);
-  }
+  albaMatrix *mat = gizmoTranslateAxis->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  CPPUNIT_ASSERT(mat == &refSys);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -186,15 +183,12 @@ void albaGizmoTranslateAxisTest::TestSetConstraintModality()
 {
   albaGizmoTranslateAxis *gizmoTranslateAxis = new albaGizmoTranslateAxis(m_GizmoInputSurface);
 
-  gizmoTranslateAxis->SetAxis(albaInteractorConstraint::X);
-  gizmoTranslateAxis->SetConstraintModality(albaInteractorConstraint::X, albaInteractorConstraint::LOCK);
+  gizmoTranslateAxis->SetAxis(albaTransformConstraint::X);
+  gizmoTranslateAxis->SetConstraintModality(albaTransformConstraint::X, albaTransformConstraint::LOCK);
   
   // using friend albaGizmoTranslateAxis
-  for (int i = 0; i < 2; i++)
-  {
-    int constrainModality = gizmoTranslateAxis->m_IsaGen[i]->GetTranslationConstraint()->GetConstraintModality(albaInteractorConstraint::X);
-    CPPUNIT_ASSERT(constrainModality  ==  albaInteractorConstraint::LOCK);
-  } 
+  int constrainModality = gizmoTranslateAxis->m_Behavior->GetTranslationConstraint()->GetConstraintModality(albaTransformConstraint::X);
+  CPPUNIT_ASSERT(constrainModality  ==  albaTransformConstraint::LOCK);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -262,14 +256,9 @@ void albaGizmoTranslateAxisTest::TestSetStep()
   albaTransform::SetPosition(absPose, position);
 
   albaGizmoTranslateAxis *gizmoTranslateAxis = new albaGizmoTranslateAxis(m_GizmoInputSurface);
-  gizmoTranslateAxis->SetStep(albaInteractorConstraint::Y, 2);
+  gizmoTranslateAxis->SetStep(albaTransformConstraint::Y, 2);
 
-  for (int i = 0; i < 2; i++)
-  {
-    CPPUNIT_ASSERT(
-      gizmoTranslateAxis->m_IsaGen[i]->GetTranslationConstraint()->GetStep(albaInteractorConstraint::Y)
-      == 2);
-  }
+  CPPUNIT_ASSERT(gizmoTranslateAxis->m_Behavior->GetTranslationConstraint()->GetStep(albaTransformConstraint::Y) == 2);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -281,7 +270,6 @@ void albaGizmoTranslateAxisTest::TestFixture()
 
 void albaGizmoTranslateAxisTest::RenderGizmo( albaGizmoTranslateAxis * gizmoTranslateAxis )
 {
-  RenderData(gizmoTranslateAxis->m_CylGizmo->GetOutput()->GetVTKData());
-  RenderData(gizmoTranslateAxis->m_ConeGizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoTranslateAxis->m_Gizmo->GetOutput()->GetVTKData());
 }
 

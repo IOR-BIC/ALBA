@@ -275,6 +275,7 @@ void albaOpExtractIsosurface::CreateOpDialog()
   albaNEW(m_DensityPicker);
   m_DensityPicker->SetListener(this);	
   m_DensityPicker->SetRendererAndView(m_View->GetFrontRenderer(), m_View);
+  m_DensityPicker->OperateOnlyOn(m_View->GetRWI());
   GetPositionalEventRouter()->PushTool(m_DensityPicker);
   m_PIPRen->SetViewport(.6, .01, .99, .4);
   m_PIPRen->GetActiveCamera()->SetFocalPoint(0,0,0);

@@ -163,11 +163,8 @@ void albaGizmoTranslatePlaneTest::TestSetConstrainRefSys()
   gizmoTranslatePlane->SetConstrainRefSys(&refSys);
   
   // using friend albaGizmoTranslatePlane
-  for (int i = 0; i < 2; i++)
-  {
-    albaMatrix *mat = gizmoTranslatePlane->m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
-    CPPUNIT_ASSERT(mat == &refSys);
-  }
+  albaMatrix *mat = gizmoTranslatePlane->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  CPPUNIT_ASSERT(mat == &refSys);
 
   cppDEL(gizmoTranslatePlane);
 }
@@ -177,14 +174,11 @@ void albaGizmoTranslatePlaneTest::TestSetConstraintModality()
   albaGizmoTranslatePlane *gizmoTranslatePlane = new albaGizmoTranslatePlane(m_GizmoInputSurface);
 
   gizmoTranslatePlane->SetPlane(albaGizmoTranslatePlane::XY);
-  gizmoTranslatePlane->SetConstraintModality(albaGizmoTranslatePlane::XY, albaInteractorConstraint::LOCK);
+  gizmoTranslatePlane->SetConstraintModality(albaGizmoTranslatePlane::XY, albaTransformConstraint::LOCK);
   
   // using friend albaGizmoTranslatePlane
-  for (int i = 0; i < 2; i++)
-  {
-    int constrainModality = gizmoTranslatePlane->m_IsaGen[i]->GetTranslationConstraint()->GetConstraintModality(albaGizmoTranslatePlane::XY);
-    CPPUNIT_ASSERT(constrainModality  ==  albaInteractorConstraint::LOCK);
-  } 
+  int constrainModality = gizmoTranslatePlane->m_Behavior->GetTranslationConstraint()->GetConstraintModality(albaGizmoTranslatePlane::XY);
+  CPPUNIT_ASSERT(constrainModality  ==  albaTransformConstraint::LOCK);
 
   cppDEL(gizmoTranslatePlane);
 }
@@ -252,14 +246,9 @@ void albaGizmoTranslatePlaneTest::TestSetStep()
   albaTransform::SetPosition(absPose, position);
 
   albaGizmoTranslatePlane *gizmoTranslatePlane = new albaGizmoTranslatePlane(m_GizmoInputSurface);
-  gizmoTranslatePlane->SetStep(albaInteractorConstraint::Y, 2);
+  gizmoTranslatePlane->SetStep(albaTransformConstraint::Y, 2);
 
-  for (int i = 0; i < 2; i++)
-  {
-    CPPUNIT_ASSERT(
-      gizmoTranslatePlane->m_IsaGen[i]->GetTranslationConstraint()->GetStep(albaInteractorConstraint::Y)
-      == 2);
-  }
+  CPPUNIT_ASSERT(gizmoTranslatePlane->m_Behavior->GetTranslationConstraint()->GetStep(albaTransformConstraint::Y) == 2);
 
   cppDEL(gizmoTranslatePlane);
 }

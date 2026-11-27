@@ -79,8 +79,8 @@ public:
   void NotifyClick();
 
   /** Enable/disable the camera motion with the mouse in this render window (enabled by default).
-    Each mouse event calls the method of the router of the mouse events registered in albaServiceLocator,
-    with the view of this render window and the renderer under the mouse; the modifier keys are set first. */
+    Each mouse event calls the method of the router of the mouse events registered in albaServiceLocator with this
+    render window, the renderer under the mouse and the position: the router gets the view from the render window. The modifier keys are set first. */
   void EnableCameraInteraction(bool enable) {m_CameraInteractionEnabled = enable;}
   bool IsCameraInteractionEnabled() {return m_CameraInteractionEnabled;}
 

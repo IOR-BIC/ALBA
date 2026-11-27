@@ -333,7 +333,7 @@ void albaRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnLeftButtonDown(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnLeftButtonDown(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -358,7 +358,7 @@ void albaRWIBase::OnMiddleMouseButtonDown(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnMiddleButtonDown(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnMiddleButtonDown(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -383,7 +383,7 @@ void albaRWIBase::OnRightMouseButtonDown(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnRightButtonDown(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnRightButtonDown(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -409,7 +409,7 @@ void albaRWIBase::OnLeftMouseButtonUp(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnLeftButtonUp(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnLeftButtonUp(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -435,7 +435,7 @@ void albaRWIBase::OnMiddleMouseButtonUp(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnMiddleButtonUp(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnMiddleButtonUp(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ void albaRWIBase::OnRightMouseButtonUp(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnRightButtonUp(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnRightButtonUp(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 //----------------------------------------------------------------------------
@@ -493,7 +493,7 @@ void albaRWIBase::OnMouseMotion(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnMouseMove(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
+    per->OnMouseMove(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos);
   }
 }
 
@@ -509,7 +509,7 @@ void albaRWIBase::OnMouseWheel(wxMouseEvent &event)
     double pos[2] = {(double)event.GetX(), (double)(m_Height - event.GetY() - 1)};
     albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
     per->SetModifierKeys(event.ControlDown(), event.AltDown(), event.ShiftDown());
-    per->OnMouseWheel(this, m_View, FindPokedRenderer((int)pos[0], (int)pos[1]), pos, rotation);
+    per->OnMouseWheel(this, FindPokedRenderer((int)pos[0], (int)pos[1]), pos, rotation);
   }
 }
 //----------------------------------------------------------------------------

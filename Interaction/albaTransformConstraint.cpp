@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorConstraint
+ Module: albaTransformConstraint
  Authors: Marco Petrone, Stefano Perticoni
  
  Copyright (c) BIC
@@ -17,7 +17,7 @@
 // include this first to avoid compilation errors in wxWindows
 #include "albaDefines.h"
 
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 #include "albaAbsMatrixPipe.h"
 #include "albaIndent.h"
 #include "albaRefSys.h"
@@ -25,7 +25,7 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-albaInteractorConstraint::albaInteractorConstraint()
+albaTransformConstraint::albaTransformConstraint()
 //------------------------------------------------------------------------------
 {
   m_RefSys = new albaRefSys;
@@ -33,14 +33,14 @@ albaInteractorConstraint::albaInteractorConstraint()
 }
 
 //------------------------------------------------------------------------------
-albaInteractorConstraint::~albaInteractorConstraint()
+albaTransformConstraint::~albaTransformConstraint()
 //------------------------------------------------------------------------------
 {
   delete m_RefSys; m_RefSys = NULL;
 }
 
 //----------------------------------------------------------------------------
-albaInteractorConstraint::albaInteractorConstraint(const albaInteractorConstraint& source)
+albaTransformConstraint::albaTransformConstraint(const albaTransformConstraint& source)
 //----------------------------------------------------------------------------
 {
   m_RefSys = new albaRefSys;
@@ -49,7 +49,7 @@ albaInteractorConstraint::albaInteractorConstraint(const albaInteractorConstrain
 }
 
 //----------------------------------------------------------------------------
-albaInteractorConstraint &albaInteractorConstraint::operator=(const albaInteractorConstraint& source)
+albaTransformConstraint &albaTransformConstraint::operator=(const albaTransformConstraint& source)
 //----------------------------------------------------------------------------
 {
   // each constraint owns its ref sys: the contents are copied, not the pointer
@@ -69,7 +69,7 @@ albaInteractorConstraint &albaInteractorConstraint::operator=(const albaInteract
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::Reset()
+void albaTransformConstraint::Reset()
 //------------------------------------------------------------------------------
 {
   for (int j = 0; j < 3; j++)
@@ -84,21 +84,21 @@ void albaInteractorConstraint::Reset()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetRefSys(albaRefSys *ref_sys)
+void albaTransformConstraint::SetRefSys(albaRefSys *ref_sys)
 //----------------------------------------------------------------------------
 {
   m_RefSys->DeepCopy(ref_sys);
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetRefSys(albaRefSys &ref_sys)
+void albaTransformConstraint::SetRefSys(albaRefSys &ref_sys)
 //----------------------------------------------------------------------------
 {
   *m_RefSys=ref_sys;
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetConstraintModality(int constraintModalityOnX, int constraintModalityOnY, int constraintModalityOnZ)
+void albaTransformConstraint::SetConstraintModality(int constraintModalityOnX, int constraintModalityOnY, int constraintModalityOnZ)
 //----------------------------------------------------------------------------
 {
   m_ConstraintModality[X] = constraintModalityOnX;
@@ -107,91 +107,91 @@ void albaInteractorConstraint::SetConstraintModality(int constraintModalityOnX, 
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetConstraintModality(int axis, int constraintModality)
+void albaTransformConstraint::SetConstraintModality(int axis, int constraintModality)
 //------------------------------------------------------------------------------
 {
   m_ConstraintModality[axis] = constraintModality;
 }
 
 //----------------------------------------------------------------------------
-int albaInteractorConstraint::GetConstraintModality(int axis)
+int albaTransformConstraint::GetConstraintModality(int axis)
 //------------------------------------------------------------------------------
 {
   return m_ConstraintModality[axis];
 }
   
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetLowerBound(int axis, double lbound)
+void albaTransformConstraint::SetLowerBound(int axis, double lbound)
 //------------------------------------------------------------------------------
 {
   m_LowerBound[axis] = lbound;
 }
 
 //----------------------------------------------------------------------------
-double albaInteractorConstraint::GetLowerBound(int axis)
+double albaTransformConstraint::GetLowerBound(int axis)
 //------------------------------------------------------------------------------
 {
   return m_LowerBound[axis];
 }
 
 //----------------------------------------------------------------------------  
-void albaInteractorConstraint::SetUpperBound(int axis, double ubound)
+void albaTransformConstraint::SetUpperBound(int axis, double ubound)
 //------------------------------------------------------------------------------
 {
   m_UpperBound[axis] = ubound;
 } 
 
 //----------------------------------------------------------------------------    
-double albaInteractorConstraint::GetUpperBound(int axis)
+double albaTransformConstraint::GetUpperBound(int axis)
 //------------------------------------------------------------------------------
 {
   return m_UpperBound[axis];
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetMin(int axis, double min)
+void albaTransformConstraint::SetMin(int axis, double min)
 //------------------------------------------------------------------------------
 {
   m_Min[axis] = min;
 }
 
 //----------------------------------------------------------------------------
-double albaInteractorConstraint::GetMin(int axis)
+double albaTransformConstraint::GetMin(int axis)
 //------------------------------------------------------------------------------
 {
   return m_Min[axis];
 }
 
 //---------------------------------------------------------------------------- 
-void albaInteractorConstraint::SetMax(int axis, double max)
+void albaTransformConstraint::SetMax(int axis, double max)
 //------------------------------------------------------------------------------
 {
   m_Max[axis] = max;
 }
 
 //----------------------------------------------------------------------------      
-double albaInteractorConstraint::GetMax(int axis)
+double albaTransformConstraint::GetMax(int axis)
 //------------------------------------------------------------------------------
 {
   return m_Max[axis];
 }
 
 //---------------------------------------------------------------------------- 
-void albaInteractorConstraint::SetStep(int axis, double step)
+void albaTransformConstraint::SetStep(int axis, double step)
 //------------------------------------------------------------------------------
 {
   m_Step[axis] = step;
 } 
 
 //----------------------------------------------------------------------------      
-double albaInteractorConstraint::GetStep(int axis)
+double albaTransformConstraint::GetStep(int axis)
 //------------------------------------------------------------------------------
 {
   return m_Step[axis];
 }
 
 //----------------------------------------------------------------------------      
-void albaInteractorConstraint::SetSnapArray(int axis, vtkDoubleArray *array)
+void albaTransformConstraint::SetSnapArray(int axis, vtkDoubleArray *array)
 //------------------------------------------------------------------------------
 {
   assert( array );
@@ -200,7 +200,7 @@ void albaInteractorConstraint::SetSnapArray(int axis, vtkDoubleArray *array)
 }   
 
 //----------------------------------------------------------------------------      
-vtkDoubleArray *albaInteractorConstraint::GetSnapArray(int axis)
+vtkDoubleArray *albaTransformConstraint::GetSnapArray(int axis)
 //------------------------------------------------------------------------------
 {
   assert( axis>=X && axis <=Z );
@@ -208,7 +208,7 @@ vtkDoubleArray *albaInteractorConstraint::GetSnapArray(int axis)
 }
 
 //----------------------------------------------------------------------------
-int albaInteractorConstraint::GetNumberOfDOF()
+int albaTransformConstraint::GetNumberOfDOF()
 //------------------------------------------------------------------------------
 {
   int ndof = 0;
@@ -223,7 +223,7 @@ int albaInteractorConstraint::GetNumberOfDOF()
 }
 
 //----------------------------------------------------------------------------
-int albaInteractorConstraint::GetConstraintAxis()
+int albaTransformConstraint::GetConstraintAxis()
 //------------------------------------------------------------------------------
 {
   if (this->GetNumberOfDOF() == 1)
@@ -240,7 +240,7 @@ int albaInteractorConstraint::GetConstraintAxis()
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::Print(std::ostream& os, const int tabs)
+void albaTransformConstraint::Print(std::ostream& os, const int tabs)
 //----------------------------------------------------------------------------
 {
   // To be completed
@@ -258,7 +258,7 @@ void albaInteractorConstraint::Print(std::ostream& os, const int tabs)
 
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetBounds(int axis, double *bounds)
+void albaTransformConstraint::SetBounds(int axis, double *bounds)
 //----------------------------------------------------------------------------
 {
   this->SetLowerBound(axis, bounds[0]);
@@ -267,7 +267,7 @@ void albaInteractorConstraint::SetBounds(int axis, double *bounds)
 
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::GetBounds(int axis, double *bounds)
+void albaTransformConstraint::GetBounds(int axis, double *bounds)
 //----------------------------------------------------------------------------
 {
   bounds[0] = this->GetLowerBound(axis);
@@ -275,7 +275,7 @@ void albaInteractorConstraint::GetBounds(int axis, double *bounds)
 }
 
 //----------------------------------------------------------------------------
-void albaInteractorConstraint::SetSnapStep(int axis, double min,double max, double step)
+void albaTransformConstraint::SetSnapStep(int axis, double min,double max, double step)
 //----------------------------------------------------------------------------
 {
   this->SetMin(axis, min);
@@ -284,7 +284,7 @@ void albaInteractorConstraint::SetSnapStep(int axis, double min,double max, doub
 }
 
 //----------------------------------------------------------------------------
-int albaInteractorConstraint::GetConstraintPlane()
+int albaTransformConstraint::GetConstraintPlane()
 //----------------------------------------------------------------------------
 {
   const int AXIS_BLOCKED = 0;
@@ -317,13 +317,13 @@ int albaInteractorConstraint::GetConstraintPlane()
   return -1;
 }
 //----------------------------------------------------------------------------
-albaRefSys* albaInteractorConstraint::GetRefSys()
+albaRefSys* albaTransformConstraint::GetRefSys()
 //----------------------------------------------------------------------------
 {
   return m_RefSys;
 }
 //----------------------------------------------------------------------------
-int albaInteractorConstraint::GetConstraintPlaneAxes(int& axis1, int& axis2)
+int albaTransformConstraint::GetConstraintPlaneAxes(int& axis1, int& axis2)
 //----------------------------------------------------------------------------
 {
   const int AXIS_BLOCKED = 0;

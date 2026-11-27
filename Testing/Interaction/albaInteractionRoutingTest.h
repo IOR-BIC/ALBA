@@ -26,16 +26,20 @@ class albaRWIBase;
 class albaRoutingTestView;
 class albaPositionalEventRouter;
 class albaInteractionTool;
+class albaVME;
+class albaVMESurface;
 
-/** Records the ids of the events received */
+/** Records the ids of the events received and the VME of the last one */
 class albaRoutingTestListener : public albaObserver
 {
 public:
+  albaRoutingTestListener() {m_LastVme = NULL;}
   virtual void OnEvent(albaEventBase *event);
   int Count(albaID id);
-  void Clear() {m_Ids.clear();}
+  void Clear() {m_Ids.clear(); m_LastVme = NULL;}
 
   std::vector<albaID> m_Ids;
+  albaVME *m_LastVme;
 };
 
 /** Characterization tests: they record how the PER and the interactors replacing it
@@ -49,6 +53,8 @@ public:
   CPPUNIT_TEST( TestCameraDragAndWheel );
   CPPUNIT_TEST( TestCameraButtons );
   CPPUNIT_TEST( TestPERPickerClick );
+  CPPUNIT_TEST( TestPERPickerTargets );
+  CPPUNIT_TEST( TestPERPickerContinuous );
   CPPUNIT_TEST( Test2DMeasureAddWithoutModifiers );
   CPPUNIT_TEST( Test2DMeasureModifiersMoveCamera );
   CPPUNIT_TEST( Test2DMeasureRightButton );
@@ -67,6 +73,8 @@ protected:
   void TestCameraDragAndWheel();
   void TestCameraButtons();
   void TestPERPickerClick();
+  void TestPERPickerTargets();
+  void TestPERPickerContinuous();
   void Test2DMeasureAddWithoutModifiers();
   void Test2DMeasureModifiersMoveCamera();
   void Test2DMeasureRightButton();
@@ -90,6 +98,9 @@ protected:
 
   /** Register again the previous PER and delete this one */
   void DeletePER(albaPositionalEventRouter *per);
+
+  /** Add to the renderer a sphere of radius 10 at the origin, picked as the returned VME */
+  albaVMESurface *AddSphereVME();
 
   /** Use a parallel camera and disable the spin, as the 2D views do */
   void Set2DCamera();

@@ -29,8 +29,7 @@
 //----------------------------------------------------------------------------
 class albaVME;
 class albaEvent; 
-class albaInteractionBehavior;
-class albaBehaviorPicker;
+class albaToolPicker;
 class albaVMELandmark;
 class albaVMELandmarkCloud;
 class vtkPoints;
@@ -92,13 +91,10 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
     //void OnEventThis(albaEvent &e);
     void OnEventThis(albaEventBase *alba_event);
 
-    /** Assign the picker of a side (SOURCE or TARGET) to its VME */
-    void AttachPicker(int side, albaVME *vme);
-
     /** A pick on a side creates its landmark, or moves its current landmark */
     void OnVmePicked(int side, albaEvent *e);
 
-    /** Give the VMEs their behaviors again and remove the landmark clouds */
+    /** Remove the picker and the landmark clouds */
     void Clear();
 
     int Register();
@@ -108,8 +104,7 @@ class ALBA_EXPORT albaOpIterativeRegistration : public albaOp
     albaVME *m_SourceVME;
     albaVME *m_TargetVME;
  
-    albaBehaviorPicker *m_Picker[2];           ///< pickers of the source and target VMEs
-    albaInteractionBehavior *m_OldBehavior[2]; ///< behaviors of the source and target VMEs before the operation
+    albaToolPicker *m_Picker;                  ///< picker of the source and target VMEs
     albaVMELandmarkCloud *m_Cloud[2];          ///< landmarks of the source and target VMEs
     albaVMELandmark *m_Landmark[2];            ///< current landmarks: a pick moves them, NULL after a registration
 

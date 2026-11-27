@@ -52,8 +52,8 @@ albaOp(label)
   m_OpType  = OPTYPE_OP;
   m_Canundo = true;
 
-	m_InteractorVector.clear();
-	m_SelectedInteractor = m_CurrentInteractor = INTERACTION_TYPE::POINT;
+	m_ToolVector.clear();
+	m_SelectedTool = m_CurrentTool = INTERACTION_TYPE::POINT;
 
 	m_MeasureListBox = NULL;
 
@@ -98,7 +98,7 @@ void albaOpMeasure2D::OpRun()
 
 	GetLogicManager()->VmeShow(m_Input, true);
 
-	InitInteractors();
+	InitTools();
 
 	//////////////////////////////////////////////////////////////////////////
 	
@@ -109,8 +109,8 @@ void albaOpMeasure2D::OpRun()
 		
 		if (view)
 		{
- 			for (int i = 0; i < m_InteractorVector.size(); i++)
- 				m_InteractorVector[i]->SetRendererByView(view);
+ 			for (int i = 0; i < m_ToolVector.size(); i++)
+ 				m_ToolVector[i]->SetRendererAndView(view->GetFrontRenderer(), view);
 
 			//Load();
 		}
@@ -141,76 +141,76 @@ albaView* albaOpMeasure2D::OpenImageView(int viewId)
 }
 
 //----------------------------------------------------------------------------
-void albaOpMeasure2D::InitInteractors()
+void albaOpMeasure2D::InitTools()
 {
 	// Create Interactor Point
 	albaTool2DMeasurePoint *InteractorPoint = albaTool2DMeasurePoint::New();
 	InteractorPoint->Register(this);
 	InteractorPoint->SetListener(this);
 	InteractorPoint->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorPoint);
+	m_ToolVector.push_back(InteractorPoint);
 	
 	// Create Interactor Distance
 	albaTool2DMeasureDistance *InteractorDistance = albaTool2DMeasureDistance::New();
 	InteractorDistance->Register(this);
 	InteractorDistance->SetListener(this);
 	InteractorDistance->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorDistance);
+	m_ToolVector.push_back(InteractorDistance);
 
 	// Create Interactor MidPoint
 	albaTool2DMeasureMidPoint *InteractorMidPoint = albaTool2DMeasureMidPoint::New();
 	InteractorMidPoint->Register(this);
 	InteractorMidPoint->SetListener(this);
 	InteractorMidPoint->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorMidPoint);
+	m_ToolVector.push_back(InteractorMidPoint);
 
 	// Create Interactor CenterPoint
 	albaTool2DMeasureCenterPoint *InteractorCenterPoint = albaTool2DMeasureCenterPoint::New();
 	InteractorCenterPoint->Register(this);
 	InteractorCenterPoint->SetListener(this);
 	InteractorCenterPoint->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorCenterPoint);
+	m_ToolVector.push_back(InteractorCenterPoint);
 
 	// Create Interactor Line
 	albaTool2DMeasureLine *InteractorLine = albaTool2DMeasureLine::New();
 	InteractorLine->Register(this);
 	InteractorLine->SetListener(this);
 	InteractorLine->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorLine);
+	m_ToolVector.push_back(InteractorLine);
 
 	// Create Interactor LineDistance
 	albaTool2DMeasureLineDistance *InteractorLineDist = albaTool2DMeasureLineDistance::New();
 	InteractorLineDist->Register(this);
 	InteractorLineDist->SetListener(this);
 	InteractorLineDist->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorLineDist);
+	m_ToolVector.push_back(InteractorLineDist);
 
 	// Create Interactor Angle
 	albaTool2DMeasureAngle *InteractorAngle = albaTool2DMeasureAngle::New();
 	InteractorAngle->Register(this);
 	InteractorAngle->SetListener(this);
 	InteractorAngle->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorAngle);
+	m_ToolVector.push_back(InteractorAngle);
 
 	// Create Interactor Angle by Line
 	albaTool2DMeasureAngleLine *InteractorAngleLine = albaTool2DMeasureAngleLine::New();
 	InteractorAngleLine->Register(this);
 	InteractorAngleLine->SetListener(this);
 	InteractorAngleLine->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorAngleLine);
+	m_ToolVector.push_back(InteractorAngleLine);
 
 	// Create Interactor Ellipse
 	albaTool2DMeasureEllipse *InteractorEllipse = albaTool2DMeasureEllipse::New();
 	InteractorEllipse->Register(this);
 	InteractorEllipse->SetListener(this);
 	InteractorEllipse->ShowText(m_ShowText);
-	m_InteractorVector.push_back(InteractorEllipse);
+	m_ToolVector.push_back(InteractorEllipse);
 
-	GetPositionalEventRouter()->PushTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PushTool(m_ToolVector[m_CurrentTool]);
 
 
-	m_MaxMeasures = m_InteractorVector[m_CurrentInteractor]->GetMaxMeasures();
-	m_MeasureType = m_InteractorVector[m_CurrentInteractor]->GetMeasureType();
+	m_MaxMeasures = m_ToolVector[m_CurrentTool]->GetMaxMeasures();
+	m_MeasureType = m_ToolVector[m_CurrentTool]->GetMeasureType();
 }
 
 //----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ void albaOpMeasure2D::CreateGui()
 	m_Gui->Divider(1);
 	int const numInter = 9;
 	wxString choises[numInter] = { _("Point"),_("Distance"),_("MidPoint"),_("CenterPoint"),_("Line"),_("Line Distance"),_("Angle"),_("Angle by Line"), "Ellipse"};
-	m_Gui->Combo(ID_SELECT_INTERACTOR, "", &m_SelectedInteractor, numInter, choises, "Select Measure Type");
+	m_Gui->Combo(ID_SELECT_INTERACTOR, "", &m_SelectedTool, numInter, choises, "Select Measure Type");
 	
 	m_MeasureListBox = m_Gui->ListBox(ID_MEASURE_LIST, "", 200);
 	m_Gui->Divider();
@@ -285,15 +285,15 @@ void albaOpMeasure2D::ExportCSV()
 			if (firstAcces) // Header
 				fprintf(pFile, "VME Name;Measure Type;Label;Measure;\n");
 
-			for (int i = 0; i < m_InteractorVector.size(); i++)
+			for (int i = 0; i < m_ToolVector.size(); i++)
 			{
-				int nMeasures = m_InteractorVector[i]->GetMeasureCount();
+				int nMeasures = m_ToolVector[i]->GetMeasureCount();
 				for (int j = 0; j < nMeasures; j++)
 				{
 					albaString vmeName = m_Input->GetName();
-					albaString measureType = m_InteractorVector[i]->GetMeasureType();
-					albaString measureLabel = m_InteractorVector[i]->GetMeasureLabel(j);
-					albaString measureText = m_InteractorVector[i]->GetMeasureText(j);
+					albaString measureType = m_ToolVector[i]->GetMeasureType();
+					albaString measureLabel = m_ToolVector[i]->GetMeasureLabel(j);
+					albaString measureText = m_ToolVector[i]->GetMeasureText(j);
 					fprintf(pFile, "%s;%s;%s;%s;\n", vmeName.GetCStr(), measureType.GetCStr(), measureLabel.GetCStr(), measureText.GetCStr());
 				}
 			}
@@ -320,12 +320,12 @@ void albaOpMeasure2D::OpStop(int result)
 	}
 	
 	// Remove Interactor
-	GetPositionalEventRouter()->PopTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PopTool(m_ToolVector[m_CurrentTool]);
 
-	for (int i = 0; i < m_InteractorVector.size(); i++)
-		albaDEL(m_InteractorVector[i]);
+	for (int i = 0; i < m_ToolVector.size(); i++)
+		albaDEL(m_ToolVector[i]);
 
-	m_InteractorVector.clear();
+	m_ToolVector.clear();
 
 	NotifyOpEnd(result);
 }
@@ -335,7 +335,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 {
 	if (albaEvent *e = albaEvent::SafeDownCast(alba_event))
 	{
-		albaTool2DMeasure *currInter = m_InteractorVector[m_CurrentInteractor];
+		albaTool2DMeasure *currInter = m_ToolVector[m_CurrentTool];
 		if (e->GetSender() == m_Gui) // FROM GUI
 		{
 			
@@ -343,7 +343,7 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 			{
 			case ID_SELECT_INTERACTOR:
 			{
-				SetMeasureInteractor(m_SelectedInteractor);
+				SetMeasureTool(m_SelectedTool);
 				m_SelectedMeasure = (currInter->GetMeasureCount() > 0) ? 0 : -1;
 				m_MeasureLabel = (m_SelectedMeasure >= 0) ? currInter->GetMeasureLabel(m_SelectedMeasure) : "";
 				m_Gui->Update();
@@ -389,8 +389,8 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 				currInter->Enable(m_Enable);
 				currInter->EnableEditMeasure(m_Edit);
 				currInter->EnableMoveMeasure(m_Move);
-				for(int i=0;i<m_InteractorVector.size();i++)
-					m_InteractorVector[i]->ShowText(m_ShowText);
+				for(int i=0;i<m_ToolVector.size();i++)
+					m_ToolVector[i]->ShowText(m_ShowText);
 				GetViewManager()->CameraUpdate();
 			}
 			break;
@@ -482,19 +482,19 @@ void albaOpMeasure2D::OnEvent(albaEventBase *alba_event)
 }
 
 //----------------------------------------------------------------------------
-void albaOpMeasure2D::SetMeasureInteractor(int index)
+void albaOpMeasure2D::SetMeasureTool(int index)
 {
-	m_InteractorVector[m_CurrentInteractor]->Enable(false);
+	m_ToolVector[m_CurrentTool]->Enable(false);
 
-	GetPositionalEventRouter()->PopTool(m_InteractorVector[m_CurrentInteractor]);
-	m_CurrentInteractor = index;
-	GetPositionalEventRouter()->PushTool(m_InteractorVector[m_CurrentInteractor]);
+	GetPositionalEventRouter()->PopTool(m_ToolVector[m_CurrentTool]);
+	m_CurrentTool = index;
+	GetPositionalEventRouter()->PushTool(m_ToolVector[m_CurrentTool]);
 
-	m_InteractorVector[m_CurrentInteractor]->SetListener(this);
-	m_InteractorVector[m_CurrentInteractor]->Enable();
+	m_ToolVector[m_CurrentTool]->SetListener(this);
+	m_ToolVector[m_CurrentTool]->Enable();
 
-	m_MaxMeasures = m_InteractorVector[m_CurrentInteractor]->GetMaxMeasures();
-	m_MeasureType = m_InteractorVector[m_CurrentInteractor]->GetMeasureType();
+	m_MaxMeasures = m_ToolVector[m_CurrentTool]->GetMaxMeasures();
+	m_MeasureType = m_ToolVector[m_CurrentTool]->GetMeasureType();
 
 	UpdateMeasureList();
 }
@@ -508,13 +508,13 @@ void albaOpMeasure2D::UpdateMeasureList()
 			m_MeasureListBox->Select(0);
 		m_MeasureListBox->Clear();
 		
-		if (m_InteractorVector.size() > 0)
-			for (int i = 0; i < m_InteractorVector[m_CurrentInteractor]->GetMeasureCount(); i++)
+		if (m_ToolVector.size() > 0)
+			for (int i = 0; i < m_ToolVector[m_CurrentTool]->GetMeasureCount(); i++)
 			{
-				wxString measure = m_InteractorVector[m_CurrentInteractor]->GetMeasureLabel(i);
+				wxString measure = m_ToolVector[m_CurrentTool]->GetMeasureLabel(i);
 				if (!measure.IsEmpty())
 					measure += " ";
-				measure += m_InteractorVector[m_CurrentInteractor]->GetMeasureText(i);
+				measure += m_ToolVector[m_CurrentTool]->GetMeasureText(i);
 				m_MeasureListBox->Append(_(measure));
 			}
 
@@ -529,21 +529,21 @@ void albaOpMeasure2D::RemoveMeasure(bool clearAll /*Default = false*/)
 {
 	if (clearAll)
 	{
-		m_InteractorVector[m_CurrentInteractor]->RemoveAllMeasures();
+		m_ToolVector[m_CurrentTool]->RemoveAllMeasures();
 		m_MeasureListBox->Clear();
 	}
 	else
 	{
 		int sel = m_SelectedMeasure;
 
-		if (sel >= 0 && sel < m_InteractorVector[m_CurrentInteractor]->GetMeasureCount())
+		if (sel >= 0 && sel < m_ToolVector[m_CurrentTool]->GetMeasureCount())
 		{
-			m_InteractorVector[m_CurrentInteractor]->RemoveMeasure(sel);
+			m_ToolVector[m_CurrentTool]->RemoveMeasure(sel);
 			m_MeasureListBox->Delete(sel);
 
-			if ((sel - 1) >= 0 && (sel - 1) < m_InteractorVector[m_CurrentInteractor]->GetMeasureCount())
+			if ((sel - 1) >= 0 && (sel - 1) < m_ToolVector[m_CurrentTool]->GetMeasureCount())
 			{
-				m_InteractorVector[m_CurrentInteractor]->SelectMeasure(sel - 1);
+				m_ToolVector[m_CurrentTool]->SelectMeasure(sel - 1);
 				m_MeasureListBox->Select(sel - 1);
 			}
 
@@ -561,10 +561,10 @@ void albaOpMeasure2D::Load()
 {
 	wxString tag = "";
 
-	for (int i = 0; i < m_InteractorVector.size(); i++)
+	for (int i = 0; i < m_ToolVector.size(); i++)
 	{
-		m_InteractorVector[i]->Load(m_Input, tag);
-		m_InteractorVector[i]->Update();
+		m_ToolVector[i]->Load(m_Input, tag);
+		m_ToolVector[i]->Update();
 	}
 
 	UpdateMeasureList();
@@ -574,6 +574,6 @@ void albaOpMeasure2D::Save()
 {
 	wxString tag = "";
 
-	for (int i = 0; i < m_InteractorVector.size(); i++)
-		m_InteractorVector[i]->Save(m_Input, tag);
+	for (int i = 0; i < m_ToolVector.size(); i++)
+		m_ToolVector[i]->Save(m_Input, tag);
 }

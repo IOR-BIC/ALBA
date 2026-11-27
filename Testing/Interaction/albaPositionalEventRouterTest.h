@@ -44,6 +44,7 @@ class albaPositionalEventRouterTest : public albaTest
   CPPUNIT_TEST(TestButtonUpDuringButtonDown);
   CPPUNIT_TEST(TestBehaviorDeletedDuringInteraction);
   CPPUNIT_TEST(TestTransformStoppedAtButtonDown);
+  CPPUNIT_TEST(TestOperateOnlyOn);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -69,6 +70,7 @@ class albaPositionalEventRouterTest : public albaTest
   void TestButtonUpDuringButtonDown();
   void TestBehaviorDeletedDuringInteraction();
   void TestTransformStoppedAtButtonDown();
+  void TestOperateOnlyOn();
 
 };
 

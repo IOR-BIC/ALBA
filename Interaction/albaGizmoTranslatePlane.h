@@ -178,12 +178,11 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** Create isa stuff */
-  void CreateISA();
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
-
-  /** isa generic*/
-  albaBehaviorTransform *m_IsaGen[2];
+  /** the behavior moving the gizmo, shared by its parts */
+  albaBehaviorTransform *m_Behavior;
 
   /** Used by albaBehaviorTransform */
   vtkTransform *m_PivotTransform;
@@ -194,9 +193,6 @@ protected:
   /**
   Register the event receiver object*/
   albaObserver *m_Listener;
-
-  /** Hide/show the square */
-  void ShowSquare(bool show);
 
   /** Register Gizmo status*/
   bool m_IsActive;

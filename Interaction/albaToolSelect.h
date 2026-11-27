@@ -49,15 +49,15 @@ public:
 
   /** The button down selects the picked VME; the right button prepares the context menu.
     Return true if the picked VME has been selected. */
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Select();}
-  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) {return Select();}
-  virtual bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Select();}
+  virtual bool OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) {return Select();}
+  virtual bool OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** A drag cancels the context menu */
-  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The right button released without dragging shows the context menu of the view; return true if shown */
-  virtual bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnRightButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
 protected:
   albaToolSelect();

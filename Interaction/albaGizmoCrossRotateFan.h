@@ -67,7 +67,7 @@ class albaRefSys;
   double localRotationAngle = event->GetDouble();
 
 */
-class albaGizmoCrossRotateFan: public albaGizmoInterface
+class ALBA_EXPORT albaGizmoCrossRotateFan : public albaGizmoInterface
 {
 public:
            albaGizmoCrossRotateFan(albaVME *input, albaObserver *listener = NULL);

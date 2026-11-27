@@ -151,15 +151,6 @@ albaTransformBase *albaRefSys::GetTransform()
     
     return m_Identity;
   case VIEW:
-    /*
-    if (m_Renderer)
-          return m_Renderer->GetActiveCamera()->GetViewTransformObject();
-        else
-          return m_Identity;
-    //return m_Renderer?m_Renderer->GetActiveCamera()->GetViewTransformObject():m_Identity;
-    // 
-
-    */
     return m_Transform?m_Transform:(albaTransformBase*)m_Identity;
   }
   return m_Identity;

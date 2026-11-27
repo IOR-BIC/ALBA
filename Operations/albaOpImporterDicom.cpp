@@ -609,6 +609,7 @@ void albaOpImporterDicom::CreateCropPage()
 		m_CropPage->GetView()->VmeSelect(m_Input, true); // the view GUI, built by the side bar, needs the selected VME
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 	m_DicomTool->SetRendererAndView(m_CropPage->GetView()->GetFrontRenderer(), m_CropPage->GetView());
+	m_DicomTool->OperateOnlyOn(m_CropPage->GetView()->GetRWI());
 }
 //----------------------------------------------------------------------------
 void albaOpImporterDicom::GuiUpdate()

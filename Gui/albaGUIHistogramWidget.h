@@ -114,6 +114,12 @@ public:
 
   /** The mouse moved on the histogram: show the number of samples of the bin under the cursor */
   void OnMouseMove(double pos[2]);
+
+  /** CTRL+click on the histogram: send BIN_PICKED to the listener */
+  void OnCtrlClick(double pos[2]);
+
+  /** CTRL+click on a bin of the histogram: its scalar value in GetDouble(), its number of samples in GetArg() */
+  ALBA_ID_DEC(BIN_PICKED);
 protected:
 
 	/** Returns the component name */
@@ -158,6 +164,6 @@ protected:
   albaRWI        *m_HistogramRWI;
   vtkALBAHistogram  *m_Histogram;
 	vtkImageData  *m_HistogramData;
-  albaInteractionTool *m_MoveTool; ///< tool getting the mouse moves of the render window
+  albaInteractionTool *m_Tool; ///< tool getting the mouse moves and the CTRL+clicks of the render window
 };
 #endif

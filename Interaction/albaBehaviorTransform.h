@@ -21,7 +21,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "albaInteractionBehavior.h"
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 
 //----------------------------------------------------------------------------
 //forward ref
@@ -106,15 +106,15 @@ public:
 
   /**
     Get the translation constraint. To set the constraint retrieve the constrain object and set it.*/
-  albaInteractorConstraint *GetTranslationConstraint() {return m_TranslationConstraint;}
+  albaTransformConstraint *GetTranslationConstraint() {return m_TranslationConstraint;}
 
   /**
     Get the rotation constraint. To set the constraint retrieve the constrain object and set it.*/
-  albaInteractorConstraint *GetRotationConstraint() {return m_RotationConstraint;}
+  albaTransformConstraint *GetRotationConstraint() {return m_RotationConstraint;}
 
   /**
     Get the scale constraint. To set the constraint retrieve the constrain object and set it.*/
-  albaInteractorConstraint *GetScaleConstraint() {return m_ScaleConstraint;}
+  albaTransformConstraint *GetScaleConstraint() {return m_ScaleConstraint;}
              
    //----------------------------------------------------------------------------
 
@@ -154,15 +154,15 @@ public:
   
   /** The left and middle buttons start the transform if PrepareTransform accepts them;
     the PER sets the picked position first. Return false without a renderer. */
-  virtual bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
-  virtual bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The drags change the transform */
-  virtual bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** The release of the button that started the transform ends it */
-  virtual bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
-  virtual bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]);
+  virtual bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
+  virtual bool OnMiddleButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   //----------------------------------------------------------------------------
   // Actions performed on mouse driven events
@@ -230,13 +230,13 @@ protected:
   virtual bool PrepareTransform(int button);
 
   /** Start the transform of the button, if PrepareTransform accepts it */
-  bool StartTransform(int button, albaView *view, vtkRenderer *ren, double pos[2]);
+  bool StartTransform(int button, albaRWIBase *rwi, vtkRenderer *ren, double pos[2]);
 
   /** End the transform, if started by the button */
   bool StopTransform(int button);
 
   int m_TransformButton;  ///< the button that started the transform, -1 if none
-  albaInteractorConstraint *m_CurrentRotationConstraint; ///< the rotation constraint of the current transform, chosen by PrepareTransform
+  albaTransformConstraint *m_CurrentRotationConstraint; ///< the rotation constraint of the current transform, chosen by PrepareTransform
   int m_LastDragPos[2];   ///< the last position of the drags, the drags without a change of position are discarded
 
   /** Perform translation */
@@ -283,9 +283,9 @@ protected:
   // the array index corresponding to the helper point position 
   int m_HelpPIndex;
 
-  albaInteractorConstraint  *m_TranslationConstraint; ///< the constrain for translation
-  albaInteractorConstraint  *m_RotationConstraint;    ///< the constrain for rotation
-  albaInteractorConstraint  *m_ScaleConstraint;       ///< the constrain for scaling
+  albaTransformConstraint  *m_TranslationConstraint; ///< the constrain for translation
+  albaTransformConstraint  *m_RotationConstraint;    ///< the constrain for rotation
+  albaTransformConstraint  *m_ScaleConstraint;       ///< the constrain for scaling
   
   albaRefSys      *m_TargetRefSys; ///< the target ref_sys matrix
   albaRefSys      *m_PivotRefSys; ///< the pivot point (only position is considered)
