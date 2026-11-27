@@ -173,8 +173,8 @@ public:
 	void ShowText(bool show);
 	void ShowText(int measure, bool show);
 
-	/** Set Renderer by View needed*/
-	void SetRendererByView(albaView * view);
+	/** Set the renderer and the view of the measures: the measures of the old renderer are removed */
+	virtual void SetRendererAndView(vtkRenderer *ren, albaView *view) override;
 
 	/* Call Rendering and Camera Update */
 	void Render();
@@ -269,10 +269,8 @@ protected:
 	int PointUpDownLine(double *point, double *lp1, double *lp2);
 	void GetParallelLine(double(&point1)[3], double(&point2)[3], double *linePoint1, double *linePoint2, double distance);
 
-	vtkRenderer					*m_Renderer;
 	vtkRenderer					*m_CurrentRenderer;
 	std::vector<vtkRenderer *> m_AllRenderersVector;
-	albaView									*m_View;
 	vtkCoordinate							*m_Coordinate;
 
 	albaRWIBase *m_CurrentRwi;

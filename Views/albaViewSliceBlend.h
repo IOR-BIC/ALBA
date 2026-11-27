@@ -45,6 +45,9 @@ public:
 
 	albaTypeMacro(albaViewSliceBlend, albaViewVTK);
 
+	/** The view shows a slice */
+	virtual bool IsSliceView() { return true; }
+
 	/*virtual*/ albaView* Copy(albaObserver *Listener, bool lightCopyEnabled = false);
 	virtual void OnEvent(albaEventBase *alba_event);
 

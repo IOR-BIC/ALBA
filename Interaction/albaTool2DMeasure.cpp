@@ -48,10 +48,8 @@ albaTool2DMeasure::albaTool2DMeasure()
 	m_Coordinate = vtkCoordinate::New();
 	m_Coordinate->SetCoordinateSystemToWorld();
 
-	m_Renderer = NULL;
 	m_CurrentRenderer = NULL;
 	m_AllRenderersVector.clear();
-	m_View = NULL;
 	m_CurrentRwi = NULL;
 	m_CurrPlane = 0; // XY;
 
@@ -529,53 +527,16 @@ void albaTool2DMeasure::SetColor(vtkActor2D *actor, Color *color)
 }
 
 //----------------------------------------------------------------------------
-void albaTool2DMeasure::SetRendererByView(albaView * view)
+void albaTool2DMeasure::SetRendererAndView(vtkRenderer *ren, albaView *view)
 {
-	m_View = view;
+	if (m_Renderer && m_Renderer != ren)
+		RemoveAllMeasures();
 
-	vtkRenderer *newRenderer = NULL;
+	Superclass::SetRendererAndView(ren, view);
+	m_CurrentRenderer = ren;
 
-	vtkRendererCollection *rc;
-	rc = view->GetRWI()->GetRenderWindow()->GetRenderers();
-		
-	if (rc) // Searching for a frontal renderer on render collection
-	{
-		rc->InitTraversal();
-		vtkRenderer *ren;
-		while (ren = rc->GetNextItem())
-			if (ren->GetLayer() == 1)//Frontal Render
-			{
-				newRenderer = ren;
-				break;
-			}
-	}
-
-	//if the renderer is changed we move all actor to new renderer 
-	if (m_Renderer != newRenderer)
-	{
-		// Removing from old renderer
-		if (m_Renderer)
-		{
-			RemoveAllMeasures();
-		}
-		// Adding to new renderer
-		if (newRenderer)
-		{
-			// 			double p1[3];
-			// 			double p2[3];
-			// 
-			// 			for (int i = 0; i < m_LineSourceVector.size(); i++)
-			// 			{
-			// 				m_LineSourceVector[i]->GetPoint1(p1);
-			// 				m_LineSourceVector[i]->GetPoint2(p2);
-			// 				AddMeasure(p1, p2);
-			// 			}
-		}
-	}
-
-	m_Renderer = newRenderer;
-	m_CurrentRenderer = newRenderer;
-	m_Renderer->GetRenderWindow()->Render();
+	if (m_Renderer)
+		m_Renderer->GetRenderWindow()->Render();
 }
 
 //----------------------------------------------------------------------------

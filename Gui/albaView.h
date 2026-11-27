@@ -33,6 +33,7 @@ class albaGUIHolder;
 class albaInteractionBehavior;
 
 class albaRWIBase;
+class vtkRenderer;
 class vtkCellPicker;
 class vtkAssemblyPath;
 
@@ -91,12 +92,16 @@ public:
 	virtual void      VmeUpdateProperty(albaVME *vme, bool fromTag = false)		{};
 	virtual bool			IsVmeShowed(albaVME *vme) { return GetNodePipe(vme) != NULL; };
 
+	/** Return true if the view shows a slice with a parallel camera; the slice views override it */
+	virtual bool IsSliceView() { return false; }
+
   virtual void	    VmeCreatePipe(albaVME *vme)										    {};
   virtual void	    VmeDeletePipe(albaVME *vme)										    {};
 
   virtual void			CameraReset(albaVME *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
   virtual albaRWIBase *GetRWI()                                              {return NULL;};
+  virtual vtkRenderer *GetFrontRenderer()                                    {return NULL;};
   virtual albaSceneGraph *GetSceneGraph()                                    {return NULL;};
   virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};
 

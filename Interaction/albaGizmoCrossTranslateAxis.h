@@ -42,7 +42,7 @@ class vtkAppendPolyData;
   
   @sa albaGizmoCrossTranslate 
 */
-class albaGizmoCrossTranslateAxis: public albaGizmoInterface 
+class ALBA_EXPORT albaGizmoCrossTranslateAxis : public albaGizmoInterface 
 {
 public:
            albaGizmoCrossTranslateAxis(albaVME *input, albaObserver *listener = NULL);

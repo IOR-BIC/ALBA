@@ -49,7 +49,7 @@ class albaMatrix;
 
 */
 
-class albaGizmoCrossTranslate : public albaGizmoInterface 
+class ALBA_EXPORT albaGizmoCrossTranslate : public albaGizmoInterface 
 {
 public:
 

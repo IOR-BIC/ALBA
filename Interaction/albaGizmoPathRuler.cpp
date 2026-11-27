@@ -65,23 +65,7 @@ albaGizmoPathRuler::~albaGizmoPathRuler()
 void albaGizmoPathRuler::OnEvent(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
-  void *sender = alba_event->GetSender();
-  
-  // waiting for mouse interaction and gizmo gui...
-  //if (...)
-  //{
-  //  OnEventGizmoComponents(alba_event); // process events from gizmo components
-  //}
-  //else if (sender == GuiGizmoTranslate)
-  //{
-  //  OnEventGizmoGui(alba_event); // process events from the gui
-  //}
-  //else
-  //{
-  //  albaEventMacro(*alba_event);
-  //}
-  
-  // for the moment just forward up...
+  // for the moment just forward up
   albaEventMacro(*alba_event);
 }
 //----------------------------------------------------------------------------  

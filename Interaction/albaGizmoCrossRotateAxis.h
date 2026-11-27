@@ -15,16 +15,6 @@
 =========================================================================*/
 
 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-
 #ifndef __albaGizmoCrossRotateAxis_H__
 #define __albaGizmoCrossRotateAxis_H__
 
@@ -59,7 +49,7 @@ class vtkAppendPolyData;
 /** 
 	Basic gizmo component used to perform constrained rotation around an axis.
 */
-class albaGizmoCrossRotateAxis: public albaGizmoInterface
+class ALBA_EXPORT albaGizmoCrossRotateAxis : public albaGizmoInterface
 {
 public:
            albaGizmoCrossRotateAxis(albaVME *input, albaObserver *listener = NULL);

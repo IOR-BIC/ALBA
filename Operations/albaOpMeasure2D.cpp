@@ -110,7 +110,7 @@ void albaOpMeasure2D::OpRun()
 		if (view)
 		{
  			for (int i = 0; i < m_ToolVector.size(); i++)
- 				m_ToolVector[i]->SetRendererByView(view);
+ 				m_ToolVector[i]->SetRendererAndView(view->GetFrontRenderer(), view);
 
 			//Load();
 		}

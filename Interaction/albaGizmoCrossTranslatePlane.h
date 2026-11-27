@@ -57,7 +57,7 @@ class vtkTubeFilter;
   
   @sa albaGizmoTranslate 
 */
-class albaGizmoCrossTranslatePlane: public albaGizmoInterface 
+class ALBA_EXPORT albaGizmoCrossTranslatePlane : public albaGizmoInterface 
 {
 public:
            albaGizmoCrossTranslatePlane(albaVME *input, albaObserver *listener = NULL);

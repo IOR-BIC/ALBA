@@ -113,7 +113,7 @@ void albaOpCreatePolyline::OpRun()
 		albaNEW(m_PointTool);
 		m_PointTool->SetListener(this);
 		m_PointTool->Enable(false);
-		m_PointTool->SetRendererByView(view);
+		m_PointTool->SetRendererAndView(view->GetFrontRenderer(), view);
 		m_PointTool->SetColorText(1, 0, 0);
 		m_PointTool->ShowText(false);
 
