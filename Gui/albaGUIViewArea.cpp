@@ -446,6 +446,9 @@ albaGUIViewPage *albaGUIViewArea::GetActivePage()
 //----------------------------------------------------------------------------
 void albaGUIViewArea::AddView(albaGUIViewPage *page)
 {
+	// The tab bar of a maximized or single view is removed before adding the page: wx draws the notebook while adding it
+	if (m_Maximized || GetPages().empty())
+		m_Active->SetTabCtrlHeight(0);
 	page->Reparent(m_Active);
 	m_Active->AddPage(page, page->GetView() ? wxStripMenuCodes(page->GetView()->GetLabel()) : wxString(), true);
 	DoLayout();
@@ -459,7 +462,21 @@ void albaGUIViewArea::RemoveView(albaGUIViewPage *page)
 		m_SelectedPage = NULL;
 	wxAuiNotebook *nb = FindNotebook(page);
 	if (nb)
+	{
+		// As in AddView: when a single view remains in this area, its tab bar is removed before wx draws the notebook
+		if (GetPages().size() == 2 && nb->GetPageCount() == 2)
+			nb->SetTabCtrlHeight(0);
 		nb->RemovePage(nb->GetPageIndex(page));
+		// An area left empty is removed later: meanwhile the active area is one that has views
+		if (nb->GetPageCount() == 0 && nb == m_Active)
+			for (wxAuiNotebook *other : GetNotebooks())
+				if (other->GetPageCount() > 0)
+				{
+					SetActive(other);
+					break;
+				}
+		DoLayout();
+	}
 	ActivePageChanged();
 	// The page is the one being closed: destroy it later, out of its own event handler; as a child of the view area it
 	// does not depend on the notebook, which may be destroyed before
