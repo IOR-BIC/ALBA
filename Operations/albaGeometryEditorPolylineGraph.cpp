@@ -90,7 +90,7 @@ albaGeometryEditorPolylineGraph::albaGeometryEditorPolylineGraph(albaVME *input,
 	if(!m_TestMode)
 	{
 		CreateGui();
-		CreateISA();
+		CreateBehavior();
 	}
 
 	CreatePipe();
@@ -403,7 +403,7 @@ int albaGeometryEditorPolylineGraph::UpdateVMEEditorData(vtkPolyData *polydata)
 	return result;
 }
 //-------------------------------------------------------------------------
-void albaGeometryEditorPolylineGraph::CreateISA()
+void albaGeometryEditorPolylineGraph::CreateBehavior()
 //-------------------------------------------------------------------------
 {
 	m_OldBehavior = m_InputVME->GetBehavior();

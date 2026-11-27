@@ -197,15 +197,15 @@ protected:
   /** Create vtk objects needed*/
   void CreateTranslationGizmoPipeline();
 
-  /** Create isa stuff */
-  void CreateISA();
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
   /** Create translation feedback arrows stuff */
   void CreateFeedbackGizmoPipeline();
   
 
-  /** isa generic*/
-  albaBehaviorTransform *m_IsaGen;
+  /** the behavior moving the gizmo */
+  albaBehaviorTransform *m_Behavior;
 
   /**
   Register the event receiver object*/

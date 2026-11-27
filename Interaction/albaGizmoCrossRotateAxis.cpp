@@ -30,7 +30,7 @@
 
 #include "albaDecl.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 #include "albaRefSys.h"
 
@@ -95,7 +95,7 @@ albaGizmoCrossRotateAxis::albaGizmoCrossRotateAxis(albaVME *input, albaObserver 
 
 	// default axis is X
 	m_RotationAxis = X;
-	m_IsaGen = NULL;
+	m_Behavior = NULL;
 	m_Radius = -1;
 
 	m_Listener = listener;
@@ -105,8 +105,8 @@ albaGizmoCrossRotateAxis::albaGizmoCrossRotateAxis(albaVME *input, albaObserver 
 	// create pipeline stuff
 	CreatePipeline();
 
-	// create isa stuff
-	CreateISA();
+	// create the behavior
+	CreateBehavior();
 
 	//-----------------
 	// create vme gizmo stuff
@@ -124,8 +124,8 @@ albaGizmoCrossRotateAxis::albaGizmoCrossRotateAxis(albaVME *input, albaObserver 
 
 	// m_GizmoCross->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 1));
 
-	// assign isa to S1 and S2;
-	m_GizmoCross->SetBehavior(m_IsaGen);
+	// assign the behavior to S1 and S2;
+	m_GizmoCross->SetBehavior(m_Behavior);
 
 	// set the axis to X axis
 	this->SetRotationAxis(m_RotationAxis);
@@ -159,8 +159,8 @@ albaGizmoCrossRotateAxis::~albaGizmoCrossRotateAxis()
 	// No leaks so somebody is performing this...
 	//----------------------
 	// the PER can keep the behavior alive: it must not notify the deleted gizmo
-	m_IsaGen->SetListener(NULL);
-	vtkDEL(m_IsaGen); 
+	m_Behavior->SetListener(NULL);
+	vtkDEL(m_Behavior); 
 
 	m_GizmoCross->ReparentTo(NULL);
 
@@ -263,22 +263,22 @@ void albaGizmoCrossRotateAxis::CreatePipeline()
 
 }
 //----------------------------------------------------------------------------
-void albaGizmoCrossRotateAxis::CreateISA()
+void albaGizmoCrossRotateAxis::CreateBehavior()
 //----------------------------------------------------------------------------
 {
 	// create the transform behavior of the gizmo
-	// Default isa constrain rotation around X axis.
+	// Default behavior constrain rotation around X axis.
 	// default behavior is activated by mouse left and is constrained to X axis,
 	// default ref sys is input vme abs matrix
-	albaNEW(m_IsaGen);
-	m_IsaGen->SetVME(m_InputVme);
-	m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK); 
-	m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
-	m_IsaGen->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
-	m_IsaGen->EnableRotation(true);
+	albaNEW(m_Behavior);
+	m_Behavior->SetVME(m_InputVme);
+	m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK); 
+	m_Behavior->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
+	m_Behavior->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
+	m_Behavior->EnableRotation(true);
 
-	//isa will send events to this
-	m_IsaGen->SetListener(this);
+	// the behavior will send events to this
+	m_Behavior->SetListener(this);
 }
 //----------------------------------------------------------------------------
 void albaGizmoCrossRotateAxis::SetRotationAxis(int axis) 
@@ -298,7 +298,7 @@ void albaGizmoCrossRotateAxis::SetRotationAxis(int axis)
 		m_LinesRotationTransform->RotateY(90);
 
 		// change the axis constrain  
-		m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
+		m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
 	}
 	else if (m_RotationAxis == Y)
 	{
@@ -307,7 +307,7 @@ void albaGizmoCrossRotateAxis::SetRotationAxis(int axis)
 		m_LinesRotationTransform->RotateX(90);
 
 		// change the Gizmo constrain
-		m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+		m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 	}
 	else if (m_RotationAxis == Z)
 	{
@@ -315,7 +315,7 @@ void albaGizmoCrossRotateAxis::SetRotationAxis(int axis)
 		m_LinesRotationTransform->Identity();
 
 		// change the Gizmo constrain
-		m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+		m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
 	}    
 }
 //----------------------------------------------------------------------------
@@ -403,8 +403,8 @@ void albaGizmoCrossRotateAxis::SetAbsPose(albaMatrix *absPose)
 void albaGizmoCrossRotateAxis::SetRefSysMatrix(albaMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-	m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-	m_IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix);
+	m_Behavior->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+	m_Behavior->GetPivotRefSys()->SetTypeToCustom(matrix);
 }
 //----------------------------------------------------------------------------
 albaMatrix *albaGizmoCrossRotateAxis::GetAbsPose()
@@ -423,7 +423,7 @@ void albaGizmoCrossRotateAxis::SetInput(albaVME *vme)
 albaBehaviorTransform *albaGizmoCrossRotateAxis::GetInteractor()
 //----------------------------------------------------------------------------
 {
-	return m_IsaGen;
+	return m_Behavior;
 }
 
 int albaGizmoCrossRotateAxis::GetAxis()

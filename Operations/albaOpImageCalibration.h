@@ -60,7 +60,7 @@ protected:
 	void OpStop(int result);
 	void CreateGui();
 	void UpdateGui();
-	void SetActiveInteractor();
+	void SetActiveTool();
 
 	void OpDo();
 	void OpUndo();
@@ -76,9 +76,9 @@ protected:
 	double m_InputSpacing[3];
 	double m_NewSpacing[3];
 
-	albaTool2DMeasureDistance *m_DistanceInteractor;
-	albaTool2DMeasureCenterPoint *m_CenterPointInteractor;
-	albaTool2DMeasure *m_ActiveInteractor;
+	albaTool2DMeasureDistance *m_DistanceTool;
+	albaTool2DMeasureCenterPoint *m_CenterPointTool;
+	albaTool2DMeasure *m_ActiveTool;
 };
 
 #endif

@@ -64,7 +64,7 @@ protected:
 
 	void CreatePolyline();
 
-	albaTool2DMeasurePoint* m_PointInteractor;
+	albaTool2DMeasurePoint* m_PointTool;
 	albaVMEPolyline *m_Polyline;
 
 	albaString m_PolylineName;

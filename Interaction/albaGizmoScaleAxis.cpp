@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaRefSys.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -51,7 +51,7 @@
 albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
 //----------------------------------------------------------------------------
 {
-  m_IsaGen[0] = m_IsaGen[1] = NULL;
+  m_Behavior[0] = m_Behavior[1] = NULL;
 
   m_Listener = listener;
   m_InputVme = input;
@@ -62,8 +62,8 @@ albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
   // create pipeline stuff
   CreatePipeline();
 
-  // create isa stuff
-  CreateISA();
+  // create the behaviors
+  CreateBehaviors();
 
   //-----------------
   // create vme gizmos stuff
@@ -81,9 +81,9 @@ albaGizmoScaleAxis::albaGizmoScaleAxis(albaVME *input, albaObserver *listener)
   m_CubeGizmo->SetDataConnection(m_RotatePDF[CUBE]->GetOutputPort());
   m_CubeGizmo->SetMediator(m_Listener);
 
-  // assign isa to cylinder and cube
-  m_CylGizmo->SetBehavior(m_IsaGen[0]);
-  m_CubeGizmo->SetBehavior(m_IsaGen[1]);
+  // assign the behavior to cylinder and cube
+  m_CylGizmo->SetBehavior(m_Behavior[0]);
+  m_CubeGizmo->SetBehavior(m_Behavior[1]);
 
   m_InputVme->Update();
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
@@ -119,8 +119,8 @@ albaGizmoScaleAxis::~albaGizmoScaleAxis()
 	// wxDEL(GizmoData[i]);
 	//----------------------
     // the PER can keep the behavior alive: it must not notify the deleted gizmo
-    m_IsaGen[i]->SetListener(NULL);
-    vtkDEL(m_IsaGen[i]); 
+    m_Behavior[i]->SetListener(NULL);
+    vtkDEL(m_Behavior[i]); 
   }
 	m_CylGizmo->ReparentTo(NULL);
 	m_CubeGizmo->ReparentTo(NULL);
@@ -243,7 +243,7 @@ void albaGizmoScaleAxis::CreatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoScaleAxis::CreateISA()
+void albaGizmoScaleAxis::CreateBehaviors()
 //----------------------------------------------------------------------------
 {
   // create the transform behavior of the gizmo
@@ -251,14 +251,14 @@ void albaGizmoScaleAxis::CreateISA()
   {
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    albaNEW(m_IsaGen[i]);
+    albaNEW(m_Behavior[i]);
 
-    m_IsaGen[i]->SetVME(m_InputVme);
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
-  	m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
+    m_Behavior[i]->SetVME(m_InputVme);
+    m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
+  	m_Behavior[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
       
-    //isa will send events to this
-    m_IsaGen[i]->SetListener(this);
+    // the behavior will send events to this
+    m_Behavior[i]->SetListener(this);
   }
 }
 
@@ -284,7 +284,7 @@ void albaGizmoScaleAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
+      m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
     }
   }
   else if (axis == Y)
@@ -299,7 +299,7 @@ void albaGizmoScaleAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+      m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
     }
   }  
   else if (axis == Z)
@@ -314,7 +314,7 @@ void albaGizmoScaleAxis::SetAxis(int axis)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+      m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
     }
   }  
 }
@@ -499,8 +499,8 @@ void albaGizmoScaleAxis::SetRefSysMatrix(albaMatrix *matrix)
 {  
   for (int i = 0; i < 2; i++)
   {
-    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-    m_IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
+    m_Behavior[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+    m_Behavior[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
   } 
 }
 

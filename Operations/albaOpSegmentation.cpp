@@ -339,7 +339,7 @@ void albaOpSegmentation::Init()
 {
 	InitMouseCursors();
 	InitSegmentationVolume();
-	InitializeInteractors();
+	InitializeTools();
 	UpdateWindowing();
 	UpdateSliderValidator();
 	InitRanges();
@@ -408,7 +408,7 @@ void albaOpSegmentation::InitSegmentationVolume()
 	m_View->VmeAdd(m_SegmentationVolume);
 }
 //----------------------------------------------------------------------------
-void albaOpSegmentation::InitializeInteractors()
+void albaOpSegmentation::InitializeTools()
 {
 	assert(m_View);
 	m_View->SetCanSpin(false);
@@ -571,7 +571,7 @@ void albaOpSegmentation::CreateOpDialog()
 	m_View->GetFrontRenderer()->AddActor(m_AutomaticSliceTextActor);
 	//////////////////////////////////////////////////////////////////////////
 
-	//InitializeInteractors();
+	//InitializeTools();
 
 	// Display window      
 	m_View->m_Rwi->SetSize(0, 0, viewSize[0], viewSize[1]);

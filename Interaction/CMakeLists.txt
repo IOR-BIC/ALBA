@@ -52,7 +52,7 @@ SET(PROJECT_SRCS
   albaBehaviorRotateTranslate.cpp  					albaBehaviorRotateTranslate.h
   albaBehaviorProsthesis.cpp  					albaBehaviorProsthesis.h
   albaBehaviorCutPlane.cpp  					albaBehaviorCutPlane.h
-  albaInteractorConstraint.cpp  				albaInteractorConstraint.h
+  albaTransformConstraint.cpp  				albaTransformConstraint.h
   albaBehaviorTransform.cpp  			albaBehaviorTransform.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
   albaBehaviorPicker.cpp  					albaBehaviorPicker.h

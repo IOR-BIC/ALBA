@@ -61,7 +61,7 @@ albaGizmoCrossTranslate::albaGizmoCrossTranslate(albaVME* input, albaObserver *l
 
   m_Normal = normal;
 
-  m_ConstraintModality = albaInteractorConstraint::FREE;
+  m_ConstraintModality = albaTransformConstraint::FREE;
 
   m_Step = 1;
 

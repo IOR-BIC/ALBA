@@ -85,7 +85,7 @@ albaGizmoCrossTranslateAxis::albaGizmoCrossTranslateAxis(albaVME *input, albaObs
 
 	m_CylinderLength = 0.5;
 
-	m_IsaGen = NULL;
+	m_Behavior = NULL;
 
 	m_Listener = listener;
 	m_InputVme = input;
@@ -97,7 +97,7 @@ albaGizmoCrossTranslateAxis::albaGizmoCrossTranslateAxis(albaVME *input, albaObs
 	CreateTranslationGizmoPipeline();
 
 	// create interactor stuff
-	CreateISA();
+	CreateBehavior();
 
 	//-----------------
 	// create vme gizmos stuff
@@ -110,8 +110,8 @@ albaGizmoCrossTranslateAxis::albaGizmoCrossTranslateAxis(albaVME *input, albaObs
 	m_TranslationCylinderGizmo->SetMediator(m_Listener);
 	// cone gizmo
 
-	// assign isa to cylinder and cone
-	m_TranslationCylinderGizmo->SetBehavior(m_IsaGen);
+	// assign the behavior to cylinder and cone
+	m_TranslationCylinderGizmo->SetBehavior(m_Behavior);
 
 	// default gizmo abs pose is the input vme one
 	SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
@@ -146,8 +146,8 @@ albaGizmoCrossTranslateAxis::~albaGizmoCrossTranslateAxis()
 	// wxDEL(GizmoData);
 	//----------------------
 	// the PER can keep the behavior alive: it must not notify the deleted gizmo
-	m_IsaGen->SetListener(NULL);
-	vtkDEL(m_IsaGen); 
+	m_Behavior->SetListener(NULL);
+	vtkDEL(m_Behavior); 
 
 	// clean up translation feedback stuff
 	vtkDEL(m_TranslationFeedbackGizmo);
@@ -278,16 +278,16 @@ void albaGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 	rightCylinderInitialTrPDF->Delete();
 }
 //----------------------------------------------------------------------------
-void albaGizmoCrossTranslateAxis::CreateISA()
+void albaGizmoCrossTranslateAxis::CreateBehavior()
 //----------------------------------------------------------------------------
 {
-	albaNEW(m_IsaGen);
+	albaNEW(m_Behavior);
 
-	m_IsaGen->SetVME(m_InputVme);
-	m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
-	m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
+	m_Behavior->SetVME(m_InputVme);
+	m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
+	m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
 
-	m_IsaGen->SetListener(this);
+	m_Behavior->SetListener(this);
 }
 //----------------------------------------------------------------------------
 void albaGizmoCrossTranslateAxis::SetAxis(int axis) 
@@ -305,7 +305,7 @@ void albaGizmoCrossTranslateAxis::SetAxis(int axis)
 		m_RightCylinderRotationTr->Identity();
 
 		// change the axis constrain
-		m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+		m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 	}
 	else if (axis == Y)
 	{
@@ -325,7 +325,7 @@ void albaGizmoCrossTranslateAxis::SetAxis(int axis)
 		m_RightUpFeedbackConeTransform->RotateZ(90);
 
 		// change the axis constrain
-		m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
+		m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
 	}  
 	else if (axis == Z)
 	{
@@ -337,7 +337,7 @@ void albaGizmoCrossTranslateAxis::SetAxis(int axis)
 		m_LeftCylinderRotationTr->RotateY(-90);
 
 		// change the axis constrain
-		m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+		m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
 	}  
 }
 //----------------------------------------------------------------------------
@@ -432,8 +432,8 @@ void albaGizmoCrossTranslateAxis::SetAbsPose(albaMatrix *absPose)
 void albaGizmoCrossTranslateAxis::SetRefSysMatrix(albaMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-	m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-	m_IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix);
+	m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+	m_Behavior->GetPivotRefSys()->SetTypeToCustom(matrix);
 }
 //----------------------------------------------------------------------------
 albaMatrix *albaGizmoCrossTranslateAxis::GetAbsPose()
@@ -453,13 +453,13 @@ void albaGizmoCrossTranslateAxis::SetInput(albaVME *vme)
 void albaGizmoCrossTranslateAxis::SetConstraintModality(int axis, int constrainModality)
 //----------------------------------------------------------------------------
 {
-	m_IsaGen->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality); 
+	m_Behavior->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality); 
 }
 //----------------------------------------------------------------------------
 void albaGizmoCrossTranslateAxis::SetStep(int axis, double step)
 //----------------------------------------------------------------------------
 {
-	m_IsaGen->GetTranslationConstraint()->SetStep(axis,step);
+	m_Behavior->GetTranslationConstraint()->SetStep(axis,step);
 }
 
 //----------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaBehaviorProsthesis.h"
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 #include "albaRefSys.h"
 #include "albaViewCompound.h"
 #include "albaDecl.h"
@@ -64,9 +64,9 @@ bool albaBehaviorProsthesis::PrepareTransform(int button)
   {
     GetRotationConstraint()->GetRefSys()->SetTypeToView();
     if (IsSliceView(m_View))
-      GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+      GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
     else
-      GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+      GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   }
 
   return Superclass::PrepareTransform(button);

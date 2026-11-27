@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaRefSys.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -52,7 +52,7 @@
 albaGizmoScaleIsotropic::albaGizmoScaleIsotropic(albaVME *input, albaObserver *listener)
 //----------------------------------------------------------------------------
 {
-  m_IsaGen = NULL;
+  m_Behavior = NULL;
 
   m_Listener = listener;
   m_InputVme = input;
@@ -60,8 +60,8 @@ albaGizmoScaleIsotropic::albaGizmoScaleIsotropic(albaVME *input, albaObserver *l
   // create pipeline stuff
   CreatePipeline();
 
-  // create isa stuff
-  CreateISA();
+  // create the behavior
+  CreateBehavior();
 
   //-----------------
   // create vme gizmo stuff
@@ -73,8 +73,8 @@ albaGizmoScaleIsotropic::albaGizmoScaleIsotropic(albaVME *input, albaObserver *l
   m_CubeGizmo->SetDataConnection(m_Cube->GetOutputPort());
   m_CubeGizmo->SetMediator(m_Listener);
 
-  // assign isa to cube
-  m_CubeGizmo->SetBehavior(m_IsaGen); 
+  // assign the behavior to cube
+  m_CubeGizmo->SetBehavior(m_Behavior); 
 
 
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
@@ -92,8 +92,8 @@ albaGizmoScaleIsotropic::~albaGizmoScaleIsotropic()
   m_CubeGizmo->SetBehavior(NULL);
   vtkDEL(m_Cube);
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  m_IsaGen->SetListener(NULL);
-  vtkDEL(m_IsaGen); 
+  m_Behavior->SetListener(NULL);
+  vtkDEL(m_Behavior); 
 
 	m_CubeGizmo->ReparentTo(NULL);
 }
@@ -127,21 +127,21 @@ void albaGizmoScaleIsotropic::CreatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoScaleIsotropic::CreateISA()
+void albaGizmoScaleIsotropic::CreateBehavior()
 //----------------------------------------------------------------------------
 {
   
   // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  albaNEW(m_IsaGen);
+  albaNEW(m_Behavior);
 
-  m_IsaGen->SetVME(m_InputVme);
-  m_IsaGen->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
-  m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_Behavior->SetVME(m_InputVme);
+  m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
     
-  //isa will send events to this
-  m_IsaGen->SetListener(this);
+  // the behavior will send events to this
+  m_Behavior->SetListener(this);
 }
 
 //----------------------------------------------------------------------------
@@ -224,8 +224,8 @@ void albaGizmoScaleIsotropic::SetAbsPose(albaMatrix *absPose)
 void albaGizmoScaleIsotropic::SetRefSysMatrix(albaMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-  m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetMatrix(matrix);
-  m_IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix); 
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetMatrix(matrix);
+  m_Behavior->GetPivotRefSys()->SetTypeToCustom(matrix); 
 }
 
 //----------------------------------------------------------------------------

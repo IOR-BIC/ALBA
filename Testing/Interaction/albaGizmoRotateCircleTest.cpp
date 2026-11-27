@@ -105,17 +105,17 @@ void albaGizmoRotateCircleTest::CreateTestData()
 void albaGizmoRotateCircleTest::TestConstructor()
 {
   albaGizmoRotateCircle *gizmoRotateCircle = new albaGizmoRotateCircle(m_GizmoInputSurface);
-  gizmoRotateCircle->SetAxis(albaInteractorConstraint::X);
+  gizmoRotateCircle->SetAxis(albaTransformConstraint::X);
   
   gizmoRotateCircle->SetRadius(3);
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoRotateCircle);
 
-  gizmoRotateCircle->SetAxis(albaInteractorConstraint::Y);
+  gizmoRotateCircle->SetAxis(albaTransformConstraint::Y);
   RenderGizmo(gizmoRotateCircle);
 
-  gizmoRotateCircle->SetAxis(albaInteractorConstraint::Z);
+  gizmoRotateCircle->SetAxis(albaTransformConstraint::Z);
   RenderGizmo(gizmoRotateCircle);
   
   cppDEL(gizmoRotateCircle);
@@ -162,7 +162,7 @@ void albaGizmoRotateCircleTest::TestSetRefSysMatrix()
   gizmoRotateCircle->SetRefSysMatrix(&refSys);
   
   // using friend albaGizmoRotateCircle
-  albaMatrix *mat = gizmoRotateCircle->m_IsaGen->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  albaMatrix *mat = gizmoRotateCircle->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
   CPPUNIT_ASSERT(mat->Equals(&refSys));
 
   cppDEL(gizmoRotateCircle);

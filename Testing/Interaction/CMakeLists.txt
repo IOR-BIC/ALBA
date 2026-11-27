@@ -28,7 +28,7 @@ SET(PROJECT_SRCS
 	albaGizmoSliceTest.h albaGizmoSliceTest.cpp
 	albaGizmoInteractionDebuggerTest.h albaGizmoInteractionDebuggerTest.cpp
 	albaGizmoInterfaceTest.h albaGizmoInterfaceTest.cpp
-	albaInteractorConstraintTest.h albaInteractorConstraintTest.cpp
+	albaTransformConstraintTest.h albaTransformConstraintTest.cpp
 	albaRefSysTest.h albaRefSysTest.cpp
 	albaGizmoTranslateGUITest.h albaGizmoTranslateGUITest.cpp
 	albaGizmoRotateGUITest.h albaGizmoRotateGUITest.cpp

@@ -116,7 +116,7 @@ public:
 
   /**
   Get the Interactor asscociated to each axis*/
-  albaBehaviorTransform *GetInteractor(int axis);
+  albaBehaviorTransform *GetBehavior(int axis);
 
   //----------------------------------------------------------------------------
   // RefSys

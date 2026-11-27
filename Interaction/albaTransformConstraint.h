@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaInteractorConstraint
+ Module: albaTransformConstraint
  Authors: Marco Petrone, Stefano Perticoni
  
  Copyright (c) BIC
@@ -13,8 +13,8 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __albaInteractorConstraint_h
-#define __albaInteractorConstraint_h
+#ifndef __albaTransformConstraint_h
+#define __albaTransformConstraint_h
 
 #include "vtkALBASmartPointer.h"
 #include "vtkDoubleArray.h"
@@ -43,17 +43,17 @@ class albaRefSys;
   - complete PrintSelf function
 
 */
-class ALBA_EXPORT albaInteractorConstraint
+class ALBA_EXPORT albaTransformConstraint
 {
 public:
-  albaInteractorConstraint();
-  virtual ~albaInteractorConstraint();
+  albaTransformConstraint();
+  virtual ~albaTransformConstraint();
 
   /** Copy constructor to allow object copy */
-  albaInteractorConstraint(const albaInteractorConstraint& source);
+  albaTransformConstraint(const albaTransformConstraint& source);
 
   /** Copy the settings and the ref sys of another constraint */
-  albaInteractorConstraint &operator=(const albaInteractorConstraint& source);
+  albaTransformConstraint &operator=(const albaTransformConstraint& source);
 
   //----------------------------------------------------------------------------
   // Enums
@@ -209,7 +209,7 @@ public:
   /** Debug printing of internal data */
   void Print(std::ostream& os, const int tabs);
 
-  void DeepCopy(const albaInteractorConstraint *source) { *this=*source;}
+  void DeepCopy(const albaTransformConstraint *source) { *this=*source;}
 
 protected:
 

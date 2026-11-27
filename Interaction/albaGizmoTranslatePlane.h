@@ -178,12 +178,12 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** Create isa stuff */
-  void CreateISA();
+  /** Create the behaviors moving the gizmo */
+  void CreateBehaviors();
 
 
-  /** isa generic*/
-  albaBehaviorTransform *m_IsaGen[2];
+  /** the behavior moving the gizmo */
+  albaBehaviorTransform *m_Behavior[2];
 
   /** Used by albaBehaviorTransform */
   vtkTransform *m_PivotTransform;

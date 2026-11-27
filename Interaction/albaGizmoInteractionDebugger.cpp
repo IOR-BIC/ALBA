@@ -63,24 +63,24 @@ albaGizmoInteractionDebugger::albaGizmoInteractionDebugger(albaVME* imputVme, al
   Constructor(imputVme, listener, name, testMode);
 }
 
-void albaGizmoInteractionDebugger::CreateInteractor()
+void albaGizmoInteractionDebugger::CreateBehavior()
 {  
   m_RefSysVME = m_InputVME;
 
   albaMatrix *absMatrix;
   absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
 
-  albaNEW(m_LeftMouseInteractor);
+  albaNEW(m_Behavior);
 
-  m_LeftMouseInteractor->SetListener(this);
-  m_LeftMouseInteractor->SetVME(m_InputVME);
+  m_Behavior->SetListener(this);
+  m_Behavior->SetVME(m_InputVME);
 
-  m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 
-  m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-  m_LeftMouseInteractor->EnableTranslation(true);    
+  m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
+  m_Behavior->EnableTranslation(true);    
 
-  m_VmeGizmo->SetBehavior(m_LeftMouseInteractor);
+  m_VmeGizmo->SetBehavior(m_Behavior);
 }
 
 void albaGizmoInteractionDebugger::Constructor(albaVME *imputVme, albaObserver *listener, const char* name, bool testMode)
@@ -108,9 +108,9 @@ void albaGizmoInteractionDebugger::Destructor()
 
   m_VmeGizmo->SetBehavior(NULL);
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  if (m_LeftMouseInteractor)
-    m_LeftMouseInteractor->SetListener(NULL);
-  albaDEL(m_LeftMouseInteractor);
+  if (m_Behavior)
+    m_Behavior->SetListener(NULL);
+  albaDEL(m_Behavior);
 
   m_VmeGizmo->ReparentTo(NULL);
   albaDEL(m_VmeGizmo);
@@ -237,7 +237,7 @@ void albaGizmoInteractionDebugger::CreateVMEGizmo()
   m_VmeGizmo->SetDataConnection(m_AppendPolyData->GetOutputPort());  
   assert(m_VmeGizmo->GetData()->GetNumberOfPoints());
 
-  CreateInteractor();
+  CreateBehavior();
 }
 
 void albaGizmoInteractionDebugger::DestroyVMEGizmo()
@@ -246,9 +246,9 @@ void albaGizmoInteractionDebugger::DestroyVMEGizmo()
 
   m_VmeGizmo->SetBehavior(NULL);
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  if (m_LeftMouseInteractor)
-    m_LeftMouseInteractor->SetListener(NULL);
-  albaDEL(m_LeftMouseInteractor);
+  if (m_Behavior)
+    m_Behavior->SetListener(NULL);
+  albaDEL(m_Behavior);
 
   m_VmeGizmo->ReparentTo(NULL);
   albaDEL(m_VmeGizmo);

@@ -105,12 +105,12 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** Create isa stuff */
-  void CreateISA();
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
 
-  /** isa generic*/
-  albaBehaviorTransform *m_IsaGen;
+  /** the behavior moving the gizmo */
+  albaBehaviorTransform *m_Behavior;
 
   /** Gizmo color setting facilities*/
   void SetColor(double col[3]);

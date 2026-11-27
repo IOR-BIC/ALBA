@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaRefSys.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -53,7 +53,7 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
 {
   this->SetIsActive(false);
   
-  m_IsaGen[0]  = m_IsaGen[1] =  NULL;
+  m_Behavior[0]  = m_Behavior[1] =  NULL;
   m_Listener  = listener;
   m_InputVme    = input;
   m_Length = 1;
@@ -64,14 +64,14 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
   //-----------------
   // pivot stuff
   //-----------------
-  // pivotTransform is useless for this operation but required by isa generic
+  // pivotTransform is useless for this operation but required by albaBehaviorTransform
   m_PivotTransform = vtkTransform::New();
 
   // create pipeline stuff
   CreatePipeline();
 
-  // create isa stuff
-  CreateISA();
+  // create the behaviors
+  CreateBehaviors();
 
   //-----------------
   // create vme gizmos stuff
@@ -89,9 +89,9 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
 		m_Gizmo[i]->SetMediator(m_Listener);
   }
 
-  // assign isa to S1 and S2;
-  m_Gizmo[S1]->SetBehavior(m_IsaGen[S1]);
-  m_Gizmo[S2]->SetBehavior(m_IsaGen[S2]);
+  // assign the behavior to S1 and S2;
+  m_Gizmo[S1]->SetBehavior(m_Behavior[S1]);
+  m_Gizmo[S2]->SetBehavior(m_Behavior[S2]);
 
   albaMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
   SetAbsPose(absInputMatrix);
@@ -138,8 +138,8 @@ albaGizmoTranslatePlane::~albaGizmoTranslatePlane()
   {
     vtkDEL(m_LineTF[i]);
     // the PER can keep the behavior alive: it must not notify the deleted gizmo
-    m_IsaGen[i]->SetListener(NULL);
-    vtkDEL(m_IsaGen[i]); 
+    m_Behavior[i]->SetListener(NULL);
+    vtkDEL(m_Behavior[i]); 
   }
 
   m_PivotTransform->Delete();
@@ -233,21 +233,21 @@ void albaGizmoTranslatePlane::CreatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoTranslatePlane::CreateISA()
+void albaGizmoTranslatePlane::CreateBehaviors()
 //----------------------------------------------------------------------------
 {
   // create the transform behavior of the gizmo
-  // Default isa is constrained to plane XZ.
+  // Default behavior is constrained to plane XZ.
   for (int i = 0; i < SQ; i++)
   {
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    albaNEW(m_IsaGen[i]);
-    m_IsaGen[i]->SetVME(m_InputVme);
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);     
+    albaNEW(m_Behavior[i]);
+    m_Behavior[i]->SetVME(m_InputVme);
+    m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);     
     
-    //isa will send events to this
-    m_IsaGen[i]->SetListener(this);
+    // the behavior will send events to this
+    m_Behavior[i]->SetListener(this);
   }
 }
 
@@ -274,7 +274,7 @@ void albaGizmoTranslatePlane::SetPlane(int plane)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::FREE);
+      m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::FREE);
     }
   }
   else if (m_ActivePlane == XZ)
@@ -290,7 +290,7 @@ void albaGizmoTranslatePlane::SetPlane(int plane)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+      m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
     }
   }  
   else if (m_ActivePlane == XY)
@@ -306,7 +306,7 @@ void albaGizmoTranslatePlane::SetPlane(int plane)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+      m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
     }
   }  
 }
@@ -454,7 +454,7 @@ void albaGizmoTranslatePlane::SetConstrainRefSys(albaMatrix *constrain)
 {  
   for (int i = 0; i < SQ; i++)
   {
-    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
+    m_Behavior[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
   }
 }
 //----------------------------------------------------------------------------
@@ -477,7 +477,7 @@ void albaGizmoTranslatePlane::SetConstraintModality(int axis, int constrainModal
 {
   for (int i = 0; i < SQ; i++)
   {
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
+    m_Behavior[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
   }
 }
 //----------------------------------------------------------------------------
@@ -486,6 +486,6 @@ void albaGizmoTranslatePlane::SetStep(int axis, double step)
 {
   for (int i = 0; i < SQ; i++)
   {
-    m_IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
+    m_Behavior[i]->GetTranslationConstraint()->SetStep(axis,step);
   }
 }

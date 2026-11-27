@@ -53,9 +53,9 @@ albaGizmoTranslate::albaGizmoTranslate(albaVME* input, albaObserver *listener, b
   m_GTPlane[XNORMAL] = m_GTPlane[YNORMAL] = m_GTPlane[ZNORMAL] = NULL;
   m_GuiGizmoTranslate = NULL;
   
-  m_ConstraintModality[X] = albaInteractorConstraint::FREE;
-  m_ConstraintModality[Y] = albaInteractorConstraint::FREE;
-  m_ConstraintModality[Z] = albaInteractorConstraint::FREE;
+  m_ConstraintModality[X] = albaTransformConstraint::FREE;
+  m_ConstraintModality[Y] = albaTransformConstraint::FREE;
+  m_ConstraintModality[Z] = albaTransformConstraint::FREE;
 
   m_Step[X] = 1;
   m_Step[Y] = 1;

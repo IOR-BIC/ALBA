@@ -53,14 +53,14 @@ albaGizmoPath::albaGizmoPath(albaVME* imputVme, albaObserver *listener, const ch
   Constructor(imputVme, listener, name);
 }
 //----------------------------------------------------------------------------
-void albaGizmoPath::CreateInteractor()
+void albaGizmoPath::CreateBehavior()
 {
-  albaNEW(m_LeftMouseInteractor);
-  m_LeftMouseInteractor->SetListener(this);
-  m_LeftMouseInteractor->SetVME(m_VmeGizmoPath);
-  m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
-  m_LeftMouseInteractor->EnableTranslation(true);
-  m_LeftMouseInteractor->ResultMatrixConcatenationOn();
+  albaNEW(m_Behavior);
+  m_Behavior->SetListener(this);
+  m_Behavior->SetVME(m_VmeGizmoPath);
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
+  m_Behavior->EnableTranslation(true);
+  m_Behavior->ResultMatrixConcatenationOn();
 }
 void albaGizmoPath::Constructor(albaVME *imputVme, albaObserver *listener, const char* name)
 //----------------------------------------------------------------------------
@@ -87,8 +87,8 @@ void albaGizmoPath::Constructor(albaVME *imputVme, albaObserver *listener, const
   assert(m_VmeGizmoPath->GetData()->GetNumberOfPoints()==2);
 
 
-  CreateInteractor();
-  m_VmeGizmoPath->SetBehavior(m_LeftMouseInteractor);
+  CreateBehavior();
+  m_VmeGizmoPath->SetBehavior(m_Behavior);
 
   m_TextSidePosition = ID_LEFT_TEXT_SIDE;
 }
@@ -100,9 +100,9 @@ void albaGizmoPath::Destructor()
 
   m_VmeGizmoPath->SetBehavior(NULL);
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  if (m_LeftMouseInteractor)
-    m_LeftMouseInteractor->SetListener(NULL);
-  albaDEL(m_LeftMouseInteractor);
+  if (m_Behavior)
+    m_Behavior->SetListener(NULL);
+  albaDEL(m_Behavior);
 
   m_VmeGizmoPath->ReparentTo(NULL);
   albaDEL(m_VmeGizmoPath);
@@ -435,9 +435,9 @@ void albaGizmoPath::DestroyVMEGizmo()
 
   m_VmeGizmoPath->SetBehavior(NULL);
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  if (m_LeftMouseInteractor)
-    m_LeftMouseInteractor->SetListener(NULL);
-  albaDEL(m_LeftMouseInteractor);
+  if (m_Behavior)
+    m_Behavior->SetListener(NULL);
+  albaDEL(m_Behavior);
 
   m_VmeGizmoPath->ReparentTo(NULL);
   albaDEL(m_VmeGizmoPath);

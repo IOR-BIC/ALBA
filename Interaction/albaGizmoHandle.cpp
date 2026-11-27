@@ -30,7 +30,7 @@
 #include "mmaMaterial.h"
 #include "albaRefSys.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -61,7 +61,7 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
 //----------------------------------------------------------------------------
 {
 	m_ConstraintModality = constraintModality;
-  m_IsaGen = NULL;
+  m_Behavior = NULL;
   m_Cube = NULL;
   
   m_ShowShadingPlane = showShadingPlane;
@@ -120,31 +120,24 @@ albaGizmoHandle::albaGizmoHandle(albaVME *input, albaObserver *listener /* = NUL
   GetLogicManager()->VmeShow(m_ShadingPlaneGizmo, m_ShowShadingPlane);
   
   //-----------------
-  // create isa stuff
+  // create the behaviors
   //-----------------
   // create the transform behavior of the gizmo
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  albaNEW(m_IsaGen);
+  albaNEW(m_Behavior);
 
-  //isa will send events to this
-	if(m_ConstraintModality==BOUNDS)
-	{
-		m_IsaGen->SetListener(this);  
-		m_IsaGen->SetVME(m_BoxGizmo);
-		m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToGlobal();
-		m_IsaGen->EnableTranslation(true);
-	}
-	else if(m_ConstraintModality==FREE)
-	{
-		m_IsaGen->SetListener(this);  
-		m_IsaGen->SetVME(m_BoxGizmo);
-		m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
-		m_IsaGen->EnableTranslation(true);
-	}
+  // the behavior will send events to this
+  m_Behavior->SetListener(this);
+  m_Behavior->SetVME(m_BoxGizmo);
+  m_Behavior->EnableTranslation(true);
+  if (m_ConstraintModality == BOUNDS)
+    m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToGlobal();
+  else if (m_ConstraintModality == FREE)
+    m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
 
-  // assign isa to cylinder and cone
-  m_BoxGizmo->SetBehavior(m_IsaGen);
+  // assign the behavior to the box
+  m_BoxGizmo->SetBehavior(m_Behavior);
 
    // default axis is X
   SetType(albaGizmoHandle::XMIN);
@@ -179,8 +172,8 @@ albaGizmoHandle::~albaGizmoHandle()
   vtkDEL(m_PlaneSource);
 	
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  m_IsaGen->SetListener(NULL);
-  albaDEL(m_IsaGen);
+  m_Behavior->SetListener(NULL);
+  albaDEL(m_Behavior);
 
   GetLogicManager()->VmeRemove(m_BoxGizmo); //m_BoxGizmo is released
   GetLogicManager()->VmeRemove(m_ShadingPlaneGizmo); //m_ShadingPlaneGizmo is released
@@ -268,7 +261,7 @@ void albaGizmoHandle::CreatePipeline()
 void albaGizmoHandle::SetType(int type) 
 //----------------------------------------------------------------------------
 {
-  assert(m_IsaGen && m_RotateBoxTr && m_BoxGizmo);
+  assert(m_Behavior && m_RotateBoxTr && m_BoxGizmo);
   
   // register the type
   m_GizmoType = type;
@@ -362,13 +355,13 @@ void albaGizmoHandle::ShowShadingPlane(bool show)
 void albaGizmoHandle::SetConstrainRefSys(albaMatrix *constrain)
 //----------------------------------------------------------------------------
 {  
-  m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
 }
 
 
 albaMatrix * albaGizmoHandle::GetConstrainRefSys()
 {
-  return m_IsaGen->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  return m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
 }
 
 //----------------------------------------------------------------------------
@@ -587,11 +580,11 @@ void albaGizmoHandle::Update()
 			// place the gizmo
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::X, m_TranslationIntervals[0]);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::X, m_TranslationIntervals[0]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[0]);
@@ -616,11 +609,11 @@ void albaGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::X, m_TranslationIntervals[1]);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::X, m_TranslationIntervals[1]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[1]);
@@ -645,11 +638,11 @@ void albaGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Y, m_TranslationIntervals[2]);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Y, m_TranslationIntervals[2]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[2]);
@@ -674,11 +667,11 @@ void albaGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Y, m_TranslationIntervals[3]);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Y, m_TranslationIntervals[3]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE, vtkALBADOFMatrix::LOCK);
 			
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[3]);
@@ -703,11 +696,11 @@ void albaGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Z, m_TranslationIntervals[4]);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS);
+				m_Behavior->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Z, m_TranslationIntervals[4]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[4]);
@@ -730,11 +723,11 @@ void albaGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Z, m_TranslationIntervals[5]);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::BOUNDS);
+				m_Behavior->GetTranslationConstraint()->SetBounds(vtkALBADOFMatrix::Z, m_TranslationIntervals[5]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE);
+				m_Behavior->GetTranslationConstraint()->SetConstraintModality(vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::LOCK, vtkALBADOFMatrix::FREE);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[5]);

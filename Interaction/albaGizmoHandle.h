@@ -220,7 +220,7 @@ protected:
   void CreatePipeline();
 
 
-  albaBehaviorTransform *m_IsaGen; ///< Generic Interactor style
+  albaBehaviorTransform *m_Behavior; ///< the behavior moving the handle
 
   /** Set the gizmo color */
   void SetColor(double col[3]);

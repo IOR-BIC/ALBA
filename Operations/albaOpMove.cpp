@@ -290,9 +290,9 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
 	  }
     break;
     case ID_ROTATION_STEP:
-      m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
-      m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
-      m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
+      m_GizmoRotate->GetBehavior(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
+      m_GizmoRotate->GetBehavior(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
+      m_GizmoRotate->GetBehavior(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
     break;
     case ID_TRANSLATION_STEP:
       m_GizmoTranslate->SetStep(0,m_TranslationStep);
@@ -302,27 +302,27 @@ void albaOpMove::OnEventThis(albaEventBase *alba_event)
     case ID_ENABLE_STEP:
       if (m_EnableStep != 0)
       {
-        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,albaInteractorConstraint::SNAP_STEP);
-        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,albaInteractorConstraint::SNAP_STEP);
-        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,albaInteractorConstraint::SNAP_STEP);
-        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
-        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
-        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
-        m_GizmoTranslate->SetConstraintModality(0,albaInteractorConstraint::SNAP_STEP);
-        m_GizmoTranslate->SetConstraintModality(1,albaInteractorConstraint::SNAP_STEP);
-        m_GizmoTranslate->SetConstraintModality(2,albaInteractorConstraint::SNAP_STEP);
+        m_GizmoRotate->GetBehavior(0)->GetRotationConstraint()->SetConstraintModality(0,albaTransformConstraint::SNAP_STEP);
+        m_GizmoRotate->GetBehavior(1)->GetRotationConstraint()->SetConstraintModality(1,albaTransformConstraint::SNAP_STEP);
+        m_GizmoRotate->GetBehavior(2)->GetRotationConstraint()->SetConstraintModality(2,albaTransformConstraint::SNAP_STEP);
+        m_GizmoRotate->GetBehavior(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
+        m_GizmoRotate->GetBehavior(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
+        m_GizmoRotate->GetBehavior(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
+        m_GizmoTranslate->SetConstraintModality(0,albaTransformConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(1,albaTransformConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(2,albaTransformConstraint::SNAP_STEP);
         m_GizmoTranslate->SetStep(0,m_TranslationStep);
         m_GizmoTranslate->SetStep(1,m_TranslationStep);
         m_GizmoTranslate->SetStep(2,m_TranslationStep);
       }
       else
       {
-        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,albaInteractorConstraint::FREE);
-        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,albaInteractorConstraint::FREE);
-        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,albaInteractorConstraint::FREE);
-        m_GizmoTranslate->SetConstraintModality(0,albaInteractorConstraint::FREE);
-        m_GizmoTranslate->SetConstraintModality(1,albaInteractorConstraint::FREE);
-        m_GizmoTranslate->SetConstraintModality(2,albaInteractorConstraint::FREE);
+        m_GizmoRotate->GetBehavior(0)->GetRotationConstraint()->SetConstraintModality(0,albaTransformConstraint::FREE);
+        m_GizmoRotate->GetBehavior(1)->GetRotationConstraint()->SetConstraintModality(1,albaTransformConstraint::FREE);
+        m_GizmoRotate->GetBehavior(2)->GetRotationConstraint()->SetConstraintModality(2,albaTransformConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(0,albaTransformConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(1,albaTransformConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(2,albaTransformConstraint::FREE);
       }
     break;
     // move this to opgui; both gizmos and gui should know ref sys
@@ -612,7 +612,7 @@ void albaOpMove::RefSysVmeChanged()
   SetRefSys on albaTransformInterfaceGUI pointer
   */
 
-  // change isa refsys
+  // change the behavior refsys
   m_GuiTransformMouse->SetRefSys(m_RefSysVME);
   // change gtranslate refsys
   m_GizmoTranslate->SetRefSys(m_RefSysVME);

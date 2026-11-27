@@ -49,7 +49,7 @@ class vtkPolyData;
 /**
   class name: albaGeometryEditorPolylineGraph
   This class allows the editing of a polylinegraph (class created by BES).
-  It creates ISA, can add, insert, remove, move point in the polyline graph,
+  It creates the behavior, can add, insert, remove, move point in the polyline graph,
   it can also add, remove branch in which points are.
 */
 class ALBA_EXPORT albaGeometryEditorPolylineGraph: public albaObserver, public albaServiceClient 
@@ -149,8 +149,8 @@ protected:
   /** create gui */
 	void CreateGui();
 
-	/** Create isa stuff */
-	void CreateISA();
+	/** Create the picker behavior of the edited polyline */
+	void CreateBehavior();
 
   /** create pipe*/
 	void CreatePipe();

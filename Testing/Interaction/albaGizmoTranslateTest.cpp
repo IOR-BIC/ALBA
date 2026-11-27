@@ -104,37 +104,37 @@ void albaGizmoTranslateTest::TestSetGetConstraintModality()
 {
   albaGizmoTranslate *gizmoTranslate = new albaGizmoTranslate(m_GizmoInputSurface,NULL,false);
   
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::FREE);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::FREE);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::FREE);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::X) == albaTransformConstraint::FREE);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Y) == albaTransformConstraint::FREE);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Z) == albaTransformConstraint::FREE);
 
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::X, albaInteractorConstraint::LOCK);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Y, albaInteractorConstraint::LOCK);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Z, albaInteractorConstraint::LOCK);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::LOCK);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::LOCK);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::LOCK);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::X, albaTransformConstraint::LOCK);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Y, albaTransformConstraint::LOCK);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Z, albaTransformConstraint::LOCK);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::X) == albaTransformConstraint::LOCK);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Y) == albaTransformConstraint::LOCK);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Z) == albaTransformConstraint::LOCK);
 
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::X, albaInteractorConstraint::BOUNDS);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Y, albaInteractorConstraint::BOUNDS);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Z, albaInteractorConstraint::BOUNDS);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::BOUNDS);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::BOUNDS);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::BOUNDS);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::X, albaTransformConstraint::BOUNDS);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Y, albaTransformConstraint::BOUNDS);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Z, albaTransformConstraint::BOUNDS);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::X) == albaTransformConstraint::BOUNDS);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Y) == albaTransformConstraint::BOUNDS);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Z) == albaTransformConstraint::BOUNDS);
 
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::X, albaInteractorConstraint::SNAP_STEP);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Y, albaInteractorConstraint::SNAP_STEP);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Z, albaInteractorConstraint::SNAP_STEP);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::SNAP_STEP);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::SNAP_STEP);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::SNAP_STEP);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::X, albaTransformConstraint::SNAP_STEP);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Y, albaTransformConstraint::SNAP_STEP);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Z, albaTransformConstraint::SNAP_STEP);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::X) == albaTransformConstraint::SNAP_STEP);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Y) == albaTransformConstraint::SNAP_STEP);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Z) == albaTransformConstraint::SNAP_STEP);
 
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::X, albaInteractorConstraint::SNAP_ARRAY);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Y, albaInteractorConstraint::SNAP_ARRAY);
-  gizmoTranslate->SetConstraintModality(albaInteractorConstraint::Z, albaInteractorConstraint::SNAP_ARRAY);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::X) == albaInteractorConstraint::SNAP_ARRAY);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Y) == albaInteractorConstraint::SNAP_ARRAY);
-  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaInteractorConstraint::Z) == albaInteractorConstraint::SNAP_ARRAY);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::X, albaTransformConstraint::SNAP_ARRAY);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Y, albaTransformConstraint::SNAP_ARRAY);
+  gizmoTranslate->SetConstraintModality(albaTransformConstraint::Z, albaTransformConstraint::SNAP_ARRAY);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::X) == albaTransformConstraint::SNAP_ARRAY);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Y) == albaTransformConstraint::SNAP_ARRAY);
+  CPPUNIT_ASSERT(gizmoTranslate->GetConstraintModality(albaTransformConstraint::Z) == albaTransformConstraint::SNAP_ARRAY);
 
   cppDEL(gizmoTranslate);
 }
@@ -215,12 +215,12 @@ void albaGizmoTranslateTest::TestSetGetStep()
   albaTransform::SetPosition(absPose, position);
 
   albaGizmoTranslate *gizmoTranslate = new albaGizmoTranslate(m_GizmoInputSurface,NULL,false);
-  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaInteractorConstraint::X) == 1);
-  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaInteractorConstraint::Y) == 1);
-  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaInteractorConstraint::Z) == 1);
+  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaTransformConstraint::X) == 1);
+  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaTransformConstraint::Y) == 1);
+  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaTransformConstraint::Z) == 1);
   
-  gizmoTranslate->SetStep(albaInteractorConstraint::Y, 2);
-  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaInteractorConstraint::Y) == 2);
+  gizmoTranslate->SetStep(albaTransformConstraint::Y, 2);
+  CPPUNIT_ASSERT(gizmoTranslate->GetStep(albaTransformConstraint::Y) == 2);
 
   cppDEL(gizmoTranslate);
 }

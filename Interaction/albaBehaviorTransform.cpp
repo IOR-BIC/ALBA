@@ -61,9 +61,9 @@ albaBehaviorTransform::albaBehaviorTransform()
 	m_SurfaceNormal         = false;
   m_ResultTransform       = NULL;
   m_TargetRefSys          = new albaRefSys;
-  m_TranslationConstraint = new albaInteractorConstraint;
-  m_RotationConstraint    = new albaInteractorConstraint;
-  m_ScaleConstraint       = new albaInteractorConstraint;
+  m_TranslationConstraint = new albaTransformConstraint;
+  m_RotationConstraint    = new albaTransformConstraint;
+  m_ScaleConstraint       = new albaTransformConstraint;
   m_PivotRefSys           = new albaRefSys;
   m_CurrentRotationConstraint = m_RotationConstraint;
   m_RotationConstraint->GetRefSys()->SetTypeToView(); // the Renderer is set later!!!
@@ -83,8 +83,8 @@ albaBehaviorTransform::albaBehaviorTransform()
    EnableTranslation(true);
 
    // set default constraint axes
-   GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-   GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+   GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
+   GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 
    m_CurrentCamera = NULL;
    m_MousePointer2DPosition[0] = m_MousePointer2DPosition[1] = 0;
@@ -306,13 +306,13 @@ void albaBehaviorTransform::Translate(double *p1, double *p2)
 
     switch(GetTranslationConstraint()->GetConstraintModality(axis)) 
     {
-      case (albaInteractorConstraint::FREE):
+      case (albaTransformConstraint::FREE):
       { 
         albaTransform::SetPosition(matr, motVecProj);//set the matrix to be send
         SendTransformMatrix(matr);                  //send the transform matrix
       }
       break;
-      case (albaInteractorConstraint::BOUNDS):
+      case (albaTransformConstraint::BOUNDS):
       {
   /*
       ------------proj-------->  
@@ -475,7 +475,7 @@ void albaBehaviorTransform::Translate(double *p1, double *p2)
       }
       break;
 
-      case (albaInteractorConstraint::SNAP_STEP):
+      case (albaTransformConstraint::SNAP_STEP):
       {
         double step = GetTranslationConstraint()->GetStep(axis);
         int motion_direction = motVecProj[axis] > 0 ? 1 : -1;
@@ -485,7 +485,7 @@ void albaBehaviorTransform::Translate(double *p1, double *p2)
       }
       break;
   
-      case (albaInteractorConstraint::SNAP_ARRAY):
+      case (albaTransformConstraint::SNAP_ARRAY):
       {
         //get a pointer to the snap array
         vtkDoubleArray *darray = GetTranslationConstraint()->GetSnapArray(axis);
@@ -603,8 +603,8 @@ void albaBehaviorTransform::Translate(double *p1, double *p2)
     int axis1, axis2;
     GetTranslationConstraint()->GetConstraintPlaneAxes(axis1, axis2);
       
-    if (GetTranslationConstraint()->GetConstraintModality(axis1) == albaInteractorConstraint::FREE &&
-        GetTranslationConstraint()->GetConstraintModality(axis2) == albaInteractorConstraint::FREE)
+    if (GetTranslationConstraint()->GetConstraintModality(axis1) == albaTransformConstraint::FREE &&
+        GetTranslationConstraint()->GetConstraintModality(axis2) == albaTransformConstraint::FREE)
     {
       if (GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::CUSTOM
        || GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::GLOBAL
@@ -620,19 +620,19 @@ void albaBehaviorTransform::Translate(double *p1, double *p2)
 
         switch  (constrainPlane) 
         {
-          case (albaInteractorConstraint::XY):
+          case (albaTransformConstraint::XY):
           {
-            albaTransform::GetVersor(albaInteractorConstraint::Z, *m_ConstrainRefSys, planeNormal);
+            albaTransform::GetVersor(albaTransformConstraint::Z, *m_ConstrainRefSys, planeNormal);
           }
   	      break;
-          case (albaInteractorConstraint::XZ):
+          case (albaTransformConstraint::XZ):
           {
-            albaTransform::GetVersor(albaInteractorConstraint::Y, *m_ConstrainRefSys, planeNormal);
+            albaTransform::GetVersor(albaTransformConstraint::Y, *m_ConstrainRefSys, planeNormal);
           }
           break;
-          case (albaInteractorConstraint::YZ):
+          case (albaTransformConstraint::YZ):
           {
-            albaTransform::GetVersor(albaInteractorConstraint::X, *m_ConstrainRefSys, planeNormal);
+            albaTransform::GetVersor(albaTransformConstraint::X, *m_ConstrainRefSys, planeNormal);
           }
           break;
         }
@@ -648,7 +648,7 @@ void albaBehaviorTransform::Translate(double *p1, double *p2)
       }
       else if (GetTranslationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW)
       {
-        if (constrainPlane == albaInteractorConstraint::XY)
+        if (constrainPlane == albaTransformConstraint::XY)
         {
           if (m_SurfaceSnap == false && m_SurfaceNormal == false)
           {
@@ -715,7 +715,7 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
   
     switch(m_CurrentRotationConstraint->GetConstraintModality(axis)) 
     {
-      case (albaInteractorConstraint::FREE):
+      case (albaTransformConstraint::FREE):
       { 
         if (refSysType == albaRefSys::CUSTOM)
         {
@@ -788,7 +788,7 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
         else if (refSysType == albaRefSys::VIEW)
         {
           // only rotation around view look is supported
-          if (axis == albaInteractorConstraint::Z)
+          if (axis == albaTransformConstraint::Z)
           {
             TrackballRoll();
           }
@@ -800,7 +800,7 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
       }
       break;
   
-      case (albaInteractorConstraint::SNAP_STEP):
+      case (albaTransformConstraint::SNAP_STEP):
       {
         if (refSysType == albaRefSys::CUSTOM)
         {
@@ -854,7 +854,7 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
       }
       break;
   
-      case (albaInteractorConstraint::SNAP_ARRAY):
+      case (albaTransformConstraint::SNAP_ARRAY):
       {
   
 
@@ -874,12 +874,12 @@ void albaBehaviorTransform::Rotate(double *p1, double *p2, double *viewup)
     int axis1, axis2;
     m_CurrentRotationConstraint->GetConstraintPlaneAxes(axis1, axis2);
 
-    if (m_CurrentRotationConstraint->GetConstraintModality(axis1) == albaInteractorConstraint::FREE &&
-        m_CurrentRotationConstraint->GetConstraintModality(axis2) == albaInteractorConstraint::FREE)
+    if (m_CurrentRotationConstraint->GetConstraintModality(axis1) == albaTransformConstraint::FREE &&
+        m_CurrentRotationConstraint->GetConstraintModality(axis2) == albaTransformConstraint::FREE)
     {
       if (m_CurrentRotationConstraint->GetRefSys()->GetType() == albaRefSys::VIEW)
       {
-        if (constrainPlane == albaInteractorConstraint::XY)
+        if (constrainPlane == albaTransformConstraint::XY)
         {				
 					TrackballRotate();
         }      
@@ -1155,7 +1155,7 @@ void albaBehaviorTransform::OnButtonDownAction(int X, int Y)
       // set constrain refsys to translation constraint 
       m_ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
 
-      if (GetTranslationConstraint()->GetConstraintModality(axis) == albaInteractorConstraint::SNAP_ARRAY)
+      if (GetTranslationConstraint()->GetConstraintModality(axis) == albaTransformConstraint::SNAP_ARRAY)
       {         
         // current axis versor
         double constrainVers[3];

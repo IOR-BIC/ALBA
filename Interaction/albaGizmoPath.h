@@ -121,11 +121,11 @@ protected:
   void Constructor(albaVME *imputVme, albaObserver *listener, const char *name);
   void Destructor();
 
-  void CreateInteractor();
+  void CreateBehavior();
 
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmoPath;
-  albaBehaviorTransform    *m_LeftMouseInteractor;
+  albaBehaviorTransform    *m_Behavior;
   albaGUI             *m_GizmoGui;
 
 
