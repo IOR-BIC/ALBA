@@ -33,7 +33,6 @@
 
 #include "wx/utils.h"
 #include <wx/laywin.h>
-#include <wx/mdi.h>
 
 #include "albaDecl.h"
 #include "albaEvent.h"

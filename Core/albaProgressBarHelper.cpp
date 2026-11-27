@@ -16,12 +16,12 @@
 
 #include "albaProgressBarHelper.h"
 #include "albaGUIBusyInfo.h"
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
 
 #include "vtkAlgorithm.h"
 #include "vtkCommand.h"
 
-albaGUIMDIFrame *albaProgressBarHelper::m_MainWindow = NULL;
+albaGUIMainFrame *albaProgressBarHelper::m_MainWindow = NULL;
 
 //----------------------------------------------------------------------------
 /** Moves the progress bar of a helper on the start, progress and end events of a vtk filter.
@@ -94,13 +94,13 @@ albaProgressBarHelper::~albaProgressBarHelper()
 }
 
 //----------------------------------------------------------------------------
-void albaProgressBarHelper::SetMainWindow(albaGUIMDIFrame *win)
+void albaProgressBarHelper::SetMainWindow(albaGUIMainFrame *win)
 {
 	m_MainWindow = win;
 }
 
 //----------------------------------------------------------------------------
-albaGUIMDIFrame *albaProgressBarHelper::GetMainWindow()
+albaGUIMainFrame *albaProgressBarHelper::GetMainWindow()
 {
 	return m_MainWindow;
 }

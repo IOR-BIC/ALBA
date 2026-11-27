@@ -35,13 +35,6 @@ albaWizardBlockOperation::albaWizardBlockOperation(const char *name):albaWizardB
 {
   //Default constructor
   m_AutoShowSelectedVME=true;
-  m_windowhastoberesized = false;
-  m_windowhastobetiled = false;
-  m_tile_windows = "";
-  m_x = 0.;
-  m_y = 0.;
-  m_width = 0.85;
-  m_height = 0.35;
   m_viewtodelete = "";
   m_viewhastobedeleted = false;
 }
@@ -80,24 +73,6 @@ wxString albaWizardBlockOperation::GetRequiredView()
 }
 
 //----------------------------------------------------------------------------
-void albaWizardBlockOperation::ResizeView(double x, double y, double width, double height)
-{
-	m_windowhastoberesized = true;
-	
-	m_x = x;
-	m_y = y;
-	m_width = width;
-	m_height = height;
-}
-
-//----------------------------------------------------------------------------
-void albaWizardBlockOperation::TileWindows( const char *tile_windows )
-{
-   m_windowhastobetiled = true;
-   m_tile_windows = tile_windows;
-}
-
-//----------------------------------------------------------------------------
 void albaWizardBlockOperation::VmeSelect( const char *path )
 //----------------------------------------------------------------------------
 {
@@ -130,8 +105,6 @@ void albaWizardBlockOperation::VmeHideAdd( const char *path )
 void albaWizardBlockOperation::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
-  albaString tmpStr;
-
   albaWizardBlock::ExcutionBegin();
 
   ///////////////////////
@@ -140,35 +113,6 @@ void albaWizardBlockOperation::ExcutionBegin()
   {
     //open or select the required view
     GetViewManager()->ViewOpen(m_RequiredView.ToAscii());
-	if(m_windowhastoberesized) 
-	{
-		wxSize albaframesize = albaGetFrame()->GetSize();
-		int x = m_x*albaframesize.GetWidth();
-		int y = m_y*albaframesize.GetHeight();
-		int width = m_width*albaframesize.GetWidth();
-		int height = m_height*albaframesize.GetHeight();
-
-	    GetViewManager()->ViewResize(tmpStr, x, y, width, height);
-	}
-	if(m_windowhastobetiled)
-	{
-		if(!m_tile_windows.Compare("Tile_window_horizontally")) 
-		{
-	        GetLogicManager()->TileViewFrames(true);
-		}
-		else if (!m_tile_windows.Compare("Tile_window_vertically")) 
-		{
-			GetLogicManager()->TileViewFrames(false);
-		}
-		else if (!m_tile_windows.Compare("Tile_window_cascade"))
-		{
-			GetLogicManager()->CascadeViewFrames();
-		}
-		else 
-		{
-	      albaLogMessage("The selected tile window modality does not exist!");
-		}
-	}
   }
 
   ///////////////////////
@@ -214,7 +158,7 @@ void albaWizardBlockOperation::ExcutionBegin()
   //Run Operation
   if (m_Operation!="")
   {
-    tmpStr=m_Operation;
+    albaString tmpStr = m_Operation;
     //ask logic for operation run the flow will continue after operation stop
     if (m_Wizard && m_Wizard->GetManager())
       m_Wizard->GetManager()->RunOp(tmpStr.GetCStr());

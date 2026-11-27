@@ -27,8 +27,6 @@
 #include "albaGUIContextualMenu.h"
 #include "wx/utils.h"
 #include <wx/laywin.h>
-#include <wx/mdi.h>
-
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaSceneNode.h"
@@ -36,7 +34,8 @@
 #include "albaView.h"
 #include "albaViewVTK.h"
 #include "albaViewCompound.h"
-#include "albaGUIMDIChild.h"
+#include "albaGUIViewPage.h"
+#include "albaGUIViewArea.h"
 #include "albaGUIDialog.h"
 #include "albaGUI.h"
 #include "albaPipe.h"
@@ -96,7 +95,7 @@ albaGUIContextualMenu::~albaGUIContextualMenu()
 {
 }
 //----------------------------------------------------------------------------
-void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, bool vme_menu)
+void albaGUIContextualMenu::ShowContextualMenu(albaGUIViewPage *child, albaView *view, bool vme_menu)
 //----------------------------------------------------------------------------
 {
 	m_ChildViewActive = child;
@@ -118,9 +117,9 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
 	this->AppendSeparator();
-  if (m_ChildViewActive->IsMaximized())
+  if (m_ChildViewActive->GetViewArea()->IsMaximized())
   {
-    this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW, "Normal Size");
+    this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW, "Show all views");
   }
   else
   {
@@ -130,7 +129,7 @@ void albaGUIContextualMenu::ShowContextualMenu(wxFrame *child, albaView *view, b
   {
     if (viewCopound->IsSubViewMaximized())
     {
-      this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW, "Normal Size SubView");
+      this->Append(CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW, "Show all subviews");
     }
     else
     {
@@ -230,7 +229,8 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
     }
     break;
 		case CONTEXTUAL_MENU_MAXIMIZE_CHILD_VIEW:
-			m_ChildViewActive->Maximize(true);
+			m_ChildViewActive->GetViewArea()->ActivateView(m_ChildViewActive);
+			m_ChildViewActive->GetViewArea()->SetMaximized(true);
 		break;
     case CONTEXTUAL_MENU_MAXIMIZE_CHILD_SUB_VIEW:
     {
@@ -243,7 +243,7 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
     }
     break;
 		case CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_VIEW:
-			m_ChildViewActive->Maximize(false);
+			m_ChildViewActive->GetViewArea()->SetMaximized(false);
 		break;
     case CONTEXTUAL_MENU_NORMAL_SIZE_CHILD_SUB_VIEW:
     {
@@ -321,9 +321,9 @@ void albaGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 			if(result != wxID_OK) return;
 			m_ViewActive->SetName(name);
 			if(name == "")
-        m_ChildViewActive->SetTitle(wxStripMenuCodes(m_ViewActive->GetLabel()));
+        m_ChildViewActive->GetViewArea()->SetViewCaption(m_ChildViewActive, wxStripMenuCodes(m_ViewActive->GetLabel()));
 			else
-				m_ChildViewActive->SetTitle(name);
+				m_ChildViewActive->GetViewArea()->SetViewCaption(m_ChildViewActive, name);
 		}
 		break;
 	}

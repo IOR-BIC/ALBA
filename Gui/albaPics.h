@@ -47,12 +47,12 @@ struct albaPictureFactory_Pimpl;
 -PIC_BACK,PIC_BOTTOM,PIC_FRONT,PIC_LEFT,PIC_RIGHT,PIC_TOP,TIME_BEGIN : set of camera orientations
 
 -APP_ICON16x16,APP_ICON32x32 : these two picture are combined in one wxIconBundle 
- and assigned to the MDIFrameWindow (the small is visible in the frame and in the taskbar,
+ and assigned to the main frame (the small is visible in the frame and in the taskbar,
  the big is visible when pressing CTRL-TAB to switch among applications).
  Note: it is not possible to set in this way the Application Icon. The application icon must 
  be inserted in the resource file - see app.rc and app.ico
 
--MDICHILD_ICON : icon assigned to all MDIChild Windows
+-VIEW_MAXIMIZE : toolbar button of the maximized view mode
 
 -CLOSE_SASH : used by albaNamedPanel
 

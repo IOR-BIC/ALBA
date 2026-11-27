@@ -129,13 +129,11 @@ albaView* albaOpMeasure2D::OpenImageView(int viewId)
 
 	currentView = GetViewManager()->GetFromOpenedViews(viewLabel);
 
-	if (!currentView)
-	{
+	// a new view is created in the active area as the active view; an open one is shown and made active
+	if (currentView)
+		GetViewManager()->ViewOpen(viewLabel);
+	else
 		currentView = GetViewManager()->ViewCreate(viewId);
-		currentView->GetFrame()->SetMaxSize(currentView->GetFrame()->GetSize());
-	}
-
-	currentView->GetFrame()->SetFocus();
 
 	return currentView;
 }

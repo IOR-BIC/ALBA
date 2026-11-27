@@ -44,8 +44,7 @@ EXPORT_STL_VECTOR(ALBA_EXPORT,long);
 //----------------------------------------------------------------------------
 enum VieweSettingsEvents
 {	
-	ID_VIEW_SETTING_MAXIMIZE = MINID,
-	ID_VIEW_SETTING_OPEN_ONLY_ONE,
+	ID_VIEW_SETTING_OPEN_ONLY_ONE = MINID,
 	ID_VIEW_SETTING_COLOR,
 	ID_VIEW_SETTING_COLOR_DEFAULT,
 };
@@ -104,9 +103,6 @@ public:
 	/** Remove the view from the view-list and delete it (called by its frame when it is closed) */
   virtual void ViewDelete(albaView *view) override;
 
-	/** Move and resize the frame of the open view with the given label */
-  virtual void ViewResize(const char *label, int x, int y, int width, int height) override;
-
 	/** Activate the view with the given label, creating it if it is not open */
 	virtual void ViewOpen(const char *label) override;
 
@@ -160,7 +156,6 @@ public:
 	albaGUI* GetSettingsGui();
 
 	void OpenOnlyViewForType(int chose) { m_ViewOpenOnlyOne = chose; };
-	void MaximizeViewOnOpen(int chose) { m_ViewMaximize = chose; };
 	void EnableViewSettings(bool enable = true);
 
 protected:
@@ -185,7 +180,6 @@ protected:
 	albaGUI *m_SettingsGui;
 
 	wxColour m_ViewColorBackground;
-	int m_ViewMaximize;
 	int m_ViewOpenOnlyOne;
 	int m_SkipCameraUpdate; ///< nesting level of EnableCameraUpdateSkip
 	bool m_CameraUpdateRequested; ///< true when a camera update arrived during a skip

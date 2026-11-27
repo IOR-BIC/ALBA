@@ -39,8 +39,7 @@ SET(PROJECT_SRCS
   albaGUIListBox.cpp  				albaGUIListBox.h
   albaGUIListCtrl.cpp  				albaGUIListCtrl.h
   albaGUIMovieCtrl.cpp  				albaGUIMovieCtrl.h
-  albaGUIMDIChild.cpp  				albaGUIMDIChild.h
-  albaGUIMDIFrame.cpp  				albaGUIMDIFrame.h
+  albaGUIMainFrame.cpp  				albaGUIMainFrame.h
   albaGUIMutexPanel.cpp  			albaGUIMutexPanel.h
   albaGUINamedPanel.cpp  			albaGUINamedPanel.h
   albaGUIPanel.cpp  					albaGUIPanel.h
@@ -55,7 +54,9 @@ SET(PROJECT_SRCS
   albaGUITimeBar.cpp  				albaGUITimeBar.h
   albaGUITree.cpp  					albaGUITree.h
   albaGUIValidator.cpp  				albaGUIValidator.h
+  albaGUIViewArea.cpp  				albaGUIViewArea.h
   albaGUIViewFrame.cpp  				albaGUIViewFrame.h
+  albaGUIViewPage.cpp  				albaGUIViewPage.h
   albaGUIViewWin.cpp  				albaGUIViewWin.h
   albaGUICrossIncremental.cpp  		albaGUICrossIncremental.h
   albaGUIComboBox.cpp  				albaGUIComboBox.h

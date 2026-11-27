@@ -173,8 +173,6 @@ void AlbaViewer::InitializeIcons()
 	albaADDPIC(FRAME_ICON128x128);
 #include "pic/FRAME_ICON256x256.xpm"
 	albaADDPIC(FRAME_ICON256x256);
-#include "pic/MDICHILD_ICON.xpm"
-	albaADDPIC(MDICHILD_ICON);
 
 #include "pic/CAMERA.xpm"
 	albaADDPIC(CAMERA);

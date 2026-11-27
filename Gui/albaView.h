@@ -117,13 +117,14 @@ public:
   void      SetName(wxString name)    {m_Name = name;};
 
   virtual wxWindow*	GetWindow(){return m_Win;};
-  virtual wxFrame*	GetFrame() {return m_Frame;};
+  /** Return the page that shows the view in the view area (albaGUIViewPage) */
+  virtual wxWindow*	GetFrame() {return m_Frame;};
   virtual albaGUI*		GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
 
 	/** destroy the Gui */
 	void DeleteGui();
 
-  virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
+  virtual void		  SetFrame(wxWindow* f) {m_Frame = f;};
 
   virtual void			OnSize(wxSizeEvent &size_event)	{};
 	    
@@ -178,7 +179,7 @@ protected:
   wxString       m_Label;
   wxString       m_Name;
   wxWindow			*m_Win;
-  wxFrame				*m_Frame;
+  wxWindow			*m_Frame;
   albaGUI      	*m_Gui;
   albaGUIHolder	*m_Guih;
 

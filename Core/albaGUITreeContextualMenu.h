@@ -24,7 +24,6 @@
 // forward references;
 //----------------------------------------------------------------------------
 class albaView;
-class albaGUIMDIChild;
 class albaEvent;
 class albaObserver;
 class albaGUIVMETree;
@@ -81,7 +80,7 @@ public:
   /** Create a contextual menu*/
   virtual void CreateContextualMenu(albaGUIVMETree *tree, albaView *view, albaVME *vme, bool vme_menu);
 
-  /** Visualize contextual men for the MDI child and selected view. */
+  /** Visualize the contextual menu of the tree. */
   void ShowContextualMenu();
 
 	void SetOpManager(albaOpManager *opManager);

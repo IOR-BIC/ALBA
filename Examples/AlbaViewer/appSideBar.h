@@ -34,7 +34,7 @@ PURPOSE. See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 class albaGUI;
 class albaGUIHolder;
-class albaGUIMDIFrame;
+class albaGUIMainFrame;
 class albaGUINamedPanel;
 class albaGUIPanel;
 class albaGUIPanelStack;
@@ -50,7 +50,7 @@ class appSideBar: public albaAbsSideBar
 {
 public:
 
-	appSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener);
+	appSideBar(albaGUIMainFrame* parent, int id, albaObserver *Listener);
 	~appSideBar(); 
 	
 	// Add a new vme into the tree

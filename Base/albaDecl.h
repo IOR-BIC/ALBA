@@ -157,7 +157,8 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 	// events about views
 	VIEW_CREATE,   // from menu to albaViewManager
-	VIEW_CLICKED,  // from albaRWIBase to albaGUIMDIChild and albaGUIViewPanel to albaViewManager
+	VIEW_CLICKED,  // from albaRWIBase to albaGUIViewPage
+	VIEW_AREA_CHANGED, // from albaGUIViewArea to its listener: the active view, the list of the views or the maximized mode changed
 
 	CAMERA_RESET,
 	CAMERA_FIT,
@@ -182,10 +183,11 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 
 	ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY
 
-	// resize window
-	TILE_WINDOW_CASCADE,
-	TILE_WINDOW_HORIZONTALLY,
-	TILE_WINDOW_VERTICALLY,
+	// view area (menu and toolbar)
+	MENU_VIEW_AREA_MAXIMIZE,
+	MENU_VIEW_AREA_CLOSE,
+	MENU_VIEW_AREA_LIST_FIRST, // list of the open views in the View menu
+	MENU_VIEW_AREA_LIST_LAST = MENU_VIEW_AREA_LIST_FIRST + 99,
 
 	// ids of the wizards (menu) - used by albaWizardManager and albaGUIFrame
 	WIZARD_START,
@@ -223,7 +225,7 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	WIDGETS_START,
 	ID_LAYOUT,         //sent from a albaGUISashPanel to albaGUIFrame
 	ID_CLOSE_SASH,     //sent from a albaGUIButton to albaGUISashPanel
-	ID_RANGE_MODIFIED, //sent from a albaGUILutSlider to albaGUIMDIChild  - ask to Views
+	ID_RANGE_MODIFIED, //sent from a albaGUILutSlider to the views
 	WIDGETS_END,
 
 	// id of pictures - used in albaGUIBitmaps

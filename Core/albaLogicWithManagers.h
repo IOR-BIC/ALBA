@@ -23,7 +23,7 @@
 #include "albaDecl.h"
 #include "albaEvent.h"
 #include "albaVMEManager.h"
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
 #include "albaSideBar.h"
 #include "albaAbsLogicManager.h"
 
@@ -52,6 +52,7 @@ class albaGUISettingsTimeBar;
 class albaHelpManager;
 class albaSnapshotManager;
 class mmaApplicationLayout;
+class albaGUIViewPage;
 class albaProsthesesDBManager;
 
 
@@ -60,7 +61,7 @@ class albaProsthesesDBManager;
 //----------------------------------------------------------------------------
 /** 
 albaLogicWithManagers provide:
-- mdi main frame
+- main frame, with the views in the view area
 - menu    (can be avoided by calling plugmenu(false); )
 - toolbar (can be avoided by calling plugtoolbarbar(false); )
 - logbar  (can be avoided by calling pluglogbar(false); )
@@ -109,7 +110,7 @@ class ALBA_EXPORT albaLogicWithManagers : public albaObserver, public albaAbsLog
 {
 public:
 
-	albaLogicWithManagers(albaGUIMDIFrame *mdiFrame = NULL);
+	albaLogicWithManagers(albaGUIMainFrame *mainFrame = NULL);
 	virtual     ~albaLogicWithManagers();
 
 	/** Events management */
@@ -188,7 +189,7 @@ public:
 	void SetFileExtension(albaString &extension) { m_Extension = extension; };
 
 	/** Returns the pointer to the main panel of the application.*/
-	virtual albaGUIMDIFrame *GetTopWin() { return m_Win; };
+	virtual albaGUIMainFrame *GetTopWin() { return m_Win; };
 
 	/** Sets the flag to know if Toolbar should be built.*/
 	void PlugToolbar(bool plug) { m_PlugToolbar = plug; };
@@ -390,11 +391,14 @@ protected:
 	/** Called by the view manager when it deletes a view: update side bar, interaction and menus */
 	virtual void ViewDeleted(albaView *view) override;
 
-	/** Tile the view frames horizontally or vertically */
-	virtual void TileViewFrames(bool horizontally) override;
+	/** Update the View menu and the toolbar after a change in the view area: maximized mode, active view and list of the views */
+	void UpdateViewAreaMenu();
 
-	/** Cascade the view frames */
-	virtual void CascadeViewFrames() override;
+	/** Add the view area commands to the Window menu, after the dockable panes */
+	virtual void CreateViewAreaMenu();
+
+	/** Return the active view page, NULL if there are no views */
+	albaGUIViewPage *GetActiveViewPage();
 
 	/** Show the tree in a dialog and return the VMEs chosen by the user, an empty vector on cancel. */
 	virtual std::vector<albaVME*> ChooseVMEs(albaString title = "Choose Nodes", albaVMEAcceptFunction acceptFunction = NULL, albaVME *selected = NULL) override;
@@ -468,6 +472,7 @@ protected:
 	wxMenu *m_RecentFileMenu;
 	wxMenu *m_OpMenu;
 	wxMenu *m_ViewMenu;
+	wxMenu *m_WindowMenu; ///< dockable panes, view area commands and list of the open views
 
 	bool m_UseVMEManager;
 	bool m_UseViewManager;
@@ -497,8 +502,8 @@ protected:
 	wxMenu *m_WizardMenu;
 	albaGUISplashScreen* m_SplashScreen;
 
-	long							m_ChildFrameStyle;
-	albaGUIMDIFrame		*m_Win;
+	albaGUIMainFrame	*m_Win;
+	wxMenuItem				*m_ViewListSeparator; ///< separator after the list of the open views in the View menu
 	wxToolBar         *m_ToolBar;
 	wxMenuBar         *m_MenuBar;
 	wxString					m_LastSelectedPanel;

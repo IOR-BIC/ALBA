@@ -53,11 +53,6 @@ public:
   /** Get The name of the operation required view */
   wxString GetRequiredView();
 
-  /** Resize and reposition the View */
-  void ResizeView(double x, double y, double width, double height);
-
-  /** Tile windows horizontally, vertically or in cascade mode */
-  void TileWindows( const char *tile_windows );
 
   /** Set The name of the required view to delete*/
   void SetViewToDelete(const char *View);
@@ -126,12 +121,5 @@ private:
   std::vector < wxString > m_VmeHide;
   albaString m_viewtodelete;
   bool m_viewhastobedeleted;
-  albaString m_tile_windows;
-  bool m_windowhastoberesized;
-  bool m_windowhastobetiled;
-  double m_x;
-  double m_y;
-  double m_width;
-  double m_height;
 };
 #endif

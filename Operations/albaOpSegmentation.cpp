@@ -55,7 +55,6 @@
 #include "albaViewSliceSegmentation.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "albaGUIMDIChild.h"
 
 #include "vtkActor.h"
 #include "vtkActor2D.h"
