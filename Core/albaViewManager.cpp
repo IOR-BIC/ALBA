@@ -32,8 +32,8 @@
 #include "albaVMEIterator.h"
 #include "albaVMERoot.h"
 
-#include "albaGUIMDIFrame.h"
-#include "albaGUIMDIChild.h"
+#include "albaGUIViewPage.h"
+#include "albaGUIViewArea.h"
 #include "albaGUIViewFrame.h"
 #include "albaViewVTK.h"
 #include "albaViewCompound.h"
@@ -86,7 +86,7 @@ albaViewManager::~albaViewManager()
   {
     v = m_ViewList;
     m_ViewList = v->m_Next;
-		albaGUIMDIChild * frame = (albaGUIMDIChild *)v->GetFrame();
+		wxWindow *frame = v->GetFrame();
 		if(frame)
 			frame->Close();
   }
@@ -105,7 +105,6 @@ albaGUI* albaViewManager::GetSettingsGui()
 		m_SettingsGui->Label("View Settings", true);
 		m_SettingsGui->Label("");
 
- 		m_SettingsGui->Bool(ID_VIEW_SETTING_MAXIMIZE, "Maximize on open", &m_ViewMaximize, 1);
 		m_SettingsGui->Bool(ID_VIEW_SETTING_OPEN_ONLY_ONE, "Open only one view of each type", &m_ViewOpenOnlyOne, 1);
 		m_SettingsGui->Divider(1);
 
@@ -123,7 +122,6 @@ void albaViewManager::EnableViewSettings(bool enable /*= true*/)
 {
 	if (m_SettingsGui != NULL)
 	{
-		m_SettingsGui->Enable(ID_VIEW_SETTING_MAXIMIZE, enable);
 		m_SettingsGui->Enable(ID_VIEW_SETTING_OPEN_ONLY_ONE, enable);
 		m_SettingsGui->Enable(ID_VIEW_SETTING_COLOR, enable);
 		m_SettingsGui->Enable(ID_VIEW_SETTING_COLOR_DEFAULT, enable);
@@ -133,15 +131,11 @@ void albaViewManager::EnableViewSettings(bool enable /*= true*/)
 //----------------------------------------------------------------------------
 void albaViewManager::InitializeSettings()
 {
-	m_ViewMaximize = 1;
 	m_ViewOpenOnlyOne = 0;
 		
 	int m_Color[3] = { 71, 71, 71 };
 
 	//On first run i cannot read configuration
-	if (!m_Config->Read("View_Maximize", &m_ViewMaximize))
-		m_Config->Write("View_Maximize", m_ViewMaximize); // So i will save default value
-
 	if (!m_Config->Read("View_OpenOnlyOne", &m_ViewOpenOnlyOne))
 		m_Config->Write("View_OpenOnlyOne", m_ViewOpenOnlyOne); // So i will save default value
 
@@ -166,13 +160,6 @@ void albaViewManager::OnEvent(albaEventBase *alba_event)
 	{
     switch(e->GetId())
     {
-			case ID_VIEW_SETTING_MAXIMIZE:
-			{
-				m_Config->Write("View_Maximize", m_ViewMaximize);
-				m_Config->Flush();
-			}
-			break;
-
 			case ID_VIEW_SETTING_OPEN_ONLY_ONE:
 			{
 				m_Config->Write("View_OpenOnlyOne", m_ViewOpenOnlyOne);
@@ -412,13 +399,7 @@ albaView *albaViewManager::ViewCreate(int id)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  GetLogicManager()->CreateViewFrame(new_view);
-
-	if (m_ViewMaximize)
-		new_view->GetFrame()->Maximize();
-
-	new_view->GetFrame()->SetMinSize(wxSize(500, 300));
-	new_view->GetFrame()->Show(true); // show the view's frame
+  GetLogicManager()->CreateViewFrame(new_view); // the view is shown in the active area of the view area
 	new_view->SetBackgroundColor(m_ViewColorBackground);
 
 	//Setting size to avoid wrong graphic draw 
@@ -470,9 +451,7 @@ albaView *albaViewManager::ViewCreate(wxString label)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  GetLogicManager()->CreateViewFrame(new_view);
-  
-  new_view->GetFrame()->Show(true); // show the view's frame
+  GetLogicManager()->CreateViewFrame(new_view); // the view is shown in the active area of the view area
 	new_view->SetBackgroundColor(m_ViewColorBackground);
 
 	return new_view;
@@ -502,16 +481,6 @@ void albaViewManager::ViewInsert(albaView *view)
   }
 }
 //----------------------------------------------------------------------------
-void albaViewManager::ViewResize(const char *label, int x, int y, int width, int height)
-{
-	albaView *view = GetFromOpenedViews(label);
-	if (view)
-	{
-		view->GetFrame()->SetSize(width, height);
-		view->GetFrame()->SetPosition(wxPoint(x, y));
-	}
-}
-//----------------------------------------------------------------------------
 void albaViewManager::ViewOpen(const char *label)
 {
 	albaView *view = GetFromOpenedViews(label);
@@ -524,13 +493,19 @@ void albaViewManager::ViewOpen(const char *label)
 void albaViewManager::ViewClose(const char *label)
 {
 	albaView *view = GetFromOpenedViews(label);
-	if (view)
+	if (!view)
+		return;
+	// the page deletes the view and removes itself from the view area; forced, so the close is not vetoed
+	albaGUIViewPage *page = dynamic_cast<albaGUIViewPage *>(view->GetFrame());
+	if (page)
 	{
-		wxFrame *frame = view->GetFrame();
-		ViewDelete(view);
-		if (frame != NULL)
-			frame->Destroy();
+		page->Close(true);
+		return;
 	}
+	wxWindow *frame = view->GetFrame();
+	ViewDelete(view);
+	if (frame != NULL)
+		frame->Destroy();
 }
 //----------------------------------------------------------------------------
 void albaViewManager::ViewDelete(albaView *view)
@@ -594,7 +569,9 @@ albaView *albaViewManager::GetSelectedView()
 //----------------------------------------------------------------------------
 void albaViewManager::Activate(albaView *view)
 {
-    ((albaGUIMDIChild *)view->GetFrame())->SetFocus();
+	albaGUIViewPage *page = dynamic_cast<albaGUIViewPage *>(view->GetFrame());
+	if (page)
+		page->GetViewArea()->ActivateView(page);
 }
 
 //----------------------------------------------------------------------------

@@ -50,9 +50,6 @@ public:
 	/** Remove the view from the view-list and delete it (called by its frame when it is closed) */
 	virtual void ViewDelete(albaView *view) = 0;
 
-	/** Move and resize the frame of the open view with the given label */
-	virtual void ViewResize(const char *label, int x, int y, int width, int height) = 0;
-
 	/** Activate the view with the given label, creating it if it is not open */
 	virtual void ViewOpen(const char *label) = 0;
 

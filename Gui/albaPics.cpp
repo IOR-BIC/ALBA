@@ -82,8 +82,6 @@ void albaPictureFactory::Initialize()
     albaADDPIC(PRINT_PREVIEW);
     #include <pic/SPLASH_SCREEN.xpm>
     albaADDPIC(SPLASH_SCREEN);
-    #include <pic/MDICHILD_ICON.xpm>
-    albaADDPIC(MDICHILD_ICON);
     #include <pic/OP_COPY.xpm>
     albaADDPIC(OP_COPY);
     #include <pic/OP_CUT.xpm>
@@ -132,6 +130,8 @@ void albaPictureFactory::Initialize()
     albaADDPIC(ZOOM_ALL);
     #include <pic/ZOOM_SEL.xpm>
     albaADDPIC(ZOOM_SEL);
+    #include <pic/VIEW_MAXIMIZE.xpm>
+    albaADDPIC(VIEW_MAXIMIZE);
 
 		#include "pic/CAMERA.xpm"
 		albaADDPIC(CAMERA);

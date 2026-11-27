@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIMDIFrame
+ Module: albaGUIMainFrame
  Authors: Silvano Imboden
  
  Copyright (c) BIC
@@ -24,7 +24,8 @@
 //----------------------------------------------------------------------------
 
 
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
+#include "albaGUIViewArea.h"
 #include <wx/icon.h>
 #include "albaDecl.h"
 #include "albaEvent.h"
@@ -38,27 +39,27 @@
 
 
 //----------------------------------------------------------------------------
-// albaGUIMDIFrame
+// albaGUIMainFrame
 //----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(albaGUIMDIFrame, wxMDIParentFrame)
-    EVT_CLOSE(albaGUIMDIFrame::OnCloseWindow)
-    EVT_DROP_FILES(albaGUIMDIFrame::OnDropFile)
-	EVT_MENU_RANGE(WIZARD_START,WIZARD_END,albaGUIMDIFrame::OnMenuWizard)
-    EVT_MENU_RANGE(MENU_START,MENU_END,albaGUIMDIFrame::OnMenu)
-		EVT_MENU_RANGE(OP_START,OP_END,albaGUIMDIFrame::OnMenuOp)
-    EVT_MENU_RANGE(VIEW_START,VIEW_END,albaGUIMDIFrame::OnMenuView)
-		EVT_MENU_RANGE(wxID_FILE1, wxID_FILE9, albaGUIMDIFrame::OnMenu)
-    EVT_SIZE(albaGUIMDIFrame::OnSize) //SIL. 23-may-2006 : 
+BEGIN_EVENT_TABLE(albaGUIMainFrame, wxFrame)
+    EVT_CLOSE(albaGUIMainFrame::OnCloseWindow)
+    EVT_DROP_FILES(albaGUIMainFrame::OnDropFile)
+	EVT_MENU_RANGE(WIZARD_START,WIZARD_END,albaGUIMainFrame::OnMenuWizard)
+    EVT_MENU_RANGE(MENU_START,MENU_END,albaGUIMainFrame::OnMenu)
+		EVT_MENU_RANGE(OP_START,OP_END,albaGUIMainFrame::OnMenuOp)
+    EVT_MENU_RANGE(VIEW_START,VIEW_END,albaGUIMainFrame::OnMenuView)
+		EVT_MENU_RANGE(wxID_FILE1, wxID_FILE9, albaGUIMainFrame::OnMenu)
+    EVT_SIZE(albaGUIMainFrame::OnSize) //SIL. 23-may-2006 : 
 
-    EVT_IDLE(albaGUIMDIFrame::OnIdle) 
+    EVT_IDLE(albaGUIMainFrame::OnIdle) 
 END_EVENT_TABLE()
 
 
 
 //----------------------------------------------------------------------------
-albaGUIMDIFrame::albaGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+albaGUIMainFrame::albaGUIMainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
 //----------------------------------------------------------------------------
-: wxMDIParentFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|wxHSCROLL|wxVSCROLL|style)
+: wxFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|style)
 {
   albaSetFrame( this );
 
@@ -71,6 +72,9 @@ albaGUIMDIFrame::albaGUIMDIFrame(const wxString& title, const wxPoint& pos, cons
   artProvider->SetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR, artProvider->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR));
   artProvider->SetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR, artProvider->GetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR));
 	artProvider->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_HORIZONTAL);
+
+  m_ViewArea = new albaGUIViewArea(this);
+  m_DockManager.AddPane(m_ViewArea, wxPaneInfo().Name("views").CenterPane().PaneBorder(false));
   m_DockManager.Update();
   
   m_ID_PBCall = 0;
@@ -97,7 +101,7 @@ albaGUIMDIFrame::albaGUIMDIFrame(const wxString& title, const wxPoint& pos, cons
 }
 
 //----------------------------------------------------------------------------
-albaGUIMDIFrame::~albaGUIMDIFrame()
+albaGUIMainFrame::~albaGUIMainFrame()
 //----------------------------------------------------------------------------
 {
   m_PBCalls.clear();
@@ -105,14 +109,14 @@ albaGUIMDIFrame::~albaGUIMDIFrame()
   albaSetFrame(NULL);
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnMenuWizard(wxCommandEvent& e)
+void albaGUIMainFrame::OnMenuWizard(wxCommandEvent& e)
 	//----------------------------------------------------------------------------
 { 
 	//Tell logic about click on wizard menu
 	albaEventMacro(albaEvent(this,MENU_WIZARD,(long)e.GetId()));
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnMenu(wxCommandEvent& e)
+void albaGUIMainFrame::OnMenu(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
 	//if(e.GetId() > SASH_START && e.GetId() < SASH_END )
@@ -121,25 +125,25 @@ void albaGUIMDIFrame::OnMenu(wxCommandEvent& e)
   albaEventMacro(albaEvent(this,e.GetId()));
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnMenuOp(wxCommandEvent& e)
+void albaGUIMainFrame::OnMenuOp(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
   albaEventMacro(albaEvent(this,MENU_OP,(long)e.GetId()));
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnMenuView(wxCommandEvent& e)
+void albaGUIMainFrame::OnMenuView(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
   albaEventMacro(albaEvent(this,VIEW_CREATE,(long)e.GetId()));
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnCloseWindow(wxCloseEvent& event)
+void albaGUIMainFrame::OnCloseWindow(wxCloseEvent& event)
 //----------------------------------------------------------------------------
 { 
   albaEventMacro(albaEvent(this,MENU_FILE_QUIT));
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnSize(wxSizeEvent& event)
+void albaGUIMainFrame::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 { 
   if(m_frameStatusBar) 
@@ -151,7 +155,7 @@ void albaGUIMDIFrame::OnSize(wxSizeEvent& event)
   //event.Skip();
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
+void albaGUIMainFrame::OnDropFile(wxDropFilesEvent &event)
 //-----------------------------------------------------------
 {
   wxString path, name, ext, *file_list;
@@ -182,7 +186,7 @@ void albaGUIMDIFrame::OnDropFile(wxDropFilesEvent &event)
   }
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::CreateStatusbar()
+void albaGUIMainFrame::CreateStatusbar()
 //----------------------------------------------------------------------------
 {
   static const int widths[]={-1,60,60,60,210,100}; // enlarged the last tab for the "free mem watch" information
@@ -250,7 +254,7 @@ size_t GetFreeMemorySize(size_t* pLargest)
 #endif
 
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::OnIdle(wxIdleEvent& event)
+void albaGUIMainFrame::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 { 
 #ifdef __WIN32__
@@ -274,7 +278,7 @@ void albaGUIMDIFrame::OnIdle(wxIdleEvent& event)
 #endif
 }
 //----------------------------------------------------------------------------
-void albaGUIMDIFrame::FreeMemorySizeOnIdle(wxIdleEvent& event)
+void albaGUIMainFrame::FreeMemorySizeOnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 {
 #ifdef __WIN32__
@@ -337,7 +341,7 @@ void albaGUIMDIFrame::FreeMemorySizeOnIdle(wxIdleEvent& event)
 #endif
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::Busy()
+void albaGUIMainFrame::Busy()
 //-----------------------------------------------------------
 {
   SetStatusText("Busy",2);
@@ -347,7 +351,7 @@ void albaGUIMDIFrame::Busy()
   Refresh(false);
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::Ready()
+void albaGUIMainFrame::Ready()
 //-----------------------------------------------------------
 {
   SetStatusText("",2);
@@ -356,7 +360,7 @@ void albaGUIMDIFrame::Ready()
   Refresh(false);
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ProgressBarShow()
+void albaGUIMainFrame::ProgressBarShow()
 //-----------------------------------------------------------
 {
   if (m_PBCalls.size()==0)
@@ -371,7 +375,7 @@ void albaGUIMDIFrame::ProgressBarShow()
   }
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ProgressBarHide()
+void albaGUIMainFrame::ProgressBarHide()
 //-----------------------------------------------------------
 {
   if (m_PBCalls.size()>0 && (m_PBCalls.at((m_PBCalls.size()-1)) == m_ID_PBCall) )
@@ -386,13 +390,13 @@ void albaGUIMDIFrame::ProgressBarHide()
   }
 }
 //-----------------------------------------------------------
-int albaGUIMDIFrame::ProgressBarGetStatus()
+int albaGUIMainFrame::ProgressBarGetStatus()
 //-----------------------------------------------------------
 {
   return m_Gauge->GetValue();
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ProgressBarSetVal(int progress)
+void albaGUIMainFrame::ProgressBarSetVal(int progress)
 //-----------------------------------------------------------
 {
   if (m_PBCalls.size()>0 && (m_PBCalls.at((m_PBCalls.size()-1)) == m_ID_PBCall) )
@@ -403,19 +407,19 @@ void albaGUIMDIFrame::ProgressBarSetVal(int progress)
   }
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ProgressBarSetText(wxString *msg)
+void albaGUIMainFrame::ProgressBarSetText(wxString *msg)
 //-----------------------------------------------------------
 {
   if(msg) SetStatusText(*msg,0);
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::RenderStart()
+void albaGUIMainFrame::RenderStart()
 //-----------------------------------------------------------
 {
   SetStatusText( "Rendering",1);
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::RenderEnd()
+void albaGUIMainFrame::RenderEnd()
 //-----------------------------------------------------------
 {
   SetStatusText( " ",1);
@@ -424,7 +428,7 @@ void albaGUIMDIFrame::RenderEnd()
 #ifdef ALBA_USE_VTK
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //-----------------------------------------------------------
-void albaGUIMDIFrame::OnQuit()
+void albaGUIMainFrame::OnQuit()
 //-----------------------------------------------------------
 {
   m_DockManager.UnInit();
@@ -436,21 +440,21 @@ void albaGUIMDIFrame::OnQuit()
 
 /*
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ShowDockSettings()
+void albaGUIMainFrame::ShowDockSettings()
 //-----------------------------------------------------------
 {
   m_DockSettings->ShowModal();
 }
 */
 //-----------------------------------------------------------
-void albaGUIMDIFrame::AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu, const wxString &subMenu)
+void albaGUIMainFrame::AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu, const wxString &subMenu)
 //-----------------------------------------------------------
 {
   m_DockManager.AddPane(window,pane_info, menu, subMenu);
   m_DockManager.Update();
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::RemoveDockPane(wxString pane_name)
+void albaGUIMainFrame::RemoveDockPane(wxString pane_name)
 //-----------------------------------------------------------
 {
   wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
@@ -461,7 +465,7 @@ void albaGUIMDIFrame::RemoveDockPane(wxString pane_name)
   }
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ShowDockPane(wxString pane_name, bool show)
+void albaGUIMainFrame::ShowDockPane(wxString pane_name, bool show)
 //-----------------------------------------------------------
 {
   wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
@@ -472,7 +476,7 @@ void albaGUIMDIFrame::ShowDockPane(wxString pane_name, bool show)
   }
 }
 //-----------------------------------------------------------
-void albaGUIMDIFrame::ShowDockPane(wxWindow *window, bool show)
+void albaGUIMainFrame::ShowDockPane(wxWindow *window, bool show)
 //-----------------------------------------------------------
 {
   wxPaneInfo& pi = m_DockManager.GetPane(window);
@@ -483,7 +487,7 @@ void albaGUIMDIFrame::ShowDockPane(wxWindow *window, bool show)
   }
 }
 //-----------------------------------------------------------
-bool albaGUIMDIFrame::DockPaneIsShown(wxString pane_name)
+bool albaGUIMainFrame::DockPaneIsShown(wxString pane_name)
 //-----------------------------------------------------------
 {
   wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
@@ -492,7 +496,7 @@ bool albaGUIMDIFrame::DockPaneIsShown(wxString pane_name)
   return false;
 }
 //-----------------------------------------------------------
-bool albaGUIMDIFrame::DockPaneIsShown(wxWindow *window)
+bool albaGUIMainFrame::DockPaneIsShown(wxWindow *window)
 //-----------------------------------------------------------
 {
   wxPaneInfo& pi = m_DockManager.GetPane(window);

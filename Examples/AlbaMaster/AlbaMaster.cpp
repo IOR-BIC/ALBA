@@ -26,7 +26,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "AlbaMasterVersion.h"
 
 #include "albaDecl.h"
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
 #include "albaPics.h"
 #include "albaPipeFactoryVME.h"
 #include "albaServiceLocator.h"
@@ -65,8 +65,6 @@ bool AlbaMaster::OnInit()
 	albaADDPIC(FRAME_ICON128x128);
 #include "Examples/AlbaMaster/FRAME_ICON256x256.xpm"
 	albaADDPIC(FRAME_ICON256x256);
-#include "Examples/AlbaMaster/MDICHILD_ICON.xpm"
-	albaADDPIC(MDICHILD_ICON);
 
 #include "pic/GIZMO_TRANSLATE_ICON.xpm"
 	albaADDPIC(GIZMO_TRANSLATE_ICON);

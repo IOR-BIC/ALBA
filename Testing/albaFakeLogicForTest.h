@@ -119,10 +119,6 @@ public:
 
 	virtual void ViewDeleted(albaView *view) override {}
 
-	virtual void TileViewFrames(bool horizontally) override {}
-
-	virtual void CascadeViewFrames() override {}
-
 	virtual void UpdateFrameTitle() override {}
 
 	virtual int FileNew() override { return ALBA_OK; }

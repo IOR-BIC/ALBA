@@ -137,6 +137,12 @@ INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 	
 				
   ENDIF(WXWIN_FORCE_CONFIGURE OR NOT EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake) 
+
+  # wxUse.cmake is created when wxWidgets is built: update it at each configure, so that a change of the used
+  # wxWidgets libraries applies also to a build tree where wxWidgets is already built
+  IF (EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake)
+    CONFIGURE_FILE("${WXWIN_SOURCE_DIR}/wxUse.cmake.in" "${WXWIN_BINARY_PATH}/wxUse.cmake" ESCAPE_QUOTES @ONLY IMMEDIATE)
+  ENDIF (EXISTS ${WXWIN_BINARY_PATH}/wxUse.cmake)
  ENDIF (WXWIN_SOURCE_PATH) 
  
 

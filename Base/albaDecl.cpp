@@ -425,6 +425,7 @@ wxString  albaIdString(int id)
 
      case VIEW_CREATE:          s="VIEW_CREATE"; break; 
      case VIEW_CLICKED:         s="VIEW_CLICKED"; break; 
+     case VIEW_AREA_CHANGED:    s="VIEW_AREA_CHANGED"; break; 
 
      case CAMERA_RESET:	        s="CAMERA_RESET"; break; 
 		 case CAMERA_FIT:						s="CAMERA_FIT"; break; 

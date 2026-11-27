@@ -38,7 +38,7 @@ class albaVME;
 class albaView;
 class albaGUINamedPanel;
 class albaGUISplittedPanel;
-class albaGUIMDIFrame;
+class albaGUIMainFrame;
 //----------------------------------------------------------------------------
 // albaSideBar :
 //----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class albaGUIMDIFrame;
 class ALBA_EXPORT albaSideBar: public albaAbsSideBar
 {
 public:
-	albaSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener, long style = DOUBLE_NOTEBOOK);
+	albaSideBar(albaGUIMainFrame* parent, int id, albaObserver *Listener, long style = DOUBLE_NOTEBOOK);
 	~albaSideBar(); 
 
   enum SIDEBAR_STYLE

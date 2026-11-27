@@ -40,11 +40,11 @@
 #include "albaGUIVMEChooser.h"
 #include "albaGUIDialogFindVme.h"
 #include "albaGUIDockManager.h"
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
 
 
 //----------------------------------------------------------------------------
-albaSideBar::albaSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener, long style)
+albaSideBar::albaSideBar(albaGUIMainFrame* parent, int id, albaObserver *Listener, long style)
 //----------------------------------------------------------------------------
 {
   m_SelectedVme  = NULL;

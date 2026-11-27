@@ -25,7 +25,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaGUIDialogFindVme.h"
 #include "albaGUIDockManager.h"
 #include "albaGUIHolder.h"
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
 #include "albaGUIPanel.h"
 #include "albaGUIPanelStack.h"
 #include "albaGUISplittedPanel.h"
@@ -42,7 +42,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "albaViewVTK.h"
 
 //----------------------------------------------------------------------------
-appSideBar::appSideBar(albaGUIMDIFrame* parent, int id, albaObserver *Listener)
+appSideBar::appSideBar(albaGUIMainFrame* parent, int id, albaObserver *Listener)
 {
   m_SelectedVme  = NULL;
 	m_OldSelectedVme = NULL;

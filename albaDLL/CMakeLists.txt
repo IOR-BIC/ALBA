@@ -218,8 +218,7 @@ SET(GUI_SRCS
   ../Gui/albaGUIListBox.cpp  				../Gui/albaGUIListBox.h
   ../Gui/albaGUIListCtrl.cpp  				../Gui/albaGUIListCtrl.h
   ../Gui/albaGUIMovieCtrl.cpp  				../Gui/albaGUIMovieCtrl.h
-  ../Gui/albaGUIMDIChild.cpp  				../Gui/albaGUIMDIChild.h
-  ../Gui/albaGUIMDIFrame.cpp  				../Gui/albaGUIMDIFrame.h
+  ../Gui/albaGUIMainFrame.cpp  				../Gui/albaGUIMainFrame.h
   ../Gui/albaGUIMutexPanel.cpp  			../Gui/albaGUIMutexPanel.h
   ../Gui/albaGUINamedPanel.cpp  			../Gui/albaGUINamedPanel.h
   ../Gui/albaGUIPanel.cpp  					../Gui/albaGUIPanel.h
@@ -234,7 +233,9 @@ SET(GUI_SRCS
   ../Gui/albaGUITimeBar.cpp  				../Gui/albaGUITimeBar.h
   ../Gui/albaGUITree.cpp  					../Gui/albaGUITree.h
   ../Gui/albaGUIValidator.cpp  				../Gui/albaGUIValidator.h
+  ../Gui/albaGUIViewArea.cpp  				../Gui/albaGUIViewArea.h
   ../Gui/albaGUIViewFrame.cpp  				../Gui/albaGUIViewFrame.h
+  ../Gui/albaGUIViewPage.cpp  				../Gui/albaGUIViewPage.h
   ../Gui/albaGUIViewWin.cpp  				../Gui/albaGUIViewWin.h
   ../Gui/albaGUICrossIncremental.cpp  		../Gui/albaGUICrossIncremental.h
   ../Gui/albaGUIComboBox.cpp  				../Gui/albaGUIComboBox.h

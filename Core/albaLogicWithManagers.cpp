@@ -50,8 +50,9 @@
 
 #include "albaSideBar.h"
 #include "albaUser.h"
-#include "albaGUIMDIFrame.h"
-#include "albaGUIMDIChild.h"
+#include "albaGUIMainFrame.h"
+#include "albaGUIViewArea.h"
+#include "albaGUIViewPage.h"
 #include "albaGUIVMETree.h"
 #include "albaGUITimeBar.h"
 #include "albaGUIViewFrame.h"
@@ -100,23 +101,19 @@
 #include "albaProgressBarHelper.h"
 
 
-#define IDM_WINDOWNEXT 4004
-#define IDM_WINDOWPREV 4006
-
-
-
 //----------------------------------------------------------------------------
-albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
+albaLogicWithManagers::albaLogicWithManagers(albaGUIMainFrame *mainFrame/*=NULL*/)
 {
-	if (mdiFrame == NULL)
-		m_Win = new albaGUIMDIFrame("alba", wxDefaultPosition, wxSize(800, 600), wxFRAME_NO_WINDOW_MENU);
+	if (mainFrame == NULL)
+		m_Win = new albaGUIMainFrame("alba", wxDefaultPosition, wxSize(800, 600));
 	else
-		m_Win = mdiFrame;
+		m_Win = mainFrame;
 
 	m_Win->SetListener(this);
+	m_Win->GetViewArea()->SetListener(this);
 	albaProgressBarHelper::SetMainWindow(m_Win);
 
-	m_ChildFrameStyle = 0; 
+	m_ViewListSeparator = NULL;
 	m_ApplicationSettings = new albaGUIApplicationSettings(this);
 	m_TimeBarSettings = NULL;
 
@@ -156,6 +153,7 @@ albaLogicWithManagers::albaLogicWithManagers(albaGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_ExportMenu = NULL;
 	m_OpMenu = NULL;
 	m_ViewMenu = NULL;
+	m_WindowMenu = NULL;
 	m_RecentFileMenu = NULL;
 
 	m_PrintSupport = new albaPrintManager();
@@ -331,18 +329,17 @@ void albaLogicWithManagers::Configure()
 void albaLogicWithManagers::UpdateFrameTitle()
 {
 	//Special Window title management during wizards
+	wxString title(m_AppTitle);
 	if (m_WizardRunning)
-	{
-		wxString title(m_AppTitle);
 		title += "   " + m_WizardManager->GetDescription();
-		m_Win->SetTitle(title);
-	}
-	else
-	{
-		wxString title(m_AppTitle);
+	else if (m_VMEManager && !m_VMEManager->GetFileName().IsEmpty())
 		title += "   " + m_VMEManager->GetFileName();
-		m_Win->SetTitle(title);
-	}
+
+	// the name of the active view, as the MDI frame did with a maximized view
+	albaGUIViewPage *page = GetActiveViewPage();
+	if (page)
+		title += " - [" + m_Win->GetViewArea()->GetViewCaption(page) + "]";
+	m_Win->SetTitle(title);
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::SetApplicationStamp(albaString &app_stamp)
@@ -360,10 +357,12 @@ void albaLogicWithManagers::Show()
 
 	FillMenus();
 	CreateToolBarsAndPanels();
+	CreateViewAreaMenu();
 
 	m_AppTitle = m_Win->GetTitle().ToAscii();
 
 	RestoreLayout();
+	UpdateViewAreaMenu();
 
 	m_Win->Show(true);
 
@@ -460,7 +459,7 @@ void albaLogicWithManagers::OnQuit()
 	StoreLayout();
 
 	albaGUIViewFrame::OnQuit();
-	albaGUIMDIChild::OnQuit();
+	albaGUIViewPage::OnQuit();
 	m_Win->OnQuit();
 
 	if (m_SnapshotManager)
@@ -506,15 +505,17 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 	{
 		switch (e->GetId())
 		{
-			//resize view
-		case TILE_WINDOW_CASCADE:
-			CascadeViewFrames();
+			// ###############################################################
+			// view area
+		case MENU_VIEW_AREA_MAXIMIZE:
+			m_Win->GetViewArea()->SetMaximized(!m_Win->GetViewArea()->IsMaximized());
 			break;
-		case TILE_WINDOW_HORIZONTALLY:
-			TileViewFrames(true);
+		case MENU_VIEW_AREA_CLOSE:
+			if (GetActiveViewPage())
+				GetActiveViewPage()->Close();
 			break;
-		case TILE_WINDOW_VERTICALLY:
-			TileViewFrames(false);
+		case VIEW_AREA_CHANGED:
+			UpdateViewAreaMenu();
 			break;
 			// ###############################################################
 			// commands related to the Dockable Panes
@@ -657,6 +658,14 @@ void albaLogicWithManagers::OnEvent(albaEventBase *alba_event)
 			break;
 
 		default:
+			if (e->GetId() >= MENU_VIEW_AREA_LIST_FIRST && e->GetId() <= MENU_VIEW_AREA_LIST_LAST)
+			{
+				std::vector<albaGUIViewPage *> pages = m_Win->GetViewArea()->GetPages();
+				int index = e->GetId() - MENU_VIEW_AREA_LIST_FIRST;
+				if (index < (int)pages.size())
+					m_Win->GetViewArea()->ActivateView(pages[index]);
+				break;
+			}
 #ifdef _DEBUG
 			e->Log();
 #endif 
@@ -1105,7 +1114,7 @@ void albaLogicWithManagers::ShowLandmark(albaVMELandmark * lm, bool visibility)
 void albaLogicWithManagers::OpRunStarting()
 {
 	m_CancelledBeforeOpStarting = false;
-	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	albaGUIViewPage *c = GetActiveViewPage();
 	if (c != NULL)
 		c->SetAllowCloseWindow(false);
 
@@ -1130,7 +1139,7 @@ void albaLogicWithManagers::OpRunTerminated(bool runOk)
 		return;
 	}
 
-	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	albaGUIViewPage *c = GetActiveViewPage();
 	if (c != NULL)
 		c->SetAllowCloseWindow(true);
 
@@ -1170,13 +1179,11 @@ void albaLogicWithManagers::ViewCreate(int viewId)
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::CreateViewFrame(albaView *v)
 {
-	// removed temporarily support for external Views
 	if (v)
 	{
-		// child views
-		albaGUIMDIChild *c = new albaGUIMDIChild(m_Win, v);
-		c->SetWindowStyleFlag(m_ChildFrameStyle);
-		v->SetFrame(c);
+		albaGUIViewPage *page = new albaGUIViewPage(m_Win->GetViewArea(), v);
+		v->SetFrame(page);
+		m_Win->GetViewArea()->AddView(page);
 	}
 }
 //----------------------------------------------------------------------------
@@ -1190,14 +1197,53 @@ void albaLogicWithManagers::ViewDeleted(albaView *view)
 		m_OpManager->RefreshMenu();
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::TileViewFrames(bool horizontally)
+void albaLogicWithManagers::CreateViewAreaMenu()
 {
-	m_Win->Tile(horizontally ? wxHORIZONTAL : wxVERTICAL);
+	if (!m_WindowMenu)
+		return;
+	if (m_WindowMenu->GetMenuItemCount() > 0)
+		m_WindowMenu->AppendSeparator();
+	m_WindowMenu->AppendCheckItem(MENU_VIEW_AREA_MAXIMIZE, _("Maximized view\tCtrl+M"));
+	m_WindowMenu->Append(MENU_VIEW_AREA_CLOSE, _("Close view\tCtrl+F4"));
 }
 //----------------------------------------------------------------------------
-void albaLogicWithManagers::CascadeViewFrames()
+albaGUIViewPage *albaLogicWithManagers::GetActiveViewPage()
 {
-	m_Win->Cascade();
+	return m_Win ? m_Win->GetViewArea()->GetActivePage() : NULL;
+}
+//----------------------------------------------------------------------------
+void albaLogicWithManagers::UpdateViewAreaMenu()
+{
+	albaGUIViewArea *area = m_Win->GetViewArea();
+	albaGUIViewPage *active = area->GetActivePage();
+	if (m_ToolBar)
+		m_ToolBar->ToggleTool(MENU_VIEW_AREA_MAXIMIZE, area->IsMaximized());
+	UpdateFrameTitle();
+	if (!m_WindowMenu || !m_MenuBar)
+		return;
+	m_MenuBar->Check(MENU_VIEW_AREA_MAXIMIZE, area->IsMaximized());
+	m_MenuBar->Enable(MENU_VIEW_AREA_CLOSE, active != NULL);
+
+	// The list of the open views follows the Close view item, after a separator
+	for (int id = MENU_VIEW_AREA_LIST_FIRST; id <= MENU_VIEW_AREA_LIST_LAST; id++)
+		if (m_WindowMenu->FindChildItem(id))
+			m_WindowMenu->Destroy(id);
+	if (m_ViewListSeparator)
+		m_WindowMenu->Destroy(m_ViewListSeparator);
+	m_ViewListSeparator = NULL;
+
+	size_t pos;
+	std::vector<albaGUIViewPage *> pages = area->GetPages();
+	if (pages.empty() || !m_WindowMenu->FindChildItem(MENU_VIEW_AREA_CLOSE, &pos))
+		return;
+	m_ViewListSeparator = m_WindowMenu->InsertSeparator(++pos);
+	int count = wxMin((int)pages.size(), MENU_VIEW_AREA_LIST_LAST - MENU_VIEW_AREA_LIST_FIRST + 1);
+	for (int i = 0; i < count; i++)
+	{
+		wxString caption = area->GetViewCaption(pages[i]);
+		wxString label = i < 9 ? wxString::Format("&%d %s", i + 1, caption) : caption;
+		m_WindowMenu->InsertCheckItem(pos + 1 + i, MENU_VIEW_AREA_LIST_FIRST + i, label)->Check(pages[i] == active);
+	}
 }
 //----------------------------------------------------------------------------
 void albaLogicWithManagers::SelectView(albaView *view)
@@ -1218,7 +1264,7 @@ void albaLogicWithManagers::SelectView(albaView *view)
 		if (!m_OpManager->Running())
 			m_OpManager->VmeSelected(m_OpManager->GetSelectedVme());
 
-		albaGUIMDIChild *c = m_Win ? (albaGUIMDIChild *)m_Win->GetActiveChild() : NULL;
+		albaGUIViewPage *c = GetActiveViewPage();
 		if (c != NULL)
 			c->SetAllowCloseWindow(!m_OpManager->Running());
 	}
@@ -1229,9 +1275,9 @@ void albaLogicWithManagers::ShowViewContextualMenu(bool vmeMenu)
 {
 	albaGUIContextualMenu *contextMenu = new albaGUIContextualMenu();
 	albaView *v = m_ViewManager->GetSelectedView();
-	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
-	if (c != NULL)
-		contextMenu->ShowContextualMenu(c, v, vmeMenu);
+	albaGUIViewPage *page = GetActiveViewPage();
+	if (page != NULL && v != NULL)
+		contextMenu->ShowContextualMenu(page, v, vmeMenu);
 	cppDEL(contextMenu);
 }
 
@@ -1374,7 +1420,7 @@ void albaLogicWithManagers::ConfigureWizardManager()
 void albaLogicWithManagers::WizardRunStarting()
 {
 	//lock the close button of the view
-	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	albaGUIViewPage *c = GetActiveViewPage();
 	if (c != NULL)
 		c->SetAllowCloseWindow(false);
 
@@ -1393,7 +1439,7 @@ void albaLogicWithManagers::WizardRunStarting()
 void albaLogicWithManagers::WizardRunTerminated()
 {
 	//unlock the close button of the view
-	albaGUIMDIChild *c = (albaGUIMDIChild *)m_Win->GetActiveChild();
+	albaGUIViewPage *c = GetActiveViewPage();
 	if (c != NULL)
 		c->SetAllowCloseWindow(true);
 
@@ -1471,11 +1517,6 @@ void albaLogicWithManagers::CreateMenu()
 #include "pic/menu/HELP_ABOUT.xpm"
 #include "pic/menu/HELP_HELP.xpm"
 #include "pic/menu/HELP_LICENCE.xpm"
-#include "pic/menu/WINDOW_CASCADE.xpm"
-#include "pic/menu/WINDOW_HORIZONTALLY.xpm"
-#include "pic/menu/WINDOW_PREV.xpm"
-#include "pic/menu/WINDOW_NEXT.xpm"
-#include "pic/menu/WINDOW_VERTICALLY.xpm"
 
 	m_MenuBar = new wxMenuBar;
 	wxMenu *file_menu = new wxMenu;
@@ -1530,20 +1571,14 @@ void albaLogicWithManagers::CreateMenu()
 	m_MenuBar->Append(edit_menu, _("&Edit"));
 
 	m_ViewMenu = new wxMenu;
-	m_MenuBar->Append(m_ViewMenu, _("&View"));
+	m_MenuBar->Append(m_ViewMenu, _("&Views"));
 
 	m_OpMenu = new wxMenu;
 	m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
-	wxMenu    *windowMenu = new wxMenu;
-	m_MenuBar->Append(windowMenu, _("Window"));
-	albaGUI::AddMenuItem(windowMenu, TILE_WINDOW_CASCADE, _("&Cascade"), WINDOW_CASCADE_xpm);
-	albaGUI::AddMenuItem(windowMenu, TILE_WINDOW_HORIZONTALLY, _("Tile &Horizontally"), WINDOW_HORIZONTALLY_xpm);
-	albaGUI::AddMenuItem(windowMenu, TILE_WINDOW_VERTICALLY, _("Tile &Vertically"), WINDOW_VERTICALLY_xpm);
-
-	windowMenu->AppendSeparator();
-	albaGUI::AddMenuItem(windowMenu, IDM_WINDOWNEXT, _("&Next"), WINDOW_NEXT_xpm);
-	albaGUI::AddMenuItem(windowMenu, IDM_WINDOWPREV, _("&Previous"), WINDOW_PREV_xpm);
+	// Window menu: the dockable panes (added with the panes), the view area commands and the list of the open views
+	m_WindowMenu = new wxMenu;
+	m_MenuBar->Append(m_WindowMenu, _("&Window"));
 
 	wxMenu    *help_menu = new wxMenu;
 	albaGUI::AddMenuItem(help_menu, ABOUT_APPLICATION, _("About"), HELP_ABOUT_xpm);
@@ -1596,7 +1631,9 @@ void albaLogicWithManagers::CreateToolbar()
 	m_ToolBar->AddTool(CAMERA_RESET, _("Reset camera to fit all (ctrl+f)"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"));
 	m_ToolBar->AddTool(CAMERA_FIT, _("Reset camera to fit selected object (ctrl+shift+f)"), albaPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"));
 	m_ToolBar->AddTool(CAMERA_FLYTO, _("Fly to object under mouse"), albaPictureFactory::GetPictureFactory()->GetBmp("FLYTO"));
-	
+	m_ToolBar->AddSeparator();
+	m_ToolBar->AddCheckTool(MENU_VIEW_AREA_MAXIMIZE, _("Maximized view"), albaPictureFactory::GetPictureFactory()->GetBmp("VIEW_MAXIMIZE"), wxNullBitmap, _("Maximized view (ctrl+m)"));
+
 	if (m_UseSnapshotManager)
 	{
 		m_ToolBar->AddSeparator();
@@ -1689,7 +1726,6 @@ void albaLogicWithManagers::FillMenus()
 	if (m_UseViewManager && m_ViewMenu)
 	{
 		m_ViewManager->FillMenu(m_ViewMenu);
-		m_ViewMenu->AppendSeparator();
 	}
 
 	if (m_OpManager && m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))

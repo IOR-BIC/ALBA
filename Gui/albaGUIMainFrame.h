@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: ALBA (Agile Library for Biomedical Applications)
- Module: albaGUIMDIFrame
+ Module: albaGUIMainFrame
  Authors: Silvano Imboden
  
  Copyright (c) BIC
@@ -13,13 +13,12 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __albaGUIMDIFrame_H__
-#define __albaGUIMDIFrame_H__
+#ifndef __albaGUIMainFrame_H__
+#define __albaGUIMainFrame_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include <wx/laywin.h>
-#include <wx/mdi.h>
 #include <vector>
 #include "albaGUIDockManager.h"
 #include "albaServiceClient.h"
@@ -30,18 +29,20 @@
 //----------------------------------------------------------------------------
 class albaObserver;
 class albaGUI;
+class albaGUIViewArea;
 /**
-  Class Name: albaGUIMDIFrame.
+  Class Name: albaGUIMainFrame.
   Represents the main frame of a ALBA Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
+  The views are shown in the view area (albaGUIViewArea), the center pane of the docking manager.
   Closing this frame is equal to close the application.
 */
-class ALBA_EXPORT albaGUIMDIFrame: public wxMDIParentFrame, public albaServiceClient
+class ALBA_EXPORT albaGUIMainFrame: public wxFrame, public albaServiceClient
 {
  public:
   /** constructor. */
-  albaGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style=0);
+  albaGUIMainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style=0);
   /** destructor. */
- ~albaGUIMDIFrame(); 
+ ~albaGUIMainFrame(); 
   
   /** Set the listener object, i.e. the object receiving events sent by this object */
   void SetListener(albaObserver *Listener) {m_Listener = Listener;};
@@ -49,12 +50,15 @@ class ALBA_EXPORT albaGUIMDIFrame: public wxMDIParentFrame, public albaServiceCl
   /** Retrieve the Docking Manager */
   albaGUIDockManager& GetDockManager()  {return m_DockManager;};
 
+  /** Retrieve the area that shows the views */
+  albaGUIViewArea *GetViewArea() {return m_ViewArea;};
+
   /** must be called @ shutdown*/
   void OnQuit();
 
   /** add a new Dockable Pane containing the given Window.
      pane_info specify the Pane settings */
-  void AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
+  void AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu = _("&Window"), const wxString &subMenu = wxEmptyString);
   
   /** remove a Dockable Pane  - the contained window is not destroyed */
   void RemoveDockPane(wxString pane_name);
@@ -160,6 +164,8 @@ protected:
 
   // AUI Layout Manager -  //SIL. 23-may-2006 : 
   albaGUIDockManager    m_DockManager;
+
+  albaGUIViewArea *m_ViewArea;
 
   /** Event Table Declaration*/
   DECLARE_EVENT_TABLE()

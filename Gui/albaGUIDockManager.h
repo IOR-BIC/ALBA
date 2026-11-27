@@ -965,14 +965,14 @@ class ALBA_EXPORT albaGUIDockManager : public wxFrameManager
 {
 public:
   /** add pane */
-  virtual bool AddPane(wxWindow* window,const wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
+  virtual bool AddPane(wxWindow* window,const wxPaneInfo& pane_info, const wxString &menu = _("&Window"), const wxString &subMenu = wxEmptyString);
   /** add pane overload*/
   virtual bool AddPane(wxWindow* window,int direction = wxLEFT,const wxString& caption = wxEmptyString);	
   /** update */
   virtual void Update();
 protected:
   /** add menu item */
-	void AddMenuItem(wxWindow* window,const wxString& caption = wxEmptyString, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString );
+	void AddMenuItem(wxWindow* window,const wxString& caption = wxEmptyString, const wxString &menu = _("&Window"), const wxString &subMenu = wxEmptyString );
   /** update menu items */
   void UpdateMenuItems();
 };  

@@ -118,12 +118,6 @@ public:
 	/** Update the title of the main window (opened file or running wizard) */
 	virtual void UpdateFrameTitle() = 0;
 
-	/** Tile the view frames horizontally or vertically */
-	virtual void TileViewFrames(bool horizontally) = 0;
-
-	/** Cascade the view frames */
-	virtual void CascadeViewFrames() = 0;
-
 	/** Called on the right click in a view: show the contextual menu of the selected view, with the VME items if vmeMenu is true */
 	virtual void ShowViewContextualMenu(bool vmeMenu) = 0;
 

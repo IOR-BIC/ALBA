@@ -29,7 +29,6 @@
 #include "albaSmartPointer.h"
 #include "mmaApplicationLayout.h"
 #include "albaView.h"
-#include "albaGUIMDIChild.h"
 
 #include "wx/module.h"
 #include <iostream>

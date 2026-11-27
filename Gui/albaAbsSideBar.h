@@ -37,7 +37,7 @@ class albaVME;
 class albaView;
 class albaGUINamedPanel;
 class albaGUISplittedPanel;
-class albaGUIMDIFrame;
+class albaGUIMainFrame;
 //----------------------------------------------------------------------------
 // albaSideBar :
 //----------------------------------------------------------------------------

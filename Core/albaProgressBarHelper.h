@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 class albaGUIBusyInfo;
-class albaGUIMDIFrame;
+class albaGUIMainFrame;
 class albaProgressBarHelperVTKCallback;
 class vtkAlgorithm;
 
@@ -39,10 +39,10 @@ public:
 	virtual ~albaProgressBarHelper();
 
 	/** Set the main window that shows the progress bar: the logic sets it when it creates the window and resets it (NULL) when it is destroyed */
-	static void SetMainWindow(albaGUIMDIFrame *win);
+	static void SetMainWindow(albaGUIMainFrame *win);
 
 	/** Return the main window that shows the progress bar, NULL if none */
-	static albaGUIMDIFrame *GetMainWindow();
+	static albaGUIMainFrame *GetMainWindow();
 
 	/**Init the Progress Bar, if label is not an empty string a busy info is created*/
 	void InitProgressBar(wxString label="", bool showBusyCursor=true);
@@ -84,7 +84,7 @@ protected:
 	wxBusyCursor *m_BusyCursor;
 	std::vector<albaProgressBarHelperVTKCallback *> m_VTKCallbacks;
 
-	static albaGUIMDIFrame *m_MainWindow;
+	static albaGUIMainFrame *m_MainWindow;
 
 private:
   albaProgressBarHelper(const albaProgressBarHelper&); // Not implemented

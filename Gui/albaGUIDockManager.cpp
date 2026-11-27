@@ -20,13 +20,13 @@
 #include <wx/minifram.h>
 #include <wx/image.h>
 #include "albaGUIDockManager.h"
-#include "albaGUIMDIFrame.h"
+#include "albaGUIMainFrame.h"
 
 // -- various array and event implementations --
 
 #include <wx/arrimpl.cpp>
-WX_DECLARE_OBJARRAY(wxRect, wxAuiRectArray);
-WX_DEFINE_OBJARRAY(wxAuiRectArray)
+WX_DECLARE_OBJARRAY(wxRect, albaDockRectArray);
+WX_DEFINE_OBJARRAY(albaDockRectArray)
 WX_DEFINE_OBJARRAY(wxDockUIPartArray)
 WX_DEFINE_OBJARRAY(wxDockInfoArray)
 WX_DEFINE_OBJARRAY(wxPaneButtonArray)
@@ -1185,24 +1185,6 @@ void wxFrameManager::SetFrame(wxFrame* frame)
 
     m_Frame = frame;
     m_Frame->PushEventHandler(this);
-
-#if wxUSE_MDI
-    // if the owner is going to manage an MDI parent frame,
-    // we need to add the MDI client window as the default
-    // center pane
-
-    if (frame->IsKindOf(CLASSINFO(wxMDIParentFrame)))
-    {
-        wxMDIParentFrame* mdi_frame = (wxMDIParentFrame*)frame;
-				wxMDIClientWindow* client_window = dynamic_cast<wxMDIClientWindow*>(mdi_frame->GetClientWindow());
-
-        wxASSERT_MSG(client_window, "Client window is NULL!");
-
-        AddPane(client_window,
-                wxPaneInfo().Name("mdiclient").
-                CenterPane().PaneBorder(false));
-    }
-#endif
 }
 
 
@@ -2505,7 +2487,7 @@ void wxFrameManager::Update()
 
     // keep track of the old window rectangles so we can
     // refresh those windows whose rect has changed
-    wxAuiRectArray old_pane_rects;
+    albaDockRectArray old_pane_rects;
     for (i = 0; i < pane_count; ++i)
     {
         wxRect r;
@@ -3570,7 +3552,7 @@ void wxFrameManager::OnSize(wxSizeEvent& event)
 {
     if (m_Frame)
     {
-      ((albaGUIMDIFrame *)m_Frame)->OnSize(event);
+      ((albaGUIMainFrame *)m_Frame)->OnSize(event);
       DoFrameLayout();
       Repaint();
     }

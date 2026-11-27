@@ -24,6 +24,7 @@
 // forward references;
 //----------------------------------------------------------------------------
 class albaView;
+class albaGUIViewPage;
 class albaEvent;
 class albaObserver;
 
@@ -40,11 +41,11 @@ public:
   virtual ~albaGUIContextualMenu();
   /** function for setting the listener of events coming from another object*/
 
-	/**  Visualize contextual menù for the MDI child and selected view. */
-  void ShowContextualMenu(wxFrame *child, albaView *view, bool vme_menu);		
+	/**  Visualize the contextual menu of the selected view and of its page in the view area. */
+  void ShowContextualMenu(albaGUIViewPage *page, albaView *view, bool vme_menu);		
 
 protected:
-  wxFrame     *m_ChildViewActive;
+  albaGUIViewPage *m_ChildViewActive;
   albaView     *m_ViewActive;
 
 	/**  Answer contextual menù's selection. */

@@ -46,7 +46,7 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "albaGUIViewFrame.h"
-#include "albaGUIMDIChild.h"
+#include "albaGUIViewPage.h"
 #include "vtkTimerLog.h"
 #include "albaTagArray.h"
 
@@ -196,7 +196,7 @@ void appLogic::OnQuit()
 	StoreLayout();
 
 	albaGUIViewFrame::OnQuit();
-	albaGUIMDIChild::OnQuit();
+	albaGUIViewPage::OnQuit();
 	m_Win->OnQuit();
 
 	if (m_SnapshotManager)
@@ -281,7 +281,6 @@ void appLogic::ViewCreate(int viewId)
 	if (!currentView)
 	{
 		currentView = m_ViewManager->ViewCreate(viewId);
-		currentView->GetFrame()->SetMaxSize(currentView->GetFrame()->GetSize());
 		ShowVMEOnView();
 	}
 }
@@ -385,13 +384,17 @@ void appLogic::CreateMenu()
 	albaGUI::AddMenuItem(edit_menu, ID_APP_SETTINGS, _("Settings..."), EDIT_SETTINGS_xpm);
 	m_MenuBar->Append(edit_menu, _("&Edit"));
 
-	// View Menu //////////////////////////////////////////////////////////////////////////
+	// Views Menu /////////////////////////////////////////////////////////////////////////
 	m_ViewMenu = new wxMenu;
-	m_MenuBar->Append(m_ViewMenu, _("&View"));
+	m_MenuBar->Append(m_ViewMenu, _("&Views"));
 
 	// Operations Menu ////////////////////////////////////////////////////////////////////
 	m_OpMenu = new wxMenu; 
 	m_MenuBar->Append(m_OpMenu, _("&Operations"));
+
+	// Window Menu ////////////////////////////////////////////////////////////////////////
+	m_WindowMenu = new wxMenu;
+	m_MenuBar->Append(m_WindowMenu, _("&Window"));
 
 	// Wizard Menu ////////////////////////////////////////////////////////////////////
 	if (m_UseWizardManager)

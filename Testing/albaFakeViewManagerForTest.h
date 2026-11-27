@@ -32,7 +32,6 @@ public:
 	virtual albaView *GetFromOpenedViews(const char *label) override { return NULL; }
 	virtual albaView *ViewCreate(int id) override { return NULL; }
 	virtual void ViewDelete(albaView *view) override {}
-	virtual void ViewResize(const char *label, int x, int y, int width, int height) override {}
 	virtual void ViewOpen(const char *label) override {}
 	virtual void ViewClose(const char *label) override {}
 	virtual albaView *GetSelectedView() override { return m_SelectedView; }
