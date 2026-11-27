@@ -55,7 +55,6 @@ SET(PROJECT_SRCS
   albaTransformConstraint.cpp  				albaTransformConstraint.h
   albaBehaviorTransform.cpp  			albaBehaviorTransform.h
   albaPositionalEventRouter.cpp  					albaPositionalEventRouter.h
-  albaBehaviorPicker.cpp  					albaBehaviorPicker.h
   albaToolPicker.cpp  						albaToolPicker.h
   albaToolFlyTo.cpp  						albaToolFlyTo.h
   albaToolSelect.cpp  						albaToolSelect.h

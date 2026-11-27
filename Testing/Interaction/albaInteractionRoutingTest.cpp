@@ -121,6 +121,8 @@ albaCxxTypeMacro(albaRoutingTestKeyTool);
 void albaRoutingTestListener::OnEvent(albaEventBase *event)
 {
   m_Ids.push_back(event->GetId());
+  if (albaEvent *e = albaEvent::SafeDownCast(event))
+    m_LastVme = e->GetVme();
 }
 
 //----------------------------------------------------------------------------
@@ -318,20 +320,7 @@ void albaInteractionRoutingTest::TestCameraButtons()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::TestPERPickerClick()
 {
-  albaVMESurface *vme;
-  albaNEW(vme);
-  vtkALBASmartPointer<vtkSphereSource> sphere;
-  sphere->SetRadius(10);
-  vtkALBASmartPointer<vtkPolyDataMapper> mapper;
-  mapper->SetInputConnection(sphere->GetOutputPort());
-  vtkALBASmartPointer<vtkActor> actor;
-  actor->SetMapper(mapper);
-  vtkALBASmartPointer<vtkALBAAssembly> assembly;
-  assembly->AddPart(actor);
-  assembly->SetVme(vme);
-  m_Renderer->AddActor(assembly);
-  m_Renderer->ResetCamera();
-  m_RenderWindow->Render();
+  albaVMESurface *vme = AddSphereVME();
 
   albaPositionalEventRouter *per = albaPositionalEventRouter::New();
   albaServiceLocator::SetPositionalEventRouter(per);
@@ -377,6 +366,124 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   albaDEL(picker);
   m_Renderer->RemoveAllViewProps();
   albaDEL(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::TestPERPickerTargets()
+{
+  albaVMESurface *vme = AddSphereVME();
+  albaVMESurface *otherVme;
+  albaNEW(otherVme);
+  albaToolPicker *picker;
+  albaNEW(picker);
+  picker->SetListener(&m_Listener);
+  albaPositionalEventRouter *per = NewPERWithTool(picker);
+
+  // with no target every VME is picked, and the event carries the picked VME
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  CPPUNIT_ASSERT(m_Listener.m_LastVme == vme);
+
+  // a VME that is not a target is not picked
+  m_Listener.Clear();
+  picker->AddTargetVME(otherVme);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+
+  // a target VME is picked
+  picker->AddTargetVME(vme);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  CPPUNIT_ASSERT(m_Listener.m_LastVme == vme);
+
+  // a removed target is not picked any more
+  m_Listener.Clear();
+  picker->RemoveTargetVME(vme);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+
+  // without targets every VME is picked again
+  picker->RemoveAllTargetVMEs();
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+
+  per->PopTool(picker);
+  DeletePER(per);
+  albaDEL(picker);
+  m_Renderer->RemoveAllViewProps();
+  albaDEL(otherVme);
+  albaDEL(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::TestPERPickerContinuous()
+{
+  albaVMESurface *vme = AddSphereVME();
+  albaToolPicker *picker;
+  albaNEW(picker);
+  picker->SetListener(&m_Listener);
+  picker->AddTargetVME(vme);
+  picker->EnableContinuousPicking(true);
+  albaPositionalEventRouter *per = NewPERWithTool(picker);
+
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startPosition[3], position[3];
+  camera->GetPosition(startPosition);
+
+  // the button down picks, the drags send VME_PICKING without moving the camera, the button up picks
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  SendMouse(TEST_MOUSE_MOVE, 410, 300);
+  SendMouse(TEST_MOUSE_MOVE, 420, 300);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKING) == 2);
+  SendMouse(TEST_BUTTON_UP, 420, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 2);
+  CPPUNIT_ASSERT(m_Listener.m_LastVme == vme);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) < 1e-6);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+
+  // a drag starting on the background does not pick and moves the camera
+  m_Listener.Clear();
+  SendMouse(TEST_BUTTON_DOWN, 5, 5, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 25, 5);
+  SendMouse(TEST_BUTTON_UP, 25, 5, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKING) == 0);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
+
+  per->PopTool(picker);
+  DeletePER(per);
+  albaDEL(picker);
+  m_Renderer->RemoveAllViewProps();
+  albaDEL(vme);
+}
+
+//----------------------------------------------------------------------------
+albaVMESurface *albaInteractionRoutingTest::AddSphereVME()
+{
+  albaVMESurface *vme;
+  albaNEW(vme);
+  vtkALBASmartPointer<vtkSphereSource> sphere;
+  sphere->SetRadius(10);
+  vtkALBASmartPointer<vtkPolyDataMapper> mapper;
+  mapper->SetInputConnection(sphere->GetOutputPort());
+  vtkALBASmartPointer<vtkActor> actor;
+  actor->SetMapper(mapper);
+  vtkALBASmartPointer<vtkALBAAssembly> assembly;
+  assembly->AddPart(actor);
+  assembly->SetVme(vme);
+  m_Renderer->AddActor(assembly);
+  m_Renderer->ResetCamera();
+  m_RenderWindow->Render();
+  return vme;
 }
 
 //----------------------------------------------------------------------------

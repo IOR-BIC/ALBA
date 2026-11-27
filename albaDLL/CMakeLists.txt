@@ -328,7 +328,6 @@ SET(INTERACTION_SRCS
   ../Interaction/albaTransformConstraint.cpp  				../Interaction/albaTransformConstraint.h
   ../Interaction/albaBehaviorTransform.cpp  			../Interaction/albaBehaviorTransform.h
   ../Interaction/albaPositionalEventRouter.cpp  					../Interaction/albaPositionalEventRouter.h
-  ../Interaction/albaBehaviorPicker.cpp  					../Interaction/albaBehaviorPicker.h
   ../Interaction/albaToolPicker.cpp  				../Interaction/albaToolPicker.h
   ../Interaction/albaPickHelper.cpp  						../Interaction/albaPickHelper.h
   ../Interaction/albaGizmoPolylineGraph.cpp  				../Interaction/albaGizmoPolylineGraph.h

@@ -26,7 +26,8 @@
 #include <albaGUIBusyInfo.h>
 
 #include "albaOpIterativeRegistration.h"
-#include "albaBehaviorPicker.h"
+#include "albaToolPicker.h"
+#include "albaPositionalEventRouter.h"
 #include "mmaMaterial.h"
 #include "vtkProperty.h"
 #include <vector>
@@ -83,10 +84,9 @@ albaOpIterativeRegistration::albaOpIterativeRegistration(wxString label)
   m_UndoSourceAbsPose = NULL;
   m_RegistrationMatrix = NULL;
 
+  m_Picker = NULL;
   for (int side = SOURCE; side <= TARGET; side++)
   {
-    m_Picker[side] = NULL;
-    m_OldBehavior[side] = NULL;
     m_Cloud[side] = NULL;
     m_Landmark[side] = NULL;
   }
@@ -175,11 +175,11 @@ void albaOpIterativeRegistration::OnEvent(albaEventBase *alba_event)
     {
       OnEventThis(e);  
     }
-    else if (e->GetId() == VME_PICKED && e->GetSender() == m_Picker[SOURCE])
+    else if (e->GetId() == VME_PICKED && e->GetSender() == m_Picker && e->GetVme() == m_SourceVME)
     {
       OnVmePicked(SOURCE, e);
     }
-    else if (e->GetId() == VME_PICKED && e->GetSender() == m_Picker[TARGET])
+    else if (e->GetId() == VME_PICKED && e->GetSender() == m_Picker && e->GetVme() == m_TargetVME)
     {
       OnVmePicked(TARGET, e);
     } 
@@ -225,7 +225,10 @@ void albaOpIterativeRegistration::CreateGui()
   m_Gui->Button(ID_REGISTER,"Register","","Perform rigid registration");
   m_Gui->Enable(ID_REGISTER, false);
   // a left click on the source and on the target VME places their landmarks
-  AttachPicker(SOURCE, m_SourceVME);
+  albaNEW(m_Picker);
+  m_Picker->SetListener(this);
+  m_Picker->AddTargetVME(m_SourceVME);
+  GetPositionalEventRouter()->PushTool(m_Picker);
 
 	//////////////////////////////////////////////////////////////////////////
 	m_Gui->Label("");
@@ -259,7 +262,7 @@ void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
       m_TargetVME = GetLogicManager()->ChooseVME(_("Choose target vme"), &albaOpIterativeRegistration::VmeAccept);
       if (m_TargetVME)
       {
-        AttachPicker(TARGET, m_TargetVME);
+        m_Picker->AddTargetVME(m_TargetVME);
         m_Gui->Enable(ID_CHOOSE_TARGET, false);
         m_TargetVmeName = m_TargetVME->GetName();
         m_Gui->Update();
@@ -297,15 +300,6 @@ void albaOpIterativeRegistration::OnEventThis(albaEventBase *alba_event)
   }
 }
 
-//----------------------------------------------------------------------------
-void albaOpIterativeRegistration::AttachPicker(int side, albaVME *vme)
-//----------------------------------------------------------------------------
-{
-  albaNEW(m_Picker[side]);
-  m_Picker[side]->SetListener(this);
-  m_OldBehavior[side] = vme->GetBehavior();
-  vme->SetBehavior(m_Picker[side]);
-}
 //----------------------------------------------------------------------------
 void albaOpIterativeRegistration::OnVmePicked(int side, albaEvent *e)
 //----------------------------------------------------------------------------
@@ -365,13 +359,12 @@ void albaOpIterativeRegistration::OnVmePicked(int side, albaEvent *e)
 void albaOpIterativeRegistration::Clear()
 //----------------------------------------------------------------------------
 {
-  albaVME *vmes[2] = {m_SourceVME, m_TargetVME};
+  if (m_Picker)
+    GetPositionalEventRouter()->PopTool(m_Picker);
+  albaDEL(m_Picker);
+
   for (int side = SOURCE; side <= TARGET; side++)
   {
-    if (m_Picker[side])
-      vmes[side]->SetBehavior(m_OldBehavior[side]);
-    albaDEL(m_Picker[side]);
-
     if (m_Cloud[side])
     {
       std::vector<albaVME *> landmarks;

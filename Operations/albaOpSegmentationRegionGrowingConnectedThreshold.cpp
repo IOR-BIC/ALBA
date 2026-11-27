@@ -32,7 +32,8 @@
 #include "albaVME.h"
 #include "albaVMEVolumeGray.h"
 #include "albaVMESurface.h"
-#include "albaBehaviorPicker.h"
+#include "albaToolPicker.h"
+#include "albaPositionalEventRouter.h"
 #include "albaTagArray.h"
 
 #include "vtkDataSet.h"
@@ -78,7 +79,6 @@ albaOpSegmentationRegionGrowingConnectedThreshold::albaOpSegmentationRegionGrowi
   }
 
   m_Picker = NULL;
-  m_OldBehavior = NULL;
 
   m_Sphere = NULL;
   m_SphereVTK = NULL;
@@ -125,11 +125,10 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpRun()
   if (CreateResample())
   {
     
-	  m_OldBehavior = m_ResampleInput->GetBehavior();
-
 	  albaNEW(m_Picker);
 	  m_Picker->SetListener(this);
-	  m_ResampleInput->SetBehavior(m_Picker);
+	  m_Picker->AddTargetVME(m_ResampleInput);
+	  GetPositionalEventRouter()->PushTool(m_Picker);
 
 	  albaNEW(m_Sphere);
 	  m_Sphere->GetTagArray()->SetTag(albaTagItem("VISIBLE_IN_THE_TREE", 0.0));
@@ -191,7 +190,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     GetLogicManager()->VmeShow(m_Sphere, false);
     m_Sphere->ReparentTo(NULL);
 
-		m_ResampleInput->SetBehavior(m_OldBehavior);
+		GetPositionalEventRouter()->PopTool(m_Picker);
     m_ResampleInput->Update();
 
     HideGui();
@@ -204,7 +203,7 @@ void albaOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
       GetLogicManager()->VmeShow(m_Sphere, false);
       m_Sphere->ReparentTo(NULL);
   
-			m_ResampleInput->SetBehavior(m_OldBehavior);
+			GetPositionalEventRouter()->PopTool(m_Picker);
       m_ResampleInput->Update();
     }
     
