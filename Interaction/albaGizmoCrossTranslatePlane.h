@@ -15,16 +15,6 @@
 =========================================================================*/
 
 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-
 #ifndef __albaGizmoCrossTranslatePlane_H__
 #define __albaGizmoCrossTranslatePlane_H__
 
@@ -197,12 +187,11 @@ protected:
   /** Create feedback gizmo vtk objects */
   void CreateFeedbackGizmoPipeline();
 
-  /** Create the behaviors moving the gizmo */
-  void CreateBehaviors();
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
-
-  /** the behavior moving the gizmo */
-  albaBehaviorTransform *m_Behavior[2];
+  /** the behavior moving the gizmo, shared by its parts */
+  albaBehaviorTransform *m_Behavior;
 
   /** Used by albaBehaviorTransform */
   vtkTransform *m_PivotTransform;

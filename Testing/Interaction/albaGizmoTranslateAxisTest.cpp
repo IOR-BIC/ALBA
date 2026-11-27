@@ -173,11 +173,8 @@ void albaGizmoTranslateAxisTest::TestSetRefSysMatrix()
   gizmoTranslateAxis->SetRefSysMatrix(&refSys);
   
   // using friend albaGizmoTranslateAxis
-  for (int i = 0; i < 2; i++)
-  {
-    albaMatrix *mat = gizmoTranslateAxis->m_Behavior[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
-    CPPUNIT_ASSERT(mat == &refSys);
-  }
+  albaMatrix *mat = gizmoTranslateAxis->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  CPPUNIT_ASSERT(mat == &refSys);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -190,11 +187,8 @@ void albaGizmoTranslateAxisTest::TestSetConstraintModality()
   gizmoTranslateAxis->SetConstraintModality(albaTransformConstraint::X, albaTransformConstraint::LOCK);
   
   // using friend albaGizmoTranslateAxis
-  for (int i = 0; i < 2; i++)
-  {
-    int constrainModality = gizmoTranslateAxis->m_Behavior[i]->GetTranslationConstraint()->GetConstraintModality(albaTransformConstraint::X);
-    CPPUNIT_ASSERT(constrainModality  ==  albaTransformConstraint::LOCK);
-  } 
+  int constrainModality = gizmoTranslateAxis->m_Behavior->GetTranslationConstraint()->GetConstraintModality(albaTransformConstraint::X);
+  CPPUNIT_ASSERT(constrainModality  ==  albaTransformConstraint::LOCK);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -264,12 +258,7 @@ void albaGizmoTranslateAxisTest::TestSetStep()
   albaGizmoTranslateAxis *gizmoTranslateAxis = new albaGizmoTranslateAxis(m_GizmoInputSurface);
   gizmoTranslateAxis->SetStep(albaTransformConstraint::Y, 2);
 
-  for (int i = 0; i < 2; i++)
-  {
-    CPPUNIT_ASSERT(
-      gizmoTranslateAxis->m_Behavior[i]->GetTranslationConstraint()->GetStep(albaTransformConstraint::Y)
-      == 2);
-  }
+  CPPUNIT_ASSERT(gizmoTranslateAxis->m_Behavior->GetTranslationConstraint()->GetStep(albaTransformConstraint::Y) == 2);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -281,7 +270,6 @@ void albaGizmoTranslateAxisTest::TestFixture()
 
 void albaGizmoTranslateAxisTest::RenderGizmo( albaGizmoTranslateAxis * gizmoTranslateAxis )
 {
-  RenderData(gizmoTranslateAxis->m_CylGizmo->GetOutput()->GetVTKData());
-  RenderData(gizmoTranslateAxis->m_ConeGizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoTranslateAxis->m_Gizmo->GetOutput()->GetVTKData());
 }
 

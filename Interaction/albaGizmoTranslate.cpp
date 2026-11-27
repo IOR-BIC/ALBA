@@ -245,6 +245,9 @@ void albaGizmoTranslate::OnEventGizmoComponents(albaEventBase *alba_event)
         }
         else if (arg == albaBehaviorTransform::MOUSE_ACTION_UP)
         {
+          // the gizmo gets back its colors
+          this->Highlight(NONE);
+
           if (this->m_Modality == G_GLOBAL)
           {
             // put the gizmo back in the start position       

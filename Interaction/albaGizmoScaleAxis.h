@@ -36,6 +36,7 @@ class vtkCubeSource;
 class vtkCylinderSource;
 class vtkTransformPolyDataFilter;
 class vtkTransform;
+class vtkAppendPolyData;
 
 /** Basic gizmo component used to perform constrained scaling along one axis.
   
@@ -111,11 +112,8 @@ protected:
   Set the constrain ref sys */
   void SetRefSysMatrix(albaMatrix *constrain);
 
-  /** Cube gizmo */
-  albaVMEGizmo *m_CubeGizmo;
-
-  /** cylinder gizmo*/
-  albaVMEGizmo *m_CylGizmo;
+  /** Gizmo vme showing the cylinder and the cube as a single figure */
+  albaVMEGizmo *m_Gizmo;
 
   /** Register input vme*/
   albaVME *m_InputVme;
@@ -137,8 +135,11 @@ protected:
   /** translation transform for cylinder and cube*/
   vtkTransform *m_TranslateTr[2];
  
-  /** rotate PDF for cylinder and cube*/
-  vtkTransformPolyDataFilter *m_RotatePDF[2];
+  /** cylinder and cube joined in a single figure */
+  vtkAppendPolyData *m_Append;
+
+  /** rotate PDF for the figure */
+  vtkTransformPolyDataFilter *m_RotatePDF;
 
   /** rotation transform for cylinder and cube*/
   vtkTransform *m_RotationTr;
@@ -146,18 +147,15 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** Create the behaviors moving the gizmo */
-  void CreateBehaviors();
-
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
   /** the behavior moving the gizmo */
-  albaBehaviorTransform *m_Behavior[2];
+  albaBehaviorTransform *m_Behavior;
 
-  /** Gizmo color setting facilities; part can be CYLINDER or CUBE*/
-  void SetColor(int part, double col[3]);
-  void SetColor(int part, double colR, double colG, double colB);
-  void SetColor(double cylCol[3], double coneCol[3]);
-  void SetColor(double cylR, double cylG, double cylB, double coneR, double coneG, double coneB);
+  /** Gizmo color setting facilities */
+  void SetColor(double col[3]);
+  void SetColor(double colR, double colG, double colB);
 
   /**
   Register the event receiver object*/

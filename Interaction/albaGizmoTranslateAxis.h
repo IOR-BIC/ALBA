@@ -34,6 +34,7 @@ class vtkConeSource;
 class vtkCylinderSource;
 class vtkTransformPolyDataFilter;
 class vtkTransform;
+class vtkAppendPolyData;
 
 /** Basic gizmo component used to perform constrained translation on one axis.
   
@@ -115,11 +116,8 @@ protected:
   Set the constrain ref sys */
   void SetRefSysMatrix(albaMatrix *constrain);
 
-  /** Cone gizmo */
-  albaVMEGizmo *m_ConeGizmo;
-
-  /** cylinder gizmo*/
-  albaVMEGizmo *m_CylGizmo;
+  /** Gizmo vme showing the cylinder and the cone as a single arrow */
+  albaVMEGizmo *m_Gizmo;
 
   /** Register input vme*/
   albaVME *m_InputVme;
@@ -141,17 +139,17 @@ protected:
   /** Cylinder length*/
   double m_CylinderLength;
 
-  /** Cylinder and cone gizmo vme data*/
-  //albaVmeData *GizmoData[2];
-
   /** translate PDF for cylinder and cone*/
   vtkTransformPolyDataFilter *m_TranslatePDF[2];
   
   /** translation transform for cylinder and cone*/
   vtkTransform *m_TranslateTr[2];
  
-  /** rotate PDF for cylinder and cone*/
-  vtkTransformPolyDataFilter *m_RotatePDF[2];
+  /** cylinder and cone joined in a single arrow */
+  vtkAppendPolyData *m_Append;
+
+  /** rotate PDF for the arrow */
+  vtkTransformPolyDataFilter *m_RotatePDF;
 
   /** rotation transform for cylinder and cone*/
   vtkTransform *m_RotationTr;
@@ -159,18 +157,15 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** Create the behaviors moving the gizmo */
-  void CreateBehaviors();
-
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
   /** the behavior moving the gizmo */
-  albaBehaviorTransform *m_Behavior[2];
+  albaBehaviorTransform *m_Behavior;
 
-  /** Gizmo color setting facilities; part can be CYLINDER or CONE*/
-  void SetColor(int part, double col[3]);
-  void SetColor(int part, double colR, double colG, double colB);
-  void SetColor(double cylCol[3], double coneCol[3]);
-  void SetColor(double cylR, double cylG, double cylB, double coneR, double coneG, double coneB);
+  /** Gizmo color setting facilities */
+  void SetColor(double col[3]);
+  void SetColor(double colR, double colG, double colB);
 
   /**
   Register the event receiver object*/

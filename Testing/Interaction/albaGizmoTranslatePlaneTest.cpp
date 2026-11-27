@@ -163,11 +163,8 @@ void albaGizmoTranslatePlaneTest::TestSetConstrainRefSys()
   gizmoTranslatePlane->SetConstrainRefSys(&refSys);
   
   // using friend albaGizmoTranslatePlane
-  for (int i = 0; i < 2; i++)
-  {
-    albaMatrix *mat = gizmoTranslatePlane->m_Behavior[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
-    CPPUNIT_ASSERT(mat == &refSys);
-  }
+  albaMatrix *mat = gizmoTranslatePlane->m_Behavior->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+  CPPUNIT_ASSERT(mat == &refSys);
 
   cppDEL(gizmoTranslatePlane);
 }
@@ -180,11 +177,8 @@ void albaGizmoTranslatePlaneTest::TestSetConstraintModality()
   gizmoTranslatePlane->SetConstraintModality(albaGizmoTranslatePlane::XY, albaTransformConstraint::LOCK);
   
   // using friend albaGizmoTranslatePlane
-  for (int i = 0; i < 2; i++)
-  {
-    int constrainModality = gizmoTranslatePlane->m_Behavior[i]->GetTranslationConstraint()->GetConstraintModality(albaGizmoTranslatePlane::XY);
-    CPPUNIT_ASSERT(constrainModality  ==  albaTransformConstraint::LOCK);
-  } 
+  int constrainModality = gizmoTranslatePlane->m_Behavior->GetTranslationConstraint()->GetConstraintModality(albaGizmoTranslatePlane::XY);
+  CPPUNIT_ASSERT(constrainModality  ==  albaTransformConstraint::LOCK);
 
   cppDEL(gizmoTranslatePlane);
 }
@@ -254,12 +248,7 @@ void albaGizmoTranslatePlaneTest::TestSetStep()
   albaGizmoTranslatePlane *gizmoTranslatePlane = new albaGizmoTranslatePlane(m_GizmoInputSurface);
   gizmoTranslatePlane->SetStep(albaTransformConstraint::Y, 2);
 
-  for (int i = 0; i < 2; i++)
-  {
-    CPPUNIT_ASSERT(
-      gizmoTranslatePlane->m_Behavior[i]->GetTranslationConstraint()->GetStep(albaTransformConstraint::Y)
-      == 2);
-  }
+  CPPUNIT_ASSERT(gizmoTranslatePlane->m_Behavior->GetTranslationConstraint()->GetStep(albaTransformConstraint::Y) == 2);
 
   cppDEL(gizmoTranslatePlane);
 }

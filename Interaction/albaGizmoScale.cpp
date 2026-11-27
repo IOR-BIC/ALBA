@@ -363,6 +363,9 @@ void albaGizmoScale::OnEventGizmoComponents(albaEventBase *alba_event)
 				}
 				else if (arg == albaBehaviorTransform::MOUSE_ACTION_UP)
 				{
+					// the gizmo gets back its colors
+					this->Highlight(NONE);
+
 					// put the gizmo back in the initial pose  
 					SetAbsPose(m_InitialGizmoPose);
 
