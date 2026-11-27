@@ -29,7 +29,6 @@
 
 #include "albaDecl.h"
 #include "albaGUI.h"
-#include "albaRotateTranslateGUI.h"
 #include "albaGUIRollOut.h"
 #include "albaSaveRestorePoseGUI.h"
 #include "albaGizmoTranslate.h"

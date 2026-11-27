@@ -48,6 +48,15 @@ void albaRotateTranslateGUITest::AfterTest()
   delete m_Win;
 }
 //----------------------------------------------------------------------------
+albaBehaviorRotateTranslate *albaRotateTranslateGUITest::CreateBehavior(albaVME *vme)
+//----------------------------------------------------------------------------
+{
+  albaBehaviorRotateTranslate *behavior;
+  albaNEW(behavior);
+  behavior->SetVME(vme);
+  return behavior;
+}
+//----------------------------------------------------------------------------
 void albaRotateTranslateGUITest::TestFixture()
 //----------------------------------------------------------------------------
 {
@@ -58,59 +67,37 @@ void albaRotateTranslateGUITest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
+  albaBehaviorRotateTranslate *behavior = CreateBehavior(group);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(behavior,NULL,true);
   delete gui;
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
 void albaRotateTranslateGUITest::TestEnableWidgets()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
+  albaBehaviorRotateTranslate *behavior = CreateBehavior(group);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(behavior,NULL,true);
 
+  // the GUI never assigns the behavior to the VME: the operation does it
   gui->EnableWidgets(true);
-
-  CPPUNIT_ASSERT( group->GetBehavior() == gui->GetBehavior() );
+  CPPUNIT_ASSERT( group->GetBehavior() == NULL );
 
   gui->EnableWidgets(false);
-
-  CPPUNIT_ASSERT( group->GetBehavior() == gui->m_OldBehavior );
-
-  delete gui;
-}
-//----------------------------------------------------------------------------
-void albaRotateTranslateGUITest::TestAttachInteractorToVme()
-//----------------------------------------------------------------------------
-{
-  albaSmartPointer<albaVMEGroup> group;
-  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
-
-  gui->AttachInteractorToVme();
-
-  CPPUNIT_ASSERT( group->GetBehavior() == gui->GetBehavior() );
+  CPPUNIT_ASSERT( group->GetBehavior() == NULL );
 
   delete gui;
-}
-//----------------------------------------------------------------------------
-void albaRotateTranslateGUITest::TestDetachInteractorFromVme()
-//----------------------------------------------------------------------------
-{
-  albaSmartPointer<albaVMEGroup> group;
-  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
-
-  gui->DetachInteractorFromVme();
-
-  CPPUNIT_ASSERT( group->GetBehavior() == gui->m_OldBehavior && group->GetBehavior() == NULL );
-
-  delete gui;
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
 void albaRotateTranslateGUITest::TestTransformBehaviors()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
-  albaBehaviorRotateTranslate *behavior = gui->GetBehavior();
+  albaBehaviorRotateTranslate *behavior = CreateBehavior(group);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(behavior,NULL,true);
+  CPPUNIT_ASSERT(gui->GetBehavior() == behavior);
 
   // the behavior moves the input VME, with the default transforms in the view plane
   CPPUNIT_ASSERT(behavior->GetRotationConstraint()->GetRefSys()->GetType() == albaRefSys::VIEW);
@@ -126,13 +113,15 @@ void albaRotateTranslateGUITest::TestTransformBehaviors()
   CPPUNIT_ASSERT(!behavior->OnLeftButtonUp(NULL, NULL, pos));
 
   delete gui;
+  albaDEL(behavior);
 }
 //----------------------------------------------------------------------------
 void albaRotateTranslateGUITest::TestOnEvent()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMEGroup> group;
-  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(group,NULL,true);
+  albaBehaviorRotateTranslate *behavior = CreateBehavior(group);
+  albaRotateTranslateGUI *gui = new albaRotateTranslateGUI(behavior,NULL,true);
 
   albaEvent e;
   e.SetId(albaRotateTranslateGUI::ID_ROTATION_AXES);
@@ -264,4 +253,5 @@ void albaRotateTranslateGUITest::TestOnEvent()
 
 
   delete gui;
+  albaDEL(behavior);
 }

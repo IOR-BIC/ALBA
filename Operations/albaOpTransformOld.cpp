@@ -34,6 +34,7 @@
 #include "albaGizmoRotate.h"
 #include "albaGizmoScale.h"
 #include "albaRotateTranslateGUI.h"
+#include "albaBehaviorRotateTranslate.h"
 #include "albaSaveRestorePoseGUI.h"
 #include "albaTransformTextEntriesGUI.h"
 
@@ -89,6 +90,8 @@ albaOpTransformInterface(label)
   m_GizmoRotate             = NULL;
   m_GizmoScale              = NULL;
   m_GuiTransform            = NULL;
+  m_MouseBehavior = NULL;
+  m_OldBehavior = NULL;
   m_GuiSaveRestorePose      = NULL;
   m_GuiTransformTextEntries = NULL;
 }
@@ -100,6 +103,7 @@ albaOpTransformOld::~albaOpTransformOld()
   cppDEL(m_GizmoRotate);
   cppDEL(m_GizmoScale);
   cppDEL(m_GuiTransform);
+  albaDEL(m_MouseBehavior);
   cppDEL(m_GuiSaveRestorePose);
   cppDEL(m_GuiTransformTextEntries);
 }
@@ -147,9 +151,9 @@ void albaOpTransformOld::OnEvent(albaEventBase *alba_event)
     OnEventThis(alba_event); 
     return;
   }
-  else if (alba_event->GetSender() == m_GuiTransform) // from gui transform
+  else if (alba_event->GetSender() == m_MouseBehavior) // from the mouse behavior
   {
-    OnEventGuiTransform(alba_event);
+    OnEventMouseBehavior(alba_event);
   }
   else if (alba_event->GetSender() == m_GizmoTranslate) // from translation gizmo
   {
@@ -211,7 +215,7 @@ void albaOpTransformOld::OpStop(int result)
   m_GizmoScale->Show(false);
   cppDEL(m_GizmoScale);
 
-  m_GuiTransform->DetachInteractorFromVme();
+  m_Input->SetBehavior(m_OldBehavior);
 
   NotifyOpEnd(result);  
 }
@@ -237,10 +241,12 @@ void albaOpTransformOld::OnEventThis(albaEventBase *alba_event)
         m_GizmoScale->Show(false);
         m_GuiTransform->SetRefSys(m_RefSysVME);
         m_GuiTransform->EnableWidgets(true);
+        m_Input->SetBehavior(m_MouseBehavior);
       }
       else if (m_UseGizmo == 1)
       {
         m_GuiTransform->EnableWidgets(false);
+        m_Input->SetBehavior(m_OldBehavior);
 
         if (m_ActiveGizmo == TR_GIZMO)
         {
@@ -448,12 +454,12 @@ void albaOpTransformOld::OnEventGizmoScale(albaEventBase *alba_event)
 
 
 //----------------------------------------------------------------------------
-void albaOpTransformOld::OnEventGuiTransform(albaEventBase *alba_event)
+void albaOpTransformOld::OnEventMouseBehavior(albaEventBase *alba_event)
 //----------------------------------------------------------------------------
 {
   switch(alba_event->GetId())
 	{
-    case ID_TRANSFORM: // from albaRotateTranslateGUI
+    case ID_TRANSFORM: // from the mouse behavior
     {
       PostMultiplyEventMatrix(alba_event);
 
@@ -569,8 +575,15 @@ void albaOpTransformOld::CreateGui()
   //---------------------------------
   // Transform Gui
   //---------------------------------
+  // create the behavior moving the input VME and give it to the VME
+  albaNEW(m_MouseBehavior);
+  m_MouseBehavior->SetListener(this);
+  m_MouseBehavior->SetVME(m_Input);
+  m_OldBehavior = m_Input->GetBehavior();
+  m_Input->SetBehavior(m_MouseBehavior);
+
   // create the transform Gui
-  m_GuiTransform = new albaRotateTranslateGUI(m_Input, this);
+  m_GuiTransform = new albaRotateTranslateGUI(m_MouseBehavior, this);
 
   // add transform gui to operation
   m_Gui->AddGui(m_GuiTransform->GetGui());

@@ -28,37 +28,26 @@
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaBehaviorRotateTranslate.h"
-#include "albaVME.h"
 
 //----------------------------------------------------------------------------
-albaRotateTranslateGUI::albaRotateTranslateGUI(albaVME *input, albaObserver *listener /* = NULL */, bool testMode /* = false */)
+albaRotateTranslateGUI::albaRotateTranslateGUI(albaBehaviorRotateTranslate *behavior, albaObserver *listener /* = NULL */, bool testMode /* = false */)
 //----------------------------------------------------------------------------
 {
-  assert(input);
+  assert(behavior);
+  m_Behavior = behavior;
   m_Listener = listener;
-  m_InputVME = input;
   m_TestMode = testMode;
   m_Gui = NULL;
   m_RotationConstraintId = albaBehaviorRotateTranslate::VIEW_PLANE;
   m_TranslationConstraintId = albaBehaviorRotateTranslate::VIEW_PLANE;
-  m_RefSysVME = m_InputVME;
-
-  m_OldBehavior = m_InputVME->GetBehavior();
-  albaNEW(m_Behavior);
-  m_Behavior->SetListener(this);
-  m_Behavior->SetVME(m_InputVME);
 
   if (!m_TestMode)
   	CreateGui();
-
-  AttachInteractorToVme();
 }
 //----------------------------------------------------------------------------
 albaRotateTranslateGUI::~albaRotateTranslateGUI()
 //----------------------------------------------------------------------------
 {
-  DetachInteractorFromVme();
-  albaDEL(m_Behavior);
 }
 //----------------------------------------------------------------------------
 void albaRotateTranslateGUI::CreateGui()
@@ -102,13 +91,6 @@ void albaRotateTranslateGUI::OnEvent(albaEventBase *alba_event)
     case ID_TRASLATION_AXES:
       m_Behavior->SetTranslationConstraint(m_TranslationConstraintId);
     break;
-    case ID_TRANSFORM:
-    {
-      // forward transform events to listener operation; the operation will move the vme
-      alba_event->SetSender(this);
-      albaEventMacro(*alba_event);
-    }
-    break;
     default:
       albaEventMacro(*alba_event);
     break;
@@ -123,23 +105,6 @@ void albaRotateTranslateGUI::EnableWidgets(bool enable)
 	  m_Gui->Enable(ID_ROTATION_AXES, enable);
 	  m_Gui->Enable(ID_TRASLATION_AXES, enable);
   }
-
-  if (enable)
-    AttachInteractorToVme();
-  else
-    DetachInteractorFromVme();
-}
-//----------------------------------------------------------------------------
-void albaRotateTranslateGUI::AttachInteractorToVme()
-//----------------------------------------------------------------------------
-{
-  m_InputVME->SetBehavior(m_Behavior);
-}
-//----------------------------------------------------------------------------
-void albaRotateTranslateGUI::DetachInteractorFromVme()
-//----------------------------------------------------------------------------
-{
-  m_InputVME->SetBehavior(m_OldBehavior);
 }
 //----------------------------------------------------------------------------
 void albaRotateTranslateGUI::RefSysVmeChanged()

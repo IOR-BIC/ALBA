@@ -31,7 +31,6 @@
 #include "albaDecl.h"
 #include "albaGUI.h"
 #include "albaGizmoScale.h"
-#include "albaRotateTranslateGUI.h"
 #include "albaSaveRestorePoseGUI.h"
 #include "albaTransformTextEntriesGUI.h"
 

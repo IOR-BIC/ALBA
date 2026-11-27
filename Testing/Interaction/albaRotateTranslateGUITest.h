@@ -26,6 +26,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaGUIFrame;
+class albaBehaviorRotateTranslate;
+class albaVME;
 
 class albaRotateTranslateGUITest : public albaTest
 {
@@ -41,8 +43,6 @@ public:
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestEnableWidgets);
-  CPPUNIT_TEST(TestAttachInteractorToVme);
-  CPPUNIT_TEST(TestDetachInteractorFromVme);
   CPPUNIT_TEST(TestTransformBehaviors);
   CPPUNIT_TEST(TestOnEvent);
   CPPUNIT_TEST_SUITE_END();
@@ -52,10 +52,11 @@ protected:
   void TestFixture();
   void TestDynamicAllocation();
   void TestEnableWidgets();
-  void TestAttachInteractorToVme();
-  void TestDetachInteractorFromVme();
   void TestTransformBehaviors();
   void TestOnEvent();
+
+  /** Create the behavior that an operation would give to the GUI */
+  albaBehaviorRotateTranslate *CreateBehavior(albaVME *vme);
 
   albaGUIFrame *m_Win;
 
