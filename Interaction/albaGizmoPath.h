@@ -35,8 +35,7 @@ class albaVME;
 
 /** Gizmo constrained to arbitrary path...
 
-to use this object instanciate it in your client and listen for ID_TRANSFORM
-events with albaGizmoPath::ABS_POSE argument; 
+to use this object instanciate it in your client and listen for ID_TRANSFORM events
 
 REFACTOR NOTE: this object should be the expanded to support mouse interaction
 */
@@ -49,13 +48,11 @@ public:
 
   virtual	~albaGizmoPath();
   
-  enum ID_TEXT_SIDE
+  enum TEXT_SIDE
   {
-    ID_LEFT_TEXT_SIDE = 0,
-    ID_RIGTH_TEXT_SIDE,
+    LEFT_TEXT_SIDE = 0,
+    RIGHT_TEXT_SIDE,
   };
-
-  enum SentPoseID {ABS_POSE = albaBehaviorTransform::MOUSE_ACTION_UP+1};
 
   /** Set position along constraint polyline*/
   void SetCurvilinearAbscissa(double s);
@@ -98,8 +95,8 @@ public:
   /** Events handling method */
   void OnEvent(albaEventBase *alba_event); 
 
-  void SetSideTextPosition(bool leftRight = ID_LEFT_TEXT_SIDE){m_TextSidePosition = leftRight;};
-  bool GetSideTextPosition(){return m_TextSidePosition;};
+  void SetSideTextPosition(TEXT_SIDE side = LEFT_TEXT_SIDE){m_TextSidePosition = side;};
+  TEXT_SIDE GetSideTextPosition(){return m_TextSidePosition;};
 
 protected:
 
@@ -143,7 +140,7 @@ protected:
   int m_ConstraintModality;
 
   int m_TextVisibility;
-  bool m_TextSidePosition;
+  TEXT_SIDE m_TextSidePosition;
 
   enum CONSTRAINT_MODALITY_ID
   {

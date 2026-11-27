@@ -90,7 +90,7 @@ void albaGizmoPath::Constructor(albaVME *imputVme, albaObserver *listener, const
   CreateBehavior();
   m_VmeGizmoPath->SetBehavior(m_Behavior);
 
-  m_TextSidePosition = ID_LEFT_TEXT_SIDE;
+  m_TextSidePosition = LEFT_TEXT_SIDE;
 }
 //----------------------------------------------------------------------------
 void albaGizmoPath::Destructor()
@@ -187,7 +187,7 @@ void albaGizmoPath::SetCurvilinearAbscissa( double s )
   double versorY[3];
   matrix->GetVersor(1, versorY);
 
-  if(m_TextSidePosition == ID_LEFT_TEXT_SIDE)
+  if(m_TextSidePosition == LEFT_TEXT_SIDE)
   {
     pos[0] = pos[0] - halfLength * (versorY[0]); 
     pos[1] = pos[1] - halfLength * (versorY[1]);
@@ -263,7 +263,7 @@ void albaGizmoPath::FindGizmoAbsPose( double s )
   albaSmartPointer<albaMatrix> mat2Send;
   mat2Send->DeepCopy(&(trans->GetMatrix()));
 
-  SendTransformMatrix(mat2Send, ID_TRANSFORM, albaGizmoPath::ABS_POSE );
+  SendTransformMatrix(mat2Send, ID_TRANSFORM, albaBehaviorTransform::MOUSE_ACTION_MOVE);
 }
   
 

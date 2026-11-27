@@ -166,18 +166,12 @@ void albaGizmoInteractionDebugger::OnEvent(albaEventBase *alba_event)
     {
     case ID_TRANSFORM:
       {
-        {
-          assert(true);
+        if (DEBUG_MODE)
+          LogTransformEvent(e);
 
-          if (DEBUG_MODE)
-          {
-            LogTransformEvent(e);        
-          }
+        m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
 
-          m_CurvilinearAbscissaHelper->MoveOnSkeleton(e);
-        }
-
-				GetViewManager()->CameraUpdate();
+        GetViewManager()->CameraUpdate();
       }
       break;
 

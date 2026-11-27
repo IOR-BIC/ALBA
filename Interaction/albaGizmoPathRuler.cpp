@@ -220,7 +220,6 @@ void albaGizmoPathRuler::SetCurvilinearAbscissa( double s )
   //// matrixVectorEvent.SetMafObject(&matrixVector);
   //matrixVectorEvent.SetSender(this);
   //matrixVectorEvent.SetId(ID_TRANSFORM);
-  //matrixVectorEvent.SetArg(albaGizmoPath::ABS_POSE);
   //
   //albaEventMacro(matrixVectorEvent);
 

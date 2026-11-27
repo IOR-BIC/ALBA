@@ -50,7 +50,7 @@ class albaGizmoCrossRotate;
  Input must be albaVMEVolumeGray
  Movement is costrained inside the volume.
 */
-class ALBA_EXPORT albaGizmoCrossRotateTranslate : albaGizmoInterface
+class ALBA_EXPORT albaGizmoCrossRotateTranslate : public albaGizmoInterface
 {
 public:
 	
@@ -86,15 +86,20 @@ public:
 	void Show(bool show);
 
 	void SetName(albaString name);
-	albaString GetName() {return m_NameRTG;}
+
+	/** Forward the ID_TRANSFORM events of the inner gizmos keeping them as sender:
+	the listener uses the sender to know the plane and whether it is a translation or a rotation */
 	void OnEvent(albaEventBase *alba_event);
-	
-	albaString m_NameRTG;
 
+	/** Return the inner translate gizmo */
+	albaGizmoCrossTranslate *GetGizmoCrossTranslate() {return m_GizmoCrossTranslate;}
+
+	/** Return the inner rotate gizmo */
+	albaGizmoCrossRotate *GetGizmoCrossRotate() {return m_GizmoCrossRotate;}
+
+protected:
 	albaGizmoCrossTranslate *m_GizmoCrossTranslate;
-	albaGizmoCrossRotate		*m_GizmoCrossRotate;
-
-	albaObserver *m_Listener;
+	albaGizmoCrossRotate *m_GizmoCrossRotate;
 };
 
 
