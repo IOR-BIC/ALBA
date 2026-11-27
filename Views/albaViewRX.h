@@ -56,6 +56,9 @@ public:
   /** RTTI macro*/
   albaTypeMacro(albaViewRX, albaViewVTK);
 
+  /** The view shows a slice */
+  virtual bool IsSliceView() { return true; }
+
   /** clone an instance of the object*/
   virtual albaView*  Copy(albaObserver *Listener, bool lightCopyEnabled = false);
 

@@ -43,7 +43,7 @@ albaBehaviorCutPlane::~albaBehaviorCutPlane()
 }
 
 //------------------------------------------------------------------------------
-bool albaBehaviorCutPlane::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaBehaviorCutPlane::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_ModifierClicks && (m_ShiftDown || m_CtrlDown))
   {
@@ -51,7 +51,7 @@ bool albaBehaviorCutPlane::OnLeftButtonDown(albaView *view, vtkRenderer *ren, do
     return true;
   }
 
-  return Superclass::OnLeftButtonDown(view, ren, pos);
+  return Superclass::OnLeftButtonDownImpl(rwi, ren, pos);
 }
 
 //------------------------------------------------------------------------------

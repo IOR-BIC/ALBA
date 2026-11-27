@@ -30,8 +30,6 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class albaISAGeneric;
-class albaISACompositor;
 class albaVME;
 class vtkOutlineSource;
 class vtkCylinderSource;

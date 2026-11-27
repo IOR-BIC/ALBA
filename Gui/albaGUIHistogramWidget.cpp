@@ -38,27 +38,36 @@
 #include "mmuIdFactory.h"
 
 //----------------------------------------------------------------------------
-class albaGUIHistogramWidgetTool : public albaInteractionTool // gives the mouse moves on the histogram renderer to the widget
+class albaGUIHistogramWidgetTool : public albaInteractionTool // gives the mouse moves and the CTRL+clicks on the histogram render window to the widget
 //----------------------------------------------------------------------------
 {
 public:
   albaTypeMacro(albaGUIHistogramWidgetTool, albaInteractionTool);
 
-  albaGUIHistogramWidgetTool() {m_Widget = NULL; m_Renderer = NULL;}
+  albaGUIHistogramWidgetTool() {m_Widget = NULL;}
 
-  virtual bool OnMove(albaView *view, vtkRenderer *ren, double pos[2])
+  albaGUIHistogramWidget *m_Widget;
+
+protected:
+  virtual bool OnMoveImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
   {
-    if (ren != m_Renderer)
-      return false;
     m_Widget->OnMouseMove(pos);
     return true;
   }
 
-  albaGUIHistogramWidget *m_Widget;
-  vtkRenderer *m_Renderer; ///< the renderer of the histogram: the moves on the other renderers are not used
+  virtual bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+  {
+    if (!GetCtrlDown())
+      return false;
+    m_Widget->OnCtrlClick(pos);
+    return true;
+  }
 };
 
 albaCxxTypeMacro(albaGUIHistogramWidgetTool);
+
+//----------------------------------------------------------------------------
+ALBA_ID_IMP(albaGUIHistogramWidget::BIN_PICKED);
 #include "vtkDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkRenderer.h"
@@ -113,12 +122,12 @@ albaGUIHistogramWidget::albaGUIHistogramWidget(wxWindow* parent, wxWindowID id /
   ((wxWindow *)m_HistogramRWI->m_RwiBase)->SetMinSize(wxSize(size.GetWidth(),size.GetHeight()));
   //m_HistogramRWI->m_RwiBase->SetMinSize(wxSize(size.GetWidth(),size.GetHeight()));
   m_HistogramRWI->m_RwiBase->Reparent(this);
-  albaGUIHistogramWidgetTool *moveTool;
-  albaNEW(moveTool);
-  moveTool->m_Widget = this;
-  moveTool->m_Renderer = m_HistogramRWI->m_RenFront;
-  m_MoveTool = moveTool;
-  albaServiceLocator::GetPositionalEventRouter()->PushTool(m_MoveTool);
+  albaGUIHistogramWidgetTool *tool;
+  albaNEW(tool);
+  tool->m_Widget = this;
+  tool->OperateOnlyOn(m_HistogramRWI->m_RwiBase);
+  m_Tool = tool;
+  albaServiceLocator::GetPositionalEventRouter()->PushTool(m_Tool);
 
   // the histogram does not move its camera
   m_HistogramRWI->m_RwiBase->EnableCameraInteraction(false);
@@ -167,9 +176,9 @@ albaGUIHistogramWidget::~albaGUIHistogramWidget()
   m_HistogramRWI->m_RenFront->RemoveActor(m_Histogram);
   cppDEL(m_Slider);
   vtkDEL(m_Histogram);
-  albaServiceLocator::GetPositionalEventRouter()->PopTool(m_MoveTool);
+  albaServiceLocator::GetPositionalEventRouter()->PopTool(m_Tool);
   cppDEL(m_HistogramRWI);
-  albaDEL(m_MoveTool);
+  albaDEL(m_Tool);
 }
 
 //----------------------------------------------------------------------------
@@ -288,6 +297,13 @@ void albaGUIHistogramWidget::OnMouseMove(double pos[2])
     m_Histogram->SetLabel(albaString(m_HisctogramValue).GetCStr());
   }
   m_HistogramRWI->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void albaGUIHistogramWidget::OnCtrlClick(double pos[2])
+{
+  if (m_Histogram->GetInputData() == NULL)
+    return;
+  albaEventMacro(albaEvent(this, BIN_PICKED, GetHistogramScalarValue(pos[0], pos[1]), GetHistogramValue(pos[0], pos[1])));
 }
 //----------------------------------------------------------------------------
 void albaGUIHistogramWidget::UpdateGui()

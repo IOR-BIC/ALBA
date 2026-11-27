@@ -99,6 +99,9 @@ public:
 
 	virtual bool IsVmeShowed(albaVME *vme);;
 
+	/** Return true if the sub view under the mouse is a slice view */
+	virtual bool IsSliceView() { albaView *subView = GetSubView(); return subView && subView->IsSliceView(); }
+
   virtual void CameraReset(albaVME *vme = NULL);
   virtual void CameraUpdate();
 
@@ -130,6 +133,9 @@ public:
 
   virtual albaSceneGraph *GetSceneGraph();
   virtual albaRWIBase    *GetRWI();
+
+  /** Return the front renderer of the sub view under the mouse */
+  virtual vtkRenderer *GetFrontRenderer() {return GetSubView()->GetFrontRenderer();}
 
 	/** return the current pipe for the specified vme from the first sub-view (if any exist at this moment) */
 	virtual albaPipe *GetNodePipe(albaVME *vme);

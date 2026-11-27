@@ -189,9 +189,9 @@ void albaGizmoRotateTest::TestGetInteractor()
 {
   albaGizmoRotate *gizmoRotate = new albaGizmoRotate(m_GizmoInputSurface,NULL,false);
 
-  for (int axis = albaInteractorConstraint::AXIS::X; axis < albaInteractorConstraint::AXIS::NUM_AXES; axis++) 
+  for (int axis = albaTransformConstraint::AXIS::X; axis < albaTransformConstraint::AXIS::NUM_AXES; axis++) 
   { 
-    albaBehaviorTransform *interactor = gizmoRotate->GetInteractor(axis);
+    albaBehaviorTransform *interactor = gizmoRotate->GetBehavior(axis);
     
     // using test friend
     CPPUNIT_ASSERT(interactor == gizmoRotate->m_GRCircle[axis]->GetInteractor());

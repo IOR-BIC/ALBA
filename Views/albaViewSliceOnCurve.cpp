@@ -52,7 +52,6 @@ See the COPYINGS file for license details
 #include "vtkRenderer.h"
 
 #include "albaGUIFloatSlider.h"
-#include "albaEventInteraction.h"
 #include "albaIndent.h"
 
 #include "albaVMESurface.h"

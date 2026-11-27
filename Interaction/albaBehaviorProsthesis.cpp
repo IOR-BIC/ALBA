@@ -23,9 +23,9 @@
 //----------------------------------------------------------------------------
 
 #include "albaBehaviorProsthesis.h"
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 #include "albaRefSys.h"
-#include "albaViewCompound.h"
+#include "albaView.h"
 #include "albaDecl.h"
 #include "albaMatrix.h"
 #include "albaTransform.h"
@@ -63,31 +63,13 @@ bool albaBehaviorProsthesis::PrepareTransform(int button)
   if (button == ALBA_LEFT_BUTTON && m_View)
   {
     GetRotationConstraint()->GetRefSys()->SetTypeToView();
-    if (IsSliceView(m_View))
-      GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+    if (m_View->IsSliceView())
+      GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
     else
-      GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+      GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   }
 
   return Superclass::PrepareTransform(button);
-}
-
-//------------------------------------------------------------------------------
-bool albaBehaviorProsthesis::IsSliceView(albaView *v)
-{
-  if (v == NULL)
-    return false;
-  if (albaViewCompound::SafeDownCast(v))
-	{
-		albaView *childView = albaViewCompound::SafeDownCast(v)->GetSubView();
-		return IsSliceView(childView);
-	}
-	else if( v->IsA("albaViewRX") || v->IsA("appViewSliceBlend"))// || v->IsA("appViewSlice") )
-  {
-		return true;
-  }
-  
-  return false;
 }
 
 //----------------------------------------------------------------------------

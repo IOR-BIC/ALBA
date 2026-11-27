@@ -49,7 +49,7 @@ class albaMatrix;
 
 */
 
-class albaGizmoCrossTranslate : public albaGizmoInterface 
+class ALBA_EXPORT albaGizmoCrossTranslate : public albaGizmoInterface 
 {
 public:
 
@@ -109,7 +109,7 @@ public:
 
   /**
   Allowed constraint modality are:
-  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY defined in albaInteractorConstraint*/
+  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY defined in albaTransformConstraint*/
   void SetConstraintModality(int constrainModality);
   int GetConstraintModality();
 

@@ -27,7 +27,7 @@
 #include "albaBehaviorRotateTranslate.h"
 #include "albaBehaviorProsthesis.h"
 #include "albaBehaviorCutPlane.h"
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 #include "albaRefSys.h"
 #include "albaEvent.h"
 #include "albaVMEGroup.h"

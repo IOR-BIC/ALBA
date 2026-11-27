@@ -1827,17 +1827,17 @@ void albaTransform::BuildVector(double coeff, const double *inVector, double *ou
       outVector[0] = outVector[1] = outVector[2];
       switch (localAxis)
       {
-      case (albaInteractorConstraint::X):
+      case (albaTransformConstraint::X):
         {
           outVector[0] = coeff;
         }
         break;
-      case (albaInteractorConstraint::Y):
+      case (albaTransformConstraint::Y):
         {
           outVector[1] = coeff;
         }
         break;
-      case (albaInteractorConstraint::Z):
+      case (albaTransformConstraint::Z):
         {
           outVector[2] = coeff;
         }

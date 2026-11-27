@@ -44,7 +44,6 @@ PURPOSE. See the above copyright notice for more information.
 #include "vtkPoints.h"
 #include "albaPipeMeshSlice.h"
 #include "albaVMEProsthesis.h"
-#include "albaEventInteraction.h"
 
 //----------------------------------------------------------------------------
 // constants:

@@ -46,7 +46,7 @@ albaOp(label)
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
 
-	m_PointInteractor = NULL;
+	m_PointTool = NULL;
 
 	m_Polyline = NULL;
 	m_PolylineName = "New Polyline";
@@ -110,16 +110,16 @@ void albaOpCreatePolyline::OpRun()
 	if (view)
 	{
 		// Init Point Interactor
-		albaNEW(m_PointInteractor);
-		m_PointInteractor->SetListener(this);
-		m_PointInteractor->Enable(false);
-		m_PointInteractor->SetRendererByView(view);
-		m_PointInteractor->SetColorText(1, 0, 0);
-		m_PointInteractor->ShowText(false);
+		albaNEW(m_PointTool);
+		m_PointTool->SetListener(this);
+		m_PointTool->Enable(false);
+		m_PointTool->SetRendererAndView(view->GetFrontRenderer(), view);
+		m_PointTool->SetColorText(1, 0, 0);
+		m_PointTool->ShowText(false);
 
-		GetPositionalEventRouter()->PushTool(m_PointInteractor);
-		m_PointInteractor->Enable(true);
-		m_PointInteractor->SetListener(this);
+		GetPositionalEventRouter()->PushTool(m_PointTool);
+		m_PointTool->Enable(true);
+		m_PointTool->SetListener(this);
 
 		if (m_Input->IsA("albaVMEPolyline"))
 		{
@@ -133,7 +133,7 @@ void albaOpCreatePolyline::OpRun()
 			for (int i = 0; i < in_data->GetNumberOfPoints(); i++)
 			{
 				in_data->GetPoint(i, point);
-				m_PointInteractor->AddMeasure(point);
+				m_PointTool->AddMeasure(point);
 			}
 
 			m_PolylineName = "New ";
@@ -162,13 +162,13 @@ void albaOpCreatePolyline::OpStop(int result)
 			m_Polyline->ReparentTo(NULL);
 	}
 
-	if (m_PointInteractor)
+	if (m_PointTool)
 	{
 		// Remove ExtraInteractor
-		GetPositionalEventRouter()->PopTool(m_PointInteractor);
+		GetPositionalEventRouter()->PopTool(m_PointTool);
 
-		m_PointInteractor->RemoveAllMeasures();
-		albaDEL(m_PointInteractor);
+		m_PointTool->RemoveAllMeasures();
+		albaDEL(m_PointTool);
 
 		GetViewManager()->CameraUpdate();
 	}
@@ -207,7 +207,7 @@ void albaOpCreatePolyline::OnEvent(albaEventBase *alba_event)
 				case albaTool2DMeasure::ID_MEASURE_CHANGED: break;
 				case albaTool2DMeasure::ID_MEASURE_FINISHED:
 				{
-					if (m_PointInteractor && m_PointInteractor->GetMeasureCount() > 2)
+					if (m_PointTool && m_PointTool->GetMeasureCount() > 2)
 					{
 						CreatePolyline();
 
@@ -242,9 +242,9 @@ void albaOpCreatePolyline::CreatePolyline()
 
 	double point[3];
 
-	for (int i = 0; i < m_PointInteractor->GetMeasureCount(); i++)
+	for (int i = 0; i < m_PointTool->GetMeasureCount(); i++)
 	{
-		m_PointInteractor->GetMeasurePoint(i, point);
+		m_PointTool->GetMeasurePoint(i, point);
 		points->InsertNextPoint(point[0], point[1], point[2]);
 
 		if (i > 0)

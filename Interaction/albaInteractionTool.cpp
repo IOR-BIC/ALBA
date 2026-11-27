@@ -23,13 +23,78 @@
 //----------------------------------------------------------------------------
 
 #include "albaInteractionTool.h"
-#include "vtkRenderer.h"
 
 //------------------------------------------------------------------------------
 albaCxxTypeMacro(albaInteractionTool);
 
 //------------------------------------------------------------------------------
-bool albaInteractionTool::IsOnToolRenderWindow(vtkRenderer *ren)
+bool albaInteractionTool::OnLeftButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
-  return ren && m_Renderer && ren->GetRenderWindow() == m_Renderer->GetRenderWindow();
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnLeftButtonDownImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnLeftButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnLeftButtonUpImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnMiddleButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnMiddleButtonDownImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnMiddleButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnMiddleButtonUpImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnRightButtonDown(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnRightButtonDownImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnRightButtonUp(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnRightButtonUpImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnDrag(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnDragImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnMove(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnMoveImpl(rwi, ren, pos);
+}
+
+//------------------------------------------------------------------------------
+bool albaInteractionTool::OnWheel(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation)
+{
+  if (!IsOnOperatingRWI(rwi))
+    return false;
+  return OnWheelImpl(rwi, ren, pos, rotation);
 }

@@ -29,7 +29,6 @@
 //----------------------------------------------------------------------------
 class albaGizmoTranslate;
 class albaGizmoRotate;
-class albaRotateTranslateGUI;
 class albaInteractionBehavior;
 class albaBehaviorTransform;
 class albaVME;

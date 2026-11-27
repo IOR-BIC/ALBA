@@ -27,7 +27,7 @@
 #include "albaGizmoBoundingBox.h"
 #include "albaDecl.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 #include "mmaMaterial.h"
 

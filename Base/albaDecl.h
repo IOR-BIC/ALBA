@@ -173,12 +173,6 @@ enum ALBA_EXPORT MAIN_EVENT_ID
 	MOUSE_UP,   // the mouse button was released: sent by albaGizmoSlice and albaToolSegmentation
 	MOUSE_WHEEL, //(Used by albaGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
 
-	// mouse events (albaEventInteraction)
-	DEVICE_BUTTON_DOWN,
-	DEVICE_BUTTON_UP,
-	DEVICE_MOUSE_WHEEL,
-	DEVICE_MOUSE_2D_MOVE,
-
 	ID_TRANSFORM, //added by Stefano. 30-11-2003
 
 	ID_CLICK_ON_VME, // left button with SHIFT or CTRL on a behavior with the clicks with modifier enabled; arg: ALBA_SHIFT_KEY or ALBA_CTRL_KEY

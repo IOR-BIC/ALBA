@@ -28,7 +28,7 @@
 #include "albaDecl.h"
 #include "albaRefSys.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -53,7 +53,7 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
 {
   this->SetIsActive(false);
   
-  m_IsaGen[0]  = m_IsaGen[1] =  NULL;
+  m_Behavior = NULL;
   m_Listener  = listener;
   m_InputVme    = input;
   m_Length = 1;
@@ -64,14 +64,14 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
   //-----------------
   // pivot stuff
   //-----------------
-  // pivotTransform is useless for this operation but required by isa generic
+  // pivotTransform is useless for this operation but required by albaBehaviorTransform
   m_PivotTransform = vtkTransform::New();
 
   // create pipeline stuff
   CreatePipeline();
 
-  // create isa stuff
-  CreateISA();
+  // create the behavior
+  CreateBehavior();
 
   //-----------------
   // create vme gizmos stuff
@@ -89,9 +89,10 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
 		m_Gizmo[i]->SetMediator(m_Listener);
   }
 
-  // assign isa to S1 and S2;
-  m_Gizmo[S1]->SetBehavior(m_IsaGen[S1]);
-  m_Gizmo[S2]->SetBehavior(m_IsaGen[S2]);
+  // the segments and the square share the behavior
+  m_Gizmo[S1]->SetBehavior(m_Behavior);
+  m_Gizmo[S2]->SetBehavior(m_Behavior);
+  m_Gizmo[SQ]->SetBehavior(m_Behavior);
 
   albaMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
   SetAbsPose(absInputMatrix);
@@ -105,13 +106,12 @@ albaGizmoTranslatePlane::albaGizmoTranslatePlane(albaVME *input, albaObserver *l
       | SQ  |S1: green         
       |     |         
        --------> y   
-      SQ: yellow
+      SQ: mix of the S1 and S2 colors, semitransparent
   */
 
-  // set come gizmo material property and initial color 
-  this->SetColor(S1, 0, 1, 0);
-  this->SetColor(S2, 0, 0, 1);
-  this->SetColor(SQ, 1, 1, 0);
+  // set the gizmo material property and initial color; the square is semitransparent
+  Highlight(false);
+  m_Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(0.5);
   
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
@@ -135,12 +135,11 @@ albaGizmoTranslatePlane::~albaGizmoTranslatePlane()
   // clean up
   int i;
   for (i = 0; i < SQ; i++)
-  {
     vtkDEL(m_LineTF[i]);
-    // the PER can keep the behavior alive: it must not notify the deleted gizmo
-    m_IsaGen[i]->SetListener(NULL);
-    vtkDEL(m_IsaGen[i]); 
-  }
+
+  // the PER can keep the behavior alive: it must not notify the deleted gizmo
+  m_Behavior->SetListener(NULL);
+  vtkDEL(m_Behavior);
 
   m_PivotTransform->Delete();
 
@@ -233,22 +232,17 @@ void albaGizmoTranslatePlane::CreatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void albaGizmoTranslatePlane::CreateISA()
+void albaGizmoTranslatePlane::CreateBehavior()
 //----------------------------------------------------------------------------
 {
-  // create the transform behavior of the gizmo
-  // Default isa is constrained to plane XZ.
-  for (int i = 0; i < SQ; i++)
-  {
-    // default behavior is activated by mouse left and is constrained to X axis,
-    // default ref sys is input vme abs matrix
-    albaNEW(m_IsaGen[i]);
-    m_IsaGen[i]->SetVME(m_InputVme);
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);     
-    
-    //isa will send events to this
-    m_IsaGen[i]->SetListener(this);
-  }
+  // default behavior is activated by mouse left and is constrained to X axis,
+  // default ref sys is input vme abs matrix
+  albaNEW(m_Behavior);
+  m_Behavior->SetVME(m_InputVme);
+  m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);     
+
+  // the behavior will send events to this
+  m_Behavior->SetListener(this);
 }
 
 //----------------------------------------------------------------------------
@@ -267,15 +261,8 @@ void albaGizmoTranslatePlane::SetPlane(int plane)
     // reset cyl and cone rotation
     m_RotationTr->Identity();
   
-    // set S1 and S2 color
-    this->SetColor(S1, 0, 1, 0);
-    this->SetColor(S2, 0, 0, 1);
-
     // change the axis constrain
-    for (int i = 0; i < 2; i++)
-    {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::FREE);
-    }
+    m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::FREE);
   }
   else if (m_ActivePlane == XZ)
   {
@@ -283,15 +270,8 @@ void albaGizmoTranslatePlane::SetPlane(int plane)
     m_RotationTr->Identity();
     m_RotationTr->RotateZ(-90);
    
-    // set S1 and S2 color
-    this->SetColor(S1, 1, 0, 0);
-    this->SetColor(S2, 0, 0, 1);
-
     // change the axis constrain
-    for (int i = 0; i < 2; i++)
-    {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
-    }
+    m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
   }  
   else if (m_ActivePlane == XY)
   {
@@ -299,59 +279,47 @@ void albaGizmoTranslatePlane::SetPlane(int plane)
     m_RotationTr->Identity();
     m_RotationTr->RotateY(90);
     
-    // set S1 and S2 color
-    this->SetColor(S1, 0, 1, 0);
-    this->SetColor(S2, 1, 0, 0);
-
      // change the axis constrain
-    for (int i = 0; i < 2; i++)
-    {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
-    }
+    m_Behavior->GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   }  
+
+  // set the plane colors
+  Highlight(false);
 }
 
 //----------------------------------------------------------------------------
 void albaGizmoTranslatePlane::Highlight(bool highlight)
 //----------------------------------------------------------------------------
 {
-  if (highlight == true)
+  // the highlighted gizmo is yellow
+  if (highlight)
   {
-   // Highlight the S1 and S2  by setting its color to yellow 
-   this->SetColor(S1, 1, 1, 0);
-   this->SetColor(S2, 1, 1, 0);
+    this->SetColor(S1, 1, 1, 0);
+    this->SetColor(S2, 1, 1, 0);
+    this->SetColor(SQ, 1, 1, 0);
+    return;
+  }
 
-   // Show the square
-   ShowSquare(true);
-
-  } 
-  else
+  // otherwise the segments have the color of their axis and the square the mix of the two colors
+  if (m_ActivePlane == YZ)
   {
-   // restore original color 
-   if (m_ActivePlane == YZ)
-   {
-    // set S1 and S2 color
     this->SetColor(S1, 0, 1, 0);
     this->SetColor(S2, 0, 0, 1);
-   } 
-   else if (m_ActivePlane == XZ)
-   {
-     // set S1 and S2 color
+    this->SetColor(SQ, 0, 1, 1);
+  }
+  else if (m_ActivePlane == XZ)
+  {
     this->SetColor(S1, 1, 0, 0);
     this->SetColor(S2, 0, 0, 1);
-   }
-   else if (m_ActivePlane == XY)
-   {     
-    // set S1 and S2 color
+    this->SetColor(SQ, 1, 0, 1);
+  }
+  else if (m_ActivePlane == XY)
+  {
     this->SetColor(S1, 0, 1, 0);
     this->SetColor(S2, 1, 0, 0);
-   } 
-
-   // Hide the square
-   ShowSquare(false);
+    this->SetColor(SQ, 1, 1, 0);
   }
 }
-
 //----------------------------------------------------------------------------
 void  albaGizmoTranslatePlane::SetSizeLength(double length)
 //----------------------------------------------------------------------------
@@ -431,13 +399,6 @@ void albaGizmoTranslatePlane::Show(bool show)
 		GetLogicManager()->VmeShow(m_Gizmo[i], show);
 }
 //----------------------------------------------------------------------------
-void albaGizmoTranslatePlane::ShowSquare(bool show)
-//----------------------------------------------------------------------------
-{
-  double opacity = ((show == true) ? 0.5 : 0);
-  m_Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(opacity);
-}
-//----------------------------------------------------------------------------
 void albaGizmoTranslatePlane::SetAbsPose(albaMatrix *absPose)
 //----------------------------------------------------------------------------
 {
@@ -452,10 +413,7 @@ void albaGizmoTranslatePlane::SetAbsPose(albaMatrix *absPose)
 void albaGizmoTranslatePlane::SetConstrainRefSys(albaMatrix *constrain)
 //----------------------------------------------------------------------------
 {  
-  for (int i = 0; i < SQ; i++)
-  {
-    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
-  }
+  m_Behavior->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
 }
 //----------------------------------------------------------------------------
 albaMatrix *albaGizmoTranslatePlane::GetAbsPose()
@@ -475,17 +433,11 @@ void albaGizmoTranslatePlane::SetInput(albaVME *vme)
 void albaGizmoTranslatePlane::SetConstraintModality(int axis, int constrainModality)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < SQ; i++)
-  {
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
-  }
+  m_Behavior->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
 }
 //----------------------------------------------------------------------------
 void albaGizmoTranslatePlane::SetStep(int axis, double step)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < SQ; i++)
-  {
-    m_IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
-  }
+  m_Behavior->GetTranslationConstraint()->SetStep(axis,step);
 }

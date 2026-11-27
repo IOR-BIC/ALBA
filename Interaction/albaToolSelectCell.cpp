@@ -38,7 +38,7 @@ albaToolSelectCell::albaToolSelectCell()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelectCell::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelectCell::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   // outside the cells the button goes to the camera (CTRL: spin)
   if (!m_CtrlDown || !PickCell(ren, pos))
@@ -49,14 +49,14 @@ bool albaToolSelectCell::OnLeftButtonDown(albaView *view, vtkRenderer *ren, doub
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelectCell::OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelectCell::OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   m_IsPicking = false;
   return true;
 }
 
 //------------------------------------------------------------------------------
-bool albaToolSelectCell::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolSelectCell::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (!m_IsPicking)
     return false;
@@ -68,7 +68,7 @@ bool albaToolSelectCell::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 //------------------------------------------------------------------------------
 bool albaToolSelectCell::PickCell(vtkRenderer *ren, double pos[2])
 {
-  if (!IsOnToolRenderWindow(ren))
+  if (ren == NULL)
     return false;
 
   vtkCellPicker *cellPicker;

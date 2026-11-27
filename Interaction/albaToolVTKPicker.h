@@ -41,13 +41,13 @@ public:
   bool GetContinuousPicking() {return m_ContinuousPicking;}
 
   /** With CTRL pick a VTK object */
-  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** Send the picked object */
-  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** With continuous picking send the new position of the picked point */
-  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
 protected:
   albaToolVTKPicker();

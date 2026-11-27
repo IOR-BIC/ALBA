@@ -202,7 +202,7 @@ void albaOpTransformOldTest::TestOnEventGizmoScale()
   albaDEL(op);
 }
 //----------------------------------------------------------------------------
-void albaOpTransformOldTest::TestOnEventGuiTransform()
+void albaOpTransformOldTest::TestOnEventMouseBehavior()
 //----------------------------------------------------------------------------
 {
   albaSmartPointer<albaVMESurface> input;
@@ -225,7 +225,7 @@ void albaOpTransformOldTest::TestOnEventGuiTransform()
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
-  op->OnEventGuiTransform(e);
+  op->OnEventMouseBehavior(e);
   op->OpDo();
 
   albaVMESurface *output = albaVMESurface::SafeDownCast(op->GetInput());
@@ -270,7 +270,7 @@ void albaOpTransformOldTest::TestOnEventGuiSaveRestorePose()
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
-  op->OnEventGuiTransform(e);
+  op->OnEventMouseBehavior(e);
   op->OpDo();
 
   albaVMESurface *output = albaVMESurface::SafeDownCast(op->GetInput());
@@ -315,7 +315,7 @@ void albaOpTransformOldTest::TestReset()
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
-  op->OnEventGuiTransform(e);
+  op->OnEventMouseBehavior(e);
   op->Reset();
   op->OpDo();
 
@@ -364,7 +364,7 @@ void albaOpTransformOldTest::TestOpUndo()
   op->TestModeOn();
   op->SetInput(input);
   op->OpRun();
-  op->OnEventGuiTransform(e);
+  op->OnEventMouseBehavior(e);
   op->OpDo();
   op->OpUndo();
 

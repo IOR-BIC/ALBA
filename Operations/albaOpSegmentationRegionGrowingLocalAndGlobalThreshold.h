@@ -87,6 +87,9 @@ protected:
 
   void WriteHistogramFiles();
 
+  /** A CTRL+click on the histogram picked a bin: set the next of the 4 points */
+  void OnHistogramBinPicked(int histogramValue, double scalar);
+
   //GUI Stuff
   albaString m_Point1;
   double m_Point1Value;

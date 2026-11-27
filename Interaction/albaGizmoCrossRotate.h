@@ -14,18 +14,6 @@
 
 =========================================================================*/
  
-
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-
-
 #ifndef __albaGizmoCrossRotate_H__
 #define __albaGizmoCrossRotate_H__
 
@@ -50,7 +38,7 @@ class albaMatrix;
   Gizmo used to perform constrained rotation around an axis.
 
 */
-class albaGizmoCrossRotate : public albaGizmoInterface 
+class ALBA_EXPORT albaGizmoCrossRotate : public albaGizmoInterface 
 {
 public:
            albaGizmoCrossRotate(albaVME *input, albaObserver* listener = NULL, bool buildGUI = true, int axis = X);
@@ -94,7 +82,7 @@ public:
 
   /**
   Get the Interactor asscociated to each axis*/
-  albaBehaviorTransform *GetInteractor(int axis);
+  albaBehaviorTransform *GetBehavior(int axis);
 
   //----------------------------------------------------------------------------
   // RefSys

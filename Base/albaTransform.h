@@ -18,7 +18,7 @@
 #define __albaTransform_h
 
 #include "albaTransformBase.h"
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 
 #include "albaUtility.h"
 
@@ -246,7 +246,7 @@ class ALBA_EXPORT albaTransform : public albaTransformBase
   static void BuildVector(double *p1, double *p2, double *out_vector);
 
   /** Build vector [coeff * inVector] */
-  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = LOCAL, int localAxis = albaInteractorConstraint::X);
+  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = LOCAL, int localAxis = albaTransformConstraint::X);
 
   /** Project in_vector on in_axis direction; in_axis does not need to be 
   normalised. The projection signed value is returned */

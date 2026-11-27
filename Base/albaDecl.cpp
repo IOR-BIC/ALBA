@@ -474,10 +474,6 @@ wxString  albaIdString(int id)
 // const used by albaGUI and albaGUIValidator
      case MINID:	              s="MINID"; break; 
      case MAXID:	              s="MAXID"; break; 
-     case DEVICE_BUTTON_DOWN: s="DEVICE_BUTTON_DOWN"; break;
-     case DEVICE_BUTTON_UP: s="DEVICE_BUTTON_UP"; break;
-     case DEVICE_MOUSE_WHEEL: s="DEVICE_MOUSE_WHEEL"; break;
-     case DEVICE_MOUSE_2D_MOVE: s="DEVICE_MOUSE_2D_MOVE"; break;
      default:
       s << id;
      break;

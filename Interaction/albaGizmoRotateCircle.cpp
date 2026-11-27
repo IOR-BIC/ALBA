@@ -30,7 +30,7 @@
 #include "wx/string.h"
 #include "albaDecl.h"
 
-// isa stuff
+// behaviors
 #include "albaBehaviorTransform.h"
 
 // vme stuff
@@ -58,7 +58,7 @@ albaGizmoRotateCircle::albaGizmoRotateCircle(albaVME *input, albaObserver *liste
   
   // default axis is X
   m_ActiveAxis = X;
-  m_IsaGen = NULL;
+  m_Behavior = NULL;
   m_Radius = -1;
 
   m_Listener = listener;
@@ -70,9 +70,9 @@ albaGizmoRotateCircle::albaGizmoRotateCircle(albaVME *input, albaObserver *liste
   CreatePipeline();
 
   //-----------------
-  // create isa stuff
+  // create the behavior
   //-----------------
-  CreateISA();
+  CreateBehavior();
 
   //-----------------
   // create vme gizmo stuff
@@ -83,8 +83,8 @@ albaGizmoRotateCircle::albaGizmoRotateCircle(albaVME *input, albaObserver *liste
   m_GizmoCircle->SetDataConnection(m_RotatePDF->GetOutputPort());
   m_GizmoCircle->SetMediator(m_Listener);
 
-  // assign isa to S1 and S2;
-  m_GizmoCircle->SetBehavior(m_IsaGen);
+  // assign the behavior to S1 and S2;
+  m_GizmoCircle->SetBehavior(m_Behavior);
   
   // set the axis to X axis
   this->SetAxis(m_ActiveAxis);
@@ -118,8 +118,8 @@ albaGizmoRotateCircle::~albaGizmoRotateCircle()
 	// No leaks so somebody is performing this...
 	//----------------------
   // the PER can keep the behavior alive: it must not notify the deleted gizmo
-  m_IsaGen->SetListener(NULL);
-  vtkDEL(m_IsaGen); 
+  m_Behavior->SetListener(NULL);
+  vtkDEL(m_Behavior); 
   
 	m_GizmoCircle->ReparentTo(NULL);
 }
@@ -169,22 +169,22 @@ void albaGizmoRotateCircle::CreatePipeline()
 
 }
 //----------------------------------------------------------------------------
-void albaGizmoRotateCircle::CreateISA()
+void albaGizmoRotateCircle::CreateBehavior()
 //----------------------------------------------------------------------------
 {
   // create the transform behavior of the gizmo
-  // Default isa constrain rotation around X axis.
+  // Default behavior constrain rotation around X axis.
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  albaNEW(m_IsaGen);
-  m_IsaGen->SetVME(m_InputVme);
-  m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK); 
-  m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
-  m_IsaGen->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
-  m_IsaGen->EnableRotation(true);
+  albaNEW(m_Behavior);
+  m_Behavior->SetVME(m_InputVme);
+  m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK); 
+  m_Behavior->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
+  m_Behavior->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
+  m_Behavior->EnableRotation(true);
 
-  //isa will send events to this
-  m_IsaGen->SetListener(this);
+  // the behavior will send events to this
+  m_Behavior->SetListener(this);
 }
 //----------------------------------------------------------------------------
 void albaGizmoRotateCircle::SetAxis(int axis) 
@@ -207,7 +207,7 @@ void albaGizmoRotateCircle::SetAxis(int axis)
     this->SetColor(1, 0, 0);
 
      // change the axis constrain  
-    m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
+    m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
   }
   else if (m_ActiveAxis == Y)
   {
@@ -219,7 +219,7 @@ void albaGizmoRotateCircle::SetAxis(int axis)
     this->SetColor(0, 1, 0);
 
     // change the Gizmo constrain
-    m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+    m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   }
   else if (m_ActiveAxis == Z)
   {
@@ -230,7 +230,7 @@ void albaGizmoRotateCircle::SetAxis(int axis)
     this->SetColor(0, 0, 1);
    
     // change the Gizmo constrain
-    m_IsaGen->GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+    m_Behavior->GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
   }    
 }
 //----------------------------------------------------------------------------
@@ -327,8 +327,8 @@ void albaGizmoRotateCircle::SetAbsPose(albaMatrix *absPose)
 void albaGizmoRotateCircle::SetRefSysMatrix(albaMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-  m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-  m_IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix);
+  m_Behavior->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+  m_Behavior->GetPivotRefSys()->SetTypeToCustom(matrix);
 }
 //----------------------------------------------------------------------------
 albaMatrix *albaGizmoRotateCircle::GetAbsPose()
@@ -350,7 +350,7 @@ void albaGizmoRotateCircle::SetInput(albaVME *vme)
 albaBehaviorTransform *albaGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
-  return m_IsaGen;
+  return m_Behavior;
 }
 
 int albaGizmoRotateCircle::GetAxis()

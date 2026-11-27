@@ -19,11 +19,6 @@
 
 #include "albaBehaviorRotateTranslate.h"
 
-//----------------------------------------------------------------------------
-// forward declarations :
-//----------------------------------------------------------------------------
-class albaView;
-
 /** Behavior moving the prosthesis: the left button rotates freely around the pivot (SetRefSysVME),
   in the slice views and in 2D modality around the view normal; the left button + CTRL rolls,
   the left button + SHIFT and the middle button translate in the view plane. */
@@ -47,9 +42,6 @@ protected:
 
   /** Rotation around the view normal */
   void TrackballRoll() override;
-
-  /** Return true for the slice views */
-  bool IsSliceView(albaView *v);
 
   bool m_Modality2D; ///< true if the left button rotates around the view normal
 

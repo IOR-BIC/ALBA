@@ -30,7 +30,6 @@
 #include "albaGUI.h"
 #include "albaGizmoTranslate.h"
 #include "albaGizmoRotate.h"
-#include "albaRotateTranslateGUI.h"
 
 #include "albaBehaviorTransform.h"
 

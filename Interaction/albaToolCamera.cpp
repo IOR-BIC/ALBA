@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "albaToolCamera.h"
+#include "albaRWIBase.h"
 #include "albaView.h"
 
 #include "vtkCamera.h"
@@ -49,15 +50,15 @@ albaToolCamera::albaToolCamera()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolCamera::OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (m_ShiftDown)
-    return Start(view, ren, pos, m_CtrlDown ? MOTION_DOLLY : MOTION_PAN);
-  return Start(view, ren, pos, m_CtrlDown ? MOTION_SPIN : MOTION_ROTATE);
+    return Start(rwi, ren, pos, m_CtrlDown ? MOTION_DOLLY : MOTION_PAN);
+  return Start(rwi, ren, pos, m_CtrlDown ? MOTION_SPIN : MOTION_ROTATE);
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::Start(albaView *view, vtkRenderer *ren, double pos[2], int motion)
+bool albaToolCamera::Start(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], int motion)
 {
   if (m_Interacting)
     return false;
@@ -68,7 +69,7 @@ bool albaToolCamera::Start(albaView *view, vtkRenderer *ren, double pos[2], int 
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  SetRendererAndView(ren, view);
+  SetRendererAndView(ren, rwi->GetView());
   m_CurrentCamera = m_Renderer ? m_Renderer->GetActiveCamera() : NULL;
   return true;
 }
@@ -91,7 +92,7 @@ bool albaToolCamera::Stop()
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
+bool albaToolCamera::OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2])
 {
   if (!m_Interacting)
     return false;
@@ -118,9 +119,9 @@ bool albaToolCamera::OnDrag(albaView *view, vtkRenderer *ren, double pos[2])
 }
 
 //------------------------------------------------------------------------------
-bool albaToolCamera::OnWheel(albaView *view, vtkRenderer *ren, double pos[2], double rotation)
+bool albaToolCamera::OnWheelImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2], double rotation)
 {
-  SetRendererAndView(ren, view);
+  SetRendererAndView(ren, rwi->GetView());
   if (m_Renderer == NULL)
     return true;
   m_CurrentCamera = m_Renderer->GetActiveCamera();

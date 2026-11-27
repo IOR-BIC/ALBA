@@ -74,7 +74,7 @@ protected:
   /** Left button: rotation, with CTRL roll; middle button: translation */
   virtual bool PrepareTransform(int button);
 
-  albaInteractorConstraint *m_RollConstraint; ///< rotation constraint of the left button + CTRL: around the view normal
+  albaTransformConstraint *m_RollConstraint; ///< rotation constraint of the left button + CTRL: around the view normal
   bool m_RollEnabled;                         ///< true if the left button + CTRL rolls
   albaVME *m_RefSysVME;                       ///< VME giving the reference system of the constraints and the pivot
 

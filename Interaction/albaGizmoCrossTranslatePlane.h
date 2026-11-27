@@ -15,16 +15,6 @@
 =========================================================================*/
 
 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-
 #ifndef __albaGizmoCrossTranslatePlane_H__
 #define __albaGizmoCrossTranslatePlane_H__
 
@@ -57,7 +47,7 @@ class vtkTubeFilter;
   
   @sa albaGizmoTranslate 
 */
-class albaGizmoCrossTranslatePlane: public albaGizmoInterface 
+class ALBA_EXPORT albaGizmoCrossTranslatePlane : public albaGizmoInterface 
 {
 public:
            albaGizmoCrossTranslatePlane(albaVME *input, albaObserver *listener = NULL);
@@ -197,12 +187,11 @@ protected:
   /** Create feedback gizmo vtk objects */
   void CreateFeedbackGizmoPipeline();
 
-  /** Create isa stuff */
-  void CreateISA();
+  /** Create the behavior moving the gizmo */
+  void CreateBehavior();
 
-
-  /** isa generic*/
-  albaBehaviorTransform *m_IsaGen[2];
+  /** the behavior moving the gizmo, shared by its parts */
+  albaBehaviorTransform *m_Behavior;
 
   /** Used by albaBehaviorTransform */
   vtkTransform *m_PivotTransform;

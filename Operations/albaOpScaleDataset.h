@@ -27,7 +27,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaGizmoScale;
-class albaRotateTranslateGUI;
 class albaSaveRestorePoseGUI;
 class albaTransformTextEntriesGUI;
 class albaVME;

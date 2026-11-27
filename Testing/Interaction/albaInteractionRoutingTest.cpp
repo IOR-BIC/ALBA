@@ -49,6 +49,14 @@
 
 #include <string>
 
+// the mouse events the tests send to the PER
+enum TEST_MOUSE_EVENTS
+{
+  TEST_BUTTON_DOWN,
+  TEST_BUTTON_UP,
+  TEST_MOUSE_MOVE,
+};
+
 //----------------------------------------------------------------------------
 class albaRoutingTestView : public albaView // view returning the test render window interactor
 //----------------------------------------------------------------------------
@@ -113,6 +121,8 @@ albaCxxTypeMacro(albaRoutingTestKeyTool);
 void albaRoutingTestListener::OnEvent(albaEventBase *event)
 {
   m_Ids.push_back(event->GetId());
+  if (albaEvent *e = albaEvent::SafeDownCast(event))
+    m_LastVme = e->GetVme();
 }
 
 //----------------------------------------------------------------------------
@@ -168,7 +178,7 @@ void albaInteractionRoutingTest::AfterTest()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::SendMouse(albaID id, double x, double y, int button, int modifier, int modifier2)
 {
-  // as the render window does: the modifier keys first, then the method of the event of the registered PER, with the view and the renderer under the mouse
+  // as the render window does: the modifier keys first, then the method of the event of the registered PER, with the render window, the renderer under the mouse and the position
   albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
   bool ctrl = modifier == ALBA_CTRL_KEY || modifier2 == ALBA_CTRL_KEY;
   bool alt = modifier == ALBA_ALT_KEY || modifier2 == ALBA_ALT_KEY;
@@ -178,23 +188,23 @@ void albaInteractionRoutingTest::SendMouse(albaID id, double x, double y, int bu
   per->SetModifierKeys(ctrl, alt, shift);
   switch (id)
   {
-    case DEVICE_BUTTON_DOWN:
+    case TEST_BUTTON_DOWN:
       switch (button)
       {
-        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos);   break;
-        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos); break;
-        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(m_Rwi, m_Rwi->GetView(), ren, pos);  break;
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonDown(m_Rwi, ren, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonDown(m_Rwi, ren, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonDown(m_Rwi, ren, pos);  break;
       }
       break;
-    case DEVICE_BUTTON_UP:
+    case TEST_BUTTON_UP:
       switch (button)
       {
-        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos);   break;
-        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos); break;
-        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(m_Rwi, m_Rwi->GetView(), ren, pos);  break;
+        case ALBA_LEFT_BUTTON:   per->OnLeftButtonUp(m_Rwi, ren, pos);   break;
+        case ALBA_MIDDLE_BUTTON: per->OnMiddleButtonUp(m_Rwi, ren, pos); break;
+        case ALBA_RIGHT_BUTTON:  per->OnRightButtonUp(m_Rwi, ren, pos);  break;
       }
       break;
-    case DEVICE_MOUSE_2D_MOVE: per->OnMouseMove(m_Rwi, m_Rwi->GetView(), ren, pos); break;
+    case TEST_MOUSE_MOVE: per->OnMouseMove(m_Rwi, ren, pos); break;
   }
 }
 
@@ -204,7 +214,7 @@ void albaInteractionRoutingTest::SendWheel(double x, double y, double rotation)
   albaPositionalEventRouter *per = albaServiceLocator::GetPositionalEventRouter();
   double pos[2] = {x, y};
   per->SetModifierKeys(false, false, false);
-  per->OnMouseWheel(m_Rwi, m_Rwi->GetView(), m_Rwi->FindPokedRenderer((int)x, (int)y), pos, rotation);
+  per->OnMouseWheel(m_Rwi, m_Rwi->FindPokedRenderer((int)x, (int)y), pos, rotation);
 }
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Set2DCamera()
@@ -227,10 +237,10 @@ void albaInteractionRoutingTest::TestCameraDragAndWheel()
   camera->GetPosition(startPosition);
 
   // a left drag without picked VME rotates the camera
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
   CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 450, 320);
-  SendMouse(DEVICE_BUTTON_UP, 450, 320, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 450, 320);
+  SendMouse(TEST_BUTTON_UP, 450, 320, ALBA_LEFT_BUTTON);
 
   camera->GetPosition(position);
   CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
@@ -248,9 +258,9 @@ void albaInteractionRoutingTest::TestCameraDragAndWheel()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::Drag(int button, double x, double y, int modifier, int modifier2)
 {
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, button, modifier, modifier2);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, x, y, button, modifier, modifier2);
-  SendMouse(DEVICE_BUTTON_UP, x, y, button, modifier, modifier2);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, button, modifier, modifier2);
+  SendMouse(TEST_MOUSE_MOVE, x, y, button, modifier, modifier2);
+  SendMouse(TEST_BUTTON_UP, x, y, button, modifier, modifier2);
 }
 
 //----------------------------------------------------------------------------
@@ -289,9 +299,9 @@ void albaInteractionRoutingTest::TestCameraButtons()
   camera->GetViewUp(viewUp);
   camera->GetFocalPoint(focalPoint);
   distance = camera->GetDistance();
-  SendMouse(DEVICE_BUTTON_DOWN, 500, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 400, 400, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
-  SendMouse(DEVICE_BUTTON_UP, 400, 400, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_BUTTON_DOWN, 500, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_MOUSE_MOVE, 400, 400, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_BUTTON_UP, 400, 400, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   camera->GetViewUp(newViewUp);
   camera->GetFocalPoint(newFocalPoint);
   CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(viewUp, newViewUp) > 1e-6);
@@ -310,6 +320,155 @@ void albaInteractionRoutingTest::TestCameraButtons()
 //----------------------------------------------------------------------------
 void albaInteractionRoutingTest::TestPERPickerClick()
 {
+  albaVMESurface *vme = AddSphereVME();
+
+  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
+  albaServiceLocator::SetPositionalEventRouter(per);
+  albaToolPicker *picker;
+  albaNEW(picker);
+  picker->SetListener(&m_Listener);
+  per->PushTool(picker);
+
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startPosition[3], position[3];
+  camera->GetPosition(startPosition);
+
+  // a click without dragging picks the VME and does not move the camera
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) < 1e-6);
+
+  // a drag does not pick: the picker does not use it, so it rotates the camera
+  m_Listener.Clear();
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 420, 300);
+  SendMouse(TEST_BUTTON_UP, 420, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+
+  // a click on the background does not pick
+  SendMouse(TEST_BUTTON_DOWN, 5, 5, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 5, 5, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+
+  // with SHIFT the click is left to the PER
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+
+  per->PopTool(picker);
+  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
+  per->Delete();
+  albaDEL(picker);
+  m_Renderer->RemoveAllViewProps();
+  albaDEL(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::TestPERPickerTargets()
+{
+  albaVMESurface *vme = AddSphereVME();
+  albaVMESurface *otherVme;
+  albaNEW(otherVme);
+  albaToolPicker *picker;
+  albaNEW(picker);
+  picker->SetListener(&m_Listener);
+  albaPositionalEventRouter *per = NewPERWithTool(picker);
+
+  // with no target every VME is picked, and the event carries the picked VME
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  CPPUNIT_ASSERT(m_Listener.m_LastVme == vme);
+
+  // a VME that is not a target is not picked
+  m_Listener.Clear();
+  picker->AddTargetVME(otherVme);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+
+  // a target VME is picked
+  picker->AddTargetVME(vme);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  CPPUNIT_ASSERT(m_Listener.m_LastVme == vme);
+
+  // a removed target is not picked any more
+  m_Listener.Clear();
+  picker->RemoveTargetVME(vme);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+
+  // without targets every VME is picked again
+  picker->RemoveAllTargetVMEs();
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+
+  per->PopTool(picker);
+  DeletePER(per);
+  albaDEL(picker);
+  m_Renderer->RemoveAllViewProps();
+  albaDEL(otherVme);
+  albaDEL(vme);
+}
+
+//----------------------------------------------------------------------------
+void albaInteractionRoutingTest::TestPERPickerContinuous()
+{
+  albaVMESurface *vme = AddSphereVME();
+  albaToolPicker *picker;
+  albaNEW(picker);
+  picker->SetListener(&m_Listener);
+  picker->AddTargetVME(vme);
+  picker->EnableContinuousPicking(true);
+  albaPositionalEventRouter *per = NewPERWithTool(picker);
+
+  vtkCamera *camera = m_Renderer->GetActiveCamera();
+  double startPosition[3], position[3];
+  camera->GetPosition(startPosition);
+
+  // the button down picks, the drags send VME_PICKING without moving the camera, the button up picks
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
+  SendMouse(TEST_MOUSE_MOVE, 410, 300);
+  SendMouse(TEST_MOUSE_MOVE, 420, 300);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKING) == 2);
+  SendMouse(TEST_BUTTON_UP, 420, 300, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 2);
+  CPPUNIT_ASSERT(m_Listener.m_LastVme == vme);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) < 1e-6);
+  CPPUNIT_ASSERT(!per->IsInteracting());
+
+  // a drag starting on the background does not pick and moves the camera
+  m_Listener.Clear();
+  SendMouse(TEST_BUTTON_DOWN, 5, 5, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 25, 5);
+  SendMouse(TEST_BUTTON_UP, 25, 5, ALBA_LEFT_BUTTON);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
+  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKING) == 0);
+  camera->GetPosition(position);
+  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
+
+  per->PopTool(picker);
+  DeletePER(per);
+  albaDEL(picker);
+  m_Renderer->RemoveAllViewProps();
+  albaDEL(vme);
+}
+
+//----------------------------------------------------------------------------
+albaVMESurface *albaInteractionRoutingTest::AddSphereVME()
+{
   albaVMESurface *vme;
   albaNEW(vme);
   vtkALBASmartPointer<vtkSphereSource> sphere;
@@ -324,51 +483,7 @@ void albaInteractionRoutingTest::TestPERPickerClick()
   m_Renderer->AddActor(assembly);
   m_Renderer->ResetCamera();
   m_RenderWindow->Render();
-
-  albaPositionalEventRouter *per = albaPositionalEventRouter::New();
-  albaServiceLocator::SetPositionalEventRouter(per);
-  albaToolPicker *picker;
-  albaNEW(picker);
-  picker->SetListener(&m_Listener);
-  per->PushTool(picker);
-
-  vtkCamera *camera = m_Renderer->GetActiveCamera();
-  double startPosition[3], position[3];
-  camera->GetPosition(startPosition);
-
-  // a click without dragging picks the VME and does not move the camera
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 1);
-  camera->GetPosition(position);
-  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) < 1e-6);
-
-  // a drag does not pick: the picker does not use it, so it rotates the camera
-  m_Listener.Clear();
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 300);
-  SendMouse(DEVICE_BUTTON_UP, 420, 300, ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
-  camera->GetPosition(position);
-  CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
-  CPPUNIT_ASSERT(!per->IsInteracting());
-
-  // a click on the background does not pick
-  SendMouse(DEVICE_BUTTON_DOWN, 5, 5, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_BUTTON_UP, 5, 5, ALBA_LEFT_BUTTON);
-  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
-
-  // with SHIFT the click is left to the PER
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
-  SendMouse(DEVICE_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
-  CPPUNIT_ASSERT(m_Listener.Count(VME_PICKED) == 0);
-
-  per->PopTool(picker);
-  albaServiceLocator::SetPositionalEventRouter(m_OldPER);
-  per->Delete();
-  albaDEL(picker);
-  m_Renderer->RemoveAllViewProps();
-  albaDEL(vme);
+  return vme;
 }
 
 //----------------------------------------------------------------------------
@@ -404,9 +519,9 @@ void albaInteractionRoutingTest::Test2DMeasureAddWithoutModifiers()
   double startScale = camera->GetParallelScale();
 
   // button down, drag and button up draw the new measure once each and do not move the camera
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 310);
-  SendMouse(DEVICE_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 420, 310);
+  SendMouse(TEST_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON);
 
   CPPUNIT_ASSERT(measure->m_DrawCount == 3);
   CPPUNIT_ASSERT(m_Listener.Count(albaTool2DMeasure::ID_MEASURE_STARTED) == 1);
@@ -432,27 +547,27 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
 
   // SHIFT leaves button down, drag and button up to the camera
   measure->SetAction(albaTool2DMeasure::ACTION_ADD_MEASURE);
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
   CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 310, 0, ALBA_SHIFT_KEY);
-  SendMouse(DEVICE_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  SendMouse(TEST_MOUSE_MOVE, 420, 310, 0, ALBA_SHIFT_KEY);
+  SendMouse(TEST_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
   CPPUNIT_ASSERT(m_Listener.Count(albaTool2DMeasure::ID_MEASURE_STARTED) == 0);
   CPPUNIT_ASSERT(m_Listener.Count(albaTool2DMeasure::ID_MEASURE_FINISHED) == 0);
 
   // CTRL does the same while adding a measure
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Camera albaToolCamera"));
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 310, 0, ALBA_CTRL_KEY);
-  SendMouse(DEVICE_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_MOUSE_MOVE, 420, 310, 0, ALBA_CTRL_KEY);
+  SendMouse(TEST_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
   CPPUNIT_ASSERT(m_Listener.Count(albaTool2DMeasure::ID_MEASURE_STARTED) == 0);
 
   // with no action CTRL is ignored: the measure handles the button down
   measure->SetAction(albaTool2DMeasure::ACTION_NONE);
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(Contains(per->GetLastEventTrace(), "-> Tool albaRecording2DMeasure"));
-  SendMouse(DEVICE_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_LEFT_BUTTON, ALBA_CTRL_KEY);
   CPPUNIT_ASSERT(m_Listener.Count(albaTool2DMeasure::ID_MEASURE_STARTED) == 1);
   CPPUNIT_ASSERT(m_Listener.Count(albaTool2DMeasure::ID_MEASURE_FINISHED) == 1);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
@@ -461,9 +576,9 @@ void albaInteractionRoutingTest::Test2DMeasureModifiersMoveCamera()
   measure->SetAction(albaTool2DMeasure::ACTION_ADD_MEASURE);
   vtkCamera *camera = m_Renderer->GetActiveCamera();
   double startScale = camera->GetParallelScale();
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 310, 0, ALBA_SHIFT_KEY);
-  SendMouse(DEVICE_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 420, 310, 0, ALBA_SHIFT_KEY);
+  SendMouse(TEST_BUTTON_UP, 420, 310, ALBA_LEFT_BUTTON, ALBA_SHIFT_KEY);
   CPPUNIT_ASSERT(measure->m_DrawCount == 3);
   CPPUNIT_ASSERT(camera->GetParallelScale() == startScale);
 
@@ -483,8 +598,8 @@ void albaInteractionRoutingTest::Test2DMeasureRightButton()
   // the measures do not use the right button: the right click shows the context menu of the view
   albaFakeLogicForTest *logic = (albaFakeLogicForTest*)albaServiceLocator::GetLogicManager();
   logic->ClearCalls();
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_RIGHT_BUTTON);
-  SendMouse(DEVICE_BUTTON_UP, 400, 300, ALBA_RIGHT_BUTTON);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_RIGHT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 300, ALBA_RIGHT_BUTTON);
   CPPUNIT_ASSERT(logic->GetNumberOfCalls(albaFakeLogicForTest::FKL_SHOW_VIEW_CONTEXTUAL_MENU) == 1);
 
   // and the drags of the right button zoom the camera, without the context menu
@@ -492,9 +607,9 @@ void albaInteractionRoutingTest::Test2DMeasureRightButton()
   double startScale = camera->GetParallelScale();
   m_Listener.Clear();
   logic->ClearCalls();
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_RIGHT_BUTTON);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 400, 340, ALBA_RIGHT_BUTTON);
-  SendMouse(DEVICE_BUTTON_UP, 400, 340, ALBA_RIGHT_BUTTON);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_RIGHT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 400, 340, ALBA_RIGHT_BUTTON);
+  SendMouse(TEST_BUTTON_UP, 400, 340, ALBA_RIGHT_BUTTON);
   CPPUNIT_ASSERT(camera->GetParallelScale() != startScale);
   CPPUNIT_ASSERT(logic->GetNumberOfCalls(albaFakeLogicForTest::FKL_SHOW_VIEW_CONTEXTUAL_MENU) == 0);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
@@ -514,14 +629,14 @@ void albaInteractionRoutingTest::Test2DMeasureMoveHighlights()
 
   // a move without buttons highlights the measure under the cursor
   measure->SetAction(albaTool2DMeasure::ACTION_NONE);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 410, 300);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 420, 300);
+  SendMouse(TEST_MOUSE_MOVE, 410, 300);
+  SendMouse(TEST_MOUSE_MOVE, 420, 300);
   CPPUNIT_ASSERT(measure->m_HighlightCount == 2);
   CPPUNIT_ASSERT(measure->m_DrawCount == 0);
 
   // a disabled measure ignores the events
   measure->Enable(false);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 430, 300);
+  SendMouse(TEST_MOUSE_MOVE, 430, 300);
   CPPUNIT_ASSERT(measure->m_HighlightCount == 2);
 
   DeletePER(per);
@@ -542,9 +657,9 @@ void albaInteractionRoutingTest::Test2DMeasurePerspectiveView()
   double startPosition[3], position[3];
   camera->GetPosition(startPosition);
 
-  SendMouse(DEVICE_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 450, 320);
-  SendMouse(DEVICE_BUTTON_UP, 450, 320, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_DOWN, 400, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 450, 320);
+  SendMouse(TEST_BUTTON_UP, 450, 320, ALBA_LEFT_BUTTON);
 
   camera->GetPosition(position);
   CPPUNIT_ASSERT(vtkMath::Distance2BetweenPoints(startPosition, position) > 1e-6);
@@ -565,15 +680,15 @@ void albaInteractionRoutingTest::TestEllipseCtrlRotates()
   albaPositionalEventRouter *per = NewPERWithTool(ellipse);
 
   // draw an ellipse
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 300, 300);
+  SendMouse(TEST_MOUSE_MOVE, 300, 300);
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == albaTool2DMeasure::ACTION_ADD_MEASURE);
-  SendMouse(DEVICE_BUTTON_DOWN, 300, 300, ALBA_LEFT_BUTTON);
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 500, 300);
-  SendMouse(DEVICE_BUTTON_UP, 500, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_BUTTON_DOWN, 300, 300, ALBA_LEFT_BUTTON);
+  SendMouse(TEST_MOUSE_MOVE, 500, 300);
+  SendMouse(TEST_BUTTON_UP, 500, 300, ALBA_LEFT_BUTTON);
   CPPUNIT_ASSERT(ellipse->GetMeasureCount() == 1);
 
   // on the first point the ellipse can be edited
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 300, 300);
+  SendMouse(TEST_MOUSE_MOVE, 300, 300);
   CPPUNIT_ASSERT(ellipse->GetCurrentAction() == albaTool2DMeasure::ACTION_EDIT_MEASURE);
 
   // pressing CTRL, without moving the mouse, switches to rotation; the key is not used, it only changes the modifier state
@@ -617,7 +732,7 @@ void albaInteractionRoutingTest::TestModifierKeysReachAllTools()
   CPPUNIT_ASSERT(bottom->GetCtrlDown());
 
   // the mouse events carry the state of the modifier keys
-  SendMouse(DEVICE_MOUSE_2D_MOVE, 300, 300, 0, ALBA_SHIFT_KEY, ALBA_ALT_KEY);
+  SendMouse(TEST_MOUSE_MOVE, 300, 300, 0, ALBA_SHIFT_KEY, ALBA_ALT_KEY);
   CPPUNIT_ASSERT(!bottom->GetCtrlDown() && bottom->GetAltDown() && bottom->GetShiftDown());
   CPPUNIT_ASSERT(per->GetCameraTool()->GetShiftDown());
 

@@ -25,7 +25,7 @@
 class albaView;
 
 /** Base class of the tools of the segmentation operation.
-  The tool works only on the view set with SetRendererAndView: the events coming from other views are ignored.
+  The operation makes the tool work only on its view with OperateOnlyOn; SetRendererAndView gives the view for the picking.
   - left button down: VME_PICKED to the listener, with the picked position (GetPointer) and the modifier (GetArg: ALBA_CTRL_KEY, ALBA_ALT_KEY or 0)
   - drag after a left button down that picked something: VME_PICKING with the picked position
   - left button up: MOUSE_UP
@@ -44,15 +44,15 @@ public:
 
   albaAbstractTypeMacro(albaToolSegmentation, albaInteractionTool);
 
-  bool OnLeftButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnLeftButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnMiddleButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnMiddleButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override {return true;}
-  bool OnRightButtonDown(albaView *view, vtkRenderer *ren, double pos[2]) override;
-  bool OnRightButtonUp(albaView *view, vtkRenderer *ren, double pos[2]) override {return true;}
+  bool OnLeftButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnLeftButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnMiddleButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnMiddleButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override {return true;}
+  bool OnRightButtonDownImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
+  bool OnRightButtonUpImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override {return true;}
 
   /** Send VME_PICKING while picking; the drag is left to the camera */
-  bool OnDrag(albaView *view, vtkRenderer *ren, double pos[2]) override;
+  bool OnDragImpl(albaRWIBase *rwi, vtkRenderer *ren, double pos[2]) override;
 
   /** Forward the key to the listener, which reads the modifier keys with GetCtrlDown, GetAltDown and GetShiftDown */
   bool OnKey(int keyCode, bool pressed) override;
@@ -60,9 +60,6 @@ public:
 protected:
   albaToolSegmentation();
   virtual ~albaToolSegmentation() {}
-
-  /** Return true if the mouse is on the view of the tool */
-  bool IsOnToolView(albaView *view) {return m_View && view == m_View;}
 
   /** Send to the listener the event eventId with the picked position (GetPointer) and the modifier (GetArg); return true if a VME was picked */
   bool SendPickingInformation(double pos[2], long modifier, int eventId);

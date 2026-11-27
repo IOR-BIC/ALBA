@@ -32,7 +32,7 @@ public:
   CPPUNIT_TEST( TestOnEventGizmoTranslate );
   CPPUNIT_TEST( TestOnEventGizmoRotate );
   CPPUNIT_TEST( TestOnEventGizmoScale );
-  CPPUNIT_TEST( TestOnEventGuiTransform );
+  CPPUNIT_TEST( TestOnEventMouseBehavior );
   CPPUNIT_TEST( TestOnEventGuiSaveRestorePose );
   CPPUNIT_TEST( TestReset );
   CPPUNIT_TEST( TestOpUndo );
@@ -46,7 +46,7 @@ private:
   void TestOnEventGizmoTranslate();
   void TestOnEventGizmoRotate();
   void TestOnEventGizmoScale();
-  void TestOnEventGuiTransform();
+  void TestOnEventMouseBehavior();
   void TestReset();
   void TestOnEventGuiSaveRestorePose();
   void TestOpUndo();

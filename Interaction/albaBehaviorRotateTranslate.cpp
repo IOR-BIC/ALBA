@@ -24,7 +24,7 @@
 
 #include "albaBehaviorRotateTranslate.h"
 #include "albaDecl.h"
-#include "albaInteractorConstraint.h"
+#include "albaTransformConstraint.h"
 #include "albaRefSys.h"
 #include "albaVME.h"
 #include "albaVMEOutput.h"
@@ -37,9 +37,9 @@ albaBehaviorRotateTranslate::albaBehaviorRotateTranslate()
 {
   m_RollEnabled = true;
   m_RefSysVME = NULL;
-  m_RollConstraint = new albaInteractorConstraint;
+  m_RollConstraint = new albaTransformConstraint;
   m_RollConstraint->GetRefSys()->SetTypeToView();
-  m_RollConstraint->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+  m_RollConstraint->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
 }
 
 //------------------------------------------------------------------------------
@@ -61,10 +61,10 @@ void albaBehaviorRotateTranslate::SetVME(albaVME *vme)
   albaMatrix *absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
   GetRotationConstraint()->GetRefSys()->SetTypeToView();
   GetRotationConstraint()->GetRefSys()->SetMatrix(absMatrix);
-  GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+  GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   GetTranslationConstraint()->GetRefSys()->SetMatrix(absMatrix);
-  GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+  GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   m_RollConstraint->GetRefSys()->SetMatrix(absMatrix);
   GetPivotRefSys()->SetTypeToCustom(absMatrix);
 }
@@ -125,35 +125,35 @@ void albaBehaviorRotateTranslate::SetRotationConstraint(int constraint)
   {
     GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
     GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);
+    GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);
   }
   else if (constraint == Y_AXIS)
   {
     GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
     GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+    GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   }
   else if (constraint == Z_AXIS)
   {
     GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
     GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+    GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
   }
   else if (constraint == VIEW_PLANE)
   {
     GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+    GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 				//Modified by Matteo 30-05-2006
-				//GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+				//GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
     //End Matteo
 				GetRotationConstraint()->GetRefSys()->SetTypeToView();
   }
 			else if (constraint == NORMAL_VIEW_PLANE)
 			{
 				GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    //GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+    //GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 				//Modified by Matteo 30-05-2006
-				GetRotationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);
+				GetRotationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);
     //End Matteo
 				GetRotationConstraint()->GetRefSys()->SetTypeToView();
 			}
@@ -171,21 +171,21 @@ void albaBehaviorRotateTranslate::SetTranslationConstraint(int constraint)
     SurfaceSnapOff();
     SurfaceNormalOff();
     GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK);   
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::LOCK);   
   }
   else if (constraint == Y_AXIS)
   {
     SurfaceSnapOff();
     SurfaceNormalOff();
     GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);        
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);        
   }
   else if (constraint == Z_AXIS)
   {                                             
     SurfaceSnapOff();
     SurfaceNormalOff();
     GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);        
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);        
   }      
   else if (constraint == VIEW_PLANE)
   {
@@ -194,7 +194,7 @@ void albaBehaviorRotateTranslate::SetTranslationConstraint(int constraint)
     GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 				//Modified by Matteo 30-05-2006
 				//GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
-				//GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+				//GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 				//End Matteo
 			}
 			else if (constraint == NORMAL_VIEW_PLANE)
@@ -204,7 +204,7 @@ void albaBehaviorRotateTranslate::SetTranslationConstraint(int constraint)
     GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 				//Modified by Matteo 30-05-2006
 				GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
-				GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+				GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 				//End Matteo
 			}
 
@@ -213,23 +213,23 @@ void albaBehaviorRotateTranslate::SetTranslationConstraint(int constraint)
     SurfaceSnapOff();
     SurfaceNormalOff();
     GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
   }
   else if (constraint == XZ_PLANE)  
   {
     SurfaceSnapOff();
     SurfaceNormalOff();
     GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE);       
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::LOCK, albaTransformConstraint::FREE);       
   }
   else if (constraint == YZ_PLANE)
   {               
     SurfaceSnapOff();
     SurfaceNormalOff();
     GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::LOCK, albaInteractorConstraint::FREE, albaInteractorConstraint::FREE);   
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::LOCK, albaTransformConstraint::FREE, albaTransformConstraint::FREE);   
   }
-  // isa gen is sending matrix to the operation
+  // the behavior is sending matrix to the operation
   else if (constraint == SURFACE_SNAP)
   {
     SurfaceSnapOn();
@@ -237,7 +237,7 @@ void albaBehaviorRotateTranslate::SetTranslationConstraint(int constraint)
     GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 				//Modified by Matteo 30-05-2006
 				GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
-				GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+				GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
 				//End Matteo
   }
   else if (constraint == NORMAL_SURFACE)
@@ -248,7 +248,7 @@ void albaBehaviorRotateTranslate::SetTranslationConstraint(int constraint)
     GetTranslationConstraint()->GetRefSys()->SetTypeToView();
     //Modified by Matteo 30-05-2006
     GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
-    GetTranslationConstraint()->SetConstraintModality(albaInteractorConstraint::FREE, albaInteractorConstraint::FREE, albaInteractorConstraint::LOCK);
+    GetTranslationConstraint()->SetConstraintModality(albaTransformConstraint::FREE, albaTransformConstraint::FREE, albaTransformConstraint::LOCK);
     //End Matteo
   }
 }

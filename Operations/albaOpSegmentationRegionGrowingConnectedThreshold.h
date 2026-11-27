@@ -27,8 +27,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class albaVME;
-class albaBehaviorPicker;
-class albaInteractionBehavior;
+class albaToolPicker;
 class albaVMESurface;
 class albaVMEVolumeGray;
 class albaOpVolumeResample;
@@ -119,8 +118,7 @@ protected:
 
   int m_ImageDim;
 
-  albaBehaviorPicker           *m_Picker;
-  albaInteractionBehavior       *m_OldBehavior;
+  albaToolPicker               *m_Picker;
 
   albaVMEVolumeGray *m_VolumeOut;
   albaVMESurface *m_SurfaceOut;

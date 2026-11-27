@@ -343,7 +343,7 @@ int albaViewArbitraryOrthoSlice::GetGizmoPlane(void *gizmo)
 {
 	for (int i = X; i <= Z; i++)
 	{
-		if (gizmo == m_GizmoRT[i]->m_GizmoCrossTranslate || gizmo == m_GizmoRT[i]->m_GizmoCrossRotate)
+		if (gizmo == m_GizmoRT[i]->GetGizmoCrossTranslate() || gizmo == m_GizmoRT[i]->GetGizmoCrossRotate())
 			return i;
 	}
 	return -1;
@@ -354,7 +354,7 @@ int albaViewArbitraryOrthoSlice::IsGizmoTranslate(void *gizmo)
 {
 	for (int i = X; i <= Z; i++)
 	{
-		if (gizmo == m_GizmoRT[i]->m_GizmoCrossTranslate)
+		if (gizmo == m_GizmoRT[i]->GetGizmoCrossTranslate())
 			return true;
 	}
 	return false;

@@ -99,13 +99,13 @@ protected:
   void CreateVMEGizmo();
   void DestroyVMEGizmo();
   void CreateGizmoVTKData();
-  void CreateInteractor();
+  void CreateBehavior();
   
   void LogTransformEvent(albaEvent  *e) ;
 
   albaString           m_Name;
   albaVMEGizmo        *m_VmeGizmo;
-  albaBehaviorTransform *m_LeftMouseInteractor;
+  albaBehaviorTransform *m_Behavior;
   
   vtkLineSource *m_LineSource;
   vtkSphereSource  *m_SphereSource;

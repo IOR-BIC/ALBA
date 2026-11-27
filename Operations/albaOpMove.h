@@ -29,6 +29,8 @@
 class albaGizmoTranslate;
 class albaGizmoRotate;
 class albaGizmoScale;
+class albaBehaviorRotateTranslate;
+class albaInteractionBehavior;
 class albaRotateTranslateGUI;
 class albaSaveRestorePoseGUI;
 class albaTransformTextEntriesGUI;
@@ -74,7 +76,7 @@ protected:
   void OnEventThis(albaEventBase *alba_event);  
   void OnEventGizmoTranslate(albaEventBase *alba_event);
   void OnEventGizmoRotate(albaEventBase *alba_event);
-  void OnEventGuiTransformMouse(albaEventBase *alba_event);
+  void OnEventMouseBehavior(albaEventBase *alba_event);
   void OnEventGuiSaveRestorePose(albaEventBase *alba_event);
   void OnEventGuiTransformTextEntries(albaEventBase *alba_event);
 
@@ -85,6 +87,8 @@ protected:
   albaGizmoTranslate           *m_GizmoTranslate;  
   albaGizmoRotate              *m_GizmoRotate;
   albaRotateTranslateGUI        *m_GuiTransformMouse;
+  albaBehaviorRotateTranslate  *m_MouseBehavior;  ///< moves the input VME with the mouse
+  albaInteractionBehavior      *m_OldBehavior;  ///< the behavior of the input VME before the operation
   albaSaveRestorePoseGUI       *m_GuiSaveRestorePose;
   albaTransformTextEntriesGUI  *m_GuiTransformTextEntries;
 
